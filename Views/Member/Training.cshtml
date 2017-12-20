@@ -1,0 +1,30 @@
+﻿@model CornerkickWebMvc.Models.TrainingModel
+
+@{
+  ViewBag.Title = "Training";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+  function setTraining(iTg) {
+    var iTr = $('#iDdlId' + iTg).val();
+    $.ajax({
+      url: '/Member/setTraining',
+      type: "GET",
+      dataType: "JSON",
+      data: { iTraining: iTr, iTag: iTg },
+      success: function (iTraining) {
+        //alert(iTg);
+      }
+    });
+  }
+</script>
+
+<h2>Training</h2>
+
+<div class="form-group">
+  @for (int i = 0; i < CornerkickWebMvc.Controllers.AccountController.ckClub.training.iTraining.Length; i++) {
+    <label for="Wochentag">@MvcApplication.ckcore.sWochentag[i]</label>
+    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", CornerkickWebMvc.Controllers.AccountController.ckClub.training.iTraining[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString() })
+  }
+</div>

@@ -1,0 +1,134 @@
+﻿@model CornerkickWebMvc.Models.LeagueModels
+
+@{
+  ViewBag.Title = "Liga";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+  var sLand = (Model.iLand + 1).ToString();
+  var sLiga = (Model.iSpKl + 1).ToString();
+}
+<h2>Land @sLand, Liga @sLiga</h2>
+
+<h3>Begegnungen</h3>
+<div class="form-group">
+  @*
+  @Html.LabelFor(m => m.iSpTg, new { @class = "col-md-2 control-label" })
+  *@
+  <div>
+    @Html.DropDownListFor(m => m.iSaison, CornerkickWebMvc.Models.RegisterViewModel.ltSasn, "Saison")
+    @Html.DropDownListFor(m => m.iLand,   CornerkickWebMvc.Models.RegisterViewModel.ltLand, "Land")
+    @Html.DropDownListFor(m => m.iSpKl,   CornerkickWebMvc.Models.RegisterViewModel.ltSpKl, "Spielklasse")
+    @Html.DropDownListFor(m => m.iSpTg,   CornerkickWebMvc.Models.RegisterViewModel.ltSpTg, "Spieltag")
+  </div>
+</div>
+
+<table width="80%" border="0" cellpadding="2" summary="Begegnungen">
+  <tr>
+    <th class="alignleft first" colspan="2"><a class="sortdown">Anstoß</a></th>
+    <th class="alignright"><a class="">Heim</a></th>
+    <th>&nbsp;</th>
+    <th class="alignleft"><a class="">Auswärts</a></th>
+    <th class="alignleft" data-betheader="true">Erg.</th>
+    @*
+    <th class="alignleft"><a class="" href="javascript:ovSortChange('begegnungen_cont0',3,'ASC','begegnungen','forcedspieltag=11&amp;forcedturniergruppe=0');">Bericht</a></th>
+    <th class="aligncenter">i</th>
+    *@
+    <th class="aligncenter last">&nbsp;</th>
+  </tr>
+
+  @{
+    var ltBeg = Model.ltErg[Model.iSpTg];
+    var dt = MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl][Model.iSpTg];
+  }
+  @foreach (int[] iBeg in ltBeg) {
+    <tr class="fest ">
+      <td class="first">Fr</td>
+      <td>@dt.ToShortDateString()&nbsp;@dt.ToShortTimeString()</td>
+
+      <td class="alignright ">
+        <div class="ovVrnLink2015">
+          @*
+          <a href="/linktoteam" class="ovVrn ovVrnLogoRight ovVrnRight" style="background-image:url('wappen.png');">&nbsp;</a>
+          *@
+          <a href="/linktoteam" class="ovVrn ovVrnRight">@MvcApplication.ckcore.ltClubs[iBeg[0]].sName</a>
+        </div>
+      </td>
+      <td class="">&nbsp;-&nbsp;</td>
+      <td class="">
+        <div class="ovVrnLink2015">
+          @*
+          <a href="/linktoteam" class="ovVrn ovVrnLogo" style="background-image:url('wappen.png');">&nbsp;</a>
+          *@
+          <a href="/linktoteam" class="ovVrn">@MvcApplication.ckcore.ltClubs[iBeg[1]].sName</a>
+        </div>
+      </td>
+
+      @if (iBeg[2] >= 0 && iBeg[3] >= 0) {
+        <td class="alignleft nowrap">@iBeg[2]:@iBeg[3]&nbsp;(@iBeg[4]:@iBeg[5])</td>
+      } else {
+        <td class="alignleft nowrap">-</td>
+      }
+      @*
+      <td><a class="link" href="/news/fussball/bundesliga/spieltag/1-bundesliga/2017-18/11/3827683/spielbericht_eintracht-frankfurt-32_werder-bremen-4.html">Spielbericht</a></td>
+      <td class="aligncenter"><a href="/news/fussball/bundesliga/spieltag/1-bundesliga/2017-18/11/3827683/spielinfo_eintracht-frankfurt-32_werder-bremen-4.html"><img src="http://mediadb.kicker.de/library/images/icon_info.png" width="12" height="13" alt="" /></a></td>
+      <td class="aligncenter">&nbsp;</td>
+      *@
+    </tr>
+  }
+</table>
+
+<h3>Tabelle</h3>
+<table class="tStat" width="80%" border="0" cellspacing="0" cellpadding="2" summary="Tabelle">
+  <tr>
+    <th class="alignleft first" colspan="2"><a class="sortdown">Pl.</a></th>
+    <th class="alignleft"><a class="">Verein</a></th>
+    <th style="width:3%">&nbsp;</th>
+    <th class="alignright"><a class="">Sp.</a></th>
+    <th style="width:3%">&nbsp;</th>
+    <th class="alignright"><a class="">g.</a></th>
+    <th class="alignright"><a class="">u.</a></th>
+    <th class="alignright"><a class="">v.</a></th>
+    <th style="width:3%">&nbsp;</th>
+    <th class="alignright"><a class="">Tore</a></th>
+    <th class="alignright"><a class="">Diff.</a></th>
+    <th style="width:3%">&nbsp;</th>
+    <th class="alignright last"><a class="">Pkte.</a></th>
+  </tr>
+
+  @{ var iPlatz = 0; }
+  @foreach (CornerkickCore.Core.Tabellenplatz tbpl in Model.ltTbl) {
+    var iSp = tbpl.iGUV[0] + tbpl.iGUV[1] + tbpl.iGUV[2];
+    var iDiff = tbpl.iTore - tbpl.iGegentore;
+    iPlatz++;
+    @*
+    <tr class="tr_sep"><td colspan="20">&nbsp;</td></tr>
+    *@
+    <tr style="" class=" ">
+      <td class="first"><b>@iPlatz</b></td>
+      <td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>
+      <td>
+        <div id="ctl00_PlaceHolderContent_tabelle_ctl00_repTabelle_ctl01_ctl00_showMe">
+          <div id="ctl00_PlaceHolderContent_tabelle_ctl00_repTabelle_ctl01_ctl00_verlinkt">
+            @*
+            <a href="/linktoteam" id="ctl00_PlaceHolderContent_tabelle_ctl00_repTabelle_ctl01_ctl00_vereinsLogo" style=""><img class="verinsLinkBild" src="wappen.png" alt=@tbpl.sName title=@tbpl.sName /></a>
+            *@
+            <a href="/linktoteam" id="ctl00_PlaceHolderContent_tabelle_ctl00_repTabelle_ctl01_ctl00_NameA" class="link verinsLinkBild" style="">@tbpl.sName</a>
+          </div>
+        </div>
+      </td>
+      <td>&nbsp;</td>
+      <td class="alignright">@iSp.ToString()</td>
+      <td>&nbsp;</td>
+      <td class="alignright">@tbpl.iGUV[0]</td>
+      <td class="alignright">@tbpl.iGUV[1]</td>
+      <td class="alignright">@tbpl.iGUV[2]</td>
+      <td>&nbsp;</td>
+      <td class="alignright">@tbpl.iTore:@tbpl.iGegentore</td>
+      <td class="alignright">@iDiff</td>
+      <td>&nbsp;</td>
+      <td class="alignright last">@tbpl.iPunkte</td>
+    </tr>
+  }
+</table>

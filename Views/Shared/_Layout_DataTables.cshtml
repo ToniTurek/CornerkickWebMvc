@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Cornerkick</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+    <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+  </head>
+  <body>
+      <div class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container">
+              <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                  </button>
+                  @Html.ActionLink("Cornerkick", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+              </div>
+              <div class="navbar-collapse collapse">
+                  <ul class="nav navbar-nav">
+                    @{
+                      if (Request.IsAuthenticated) {
+                        <li>
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Saison</a>
+                          <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Kalender", "Calender", "Member")</li>
+                            <li>@Html.ActionLink("Liga", "League", "Member")</li>
+                            <li>@Html.ActionLink("Pokal", "Console", "Member")</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mannschaft</a>
+                          <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Aufstellung", "Team", "Member")</li>
+                            <li>@Html.ActionLink("Positionen", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Taktik", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Mannschaftstraining", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Individuelles Training", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Jugendspieler", "Console", "Member")</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Verein</a>
+                          <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Finanzen", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Personal", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Stadion", "Console", "Member")</li>
+                            <li>@Html.ActionLink("Stadionumgebung", "Console", "Member")</li>
+                          </ul>
+                        </li>
+                      }
+                    }
+                  </ul>
+                  @Html.Partial("_LoginPartial")
+              </div>
+          </div>
+      </div>
+      <div class="container body-content">
+          @RenderBody()
+          <hr />
+          <footer>
+              <p>&copy; @DateTime.Now.Year - Cornerkick</p>
+          </footer>
+      </div>
+
+    @*
+    @Scripts.Render("~/bundles/jquery")
+    *@
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+  </body>
+</html>

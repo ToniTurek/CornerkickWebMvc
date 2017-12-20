@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@ViewBag.Title - Cornerkick</title>
+  @Styles.Render("~/Content/css")
+  @Scripts.Render("~/bundles/modernizr")
+  @Scripts.Render("~/bundles/jquery")
+</head>
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        @Html.ActionLink("Cornerkick", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          @{
+            if (Request.IsAuthenticated) {
+              <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Schreibtisch</a>
+                <ul class="dropdown-menu">
+                  <li>@Html.ActionLink("Schreibtisch", "Desk", "Member")</li>
+                </ul>
+              </li>
+              <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Saison</a>
+                <ul class="dropdown-menu">
+                  <li>@Html.ActionLink("Kalender", "Calendar", "Member")</li>
+                  <li>@Html.ActionLink("Liga", "League", "Member")</li>
+                  <li>@Html.ActionLink("Pokal", "Console", "Member")</li>
+                </ul>
+              </li>
+              <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mannschaft</a>
+                <ul class="dropdown-menu">
+                  <li>@Html.ActionLink("Aufstellung", "Team", "Member")</li>
+                  <li>@Html.ActionLink("Taktik", "Taktik", "Member")</li>
+                  <li>@Html.ActionLink("Mannschaftstraining", "Training", "Member")</li>
+                  <li>@Html.ActionLink("Jugendspieler", "Console", "Member")</li>
+                </ul>
+              </li>
+              <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Verein</a>
+                <ul class="dropdown-menu">
+                  <li>@Html.ActionLink("Finanzen", "Console", "Member")</li>
+                  <li>@Html.ActionLink("Personal", "Console", "Member")</li>
+                  <li>@Html.ActionLink("Stadion", "Console", "Member")</li>
+                  <li>@Html.ActionLink("Stadionumgebung", "Console", "Member")</li>
+                </ul>
+              </li>
+            }
+          }
+        </ul>
+        @Html.Partial("_LoginPartial")
+      </div>
+
+      @{
+        if (Request.IsAuthenticated) {
+          <div class="" style="position: relative; width: 100%; margin-top: 2px; height: 0px">
+            <div style="position: absolute; width: 100%; height: 20px; background-color: white; border: 1px solid black">
+              <div style="position: absolute; height: 0px; margin-left: 1%; width: 49%; left:  0%; text-align: left">
+                @Html.ActionLink(MvcApplication.ckcore.sWochentag[(int)MvcApplication.ckcore.dtDatum.DayOfWeek] + ", " + MvcApplication.ckcore.dtDatum.ToShortDateString() + ", " + MvcApplication.ckcore.dtDatum.ToShortTimeString() + " Uhr", "Calendar", "Member")
+              </div>
+              <div style="position: absolute; height: 0px; width: 49%; left: 50%; text-align: right">
+                @Html.ActionLink(CornerkickWebMvc.Controllers.AccountController.ckClub.iKontostand + " €", "Finance", "Member")
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <div id="box_top" style="position: relative; width: 100%; height: 30px; background-color: white; border: 0px solid red"></div>
+
+  <div class="container body-content">
+    @RenderBody()
+    <hr />
+    <footer>
+      <p>&copy; @DateTime.Now.Year - Cornerkick</p>
+    </footer>
+  </div>
+
+  @Scripts.Render("~/bundles/bootstrap")
+  @RenderSection("scripts", required: false)
+</body>
+</html>

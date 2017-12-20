@@ -1,0 +1,260 @@
+﻿@model CornerkickWebMvc.Models.TeamModels
+
+@{
+  ViewBag.Title = "Team";
+  @*
+  Layout = null;
+  *@
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<script src="~/Scripts/Formation.js" type="text/javascript"></script>
+<head>
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var ddlFormation = $('#ddlFormation');
+      var iFormation = 0;
+
+      if (ddlFormation.val() > 0) iFormation = ddlFormation.val();
+
+      drawAufstellung(iFormation);
+
+      ddlFormation.change(function () {
+        iFormation = $(this).val(); // Use $(this) so you don't traverse the DOM again
+        drawAufstellung(iFormation);
+      });
+
+      var oTable = $('#table1').DataTable({
+        "ajax": '@Url.Action("GetJSONQuery", "Member")',
+        "columns": [
+          { "data": "sI" },
+          { "data": "sID" },
+          { "data": "sNr" },
+          {
+            "data": "sName",
+            "render": function (data, type, row) {
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new {i = "id"}, new { target = "_blank" })'.replace("name", data).replace("id", row.sID);
+            }
+          },
+          { "data": "sPosition" },
+          { "data": "sStaerke" },
+          { "data": "sKondi" },
+          { "data": "sFrische" },
+          { "data": "sMoral" },
+          { "data": "sErf" },
+          { "data": "sMarktwert" },
+          { "data": "sGehalt" },
+          { "data": "sLz" },
+          { "data": "sNat" },
+          { "data": "sForm" },
+          { "data": "sAlter" }
+        ],
+        rowReorder: {
+          dataSrc: 'sI'
+        },
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "responsive": true,
+        columnDefs: [
+          { targets: 1, "orderable": false },
+          { targets: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], "className": "dt-center" },
+        ],
+        select: true,
+        select: {
+          selector: 'tr',
+          style: 'os'
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+          //alert(iDisplayIndex);
+
+          if (iDisplayIndex < 11) {
+            $('td', nRow).eq(0).css('background-color', "rgb(210,230,188)");
+          } else if (iDisplayIndex < 19) {
+            $('td', nRow).eq(0).css('background-color', "rgb(192,204,224)");
+          } else {
+            $('td', nRow).eq(0).css('background-color', "rgb(225,204,190)");
+          }
+        }
+      });
+
+      oTable.on('row-reorder', function (dragEvent, diff, nodes) {
+        alert("oTable");
+        var iNr = nodes.triggerRow.data()[0];
+        var iFromPos = 0;
+        var iToPos = 0;
+        for (var i = 0, ien = diff.length; i < ien; i++) {
+          var rowData = oTable.row(diff[i].node).data();
+          if (rowData[0] === iNr) {
+            iFromPos = diff[i].oldData;
+            iToPos   = diff[i].newData;
+            break;
+          }
+        }
+
+        $.ajax({
+          url: '/Member/UpdateRow',
+          type: "GET",
+          dataType: "JSON",
+          cache: false,
+          contentType: "application/json; charset=utf-8",
+          data: { fromPosition: iFromPos, toPosition: iToPos }
+        });
+
+        drawAufstellung(iFormation);
+      });
+
+      $('#table1 tbody').on('click', 'tr', function () {
+        $(this).toggleClass('selected');
+
+        /*
+        var tr = $(this).closest('tr');
+        var row = $('#myTable').DataTable().row(tr);
+        */
+
+        var data = oTable.rows('.selected').data();
+
+        if (data.length == 2) {
+          var i1 = data[0].sID;
+          var i2 = data[1].sID;
+
+          $.ajax({
+            url: '/Member/SwitchPlayerByID',
+            type: "GET",
+            dataType: "JSON",
+            data: { iID1: i1, iID2: i2 },
+            success: function (ltPlayer) {
+              console.log(ltPlayer); // <==============================
+              if (ltPlayer) {
+                drawAufstellung(iFormation);
+                oTable.ajax.reload();
+              }
+            }
+          });
+        }
+      });
+
+      /*
+      // for non-draggable applications
+      // Add event listener for opening and closing details
+      $('#tableTeam tbody').on('click', function () {
+        var tr = $(this).closest('tr');
+        var row = tableTeam.row(tr);
+        alert(row.data);
+      });
+      */
+    });
+
+    /*
+    function format(d) {
+      alert(d);
+      // `d` is the original data object for the row
+      return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+        '<tr>' +
+        '<td>Full name:</td>' +
+        '<td>' + d.name + '</td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td>Extension number:</td>' +
+        '<td>' + d.extn + '</td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td>Extra info:</td>' +
+        '<td>And any further details here (images etc)...</td>' +
+        '</tr>' +
+        '</table>';
+    }
+    */
+  </script>
+</head>
+
+<script>/* Formatting function for row details - modify as you need */
+</script>
+@*
+        <div id="draggable">Drag me</div>
+
+          <script>
+            $("#draggable").draggable();
+          </script>
+
+      @using (Html.BeginForm("CkAufstellungFormation", "Member", FormMethod.Post, new { @class = "form-horizontal", role = "form" })) {
+        <div class="form-group">
+          <div class="col-md-10">
+            @Html.DropDownListFor(m => m.iFormation, CornerkickWebMvc.Models.TeamModels.ltsFormations, "Formation", new { @Id = "ddlFormation", @class = "form-control" })
+          </div>
+        </div>
+        <input type="submit" value="übernehmen" />
+      }
+
+    @using (Ajax.BeginForm("Test", "Member",
+                                  new AjaxOptions {
+                                    HttpMethod = "GET",
+                                    InsertionMode = InsertionMode.Replace,
+                                    UpdateTargetId = "searchResults"
+                                  })) {
+      string patient_Name = "";
+      @Html.EditorFor(x => patient_Name) //text box with name and id, that it will pass to controller
+                                          <input type="submit" value="Search" />
+    }
+
+    @Html.Partial("_PartialViewTest")
+
+  <table id="searchResults"></table>
+*@
+
+<div class="form-group" style="position: relative; width: 100%; height: 30px; background-color: white">
+  <div class="form-group" style="position: absolute; width: 50%; height: auto">
+    @Html.LabelFor(m => m.sFormation, new { @class = "col-md-2 control-label" })
+    <div class="col-md-10">
+      @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, "Formation", new { @Id = "ddlFormation", @class = "form-control" })
+    </div>
+  </div>
+  <div style="position: absolute; left: 50%; width: 50%; height: auto; text-align: left">
+    @using (Html.BeginForm("CkAufstellungKI", "Member", FormMethod.Post/*, new { @class = "form-control", role = "form" }*/)) {
+      <input type="submit" value="Co-Trainer" style="position: absolute; left: 50%; width: 50%; height: auto"/>
+    }
+  </div>
+</div>
+
+<div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
+  <img style="position: relative; width: 100%" src="~/Content/Images/field.png" alt="" />
+  <div id="drawFormation" style="position: absolute; margin-left: 5%; width: 90%; height: 92%; top: 0%; left: 0%; border: 0px solid black"></div>
+</div>
+
+  <div id="tablediv">
+    <div class="dataTables_wrapper">
+      <table id="table1" cellspacing="0" style="width: auto" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th></th>
+            <th>Nr</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Stärke</th>
+            <th>Kondi.</th>
+            <th>Frische</th>
+            <th>Moral</th>
+            <th>Erf.</th>
+            <th>Marktwert [€]</th>
+            <th>Gehalt [€]</th>
+            <th>Lz</th>
+            <th>Nat.</th>
+            <th>Form</th>
+            <th>Alter</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
+  </div>

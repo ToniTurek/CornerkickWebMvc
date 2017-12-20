@@ -1,0 +1,44 @@
+﻿@{
+  ViewBag.Title = "Console";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Console</h2>
+
+<meta http-equiv="refresh" content="5">
+
+@{
+  if (ViewData["sNews"] == null) { ViewData["sNews"] = ""; }
+  if (ViewData["s"    ] == null) { ViewData["s"    ] = ""; }
+}
+
+@Html.TextArea("ConsoleNews", ViewData["sNews"].ToString(),  6, 1000, new { @class = "form-control" })
+
+@Html.TextArea("ConsoleOut",  ViewData["s"    ].ToString(), 30, 1000, new { @class = "form-control" })
+@*
+  @Html.TextArea("ConsoleOut", ViewData["s"].ToString(), 20, 1000, new { cols = "55", rows = "1000", wrap = "off" })
+*@
+
+@*
+<pre>
+@Html.TextBox("textbox", ViewData["s"], new { @class = "form-control" })
+</pre>
+@Html.TextBoxFor(m => m.s, new { @class = "form-control" })
+*@
+
+@*
+<ul>
+    @foreach (string s in ViewData["s"] as List<string>) {
+    <li>
+        @s
+    </li>
+    }
+</ul>
+*@
+
+@model CornerkickWebMvc.Models.ConsoleModels
+@using (Html.BeginForm("ConsoleInput", "Member", FormMethod.Post)) {
+  @Html.TextBoxFor(model => model.sIn, new { autocomplete = "off", autofocus = "autofocus", style = "width: 90%;" })
+  @Html.ValidationMessageFor(model => model)
+  <button type="submit">Enter</button>
+}

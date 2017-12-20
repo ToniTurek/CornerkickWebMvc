@@ -1,0 +1,88 @@
+﻿@model CornerkickWebMvc.Models.CalendarModels
+
+@{
+  ViewBag.Title = "Kalender";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+  <link href="~/Content/fullcalendar.css" rel="stylesheet" />
+  <script src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script src="~/Scripts/moment.min.js"></script>
+  <script src="~/Scripts/fullcalendar/fullcalendar.js"></script>
+  <script src="~/Scripts/fullcalendar/locale-all.js"></script>
+</head>
+
+@{ 
+  //DateTime dtToday = MvcApplication.ckcore.dtDatum.AddHours(12);
+  DateTime dtToday = new DateTime(2017, 11, 21, 12, 00, 00);
+  string sDtToday = dtToday.ToString("YYYY-MM-DD");
+}
+<script type="text/javascript">
+  $(document).ready(function () {
+    var calendar = $('#calendar').fullCalendar({
+      header: {
+        left: 'prev, next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      defaultView: 'agendaWeek',
+      editable: true,
+      allDaySlot: false,
+      selectable: true,
+      slotMinutes: 15,
+      locale: 'de',
+      events: "/Member/PostCalendarData/"
+      /*
+      events: function (start, end, timezone, callback) {
+        $.ajax({
+          cache: false,
+          contentType: "application/json; charset=utf-8",
+          url: '/Member/PostCalendarData',
+          type: 'POST',
+          data: { },
+          dataType: "json",
+          success: function (doc) {
+              events.push(doc);
+              callback(events);
+          },
+          error: function () {
+              alert("Server access failure!");
+          }
+        });
+      }
+      */
+      /*
+      eventClick: function (calEvent, jsEvent, view) {
+        alert('You clicked on event id: ' + calEvent.id
+          + "\nSpecial ID: " + calEvent.someKey
+          + "\nAnd the title is: " + calEvent.title);
+
+      }*/
+    });
+
+    $('#calendar').fullCalendar('gotoDate', "2017-7-1");
+
+    $('#btnInit').click(function () {
+      $.ajax({
+        type: 'POST',
+        url: "/Member/InitCalendar",
+        success: function (response) {
+          if (response == 'True') {
+            $('#calendar').fullCalendar('refetchEvents');
+            alert('Database populated! ');
+          }
+          else {
+            alert('Error, could not populate database!');
+          }
+        }
+      });
+    });
+  });
+</script>
+
+@*
+  <a href="#" id="btnInit" class="btn btn-secondary">Initialise database!</a>
+*@
+<div id="calendar" style="position: relative; width: 100%; margin-top: 2%"></div>

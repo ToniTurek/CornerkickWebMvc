@@ -1,0 +1,122 @@
+﻿@model CornerkickWebMvc.Models.TeamModels
+
+@{
+    ViewBag.Title = "Team";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+  <script language="javascript" type="text/javascript" src="~/Scripts/jquery-1.12.4.js"></script>
+  <script language="javascript" type="text/javascript" src="~/Scripts/jquery-ui-1.11.4.js"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script src="~/Scripts/DataTables/dataTables.jqueryui.min.js"></script>
+  <script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+      $('#ltPlayer img').css({ 'z-index': 100 }).draggable({
+        'opacity': '0.5', 'revert': true, 'cursor': 'pointer'
+      });
+    });
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('.hello').click(function () {
+        alert('Hello');
+      });
+    });
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+      $('#example').DataTable();
+    });
+  </script>
+</head>
+
+<table class="display" id="example">
+  <thead>
+    <tr>
+      <th>OrderIndex</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Gowi</td>
+      <td>Town</td>
+      <td>Pancevo</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Microsoft</td>
+      <td></td>
+      <td>Redmond</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>IBM</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Oracle</td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<body>
+  <a href="#" class="hello">Hello</a>
+
+  <h2>Team</h2>
+
+  <div id="draggable">Drag me</div>
+
+  <script>
+    $("#draggable").draggable();
+  </script>
+
+  <div style="float:left; margin-right:10px;" id="listPlayer">
+    <table cellpadding="2" cellspacing="2" border="1">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <td>
+          <img src="~/Content/Images/10.jpg" width="120" height="100" class="playerPhoto" />
+          <input type="hidden" class="playerId" value="@Model.ltPlayer[0].iID" />
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div style="fill:bisque" id="row">
+    <table class="" width="80%" border="0" cellspacing="0" cellpadding="2" summary="Team">
+      <tr>
+        <th class="alignleft first" colspan="2"><a class="sortdown">ID</a></th>
+        <th class="alignright"><a class="">Name</a></th>
+      </tr>
+
+      @{
+        var ltPlayer = Model.ltPlayer;
+      }
+      @foreach (CornerkickGame.Game.Spieler player in ltPlayer) {
+        <tr class="fest " id="rowPlayer">
+          <td class="alignright ">
+            <div class="ovVrnLink2015">
+              <a href="/linktoteam" class="id">@player.iID</a>
+            </div>
+          </td>
+          <td class="">
+            <div class="ovVrnLink2015">
+              <a href="/linktoteam" class="name">@player.sName</a>
+            </div>
+          </td>
+        </tr>
+      }
+    </table>
+  </div>
+</body>
+</html>

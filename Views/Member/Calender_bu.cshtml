@@ -1,0 +1,161 @@
+﻿@model IEnumerable<CornerkickWebMvc.Models.CalendarModels>
+
+@{
+  ViewBag.Title = "Calendar";
+  //Layout = "~/Views/Shared/_Layout.cshtml";
+  Layout = null;
+}
+
+<!DOCTYPE html>
+<head>
+  <link href="~/Content/fullcalendar.css" rel="stylesheet" />
+  <script src="~/Scripts/jquery-1.12.4.min.js"></script>
+  <script src="~/Scripts/fullcalendar.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var date = new Date();
+      var d = date.getDate();
+      var m = date.getMonth();
+      var y = date.getFullYear();
+
+      $('#calendar').fullCalendar({
+        editable: true,
+        weekMode: 'liquid',
+        url: '#',
+        events: [
+          {
+            title: 'Praent vestibulum',
+            start: new Date(y, m, 1, 9, 00), end: new Date(y, m, 1, 10, 00), allDay: false
+          },
+          {
+            title: 'Vestibulum iaculis lacinia',
+            start: new Date(y, m, 2, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Integer rutrum ante eu lacus',
+            start: new Date(y, m, 4, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Aliquam erat volpat. Duis ac turpis',
+            start: new Date(y, m, 9, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Donec in velit vel ipsum',
+            start: new Date(y, m, 10, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Praent vestibulum',
+            start: new Date(y, m, 13, 9, 00),
+            allDay: false
+          },
+          {
+            title: 'Vestibulum iaculis lacinia',
+            start: new Date(y, m, 15, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Integer rutrum ante eu lacus',
+            start: new Date(y, m, 17, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'nteger rutrum ante eu lacusi',
+            start: new Date(y, m, 18, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Integer rutrum ante eu lacus',
+            start: new Date(y, m, 19, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Integer rutrum ante eu lacus',
+            start: new Date(y, m, 23, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'nteger rutrum ante eu lacus',
+            start: new Date(y, m, 24, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Integer rutrum ante eu lacus',
+            start: new Date(y, m, 27, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Integer rutrum ante eu lacus',
+            start: new Date(y, m, 28, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Vestibulum iaculis lacinia',
+            start: new Date(y, m, 29, 16, 00),
+            allDay: false
+          },
+          {
+            title: 'Praent vestibulum',
+            start: new Date(y, m, 30, 9, 00),
+            allDay: false
+          }
+        ]
+      });
+    }
+  </script>
+</head>
+
+<div id="eventContent" title="Event Details" style="display:none;">
+  Start: <span id="startTime"></span><br>
+  End: <span id="endTime"></span><br><br>
+  <p id="eventInfo"></p>
+  <p><strong><a id="eventLink" href="" target="_blank">Read More</a></strong></p>
+</div>
+
+<h2>FullCalendar</h2>
+<div id="calendar"></div>
+
+<body>
+  <a href="#" class="hello">Hello</a>
+</body>
+<p>
+  @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+  <tr>
+    <th></th>
+  </tr>
+
+  @foreach (var item in ViewData["sCal"] as IEnumerable<string>) {
+    <tr>
+      <td>
+        @item.ToString();
+        @*
+          @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+          @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+          @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        *@
+      </td>
+    </tr>
+  }
+
+  @for (var i = 0; i < 31; i++) {
+    <tr>
+      <td>
+        @{var dtCal = new DateTime(2017, 1, i + 1); }
+        @dtCal.ToShortDateString()
+        @*
+          @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+          @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+          @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        *@
+      </td>
+    </tr>
+          }
+
+
+</table>

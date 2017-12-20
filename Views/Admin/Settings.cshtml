@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Settings</h2>
+
+@model CornerkickWebMvc.Models.AdminModel
+@using (Html.BeginForm("StartCalender", "Admin", FormMethod.Post)) {
+  @Html.TextBoxFor(m => m.fCalenderInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 90%;" })
+
+  <button type="submit">Start/Stop</button>
+}

@@ -1,0 +1,129 @@
+﻿@model CornerkickWebMvc.Models.TaktikModel
+
+@{
+  ViewBag.Title = "Taktik";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub.taktik;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Slider - Range with fixed minimum</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+    @{ int iAusrichtung = (int)(taktik.fAusrichtung * 100); }
+    $(function () {
+      $("#slider-Ausrichtung").slider({
+        range: "min",
+        value: @iAusrichtung,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputAusrichtung").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 0, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-Einsatz").slider({
+        range: "min",
+        value: 0,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputEinsatz").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 1, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-Schussentf").slider({
+        range: "min",
+        value: 0,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputSchussentf").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 2, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#inputAusrichtung").val($("#slider-Ausrichtung").slider("value") + "%");
+      $("#inputEinsatz")    .val($("#slider-Einsatz")    .slider("value") + "%");
+      $("#inputSchussentf") .val($("#slider-Schussentf") .slider("value") + "%");
+    });
+  </script>
+</head>
+
+<body>
+  <h2>Taktik</h2>
+
+  <fieldset>
+    <legend>Taktik</legend>
+    <div class="controlgroup-vertical">
+      <p>
+        @Html.LabelFor(m => m.fAusrichtung, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputAusrichtung" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Ausrichtung"></div>
+
+      <p>
+        @Html.LabelFor(m => m.fEinsatz, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputEinsatz" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Einsatz"></div>
+
+      <p>
+        @Html.LabelFor(m => m.fSchussentf, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputSchussentf" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Schussentf"></div>
+    </div>
+  </fieldset>
+</body>
+
+</html>
+
+@*
+  <div class="form-group" style="position: relative; width: 100%; height: 30px; background-color: white">
+    <div class="form-group" style="position: absolute; width: 50%; height: auto">
+      <div class="col-md-10">
+        <input type="range" min="-10" max="+10" />
+      </div>
+    </div>
+  </div>
+*@

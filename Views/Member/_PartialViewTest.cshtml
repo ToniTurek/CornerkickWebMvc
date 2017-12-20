@@ -1,0 +1,14 @@
+﻿@model CornerkickWebMvc.Models.TeamModels
+
+<table id="patientList">
+  @foreach (var patient in CornerkickWebMvc.Models.TeamModels.ltPlayer) {
+    <tr>
+      <td>
+        @Html.DisplayFor(modelItem => patient.sName)
+      </td>
+      <td>
+        @Html.DisplayFor(modelItem => patient.ptPosDefault.X)
+      </td>
+    </tr>
+  }
+</table>
