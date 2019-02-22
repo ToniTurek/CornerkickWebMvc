@@ -177,7 +177,7 @@
       if (club.nextGame.iGameType == 99) {
         sDt += "Saisonende";
       } else {
-        sDt += club.nextGame.sTeamH + " vs. " + club.nextGame.sTeamA;
+        sDt += club.nextGame.team[0].sTeam + " vs. " + club.nextGame.team[1].sTeam;
         if (club.nextGame.iGameType == 1) {
           sDt += " (Liga)";
         } else if (club.nextGame.iGameType == 2) {

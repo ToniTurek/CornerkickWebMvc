@@ -9,11 +9,11 @@
   var sEmblemH = "/Content/Uploads/0.png";
   var sEmblemA = "/Content/Uploads/0.png";
   if (Model.game != null) {
-    sHeader = Model.game.data.sTeamH + " - " + Model.game.data.sTeamA;
-    sH = Model.game.data.sTeamH;
-    sA = Model.game.data.sTeamA;
-    sGoalsH = Model.game.data.iGoalsH.ToString();
-    sGoalsA = Model.game.data.iGoalsA.ToString();
+    sHeader = Model.game.data.team[0].sTeam + " - " + Model.game.data.team[1].sTeam;
+    sH = Model.game.data.team[0].sTeam;
+    sA = Model.game.data.team[1].sTeam;
+    sGoalsH = Model.game.data.team[0].iGoals.ToString();
+    sGoalsA = Model.game.data.team[1].iGoals.ToString();
     sEmblemH = "/Content/Uploads/" + Model.sEmblemH;
     sEmblemA = "/Content/Uploads/" + Model.sEmblemA;
   }
