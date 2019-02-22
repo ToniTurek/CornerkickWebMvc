@@ -5,17 +5,6 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickWebMvc", "CornerkickWebMvc.csproj", "{4BFD5B53-3067-497F-8AC2-72E5D8CD71B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickGame", "..\CornerkickGame\CornerkickGame.csproj", "{AB3295F6-F21A-4E55-89AE-BF8CE5A91782}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickConsole", "..\CornerkickConsole\CornerkickConsole.csproj", "{4CDB787B-A03C-4FE3-BC0C-10FB33D1034A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F19C9314-605A-4EDC-A13C-ADEED4BD8299} = {F19C9314-605A-4EDC-A13C-ADEED4BD8299}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickManager", "..\CornerkickManager\CornerkickManager.csproj", "{F19C9314-605A-4EDC-A13C-ADEED4BD8299}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickUnitTest", "..\CornerkickUnitTest\CornerkickUnitTest.csproj", "{08431505-17D8-4778-BB6E-3B5F6B8E7B95}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,22 +15,6 @@ Global
 		{4BFD5B53-3067-497F-8AC2-72E5D8CD71B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BFD5B53-3067-497F-8AC2-72E5D8CD71B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BFD5B53-3067-497F-8AC2-72E5D8CD71B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB3295F6-F21A-4E55-89AE-BF8CE5A91782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB3295F6-F21A-4E55-89AE-BF8CE5A91782}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB3295F6-F21A-4E55-89AE-BF8CE5A91782}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB3295F6-F21A-4E55-89AE-BF8CE5A91782}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4CDB787B-A03C-4FE3-BC0C-10FB33D1034A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CDB787B-A03C-4FE3-BC0C-10FB33D1034A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4CDB787B-A03C-4FE3-BC0C-10FB33D1034A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4CDB787B-A03C-4FE3-BC0C-10FB33D1034A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F19C9314-605A-4EDC-A13C-ADEED4BD8299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F19C9314-605A-4EDC-A13C-ADEED4BD8299}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F19C9314-605A-4EDC-A13C-ADEED4BD8299}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F19C9314-605A-4EDC-A13C-ADEED4BD8299}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08431505-17D8-4778-BB6E-3B5F6B8E7B95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08431505-17D8-4778-BB6E-3B5F6B8E7B95}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08431505-17D8-4778-BB6E-3B5F6B8E7B95}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08431505-17D8-4778-BB6E-3B5F6B8E7B95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
