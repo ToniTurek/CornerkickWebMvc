@@ -55,6 +55,14 @@
       <HintPath>packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CornerkickCore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\CornerkickCore.dll</HintPath>
+    </Reference>
+    <Reference Include="CornerkickGame, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\CornerkickGame.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -1161,16 +1169,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CornerkickGame\CornerkickGame.csproj">
-      <Project>{ab3295f6-f21a-4e55-89ae-bf8ce5a91782}</Project>
-      <Name>CornerkickGame</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CornerkickManager\CornerkickManager.csproj">
-      <Project>{f19c9314-605a-4edc-a13c-adeed4bd8299}</Project>
-      <Name>CornerkickManager</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
