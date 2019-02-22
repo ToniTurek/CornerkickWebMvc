@@ -1,0 +1,124 @@
+﻿@model CornerkickWebMvc.Models.ClubModel
+
+@{
+  ViewBag.Title = Model.club.sName;
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.club.sName</h2>
+
+@{
+  string sUser = "Computer";
+  int iUser = Model.club.iUser;
+  if (iUser >= 0) {
+    sUser = MvcApplication.ckcore.ltUser[iUser].sVorname + " " + MvcApplication.ckcore.ltUser[iUser].sNachname;
+  }
+
+  string sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
+  string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(Model.club).ToString();
+  float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
+  string sAveStrength = fAve[3].ToString("0.0");
+  string sAveAge = fAve[4].ToString("0.0");
+}
+
+<div style="position: relative; width: 50%; height: auto; float: left">
+  <table cellpadding="3" style="width: auto">
+    <tbody>
+      <tr>
+        <td align="right">Manager:</td>
+        <td align="left">@Html.ActionLink(sUser, "Mail", "Member")</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td align="right">Land:</td>
+        <td align="left">@MvcApplication.ckcore.sLand[MvcApplication.ckcore.iNatUmrechnung[@Model.club.iLand + 1]]</td>
+      </tr>
+      <tr>
+        <td align="right">Liga:</td>
+        <td align="left">@sDivision</td>
+      </tr>
+      <tr>
+        <td align="right">akt. Tabellenplatz:</td>
+        <td align="left">@sPlace</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td align="right">Anzahl Spieler:</td>
+        <td align="left">@Model.club.ltPlayerId.Count</td>
+      </tr>
+      <tr>
+        <td align="right">Durchschnittstärke:</td>
+        <td align="left">@sAveStrength</td>
+      </tr>
+      <tr>
+        <td align="right">Durchschnittsalter:</td>
+        <td align="left">@sAveAge</td>
+      </tr>
+      <tr>
+        <td align="right">Anzahl Jugendspieler:</td>
+        <td align="left">@Model.club.ltJugendspielerID.Count</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="position: relative; width: 50%; height: auto; float: left">
+  <table cellpadding="1" style="width: auto">
+    <tbody>
+      <tr>
+        <td align="right">Höchster Heimsieg Liga:</td>
+        <td align="left">@Model.sRecordLWinH</td>
+      </tr>
+      <tr>
+        <td align="right">Höchster Auswärtssieg Liga:</td>
+        <td align="left">@Model.sRecordLWinA</td>
+      </tr>
+      <tr>
+        <td align="right">Höchste Heimniederlage Liga:</td>
+        <td align="left">@Model.sRecordLDefH</td>
+      </tr>
+      <tr>
+        <td align="right">Höchster Auswärtsniederlage Liga:</td>
+        <td align="left">@Model.sRecordLDefA</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td align="right">Höchster Heimsieg Pokal:</td>
+        <td align="left">@Model.sRecordCWinH</td>
+      </tr>
+      <tr>
+        <td align="right">Höchster Auswärtssieg Pokal:</td>
+        <td align="left">@Model.sRecordCWinA</td>
+      </tr>
+      <tr>
+        <td align="right">Höchste Heimniederlage Pokal:</td>
+        <td align="left">@Model.sRecordCDefH</td>
+      </tr>
+      <tr>
+        <td align="right">Höchster Auswärtsniederlage Pokal:</td>
+        <td align="left">@Model.sRecordCDefA</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

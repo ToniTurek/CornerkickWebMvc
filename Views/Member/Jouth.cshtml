@@ -1,0 +1,104 @@
+﻿@model CornerkickWebMvc.Models.JouthModel
+
+@{
+  ViewBag.Title = "Jouth";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      bnTakeJouth = document.getElementById("bnTakeJouth");
+      bnTakeJouth.disabled = true;
+
+      var jTable = $('#tableJouth').DataTable({
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "responsive": true,
+        "searching": false,
+        columnDefs: [
+          {
+            targets: 0,
+            "visible": false,
+            "searchable": false
+          }
+        ]
+      });
+
+      $('#tableJouth tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+          bnTakeJouth.disabled = true;
+        } else {
+          jTable.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+
+          var data = jTable.row('.selected').data();
+          if (data) {
+            if (data[6] > 16) {
+              bnTakeJouth.disabled = false;
+            }
+          }
+        }
+      });
+
+      $("#bnTakeJouth").click(function () {
+        var data = jTable.row('.selected').data();
+        if (data) {
+          var iId = data[0];
+          //table.row('.selected').remove().draw(false);
+          $.ajax({
+            type: 'post',
+            url: '/Member/TakeJouth',
+            dataType: "json",
+            data: { iJouthID: iId },
+            success: function () {
+              window.location.reload(true);
+            }
+          });
+        }
+      });
+    });
+  </script>
+</head>
+
+<h2>Jugendspieler</h2>
+
+<table id="tableJouth" cellspacing="0" style="width: auto" class="display responsive nowrap">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Stärke</th>
+      <th>Talent</th>
+      <th>Nat.</th>
+      <th>Alter</th>
+    </tr>
+  </thead>
+  <tbody>
+    @{
+      foreach (CornerkickGame.Player spJ in CornerkickWebMvc.Models.JouthModel.ltPlayerJouth) {
+        <tr>
+          <td align="center">@spJ.iId</td>
+          <td align="center">@Html.ActionLink(spJ.sName, "PlayerDetails", "Member", new { i = spJ.iId }, new { target = "_blank" })</td>
+          <td align="center">@MvcApplication.ckcore.plr.getStrPos(spJ)</td>
+          <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(spJ).ToString("0.0")</td>
+          <td align="center">@(spJ.iTalent + 1)</td>
+          <td align="center">@MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[spJ.iNat1 + 1]]</td>
+          <td align="center">@MvcApplication.ckcore.game.tl.getPlayerAge(spJ, MvcApplication.ckcore.dtDatum).ToString("0")</td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>
+
+<button type="submit" id="bnTakeJouth" class="btn btn-default" style="width: 100%">zu Mannschaft hochziehen</button>

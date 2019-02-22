@@ -1,11 +1,285 @@
 ﻿@model CornerkickWebMvc.Models.DeskModel
 
 @{
-    ViewBag.Title = "Desk";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Schreibtisch";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Schreibtisch</h2>
+<script>
+  $(document).ready(function () {
+    setNews();
+  });
 
-<h4>News</h4>
-@Html.TextArea("News", Model.sNews, 10, 1000, new { @class = "form-control" })
+  function setNews() {
+    var divTableNews    = $("#tableDivNews");
+    var divTableNewsOld = $("#tableDivNewsOld");
+
+    divTableNews   .html('');
+    divTableNews   .html(setNews2($('#divNews'   ).data('name'))).show();
+
+    divTableNewsOld.html('');
+    divTableNewsOld.html(setNews2($('#divNewsOld').data('name'))).show();
+  }
+
+  function setNews2(sNews) {
+    var sBox = '';
+    sBox += '<table id="tableNews" style="width: 100%">';
+
+    sNsplit = sNews.split("\n");
+    var nPlayer = $('#idPlayerCount').data('name');
+    for (var i = 0; i < sNsplit.length; i++) {
+      sN = sNsplit[i];
+
+      if (sN.includes("Stadions")) {
+        sN = sN.replace("Stadions", '@Html.ActionLink("Stadions", "Stadion", "Member")');
+      }
+      if (sN.includes("Jugendmannschaft")) {
+        sN = sN.replace("Jugendmannschaft", '@Html.ActionLink("Jugendmannschaft", "Jouth", "Member")');
+      }
+      if (sN.includes("Jugendspieler")) {
+        sN = sN.replace("Jugendspieler", '@Html.ActionLink("Jugendspieler", "Jouth", "Member")');
+      }
+      if (sN.includes("Hauptsponsor")) {
+        sN = sN.replace("Hauptsponsor", '@Html.ActionLink("Hauptsponsor", "Sponsor", "Member")');
+      }
+      if (sN.includes("Pokalauslosung")) {
+        sN = sN.replace("Pokalauslosung", '@Html.ActionLink("Pokalauslosung", "Cup", "Member")');
+      }
+      if (sN.includes("Testspiel")) {
+        sN = sN.replace("Testspiel", '@Html.ActionLink("Testspiel", "Calendar", "Member")');
+      }
+      if (sN.includes("Transferangebot")) {
+        sN = sN.replace("Transferangebot", '@Html.ActionLink("Transferangebot", "Transfer", "Member")');
+      }
+
+      for (var j = 0; j < nPlayer; j++) {
+        var sPlayer = $('#idPlayerNames' + j.toString()).data('name').split(',');
+        if (sPlayer.length > 1) {
+          var sPlayerName = sPlayer[0];
+          var sPlayerId   = sPlayer[1];
+          if (sN.includes(sPlayerName)) {
+            sN = sN.replace(sPlayerName, '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "_blank" })'.replace("name", sPlayerName).replace("id", sPlayerId));
+            break;
+          }
+        }
+      }
+      //var sPlayerName = $('#idPlayerNames' + iBeg[0]).data('name');
+
+      sBox += '<tr>';
+      sBox += '<td>' + sN + '</td>';
+      sBox += '</tr>';
+    }
+
+    sBox += '</table>';
+
+    return sBox;
+  }
+</script>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <title>Index</title>
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</head>
+
+<body>
+  @{
+    CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
+
+    int nPl = 0;
+    if (clb.ltPlayerId != null) {
+      for (int iPl = 0; iPl < clb.ltPlayerId.Count; iPl++, nPl++) {
+        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
+        string sId = "idPlayerNames" + iPl.ToString();
+        <div id="@sId" data-name="@pl.sName,@clb.ltPlayerId[iPl]"></div>
+      }
+    }
+    if (clb.ltJugendspielerID != null) {
+      for (int iPl = 0; iPl < clb.ltJugendspielerID.Count; iPl++, nPl++) {
+        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltJugendspielerID[iPl]];
+        string sId = "idPlayerNames" + (iPl + clb.ltPlayerId.Count).ToString();
+        <div id="@sId" data-name="@pl.sName,@clb.ltJugendspielerID[iPl]"></div>
+      }
+    }
+
+    <div id="idPlayerCount" data-name="@nPl"></div>
+
+    @*
+      if (CornerkickWebMvc.Controllers.MemberController.countNewMails() > 0) {
+        <div style="position: relative; width: 100%; text-align: center">
+          @Html.ActionLink("Sie haben neue Nachrichten", "Mail", "Member", null)
+        </div>
+      }
+    *@
+
+    bool bTraining = false;
+    if (clb.training.iTraining != null) {
+      foreach (byte iT in clb.training.iTraining) {
+        if (iT > 0) {
+          bTraining = true;
+          break;
+        }
+      }
+    }
+
+    if (!bTraining) {
+      <div style="position: relative; width: 100%; text-align: center">
+        @Html.ActionLink("ACHTUNG: Sie haben für die nächste Woche noch kein Training eingestellt!", "Training", "Member", null, new { @style = "color:red" })
+      </div>
+    }
+
+    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date)) {
+      if (clb.personal.iTrainerCo == 0 &&
+          clb.personal.iTrainerKondi == 0 &&
+          clb.personal.iMasseur == 0 &&
+          clb.personal.iTrainerMental == 0 &&
+          clb.personal.iArzt == 0 &&
+          clb.personal.iJugendScouting == 0 &&
+          clb.personal.iJugendTrainer == 0) {
+        <div style="position: relative; width: 100%; text-align: center">
+          @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
+        </div>
+      }
+
+      if (CornerkickWebMvc.Controllers.AccountController.ckUser().budget.iInSpec == 0) {
+        <div style="position: relative; width: 100%; text-align: center">
+          @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
+        </div>
+      }
+    }
+
+    if (clb.iCaptainId[0] < 0) {
+      <div style="position: relative; width: 100%; text-align: center">
+        @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
+      </div>
+    }
+  }
+  @*
+    <h2>Schreibtisch</h2>
+  *@
+
+  <h3>Nächstes Spiel</h3>
+  @{
+    string sDt = "?";
+    CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    if (club.nextGame != null) {
+      if (club.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
+        sDt = "Heute";
+      } else {
+        sDt = club.nextGame.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + " (" + (club.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
+      }
+
+      sDt += " - ";
+
+      if (club.nextGame.iGameType == 99) {
+        sDt += "Saisonende";
+      } else {
+        sDt += club.nextGame.sTeamH + " vs. " + club.nextGame.sTeamA;
+        if (club.nextGame.iGameType == 1) {
+          sDt += " (Liga)";
+        } else if (club.nextGame.iGameType == 2) {
+          sDt += " (Pokal)";
+        } else if (club.nextGame.iGameType == 5) {
+          sDt += " (Testspiel)";
+        }
+      }
+    }
+    string sWeatherIcon = "/Content/Icons/Weather/" + Model.iWeather.ToString() + ".gif";
+    string[] sWeatherTitleAll = new string[4] { "Sonne", "Bewölkt", "Regen", "Schnee" };
+    string sWeatherTitle = sWeatherTitleAll[Model.iWeather];
+  }
+  <text>@sDt</text>
+  <img src=@sWeatherIcon alt="Wetter" style="position: relative; top: 0px; left: 10px; width: 20px" title=@sWeatherTitle>
+
+  <h3>Aktuelle Lage</h3>
+  @{
+    string sTabellenplatz = Model.sTabellenplatz;
+  }
+  <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
+  <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
+  <p>@Model.sStrength</p>
+  <p>@Model.sKFM</p>
+
+  <h3>Letzte Spiele</h3>
+
+  <div id="chartContainerLastGames" style="height: 160px; width: 100%"></div>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $.get("/Member/GetLastGames/", function (dataLastGames) {
+        var chart = new CanvasJS.Chart("chartContainerLastGames", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            labelFontColor: "white",
+            lineThickness: 0,
+            gridThickness: 1,
+            interval: 1,
+          },
+          axisY: {
+            labelFontSize: 16,
+            interval: 1,
+            minimum: -1.2,
+            maximum: +1.2
+          },
+          /*legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },*/
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
+              markerColor: "green",
+              legendText: "Liga",
+              dataPoints: dataLastGames[0]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
+              markerColor: "blue",
+              legendText: "Pokal",
+              dataPoints: dataLastGames[1]
+            }/*,
+                                      {
+                                        // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                                        type: "line",
+                                        lineColor: "white",
+                                        lineThickness: 0,
+                                        showInLegend: true,
+                                        markerSize: 20,
+                                        legendText: "Testspiel",
+                                        dataPoints: dataLastGames[2]
+                                      }*/
+          ]
+        });
+
+        chart.render();
+      });
+    });
+  </script>
+
+  <h3>News</h3>
+  @*
+    @Html.TextAreaFor(x => Model.sNews, 10, 100, htmlAttributes: new { @readonly = "readonly", style = "width: 100%; max-width: 100%; readonly: readonly" })
+  *@
+
+  <div id="divNews" data-name="@Model.sNews"></div>
+  <div id="tableDivNews"></div>
+
+  <div id="divNewsOld" data-name="@Model.sNewsOld"></div>
+  <div id="tableDivNewsOld" style="color:gray"></div>
+</body>
+</html>

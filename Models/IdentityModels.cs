@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -12,6 +13,7 @@ namespace CornerkickWebMvc.Models
     public string Vorname { get; set; } 
     public string Nachname { get; set; }
     public string Vereinsname { get; set; }
+    //public bool   bAdmin { get; set; }
 
     public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
     {

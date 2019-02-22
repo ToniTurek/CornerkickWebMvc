@@ -11433,7 +11433,10 @@ var Calendar = FC.Calendar = Class.extend(EmitterMixin, {
 
 
 	today: function() {
-		this.currentDate = this.getNow(); // should deny like prev/next?
+    this.currentDate = this.getNow(); // should deny like prev/next?
+    //alert(this.currentDate.toDate());
+    //this.currentDate = dtCk.toString().toDate();
+    //alert(this.currentDate);
 		this.renderView();
 	},
 
@@ -11839,11 +11842,13 @@ Calendar.mixin({
 	// Returns a moment for the current date, as defined by the client's computer or from the `now` option.
 	// Will return an moment with an ambiguous timezone.
 	getNow: function() {
-		var now = this.opt('now');
+    var now = this.opt('now');
 		if (typeof now === 'function') {
 			now = now();
-		}
-		return this.moment(now).stripZone();
+    }
+
+    //return this.moment(now).stripZone();
+    return this.moment(dtCk).stripZone();
 	},
 
 

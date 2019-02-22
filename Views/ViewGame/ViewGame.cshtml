@@ -1,0 +1,671 @@
+﻿@model CornerkickWebMvc.Models.ViewGameModel
+
+@{
+  var sHeader = "Livespiel";
+  var sH = "";
+  var sA = "";
+  var sGoalsH = "";
+  var sGoalsA = "";
+  var sEmblemH = "/Content/Uploads/0.png";
+  var sEmblemA = "/Content/Uploads/0.png";
+  if (Model.game != null) {
+    sHeader = Model.game.data.sTeamH + " - " + Model.game.data.sTeamA;
+    sH = Model.game.data.sTeamH;
+    sA = Model.game.data.sTeamA;
+    sGoalsH = Model.game.data.iGoalsH.ToString();
+    sGoalsA = Model.game.data.iGoalsA.ToString();
+    sEmblemH = "/Content/Uploads/" + Model.sEmblemH;
+    sEmblemA = "/Content/Uploads/" + Model.sEmblemA;
+  }
+
+  var sStadion = "";
+  if (Model.game != null) {
+    sStadion = Model.game.data.stadium.sName;
+    sStadion += " (" + (Model.game.data.iSpectators[0] + Model.game.data.iSpectators[1] + Model.game.data.iSpectators[2]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + " / " + MvcApplication.ckcore.st.getStadiumSeats(Model.game.data.stadium).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
+  }
+
+  ViewBag.Title = sHeader;
+  Layout = "~/Views/Shared/_Layout_plain.cshtml";
+}
+
+<html style="height: 100%; min-height: 100%">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <style>
+    #slider {
+      margin: 10px;
+    }
+
+    .ui-slider-horizontal {
+      height: 20px;
+      width: 100%;
+    }
+
+    .ui-slider .ui-slider-handle {
+      height: 26px;
+      width: 10px;
+      padding-left: 0px;
+    }
+
+    #slider-Minute .ui-slider-range {
+      background: orange;
+    }
+
+    #slider-Minute .ui-slider-handle {
+      border-color: orange;
+    }
+  </style>
+
+  <script type="text/javascript">
+    var bStopPlay = false;
+    var bAdminStopPlay = false;
+
+    var ltF = [];
+    var ltM = [];
+    var chartF;
+    var chartM;
+
+    var i = 0;
+    for (i = 0; i < 11; ++i) {
+      ltF[i] = [];
+      ltM[i] = [];
+    }
+  </script>
+
+  <script type="text/javascript" src="~/Scripts/draw.js"></script>
+  <script type="text/javascript" src="~/Scripts/ViewGame.js"></script>
+
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
+  <script type="text/javascript" src="~/Scripts/flot/jquery.flot.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/flot/jquery.flot.stack.js"></script>
+  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/js/flot/excanvas.min.js"></script><![endif]-->
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+  <script type="text/javascript">
+    $(window).resize(function () {
+      setView();
+    });
+
+    $(document).ready(function () {
+      bnStart = document.getElementById("bnStart");
+      bnBack  = document.getElementById("bnBack");
+      bnPlay  = document.getElementById("bnPlay");
+      bnForth = document.getElementById("bnForth");
+      bnEnd   = document.getElementById("bnEnd");
+
+      // Admin
+      bnAdminPlay = document.getElementById("bnAdminPlay");
+      bnAdminNext = document.getElementById("bnAdminNext");
+
+      var ddlHeatmap = $('#ddlHeatmap');
+
+      setView();
+
+      drawGame(-1);
+
+      pMainSlider = $('#slider-Minute');
+
+      //$("#slider-Minute").slider("option", "max", 1000);
+
+      pMainSlider.slider({
+        range: "min",
+        min: 0,
+        max: @Model.gD.nStates,
+        step: 1,
+        value: @Model.gD.nStates,
+        slide: function (event, ui) {
+          bStopPlay = true;
+
+          var iStep = ui.value;
+          drawGame(iStep);
+        }
+      });
+
+      $("#bnStart").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        drawGame(0);
+      });
+
+      $("#bnBack").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        var iStatePlay = $('#slider-Minute').slider("value");
+        if (iStatePlay > 0) {
+          drawGame(iStatePlay - 1);
+        }
+      });
+
+      $("#bnPlay").click(function () {
+        if (bStopPlay) {
+          var iStatePlay = $('#slider-Minute').slider("value");
+          bStopPlay = false;
+          bnPlay.innerText = "◼";
+
+          play(iStatePlay);
+        } else {
+          bStopPlay = true;
+          bnPlay.innerText = '►';
+        }
+      });
+
+      $("#bnForth").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        var iStatePlay = $('#slider-Minute').slider("value");
+        if (iStatePlay < $("#slider-Minute").slider("option", "max") - 1) {
+          drawGame(iStatePlay + 1);
+        }
+      });
+
+      $("#bnEnd").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        drawGame($("#slider-Minute").slider("option", "max") - 1);
+      });
+
+      $("#bnAdminPlay").click(function () {
+        if (bAdminStopPlay) {
+          bAdminStopPlay = false;
+          bnAdminPlay.innerText = "◼";
+
+          playAdmin();
+        } else {
+          bAdminStopPlay = true;
+          bnAdminPlay.innerText = '►';
+        }
+      });
+
+      $("#bnAdminNext").click(function () {
+        bAdminStopPlay = true;
+        bnAdminPlay.innerText = '►';
+
+        $.ajax({
+          url: '/ViewGame/AdminNext',
+          type: "GET",
+          dataType: "JSON",
+          success: function () {
+            drawGame(-2);
+          }
+        });
+      });
+
+      $("#bnAdminNew").click(function () {
+        bAdminStopPlay = true;
+        bnAdminPlay.innerText = '►';
+
+        $.ajax({
+          url: '/ViewGame/AdminNew',
+          type: "GET",
+          dataType: "JSON",
+          success: function () {
+            drawGame(-2);
+          }
+        });
+      });
+
+      CanvasJS.addColorSet("csF", [
+        "rgba(0,0,130,1.0)",
+        "rgba(0,0,155,1.0)",
+        "rgba(0,0,180,1.0)",
+        "rgba(0,0,205,1.0)",
+        "rgba(0,0,230,1.0)",
+        "rgba(0,0,255,1.0)",
+        "rgba(25,25,255,1.0)",
+        "rgba(50,50,255,1.0)",
+        "rgba(75,75,255,1.0)",
+        "rgba(100,100,255,1.0)",
+        "rgba(125,125,255,1.0)"]
+      );
+
+      chartF = new CanvasJS.Chart("chartContainerF", {
+        colorSet: "colorSet3",
+        animationEnabled: false,
+        theme: "theme2",//theme1
+        title: {
+          text: "Frische",
+          fontSize: 18
+        },
+        axisX: {
+          labelFontColor: "white",
+          gridThickness: 1
+        },
+        axisY: {
+          valueFormatString: "0.0%",
+          maximum: 1,
+          includeZero: false
+        },
+        legend: {
+          horizontalAlign: "center", // left, center, right
+          verticalAlign: "bottom",  // top, center, bottom
+          dockInsidePlotArea: true
+        },
+        toolTip: {
+          content: "{name}: {y}"
+        },
+        data: [{
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "1",
+          dataPoints: ltF[0]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "2",
+          dataPoints: ltF[1]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "3",
+          dataPoints: ltF[2]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "4",
+          dataPoints: ltF[3]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "5",
+          dataPoints: ltF[4]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "6",
+          dataPoints: ltF[5]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "7",
+          dataPoints: ltF[6]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "8",
+          dataPoints: ltF[7]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "9",
+          dataPoints: ltF[8]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "10",
+          dataPoints: ltF[9]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "11",
+          dataPoints: ltF[10]
+        }]
+      });
+
+      //chartF.render();
+
+      chartM = new CanvasJS.Chart("chartContainerM", {
+        colorSet: "colorSet3",
+        animationEnabled: false,
+        theme: "theme2",//theme1
+        title: {
+          text: "Moral",
+          fontSize: 18
+        },
+        axisX: {
+          labelFontColor: "white",
+          gridThickness: 1
+        },
+        axisY: {
+          valueFormatString: "0.0%",
+          includeZero: false
+        },
+        legend: {
+          horizontalAlign: "center", // left, center, right
+          verticalAlign: "bottom",  // top, center, bottom
+          dockInsidePlotArea: true
+        },
+        toolTip: {
+          content: "{name}: {y}"
+        },
+        data: [{
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "1",
+          dataPoints: ltM[0]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "2",
+          dataPoints: ltM[1]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "3",
+          dataPoints: ltM[2]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "4",
+          dataPoints: ltM[3]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "5",
+          dataPoints: ltM[4]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "6",
+          dataPoints: ltM[5]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "7",
+          dataPoints: ltM[6]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "8",
+          dataPoints: ltM[7]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "9",
+          dataPoints: ltM[8]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "10",
+          dataPoints: ltM[9]
+        },
+        {
+          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+          showInLegend: true,
+          type: "line",
+          name: "11",
+          dataPoints: ltM[10]
+        }]
+      });
+
+      ddlHeatmap.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
+      ddlPositions.change(function () {
+        drawGame(pMainSlider.slider("value"));
+      });
+    }); // $(document).ready(function () {});
+
+    function playAdmin() {
+      if (bAdminStopPlay === true) return;
+
+      var iAdminGameSpeed = document.getElementById("inputAdminGameSpeed").value;
+
+      if (iAdminGameSpeed >= 0) {
+        $.ajax({
+          url: '/ViewGame/AdminNext',
+          type: "GET",
+          dataType: "JSON",
+          success: function () {
+            $.when(drawGame(-2)).done(function () {
+              setTimeout(function () { playAdmin() }, iAdminGameSpeed);
+            });
+          }
+        });
+      }
+    }
+
+    /*
+    function requestFullScreen(element) {
+      alert(element);
+      // Supports most browsers and their versions.
+      var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+      alert(requestMethod);
+      if (requestMethod) { // Native full screen.
+        requestMethod.call(element);
+      } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+        var wscript = new ActiveXObject("WScript.Shell");
+        if (wscript !== null) {
+          wscript.SendKeys("{F11}");
+        }
+      }
+    }
+    */
+
+    function setView() {
+      var divDrawGameContainer = document.getElementById("divDrawGameContainer");
+      var imgGame = document.getElementById("imgGame");
+      var divDrawGame = document.getElementById("divDrawGame");
+      var divHeader = document.getElementById("divHeader");
+      var divTimeline = document.getElementById("divTimeline");
+      var divPlotStatistics = document.getElementById("divPlotStatistics");
+      var divStat1 = document.getElementById("divStat1");
+      var divStat2 = document.getElementById("divStat2");
+      var tbKommentar = document.getElementById("tbKommentar");
+
+      var fWidth = $(window).width();
+      if (fWidth < 960 && $(window).height() < fWidth) {
+        //requestFullScreen(divDrawGameContainer)
+        divHeader.style.display = 'none';
+        //divStat1.style.display = 'none';
+        divStat2.style.display = 'none';
+        //tbKommentar.style.display = 'none';
+        divDrawGameContainer.style.position = "absolute";
+        divDrawGameContainer.style.top = "0px";
+        divDrawGameContainer.style.left = "0px";
+        divDrawGameContainer.style.height = "90%";
+        imgGame.style.height = "100%";
+        imgGame.style.width = "auto";
+        divDrawGameContainer.style.width = imgGame.offsetWidth.toString() + "px";
+        divDrawGame.style.width = "90%";
+        tbKommentar.style.position = "absolute";
+        tbKommentar.style.left = "0px";
+        tbKommentar.style.top = "90%";
+
+        var fInfoLeft = divDrawGameContainer.offsetWidth + 6;
+        var fInfoWidth = fWidth - fInfoLeft - 6;
+
+        divTimeline.style.position = "absolute";
+        divTimeline.style.top = "0px";
+        divTimeline.style.left = fInfoLeft.toString() + "px";
+        divTimeline.style.width = fInfoWidth.toString() + "px";
+
+        divStat1.style.position = "absolute";
+        divStat1.style.left  = fInfoLeft .toString() + "px";
+        divStat1.style.width = fInfoWidth.toString() + "px";
+        divStat1.style.minWidth = "0px";
+
+        var fCommY = tbKommentar.offsetTop + tbKommentar.offsetHeight;
+
+        divPlotStatistics.style.position = "absolute";
+        divPlotStatistics.style.left = "0px";
+        divPlotStatistics.style.top = fCommY.toString() + "px";
+      }
+      else {
+        divHeader.style.display = 'block';
+        //divStat1.style.display = 'block';
+        divStat2.style.display = 'block';
+        //tbKommentar.style.display = 'block';
+        divDrawGameContainer.style.position = "relative";
+        divDrawGameContainer.style.width = "100%";
+        divDrawGameContainer.style.height = "auto";
+        imgGame.style.width = "100%";
+        imgGame.style.height = "auto";
+        tbKommentar.style.position = "relative";
+
+        divStat1.style.position = "relative";
+        divStat1.style.left = "0%";
+        divStat1.style.minWidth = "300px";
+      }
+    }
+
+    function hideAdressBar() {
+      alert("hideAdressBar");
+      window.scrollTo(0, 1);
+    }
+  </script>
+</head>
+
+<body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
+  <div id="divHeader" style="position: relative; width: 100%; height: 71px">
+    <div style="position: absolute; width: 30px; height: 30px; left:  1%; margin-top: 12px">
+      <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid blue; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
+    </div>
+    <div style="position: absolute; width: 28%; height: 100%; left: 5%; top: 30%; text-align: right">
+      <font size="4">@sH</font>
+    </div>
+    <div style="position: absolute; width: 6%; height: 100%; left: 34%">
+      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@sEmblemH alt="" />
+    </div>
+
+    <div style="position: absolute; width: 20%; height: 100%; left: 40%">
+      <div style="position: absolute; width: 35%; height: 100%; left: 0%; text-align: right">
+        <font id="lbGoalsH" size="8">@sGoalsH</font>
+      </div>
+      <div style="position: absolute; width: 100%; height: 100%; left: 0px; text-align: center">
+        <font size="8">-</font>
+      </div>
+      <div style="position: absolute; width: 100%; height: auto; bottom: 0%; left: 0%; text-align: center">
+        <font size="2">@sStadion</font>
+      </div>
+      <div style="position: absolute; width: 35%; height: 100%; right: 0%; text-align: left">
+        <font id="lbGoalsA" size="8">@sGoalsA</font>
+      </div>
+    </div>
+
+    <div style="position: absolute; width: 6%; height: 100%; right: 34%">
+      <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@sEmblemA alt="" />
+    </div>
+    <div style="position: absolute; width: 28%; height: 100%; right: 5%; top: 30%; text-align: left">
+      <font size="4">@sA</font>
+    </div>
+    <div style="position: absolute; width: 30px; height: 30px; right: 1%; margin-top: 12px">
+      <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid red; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
+    </div>
+  </div>
+
+  <div style="position: relative; left: 0px; width: 100%; height: 40px">
+    <div style="position: relative; float: left; width: 75%; min-width: 420px; height: 40px">
+      <b style="position: absolute; top: 6px">Heatmap:</b>
+      <div style="position: absolute; left: 70px; width: 110px; height: auto">
+        @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
+      </div>
+      <b style="position: absolute; top: 6px; left: 200px">Positionen:</b>
+      <div style="position: absolute; left: 280px; width: 120px; height: auto">
+        @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
+      </div>
+    </div>
+    @if (Model.game != null) {
+      if (Model.bAdmin) {
+        <div style="position: relative; float: left; width: 25%; min-width: 160px; height: 40px">
+          <input id="cbTargetPos" name="cbTargetPos" type="checkbox" value="0" style="position: absolute; left: 0px" class="checkbox">
+          <input id="inputAdminGameSpeed" style="position: absolute; left: 22%; width: 18%" type="text" value="250" data-val-required='Das Feld "inputAdminGameSpeed" ist erforderlich.' data-val-number='Das Feld "inputAdminGameSpeed" muss eine Zahl sein.' data-val="true" autocomplete="off">
+          <button type="submit" id="bnAdminPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
+          <button type="submit" id="bnAdminNext" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
+          <button type="submit" id="bnAdminNew" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">new</button>
+        </div>
+      } else if (Model.game.data.bFinished) {
+        <div style="position: relative; float: left; width: 25%; min-width: 160px; height: 40px">
+          <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
+          <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
+          <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
+          <button type="submit" id="bnForth" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
+          <button type="submit" id="bnEnd" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">>|</button>
+        </div>
+      }
+    }
+  </div>
+
+  <div id="divTimeline" style="position: relative; width: 100%; height: 64px">
+    <div id="divTimelineIcons" style="position: absolute; width: 100%; height: 100%"></div>
+    <div id="slider-Minute" style="position: absolute; width: 100%; top: 20px">
+      <div id="divMinute" style="position: absolute; width: 100%"></div>
+    </div>
+  </div>
+
+  <div id="divDrawGameContainer" style="position: relative; float: left; width: auto; margin-bottom: 2%">
+    <img id="imgGame" style="position: relative; width: 100%" src="~/Content/Images/stadium/field_full.png" alt="" />
+    <div id="drawHeatmap" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
+    <div id="divDrawGame" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
+    <div id="divLinks" style="position: absolute; margin-left: 5%; top: 0px; width: 45%">
+      @Html.ActionLink("Aufstellung", "Team", "Member", null, new { @style = "color:#000aaa;" })
+    </div>
+    <div id="divLinks" style="position: absolute; margin-right: 5%; top: 0px; left: 45%; width: 50%; text-align: right">
+      @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
+    </div>
+  </div>
+
+  @if (Model.game != null) {
+    if (Model.bAdmin) {
+      <div style="position: relative; float: left; width: 100%; height: 60px; margin-top: -2%">
+        <text id="txtAdminChanceShootOnGoal"></text>
+        <text id="txtAdminChanceGoal"></text>
+      </div>
+    }
+  }
+
+  <textarea id="tbKommentar" readonly rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
+
+  <div id="divPlotStatistics" style="width: 100%; height: 250px"></div>
+
+  <div id="divStat1" style="position: relative; float: left; width: 50%; min-width: 300px; display: block; word-break: break-word">
+    <text id="statistikGoals">Tore:</text>
+    <text id="statistikSubs">Spielerwechsel:</text>
+  </div>
+  <div id="divStat2" style="position: relative; float: left; width: 50%; min-width: 300px">
+    <text id="statistikCards"></text>
+    <text id="playerAction"></text>
+  </div>
+
+  <div id="chartContainerF" style="position: relative; float: left; height: 350px; width: 100%"></div>
+  <div id="chartContainerM" style="position: relative; float: left; height: 350px; width: 100%"></div>
+</body>
+</html>

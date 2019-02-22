@@ -1,0 +1,376 @@
+﻿@model CornerkickWebMvc.Models.StadionModel
+
+@{
+  ViewBag.Title = "Stadion";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <script type="text/javascript">
+    function setName() {
+      var sNewName = $("#sName").val();
+      $.ajax({
+        url: '/Member/StadiumSetName',
+        type: "GET",
+        dataType: "JSON",
+        data: { sName: sNewName }
+      });
+    }
+
+    var seats = [];
+    var seattypes = [];
+    $(document).ready(function () {
+      bnBuild = document.getElementById("bnBuild");
+      bnBuild.disabled = true;
+
+      bnBuildTopring = document.getElementById("bnBuildTopring");
+      bnBuildTopring.disabled = true;
+
+      bnRenewPitch = document.getElementById("bnRenewPitch");
+      bnRenewPitch.disabled = true;
+
+      setImage();
+
+      getStadion();
+      getVideo();
+
+      $('.tbSeats').each(function () {
+        $(this).on('keyup', function (ev) {
+          getStadion();
+        });
+      });
+
+      $("#bnBuild").click(function () {
+        $.when(getStadion()).done(function () {
+          setStadion();
+        });
+      });
+
+      $("#bnBuildTopring").click(function () {
+        buildTopring();
+      });
+
+      $("#bnBuildVideo").click(function () {
+        buildVideo();
+      });
+
+      $("#bnRenewPitch").click(function () {
+        $.ajax({
+          type: 'post',
+          url: '/Member/StadiumRenewPitch',
+          dataType: "json",
+          success: function (sMessage) {
+            alert(sMessage);
+            window.location.reload(true);
+          }
+        });
+      });
+    });
+
+    function setImage() {
+      $.ajax({
+        url: '/Member/StadiumGetTopring',
+        type: "post",
+        dataType: "JSON",
+        success: function (bTopring) {
+          if (bTopring) {
+            document.getElementById("imgStadium").src = "/Content/Images/stadium/stadion_L.jpg";
+          } else {
+            document.getElementById("imgStadium").src = "/Content/Images/stadium/stadion_S.jpg";
+          }
+        }
+      });
+    }
+
+    function getStadion() {
+      seats = [];
+      seattypes = [];
+      $('.tbSeats').each(function () {
+        seats.push($(this).val());
+      });
+
+      $('.ddlSeatTypes').each(function () {
+        seattypes.push($(this).val());
+      });
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumChange',
+        dataType: "json",
+        data: { iSeats: seats, iArt: seattypes },
+        success: function (sKostenDauer) {
+          $("#bnBuild").text("Kosten: " + sKostenDauer[0] + " €, Dauer: " + sKostenDauer[1] + " Tage");
+
+          if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
+            bnBuild.disabled = true;
+          } else {
+            bnBuild.disabled = false;
+          }
+        }
+      });
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostTopring',
+        dataType: "json",
+        success: function (sKostenDauer) {
+          $("#bnBuildTopring").text("Oberring bauen. Kosten: " + sKostenDauer[0] + " €, Dauer: " + sKostenDauer[1] + " Tage");
+          if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
+            bnBuildTopring.disabled = true;
+          } else {
+            bnBuildTopring.disabled = false;
+          }
+        }
+      });
+
+      // Renew pitch
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumRenewPitchCost',
+        dataType: "json",
+        success: function (sCost) {
+          $("#bnRenewPitch").text("Rasen + 10%, Kosten: " + sCost + " €");
+
+          if (sCost == "0" || sCost == "") {
+            bnRenewPitch.disabled = true;
+          } else {
+            bnRenewPitch.disabled = false;
+          }
+        }
+      });
+    }
+
+    function setStadion() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumChangeSet',
+        dataType: "json",
+        data: { iSeats: seats, iArt: seattypes },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function buildTopring() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildTopring',
+        dataType: "json",
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function getVideo() {
+      bnBuildVideo = document.getElementById("bnBuildVideo");
+      bnBuildVideo.disabled = true;
+
+      var iVideo = $('#iDdlVideo').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostVideo',
+        dataType: "json",
+        data: { iVideo: iVideo },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildVideo").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildVideo.disabled = true;
+          } else {
+            bnBuildVideo.disabled = false;
+          }
+        }
+      });
+    }
+
+    function buildVideo() {
+      var iVideo = $('#iDdlVideo').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildVideo',
+        dataType: "json",
+        data: { iVideo: iVideo },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  @{
+    var sStadion = "";
+    string sName = "";
+    if (Model != null) {
+      if (!string.IsNullOrEmpty(Model.sName)) {
+        sName = Model.sName;
+        sStadion = MvcApplication.ckcore.st.getStadiumSeats(Model.stadion).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+      }
+    }
+
+    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date) && MvcApplication.ckcore.iSaisonCount == 0) {
+      <div class="form-group">
+        @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
+      </div>
+    } else {
+      <h2>@sName</h2>
+    }
+  }
+
+  <h4>@sStadion</h4>
+
+  <div class="image" style="position: relative; width: 100%; margin-bottom: 1%">
+    <img id="imgStadium" style="position: relative; width: 100%" src="~/Content/Images/stadium/stadion_S.jpg" alt="" />
+    <div id="divStadion" style="position: absolute; margin-left: 0%; width: 100%; height: 100%; top: 0%; left: 0%; border: 1px solid black">
+      @{
+        if (Model.iSeats != null) {
+          float[,] sLoc = new float[Model.iSeats.Length, 2];
+
+          sLoc[0, 0] = 0.31f; sLoc[0, 1] = 0.78f;       // A
+          sLoc[1, 0] = 0.50f; sLoc[1, 1] = sLoc[0, 1]; // B
+          sLoc[2, 0] = 1 - sLoc[0, 0]; sLoc[2, 1] = sLoc[0, 1]; // C
+          sLoc[3, 0] = 0.83f; sLoc[3, 1] = 0.58f;       // D
+          sLoc[4, 0] = sLoc[3, 0]; sLoc[4, 1] = 0.35f;       // E
+          sLoc[5, 0] = sLoc[2, 0]; sLoc[5, 1] = 0.18f;       // F
+          sLoc[6, 0] = sLoc[1, 0]; sLoc[6, 1] = sLoc[5, 1]; // G
+          sLoc[7, 0] = sLoc[0, 0]; sLoc[7, 1] = sLoc[5, 1]; // H
+          sLoc[8, 0] = 1 - sLoc[3, 0]; sLoc[8, 1] = sLoc[4, 1]; // I
+          sLoc[9, 0] = sLoc[8, 0]; sLoc[9, 1] = sLoc[3, 1]; // J
+
+          sLoc[10, 0] = sLoc[0, 0]; sLoc[10, 1] = 0.89f;       // A1
+          sLoc[11, 0] = sLoc[1, 0]; sLoc[11, 1] = sLoc[10, 1]; // B1
+          sLoc[12, 0] = sLoc[2, 0]; sLoc[12, 1] = sLoc[10, 1]; // C1
+          sLoc[13, 0] = 0.92f; sLoc[13, 1] = sLoc[3, 1]; // D1
+          sLoc[14, 0] = sLoc[13, 0]; sLoc[14, 1] = sLoc[4, 1]; // E1
+          sLoc[15, 0] = sLoc[5, 0]; sLoc[15, 1] = 0.05f;       // F1
+          sLoc[16, 0] = sLoc[6, 0]; sLoc[16, 1] = sLoc[15, 1]; // G1
+          sLoc[17, 0] = sLoc[7, 0]; sLoc[17, 1] = sLoc[15, 1]; // H1
+          sLoc[18, 0] = 1 - sLoc[13, 0]; sLoc[18, 1] = sLoc[8, 1]; // I1
+          sLoc[19, 0] = sLoc[18, 0]; sLoc[19, 1] = sLoc[9, 1]; // J1
+          sLoc[20, 0] = 0.13f; sLoc[20, 1] = 0.84f;       // K
+          sLoc[21, 0] = 1 - sLoc[20, 0]; sLoc[21, 1] = sLoc[20, 1]; // L
+          sLoc[22, 0] = sLoc[21, 0]; sLoc[22, 1] = 0.12f;       // M
+          sLoc[23, 0] = sLoc[20, 0]; sLoc[23, 1] = sLoc[22, 1]; // N
+
+
+          for (byte iB = 0; iB < Model.iSeats.Length; iB++) {
+            if (iB >= 10 && !Model.bOberring) {
+              break;
+            }
+
+            var htmlAttributesEditorFor = new Dictionary<string, object>
+            {
+              { "type", "number" },
+              { "class", "form-control tbSeats" },
+              { "id", "tbSeats_" + iB.ToString() },
+              //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
+              { "style", "position: relative width: 100%; text-align: right" },
+              { "autocomplete", "off" },
+              { "min", "0" }
+            };
+            if (Model.iSeatsBuild[iB] > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
+
+            //@Html.EditorFor(model => model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
+
+            var htmlAttributesDropDownListFor = new Dictionary<string, object>
+            {
+              { "class", "form-control ddlSeatTypes" },
+              { "id", "iDdlId" + iB.ToString() },
+              { "style", "position: relative; text-align: right" },
+              { "onchange", "getStadion()" }
+            };
+
+            if (Model.iSeatsBuild[iB] > 0) { htmlAttributesDropDownListFor.Add("disabled", "disabled"); }
+
+            string sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; left: " + (sLoc[iB, 0] - 0.03).ToString("0%");
+            if (iB == 8 || iB == 9) {
+              sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; right: " + (1.0 - sLoc[iB, 0] - 0.03).ToString("0%");
+            }
+            <div style="@sStyle">
+              <div style="position: relative">
+                @Html.EditorFor(Model => Model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
+              </div>
+
+              @if (Model.iSeatsBuild[iB] > 0) {
+                @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right", @disabled = "disabled" })
+              } else {
+                @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right" })
+              }
+            </div>
+            //@Html.DropDownListFor(m => m.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { htmlAttributes = htmlAttributesDropDownListFor })
+          }
+        }
+      }
+
+      @* Pitch quality *@
+      <div style="position: absolute; left: 35%; width: 30%; min-width: 150px; height: auto; top: 40%">
+        @{
+          string sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
+        }
+        <p style="text-align: center; font-weight:bold">Akt. Rasenqualität: @sPitchQuality</p>
+        <button type="submit" id="bnRenewPitch" class="btn btn-default" style="width: 100%">Rasen +10%, Kosten: 0</button>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+  @{
+    if (!Model.stadion.bTopring) {
+      <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
+    }
+  }
+</body>
+</html>
+
+<legend style="position: relative; margin-top: 2%">Stadionextras</legend>
+<p><b>Anzeigetafel:</b></p>
+@Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 200px; margin-right: 2%" })
+<button type="submit" id="bnBuildVideo" class="btn btn-default" style="float: left; width: 400px">Kosten: 0</button>
+
+<div style="float: left; position: relative; height: 60px"></div>
+<legend>Stadionausbau</legend>
+<table class="tStat" style="width: auto" border="1" cellpadding="3" summary="Stadionausbau">
+  <tr>
+    <th>Name</th>
+    <th>Art</th>
+    <th>Dauer</th>
+  </tr>
+
+  @{
+    for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
+      if (Model.iSeatsBuild[iB] > 0) {
+        //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+        <tr>
+          <td align="center">Block @Model.stadion.blocks[iB].sName</td>
+          <td align="center">@Model.iSeatType[iB]</td>
+          <td align="center">@Model.iSeatsBuild[iB] d</td>
+        </tr>
+      }
+    }
+
+    if (Model.stadion.iDaysConstructTopring > 0) {
+      //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+      <tr>
+        <td align="center">Oberring</td>
+        <td align="center">N/A</td>
+        <td align="center">@Model.stadion.iDaysConstructTopring d</td>
+      </tr>
+    }
+
+    if (Model.stadion.iDaysConstructVideo > 0) {
+      //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+      <tr>
+        <td align="center">Anzeigetafel</td>
+        <td align="center">@MvcApplication.ckcore.st.sVideo[Model.iVideo]</td>
+        <td align="center">@Model.stadion.iDaysConstructVideo d</td>
+      </tr>
+    }
+  }
+</table>

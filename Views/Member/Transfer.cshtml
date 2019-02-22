@@ -1,0 +1,511 @@
+﻿@model CornerkickWebMvc.Models.TransferModel
+
+@{
+  ViewBag.Title = "Transfer";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+  <script src="~/Scripts/autoNumeric/autoNumeric-min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/Player.js" type="text/javascript"></script>
+  <script src="~/Scripts/Numbers.js" type="text/javascript"></script>
+
+  <style media="screen" type="text/css">
+    tr.details-control td.symbol {
+      background: url('/Content/Icons/plus.png') no-repeat center center;
+      cursor: pointer;
+    }
+
+    tr.shown td.symbol {
+      background: url('/Content/Icons/minus.png') no-repeat center center;
+    }
+  </style>
+
+  <script type="text/javascript">
+    var iPos = 0;
+
+    var iAcceptPlId   = -1;
+    var iAcceptClubId = -1;
+    function handleClick(rBOffer) {
+      bnAcceptOffer = document.getElementById("bnAcceptOffer");
+      bnMakeOffer   = document.getElementById("bnMakeOffer");
+      bnCancelOffer = document.getElementById("bnCancelOffer");
+
+      iAcceptClubId = rBOffer.value;
+
+      bnMakeOffer  .style.display = "none";
+      bnCancelOffer.style.display = "none";
+
+      if (iAcceptPlId >= 0) {
+        bnAcceptOffer.style.display = "block";
+
+        $.ajax({
+          url: "/Member/GetPlayerName",
+          type: 'POST',
+          traditional: true,
+          data: { iPlayer: iAcceptPlId },
+          dataType: "json",
+          success: function (sName) {
+            $("#bnAcceptOffer").text("Angebot für " + sName + " annehmen");
+          }
+        });
+      }
+    }
+
+    $(document).ready(function () {
+      bnMakeOffer   = document.getElementById("bnMakeOffer");
+      bnMakeOffer  .style.display = "none";
+      bnAcceptOffer = document.getElementById("bnAcceptOffer");
+      bnAcceptOffer.style.display = "none";
+      bnCancelOffer = document.getElementById("bnCancelOffer");
+      bnCancelOffer.style.display = "none";
+
+      $("#tbTransferFee").autoNumeric('init', {
+        aSep: '.',
+        aDec: ',',
+        mDec: '0'
+      });
+
+      $("#tbContractSalaryOffer").autoNumeric('init', {
+        aSep: '.',
+        aDec: ',',
+        mDec: '0'
+      });
+
+      var jTable = $('#tableTransfer').DataTable({
+        "ajax": {
+          "url": '@Url.Action("getTableTransfer", "Member")',
+          "type": 'POST',
+          "data": function (d) {
+            d.iPos    = $('#ddlFilterPos')  .val();
+            d.iFType  = $('#ddlFilterFType').val();
+            d.iFValue = $('#ddlFilterF').val();
+            d.bJouth  = document.getElementById("rbJouth").checked;
+          }
+        },
+        "info": false,
+        "searching": false,
+        'responsive': {
+          'details': {
+            'type': 'column',
+            'target': 0
+          }
+        },
+        columnDefs: [
+          {
+            targets: 0,
+            "className": "symbol",
+            "orderable": false,
+            "data": null,
+            "defaultContent": '',
+            "searchable": false
+          },
+          {
+            targets: [1,2,3],
+            "visible": false,
+            "searchable": false
+          }
+        ],
+        "columns": [
+          { "data": null },
+          { "data": "playerId" },
+          { "data": "iOffer" },
+          { "data": "index", "className": "dt-center" },
+          { "data": "datum", "className": "dt-center" },
+          {
+            "data": "name",
+            "className": "dt-center",
+            "render": function (data, type, row) {
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "_blank" })'.replace("name", data).replace("id", row.playerId);
+            }
+          },
+          { "data": "club", "className": "dt-center" },
+          { "data": "position", "className": "dt-center" },
+          { "data": "strength", "className": "dt-center" },
+          { "data": "strengthIdeal", "className": "dt-center" },
+          { "data": "age", "className": "dt-center" },
+          { "data": "talent", "className": "dt-center" },
+          { "data": "mw", "className": "dt-right" },
+          { "data": "nat", "className": "dt-center" }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.iOffer > 0) { // already offered or own player
+            $(nRow).addClass('details-control');
+          } else if (aData.iOffer < 0) { // negotiation cancelled
+            $('td', nRow).css('color', "rgb(180,180,180)");
+          }
+        }
+      });
+
+      // Filter
+      $('#ddlFilterPos').on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      $('#ddlFilterFType').on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      $('#ddlFilterF').on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      // Radio-buttons defence/offence
+      $("#rbProfi").on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      $("#rbJouth").on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      // Select row
+      $('#tableTransfer tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+          $(this).removeClass('selected-Details');
+
+          bnMakeOffer  .style.display = "none";
+          bnCancelOffer.style.display = "none";
+        } else {
+          jTable.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+          $(this).addClass('selected-Details');
+
+          // Remove select class for first column (not working!)
+          //$('#td details-control').removeClass('selected');
+
+          var data = jTable.rows('.selected').data();
+          if (data) {
+            iAcceptPlId = data[0].playerId;
+
+            if (data[0].iOffer == 1) {
+              $("#bnMakeOffer").text("Angebot ändern");
+              bnCancelOffer.style.display = "block";
+            } else {
+              $("#bnMakeOffer").text("Spieler verpflichten");
+              bnCancelOffer.style.display = "none";
+            }
+
+            if (data[0].iOffer == 2) {
+              bnMakeOffer.style.display = "none";
+            } else {
+              bnMakeOffer.style.display = "block";
+            }
+            bnAcceptOffer.style.display = "none";
+          }
+        }
+      });
+
+      // Add event listener for opening and closing details
+      $('#tableTransfer tbody').on('click', 'tr.details-control td.symbol', function () {
+        var tr = $(this).closest('tr');
+        var row = jTable.row(tr);
+
+        if (row.child.isShown()) {
+          // This row is already open - close it
+          row.child.hide();
+          tr.removeClass('shown');
+        } else {
+          // Open this row
+          data = row.data();
+          $.when(getTableTransferDetailsAjax(data.playerId)).done(function (sChildTable) {
+            row.child(sChildTable).show();
+            tr.addClass('shown');
+          });
+        }
+      });
+
+      /*
+      $("#bnMio").click(function () {
+        var mio = Model.iTransferFee;
+        alert(mio);
+      });
+      */
+
+      $("#bnMakeOffer").click(function () {
+        var data = jTable.rows('.selected').data();
+        if (data) {
+          var iIdPl = data[0].playerId;
+          var iYears = $("#iContractYears").val();
+
+          $.when(getSalary(iIdPl, iYears, 0)).done(function (contract) {
+            if (contract.fPlayerMood < 0) {
+              alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
+            } else {
+              $("#txtContractMoney").html(contract.iSalary + " €");
+              $("#txtContractMood") .html((contract.fPlayerMood * 100).toFixed(0) + "%");
+              $("#tbContractSalaryOffer").val(contract.iSalary);
+
+              $("#dialogContract").dialog("open");
+            }
+          });
+        }
+      });
+
+      // Player contract
+      $("#iContractYears").keyup(function () {
+        var data = jTable.rows('.selected').data();
+        if (data) {
+          var iIdPl = data[0].playerId;
+
+          $.when(getSalary(iIdPl, $(this).val(), 0)).done(function (contract) {
+            $("#txtContractMoney").html(contract.iSalary + " €");
+            $("#txtContractMood" ).html((contract.fPlayerMood * 100).toFixed(0) + "%");
+            $("#tbContractSalaryOffer").val(contract.iSalary);
+          });
+        }
+      });
+
+      $("#bnNegotiate").click(function () {
+        var data = jTable.rows('.selected').data();
+        if (data) {
+          var iIdPl        = data[0].playerId;
+          var iYears       = $("#iContractYears").val();
+          //var iSalaryOffer = $("#iContractSalaryOffer").val();
+          var iSalaryOffer = getIntFromString($("#tbContractSalaryOffer").val());
+
+          $.when(getSalary(iIdPl, iYears, iSalaryOffer)).done(function (contract) {
+            if (contract.fPlayerMood < 0) {
+              alert("Der Spieler hat die Vertragsverhandlungen abgebrochen!");
+              jTable.ajax.reload();
+
+              $("#dialogContract").dialog("close");
+            } else {
+              $("#txtContractMoney").html(contract.iSalary + " €");
+              $("#txtContractMood") .html((contract.fPlayerMood * 100).toFixed(0) + "%");
+            }
+          });
+        }
+      });
+
+      $("#bnCancelOffer").click(function () {
+        cancelTransferOffer();
+      });
+
+      function cancelTransferOffer() {
+        var data = jTable.rows('.selected').data();
+        if (data) {
+          var iIdPl = data[0].playerId;
+
+          $.ajax({
+            url: "/Member/CancelTransferOffer",
+            type: 'POST',
+            traditional: true,
+            data: { iPlayerId: iIdPl },
+            dataType: "json",
+            success: function (response) {
+              alert(response);
+              window.location.reload(true);
+            },
+            error: function (xhr) {
+              debugger;
+              alert(xhr.error);
+            }
+          });
+        }
+      }
+
+      $("#dialogContract").dialog({
+        autoOpen: false,
+        width: 400,
+        height: 300,
+        buttons: {
+          "Bestätigen": function () {
+            var data = jTable.rows('.selected').data();
+            if (data) {
+              var iId = data[0].playerId;
+              var iYears  = $("#iContractYears").val();
+              var sSalary = $("#txtContractMoney").text();
+              var sPlayerMood = $("#txtContractMood").text();
+
+              $.ajax({
+                url: "/Member/NegotiatePlayerContract",
+                type: 'POST',
+                traditional: true,
+                data: { iId: iId, iYears: iYears, sSalary: sSalary, sPlayerMood: sPlayerMood, iMode: 1 },
+                dataType: "json",
+                success: function (response) {
+                  //window.location.reload(true);
+                  alert(response);
+                  $("#dialogTransferFee").dialog("open");
+                },
+                error: function (xhr) {
+                  debugger;
+                  alert(xhr);
+                }
+              });
+            }
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+
+      // Transfer Fee
+      $("#dialogTransferFee").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            var data = jTable.rows('.selected').data();
+            var iId = data[0].playerId;
+            var iFee = getIntFromString($("#tbTransferFee").val());
+
+            $.ajax({
+              url: "/Member/MakeTransferOffer",
+              type: 'POST',
+              traditional: true,
+              data: { iPlayerId: iId, iTransferFee: iFee },
+              dataType: "json",
+              success: function (response) {
+                alert(response);
+
+                jTable.ajax.reload();
+                //window.location.reload(true);
+              },
+              error: function (xhr) {
+                debugger;
+                alert(xhr.error);
+              }
+            });
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+
+      // Accept Transfer offer
+      $("#bnAcceptOffer").click(function () {
+        if (iAcceptClubId >= 0 && iAcceptPlId >= 0) {
+          $.ajax({
+            url: "/Member/AcceptTransferOffer",
+            type: 'POST',
+            traditional: true,
+            data: { iPlayerId: iAcceptPlId, iClubId: iAcceptClubId },
+            dataType: "json",
+            success: function (response) {
+              alert(response);
+              window.location.reload(true);
+            },
+            error: function (xhr) {
+              debugger;
+              alert(xhr.error);
+            }
+          });
+        }
+      });
+    });
+  </script>
+</head>
+
+<h2>Transferliste</h2>
+<div class="form-group" style="position: relative; width: 100%; border: 0px solid black">
+  <div style="position: relative; width: auto; float: left; left: 0%; margin-bottom: 1%">
+    <b class="left">Position:</b>
+    @Html.DropDownListFor(m => m.sFilterPos, Model.ltDdlFilterPos, new { @class = "form-control", id = "ddlFilterPos", @style = "width:80px" })
+  </div>
+
+  <div style="position: relative; width: auto; float: left; margin-left: 2%; margin-bottom: 1%">
+    <b class="left">Fähigkeit:</b>
+    @Html.DropDownListFor(m => m.sFilterFType, Model.ltDdlFilterFType, new { @class = "form-control", id = "ddlFilterFType", @style = "width:160px" })
+  </div>
+
+  <div style="position: relative; width: auto; float: left; margin-left: 1%; margin-bottom: 1%">
+    <b class="left">Wert:</b>
+    @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
+  </div>
+
+  <div style="position: relative; width: 150px; height: auto; float: left; margin-top: 2%; margin-left: 2%">
+    <form>
+      <fieldset>
+        <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+        <label for="lbProfi" style="font-size:100%; color: black; margin-right: 4%"> Profis</label>
+        <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+        <label for="lbJouth" style="font-size:100%; color: black"> Jugend</label>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<table id="tableTransfer" cellspacing="0" style="width: auto" class="display responsive nowrap">
+  <thead>
+    <tr>
+      <th></th>
+      <th>IdPlayer</th>
+      <th>iOffer</th>
+      <th>#</th>
+      <th>Datum</th>
+      <th>Name</th>
+      <th>Verein</th>
+      <th>Position</th>
+      <th>Stärke</th>
+      <th>St. ber.</th>
+      <th>Alter</th>
+      <th>Talent</th>
+      <th>Marktwert [€]</th>
+      <th>Nat.</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!---Data and tags are dynamically generated--->
+  </tbody>
+</table>
+
+<button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%">Spieler verpflichten</button>
+<button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%">Angebot annehmen</button>
+<button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%">Angebot zurückziehen</button>
+
+<div id="dialogContract" title="Vertragsverhandlung">
+  <div style="position: relative; width: 100%; height: 40px" class="form-group">
+    <div style="position: absolute; width: 48%; height: auto; top: 10px" align="right">
+      <b class="left">Laufzeit [a]: </b>
+    </div>
+    <div style="position: absolute; width: 48%; left: 52%" align="left">
+      @Html.EditorFor(Model => Model.iContractYears, new { htmlAttributes = new { @class = "form-control tbContractYears", @type = "number", @min = "1", @max = "10", @step = "1", @value = "1", @style = "text-align: right; width:60px", @autocomplete = "off" } })
+    </div>
+  </div>
+  <div style="position: relative; height: 90px">
+    <div style="position: absolute; width: 45%" align="center">
+      <b>Gefordertes Gehalt:</b>
+      <p id="txtContractMoney"></p>
+    </div>
+    <div style="position: absolute; left: 55%; width: 45%" class="form-group">
+      <div style="position: absolute; width: 100%; height: auto; top: 0px" align="center">
+        <b class="left">Gebotenes Gehalt:</b>
+      </div>
+      <div style="position: absolute; width: 100%; top: 20px" align="right">
+        @Html.EditorFor(Model => Model.iContractSalaryOffer, new { htmlAttributes = new { @id = "tbContractSalaryOffer", @class = "form-control tbContractSalaryOffer", @type = "tel", @min = "0", @step = "1000", @value = "0", @style = "text-align: right; width:100%", @autocomplete = "off" } })
+      </div>
+    </div>
+    <div style="position: absolute; width: 45%; top: 40px" align="center">
+      <b>Stimmung:</b>
+      <p id="txtContractMood"></p>
+    </div>
+  </div>
+  <button type="submit" id="bnNegotiate" class="btn btn-default" style="width: 100%">verhandeln</button>
+</div>
+
+<div id="dialogTransferFee" title="Ablöseverhandlungen">
+  <div style="position: relative; width: 100%; height: 40px" class="form-group">
+    <div style="position: absolute; width: 50%; height: auto; top: 10px" class="form-group">
+      <b class="left">Ablöse [€]:</b>
+    </div>
+    <div style="position: absolute; width: 50%; left: 50%" class="col-md-10">
+      @Html.TextBoxFor(m => m.iTransferFee, new { @id = "tbTransferFee", @class = "form-control tbTransferFee", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+﻿@model CornerkickWebMvc.Models.AdminModel
+
+@{
+  ViewBag.Title = "Log";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Log</h2>
+
+@Html.TextAreaFor(x => x.sLog, 50, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })

@@ -1,0 +1,225 @@
+﻿@model CornerkickWebMvc.Models.StadiumSurroundingsModel
+
+@{
+  ViewBag.Title = "Stadionumgebung";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!doctype html>
+<html lang="en">
+<head>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      setImage();
+      getCurrent();
+      getTrGel();
+      getJouthInt();
+
+      $("#bnBuildTrGel").click(function () {
+        buildTrGel();
+      });
+
+      $("#bnBuildJouthInt").click(function () {
+        buildJouthInt();
+      });
+
+      $("#tbParkp").on('keyup', function (ev) {
+        getPark();
+      });
+
+      $("#bnBuildPark").click(function () {
+        buildPark();
+      });
+    });
+
+    function setImage() {
+      $.ajax({
+        url: '/Member/StadiumGetTopring',
+        type: "post",
+        dataType: "JSON",
+        success: function (bTopring) {
+          if (bTopring) {
+            document.getElementById("imgStadium").src = "/Content/Images/stadium/stadion_L.jpg";
+          } else {
+            document.getElementById("imgStadium").src = "/Content/Images/stadium/stadion_S.jpg";
+          }
+        }
+      });
+    }
+
+    function getCurrent() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetSurrGetCurrent',
+        dataType: "json",
+        success: function (sCurrent) {
+          $("#txtTrGel").text("Aktuell: " + sCurrent[0][0]);
+          if (sCurrent[0][2] != "0") {
+            $("#txtTrGelNew").text("Ausbau zu: " + sCurrent[0][1] + " (" + sCurrent[0][2] + " d)");
+          }
+
+          $("#txtJouthInt"   ).text("Aktuell: "   + sCurrent[1][0]);
+          if (sCurrent[1][2] != "0") {
+            $("#txtJouthIntNew").text("Ausbau zu: " + sCurrent[1][1] + " (" + sCurrent[1][2] + " d)");
+          }
+
+          $("#txtPark").text("Aktuell: " + sCurrent[2][0]);
+         if (sCurrent[2][2] != "0") {
+            $("#txtParkNew").text("Ausbau zu: " + sCurrent[2][1] + " (" + sCurrent[2][2] + " d)");
+          }
+        }
+      });
+    }
+
+    function getTrGel() {
+      bnBuildTrGel = document.getElementById("bnBuildTrGel");
+      bnBuildTrGel.disabled = true;
+
+      var iTrGel = $('#iDdlTrGel').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSurr',
+        dataType: "json",
+        data: { i: iTrGel, iType: 0 },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildTrGel").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildTrGel.disabled = true;
+          } else {
+            bnBuildTrGel.disabled = false;
+          }
+        }
+      });
+    }
+
+    function getJouthInt() {
+      bnBuildJouthInt = document.getElementById("bnBuildJouthInt");
+      bnBuildJouthInt.disabled = true;
+
+      var iJI = $('#iDdlJouthInt').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSurr',
+        dataType: "json",
+        data: { i: iJI, iType: 1 },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildJouthInt").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildJouthInt.disabled = true;
+          } else {
+            bnBuildJouthInt.disabled = false;
+          }
+        }
+      });
+    }
+
+    function getPark() {
+      bnBuildPark = document.getElementById("bnBuildPark");
+      bnBuildPark.disabled = true;
+
+      var iPark = $('#tbParkp').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSurr',
+        dataType: "json",
+        data: { i: iPark, iType: 2 },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildPark").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildPark.disabled = true;
+          } else {
+            bnBuildPark.disabled = false;
+          }
+        }
+      });
+    }
+
+    function buildTrGel() {
+      var iTG = $('#iDdlTrGel').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildTrGel',
+        dataType: "json",
+        data: { iTrGel: iTG },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function buildJouthInt() {
+      var iInt = $('#iDdlJouthInt').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildJouthInt',
+        dataType: "json",
+        data: { iInt: iInt },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function buildPark() {
+      var iPark = $('#tbParkp').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildPark',
+        dataType: "json",
+        data: { iPark: iPark },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+ </script>
+</head>
+
+<body>
+  <h2>Stadionumgebung</h2>
+
+  <div class="image" style="position: relative; width: 50%; margin-bottom: 1%">
+    <img id="imgStadium" style="position: relative; width: 100%" src="~/Content/Images/stadium/stadion_S.jpg" alt="" />
+  </div>
+
+  <div style="position: relative; width: 50%">
+    <div style="position: relative; width: 100%">
+      <p><b>Trainingsgelände:</b></p>
+      <text id="txtTrGel"></text>
+      <p id="txtTrGelNew"></p>
+      @Html.DropDownListFor(m => m.iTrainingsgel, Model.ddlTrainingsgel, new { @class = "form-control", @onchange = "getTrGel()", id = "iDdlTrGel", @style = "width: 300px; margin-right: 2%" })
+      <button type="submit" id="bnBuildTrGel" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+    </div>
+
+    <div style="position: relative; width: 100%; margin-top: 4%">
+      <p><b>Jugendinternat:</b></p>
+      <text id="txtJouthInt"></text>
+      <p id="txtJouthIntNew"></p>
+      @Html.DropDownListFor(m => m.iJouthInternat, Model.ddlJouthInternat, new { @class = "form-control", @onchange = "getJouthInt()", id = "iDdlJouthInt", @style = "width: 300px; margin-right: 2%" })
+      <button type="submit" id="bnBuildJouthInt" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+    </div>
+
+    @{ 
+      var htmlAttributesEditorFor = new Dictionary<string, object>
+      {
+                              { "type", "number" },
+                              { "class", "form-control tbSeats" },
+                              { "id", "tbParkp" },
+                              { "style", "position: relative width: 100%; text-align: right" },
+                              { "autocomplete", "off" },
+                              { "min", "0" }
+                            };
+      if (Model.iParkpNeu > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
+    }
+    <div style="position: relative; width: 100%; margin-top: 4%">
+      <p><b>Parkplätze:</b></p>
+      <text id="txtPark"></text>
+      <p id="txtParkNew"></p>
+      @Html.EditorFor(Model => Model.iParkp, new { htmlAttributes = htmlAttributesEditorFor })
+      <button type="submit" id="bnBuildPark" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+    </div>
+  </div>
+</body>
+</html>

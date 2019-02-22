@@ -64,6 +64,9 @@ namespace CornerkickWebMvc.Models
 
   public class RegisterViewModel
   {
+    public static List<System.Web.Mvc.SelectListItem> ltLand = new List<System.Web.Mvc.SelectListItem>();
+    public static List<System.Web.Mvc.SelectListItem> ltSpKl = new List<System.Web.Mvc.SelectListItem>();
+
     [Required]
     [EmailAddress]
     [Display(Name = "E-Mail")]
@@ -85,6 +88,7 @@ namespace CornerkickWebMvc.Models
 
 #if !DEBUG
     [Required]
+    [System.Web.Mvc.Remote("CheckExistingTeamName", "Account", HttpMethod = "POST", ErrorMessage = "Vereinsname bereits vorhanden!")]
 #endif
     [DataType(DataType.Text)]
     [Display(Name = "Vereinsname")]
@@ -112,11 +116,6 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Kennwort bestätigen")]
     [Compare("Password", ErrorMessage = "Das Kennwort entspricht nicht dem Bestätigungskennwort.")]
     public string ConfirmPassword { get; set; }
-
-    public static List<System.Web.Mvc.SelectListItem> ltSasn = new List<System.Web.Mvc.SelectListItem>();
-    public static List<System.Web.Mvc.SelectListItem> ltLand = new List<System.Web.Mvc.SelectListItem>();
-    public static List<System.Web.Mvc.SelectListItem> ltSpKl = new List<System.Web.Mvc.SelectListItem>();
-    public static List<System.Web.Mvc.SelectListItem> ltSpTg = new List<System.Web.Mvc.SelectListItem>();
   }
 
   public class ResetPasswordViewModel

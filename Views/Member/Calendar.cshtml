@@ -7,20 +7,37 @@
 
 <head>
   <link href="~/Content/fullcalendar.css" rel="stylesheet" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
   <script src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script src="~/Scripts/moment.min.js"></script>
   <script src="~/Scripts/fullcalendar/fullcalendar.js"></script>
   <script src="~/Scripts/fullcalendar/locale-all.js"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
 </head>
 
-@{ 
-  //DateTime dtToday = MvcApplication.ckcore.dtDatum.AddHours(12);
-  DateTime dtToday = new DateTime(2017, 11, 21, 12, 00, 00);
-  string sDtToday = dtToday.ToString("YYYY-MM-DD");
-}
 <script type="text/javascript">
+  var dtCk = "@MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd HH:mm")";
+
   $(document).ready(function () {
+    // Buttons
+    bnAcceptTg  = document.getElementById("bnAcceptTestgame");
+    bnAcceptTg.disabled = true;
+
+    bnDeclineTg = document.getElementById("bnDeclineTestgame");
+    bnDeclineTg.disabled = true;
+
+    // Radio
+    var rbTestgame = document.getElementById("rbTestgame");
+    var rbCamp     = document.getElementById("rbTrainingscamp");
+
+    // Calendar
+    var dtStart;
     var calendar = $('#calendar').fullCalendar({
       header: {
         left: 'prev, next today',
@@ -28,61 +45,351 @@
         right: 'month,agendaWeek,agendaDay'
       },
       defaultView: 'agendaWeek',
+      nowIndicator: 'true',
+      nowIndicator: true,
       editable: true,
-      allDaySlot: false,
+      allDaySlot: true,
       selectable: true,
       slotMinutes: 15,
       locale: 'de',
-      events: "/Member/PostCalendarData/"
-      /*
-      events: function (start, end, timezone, callback) {
+      events: "/Member/PostCalendarData/",
+      select: function (start, end) {
         $.ajax({
-          cache: false,
-          contentType: "application/json; charset=utf-8",
-          url: '/Member/PostCalendarData',
+          url: "/Member/compareDates",
           type: 'POST',
-          data: { },
+          traditional: true,
+          data: { dt: start.format() },
           dataType: "json",
-          success: function (doc) {
-              events.push(doc);
-              callback(events);
-          },
-          error: function () {
-              alert("Server access failure!");
+          success: function (iCompare) {
+            if (iCompare > 0) {
+              dtStart = start;
+              $("#dialogOptions").dialog("open");
+            } else if (iCompare === -2) {
+              alert("Keine Aktion am Spieltag möglich!");
+            }
           }
         });
       }
-      */
-      /*
-      eventClick: function (calEvent, jsEvent, view) {
-        alert('You clicked on event id: ' + calEvent.id
-          + "\nSpecial ID: " + calEvent.someKey
-          + "\nAnd the title is: " + calEvent.title);
-
-      }*/
     });
 
-    $('#calendar').fullCalendar('gotoDate', "2017-7-1");
+    var jTable = $('#tableTestgames').DataTable({
+      "pageLength": 50,
+      "paging": false,
+      "info": false,
+      "responsive": true,
+      "searching": false,
+      columnDefs: [
+        {
+          targets: 0,
+          "visible": false,
+          "searchable": false
+        }
+      ]
+    });
 
-    $('#btnInit').click(function () {
-      $.ajax({
-        type: 'POST',
-        url: "/Member/InitCalendar",
-        success: function (response) {
-          if (response == 'True') {
-            $('#calendar').fullCalendar('refetchEvents');
-            alert('Database populated! ');
-          }
-          else {
-            alert('Error, could not populate database!');
+    // Table testgame requests
+    $('#tableTestgames tbody').on('click', 'tr', function () {
+      if ($(this).hasClass('selected')) {
+        $(this).removeClass('selected');
+
+        bnAcceptTg .disabled = true;
+        bnDeclineTg.disabled = true;
+      } else {
+        jTable.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+
+        var data = jTable.row('.selected').data();
+        if (data) {
+          bnAcceptTg .disabled = false;
+          bnDeclineTg.disabled = false;
+        }
+      }
+    });
+
+    // Dialogs
+    $(function () {
+      $("#dialogOptions").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            $(this).dialog("close");
+
+            if (rbTestgame.checked) {
+              $("#dialogTestgame").dialog("open");
+            } else if (rbCamp.checked) {
+              var ddlTrainingscampDays = document.getElementById("ddlTrainingscampDays");
+
+              $.ajax({
+                url: "/Member/getStringDaysUntilNextGame",
+                type: 'POST',
+                traditional: true,
+                data: { dtStart: dtStart.format(), iIgnoreGameType: 5 },
+                dataType: "json",
+                success: function (ltDays) {
+                  ddlTrainingscampDays.innerHTML = "";
+
+                  for (var i = 1; i < ltDays.length; i++) {
+                    var sDay = ltDays[i];
+
+                    var el = document.createElement("option");
+                    el.textContent = sDay;
+                    el.value = (i + 1).toString();
+                    ddlTrainingscampDays.appendChild(el);
+                  }
+
+                  setSelectedCamp();
+
+                  $("#dialogTrainingscamp").dialog("open");
+                },
+                error: function (xhr) {
+                  debugger;
+                  alert(xhr);
+                }
+              });
+            }
+          },
+          Cancel: function () {
+            $(this).dialog("close");
           }
         }
       });
     });
+
+    $(function () {
+      $("#dialogTestgame").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            var iTeamId = $("#selectTeam").val();
+            var sTitle = "Testspiel";
+
+            $.ajax({
+              url: "/Member/AddTestGameToCalendar",
+              type: 'POST',
+              traditional: true,
+              data: { title: sTitle, start: dtStart.format(), iTeamId: iTeamId },
+              dataType: "json",
+              success: function (response) {
+                alert(response);
+                calendar.fullCalendar('refetchEvents');
+              },
+              error: function (xhr) {
+                debugger;
+                alert(xhr);
+              }
+            });
+
+            calendar.fullCalendar('unselect');
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+    });
+
+    $(function () {
+      $("#dialogTrainingscamp").dialog({
+        autoOpen: false,
+        width: "600px",
+        buttons: {
+          "Bestätigen": function () {
+            var iCampIx = $("#selectCamp option:selected").index();
+            var nDays   = $("#ddlTrainingscampDays").val();
+
+            $.ajax({
+              url: "/Member/bookTrainingscamp",
+              type: 'POST',
+              traditional: true,
+              data: { iIx: iCampIx, sStart: dtStart.format(), nDays: nDays },
+              dataType: "json",
+              success: function (response) {
+                alert(response);
+                calendar.fullCalendar('refetchEvents');
+              },
+              error: function (xhr) {
+                debugger;
+                alert(xhr);
+              }
+            });
+
+            calendar.fullCalendar('unselect');
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+    });
+
+    $('#selectCamp').on('change', function (ev) {
+      setSelectedCamp();
+    });
+
+    $('#ddlTrainingscampDays').on('change', function (ev) {
+      setSelectedCamp();
+    });
+
+    $("#bnAcceptTestgame").click(function () {
+      var data = jTable.row('.selected').data();
+      if (data) {
+        var sDate = data[0];
+
+        $.ajax({
+          type: 'post',
+          url: '/Member/AcceptTestgame',
+          dataType: "json",
+          data: { sDateTestgame: sDate },
+          success: function () {
+            window.location.reload(true);
+          },
+          error: function (xhr) {
+            alert(xhr.responseJSON.message);
+          }
+        });
+      }
+    });
+
+    $("#bnDeclineTestgame").click(function () {
+      var data = jTable.row('.selected').data();
+      if (data) {
+        var sDate = data[0];
+
+        $.ajax({
+          type: 'post',
+          url: '/Member/DeclineTestgame',
+          dataType: "json",
+          data: { sDateTestgame: sDate },
+          success: function () {
+            window.location.reload(true);
+          }
+        });
+      }
+    });
   });
+
+  function setSelectedCamp() {
+    var iCampIx = $("#selectCamp option:selected").index();
+    var nDays   = $("#ddlTrainingscampDays").val();
+
+    $.ajax({
+      url: '/Member/setSelectedCamp',
+      type: "GET",
+      dataType: "JSON",
+      data: { iIx: iCampIx },
+      success: function (camp) {
+        var divSelCamp = $("#tableDivSelectedCamp");
+
+        var sBox = '';
+
+        sBox += '<table id="tableSelectedCamp" style="width: 100%" border="1" cellpadding="2">';
+        sBox += '<tr>';
+        sBox += '<th style="text-align:center">Bonus Kondi.</th>';
+        sBox += '<th style="text-align:center">Bonus Frische</th>';
+        sBox += '<th style="text-align:center">Bonus Moral</th>';
+        sBox += '<th style="text-align:center">Bonus Training</th>';
+        sBox += '<th style="text-align:center">Kosten / Nacht</th>';
+        sBox += '<th style="text-align:center">Reisekosten</th>';
+        sBox += '<th style="text-align:center">Reisestrapazen</th>';
+        sBox += '</tr>';
+
+        sBox += '<tr>';
+        sBox += '<td align="center">' + (camp.fBonusKondi * 100).toFixed(1).toString() + '%</td>';
+        sBox += '<td align="center">' + (camp.fBonusFresh * 100).toFixed(1).toString() + '%</td>';
+        sBox += '<td align="center">' + (camp.fBonusMood  * 100).toFixed(1).toString() + '%</td>';
+        sBox += '<td align="center">' + (camp.fBonusF     * 100).toFixed(1).toString() + '%</td>';
+        sBox += '<td align="center">' + camp.iCost.toString() + ' €</td>';
+        sBox += '<td align="center">' + camp.iCostTravel.toString() + ' €</td>';
+        sBox += '<td align="center">' + (camp.fMalusFreshTravel * 100).toFixed(1).toString() + '%</td>';
+        sBox += '</tr>';
+
+        sBox += '</table>';
+
+        divSelCamp.html(sBox).show();
+
+        var iCostTotal = (camp.iCost * nDays) + (camp.iCostTravel * 2);
+        $("#txtCost").text("Gesamtkosten: " + iCostTotal.toString() + " €");
+      }
+    });
+  }
 </script>
 
-@*
-  <a href="#" id="btnInit" class="btn btn-secondary">Initialise database!</a>
-*@
-<div id="calendar" style="position: relative; width: 100%; margin-top: 2%"></div>
+<div id="calendar" style="position: relative; width: 100%; margin-top: 2%; margin-bottom: 2%"></div>
+
+<h4>Anfragen Testspiele</h4>
+
+<table id="tableTestgames" cellspacing="0" style="width: auto" class="display responsive nowrap">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Datum</th>
+      <th>Heim</th>
+      <th>Auswärts</th>
+    </tr>
+  </thead>
+  <tbody>
+    @{
+      foreach (CornerkickWebMvc.Models.Testgame tg in Model.ltTestgames) {
+        string sDate = tg.dt.ToString("dd.MM.yyyy HH:mm");
+        string sDateIso = tg.dt.ToString("yyyy-MM-ddTHH:mm");
+        <tr>
+          <td align="center">@sDateIso</td>
+          <td align="center">@sDate</td>
+          <td align="center">@MvcApplication.ckcore.ltClubs[tg.iTeamHome].sName</td>
+          <td align="center">@MvcApplication.ckcore.ltClubs[tg.iTeamAway].sName</td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>
+
+<button type="submit" id="bnAcceptTestgame" class="btn btn-default" style="width: 49%">Anfrage bestätigen</button>
+<button type="submit" id="bnDeclineTestgame" class="btn btn-default" style="width: 49%">Anfrage ablehnen</button>
+
+<div id="dialogOptions" title="Was wollen Sie machen?">
+  <input type="radio" name="rbOptions" id="rbTestgame" checked="checked" value="1">
+  <text for="1"> Testspiel vereinbaren</text><br>
+  <input type="radio" name="rbOptions" id="rbTrainingscamp" value="2">
+  <text for="2"> Trainingslager planen</text><br>
+</div>
+
+<div id="dialogTestgame" title="Testspielanfrage">
+  <p>Wählen Sie Ihren gewünschten Testspielgegner:</p>
+
+  <select name="Team" id="selectTeam">
+    @{
+      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
+        if (iC != CornerkickWebMvc.Controllers.AccountController.ckClub().iId && MvcApplication.ckcore.ltClubs[iC].iLand >= 0) {
+          <option value="@iC.ToString()">@MvcApplication.ckcore.ltClubs[iC].sName</option>
+        }
+      }
+    }
+  </select>
+</div>
+
+<div id="dialogTrainingscamp" title="Trainingslager buchen" style="width: 200px">
+  <p>Wählen Sie Ihr gewünschtes Trainingslager:</p>
+
+  <select name="Camp" id="selectCamp">
+    @{
+      foreach (CornerkickCore.csTrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
+        <option value="@camp.iId.ToString()">@camp.sName</option>
+      }
+    }
+  </select>
+
+  <div id="tableDivSelectedCamp" style="position: relative; margin-top: 6px"></div>
+
+  <div style="position: relative; margin-top: 16px">
+    <text>Übernachtungen:</text>
+    <select id="ddlTrainingscampDays"></select>
+  </div>
+
+  <div style="position: relative; margin-top: 16px">
+    <text id="txtCost">Gesamtkosten:</text>
+  </div>
+</div>

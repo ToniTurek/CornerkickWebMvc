@@ -1,0 +1,256 @@
+﻿@model CornerkickWebMvc.Models.TaktikModel
+
+@{
+  ViewBag.Title = "Taktik";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().taktik;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+    @{
+      int iAusrichtung = (int)(taktik.fAusrichtung       * 100);
+      int iEinsatz     = (int)(taktik.fEinsatz           * 100);
+      int iSchussentf  = (int)(taktik.fSchusshaeufigkeit * 100);
+      int iZK          = (int)(taktik.fAggressivitaet    * 100);
+      int iLeft        = (int)((taktik.fPassLeft  + 1f)  * 100);
+      int iRight       = (int)((taktik.fPassRight + 1f)  * 100);
+    }
+    $(function () {
+      $("#slider-Ausrichtung").slider({
+        range: "min",
+        value: @iAusrichtung,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputAusrichtung").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 0, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-Einsatz").slider({
+        range: "min",
+        value: @iEinsatz,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputEinsatz").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 1, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-Schussentf").slider({
+        range: "min",
+        value: @iSchussentf,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputSchussentf").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 2, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-Zweikampf").slider({
+        range: "min",
+        value: @iZK,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputZweikampf").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 3, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-left").slider({
+        range: "min",
+        value: @iLeft,
+        min:    0,
+        max: +300,
+        step: 10,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          $("#inputLeft").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 4, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-right").slider({
+        range: "min",
+        value: @iRight,
+        min:    0,
+        max: +300,
+        step: 10,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          $("#inputRight").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 5, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#inputAusrichtung").val($("#slider-Ausrichtung").slider("value") + "%");
+      $("#inputEinsatz")    .val($("#slider-Einsatz")    .slider("value") + "%");
+      $("#inputSchussentf") .val($("#slider-Schussentf") .slider("value") + "%");
+      $("#inputZweikampf")  .val($("#slider-Zweikampf")  .slider("value") + "%");
+      $("#inputLeft")       .val($("#slider-left")       .slider("value") + "%");
+      $("#inputRight")      .val($("#slider-right")      .slider("value") + "%");
+    });
+
+    function setStandards(iStd) {
+      var iIndexPl = $('#iDdlStandard' + iStd).val();
+      $.ajax({
+        url: '/Member/setStandards',
+        type: "GET",
+        dataType: "JSON",
+        data: { iStandard: iStd, iIndexPlayer: iIndexPl },
+        success: function () {
+          //alert(iTg);
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <fieldset>
+    <legend>Taktik</legend>
+    <div style="position: relative; margin-bottom: 2%">
+      <p>
+        @Html.LabelFor(m => m.fAusrichtung, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputAusrichtung" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Ausrichtung"></div>
+
+      <p>
+        @Html.LabelFor(m => m.fEinsatz, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputEinsatz" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Einsatz"></div>
+
+      <p>
+        @Html.LabelFor(m => m.fSchussentf, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputSchussentf" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Schussentf"></div>
+
+      <p>
+        @Html.LabelFor(m => m.fZkAggressiv, new { @class = "col-md-2 control-label" })
+        <input type="text" id="inputZweikampf" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      </p>
+      <div id="slider-Zweikampf"></div>
+    </div>
+
+    <div class="image" style="position: relative; width: 100%">
+      <img style="position: relative; width: 100%; transform:rotate(180deg)" src="~/Content/Images/stadium/field.png" />
+
+      <div style="position: absolute; float: left; width: 100%; height: 100%; border: 1px solid red">
+        <div style="position: absolute; width: 50%; height: 100%; border: 1px solid blue">
+          <p>
+            <input type="text" id="inputLeft" readonly style="border:0; color:#f6931f; font-weight:bold;">
+          </p>
+          <div id="slider-left" style="position: relative; height: 100%"></div>
+        </div>
+      </div>
+
+      <div style="position: absolute; width: 10%; left: 90%">
+        <p>
+          <input type="text" id="inputRight" readonly style="border:0; color:#f6931f; font-weight:bold;">
+        </p>
+        <div id="slider-right"></div>
+      </div>
+    </div>
+
+    <legend>Schützen</legend>
+    <div class="form-group" style="position: relative">
+      <div style="position: relative; margin-bottom: 1%">
+        <b class="left">Elfmeter:</b>
+        @Html.DropDownListFor(m => m.sStandards[0], Model.ltDdlStandards[0], new { @class = "form-control", @onchange = "setStandards(0)", id = "iDdlStandard0" })
+      </div>
+      <div style="position: relative; margin-bottom: 1%">
+        <b class="left">Freistoß:</b>
+        @Html.DropDownListFor(m => m.sStandards[1], Model.ltDdlStandards[1], new { @class = "form-control", @onchange = "setStandards(1)", id = "iDdlStandard1" })
+      </div>
+      <div style="position: relative; margin-bottom: 1%">
+        <b class="left">Ecke rechts:</b>
+        @Html.DropDownListFor(m => m.sStandards[2], Model.ltDdlStandards[2], new { @class = "form-control", @onchange = "setStandards(2)", id = "iDdlStandard2" })
+      </div>
+      <div style="position: relative; margin-bottom: 1%">
+        <b class="left">Ecke links:</b>
+        @Html.DropDownListFor(m => m.sStandards[3], Model.ltDdlStandards[3], new { @class = "form-control", @onchange = "setStandards(3)", id = "iDdlStandard3" })
+      </div>
+    </div>
+  </fieldset>
+</body>
+</html>
+
+@*
+  <div class="form-group" style="position: relative; width: 100%; height: 30px; background-color: white">
+    <div class="form-group" style="position: absolute; width: 50%; height: auto">
+      <div class="col-md-10">
+        <input type="range" min="-10" max="+10" />
+      </div>
+    </div>
+  </div>
+*@

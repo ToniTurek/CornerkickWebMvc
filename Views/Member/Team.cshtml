@@ -1,47 +1,155 @@
 ﻿@model CornerkickWebMvc.Models.TeamModels
 
 @{
-  ViewBag.Title = "Team";
-  @*
-  Layout = null;
-  *@
-Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Aufstellung";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+
+  var clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
+  var plSelected = MvcApplication.ckcore.ltPlayer[clubUser.ltPlayerId[0]];
+  var tactic = clubUser.taktik;
 }
 
 <!DOCTYPE html>
-<script src="~/Scripts/Formation.js" type="text/javascript"></script>
+<script type="text/javascript" src="~/Scripts/draw.js"></script>
+<script type="text/javascript" src="~/Scripts/Formation.js"></script>
 <head>
   <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
   <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
   <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
-  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
   <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
 
   <script type="text/javascript">
-    $(document).ready(function () {
-      var ddlFormation = $('#ddlFormation');
-      var iFormation = 0;
+    var iFormation = 0;
+    var iSelectedPlayer = 0;
+    var bAllowMove = false;
 
-      if (ddlFormation.val() > 0) iFormation = ddlFormation.val();
+    var datatableTeamGlobal;
 
-      drawAufstellung(iFormation);
+    $('#img_arrow_1').on('touchstart', function () {
+      movePlayer(1);
+    });
 
-      ddlFormation.change(function () {
-        iFormation = $(this).val(); // Use $(this) so you don't traverse the DOM again
-        drawAufstellung(iFormation);
+    $('#img_arrow_2').on('touchstart', function () {
+      movePlayer(2);
+    });
+
+    $('#img_arrow_3').on('touchstart', function () {
+      movePlayer(3);
+    });
+
+    $('#img_arrow_4').on('touchstart', function () {
+      movePlayer(4);
+    });
+
+    function movePlayer(iMoveDirection) {
+      if (!e) var e = window.event;
+      e.cancelBubble = true;
+      if (e.stopPropagation) e.stopPropagation();
+
+      iFormation = 0;
+      document.getElementById('ddlFormation').value = iFormation;
+
+      document.getElementById("bnSaveFormation").disabled = false;
+
+      movePlayerAjax(iMoveDirection);
+    }
+
+    function moveRoa(iMoveDirection) {
+      if (!e) var e = window.event;
+      e.cancelBubble = true;
+      if (e.stopPropagation) e.stopPropagation();
+
+      moveRoaAjax(iMoveDirection);
+    }
+
+    function selectPlayer(iSelPlayer) {
+      if (!e) var e = window.event;
+      e.cancelBubble = true;
+      if (e.stopPropagation) e.stopPropagation();
+
+      iSelectedPlayer = iSelPlayer + 1;
+      drawAufstellung(iFormation, iSelectedPlayer, true);
+    }
+
+    function selectPlayerOpp(iSelPlayerOpp) {
+      if (iSelectedPlayer < 0) {
+        return;
+      }
+
+      if (!e) var e = window.event;
+      e.cancelBubble = true;
+      if (e.stopPropagation) e.stopPropagation();
+
+      $.ajax({
+        url: '/Member/TeamSetManMarking',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        data: { iIxPlayer: iSelectedPlayer - 1, iIxPlayerOpp: iSelPlayerOpp - 11 },
+        success: function () {
+          drawAufstellung(iFormation, iSelectedPlayer, true);
+        }
       });
+    }
 
-      var oTable = $('#table1').DataTable({
-        "ajax": '@Url.Action("GetJSONQuery", "Member")',
+    function cleanSelectedPlayer() {
+      if (!e) var e = window.event;
+      e.cancelBubble = true;
+      if (e.stopPropagation) e.stopPropagation();
+
+      iSelectedPlayer = 0;
+      drawAufstellung(iFormation, iSelectedPlayer, true);
+      datatableTeamGlobal.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp');
+      datatableTeamGlobal.rows('.selected')    .nodes().to$().removeClass('selected');
+    }
+
+    function movePlayerAjax(iMoveDirection) {
+      $.ajax({
+        url: '/Member/movePlayer',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        data: { iIndexPlayer: iSelectedPlayer - 1, iDirection: iMoveDirection },
+        success: function () {
+          drawAufstellung(-1, iSelectedPlayer, true);
+          datatableTeamGlobal.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp');
+          datatableTeamGlobal.rows('.selected')    .nodes().to$().removeClass('selected');
+        }
+      });
+    }
+
+    function moveRoaAjax(iMoveDirection) {
+      $.ajax({
+        url: '/Member/movePlayerRoa',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        data: { iIndexPlayer: iSelectedPlayer - 1, iDirection: iMoveDirection },
+        success: function () {
+          drawAufstellung(-1, iSelectedPlayer, false);
+        }
+      });
+    }
+
+    function datatableTeam() {
+      datatableTeamGlobal = $('#tableTeam').DataTable({
+        "ajax": '@Url.Action("getTableTeam", "Member")',
         "columns": [
-          { "data": "sI" },
+          { "data": "iIndex" },
           { "data": "sID" },
+          { "data": "bSubstituted" },
           { "data": "sNr" },
           {
             "data": "sName",
             "render": function (data, type, row) {
-              return '@Html.ActionLink("name", "PlayerDetails", "Member", new {i = "id"}, new { target = "_blank" })'.replace("name", data).replace("id", row.sID);
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "_blank" })'.replace("name", data).replace("id", row.sID);
             }
           },
           { "data": "sPosition" },
@@ -49,57 +157,116 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           { "data": "sKondi" },
           { "data": "sFrische" },
           { "data": "sMoral" },
+          { "data": "sStaerkeIdeal" },
           { "data": "sErf" },
+          { "data": "sForm" },
+          { "data": "sAlter" },
+          { "data": "sTalent" },
+          { "data": "fLeader" },
           { "data": "sMarktwert" },
           { "data": "sGehalt" },
           { "data": "sLz" },
           { "data": "sNat" },
-          { "data": "sForm" },
-          { "data": "sAlter" }
+          { "data": "iSuspended" }
         ],
         rowReorder: {
-          dataSrc: 'sI'
+          dataSrc: 'iIndex'
         },
         "pageLength": 50,
         "paging": false,
         "info": false,
         "responsive": true,
+        "searching": false,
         columnDefs: [
-          { targets: 1, "orderable": false },
-          { targets: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], "className": "dt-center" },
+          {
+            targets: [1, 2, 20],
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "className": "dt-center" }
         ],
         select: true,
         select: {
           selector: 'tr',
           style: 'os'
         },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-          //alert(iDisplayIndex);
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if        (aData.iIndex < 12) {
+            if (aData.iIndex % 2 == 0) {
+              $('td', nRow).css('background-color', "rgb(235,255,235)");
+            } else {
+              $('td', nRow).css('background-color', "rgb(245,255,245)");
+            }
+            $('td', nRow).eq( 0).css('background-color', "rgb(210,230,188)");
+          } else if (aData.iIndex < 19) {
+            if (aData.iIndex % 2 == 0) {
+              $('td', nRow).css('background-color', "rgb(230,240,255)");
+            } else {
+              $('td', nRow).css('background-color', "rgb(240,250,255)");
+            }
+            $('td', nRow).eq( 0).css('background-color', "rgb(192,204,224)");
+          }
 
-          if (iDisplayIndex < 11) {
-            $('td', nRow).eq(0).css('background-color', "rgb(210,230,188)");
-          } else if (iDisplayIndex < 19) {
-            $('td', nRow).eq(0).css('background-color', "rgb(192,204,224)");
+          if (aData.bSubstituted) {
+            $('td', nRow).css('color', "rgb(180,180,180)");
           } else {
-            $('td', nRow).eq(0).css('background-color', "rgb(225,204,190)");
+            if (aData.iSuspended < 0) {
+              $('td', nRow).css('color', "rgb(220,140,0)");
+            } else if (aData.iSuspended > 0) {
+              $('td', nRow).css('color', "rgb(255,0,0)");
+            }
           }
         }
       });
 
-      oTable.on('row-reorder', function (dragEvent, diff, nodes) {
-        alert("oTable");
-        var iNr = nodes.triggerRow.data()[0];
-        var iFromPos = 0;
-        var iToPos = 0;
-        for (var i = 0, ien = diff.length; i < ien; i++) {
-          var rowData = oTable.row(diff[i].node).data();
-          if (rowData[0] === iNr) {
-            iFromPos = diff[i].oldData;
-            iToPos   = diff[i].newData;
-            break;
-          }
-        }
+      return datatableTeamGlobal;
+    }
 
+    $(document).ready(function () {
+      // declarations
+      var ddlFormation = $('#ddlFormation');
+
+      bnSaveFormation = document.getElementById("bnSaveFormation");
+      bnSaveFormation.disabled = true;
+      bnDeleteFormation = document.getElementById("bnDeleteFormation");
+
+      var fWidth = $(document).width();
+      // end declarations
+
+      // Formation
+      if (ddlFormation.val() > 0) {
+        iFormation = ddlFormation.val();
+        bnDeleteFormation.disabled = iFormation < 21;
+      }
+
+      drawAufstellung(iFormation, iSelectedPlayer, true);
+
+      // Radio-buttons defence/offence
+      $("#rbDefence").on('change', function (ev) {
+        drawAufstellung(iFormation, 0, true);
+      });
+
+      $("#rbOffence").on('change', function (ev) {
+        drawAufstellung(iFormation, 0, true);
+      });
+
+      // Initialize Substitution list
+      getSubstitutionList();
+
+      var oTable = datatableTeam();
+
+      /*
+      if ($(window).width() < 960) {
+        alert($(this).attr('data-column'));
+        var column = oTable.column("sName");
+        column.visible(false);
+      };
+      */
+
+      oTable.on('row-reorder', function (dragEvent, diff, nodes) {
+        var iFromPos = diff[0].oldData;
+        var iToPos   = diff[0].newData;
         $.ajax({
           url: '/Member/UpdateRow',
           type: "GET",
@@ -109,37 +276,70 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           data: { fromPosition: iFromPos, toPosition: iToPos }
         });
 
-        drawAufstellung(iFormation);
+        drawAufstellung(iFormation, iSelectedPlayer, true);
       });
 
-      $('#table1 tbody').on('click', 'tr', function () {
-        $(this).toggleClass('selected');
+      $('#tableTeam tbody').on('click', 'tr', function () {
+        $(this).toggleClass('selected_tmp'); // add temporary selected class
+
+        var data = oTable.rows('.selected_tmp').data(); // get data from row(s)
 
         /*
         var tr = $(this).closest('tr');
         var row = $('#myTable').DataTable().row(tr);
         */
 
-        var data = oTable.rows('.selected').data();
+        if (data.length == 0) {
+          iSelectedPlayer = 0;
+          drawAufstellung(iFormation, iSelectedPlayer, true);
+          oTable.rows('.selected').nodes().to$().removeClass('selected'); // if no data --> remove all selected classes
+        } else if (data.length == 1) {
+          if (data[0].iSuspended < 1) {
+            $(this).toggleClass('selected'); // add selected class to row
 
-        if (data.length == 2) {
-          var i1 = data[0].sID;
-          var i2 = data[1].sID;
+            iSelectedPlayer = data[0].iIndex;
+            drawAufstellung(iFormation, iSelectedPlayer, true);
+          } else {
+            // suspended
+            oTable.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp'); // remove all selected_tmp classes
+          }
+        } else if (data.length == 2) {
+          if (data[0].iSuspended < 1 && data[1].iSuspended < 1) {
+            $(this).toggleClass('selected'); // add selected class to row
 
-          $.ajax({
-            url: '/Member/SwitchPlayerByID',
-            type: "GET",
-            dataType: "JSON",
-            data: { iID1: i1, iID2: i2 },
-            success: function (ltPlayer) {
-              console.log(ltPlayer); // <==============================
-              if (ltPlayer) {
-                drawAufstellung(iFormation);
-                oTable.ajax.reload();
+            var i1 = data[0].sID;
+            var i2 = data[1].sID;
+
+            $.ajax({
+              url: '/Member/SwitchPlayerByID',
+              type: "GET",
+              dataType: "JSON",
+              data: { iID1: i1, iID2: i2 },
+              success: function (ltPlayer) {
+                //console.log(ltPlayer);
+                if (ltPlayer) {
+                  iSelectedPlayer = 0;
+                  drawAufstellung(iFormation, iSelectedPlayer, true);
+                  oTable.ajax.reload();
+
+                  getSubstitutionList();
+                }
               }
-            }
-          });
+            });
+          } else {
+            oTable.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp'); // remove all selected_tmp classes
+          }
         }
+      });
+
+      ddlFormation.change(function () {
+        iSelectedPlayer = 0;
+        iFormation = $(this).val(); // Use $(this) so you don't traverse the DOM again
+        drawAufstellung(iFormation, iSelectedPlayer, true);
+        oTable.ajax.reload();
+
+        bnSaveFormation.disabled = iFormation > 0;
+        bnDeleteFormation.disabled = iFormation < 21;
       });
 
       /*
@@ -151,6 +351,110 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         alert(row.data);
       });
       */
+
+      $("#bnSaveFormation").click(function () {
+        sName = document.getElementById("tbSaveFormation").value;
+        if (sName == "") {
+          alert("Name für Formation angeben");
+        } else {
+          $.ajax({
+            type: 'post',
+            url: '/Member/saveFormation',
+            dataType: "json",
+            data: { sName: sName },
+            success: function (iFrm) {
+              window.location.reload(true);
+            }
+          });
+        }
+      });
+
+      $("#bnDeleteFormation").click(function () {
+        $.ajax({
+          type: 'post',
+          url: '/Member/deleteFormation',
+          dataType: "json",
+          data: { iFormation: iFormation },
+          success: function () {
+            window.location.reload(true);
+          }
+        });
+      });
+
+      $("#bnAutoFormation").click(function () {
+        var iType = $('#ddlAutoFormationType').val();
+        doAutoFormation(parseInt(iType));
+      });
+
+      $('#ddlAutoFormationType').on('change', function (ev) {
+        var iType = $('#ddlAutoFormationType').val();
+        doAutoFormation(parseInt(iType));
+      });
+
+      function doAutoFormation(iType) {
+        $.ajax({
+          type: "post",
+          url: '/Member/doFormationKI',
+          dataType: "json",
+          data: { iType: iType },
+          success: function () {
+            drawAufstellung(iFormation, -1, true);
+            oTable.ajax.reload();
+          }
+        });
+      }
+
+      //window.scrollTo(0, 600);
+    }); // $(document).ready(function () {});
+
+    $(function () {
+      @{
+      int iOrientation = (int)(tactic.fOrientation * 100);
+      }
+
+      $("#slider-Orientation").slider({
+        range: "min",
+        value: @iOrientation,
+        min: -100,
+        max: +100,
+        step: 10,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          //$("#inputOrientation").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 0, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              drawAufstellung(iFormation, iSelectedPlayer, true);
+              //alert("Orientation set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-IndOrientation").slider({
+        range: "min",
+        value: 0,
+        min: -100,
+        max: +100,
+        step: 10,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          //$("#inputOrientation").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/TeamSetIndOrientation',
+            type: "GET",
+            dataType: "JSON",
+            data: { iIndexPlayer: iSelectedPlayer - 1, fIndOrientation: ui.value / 100 },
+            success: function (fIndOrientation) {
+              drawAufstellung(iFormation, iSelectedPlayer, false);
+              //alert("Orientation set to " + fTaktik);
+            }
+          });
+        }
+      });
     });
 
     /*
@@ -176,85 +480,162 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   </script>
 </head>
 
-<script>/* Formatting function for row details - modify as you need */
-</script>
-@*
-        <div id="draggable">Drag me</div>
+<style>
+  .selected td {
+    background-color: pink !important; /* Add !important to make sure override datables base styles */
+  }
 
-          <script>
-            $("#draggable").draggable();
-          </script>
+  #slider {
+    margin: 10px;
+  }
 
-      @using (Html.BeginForm("CkAufstellungFormation", "Member", FormMethod.Post, new { @class = "form-horizontal", role = "form" })) {
-        <div class="form-group">
-          <div class="col-md-10">
-            @Html.DropDownListFor(m => m.iFormation, CornerkickWebMvc.Models.TeamModels.ltsFormations, "Formation", new { @Id = "ddlFormation", @class = "form-control" })
-          </div>
+  .ui-slider-vertical {
+    height: 100%;
+    width: 20px;
+  }
+
+  .ui-slider .ui-slider-handle {
+    height: 26px;
+    width: 26px;
+    padding-left: 0px;
+  }
+
+  #slider-Orientation .ui-slider-range {
+    background: orange;
+  }
+
+  #slider-Orientation .ui-slider-handle {
+    border-color: orange;
+  }
+
+  #slider-IndOrientation .ui-slider-range {
+    background: orange;
+  }
+
+  #slider-IndOrientation .ui-slider-handle {
+    border-color: orange;
+  }
+
+  #slider-IndOrientation.ui-slider-vertical {
+    width: 15px;
+  }
+
+  #slider-IndOrientation.ui-slider .ui-slider-handle {
+    height: 22px;
+    width: 22px;
+  }
+</style>
+
+@{
+  if (true) { // is admin
+    <div class="image" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 1%">
+      <img style="position: relative; width: 100%; transform:rotate(180deg)" src="~/Content/Images/stadium/field.png" />
+      <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
+      <div style="position: absolute; float: left; margin-left: 5%; width: 90%; height: 94%; top: 3%; left: 0%">
+        <div id="drawFormation" onclick="javascript:cleanSelectedPlayer()" style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%"></div>
+
+        <div id="divTacticOrientation" style="position: absolute; width: 0%; height: 100%; top: 0%; left: 101%; display:none">
+          @*
+            <p>
+              <input type="text" id="inputOrientation" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; width: 37px; left: 0px">
+            </p>*@
+          <div id="slider-Orientation" style="position: relative; height: 100%"></div>
         </div>
-        <input type="submit" value="übernehmen" />
+
+        <div id="divTacticIndOrientation" style="position: absolute; width: 0%; height: 50%; top: 0%; left: -3%; display:none">
+          @*
+            <p>
+              <input type="text" id="inputIndOrientation" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; width: 37px; left: 0px">
+            </p>*@
+          <div id="slider-IndOrientation" style="position: relative; height: 100%"></div>
+        </div>
+      </div>
+      <div align="center" style="position: absolute; top: 2px; width: 100%">
+        <div style="position: relative; width: 300px; height: 30px; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+          <form>
+            <fieldset>
+              <input type="radio" id="rbDefence" name="rbDefOff" value="0" checked>
+              <label for="rbDefence" style="font-size:140%; color: black; margin-right: 4%"> Formation</label>
+              <input type="radio" id="rbOffence" name="rbDefOff" value="1">
+              <label for="rbOffense" style="font-size:140%; color: black"> Offensive</label>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+
+      <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
+    </div>
+
+    <div class="form-group" style="position: relative; float: left; width: 100%; height: auto; background-color: white">
+      <div class="form-group" style="position: relative; float: left; width: 60%; min-width: 340px; height: 30px">
+        <div style="position: absolute; width: 120px; height: auto">
+          @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlFormation", @class = "form-control" })
+        </div>
+        <input id="tbSaveFormation" class="form-control" style="position: absolute; left: 120px; width: 100px; height: auto" />
+        <button type="submit" id="bnSaveFormation" class="btn btn-default" style="position: absolute; left: 220px; width: 60px; height: auto">save</button>
+        <button type="submit" id="bnDeleteFormation" class="btn btn-default" style="position: absolute; left: 280px; width: 60px; height: auto">delete</button>
+      </div>
+      @{
+        if (!Model.bGame) {
+          <div style="position: relative; float: left; width: 40%; min-width: 340px; height: 30px">
+            <div style="position: absolute; width: 49%">
+              <button type="submit" id="bnAutoFormation" class="btn btn-default" style="position: relative; width: 100%">Co-Trainer</button>
+            </div>
+
+            <div style="position: absolute; width: 49%; left: 51%">
+              @Html.DropDownListFor(m => m.sAutoFormationType, Model.ltDdlAutoFormationType, new { @class = "form-control", id = "ddlAutoFormationType" })
+            </div>
+          </div>
+        }
       }
-
-    @using (Ajax.BeginForm("Test", "Member",
-                                  new AjaxOptions {
-                                    HttpMethod = "GET",
-                                    InsertionMode = InsertionMode.Replace,
-                                    UpdateTargetId = "searchResults"
-                                  })) {
-      string patient_Name = "";
-      @Html.EditorFor(x => patient_Name) //text box with name and id, that it will pass to controller
-                                          <input type="submit" value="Search" />
-    }
-
-    @Html.Partial("_PartialViewTest")
-
-  <table id="searchResults"></table>
-*@
-
-<div class="form-group" style="position: relative; width: 100%; height: 30px; background-color: white">
-  <div class="form-group" style="position: absolute; width: 50%; height: auto">
-    @Html.LabelFor(m => m.sFormation, new { @class = "col-md-2 control-label" })
-    <div class="col-md-10">
-      @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, "Formation", new { @Id = "ddlFormation", @class = "form-control" })
     </div>
-  </div>
-  <div style="position: absolute; left: 50%; width: 50%; height: auto; text-align: left">
-    @using (Html.BeginForm("CkAufstellungKI", "Member", FormMethod.Post/*, new { @class = "form-control", role = "form" }*/)) {
-      <input type="submit" value="Co-Trainer" style="position: absolute; left: 50%; width: 50%; height: auto"/>
+
+    // Substitutions
+    if (Model.bGame) {
+      if (CornerkickWebMvc.Models.TeamModels.ltsSubstitution != null) {
+        <h4>Geplante Spielerwechsel</h4>
+        <div id="drawSubstitutions" style="position: relative"></div>
+        using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
+          <input type="submit" value="bestätigen" style="position: relative; width: 20%; min-width: 100px; height: 100%" />
+        }
+        using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
+          <input type="submit" value="zurücksetzen" style="position: relative; width: 20%; min-width: 100px; height: 100%" />
+        }
+      }
     }
+  }
+}
+
+<div id="tablediv">
+  <div class="dataTables_wrapper">
+    <table id="tableTeam" cellspacing="0" style="width: 100%" class="display responsive nowrap">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>subst</th>
+          <th>Nr</th>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Stärke</th>
+          <th>Kondi.</th>
+          <th>Frische</th>
+          <th>Moral</th>
+          <th>St. ber.</th>
+          <th>Erf.</th>
+          <th>Form</th>
+          <th>Alter</th>
+          <th>Talent</th>
+          <th>FP</th>
+          <th>Marktwert [€]</th>
+          <th>Gehalt [€/a]</th>
+          <th>Lz [a]</th>
+          <th>Nat.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+    </table>
   </div>
 </div>
-
-<div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
-  <img style="position: relative; width: 100%" src="~/Content/Images/field.png" alt="" />
-  <div id="drawFormation" style="position: absolute; margin-left: 5%; width: 90%; height: 92%; top: 0%; left: 0%; border: 0px solid black"></div>
-</div>
-
-  <div id="tablediv">
-    <div class="dataTables_wrapper">
-      <table id="table1" cellspacing="0" style="width: auto" class="display responsive nowrap">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th></th>
-            <th>Nr</th>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Stärke</th>
-            <th>Kondi.</th>
-            <th>Frische</th>
-            <th>Moral</th>
-            <th>Erf.</th>
-            <th>Marktwert [€]</th>
-            <th>Gehalt [€]</th>
-            <th>Lz</th>
-            <th>Nat.</th>
-            <th>Form</th>
-            <th>Alter</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!---Data and tags are dynamically generated--->
-        </tbody>
-      </table>
-    </div>
-  </div>

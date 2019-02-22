@@ -1,0 +1,1652 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Services;
+using System.Web.Services.Protocols;
+using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
+
+namespace CornerkickWebMvc.Controllers
+{
+#if !DEBUG
+  [Authorize]
+#endif
+  public class MemberController : Controller
+  {
+    public MemberController()
+    {
+#if _CONSOLE
+      ConsoleNews();
+#endif
+    }
+
+    // 
+    // GET: /HelloWorld/ 
+    [Authorize]
+    public string Index()
+    {
+      return "This is my <b>default</b> action...";
+    }
+
+    // 
+    // GET: /HelloWorld/Welcome/ 
+    [Authorize]
+    public string Welcome(string name, int numTimes = 1)
+    {
+      return HttpUtility.HtmlEncode("Hello " + name + ", NumTimes is: " + numTimes);
+    }
+
+#if _CONSOLE
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Console
+    /// </summary>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult ConsoleNews()
+    {
+      if (AccountController.ckconsole == null) return View("Console", "");
+
+      string s = MvcApplication.ckcore.sWochentag[(int)MvcApplication.ckcore.dtDatum.DayOfWeek] + ", " + MvcApplication.ckcore.dtDatum.ToShortDateString() + ", " + MvcApplication.ckcore.dtDatum.ToShortTimeString() + " Uhr\n\n";
+
+      if (ModelState.IsValid) {
+        ModelState.Clear();
+      }
+
+      for (int iN = 0; iN < AccountController.ckUser.ltNews.Count; iN++) {
+        CornerkickCore.Core.News news = AccountController.ckUser.ltNews[iN];
+        if (news.bUnread) {
+          s += news.sNews + '\n';
+          //news.bUnread = false;
+          //AccountController.ckUser.ltNews[iN] = news;
+        }
+      }
+
+      ViewData["sNews"] = s;
+
+      //return RedirectToAction("Console", "Member");
+      return View("Console", "");
+    }
+
+    [Authorize]
+    public ActionResult Console()
+    {
+      if (AccountController.ckconsole == null) return View("Console", "");
+
+      string s = "";
+
+      if (ModelState.IsValid) {
+        ModelState.Clear();
+      }
+      //foreach (string s1 in AccountController.ckconsole.ltPrint) s += s1 + '\n';
+
+      ViewData["s"] = s;
+
+      //return RedirectToAction("Console", "Member");
+      return View("Console", "");
+    }
+
+    public ActionResult ConsoleInput(Models.ConsoleModels input)
+    {
+      ViewData["s"] = "";
+
+      if (ModelState.IsValid) {
+        //TODO: SubscribeUser(model.Email);
+      }
+
+      if (string.IsNullOrEmpty(input.sIn)) AccountController.ckconsole.resetMenu();
+
+      if (passInputToCk(input.sIn)) AccountController.ckconsole.game(AccountController.ckUser);
+      Console();
+
+      return View("Console", "");
+    }
+
+    private bool passInputToCk(string sIn)
+    {
+      //AccountController.ckconsole.sInput = sIn;
+      return true;
+    }
+#endif
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Desk
+    /// </summary>
+    /// <param name="desk"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult Desk(Models.DeskModel desk)
+    {
+      desk.sNews = "";
+
+      if (ModelState.IsValid) {
+        ModelState.Clear();
+      }
+
+      CornerkickCore.Core.User usr = AccountController.ckUser();
+      if (usr.ltNews == null) return View(desk);
+
+      //desk.sNews += "Html.ActionLink(test, \"PlayerDetails\", \"Member\", new { i = 1 }, new { target = \"_blank\" })" + '\n';
+      for (int iN = usr.ltNews.Count - 1; iN >= 0; iN--) {
+        CornerkickCore.Core.News news = usr.ltNews[iN];
+        if (news.bUnread) {
+          desk.sNews += news.dt.ToString("d", AccountController.ciUser) + " " + news.dt.ToString("t", AccountController.ciUser) + " - " + news.sNews + '\n';
+          //news.bUnread = false;
+          //AccountController.ckUser.ltNews[iN] = news;
+        }
+      }
+
+      return View(desk);
+    }
+
+    public ContentResult GetTeamDevelopmentData(Models.DeskModel desk)
+    {
+      int iU = AccountController.getiUser();
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      CornerkickCore.Core.TrainingHistory trHistCurrent = new CornerkickCore.Core.TrainingHistory();
+      trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
+      trHistCurrent.fKFM = MvcApplication.ckcore.tl.fKFMTeamAve(clb);
+
+      List<Models.DataPoint>[] dataPoints = new List<Models.DataPoint>[3];
+      for (byte j = 0; j < dataPoints.Length; j++) {
+        dataPoints[j] = new List<Models.DataPoint>();
+
+        for (int i = 0; i < clb.ltTrainingHist.Count; i++) {
+          CornerkickCore.Core.TrainingHistory trHist = clb.ltTrainingHist[i];
+          if (trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-7)) > 0) {
+            long iDate = convertDateTimeToTimestamp(trHist.dt);
+            dataPoints[j].Add(new Models.DataPoint(iDate, trHist.fKFM[j]));
+          }
+        }
+
+        long iDateCurrent = convertDateTimeToTimestamp(trHistCurrent.dt);
+        dataPoints[j].Add(new Models.DataPoint(iDateCurrent, trHistCurrent.fKFM[j]));
+      }
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Team
+    /// </summary>
+    /// <param name="team"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    //[Authorize]
+    public ActionResult Team(Models.TeamModels team)
+    {
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      team.bGame = false;
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) {
+          team.bGame = true;
+        }
+      }
+
+      setModelLtPlayer(user);
+
+      // Formationen
+      //List<System.Web.Mvc.SelectListItem> ltsFormations = new List<System.Web.Mvc.SelectListItem>();
+      if (team.ltsFormations == null) team.ltsFormations = new List<SelectListItem>();
+      team.ltsFormations.Clear();
+
+      for (int i = 0; i < MvcApplication.ckcore.ltFormationen.Count; i++) {
+        CornerkickCore.Core.Formation frm = MvcApplication.ckcore.ltFormationen[i];
+        bool bSelected = false;
+        if (MvcApplication.ckcore.ltClubs.Count > AccountController.ckUser().iTeam) {
+          if (i == MvcApplication.ckcore.ltClubs[AccountController.ckUser().iTeam].formation.iID) {
+            bSelected = true;
+          }
+        }
+        team.ltsFormations.Add(new SelectListItem { Text = (i + 1).ToString() + " - " + frm.sName, Value = i.ToString(), Selected = bSelected });
+      }
+
+      return View(team);
+    }
+
+    private void setModelLtPlayer(CornerkickCore.Core.User user)
+    {
+      if (Models.TeamModels.ltPlayer == null) Models.TeamModels.ltPlayer = new List<CornerkickGame.Game.Player>();
+      else                                    Models.TeamModels.ltPlayer.Clear();
+
+      CornerkickCore.Core.Club club = AccountController.ckClub();
+      foreach (int iSp in club.ltSpielerID) {
+        Models.TeamModels.ltPlayer.Add(MvcApplication.ckcore.ltPlayer[iSp]);
+      }
+
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) {
+          Models.TeamModels.ltsSubstitution = new List<string[]>();
+
+          byte iHA = 0;
+          if (club.iID == user.game.spIn.iAusw) iHA = 1;
+
+          Models.TeamModels.iSubRest = user.game.daten.iAuswechslungen[iHA];
+
+          if (Models.TeamModels.ltiSubstitution != null) {
+            foreach (int[] iSub in Models.TeamModels.ltiSubstitution) {
+              Models.TeamModels.ltsSubstitution.Add(new string[] { user.game.spieler[iHA][iSub[0]].sName, user.game.spieler[iHA][iSub[1]].sName, iSub[2].ToString() });
+            }
+          }
+        }
+      }
+    }
+
+    public void UpdateRow(int fromPosition, int toPosition)
+    {
+      if (fromPosition < 1 || toPosition < 1) return;
+
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      int iC = user.iTeam;
+
+      int iPlayerID = MvcApplication.ckcore.ltClubs[iC].ltSpielerID[fromPosition - 1];
+      MvcApplication.ckcore.ltClubs[iC].ltSpielerID.RemoveAt(fromPosition - 1);
+      MvcApplication.ckcore.ltClubs[iC].ltSpielerID.Insert(toPosition - 1, iPlayerID);
+
+      setModelLtPlayer(user);
+
+      CkAufstellungFormation(MvcApplication.ckcore.ltClubs[iC].formation.iID);
+    }
+
+    public JsonResult SwitchPlayerByIndex(int iIndex1, int iIndex2)
+    {
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      int iC = user.iTeam;
+      CornerkickCore.Core.Club club = MvcApplication.ckcore.ltClubs[iC];
+
+      int jPosMin = Math.Min(iIndex1, iIndex2);
+      int jPosMax = Math.Max(iIndex1, iIndex2);
+
+      int iPlayerID1 = club.ltSpielerID[jPosMin];
+      int iPlayerID2 = club.ltSpielerID[jPosMax];
+
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) {
+          byte iHA = 0;
+          if (club.iID == user.game.spIn.iAusw) iHA = 1;
+
+          // If switch of player in starting 11 --> do it directly
+          if (jPosMin < 11 && jPosMax >= 11) {
+            // Return if player in already played or if no subs left
+            if (user.game.spieler[iHA][jPosMax].bGespielt || user.game.daten.iAuswechslungen[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
+
+            if (Models.TeamModels.ltiSubstitution == null) {
+              Models.TeamModels.ltiSubstitution = new List<int[]>();
+            }
+            Models.TeamModels.ltiSubstitution.Add(new int[] { jPosMin, jPosMax, 0 });
+          } else {
+            user.game.ltSubstitutions[iHA].Add(new int[] { jPosMin, jPosMax, 0 });
+          }
+        }
+      }
+
+      if (jPosMin < 11) {
+        CornerkickGame.Game.Player sp1 = MvcApplication.ckcore.ltPlayer[iPlayerID1];
+        CornerkickGame.Game.Player sp2 = MvcApplication.ckcore.ltPlayer[iPlayerID2];
+
+        byte iPos2Tmp = sp2.iPos;
+        sp2.iPos = sp1.iPos;
+
+        if (jPosMax < 11) {
+          sp1.iPos = iPos2Tmp;
+        }
+
+        MvcApplication.ckcore.ltPlayer[iPlayerID1] = sp1;
+        MvcApplication.ckcore.ltPlayer[iPlayerID2] = sp2;
+      }
+
+      // Switch player in club list
+      club.ltSpielerID.Remove(iPlayerID1);
+      club.ltSpielerID.Remove(iPlayerID2);
+
+      club.ltSpielerID.Insert(jPosMin, iPlayerID2);
+      club.ltSpielerID.Insert(jPosMax, iPlayerID1);
+
+      MvcApplication.ckcore.ltClubs[iC] = club;
+      setModelLtPlayer(user);
+
+      return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult SwitchPlayerByID(int iID1, int iID2)
+    {
+      int iC = AccountController.ckUser().iTeam;
+
+      int iIndex1 = MvcApplication.ckcore.ltClubs[iC].ltSpielerID.IndexOf(iID1);
+      int iIndex2 = MvcApplication.ckcore.ltClubs[iC].ltSpielerID.IndexOf(iID2);
+
+      return Json(SwitchPlayerByIndex(iIndex1, iIndex2), JsonRequestBehavior.AllowGet);
+    }
+
+    public class DatatableEntryTeam
+    {
+      public string sI { get; set; }
+      public string sID { get; set; }
+      public string sNr { get; set; }
+      public string sNull { get; set; }
+      public string sName { get; set; }
+      public string sPosition { get; set; }
+      public string sStaerke { get; set; }
+      public string sKondi { get; set; }
+      public string sFrische { get; set; }
+      public string sMoral { get; set; }
+      public string sErf { get; set; }
+      public string sForm { get; set; }
+      public string sAlter { get; set; }
+      public string sTalent { get; set; }
+      public string sMarktwert { get; set; }
+      public string sGehalt { get; set; }
+      public string sLz { get; set; }
+      public string sNat { get; set; }
+    }
+
+    public ActionResult getTableTeam()
+    {
+      /*
+      List<CornerkickGame.Game.Player> ltSpieler = new List<CornerkickGame.Game.Player>();
+      foreach (int iSp in AccountController.ckClub.ltSpielerID) {
+        ltSpieler.Add(MvcApplication.ckcore.ltPlayer[iSp]);
+      }
+      */
+      var club = CornerkickWebMvc.Controllers.AccountController.ckClub();
+      var user = AccountController.ckUser();
+      bool bGame = false;
+      if (user.game != null) {
+        bGame = !user.game.daten.bBeendet;
+      }
+      List<string[]> ltLV = MvcApplication.ckcore.ui.sLVMannschaft(Models.TeamModels.ltPlayer, bGame, club.spIn.iSpielart);
+
+      //The table or entity I'm querying
+      DatatableEntryTeam[] query = new DatatableEntryTeam[ltLV.Count];
+
+      for (int i = 0; i < query.Length; i++) {
+        //Hard coded data here that I want to replace with query results
+        query[i] = new DatatableEntryTeam { sI = (i + 1).ToString(), sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = ltLV[i][2], sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = ltLV[i][12], sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15] };
+      }
+
+      /*
+      var query = new[]
+                {
+                    //Hard coded data here that I want to replace with query results
+                    new DatatableEntryTeam { sI = "0", sID = "1", sNull = "", sName = "1" },
+                    new DatatableEntryTeam { sI = "1", sID = "3", sNull = "", sName = "2" },
+                    new DatatableEntryTeam { sI = "2", sID = "5", sNull = "", sName = "3" },
+                    new DatatableEntryTeam { sI = "3", sID = "2", sNull = "", sName = "4" },
+                    new DatatableEntryTeam { sI = "4", sID = "4", sNull = "", sName = "5" },
+                    new DatatableEntryTeam { sI = "5", sID = "6", sNull = "", sName = "6" }
+                };
+      */
+
+      return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public ActionResult CkAufstellungKI()
+    {
+      // Check if game running
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) return RedirectToAction("Team");
+      }
+
+      MvcApplication.ckcore.doFormationKI(user.iTeam, true);
+      return RedirectToAction("Team");
+    }
+
+    [HttpPost]
+    public ActionResult TeamSetSubstitutions()
+    {
+      // Check if game running
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) {
+          if (Models.TeamModels.ltiSubstitution != null) {
+            CornerkickCore.Core.Club club = AccountController.ckClub();
+            byte iHA = 0;
+            if (club.iID == user.game.spIn.iAusw) iHA = 1;
+
+            foreach (int[] iSub in Models.TeamModels.ltiSubstitution) {
+              user.game.ltSubstitutions[iHA].Add(new int[] { iSub[0], iSub[1], 0 });
+            }
+            Models.TeamModels.ltiSubstitution.Clear();
+          }
+        }
+      }
+
+      return RedirectToAction("Team");
+    }
+
+    [HttpPost]
+    public ActionResult TeamUnsetSubstitutions()
+    {
+      // Check if game running
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) {
+          CornerkickCore.Core.Club club = AccountController.ckClub();
+
+          Models.TeamModels.ltiSubstitution = new List<int[]>();
+
+          byte iHA = 0;
+          if (club.iID == user.game.spIn.iAusw) iHA = 1;
+
+          // Create list of temp player
+          List<int> ltiSpErsatz = new List<int>();
+          for (int i = 18; i < club.ltSpielerID.Count; i++) ltiSpErsatz.Add(club.ltSpielerID[i]);
+
+          // Clear current list of players
+          club.ltSpielerID.Clear();
+
+          // Add player from current game
+          foreach (CornerkickGame.Game.Player sp in user.game.spieler[iHA]) club.ltSpielerID.Add(sp.iID);
+
+          // Add temp player
+          foreach (int iSp in ltiSpErsatz) club.ltSpielerID.Add(iSp);
+
+          return RedirectToAction("Team");
+        }
+      }
+
+      return RedirectToAction("Team");
+    }
+
+    public JsonResult GetSubstitutionList()
+    {
+      List<string[]> ltsSubstitution = new List<string[]>();
+
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      CornerkickCore.Core.Club club = AccountController.ckClub();
+
+      if (user.game != null) {
+        if (!user.game.daten.bBeendet) {
+          byte iHA = 0;
+          if (club.iID == user.game.spIn.iAusw) iHA = 1;
+
+          Models.TeamModels.iSubRest = user.game.daten.iAuswechslungen[iHA];
+
+          if (Models.TeamModels.ltiSubstitution != null) {
+            foreach (int[] iSub in Models.TeamModels.ltiSubstitution) {
+              ltsSubstitution.Add(new string[] { user.game.spieler[iHA][iSub[0]].sName, user.game.spieler[iHA][iSub[1]].sName, iSub[2].ToString() });
+            }
+          }
+        }
+      }
+
+      return Json(ltsSubstitution, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult CkAufstellungFormation(int iF)
+    {
+      CornerkickCore.Core.User usr = AccountController.ckUser();
+
+      if (iF >= 0 && iF < MvcApplication.ckcore.ltFormationen.Count && MvcApplication.ckcore.ltClubs.Count > usr.iTeam) {
+        CornerkickCore.Core.Club club = AccountController.ckClub();
+        club.formation = MvcApplication.ckcore.ltFormationen[iF];
+        MvcApplication.ckcore.tl.setFormationToClub(ref club);
+        MvcApplication.ckcore.ltClubs[usr.iTeam] = club;
+
+        setModelLtPlayer(usr);
+      }
+
+      return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult GetPlayerStrength(int iPlayer)
+    {
+      CornerkickGame.Game.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
+      double fStrength = MvcApplication.ckcore.spiel.tl.getStaerkeSpieler(player, player.iPos, true);
+      return Json(fStrength, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult GetPlayerStrengthAgeAve()
+    {
+      CornerkickCore.Core.Club club = AccountController.ckClub();
+      float[] f = new float[2];
+      for (byte i = 0; i < MvcApplication.ckcore.spiel.nPlStart; i++) {
+        CornerkickGame.Game.Player player = MvcApplication.ckcore.ltPlayer[club.ltSpielerID[i]];
+        f[0] += MvcApplication.ckcore.spiel.tl.getStaerkeSpieler(player, player.iPos, true);
+        f[1] += MvcApplication.ckcore.spiel.tl.getPlayerAgeFloat(player, MvcApplication.ckcore.dtDatum);
+      }
+
+      f[0] /= MvcApplication.ckcore.spiel.nPlStart;
+      f[1] /= MvcApplication.ckcore.spiel.nPlStart;
+
+      return Json(f, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult PlayerDetails(int i)
+    {
+      Models.PlayerModel plModel = new Models.PlayerModel();
+      plModel.iPlayer = i;
+      plModel.iPlayerIndTr = MvcApplication.ckcore.ltPlayer[i].iIndTraining;
+
+      plModel.iContractYears = 1;
+
+      return View(plModel);
+    }
+
+    public ActionResult setPlayerIndTraining(int iPlayer, int iIndTr)
+    {
+      CornerkickGame.Game.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
+      player.iIndTraining = (byte)iIndTr;
+      MvcApplication.ckcore.ltPlayer[iPlayer] = player;
+
+      return Json(iIndTr, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult GetPlayerSallery(int iPlayer, int iYears)
+    {
+      if (iPlayer < 1) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (iYears  < 1) return Json("0",     JsonRequestBehavior.AllowGet);
+
+      uint iSallery = MvcApplication.ckcore.plr.getSalary(MvcApplication.ckcore.ltPlayer[iPlayer], (byte)iYears, 0);
+
+      return Json(iSallery.ToString("#,#", AccountController.ciUser), JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSallery, int iMode)
+    {
+      if (iId    < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (iYears < 1) return Json("0",     JsonRequestBehavior.AllowGet);
+
+      sSallery = sSallery.Replace("€", string.Empty);
+      sSallery = sSallery.Replace(".", string.Empty);
+      sSallery = sSallery.Trim();
+
+      uint iSallery = 0;
+      if (!uint.TryParse(sSallery, out iSallery)) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      string sReturn = "";
+      if (iMode == 0) {
+        CornerkickGame.Game.Player player = MvcApplication.ckcore.ltPlayer[iId];
+        player.contract.iLength += (byte)iYears;
+        player.contract.iSalary = iSallery;
+        MvcApplication.ckcore.ltPlayer[iId] = player;
+
+        sReturn = "Der Vertrag mit " + player.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.";
+      } else {
+        CornerkickCore.csTransfer.TransferOffer offer = new CornerkickCore.csTransfer.TransferOffer();
+        CornerkickGame.Game.Contract contract = new CornerkickGame.Game.Contract();
+        contract.iLength = (byte)iYears;
+        contract.iSalary = iSallery;
+        offer.contract = contract;
+        offer.iClubId = AccountController.ckClub().iID;
+
+        for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
+          CornerkickCore.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+
+          if (transfer.iPlayerId == iId) {
+            if (transfer.ltOffers == null) transfer.ltOffers = new List<CornerkickCore.csTransfer.TransferOffer>();
+
+            // Remove offer if already exist
+            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
+              if (transfer.ltOffers[iO].iClubId == offer.iClubId) {
+                transfer.ltOffers.RemoveAt(iO);
+                break;
+              }
+            }
+
+            transfer.ltOffers.Add(offer);
+            MvcApplication.ckcore.ltTransfer[iT] = transfer;
+
+            sReturn = "Sie haben sich mit dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
+          }
+        }
+      }
+
+      return Json(sReturn, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult ExtentPlayerContract(int iPlayer, int iYears, string sSallery)
+    {
+      if (iPlayer < 1) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (iYears  < 1) return Json("0", JsonRequestBehavior.AllowGet);
+
+      sSallery = sSallery.Replace("€", string.Empty);
+      sSallery = sSallery.Replace(".", string.Empty);
+      sSallery = sSallery.Trim();
+
+      uint iSallery = 0;
+      if (!uint.TryParse(sSallery, out iSallery)) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Game.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
+      //uint iSallery = MvcApplication.ckcore.plr.getSalary(player, (byte)iYears, 0);
+      player.contract.iLength += (byte)iYears;
+      player.contract.iSalary = iSallery;
+      MvcApplication.ckcore.ltPlayer[iPlayer] = player;
+
+      return Json("Der Vertrag mit " + player.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.", JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Jouth
+    /// </summary>
+    /// <param name="Jouth"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    //[Authorize]
+    public ActionResult Jouth(Models.JouthModel jouth)
+    {
+      int iC = AccountController.ckUser().iTeam;
+
+      Models.JouthModel.ltPlayerJouth = new List<CornerkickGame.Game.Player>();
+
+      if (MvcApplication.ckcore.ltClubs.Count > iC) {
+        foreach (int iSp in MvcApplication.ckcore.ltClubs[iC].ltJugendspielerID) {
+          CornerkickGame.Game.Player sp = MvcApplication.ckcore.ltPlayer[iSp];
+
+          // Change Birthday if too young
+          if (MvcApplication.ckcore.spiel.tl.getPlayerAgeFloat(sp, MvcApplication.ckcore.dtDatum) < 15) {
+            sp.dtGeburt = new DateTime(sp.dtGeburt.Year - 5, sp.dtGeburt.Month, sp.dtGeburt.Day);
+            MvcApplication.ckcore.ltPlayer[iSp] = sp;
+          }
+
+          Models.JouthModel.ltPlayerJouth.Add(sp);
+        }
+      }
+
+      return View(jouth);
+    }
+
+    [HttpPost]
+    public JsonResult TakeJouth(int iJouthID)
+    {
+      if (iJouthID < 0) return Json("", JsonRequestBehavior.AllowGet);
+
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      clb.ltJugendspielerID.Remove(iJouthID);
+      clb.ltSpielerID.Add(iJouthID);
+
+      CornerkickGame.Game.Player sp = MvcApplication.ckcore.ltPlayer[iJouthID];
+
+      sp.contract.iLength = 2;
+      sp.contract.iSalary = MvcApplication.ckcore.plr.getSalary(sp, sp.contract.iLength, MvcApplication.ckcore.fz.iMoneyTotal());
+
+      MvcApplication.ckcore.ltPlayer[iJouthID] = sp;
+
+      AccountController.setCkClub(clb);
+
+      return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Transfer
+    /// </summary>
+    /// <param name="Transfer"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult Transfer(Models.TransferModel transfer)
+    {
+      transfer.iContractYears = 1;
+      return View(transfer);
+    }
+
+    [HttpPost]
+    public JsonResult PutOnTransferList(int iPlayerId)
+    {
+      MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+
+      return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult MakeTransferOffer(int iPlayerId, int iTransferFee)
+    {
+      string sReturn = "Error";
+      int iClub = AccountController.ckClub().iID;
+
+      for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
+        CornerkickCore.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+
+        if (transfer.iPlayerId == iPlayerId) {
+          if (transfer.ltOffers != null) {
+            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
+              CornerkickCore.csTransfer.TransferOffer offer = transfer.ltOffers[iO];
+              if (offer.iClubId == iClub) {
+                offer.dt = MvcApplication.ckcore.dtDatum;
+                offer.iMoney = iTransferFee;
+
+                transfer.ltOffers[iO] = offer;
+
+                MvcApplication.ckcore.ltTransfer[iT] = transfer;
+
+                int iClubPlayer = MvcApplication.ckcore.ltPlayer[iPlayerId].iClubId;
+                if (iClubPlayer >= 0) {
+                  int iUserPlayer = MvcApplication.ckcore.ltClubs[iClubPlayer].iUser;
+                  if (iUserPlayer >= 0) {
+                    MvcApplication.ckcore.Info("Sie haben ein neues Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " erhalten!", iUserPlayer, 3, 0, iUserPlayer);
+                  }
+                }
+
+                CornerkickGame.Game.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
+                player.fCharacterMoney += 0.05f;
+                MvcApplication.ckcore.ltPlayer[iPlayerId] = player;
+
+                sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " erfolgreich abgegeben.";
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      return Json(sReturn, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult AcceptTransferOffer(int iPlayerId, int iClubId)
+    {
+      string sReturn = "Error";
+
+      for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
+        CornerkickCore.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+
+        if (transfer.iPlayerId == iPlayerId) {
+          if (transfer.ltOffers != null) {
+            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
+              CornerkickCore.csTransfer.TransferOffer offer = transfer.ltOffers[iO];
+              if (offer.iClubId == iClubId) {
+                CornerkickCore.Core.Club clubUser = AccountController.ckClub();
+                clubUser.iKontostand += offer.iMoney;
+                clubUser.ltSpielerID.Remove(iPlayerId);
+                MvcApplication.ckcore.fz.setKonto(ref clubUser, MvcApplication.ckcore.dtDatum, +offer.iMoney, "Spielertransfer");
+                AccountController.setCkClub(clubUser);
+
+                CornerkickCore.Core.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
+                clubTake.iKontostand -= offer.iMoney;
+                clubTake.ltSpielerID.Add(iPlayerId);
+                MvcApplication.ckcore.fz.setKonto(ref clubTake, MvcApplication.ckcore.dtDatum, -offer.iMoney, "Spielertransfer");
+                MvcApplication.ckcore.Info("Ihr Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " von " + offer.iMoney.ToString("#,#", AccountController.ciUser) + " wurde angenommen!", clubTake.iUser, 3, 0, clubTake.iUser);
+                MvcApplication.ckcore.ltClubs[iClubId] = clubTake;
+
+                MvcApplication.ckcore.ltTransfer.Remove(transfer);
+
+                sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
+
+                return Json(sReturn, JsonRequestBehavior.AllowGet);
+              }
+            }
+          }
+        }
+      }
+
+      return Json(sReturn, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult getTableTransfer()
+    {
+      //The table or entity I'm querying
+      List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
+
+      int iTr = 0;
+      foreach (CornerkickCore.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
+        CornerkickGame.Game.Player spTr = MvcApplication.ckcore.ltPlayer[transfer.iPlayerId];
+        string sClub = "vereinslos";
+        if (spTr.iClubId >= 0) {
+          sClub = MvcApplication.ckcore.ltClubs[spTr.iClubId].sName;
+        }
+
+        ltDeTransfer.Add(new Models.DatatableEntryTransfer {
+          playerId = transfer.iPlayerId,
+          empty = "",
+          index = (iTr + 1).ToString(),
+          name = spTr.sName,
+          position = MvcApplication.ckcore.plr.getStrPos(spTr),
+          strength = MvcApplication.ckcore.spiel.tl.getStaerkeSpieler(spTr, 0, true).ToString("0.0"),
+          age = MvcApplication.ckcore.spiel.tl.getPlayerAge(spTr, MvcApplication.ckcore.dtDatum).ToString("0"),
+          talent = (spTr.iTalent + 1).ToString(),
+          mw = (MvcApplication.ckcore.plr.getValue(spTr) * 1000).ToString("#,#", AccountController.ciUser),
+          club = sClub,
+          nat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[spTr.iNat1 + 1]]
+        });
+
+        iTr++;
+      }
+
+      return Json(new { aaData = ltDeTransfer.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult getTableTransferDetails(int iPlayerId)
+    {
+      //The table or entity I'm querying
+      List<Models.DatatableEntryTransferDetails> ltDeTransferDetails = new List<Models.DatatableEntryTransferDetails>();
+
+      CornerkickGame.Game.Player spTr = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      int iTr = 0;
+      foreach (CornerkickCore.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
+        if (transfer.iPlayerId == iPlayerId) {
+          if (transfer.ltOffers == null) break;
+
+          foreach (CornerkickCore.csTransfer.TransferOffer offer in transfer.ltOffers) {
+            string sClub = "vereinslos";
+            if (spTr.iClubId >= 0) {
+              sClub = MvcApplication.ckcore.ltClubs[spTr.iClubId].sName;
+            }
+
+            ltDeTransferDetails.Add(new Models.DatatableEntryTransferDetails {
+              i = iTr,
+              iPlayerId = iPlayerId,
+              iClubId = offer.iClubId,
+              club = MvcApplication.ckcore.ltClubs[offer.iClubId].sName,
+              fee = offer.iMoney.ToString("#,#", AccountController.ciUser) + " €"
+            });
+          }
+        }
+
+        iTr++;
+      }
+
+      return Json(new { aaData = ltDeTransferDetails.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public ActionResult getTableTransferDetails2(int iPlayerId)
+    {
+      string sTable = "";
+
+      CornerkickCore.Core.Club clubUser = AccountController.ckClub();
+
+      sTable += "<table id=\"tableTransferDetails\" cellspacing=\"0\" style =\"width: auto\" class=\"display responsive nowrap\" > ";
+      sTable += "<thead>";
+      sTable += "<tr>";
+      sTable += "<th>#</th>";
+      sTable += "<th>Verein</th>";
+      sTable += "<th>Ablöse</th>";
+      sTable += "<th></th>";
+      sTable += "</tr>";
+      sTable += "</thead>";
+      sTable += "<tbody>";
+
+      int iTr = 0;
+      foreach (CornerkickCore.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
+        if (transfer.iPlayerId == iPlayerId) {
+          if (transfer.ltOffers == null) break;
+
+          foreach (CornerkickCore.csTransfer.TransferOffer offer in transfer.ltOffers) {
+            if (MvcApplication.ckcore.plr.ownPlayer(clubUser, MvcApplication.ckcore.ltPlayer[iPlayerId]) || // If own player
+                clubUser.iID == offer.iClubId) {
+              string sClub = "vereinslos";
+              if (offer.iClubId >= 0) {
+                sClub = MvcApplication.ckcore.ltClubs[offer.iClubId].sName;
+              }
+
+              string sStyle = "";
+              if (offer.iClubId == clubUser.iID) sStyle = "font-weight:bold";
+
+              sTable += "<tr id=\"rowTransferDetail_" + offer.iClubId.ToString() + "\" style=" + sStyle + ">";
+              sTable += "<td>" + iTr.ToString() + "</td>";
+              sTable += "<td align=\"center\">" + sClub + "</td>";
+              sTable += "<td align=\"right\">" + offer.iMoney.ToString("#,#", AccountController.ciUser) + " €" + "</td>";
+              string sChecked = "";
+              //if (iTr == 0) sChecked = " checked";
+              sTable += "<td><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.iClubId.ToString() + "\"" + sChecked + "></td>";
+              sTable += "</tr>";
+
+              iTr++;
+            }
+          }
+
+          break;
+        }
+      }
+
+      sTable += "</tbody>";
+      sTable += "</table>";
+
+      // Reset sTable if no offers
+      if (iTr == 0) sTable = "";
+
+      return Json(sTable, JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Taktik
+    /// </summary>
+    /// <param name="Taktik"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+
+    //[Authorize]
+    public ActionResult Taktik(Models.TaktikModel taktik)
+    {
+      return View(taktik);
+    }
+
+    public ActionResult setTaktik(int iTaktik, float fTaktik)
+    {
+      CornerkickCore.Core.User usr = AccountController.ckUser();
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if      (iTaktik == 0) clb.taktik.fAusrichtung       = fTaktik;
+      else if (iTaktik == 1) clb.taktik.fEinsatz           = fTaktik;
+      else if (iTaktik == 2) clb.taktik.fSchusshaeufigkeit = fTaktik;
+      else if (iTaktik == 3) clb.taktik.fAggressivitaet    = fTaktik;
+      else if (iTaktik == 4) clb.taktik.fPassrisiko        = fTaktik;
+
+      // Set tactic of current game
+      if (usr.game != null) {
+        if (!usr.game.daten.bBeendet) {
+          if      (usr.game.daten.iHeim == clb.iID) usr.game.spIn.tkHeim = clb.taktik;
+          else if (usr.game.daten.iAusw == clb.iID) usr.game.spIn.tkAusw = clb.taktik;
+        }
+      }
+
+      AccountController.setCkClub(clb);
+
+      return Json(fTaktik, JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Training
+    /// </summary>
+    /// <param name="Training"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult Training(Models.TrainingModel training)
+    {
+      training = new Models.TrainingModel();
+
+      return View(training);
+    }
+
+    public ActionResult setTraining(int iTraining, int iTag)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      clb.training.iTraining[iTag] = (byte)iTraining;
+      return Json(iTraining, JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Stadion
+    /// </summary>
+    /// <param name="Stadion"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult Stadion(Models.StadionModel stadionModel)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if (clb.stadion.iPlaetze == null) return View(stadionModel);
+
+      stadionModel.stadion = clb.stadion;
+
+      stadionModel.sName = clb.stadion.strName;
+
+      stadionModel.iSeats = new int[clb.stadion.iPlaetze.Length];
+      for (int i = 0; i < clb.stadion.iPlaetze.Length; i++) {
+        stadionModel.iSeats[i] = clb.stadion.iPlaetze[i];
+      }
+
+      stadionModel.iSeatType = new int[clb.stadion.iArt.Length];
+      for (int i = 0; i < clb.stadion.iArt.Length; i++) {
+        stadionModel.iSeatType[i] = clb.stadion.iArt[i];
+      }
+
+      stadionModel.iSeatsBuild = new int[clb.stadion.iAusbauPl.Length];
+      for (int i = 0; i < clb.stadion.iAusbauPl.Length; i++) {
+        stadionModel.iSeatsBuild[i] = clb.stadion.iAusbauPl[i];
+      }
+
+      stadionModel.bOberring = clb.stadion.bOberring;
+
+      stadionModel.stadionNew = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);
+
+      /*
+      stModel.stadionNew = MvcApplication.ckcore.ini.newStadion();
+      for (int i = 0; i < stModel.stadionNew.iPlaetze.Length; i++) {
+        stModel.stadionNew.iPlaetze[i] = clb.stadion.iPlaetze[i];
+      }
+
+      if (stadionModel.iSeats == null) {
+        stadionModel.iSeats = new int[clb.stadion.iPlaetze.Length];
+        for (int i = 0; i < clb.stadion.iPlaetze.Length; i++) {
+          stadionModel.iSeats[i] = clb.stadion.iPlaetze[i];
+        }
+      }
+      */
+
+      return View(stadionModel);
+    }
+
+    /*
+    public JsonResult StadionChange(Models.StadionModel stadionModel, string sId, int iSeats)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      byte iB = 255;
+      string[] sB = sId.Split('_');
+      if (sB.Length < 1) return Json(0, JsonRequestBehavior.AllowGet);
+
+      byte.TryParse(sB[sB.Length - 1], out iB);
+      if (iB > stadionModel.stadion.iPlaetze.Length) return Json(0, JsonRequestBehavior.AllowGet);
+      stadionModel.stadion.iPlaetze[iB] = iSeats;
+
+      UpdateModel(stadionModel);
+
+      int iKosten = MvcApplication.ckcore.tl.iKostenStadionAusbau(stadionModel.stadion, clb.stadion);
+
+      return Json(iKosten, JsonRequestBehavior.AllowGet);
+      //return View(stadionModel);
+    }
+    */
+
+    [HttpPost]
+    public JsonResult StadionChange(int[] iSeats, int[] iArt)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      CornerkickGame.Game.Stadion stadion = convertToStadion(iSeats, iArt, null);
+
+      int[] iKostenDauer = MvcApplication.ckcore.tl.iKostenDauerStadionAusbau(stadion, clb.stadion);
+      string[] sKostenDauer = new string[] { iKostenDauer[0].ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser), iKostenDauer[1].ToString() };
+
+      return Json(sKostenDauer, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult StadionChangeSet(Models.StadionModel stadionModel)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      CornerkickGame.Game.Stadion stadion = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);
+
+      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+
+      if (clb.iUser >= 0) MvcApplication.ckcore.ltClubs[MvcApplication.ckcore.ltUser[clb.iUser].iTeam] = clb;
+
+      return RedirectToAction("Stadion");
+      //return View(stadionModel);
+      //return View("Stadion", "");
+    }
+
+    internal CornerkickGame.Game.Stadion convertToStadion(int[] iSeats, int[] iSeatType, int[] iSeatsBuild)
+    {
+      CornerkickGame.Game.Stadion stadion = MvcApplication.ckcore.ini.newStadion();
+      if (iSeats != null) {
+        for (int i = 0; i < iSeats.Length; i++) stadion.iPlaetze[i] = iSeats[i];
+      }
+      if (iSeatType != null) {
+        for (int i = 0; i < iSeatType.Length; i++) stadion.iArt[i] = (byte)iSeatType[i];
+      }
+      if (iSeatsBuild != null) {
+        for (int i = 0; i < iSeatsBuild.Length; i++) stadion.iAusbauPl[i] = iSeatsBuild[i];
+      }
+
+      return stadion;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Personal
+    /// </summary>
+    /// <param name="Personal"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult Personal(Models.PersonalModel personal)
+    {
+      personal = new Models.PersonalModel();
+
+      return View(personal);
+    }
+
+    public ActionResult setPersonal(int iPersonal, int iLevel)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      if      (iPersonal == 0) clb.personal.iTrainerCo =      (byte)iLevel;
+      else if (iPersonal == 1) clb.personal.iTrainerKondi =   (byte)iLevel;
+      else if (iPersonal == 2) clb.personal.iMasseur =        (byte)iLevel;
+      else if (iPersonal == 3) clb.personal.iTrainerMental =  (byte)iLevel;
+      else if (iPersonal == 4) clb.personal.iArzt =           (byte)iLevel;
+      else if (iPersonal == 5) clb.personal.iJugendTrainer =  (byte)iLevel;
+      else if (iPersonal == 6) clb.personal.iJugendScouting = (byte)iLevel;
+
+      int iU = AccountController.getiUser();
+      int iT = MvcApplication.ckcore.ltUser[iU].iTeam;
+      MvcApplication.ckcore.ltClubs[iT] = clb;
+
+      uint iKosten = 0;
+      iKosten += MvcApplication.ckcore.fz.iKostenCo[clb.personal.iTrainerCo];
+      iKosten += MvcApplication.ckcore.fz.iKostenKondiTrainer[clb.personal.iTrainerKondi];
+      iKosten += MvcApplication.ckcore.fz.iKostenMasseur[clb.personal.iMasseur];
+      iKosten += MvcApplication.ckcore.fz.iKostenMental[clb.personal.iTrainerMental];
+      iKosten += MvcApplication.ckcore.fz.iKostenMed[clb.personal.iArzt];
+      iKosten += MvcApplication.ckcore.fz.iKostenJugendScouting[clb.personal.iJugendTrainer];
+      iKosten += MvcApplication.ckcore.fz.iKostenJugendTrainer[clb.personal.iJugendScouting];
+
+      string sKosten = "0";
+      if (iKosten != 0) sKosten = iKosten.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+
+      return Json(sKosten, JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// League
+    /// </summary>
+    /// <param name="league"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult League(Models.LeagueModels league)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      league.iLand = clb.iLand;
+      league.iSpKl = clb.iSpielklasse;
+
+      league.ltScorer = MvcApplication.ckcore.ui.getScorer(1, league.iLand, league.iSpKl);
+
+      league.iSpTg = MvcApplication.ckcore.tl.getSpieltagNeu(league.iLand, league.iSpKl, MvcApplication.ckcore.dtDatum, 1);
+      league.ltErg = MvcApplication.ckcore.tl.getLtErgLiga(league.iSaison, league.iLand, league.iSpKl, false);
+      league.ltTbl = MvcApplication.ckcore.getTabelleLiga(league.iSaison, league.iLand, league.iSpKl, league.iSpTg - 1, 0);
+
+      return View(league);
+    }
+
+    public JsonResult setLeague(Models.LeagueModels league, int iGameday)
+    {
+      league.ltTbl = MvcApplication.ckcore.getTabelleLiga(league.iSaison, league.iLand, league.iSpKl, iGameday, 0);
+
+      return Json(league.ltTbl, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult setLeagueTeams(Models.LeagueModels league, int iGameday)
+    {
+      league.ltErg = MvcApplication.ckcore.tl.getLtErgLiga(league.iSaison, league.iLand, league.iSpKl, false);
+
+      return Json(league.ltErg[iGameday - 1], JsonRequestBehavior.AllowGet);
+    }
+
+    [Authorize]
+    public ActionResult Cup(Models.CupModel cupModel)
+    {
+      cupModel.ltErg = new List<List<int[]>>();
+
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      cupModel.iLand = clb.iLand;
+
+      cupModel.ltScorer = MvcApplication.ckcore.ui.getScorer(2, cupModel.iLand, 0);
+
+      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(cupModel.iLand, 2);
+      if (cup.ltGameday == null) return View(cupModel);
+
+      foreach (CornerkickCore.Core.GameDay gd in cup.ltGameday) {
+        cupModel.ltErg.Add(gd.ltResult);
+      }
+
+      return View(cupModel);
+    }
+
+    public JsonResult setCup(Models.CupModel cupModel, int iGameday)
+    {
+      cupModel.ltErg = new List<List<int[]>>();
+
+      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(cupModel.iLand, 2);
+      if (cup.ltGameday == null) return Json("", JsonRequestBehavior.AllowGet);
+
+      foreach (CornerkickCore.Core.GameDay gd in cup.ltGameday) {
+        cupModel.ltErg.Add(gd.ltResult);
+      }
+
+      return Json(cupModel.ltErg[iGameday - 1], JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Calendar
+    /// </summary>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult Calendar(Models.CalendarModels cal)
+    {
+      /*
+      if (cal.sCal == null) cal.sCal = new List<string>();
+      cal.sCal.Add("Kalender 1");
+      cal.sCal.Add("Kalender 2");
+      cal.sCal.Add("Kalender 3");
+      ViewData["sCal"] = cal.sCal;
+      */
+
+      cal.ltTestgames = new List<Models.Testgame>();
+      foreach (CornerkickCore.Core.Cup cup in MvcApplication.ckcore.ltCups) {
+        if (cup.iID == -5) {
+          foreach (CornerkickCore.Core.GameDay gd in cup.ltGameday) {
+            foreach (int[] iRes in gd.ltResult) {
+              if (iRes[1] == AccountController.ckClub().iID) {
+                Models.Testgame tg = new Models.Testgame();
+                tg.dt = gd.dt;
+                tg.iTeamHome = iRes[0];
+                tg.iTeamAway = iRes[1];
+                cal.ltTestgames.Add(tg);
+
+                return View(cal);
+              }
+            }
+          }
+        }
+      }
+
+      return View(cal);
+    }
+
+    public ActionResult PostCalendarData()
+    {
+      //var result = getCalendarEvents();
+
+      var ApptListForDate = Models.DiaryEvent.getCalendarEvents();
+      var eventList = from e in ApptListForDate
+                      select new
+                      {
+                        id          = e.iID,
+                        title       = e.sTitle,
+                        description = e.sDescription,
+                        start       = e.sStartDate,
+                        end         = e.sEndDate,
+                        color       = e.sColor,
+                        editable    = e.bEditable,
+                        allDay = false
+                      };
+
+      var rows = eventList.ToArray();
+
+      return Json(rows, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult AddTestGameToCalendar(string title, string start, int iTeamId)
+    {
+      string sReturn = "Error";
+
+      CornerkickCore.Core.Club club = AccountController.ckClub();
+      int iTeamIdUser = club.iID;
+      //int iTeamId = -1;
+      //int.TryParse(sTeamId, out iTeamId);
+      if (iTeamId >= 0 && iTeamId < MvcApplication.ckcore.ltClubs.Count && iTeamId != iTeamIdUser) {
+        CornerkickCore.Core.Cup cup = MvcApplication.ckcore.ini.newCup();
+        cup.iID = -5;
+        cup.sName = "Testspiel";
+
+        CornerkickCore.Core.GameDay gd = new CornerkickCore.Core.GameDay();
+        DateTime.TryParse(start, out gd.dt);
+
+        gd.ltResult = new List<int[]>();
+        int[] iRes = new int[6] { iTeamIdUser, iTeamId, -1, -1, -1, -1 };
+        gd.ltResult.Add(iRes);
+
+        cup.ltGameday.Add(gd);
+
+        sReturn = "Anfrage für Testspiel am " + gd.dt.ToString("dd.MM.yyyy HH:mm") + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
+
+        // Inform user
+        CornerkickCore.Core.Club clubRequest = MvcApplication.ckcore.ltClubs[iTeamId];
+        if (clubRequest.iUser < 0) {
+          cup.iID = 5;
+        } else {
+          MvcApplication.ckcore.Info("Sie haben eine neue Anfrage für ein Testspiel erhalten.", clubRequest.iUser, 3, 0, clubRequest.iUser);
+        }
+
+        MvcApplication.ckcore.ltCups.Add(cup);
+      }
+
+      return Json(sReturn, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult AcceptTestgame(string sDateTestgame)
+    {
+      DateTime dt = new DateTime();
+      if (!DateTime.TryParse(sDateTestgame, out dt)) {
+        Response.StatusCode = 1;
+        return Json(new { message = "Error parsing '" + sDateTestgame + "' to Date" }, JsonRequestBehavior.AllowGet);
+      }
+
+      CornerkickCore.Core.Club club = AccountController.ckClub();
+
+      for (int iC = 0; iC < MvcApplication.ckcore.ltCups.Count; iC++) {
+        CornerkickCore.Core.Cup cup = MvcApplication.ckcore.ltCups[iC];
+
+        if (cup.iID == -5) {
+          foreach (CornerkickCore.Core.GameDay gd in cup.ltGameday) {
+            if (gd.dt.Equals(dt)) {
+              foreach (int[] iRes in gd.ltResult) {
+                if (iRes[1] == club.iID) {
+                  cup.iID = 5;
+                  MvcApplication.ckcore.ltCups[iC] = cup;
+
+                  club.spIn = MvcApplication.ckcore.tl.getNaSpiel(club);
+                  MvcApplication.ckcore.ltClubs[iRes[1]] = club;
+
+                  CornerkickCore.Core.Club clubH = MvcApplication.ckcore.ltClubs[iRes[0]];
+                  clubH.spIn = MvcApplication.ckcore.tl.getNaSpiel(clubH);
+                  MvcApplication.ckcore.ltClubs[iRes[0]] = clubH;
+
+                  if (clubH.iUser >= 0) {
+                    MvcApplication.ckcore.Info("Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde akzeptiert!", clubH.iUser, 3, 0, clubH.iUser);
+                  }
+
+                  return Json("", JsonRequestBehavior.AllowGet);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult DeclineTestgame(string sDateTestgame)
+    {
+      DateTime dt = new DateTime();
+      if (!DateTime.TryParse(sDateTestgame, out dt)) {
+        return Json("", JsonRequestBehavior.AllowGet);
+      }
+
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      for (int iC = 0; iC < MvcApplication.ckcore.ltCups.Count; iC++) {
+        CornerkickCore.Core.Cup cup = MvcApplication.ckcore.ltCups[iC];
+
+        if (cup.iID == -5) {
+          foreach (CornerkickCore.Core.GameDay gd in cup.ltGameday) {
+            if (gd.dt.Equals(dt)) {
+              foreach (int[] iRes in gd.ltResult) {
+                if (iRes[1] == clb.iID) {
+                  cup.iID = 5;
+                  MvcApplication.ckcore.ltCups.RemoveAt(iC);
+
+                  CornerkickCore.Core.Club clubH = MvcApplication.ckcore.ltClubs[iRes[0]];
+                  if (clubH.iUser >= 0) {
+                    MvcApplication.ckcore.Info("Ihre Anfrage an " + clb.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde abgelehnt!", clubH.iUser, 3, 0, clubH.iUser);
+                  }
+
+                  return Json("", JsonRequestBehavior.AllowGet);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    private static DateTime convertTimestampToDateTime(double timestamp)
+    {
+      var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+      return origin.AddSeconds(timestamp);
+    }
+
+    private static long convertDateTimeToTimestamp(DateTime dt)
+    {
+      return (dt.Ticks - 621355968000000000) / 10000;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Finanzen
+    /// </summary>
+    /// <param name="Finanzen"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult Finance(Models.FinanceModel financeModel)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      financeModel.iEintritt1 = clb.iEintrittspreise[0];
+      financeModel.iEintritt2 = clb.iEintrittspreise[1];
+      financeModel.iEintritt3 = clb.iEintrittspreise[2];
+
+      return View(financeModel);
+    }
+
+    public ContentResult GetFinanceDevelopmentData(Models.FinanceModel financeModel)
+    {
+      int iU = AccountController.getiUser();
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      CornerkickCore.Core.TrainingHistory trHistCurrent = new CornerkickCore.Core.TrainingHistory();
+      trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
+      trHistCurrent.fKFM = MvcApplication.ckcore.tl.fKFMTeamAve(clb);
+
+      List<Models.DataPoint> dataPoints = new List<Models.DataPoint>();
+
+      foreach (CornerkickCore.Finanzen.Konto kto in clb.ltKonto) {
+        if (kto.dtKto.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-30)) > 0) {
+          long iDate = convertDateTimeToTimestamp(kto.dtKto);
+          dataPoints.Add(new Models.DataPoint(iDate, kto.iKontostand));
+        }
+      }
+
+      long iDateCurrent = convertDateTimeToTimestamp(trHistCurrent.dt);
+      dataPoints.Add(new Models.DataPoint(iDateCurrent, clb.iKontostand));
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
+    [HttpPost]
+    public JsonResult EintrittChange(int[] iEintritt)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      clb.iEintrittspreise[0] = iEintritt[0];
+      clb.iEintrittspreise[1] = iEintritt[1];
+      clb.iEintrittspreise[2] = iEintritt[2];
+
+      return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Sponsor
+    /// </summary>
+    /// <param name="Sponsor"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult Sponsor(Models.SponsorModel sponsorModel)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if (clb.ltSponsor == null) return View(sponsorModel);
+
+      if (Models.SponsorModel.ltSponsors == null) Models.SponsorModel.ltSponsors = new List<CornerkickCore.Finanzen.Spon>();
+      else                                        Models.SponsorModel.ltSponsors.Clear();
+
+      foreach (CornerkickCore.Finanzen.Spon sponsor in clb.ltSponsor) {
+        Models.SponsorModel.ltSponsors.Add(sponsor);
+      }
+
+      sponsorModel.iSponsorID = clb.iHauptsponsor;
+
+      return View(sponsorModel);
+    }
+
+    [HttpPost]
+    public JsonResult SponsorSet(int iSponsorID)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      int iCash = 0;
+
+      clb.iHauptsponsor = (byte)iSponsorID;
+      foreach (CornerkickCore.Finanzen.Spon sponsor in clb.ltSponsor) {
+        if (sponsor.bHaupt && sponsor.id == iSponsorID) {
+          clb.iKontostand += sponsor.iGeldJahr;
+          MvcApplication.ckcore.fz.setKonto(ref clb, MvcApplication.ckcore.dtDatum, sponsor.iGeldJahr, "Hauptsponsor");
+          iCash = sponsor.iGeldJahr;
+          break;
+        }
+      }
+
+      AccountController.setCkClub(clb);
+
+      return Json(iCash, JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// ViewGame
+    /// </summary>
+    /// <param name="ViewGame"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult ViewGame(Models.ViewGameModel view)
+    {
+      CornerkickCore.Core.User user = AccountController.ckUser();
+      view.game = user.game;
+
+      return View(view);
+    }
+
+    public JsonResult ViewGameLocations()
+    {
+      Models.ViewGameModel.ltLoc = new List<float[]>();
+
+      CornerkickCore.Core.User user = AccountController.ckUser();
+
+      if (user.game == null) {
+        Response.StatusCode = 1;
+        return Json(Models.ViewGameModel.ltLoc, JsonRequestBehavior.AllowGet);
+      }
+
+      Models.ViewGameModel.ltLoc.Add(new float[3] { user.game.ball.Pos.X, user.game.ball.Pos.Y, 0 });
+
+      for (int iP = 0; iP < 11; iP++) {
+        CornerkickGame.Game.Player sp = user.game.spieler[0][iP];
+        Models.ViewGameModel.ltLoc.Add(new float[3] { sp.ptPos.X, sp.ptPos.Y, sp.iNr });
+      }
+
+      for (int iP = 0; iP < 11; iP++) {
+        CornerkickGame.Game.Player sp = user.game.spieler[1][iP];
+        Models.ViewGameModel.ltLoc.Add(new float[3] { sp.ptPos.X, sp.ptPos.Y, sp.iNr });
+      }
+
+      return Json(Models.ViewGameModel.ltLoc, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult ViewGameHeader()
+    {
+      CornerkickCore.Core.User user = AccountController.ckUser();
+
+      if (user.game == null) return Json("", JsonRequestBehavior.AllowGet);
+
+      string sHeader = "";
+      sHeader = MvcApplication.ckcore.spiel.tl.sSpielmin(user.game.tsSpielminute, true) + user.game.daten.iToreHeim.ToString() + " : " + user.game.daten.iToreAusw.ToString();
+
+      return Json(sHeader, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult ViewGameStatistik()
+    {
+      CornerkickCore.Core.User user = AccountController.ckUser();
+
+      if (user.game == null) return Json("", JsonRequestBehavior.AllowGet);
+
+      string[] sSpielstatistik = new string[5] { "", "", "", "", "" };
+      sSpielstatistik[3] = "";
+
+      // Torschüsse
+      int iTsH = 0;
+      int iTsA = 0;
+      int iAufsTorH = 0;
+      int iAufsTorA = 0;
+      foreach (CornerkickGame.Game.Torschuss ts in user.game.daten.ltTorschuss) {
+        if (MvcApplication.ckcore.ltClubs[user.game.daten.iHeim].ltSpielerID.IndexOf(ts.iSchuetze) >= 0) {
+          iTsH++;
+          if (ts.iErgebnis > 0 && ts.iErgebnis < 7) iAufsTorH++;
+        } else {
+          iTsA++;
+          if (ts.iErgebnis > 0 && ts.iErgebnis < 7) iAufsTorA++;
+        }
+
+        if (ts.iErgebnis == 1) {
+          if (string.IsNullOrEmpty(sSpielstatistik[3])) sSpielstatistik[3] = "Tore:<br/>";
+          sSpielstatistik[3] += "  " + MvcApplication.ckcore.spiel.tl.sSpielmin(ts.tsSpielminute, false);
+          sSpielstatistik[3] += ts.iToreH.ToString() + ":" + ts.iToreA.ToString();
+          if (ts.iSchuetze > 0) sSpielstatistik[3] += " - " + MvcApplication.ckcore.ltPlayer[ts.iSchuetze].sName;
+          sSpielstatistik[3] += ", Entf.:" + ts.fEntf.ToString("0.0").PadLeft(5) + "m";
+          if (ts.iVorlage  > 0) sSpielstatistik[3] += " ("   + MvcApplication.ckcore.ltPlayer[ts.iVorlage].sName + ")";
+          sSpielstatistik[3] += "<br/>";
+        }
+      }
+
+      // Ballbesitz
+      float fBallbHeim = 100 * user.game.daten.iBallbesitzHeim / (float)(user.game.daten.iBallbesitzHeim + user.game.daten.iBallbesitzAusw);
+
+      // Zweikämpfe
+      float fZkHeim = 100 * user.game.daten.iZKHeim / (float)(user.game.daten.iZKHeim + user.game.daten.iZKAusw);
+
+      sSpielstatistik[0] = "Torschüsse: " + iTsH.ToString() + ":" + iTsA.ToString() + " - aufs Tor: " + iAufsTorH.ToString() + ":" + iAufsTorA.ToString();
+      sSpielstatistik[1] = "Ballbesitz: " + fBallbHeim.ToString("0.0") + ":" + (100 - fBallbHeim).ToString("0.0");
+      sSpielstatistik[2] = "Zweikämpfe: " + fZkHeim   .ToString("0.0") + ":" + (100 - fZkHeim)   .ToString("0.0");
+
+      // Spielerwechsel
+      if (user.game.daten.ltSubstitutions != null) {
+        for (int iHA = 0; iHA < 2; iHA++) {
+          if (user.game.daten.ltSubstitutions[iHA] != null) {
+            string sTeam = user.game.daten.sHeim;
+            if (iHA > 0) sTeam = user.game.daten.sAusw;
+            foreach (int[] iSub in user.game.daten.ltSubstitutions[iHA]) {
+              sSpielstatistik[4] += "<br/>" + iSub[2].ToString() + ". Min.: " + sTeam + " - ";
+              sSpielstatistik[4] += MvcApplication.ckcore.ltPlayer[iSub[1]].sName + " für " + MvcApplication.ckcore.ltPlayer[iSub[0]].sName;
+            }
+          }
+        }
+        if (!string.IsNullOrEmpty(sSpielstatistik[4])) sSpielstatistik[4] = "<br/>Spielerwechsel:" + sSpielstatistik[4];
+      }
+
+      return Json(sSpielstatistik, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult ViewGameKommentar()
+    {
+      CornerkickCore.Core.User user = AccountController.ckUser();
+
+      if (user.game == null) return Json("", JsonRequestBehavior.AllowGet);
+
+      string sKomm = "";
+      foreach (CornerkickGame.Game.Kommentar k in user.game.daten.ltKommentar) {
+        string sKommTmp = sKomm;
+        sKomm = MvcApplication.ckcore.spiel.tl.sSpielmin(k.tsSpielminute, true) + k.sKommentar + '\n' + sKommTmp;
+      }
+
+      return Json(sKomm, JsonRequestBehavior.AllowGet);
+    }
+
+    // 
+    // GET: /HelloWorld/Welcome/ 
+    [Authorize]
+    public string Print(string s)
+    {
+      return s;
+    }
+
+    // GET: Member
+    [Authorize]
+    public ActionResult Saison()
+    {
+      return View();
+    }
+
+  }
+}

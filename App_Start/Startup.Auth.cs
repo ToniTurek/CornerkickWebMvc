@@ -24,6 +24,7 @@ namespace CornerkickWebMvc
       // Konfigurieren des Anmeldecookies.
       app.UseCookieAuthentication(new CookieAuthenticationOptions
       {
+          ExpireTimeSpan = TimeSpan.FromMinutes(30), // was TimeSpan.FromMinutes(5)
           AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
           LoginPath = new PathString("/Account/Login"),
           Provider = new CookieAuthenticationProvider
@@ -38,7 +39,7 @@ namespace CornerkickWebMvc
       app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
       // Aktiviert die Anwendung für das vorübergehende Speichern von Benutzerinformationen beim Überprüfen der zweiten Stufe im zweistufigen Authentifizierungsvorgang.
-      app.UseTwoFactorSignInCookie(DefaultAuthenticationTypes.TwoFactorCookie, TimeSpan.FromMinutes(5));
+      app.UseTwoFactorSignInCookie(DefaultAuthenticationTypes.TwoFactorCookie, TimeSpan.FromMinutes(30)); // was TimeSpan.FromMinutes(5)
 
       // Aktiviert die Anwendung für das Speichern der zweiten Anmeldeüberprüfungsstufe (z. B. Telefon oder E-Mail).
       // Wenn Sie diese Option aktivieren, wird Ihr zweiter Überprüfungsschritt während des Anmeldevorgangs auf dem Gerät gespeichert, von dem aus Sie sich angemeldet haben.

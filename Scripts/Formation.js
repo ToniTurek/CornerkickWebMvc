@@ -1,85 +1,248 @@
-﻿function drawAufstellung(iFormation) {
+﻿async function drawAufstellung(iFormation, iSelectedPlayer, onLoad) {
   var drawFormation = $("#drawFormation");
-  //alert("Formation: " + iFormation);
+  var textteamaverage = $("#average");
+  var divTacticOrientation    = document.getElementById("divTacticOrientation");
+  var divTacticIndOrientation = document.getElementById("divTacticIndOrientation");
+  var fStrength = 0.0;
+  var fStrengthAve = 0.0;
+
   // respond to the change event in here
   $.ajax({
     cache: false,
     url: "/Member/CkAufstellungFormation",
     type: "GET",
-    data: { iF: iFormation },
-    success: function (dataFormation) {
-      if (dataFormation) {  // check if data is defined
+    data: { iF: iFormation - 1, iSP: iSelectedPlayer - 1 },
+    success: function (teamData) {
+      if (teamData) {  // check if data is defined
         var result = "";
         var i = 0;
-        var sSt = '';
 
         drawFormation.html('');
-        $.each(dataFormation, function (iFormation, player) {
-          /*
-          $.ajax({
-            cache: false,
-            url: "/Member/GetPlayerStrength",
-            type: "GET",
-            data: { iPlayer: player.iPlID },
-            success: function (fPlSt) {
-              alert("Test B");
-              sSt = fPlSt;
-            },
-            error: function () {
-              alert("Test C");
+
+        if (document.getElementById("rbDefence").checked) {
+          $.each(teamData.ltPlayer, function (iFormation, player) {
+            if (player.iIxManMarking >= 0) {
+              plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
+
+              var iPos = convertPosToPix(player.ptPosDefault.Y, 122 - player.ptPosDefault.X, -plOpp.ptPosDefault.Y, plOpp.ptPosDefault.X, document.getElementById("drawFormation"), false);
+              result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
+
+            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i]);
+
+            i = i + 1;
+            return (i !== 11);
           });
-          */
 
-          result += getBoxFormation(player, sSt);
-          i = i + 1;
-          return (i !== 11);
-        });
+          // opponent player
+          $.each(teamData.ltPlayerOpp, function (iFormation, player) {
+            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1);
 
-        //alert("drawFormation A" + iFormation);
+            i = i + 1;
+            return (i !== 11);
+          });
+
+          // hide orientation slider on start
+          divTacticOrientation   .style.display = 'none';
+          divTacticIndOrientation.style.display = 'none';
+        } else {
+          // print radius of action
+          if (iSelectedPlayer > 0 && iSelectedPlayer < 12) {
+            result += teamData.sDivRoa;
+
+            if (onLoad && teamData.fIndOrientationMinMax[1] > teamData.fIndOrientationMinMax[0]) {
+              $("#slider-IndOrientation").slider("value", parseInt(teamData.fIndOrientation * 100));
+
+              divTacticIndOrientation.style.top = ((1.0 - teamData.fIndOrientationMinMax[1]) * 100).toString() + '%';
+              divTacticIndOrientation.style.height = ((teamData.fIndOrientationMinMax[1] - teamData.fIndOrientationMinMax[0]) * 100).toString() + '%';
+              divTacticIndOrientation.style.display = 'block';
+            }
+          } else {
+            divTacticIndOrientation.style.display = 'none';
+          }
+
+          result += teamData.sDivPlayer;
+
+          // show orientation slider on start
+          divTacticOrientation.style.display = 'block';
+        }
+
+        if (iSelectedPlayer > 0 && iSelectedPlayer < 12) {
+          if (document.getElementById("rbDefence").checked) {
+            result += getBoxMovePlayer(teamData.ltPlayer[iSelectedPlayer - 1]);
+          }
+        }
+
         drawFormation/*.hide()*/.html(result).fadeIn('slow')/*.show()*/;
-        //alert("drawFormation B" + iFormation);
       } else {
         alert("data hasn't worked!");
       }
     }
   });
+
+  $.ajax({
+    cache: false,
+    url: "/Member/GetPlayerStrengthAgeAve",
+    type: "GET",
+    data: { },
+    success: function (fStrengthAgeAve) {
+      textteamaverage.html('');
+      textteamaverage.html("Durchschnittsstärke (-alter): " + fStrengthAgeAve[0].toFixed(2) + " (" + fStrengthAgeAve[1].toFixed(1) + ")");
+    }
+  });
 }
 
-function getBoxFormation(player, sStrength) {
-  var iTop = 100 - (((100 * player.ptPosDefault.X) / (122 / 2)) - 0);
-  var iLeft = (((100 * player.ptPosDefault.Y) / 50) - 10);
-  var iLeft2 = iLeft + 5;
+function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos) {
+  if (!iPos) {
+    iPos = 0;
+  }
+
+  var iTop  = 100 - (((100 * player.ptPosDefault.X) / 122));
+  var iLeft = (100 * (player.ptPosDefault.Y + 25)) / 50;
+  if (bOpponentTeam) {
+    iTop  = 100 - iTop;
+    iLeft = 100 - iLeft;
+  }
+
+  iTop  = iTop  -  1.75;
+  iLeft = iLeft - 13.00;
+
   var sName = player.sName;
   var sNameSplit = sName.split(' ');
   if (sNameSplit.length > 1) sName = sNameSplit[0][0] + ". " + sNameSplit[sNameSplit.length - 1];
+  if (sName.length > 11) sName = sName.substring(0, 11);
   var sPos = ["", "TW", "IV", "LV", "RV", "DM", "LM", "RM", "OM", "LA", "RA", "ST", "LIB", "OLV", "ORV", "ZM", "", "", "", "", "", "HS"];
 
+  var color  = "white";
+  var color2 = "black";
+  if (bOpponentTeam) {
+    color = "lightgray";
+  } else if (player.bYellowCard) {
+    color = "yellow";
+  } else if (iSelectedPlayer >= 0 && i !== iSelectedPlayer) {
+    color  = "rgba(255, 255, 255, .5)";
+    color2 = "rgba(0, 0, 0, .5)";
+  }
+
+  var sSelectPlayer = "";
+  var sZIndex = "";
+  if (!bOpponentTeam) {
+    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\"";
+    if (i === iSelectedPlayer) {
+      sZIndex = ";z-index:99";
+    }
+  } else if (iSelectedPlayer >= 0) {
+    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\"";
+  }
+
   var sBox = "";
-  sBox += '<div style="position: absolute; width: 5%; height: 6%; top: ' + iTop + '%; left: ' + iLeft + '%; background-color: black">' +
-      '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 300%; color: white">' + player.iNr + '</h2>' +
+  sBox +=
+  '<div' + sSelectPlayer + ' style="position: absolute; width: 26%; height: 3.5%; top: ' + iTop + '%; left: ' + iLeft + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
+    '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
+      '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 240%; color: white">' + player.iNr + '</h2>' +
     '</div>' +
-    '<div style="position: absolute; width: 16%; height: 6%; top: ' + iTop + '%; left: ' + iLeft2 + '%; background-color: white; border: 2px solid black">' +
-      '<div style="position: absolute; width: 100%; height: 65%; top: 0%; left: 0%; background-color: white; border: 1px solid black; word-break: break-word">' +
+    '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black">' +
+      '<div style="position: absolute; width: 100%; height: 65%; top: 0%; left: 0%; background-color: ' + color + '; word-break: break-word">' +
         '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 150%; color: black">' + sName + '</h2>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 0%; background-color: white; border: 1px solid black">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sPos[player.iPos] + '</h2>' +
+      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 0%; background-color: ' + color + '">' +
+        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sPos[iPos] + '</h2>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 25%; background-color: white; border: 1px solid black">' +
+      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 25%; background-color: ' + color + '">' +
         '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sStrength + '</h2>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 50%; background-color: white; border: 1px solid black">' +
+      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 50%; background-color: ' + color + '">' +
         '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">X: ' + player.ptPosDefault.Y + '</h2>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 75%; background-color: white; border: 1px solid black">' +
+      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 75%; background-color: ' + color + '">' +
         '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">Y: ' + player.ptPosDefault.X + '</h2>' +
       '</div>' +
+    '</div>' +
+  '</div>';
+
+  return sBox;
+}
+
+function getBoxMovePlayer(player) {
+  // Total box width: 18%
+  var iTop = (100 - ((100 * player.ptPosDefault.X) / 122)) - 1.75;
+  var iLeft  = (100 *       (player.ptPosDefault.Y + 25))  / 50;
+  var iRight = (100 * (50 - (player.ptPosDefault.Y + 25))) / 50;
+
+  var sBox = "";
+
+  sBox +=
+    '<div style="position: absolute; width: 10%; min-width: 60px; top: ' + (iTop - 3) + '%; left: ' + (iLeft + 0 - 5) + '%">' +
+      '<img id="img_arrow_1" onclick="javascript:movePlayer(1)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_up.png"/>' +
+    '</div>';
+
+  sBox +=
+    '<div style="position: absolute; width:  4%; min-width: 24px; top: ' + (iTop - 1.5) + '%; left: ' + (iLeft + 13 + 1) + '%">' +
+      '<img id="img_arrow_2" onclick="javascript:movePlayer(2)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_right.png"/>' +
+    '</div>';
+
+  sBox +=
+    '<div style="position: absolute; width: 10%; min-width: 60px; top: ' + (iTop + 4) + '%; left: ' + (iLeft + 0 - 5) + '%">' +
+      '<img id="img_arrow_3" onclick="javascript:movePlayer(3)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_down.png"/>' +
+    '</div>';
+
+  sBox +=
+    '<div style="position: absolute; width:  4%; min-width: 24px; top: ' + (iTop - 1.5) + '%; right: ' + (iRight + 13 + 1) + '%">' +
+      '<img id="img_arrow_4" onclick="javascript:movePlayer(4)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_left.png"/>' +
     '</div>';
 
   return sBox;
 }
 
+function getSubstitutionList() {
+  $.ajax({
+    url: '/Member/GetSubstitutionList',
+    type: "GET",
+    dataType: "JSON",
+    success: function (ltsSubstitution) {
+      if (ltsSubstitution) {
+        if (ltsSubstitution.length > 0) {
+          drawSubstitutionList(ltsSubstitution);
+        }
+      }
+      return true;
+    },
+    error: function () {
+      alert("ERROR in getSubstitutionList");
+      return false;
+    }
+  });
+}
+
+function drawSubstitutionList(ltsSubstitution) {
+  var divDrawSubstitutions = $("#drawSubstitutions");
+  divDrawSubstitutions.html('');
+
+  var sBox = "";
+  sBox += '<table style="width: 50 %; min-width: 300px" border="1" cellpadding="3">';
+  sBox += '<thead>';
+  sBox += '<tr>';
+  sBox += '<th style="text-align:right">#</th>';
+  sBox += '<th style="text-align:center">aus</th>';
+  sBox += '<th style="text-align:center">ein</th>';
+  sBox += '</tr>';
+  sBox += '</thead>';
+  sBox += '<tbody>';
+  for (var i = 0; i < ltsSubstitution.length; i++) {
+    var sSub = ltsSubstitution[i]; 
+    sBox += '<tr>';
+    sBox += '<td align="right">' + (i + 1) + '</td>';
+    sBox += '<td align="center">' + sSub[0] + '</td>';
+    sBox += '<td align="center">' + sSub[1] + '</td>';
+    sBox += '</tr>';
+  }
+  sBox += '</tbody>';
+  sBox += '</table>';
+
+  divDrawSubstitutions.html(sBox);
+}
+
+/*
 function actionDrawDatatable(ltLV) {
   var drawDatatable = $("#tableTeam2");
   drawDatatable.html('');
@@ -124,7 +287,7 @@ function drawAufstellung2(ltLV) {
     sBox += '    <img src="~/Content/Images/10.jpg" width="20" height="26" class="playerPhoto" />';
     sBox += '     <input type="hidden" class="playerId" value="' + iPlID + '" />';
     sBox += '   </td>';
-
+    
     for (var j = 1; j < ltLV[i].length - 1; j++) {
       if (j === 2) {
         sBox += '<td align="center">@Html.ActionLink(' + ltLV[i][j] + ', "PlayerDetails", "Member", new {i = ' + iPlID + '}, new {target = "_blank"})</td>';
@@ -140,3 +303,4 @@ function drawAufstellung2(ltLV) {
 
   return sBox;
 }
+*/

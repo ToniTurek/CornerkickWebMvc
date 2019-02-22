@@ -1,0 +1,331 @@
+﻿@model CornerkickWebMvc.Models.SponsorModel
+
+@{
+  ViewBag.Title = "Sponsor";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<head>
+  <meta charset="UTF-8">
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    var bMobile = false;
+
+    function getLtSponsorBoardIds() {
+      return $.ajax({
+        url: "/Member/getLtSponsorBoardIds",
+        type: 'POST',
+        traditional: true,
+        dataType: "json",
+        success: function (ltSponsorBoardIds) {
+        }
+      });
+    }
+
+    function loadImageMain(iSponsorID) {
+      if (iSponsorID >= 0) {
+        document.getElementById("imgSponsorMain").src = "/Content/Images/sponsors/" + iSponsorID.toString() + ".png";
+      }
+    }
+
+    function loadImageBoards(ltSponsorIds) {
+      if (ltSponsorIds) {
+        ltSponsorTmp = ltSponsorIds.slice()
+        while (ltSponsorTmp.length < 12) {
+          ltSponsorTmp.push(0);
+        }
+
+        for (i = 0; i < ltSponsorTmp.length; i++) {
+          document.getElementById("imgSponsorBoard_" + i.toString()).src = "/Content/Images/sponsors/" + ltSponsorTmp[i].toString() + ".png";
+        }
+      }
+    }
+
+    $(document).ready(function () {
+      bnTakeBoard = document.getElementById("bnTakeBoard");
+      bnTakeBoard.disabled = true;
+
+      var iSponsorID = @Html.Raw(Json.Encode(Model.sponsorMain.iId));
+
+      loadImageMain(iSponsorID);
+
+      $.when(getLtSponsorBoardIds()).done(function (ltSponsor) {
+        loadImageBoards(ltSponsor);
+      });
+
+      var jTable = $('#tableSponsors').DataTable({
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "searching": false,
+        "responsive": true,
+        columnDefs: [
+          { "className": "dt-center", "targets": "_all" },
+          {
+            targets: [0, 1],
+            "visible": false,
+            "searchable": false
+          }
+        ]
+      });
+
+      $('#tableSponsors tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+        } else {
+          jTable.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+
+          var data = jTable.row('.selected').data();
+          if (data) {
+            loadImageMain(data[1]);
+          } else {
+            loadImageMain(iSponsorID);
+          }
+        }
+      });
+
+      $('#bnTake').click(function () {
+        var data = jTable.row('.selected').data();
+        if (data) {
+          var iIndex = data[0];
+          //table.row('.selected').remove().draw(false);
+          $.ajax({
+            type: 'post',
+            url: '/Member/SponsorSet',
+            dataType: "json",
+            data: { iSponsorIndex: iIndex },
+            success: function (sCash) {
+              //$("#bnBuild").text("Kosten: " + iKosten);
+              alert("Ihr aktuelles Guthaben hat sich um " + sCash + "€ erhöht.");
+              window.location.reload(true);
+            }
+          });
+        }
+      });
+
+      var tableBoard = $('#tableSponsorBoard').DataTable({
+        "ajax": {
+          "url": '@Url.Action("getTableSponsorBoard", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "bOffer" },
+          { "data": "iId" },
+          { "data": "iIndex" },
+          { "data": "sName" },
+          { "data": "sMoneyVicHome" },
+          { "data": "nBoards" },
+          { "data": "iYears" }
+        ],
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "searching": false,
+        "responsive": true,
+        columnDefs: [
+          { "className": "dt-center", "targets": "_all" },
+          {
+            targets: [0, 1, 2],
+            "visible": false,
+            "searchable": false
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (!aData.bOffer) {
+            $('td', nRow).css('font-weight', "bold");
+          }
+        }
+      });
+
+      $('#tableSponsorBoard tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+        } else {
+          tableBoard.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+        }
+
+        $.when(getLtSponsorBoardIds()).done(function (ltSponsorTmp) {
+          if (ltSponsorTmp.length < 12) {
+            var data = tableBoard.row('.selected').data();
+            if (data) {
+              if (data.iId > 0) {
+                bnTakeBoard.disabled = false;
+                for (iB = 0; iB < data.nBoards; iB++) {
+                  ltSponsorTmp.push(data.iId);
+                }
+              }
+            }
+
+            loadImageBoards(ltSponsorTmp);
+          } else {
+            bnTakeBoard.disabled = true;
+          }
+        });
+      });
+
+      $('#bnTakeBoard').click(function () {
+        var data = tableBoard.row('.selected').data();
+        if (data) {
+          var iIndex = data.iIndex;
+          bnTakeBoard.disabled = true;
+
+          $.ajax({
+            type: 'post',
+            url: '/Member/SponsorSet',
+            dataType: "json",
+            data: { iSponsorIndex: iIndex },
+            success: function (sCash) {
+              //window.location.reload(true);
+              $('#tableSponsorBoard').DataTable().ajax.reload();
+            }
+          });
+        }
+      });
+    });
+  </script>
+</head>
+
+<h2>Hauptsponsor</h2>
+
+<div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
+  <img id="imgSponsorMain" src="" style="position: relative; width: 100%; border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px" />
+</div>
+
+@{
+  string sStyleTable = "display";
+  if (true) {
+    sStyleTable += " compact";
+  }
+}
+<table id="tableSponsors" style="width: auto" class=@sStyleTable>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>id</th>
+      <th>Sponsor</th>
+      <th>Prämie/Jahr €</th>
+      <th>Siegprämie €</th>
+      <th>Meisterprämie €</th>
+      <th>Laufzeit</th>
+    </tr>
+  </thead>
+  <tbody>
+    @{
+      if (Model.sponsorMain.iId > 0) {
+        <tr style="font-weight:bold">
+          <td>0</td>
+          <td>@Model.sponsorMain.iId</td>
+          <td>@MvcApplication.ckcore.fz.ltSponsoren[Model.sponsorMain.iId].sName</td>
+          <td>@Model.sponsorMain.iGeldJahr.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+          <td>@Model.sponsorMain.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+          <td>@Model.sponsorMain.iGeldMeister.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+          <td>@Model.sponsorMain.iYears</td>
+        </tr>
+      }
+
+      int iSp = 0;
+      foreach (CornerkickCore.Finance.Sponsor spon in Model.ltSponsorOffers) {
+        if (spon.bMain && spon.iId > 0 && spon.iId < MvcApplication.ckcore.fz.ltSponsoren.Count) {
+          <tr>
+            <td>@iSp</td>
+            <td>@spon.iId</td>
+            <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName</td>
+            <td>@spon.iGeldJahr.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.iGeldMeister.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.iYears</td>
+          </tr>
+        }
+        iSp++;
+      }
+    }
+  </tbody>
+</table>
+
+@{
+  if (Model.sponsorMain.iId <= 0) {
+    <button type="submit" id="bnTake" class="btn btn-default" style="width: 100%">Sponsor wählen</button>
+  }
+}
+
+<p> </p>
+<h2>Banden</h2>
+
+<table id="tableSponsorBoard" style="width: auto" class="display">
+  <thead>
+    <tr>
+      <th></th>
+      <th>id</th>
+      <th>#</th>
+      <th>Sponsor</th>
+      <th>Prämie/Heimspiel €</th>
+      <th>Banden</th>
+      <th>Laufzeit</th>
+    </tr>
+  </thead>
+  <tbody>
+    @*
+    @{
+      foreach (CornerkickCore.Finance.Sponsor spon in Model.ltSponsorBoards) {
+        if (!spon.bHaupt) {
+          <tr style="font-weight:bold">
+            <td>-1</td>
+            <td>@spon.iId</td>
+            <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName</td>
+            <td>@spon.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.nBoards.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.iYears</td>
+          </tr>
+        }
+      }
+
+      int iSpB = 0;
+      foreach (CornerkickCore.Finance.Sponsor spon in Model.ltSponsorOffers) {
+        if (!spon.bHaupt) {
+          <tr>
+            <td>@iSpB</td>
+            <td>@spon.iId</td>
+            <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName</td>
+            <td>@spon.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.nBoards.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.iYears</td>
+          </tr>
+        }
+        iSpB++;
+      }
+    }
+    *@
+  </tbody>
+</table>
+
+<button type="submit" id="bnTakeBoard" class="btn btn-default" style="width: 100%">Sponsor wählen</button>
+
+@{
+  for (int iB = 0; iB < 12; iB++) {
+    if (iB < Model.ltSponsorBoards.Count) {
+      CornerkickCore.Finance.Sponsor spon = Model.ltSponsorBoards[iB];
+    }
+    string sImgId = "imgSponsorBoard_" + iB.ToString();
+    <div class="image" style="position: relative; width: 100%; margin-top: 2%">
+      <div style="position: relative; float: left; width: 48%; margin-right: 2%; margin-bottom: 2%; height: auto; border: 0px solid green">
+        <img id=@sImgId src="" style="position: relative; width: 100%; border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px" />
+      </div>
+    </div>
+  }
+}

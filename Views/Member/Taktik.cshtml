@@ -3,7 +3,7 @@
 @{
   ViewBag.Title = "Taktik";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub.taktik;
+  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().taktik;
 }
 
 <!doctype html>
@@ -11,13 +11,101 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>jQuery UI Slider - Range with fixed minimum</title>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
+  <style>
+    #slider {
+      margin: 10px;
+    }
+
+    .ui-slider-horizontal {
+      height: 20px;
+      width: 100%;
+    }
+
+    .ui-slider-vertical {
+      height: 100%;
+      width: 20px;
+    }
+
+    .ui-slider .ui-slider-handle {
+      height: 26px;
+      width: 26px;
+      padding-left: 0px;
+    }
+
+    #slider-Ausrichtung .ui-slider-range {
+      background: orange;
+    }
+    #slider-Ausrichtung .ui-slider-handle {
+      border-color: orange;
+    }
+
+    #slider-left .ui-slider-range {
+      background: green;
+    }
+    #slider-left .ui-slider-handle {
+      border-color: green;
+    }
+
+    #slider-right .ui-slider-range {
+      background: green;
+    }
+    #slider-right .ui-slider-handle {
+      border-color: green;
+    }
+
+    #slider-mid .ui-slider-range {
+      background: green;
+    }
+    #slider-mid .ui-slider-handle {
+      border-color: green;
+    }
+
+    #slider-PassLength .ui-slider-range {
+      background: green;
+    }
+    #slider-PassLength .ui-slider-handle {
+      border-color: green;
+    }
+
+    #slider-PassRisk .ui-slider-range {
+      background: green;
+    }
+    #slider-PassRisk .ui-slider-handle {
+      border-color: green;
+    }
+
+    #slider-PassFreq .ui-slider-range {
+      background: green;
+    }
+    #slider-PassFreq .ui-slider-handle {
+      border-color: green;
+    }
+
+    #slider-Schussentf .ui-slider-range {
+      background: red;
+    }
+    #slider-Schussentf .ui-slider-handle {
+      border-color: red;
+    }
+  </style>  
+  
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
-    @{ int iAusrichtung = (int)(taktik.fAusrichtung * 100); }
+    @{
+      int iAusrichtung = (int)(taktik.fOrientation       * 100);
+      int iEinsatz     = (int)(taktik.fPower             * 100);
+      int iSchussentf  = (int)((taktik.fShootFreq * -1f) * 100);
+      int iZK          = (int)(taktik.fAggressive        * 100);
+      int iPassRisk    = (int)(taktik.fPassRisk          * 100);
+      int iPassLength  = (int)(taktik.fPassLength        * 100);
+      int iPassFreq    = (int)(taktik.fPassFreq          * 100);
+      int iLeft        = (int)((taktik.fPassLeft  + 1f)  * 100);
+      int iRight       = (int)((taktik.fPassRight + 1f)  * 100);
+      int iMid         = (int)((1f - (taktik.fPassLeft + taktik.fPassRight)) * 100);
+    }
     $(function () {
       $("#slider-Ausrichtung").slider({
         range: "min",
@@ -25,9 +113,9 @@
         min: -100,
         max: +100,
         step: 10,
+        orientation: "vertical",
         slide: function (event, ui) {
           $("#inputAusrichtung").val(ui.value + "%");
-
           $.ajax({
             url: '/Member/setTaktik',
             type: "GET",
@@ -42,7 +130,7 @@
 
       $("#slider-Einsatz").slider({
         range: "min",
-        value: 0,
+        value: @iEinsatz,
         min: -100,
         max: +100,
         step: 10,
@@ -63,10 +151,11 @@
 
       $("#slider-Schussentf").slider({
         range: "min",
-        value: 0,
+        value: @iSchussentf,
         min: -100,
         max: +100,
         step: 10,
+        orientation: "vertical",
         slide: function (event, ui) {
           $("#inputSchussentf").val(ui.value + "%");
 
@@ -74,7 +163,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 2, fTaktik: ui.value / 100 },
+            data: { iTaktik: 2, fTaktik: (ui.value * -1) / 100 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -82,48 +171,368 @@
         }
       });
 
+      $("#slider-Zweikampf").slider({
+        range: "min",
+        value: @iZK,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputZweikampf").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 3, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-PassRisk").slider({
+        range: "min",
+        value: @iPassRisk,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputPassRisk").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 4, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-PassLength").slider({
+        range: "min",
+        value: @iPassLength,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputPassLength").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 5, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-PassFreq").slider({
+        range: "min",
+        value: @iPassFreq,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          $("#inputPassFreq").val(ui.value + "%");
+
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 6, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      var sliderMid = $("#slider-mid").slider({
+        range: "min",
+        value: @iMid,
+        min:    0,
+        max: +300,
+        step: 10,
+        orientation: "vertical",
+        disabled: true
+      });
+
+      var sliderLeft = $("#slider-left").slider({
+        range: "min",
+        value: @iLeft,
+        min:    0,
+        max: +300,
+        step: 10,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          $("#inputLeft").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 7, fTaktik: (ui.value / 100) - 1 },
+            success: function (fTaktik) {
+              sliderRight.slider("value", (fTaktik + 1) * 100);
+              sliderMid.slider("value", 300 - (sliderLeft.slider("value") + sliderRight.slider("value")));
+              setInputs();
+            }
+          });
+        }
+      });
+
+      var sliderRight = $("#slider-right").slider({
+        range: "min",
+        value: @iRight,
+        min:    0,
+        max: +300,
+        step: 10,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          $("#inputRight").val(ui.value + "%");
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 8, fTaktik: (ui.value / 100) - 1 },
+            success: function (fTaktik) {
+              sliderLeft.slider("value", (fTaktik + 1) * 100);
+              sliderMid.slider("value", 300 - (sliderLeft.slider("value") + sliderRight.slider("value")));
+              setInputs();
+            }
+          });
+        }
+      });
+
+      setInputs();
+
+      createAutoSubs(0);
+    });
+
+    function setInputs() {
       $("#inputAusrichtung").val($("#slider-Ausrichtung").slider("value") + "%");
       $("#inputEinsatz")    .val($("#slider-Einsatz")    .slider("value") + "%");
       $("#inputSchussentf") .val($("#slider-Schussentf") .slider("value") + "%");
-    });
+      $("#inputZweikampf")  .val($("#slider-Zweikampf")  .slider("value") + "%");
+      $("#inputPassRisk")   .val($("#slider-PassRisk")   .slider("value") + "%");
+      $("#inputPassLength") .val($("#slider-PassLength") .slider("value") + "%");
+      $("#inputPassFreq")   .val($("#slider-PassFreq")   .slider("value") + "%");
+      $("#inputLeft")       .val($("#slider-left")       .slider("value") + "%");
+      $("#inputRight")      .val($("#slider-right")      .slider("value") + "%");
+      $("#inputMid")        .val($("#slider-mid")        .slider("value") + "%");
+    }
+
+    function setStandards(iStd) {
+      var iIndexPl = $('#iDdlStandard' + iStd).val();
+
+      $.ajax({
+        url: '/Member/setStandards',
+        type: "GET",
+        dataType: "JSON",
+        data: { iStandard: iStd, iIndexPlayer: iIndexPl },
+        success: function () {
+          //alert(iTg);
+        }
+      });
+    }
+
+    function createAutoSubs(iAS) {
+      $.ajax({
+        url: '/Member/getHtmlAutoSubOut',
+        type: "GET",
+        dataType: "JSON",
+        data: { iAS: iAS },
+        success: function (sBox) {
+          $("#divAutoSubOut" + iAS.toString()).html(sBox[0]);
+          $("#divAutoSubIn"  + iAS.toString()).html(sBox[1]);
+
+          tbAutoSubsMin = document.getElementById("tbAutoSubsMin" + iAS.toString());
+          tbAutoSubsMin.disabled = false;
+
+          setAutoSubs(iAS);
+        }
+      });
+    }
+
+    function setAutoSubs(iAS) {
+      var iIndexPlOut = $('#ddlAutoSubOut' + iAS).val();
+      var iIndexPlIn  = $('#ddlAutoSubIn'  + iAS).val();
+      var iMin        = $('#tbAutoSubsMin' + iAS).val();
+      //alert(iAS + ", " + iIndexPlOut + ", " + iIndexPlIn + ", " + iMin);
+
+      $.ajax({
+        url: '/Member/setAutoSubs',
+        type: "GET",
+        dataType: "JSON",
+        data: { iAS: iAS, iIndexPlayerOut: iIndexPlOut, iIndexPlayerIn: iIndexPlIn, iMin: iMin },
+        success: function (bValid) {
+          if (bValid) {
+            if (iAS < 2) {
+              createAutoSubs(iAS + 1);
+            }
+          } else {
+            var jAS = iAS + 1;
+            while (jAS < 3) {
+              ddlAutoSubOut = document.getElementById("ddlAutoSubOut" + jAS.toString());
+              ddlAutoSubIn  = document.getElementById("ddlAutoSubIn"  + jAS.toString());
+              tbAutoSubsMin = document.getElementById("tbAutoSubsMin" + jAS.toString());
+
+              if (ddlAutoSubOut.disabled == false) {
+                ddlAutoSubOut.disabled = true;
+              }
+              if (ddlAutoSubIn.disabled == false) {
+                ddlAutoSubIn.disabled = true;
+              }
+              if (tbAutoSubsMin.disabled == false) {
+                tbAutoSubsMin.disabled = true;
+              }
+
+              jAS = jAS + 1;
+            }
+          }
+        }
+      });
+    }
   </script>
 </head>
 
 <body>
-  <h2>Taktik</h2>
-
   <fieldset>
     <legend>Taktik</legend>
-    <div class="controlgroup-vertical">
-      <p>
-        @Html.LabelFor(m => m.fAusrichtung, new { @class = "col-md-2 control-label" })
-        <input type="text" id="inputAusrichtung" readonly style="border:0; color:#f6931f; font-weight:bold;">
-      </p>
-      <div id="slider-Ausrichtung"></div>
+    <div style="position: relative; width: 100%; height: 70px">
+      <div id="shoots" style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
+        <div style="position: absolute; width: 30%; top: 50%; left: 0%">
+          @Html.DropDownListFor(m => m.sStandards[3], Model.ltDdlStandards[3], new { @class = "form-control", @onchange = "setStandards(3)", id = "iDdlStandard3" })
+        </div>
+        <div style="position: absolute; width: 30%; top: 50%; right: 0px">
+          @Html.DropDownListFor(m => m.sStandards[2], Model.ltDdlStandards[2], new { @class = "form-control", @onchange = "setStandards(2)", id = "iDdlStandard2" })
+        </div>
+        <div style="position: absolute; width: 30%; top: 50%; left: 35%">
+          @Html.DropDownListFor(m => m.sStandards[0], Model.ltDdlStandards[0], new { @class = "form-control", @onchange = "setStandards(0)", id = "iDdlStandard0" })
+        </div>
+        <div style="position: absolute; width: 30%; top: 0%; left: 35%">
+          @Html.DropDownListFor(m => m.sStandards[1], Model.ltDdlStandards[1], new { @class = "form-control", @onchange = "setStandards(1)", id = "iDdlStandard1" })
+        </div>
+      </div>
+    </div>
 
-      <p>
-        @Html.LabelFor(m => m.fEinsatz, new { @class = "col-md-2 control-label" })
-        <input type="text" id="inputEinsatz" readonly style="border:0; color:#f6931f; font-weight:bold;">
-      </p>
-      <div id="slider-Einsatz"></div>
+    <div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
+      <img style="position: relative; width: 100%" src="~/Content/Images/tactic.png" />
 
-      <p>
-        @Html.LabelFor(m => m.fSchussentf, new { @class = "col-md-2 control-label" })
-        <input type="text" id="inputSchussentf" readonly style="border:0; color:#f6931f; font-weight:bold;">
-      </p>
-      <div id="slider-Schussentf"></div>
+      <div id="tactic" style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
+        <div style="position: absolute; width: 0%; height: 34%; top: 12%; left: 33%">
+          <p>
+            <input type="text" id="inputAusrichtung" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-Ausrichtung" style="position: relative; float: left; height: 100%"></div>
+        </div>
+
+        <div style="position: absolute; width: 0%; height: 25%; top: 2%; left: 65%">
+          <p>
+            <input type="text" id="inputSchussentf" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-Schussentf" style="position: relative; float: left; height: 100%"></div>
+        </div>
+
+        <div style="position: absolute; width: 0%; height: 34%; top: 12%; left: 5%">
+          <p>
+            <input type="text" id="inputLeft" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-left" style="position: relative; float: left; height: 100%"></div>
+        </div>
+
+        <div style="position: absolute; width: 0%; height: 34%; top: 12%; right: 5%">
+          <p>
+            <input type="text" id="inputRight" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: right; float: right; width: 37px; right: 0px">
+          </p>
+          <div id="slider-right" style="position: relative; float: right; height: 100%; right: 0px"></div>
+        </div>
+
+        <div style="position: absolute; width: 0%; height: 34%; top: 12%; left: 50%">
+          <p>
+            <input type="text" id="inputMid" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-mid" style="position: relative; float: left; height: 100%"></div>
+        </div>
+
+        <div style="position: absolute; width: 40%; top: 52%; left: 5%">
+          <p>
+            <input type="text" id="inputEinsatz" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-Einsatz" style="position: relative; float: left"></div>
+        </div>
+        <div style="position: absolute; width: 40%; top: 58%; left: 5%">
+          <p>
+            <input type="text" id="inputZweikampf" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-Zweikampf" style="position: relative; float: left"></div>
+        </div>
+
+        <div style="position: absolute; width: 40%; top: 52%; left: 55%">
+          <p>
+            <input type="text" id="inputPassLength" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-PassLength" style="position: relative; float: left"></div>
+        </div>
+        <div style="position: absolute; width: 40%; top: 58%; left: 55%">
+          <p>
+            <input type="text" id="inputPassRisk" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-PassRisk" style="position: relative; float: left"></div>
+        </div>
+        <div style="position: absolute; width: 40%; top: 64%; left: 55%">
+          <p>
+            <input type="text" id="inputPassFreq" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-PassFreq" style="position: relative; float: left"></div>
+        </div>
+
+        <div style="position: absolute; width: 60%; bottom: 20%; left: 20%; text-align: center">
+          @for (byte i = 0; i < 3; i++) {
+            var htmlAttributesEditorFor = new Dictionary<string, object>
+            {
+              { "type", "number" },
+              { "class", "form-control" },
+              { "id", "tbAutoSubsMin" + i.ToString() },
+              { "autocomplete", "off" },
+              { "min",   "0" },
+              { "max", "120" },
+              { "onkeyup", "setAutoSubs(" + i.ToString() + ")" }
+            };
+            if (i > 0) {
+              htmlAttributesEditorFor.Add("disabled", "disabled");
+            }
+
+            string sIdO = "divAutoSubOut" + i.ToString();
+            string sIdI = "divAutoSubIn"  + i.ToString();
+            string sDdlIdO = "ddlAutoSubOut" + i.ToString();
+            string sDdlIdI = "ddlAutoSubIn"  + i.ToString();
+            <div style="position: relative; width: 100%; height: 40px">
+              <div id=@sIdO style="position: absolute; width: 38%; left:  0%">
+                <select class="form-control" disabled="disabled" id=@sDdlIdO onchange="setAutoSubs(@i)">
+                  <option value="-1">aus</option>
+                </select>
+              </div>
+              <div id=@sIdI style="position: absolute; width: 38%; left: 40%">
+                <select class="form-control" disabled="disabled" id=@sDdlIdI onchange="setAutoSubs(@i)">
+                  <option value="-1">aus</option>
+                </select>
+              </div>
+              <div style="position: absolute; width: 20%; left: 80%">
+                @Html.EditorFor(Model => Model.iAutoSubsMin[i], new { htmlAttributes = htmlAttributesEditorFor })
+              </div>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   </fieldset>
 </body>
-
 </html>
-
-@*
-  <div class="form-group" style="position: relative; width: 100%; height: 30px; background-color: white">
-    <div class="form-group" style="position: absolute; width: 50%; height: auto">
-      <div class="col-md-10">
-        <input type="range" min="-10" max="+10" />
-      </div>
-    </div>
-  </div>
-*@

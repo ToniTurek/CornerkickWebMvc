@@ -1,0 +1,183 @@
+﻿@model CornerkickWebMvc.Models.UserModel
+
+@{
+  ViewBag.Title = "Mail";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
+  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      bnSend = document.getElementById("bnSend");
+      bnSend.disabled = true;
+
+      bnReply = document.getElementById("bnReply");
+      bnReply.disabled = true;
+
+      tbNewMail = document.getElementById("tbNewMail");
+      //tbNewMail.readOnly = "true";
+
+      var tblMail = $('#tblMail').DataTable({
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "responsive": true,
+        "searching": false,
+        "order": [[1, "desc"]],
+        columnDefs: [
+          {
+            targets: [0, 1],
+            "visible": false,
+            "searchable": false
+          }
+        ]
+      });
+
+      $('#tblMail tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+          tbNewMail.value = "";
+          bnReply.disabled = true;
+        } else {
+          tblMail.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+
+          var data = tblMail.row('.selected').data();
+          if (data) {
+            tbNewMail.value = data[4];
+
+            if (data[1] >= 0) {
+              bnReply.disabled = false;
+            }
+
+            $.ajax({
+              type: 'post',
+              url: '/Member/MailMarkRead',
+              dataType: "json",
+              data: { iIndexMail: data[0] },
+              success: function () {
+                tblMail.ajax.reload();
+              }
+            });
+          }
+        }
+      });
+
+      $("#bnReply").click(function () {
+        var data = tblMail.row('.selected').data();
+
+        if (data) {
+          if (data[1] >= 0) {
+            $('#ddlUser').val(data[1]);
+
+            tbNewMail.value = "\n\n";
+            tbNewMail.value += "-------------------------------------------------------------------------------------\n";
+            tbNewMail.value += " " + data[2] + " - Von: " + data[3] + "\n";
+            tbNewMail.value += "-------------------------------------------------------------------------------------\n";
+            tbNewMail.value += data[4];
+
+            //tbNewMail.readOnly = "false";
+            tbNewMail.focus();
+            tbNewMail.selectionEnd = 0;
+
+            bnSend.disabled = false;
+          }
+        }
+      });
+
+      $("#bnSend").click(function () {
+        var iTo = $('#ddlUser').val();
+
+        if (iTo >= 0) {
+          tbNewMail = document.getElementById("tbNewMail");
+
+          $.ajax({
+            type: 'post',
+            url: '/Member/MailSend',
+            dataType: "json",
+            data: { iTo: iTo, sText: tbNewMail.value },
+            success: function (sReturn) {
+              alert(sReturn);
+              tbNewMail.value = "";
+              bnSend.disabled = true;
+              //window.location.reload(true);
+            }
+          });
+        }
+      });
+    });
+
+    function ddlMailToChanged() {
+      bnSend    = document.getElementById("bnSend");
+      tbNewMail = document.getElementById("tbNewMail");
+
+      bnSend.disabled = false;
+
+      tbNewMail.focus();
+      tbNewMail.selectionEnd = 0;
+    }
+  </script>
+</head>
+
+<h2>Postfach</h2>
+<table id="tblMail" cellspacing="0" style="width: auto; max-width: 100%; left: 0px" class="display responsive nowrap">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>iFrom</th>
+      <th>Datum</th>
+      <th>Von</th>
+      <th>Nachricht</th>
+    </tr>
+  </thead>
+  <tbody>
+    @{
+      int iIndex = 0;
+      foreach (CornerkickCore.Core.News news in Model.ltUserMail) {
+        int iFrom = news.iFrom;
+        string sFrom = "-";
+        string sFirstLine = news.sText.Split('\n')[0];
+        string sStyle = "";
+
+        if (iFrom < 0) {
+          sFrom = "Admin";
+        } else {
+          CornerkickCore.Core.User user = MvcApplication.ckcore.ltUser[iFrom];
+          sFrom = user.sVorname + " " + user.sNachname;
+          sFrom += " (" + MvcApplication.ckcore.ltClubs[user.iTeam].sName + ")";
+        }
+
+        if (!news.bRead) {
+          sStyle = "font-weight:bold";
+        }
+
+        <tr style=@sStyle>
+          <td align="center">@iIndex</td>
+          <td align="center">@iFrom</td>
+          <td align="center">@news.dt</td>
+          <td align="center">@sFrom</td>
+          <td align="center">@sFirstLine</td>
+        </tr>
+
+        iIndex++;
+      }
+    }
+  </tbody>
+</table>
+<button type="submit" id="bnReply" class="btn btn-default" style="width: 100%">antworten</button>
+
+<div style="margin-top: 4%"></div>
+<b class="left">An:</b>
+@Html.DropDownListFor(m => m.sMailTo, Model.ltDdlUser, new { @class = "form-control", id = "ddlUser", @onchange = "ddlMailToChanged()" })
+<div class="form-group">
+  <textarea id="tbNewMail" rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
+</div>
+
+<button type="submit" id="bnSend" class="btn btn-default" style="width: 100%">abschicken</button>

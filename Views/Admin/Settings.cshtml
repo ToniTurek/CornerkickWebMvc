@@ -1,14 +1,80 @@
-﻿
+﻿@model CornerkickWebMvc.Models.AdminModel
+
 @{
-    ViewBag.Title = "Settings";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Settings";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Settings</h2>
+@{
+  string sDtNow = DateTime.Now.ToString();
+}
 
-@model CornerkickWebMvc.Models.AdminModel
-@using (Html.BeginForm("StartCalender", "Admin", FormMethod.Post)) {
-  @Html.TextBoxFor(m => m.fCalenderInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 90%;" })
+@using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
+  @Html.TextBoxFor(m => m.fCalenderInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 30%" })
+  @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 30%" })
+  @Html.TextBoxFor(m => m.iGameSpeed, new { autocomplete = "off", style = "width: 30%" })
 
-  <button type="submit">Start/Stop</button>
+  <button type="submit">Start</button>
+}
+
+@using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
+  <button type="submit">Stop</button>
+}
+
+<text>System time: @sDtNow<br></text>
+
+@{
+  bool bCk = true;
+  bool bTimer = false;
+  string sInterval = "";
+  string sHour = "";
+  if (Model != null) {
+    bCk = Model.bCk;
+    bTimer = Model.bTimer;
+    sInterval = Model.fCalenderInterval.ToString() + " s";
+    sHour = Model.sStartHour;
+  }
+}
+<text>running: @bCk.ToString()<br></text>
+<text>timer: @bTimer.ToString()<br></text>
+<text>interval: @sInterval<br></text>
+<text>hour: @sHour<br></text>
+<text>No. of Teams: @Model.nClubs<br></text>
+<text>No. of User: @Model.nUser<br></text>
+<text>No. of Player: @Model.nPlayer<br></text>
+
+@using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {
+  <button type="submit">Restart Cornerkick</button>
+}
+
+@using (Html.BeginForm("DeleteLog", "Admin", FormMethod.Post)) {
+  if (Model.bLogExist) {
+    <button type="submit">delete Log</button>
+  } else {
+    <button type="submit" disabled>delete Log</button>
+  }
+}
+
+@using (Html.BeginForm("SaveAutosave", "Admin", FormMethod.Post)) {
+  <button type="submit">save autosave</button>
+}
+
+@using (Html.BeginForm("DeleteAutosave", "Admin", FormMethod.Post)) {
+  if (Model.bAutosaveExist) {
+    <button type="submit">delete autosave</button>
+  } else {
+    <button type="submit" disabled>delete autosave</button>
+  }
+}
+
+@using (Html.BeginForm("LoadAutosave", "Admin", FormMethod.Post)) {
+  <label for="files">autosave files:</label>
+  @Html.DropDownListFor(m => m.sSelectedAutosaveFile, Model.ddlAutosaveFiles, new { @class = "form-control" })
+
+  if (Model.bAutosaveExist) {
+    <button type="submit">load autosave</button>
+  } else {
+    <button type="submit" disabled>load autosave</button>
+  }
 }

@@ -1,0 +1,232 @@
+﻿@model CornerkickWebMvc.Models.UserManualModel
+
+@{
+  ViewBag.Title = "User Manual";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <title>Index</title>
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</head>
+<body>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $.get("/Home/UmGetStadiumCost/", function (dataStadiumCost) {
+        var chart = new CanvasJS.Chart("chartContainerStadiumCost", {
+          animationEnabled: false,
+          theme: "theme2",//theme1
+          axisX: {
+            title: "auszubauende Plätze",
+            labelFontSize: 14,
+            gridThickness: 1,
+            interval: 500,
+          },
+          axisY: {
+            title: "Kosten [mio. €]",
+            labelFontSize: 14,
+            valueFormatString: "#,,."
+          },
+          legend: {
+            horizontalAlign: "left", // left, center ,right
+            verticalAlign: "top",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              showInLegend: true,
+              legendText: "0 Pl. vorhanden",
+              dataPoints: dataStadiumCost[0]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              showInLegend: true,
+              legendText: "1000 Pl. vorhanden",
+              dataPoints: dataStadiumCost[1]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              showInLegend: true,
+              legendText: "2000 Pl. vorhanden",
+              dataPoints: dataStadiumCost[2]
+            }
+          ]
+        });
+
+        chart.render();
+      });
+    });
+  </script>
+</body>
+</html>
+
+<h2>Erste Schritte</h2>
+Einige Einstellungen können nur zu bestimmten Zeitpunkten (zu Beginn einer Saison oder am ersten jeden Monats) vorgenommen werden.
+
+<h4>Erster Tag des Spiels</h4>
+Nur am ersten Tag des Spiels können:
+<ul>
+  <li>die Namen und die Rückennummern der Spieler</li>
+  <li>der Name des Stadions</li>
+</ul>
+geändert werden.
+
+<h4>Erster Tag der Saison</h4>
+Am ersten Tag jeder Saison kann:
+<ul>
+  <li>die Finanzplanung durchgeführt werden.</li>
+  <li>das Personal geändert werden. Dies ist auch am ersten Tag jeden Monats möglich.</li>
+</ul>
+
+<h2>Spieler</h2>
+<h4>Konstitution</h4>
+<ul>
+  <li>
+    <u>Kondition</u><br />
+    Je besser die Kondition des Spielers, desto geringer fällt der Frischeverlust in Spiel und Training aus.<br />
+    Der Konditionsbereich liegt zwischen 10 < Kondition < 100 (durch Spielerdoping kann die maximale Kondition erhöht werden).
+  </li>
+  <li>
+    <u>Frische</u><br />
+    Je größer die Frische des Spielers, desto mehr Strecke kann er zurücklegen.<br />
+    Der Frischebereich liegt zwischen 10 < Frische < 100.
+  </li>
+</ul>
+
+<h4>Soft-skills</h4>
+<ul>
+  <li>
+    <u>Moral</u><br />
+    Die Moral wirkt sich auf die Fähigkeiten des Spielers aus.<br />
+    Der Moralbereich liegt zwischen 10 < Moral < inf. Ist ein Spieler hoch motiviert (Moral > 100) ist es schwerer die Motivation zu steigern als wenn er schwach motiviert ist. Mit der Zeit nähert sich die Motivation dem Normwert von 100 an.
+  </li>
+  <li>
+    <u>Erfahrung</u><br />
+    Je höher die Erfahrung des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
+    Die Erfahrung steigt mit jeder gespielten Spielminute und sinkt im Lauf der Zeit kontinuierlich ab. Junge Spieler gewinnen schneller/verlieren langsamer Erfahrung als ältere.<br />
+    Der Erfahrungbereich liegt zwischen 10 < Erfahrung < 100.
+  </li>
+  <li>
+    <u>Talent</u><br />
+    Das Talent ist für jeden Spieler konstant. Je größer das Talent des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
+    Das Talent liegt üblicherweise zwischen 1 und 10. In Ausnahmefällen ist jedoch auch ein Talent > 10 möglich.
+  </li>
+  <li>
+    <u>Tagesform</u><br />
+    Die Tagesform wirkt sich auf die Fähigkeiten des Spielers aus und ändert sich jeden Tag.<br />
+  </li>
+</ul>
+
+<h4>Fähigkeiten</h4>
+Die Fähigkeiten des Spielers werden beeinflußt durch seine Frische, seine Moral, seine Tagesform und seine Position (wenn nicht auf Hauptposition eingesetzt).
+<ul>
+  @{
+    foreach (string sSkill in MvcApplication.ckcore.plr.sSkills) {
+      <li>@sSkill</li>
+    }
+  }
+</ul>
+
+<h2>Mannschaftstraining</h2>
+<table class="tStat" style="width: auto" border="1" cellpadding="3" summary="Teamtraining">
+  <tr>
+    <th style="text-align:center">Art</th>
+    <th style="text-align:center">Kondition</th>
+    <th style="text-align:center">Frische</th>
+    <th style="text-align:center">Moral</th>
+  </tr>
+  @{
+    for (int iT = 0; iT < MvcApplication.ckcore.sTraining.Length; iT++) {
+      float[] fTr = MvcApplication.ckcore.plr.fTrainingFactors(iT);
+      string[] sTr = new string[3];
+      int[] iMulti = new int[3];
+      if (fTr[0] > 0) { // Type: Kondition
+        iMulti[0] = (int)Math.Round(Math.Abs(1f - fTr[0]) * 30);
+        iMulti[1] = (int)Math.Round(Math.Abs(fTr[1]) * 2);
+        iMulti[2] = (int)Math.Round(Math.Abs(fTr[2]) * 6);
+      } else {
+        iMulti[0] = (int)Math.Round(Math.Abs(fTr[0]) * 2);
+        iMulti[1] = (int)Math.Round(Math.Abs(fTr[1]) / 3f);
+        iMulti[2] = (int)Math.Round(Math.Abs(fTr[2]) * 5);
+      }
+
+      string[] sStyle = new string[3] { "color: green", "color: green", "color: green" };
+      for (byte j = 0; j < sTr.Length; j++) {
+        char cPM = '+';
+        if (fTr[j] < 0f) {
+          cPM = '-';
+          sStyle[j] = "font-weight:bold; color: red";
+        }
+
+        sTr[j] = new string(cPM, iMulti[j]);
+
+        if (string.IsNullOrEmpty(sTr[j])) {
+          sTr[j] = "o";
+          sStyle[j] = "color: black";
+        }
+      }
+
+      <tr style="border: 1px solid black">
+        <td align="center">@MvcApplication.ckcore.sTraining[iT]</td>
+        <td align="center" style="@sStyle[0]">@sTr[0]</td>
+        <td align="center" style="@sStyle[1]">@sTr[1]</td>
+        <td align="center" style="@sStyle[2]">@sTr[2]</td>
+      </tr>
+    }
+  }
+</table>
+
+Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leichter Kondition auf, ältere schwerer.
+
+<h2>Personal</h2>
+<ul>
+  <li>
+    <u>Co-Trainer</u><br />
+    Je besser der Co-Trainer, desto wahrscheinlicher entwickeln sich die Fähigkeiten der Spieler.
+  </li>
+  <li>
+    <u>Konditionstrainer</u><br />
+    Je besser der Konditionstrainer, desto effektiver ist das Konditionstraining.
+  </li>
+  <li>
+    <u>Masseur</u><br />
+    Je besser der Masseur, desto schneller regenerieren die Spieler.
+  </li>
+  <li>
+    <u>Mentaltrainer</u><br />
+    Je besser der Mentaltrainer, desto geringer wirken sich Niederlagen auf die Moral aus.
+  </li>
+  <li>
+    <u>Teamarzt</u><br />
+    Je besser der Teamarzt, desto kürzer sind die Verletzungszeiten der Spieler.
+  </li>
+  <li>
+    <u>Jugendtrainer</u><br />
+    Je besser der Jugendtrainer, desto wahrscheinlicher entwickeln sich die Fähigkeiten der Jugendspieler.
+  </li>
+  <li>
+    <u>Jugendscout</u><br />
+    Je besser der Jugendscout, desto wahrscheinlicher sschließt sich ein neuer Jugendspieler dem Verein an.
+  </li>
+</ul>
+
+<h2>Stadion</h2>
+<h4>Ausbaukosten</h4>
+Die Kosten für den Ausbau der Stadionplätze ist abhängig von der Anzahl der neu zu bauenden Plätze und der bereits vorhandenen Plätze.<br />
+Je mehr Plätze gebaut werden und je mehr Plätze bereits vorhanden sind, desto teurer sind die Kosten pro Platz.
+
+<div id="chartContainerStadiumCost" style="position: relative; height: 300px; width: 100%"></div>
+
+<div style="position: relative">
+  <h4>Oberring</h4>
+  Wird ein Oberring gebaut, stehen 14 neue Stadionblöcke zur Verfügung.<br />
+  Die Baukosten der Blöcke des Oberrings erhöhen sich um 50%. Untere Blöcke können nur noch bis zur Kapazität (abhängig vom Blocktyp) des größen Blocks des Unterings ausgebaut werden.
+</div>
