@@ -4,11 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickWebMvc", "CornerkickWebMvc.csproj", "{4BFD5B53-3067-497F-8AC2-72E5D8CD71B8}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F19C9314-605A-4EDC-A13C-ADEED4BD8299} = {F19C9314-605A-4EDC-A13C-ADEED4BD8299}
-		{4CDB787B-A03C-4FE3-BC0C-10FB33D1034A} = {4CDB787B-A03C-4FE3-BC0C-10FB33D1034A}
-		{AB3295F6-F21A-4E55-89AE-BF8CE5A91782} = {AB3295F6-F21A-4E55-89AE-BF8CE5A91782}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CornerkickGame", "..\CornerkickGame\CornerkickGame.csproj", "{AB3295F6-F21A-4E55-89AE-BF8CE5A91782}"
 EndProject
