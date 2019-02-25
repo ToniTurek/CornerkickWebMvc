@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Data.Entity;
 
 namespace CornerkickWebMvc.Models
 {
-  // Sie können Profildaten für den Benutzer hinzufügen, indem Sie der ApplicationUser-Klasse weitere Eigenschaften hinzufügen. Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?LinkID=317594.
+  // You can add profile data for the user by adding more properties to your ApplicationUser
+  // class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
   public class ApplicationUser : IdentityUser
   {
-    public string Vorname { get; set; } 
+    public string Vorname { get; set; }
     public string Nachname { get; set; }
     public string Vereinsname { get; set; }
     //public bool   bAdmin { get; set; }
@@ -35,8 +35,13 @@ namespace CornerkickWebMvc.Models
 
   public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
   {
+    static ApplicationDbContext()
+    {
+      Database.SetInitializer(new MySqlInitializer());
+    }
+
     public ApplicationDbContext()
-        : base("DefaultConnection", throwIfV1Schema: false)
+      : base("DefaultConnection")
     {
     }
 
