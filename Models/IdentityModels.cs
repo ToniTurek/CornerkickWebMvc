@@ -41,7 +41,7 @@ namespace CornerkickWebMvc.Models
     }
 
     public ApplicationDbContext()
-      : base("DefaultConnection")
+      : base("ckMySqlConnection")
     {
     }
 
