@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define _USE_BLOB
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -185,6 +186,7 @@ namespace CornerkickWebMvc.Controllers
       return RedirectToAction("Settings");
     }
 
+#if _USE_BLOB
     public ActionResult CreateBlobContainer()
     {
       CloudBlobContainer container = MvcApplication.GetCloudBlobContainer();
@@ -194,5 +196,6 @@ namespace CornerkickWebMvc.Controllers
       return View();
     }
 
+#endif
   }
 }

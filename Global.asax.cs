@@ -1,15 +1,22 @@
-﻿using System;
+﻿//#define _USE_BLOB
+#define _USE_AMAZON_S3
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using System.Web.UI.WebControls;
 
+#if _USE_BLOB
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+#endif
 
 namespace CornerkickWebMvc
 {
@@ -33,12 +40,11 @@ namespace CornerkickWebMvc
 
     internal static void newCk()
     {
+      string sHomeDir = getHomeDir();
+
       ckcore = new CornerkickCore.Core();
 
-#if DEBUG
-      string sHomeDir = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
-#else
-      string sHomeDir = System.Web.HttpContext.Current.Server.MapPath("~/");
+#if !DEBUG
       ckcore.sHomeDir = sHomeDir;
 #endif
 
@@ -72,10 +78,16 @@ namespace CornerkickWebMvc
 #if !DEBUG
       string sFileZipLog = sHomeDir + "log.zip";
 
+#if _USE_BLOB
       CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
-
       if (!System.IO.File.Exists(sFileLoad)) bcontr.downloadBlob("blobSave", sFileLoad);
-      bcontr.downloadBlob("blobLog",  sFileZipLog);
+      bcontr.downloadBlob("blobLog", sFileZipLog);
+#endif
+#if _USE_AMAZON_S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+      if (!System.IO.File.Exists(sFileLoad)) as3.downloadFile("ckSave", sHomeDir + "save");
+      as3.downloadFile("ckLog", sHomeDir + "log");
+#endif
 #endif
 
       //if (MvcApplication.ckcore.io.load(sFileLoad)) MvcApplication.ckcore.calcSpieltage();
@@ -189,6 +201,7 @@ namespace CornerkickWebMvc
 #else
       try {
         path = System.Web.HttpContext.Current.Server.MapPath("~");
+        if (path.EndsWith("\\")) path = path.Remove(path.Length - 1);
       } catch (HttpException exp) {
         MvcApplication.ckcore.tl.writeLog("save: HttpException: " + exp.Message.ToString());
         path = "D:\\home\\site\\wwwroot";
@@ -206,10 +219,21 @@ namespace CornerkickWebMvc
 
 #if !DEBUG
         try {
+#if _USE_BLOB
           CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
           bcontr.uploadBlob("blobSave", sFileSave);
+#endif
+#if _USE_AMAZON_S3
+          AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+          as3.uploadFile(sFileSave, "ckSave");
+#endif
         } catch {
+#if _USE_BLOB
           MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to blob", MvcApplication.ckcore.sErrorFile);
+#endif
+#if _USE_AMAZON_S3
+          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to amazon s3", MvcApplication.ckcore.sErrorFile);
+#endif
         }
 #endif
 
@@ -242,15 +266,27 @@ namespace CornerkickWebMvc
         ZipFile.CreateFromDirectory(path + "/log", sFileZipLog);
 
         try {
+#if _USE_BLOB
           CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
           bcontr.uploadBlob("blobLog", sFileZipLog);
+#endif
+#if _USE_AMAZON_S3
+          AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+          as3.uploadFile(sFileZipLog, "ckLog");
+#endif
         } catch {
+#if _USE_BLOB
           MvcApplication.ckcore.tl.writeLog("ERROR: could not upload log file to blob", MvcApplication.ckcore.sErrorFile);
+#endif
+#if _USE_AMAZON_S3
+          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload log file to amazon s3", MvcApplication.ckcore.sErrorFile);
+#endif
         }
 #endif
       }
-    }
+      }
 
+#if _USE_BLOB
     // Blob Container
     internal static CloudBlobContainer GetCloudBlobContainer()
     {
@@ -281,6 +317,7 @@ namespace CornerkickWebMvc
 
       return true;
     }
+#endif
 
     public static string getHomeDir()
     {
