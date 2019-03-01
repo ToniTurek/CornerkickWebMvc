@@ -57,6 +57,8 @@ namespace CornerkickWebMvc
       } catch (AmazonS3Exception s3Exception) {
         //Console.WriteLine(s3Exception.Message, s3Exception.InnerException);
         MvcApplication.ckcore.tl.writeLog(s3Exception.Message);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog(String.Format("Unknown error while downloading file: {0} from bucket: {1} to location: {2}", sKey, sBucketName, sTargetPath));
       }
     }
 
