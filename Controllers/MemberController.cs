@@ -1669,11 +1669,14 @@ namespace CornerkickWebMvc.Controllers
       tactic.ddlAutoSubsOut = new List<SelectListItem>[nSubs];
       tactic.ddlAutoSubsIn  = new List<SelectListItem>[nSubs];
       tactic.iAutoSubsMin   = new int                 [nSubs];
-      byte iHA = 0;
-      if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
-      for (byte iAS = 0; iAS < nSubs; iAS++) {
-        tactic.iAutoSubsMin[iAS] = 60;
-        if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) tactic.iAutoSubsMin[iAS] = clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][2];
+
+      if (clb.nextGame != null) {
+        byte iHA = 0;
+        if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
+        for (byte iAS = 0; iAS < nSubs; iAS++) {
+          tactic.iAutoSubsMin[iAS] = 60;
+          if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) tactic.iAutoSubsMin[iAS] = clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][2];
+        }
       }
 
       return View(tactic);
