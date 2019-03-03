@@ -778,13 +778,15 @@ namespace CornerkickWebMvc.Controllers
         tD.fIndOrientationMinMax = TeamGetIndOrientationMinMax(iSP, club);
       }
 
-      int iClubOpp = club.nextGame.team[1].iTeamId;
-      if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
-      tD.ltPlayerOpp = new List<CornerkickGame.Player>();
-      if (iClubOpp > 0) {
-        for (byte iPl = 0; iPl < 11; iPl++) {
-          int iPlId = MvcApplication.ckcore.ltClubs[iClubOpp].ltPlayerId[iPl];
-          tD.ltPlayerOpp.Add(MvcApplication.ckcore.ltPlayer[iPlId]);
+      if (club.nextGame != null) {
+        int iClubOpp = club.nextGame.team[1].iTeamId;
+        if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
+        tD.ltPlayerOpp = new List<CornerkickGame.Player>();
+        if (iClubOpp > 0) {
+          for (byte iPl = 0; iPl < 11; iPl++) {
+            int iPlId = MvcApplication.ckcore.ltClubs[iClubOpp].ltPlayerId[iPl];
+            tD.ltPlayerOpp.Add(MvcApplication.ckcore.ltPlayer[iPlId]);
+          }
         }
       }
 
@@ -1740,6 +1742,8 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
+      if (clb.nextGame == null) return;
+
       const byte nSubs = 3;
       tactic.ddlAutoSubsOut = new List<SelectListItem>[nSubs];
       tactic.ddlAutoSubsIn  = new List<SelectListItem>[nSubs];
@@ -1801,6 +1805,9 @@ namespace CornerkickWebMvc.Controllers
       string[] sBox = new string[2]; // [Out, In]
 
       CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if (clb.nextGame == null) Json(sBox, JsonRequestBehavior.AllowGet);
+
       byte iHA = 0;
       if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
 
@@ -1847,6 +1854,8 @@ namespace CornerkickWebMvc.Controllers
     public ActionResult setAutoSubs(int iAS, int iIndexPlayerOut, int iIndexPlayerIn, int iMin)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if (clb.nextGame == null) Json(false, JsonRequestBehavior.AllowGet);
 
       byte iHA = 0;
       if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
