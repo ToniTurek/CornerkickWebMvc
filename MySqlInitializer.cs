@@ -14,11 +14,11 @@ namespace CornerkickWebMvc
         context.Database.Create();
       } else {
         // query to check if MigrationHistory table is present in the database 
-        var migrationHistoryTableExists = ((IObjectContextAdapter)context).ObjectContext.ExecuteStoreQuery<int>(
-          "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'ckmysqldb' AND table_name = '__MigrationHistory'");
+        //var migrationHistoryTableExists = ((IObjectContextAdapter)context).ObjectContext.ExecuteStoreQuery<int>("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'ckmysqldb' AND table_name = '__MigrationHistory'");
 
         // if MigrationHistory table is not there (which is the case first time we run) - create it
-        if (migrationHistoryTableExists.FirstOrDefault() == 0) {
+        //if (migrationHistoryTableExists.FirstOrDefault() == 0) {
+        if (MvcApplication.ckcore.ltUser.Count == 0) {
           context.Database.Delete();
           context.Database.Create();
         }
