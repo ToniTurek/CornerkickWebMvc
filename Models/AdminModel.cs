@@ -31,15 +31,17 @@ namespace CornerkickWebMvc.Models
       ddlAutosaveFiles = new List<SelectListItem>();
 
       DirectoryInfo d = new DirectoryInfo(MvcApplication.getHomeDir() + "/save");
-      FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
-      int i = 0;
-      foreach (FileInfo ckx in ltCkxFiles) {
-        ddlAutosaveFiles.Add(
-          new SelectListItem {
-            Text = ckx.Name,
-            Value = ckx.Name
-          }
-        );
+      if (d.Exists) {
+        FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
+        int i = 0;
+        foreach (FileInfo ckx in ltCkxFiles) {
+          ddlAutosaveFiles.Add(
+            new SelectListItem {
+              Text = ckx.Name,
+              Value = ckx.Name
+            }
+          );
+        }
       }
     }
   }
