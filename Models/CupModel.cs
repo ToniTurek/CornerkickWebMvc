@@ -26,7 +26,7 @@ namespace CornerkickWebMvc.Models
       CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(iLand, 2);
 
       // Spieltage zu Dropdown Menü hinzufügen
-      if (cup.iId >= 0) {
+      if (cup != null) {
         if (cup.ltMatchdays[0].ltGameData != null) {
           int nRound = MvcApplication.ckcore.tl.getPokalRundeVonNTeiln(cup.ltMatchdays[0].ltGameData.Count * 2);
           while (ltDdlSpTg.Count < nRound) {
