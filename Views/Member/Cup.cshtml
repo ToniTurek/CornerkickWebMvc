@@ -32,7 +32,7 @@
   var dt = new DateTime();
   CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(Model.iLand, 2);
   if (Model.iSpTg < Model.ltErg.Count) {
-    if (cup.ltMatchdays != null) { dt = cup.ltMatchdays[Model.iSpTg].dt; }
+    if (cup != null && cup.ltMatchdays != null) { dt = cup.ltMatchdays[Model.iSpTg].dt; }
   }
 
   string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
@@ -43,7 +43,7 @@
   }
 
   if (Model.iLand >= 0) {
-    if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
+    if (cup != null && MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
       int j = 0;
       foreach (CornerkickCore.Core.Matchday gd in cup.ltMatchdays) {
         string sIdDay = "idDtDay" + j.ToString();

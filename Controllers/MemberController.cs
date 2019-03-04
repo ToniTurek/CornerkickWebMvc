@@ -866,7 +866,7 @@ namespace CornerkickWebMvc.Controllers
       for (byte i = 0; i < MvcApplication.ckcore.game.nPlStart; i++) {
         CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[i]];
         f[0] += MvcApplication.ckcore.game.tl.getAveSkill(player, 99);
-        f[1] += MvcApplication.ckcore.game.tl.getPlayerAgeFloat(player, MvcApplication.ckcore.dtDatum);
+        f[1] += player.getAge(MvcApplication.ckcore.dtDatum);
       }
 
       f[0] /= MvcApplication.ckcore.game.nPlStart;
@@ -890,7 +890,7 @@ namespace CornerkickWebMvc.Controllers
           float fHeight = 0.04f;
           float fWidth  = fHeight * (3f / 2f);
 
-          int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.taktik.fOrientation);
+          int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.tactic.fOrientation);
           float fTop = 1f - (iXOffence / (float)MvcApplication.ckcore.game.ptPitch.X);
           float fLeft = (pl.ptPosDefault.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
 
@@ -928,11 +928,11 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPlayerIndex]];
 
-      int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.taktik.fOrientation);
+      int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.tactic.fOrientation);
 
       for (double fRoa = 0.5; fRoa < 1.01; fRoa += 0.1) {
-        System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(pl, club.taktik.fOrientation, +1, -1, fRoa, fRoa);
-        System.Drawing.Point ptRoaBR = MvcApplication.ckcore.game.tl.getRndPos(pl, club.taktik.fOrientation, -1, +1, fRoa, fRoa);
+        System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(pl, club.tactic.fOrientation, +1, -1, fRoa, fRoa);
+        System.Drawing.Point ptRoaBR = MvcApplication.ckcore.game.tl.getRndPos(pl, club.tactic.fOrientation, -1, +1, fRoa, fRoa);
 
         float fTopRoa  = 1f - ((iXOffence + ptRoaTL.X) / (float)MvcApplication.ckcore.game.ptPitch.X);
         float fLeftRoa = (pl.ptPosDefault.Y + ptRoaTL.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
@@ -1014,8 +1014,8 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPlayerIndex]];
 
-      fIndOrientationMinMax[0] = MvcApplication.ckcore.game.tl.getXPosOffence(pl.ptPosDefault.X, club.taktik.fOrientation, -1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
-      fIndOrientationMinMax[1] = MvcApplication.ckcore.game.tl.getXPosOffence(pl.ptPosDefault.X, club.taktik.fOrientation, +1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
+      fIndOrientationMinMax[0] = MvcApplication.ckcore.game.tl.getXPosOffence(pl.ptPosDefault.X, club.tactic.fOrientation, -1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
+      fIndOrientationMinMax[1] = MvcApplication.ckcore.game.tl.getXPosOffence(pl.ptPosDefault.X, club.tactic.fOrientation, +1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
 
       return fIndOrientationMinMax;
     }
@@ -1531,21 +1531,21 @@ namespace CornerkickWebMvc.Controllers
 
       int iTr = 0;
       foreach (CornerkickCore.csTransfer.Transfer transfer in MvcApplication.ckcore.ui.filterTransferlist("", -1, iPos, -1f, 0, iFType, iFValue, bJouth)) {
-        CornerkickGame.Player spTr = MvcApplication.ckcore.ltPlayer[transfer.iPlayerId];
+        CornerkickGame.Player plTr = MvcApplication.ckcore.ltPlayer[transfer.iPlayerId];
 
-        CornerkickCore.Core.Club club = MvcApplication.ckcore.ltClubs[spTr.iClubId];
+        CornerkickCore.Core.Club club = MvcApplication.ckcore.ltClubs[plTr.iClubId];
 
         string sClub = "vereinslos";
-        if (spTr.iClubId >= 0) {
+        if (plTr.iClubId >= 0) {
           sClub = club.sName;
         }
 
         int iOffer = 0;
         CornerkickCore.Core.Club clubUser = AccountController.ckClub();
         if (clubUser.iId > 0) {
-          if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, spTr)) iOffer = -1;
-          else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, spTr)) iOffer = +1;
-          else if (MvcApplication.ckcore.plr.ownPlayer           (clubUser, spTr)) iOffer = +2;
+          if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, plTr)) iOffer = -1;
+          else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, plTr)) iOffer = +1;
+          else if (MvcApplication.ckcore.plr.ownPlayer           (clubUser, plTr)) iOffer = +2;
         }
 
         ltDeTransfer.Add(new Models.DatatableEntryTransfer {
@@ -1554,15 +1554,15 @@ namespace CornerkickWebMvc.Controllers
           iOffer = iOffer,
           index = (iTr + 1).ToString(),
           datum = transfer.dt.ToString("d", AccountController.ciUser),
-          name = spTr.sName,
-          position = MvcApplication.ckcore.plr.getStrPos(spTr),
-          strength = MvcApplication.ckcore.game.tl.getAveSkill(spTr, 0, true).ToString("0.0"),
-          strengthIdeal = MvcApplication.ckcore.game.tl.getAveSkill(spTr, 0, false).ToString("0.0"),
-          age = MvcApplication.ckcore.game.tl.getPlayerAge(spTr, MvcApplication.ckcore.dtDatum).ToString("0"),
-          talent = (spTr.iTalent + 1).ToString(),
-          mw = (MvcApplication.ckcore.plr.getValue(spTr) * 1000).ToString("#,#", AccountController.ciUser),
+          name = plTr.sName,
+          position = MvcApplication.ckcore.plr.getStrPos(plTr),
+          strength = MvcApplication.ckcore.game.tl.getAveSkill(plTr, 0, true).ToString("0.0"),
+          strengthIdeal = MvcApplication.ckcore.game.tl.getAveSkill(plTr, 0, false).ToString("0.0"),
+          age = plTr.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
+          talent = (plTr.iTalent + 1).ToString(),
+          mw = (MvcApplication.ckcore.plr.getValue(plTr) * 1000).ToString("#,#", AccountController.ciUser),
           club = sClub,
-          nat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[spTr.iNat1 + 1]]
+          nat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[plTr.iNat1 + 1]]
         });
 
         iTr++;
@@ -1662,7 +1662,7 @@ namespace CornerkickWebMvc.Controllers
           if (clb.ltPlayerId.Count <= iPl) break;
 
           CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
-          tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = pl.sName, Value = iPl.ToString(), Selected = iPl == clb.taktik.iStandards[iS] });
+          tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = pl.sName, Value = iPl.ToString(), Selected = iPl == clb.tactic.iStandards[iS] });
         }
       }
 
@@ -1691,29 +1691,29 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.User usr = AccountController.ckUser();
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      if      (iTaktik == 0) clb.taktik.fOrientation = fTaktik;
-      else if (iTaktik == 1) clb.taktik.fPower       = fTaktik;
-      else if (iTaktik == 2) clb.taktik.fShootFreq   = fTaktik;
-      else if (iTaktik == 3) clb.taktik.fAggressive  = fTaktik;
-      else if (iTaktik == 4) clb.taktik.fPassRisk    = fTaktik;
-      else if (iTaktik == 5) clb.taktik.fPassLength  = fTaktik;
-      else if (iTaktik == 6) clb.taktik.fPassFreq    = fTaktik;
+      if      (iTaktik == 0) clb.tactic.fOrientation = fTaktik;
+      else if (iTaktik == 1) clb.tactic.fPower       = fTaktik;
+      else if (iTaktik == 2) clb.tactic.fShootFreq   = fTaktik;
+      else if (iTaktik == 3) clb.tactic.fAggressive  = fTaktik;
+      else if (iTaktik == 4) clb.tactic.fPassRisk    = fTaktik;
+      else if (iTaktik == 5) clb.tactic.fPassLength  = fTaktik;
+      else if (iTaktik == 6) clb.tactic.fPassFreq    = fTaktik;
       else if (iTaktik == 7) {
-        clb.taktik.fPassLeft  = fTaktik;
-        if (clb.taktik.fPassLeft + clb.taktik.fPassRight > 1f) clb.taktik.fPassRight = (float)Math.Round(1f - clb.taktik.fPassLeft,  2);
-        fRet = clb.taktik.fPassRight;
+        clb.tactic.fPassLeft  = fTaktik;
+        if (clb.tactic.fPassLeft + clb.tactic.fPassRight > 1f) clb.tactic.fPassRight = (float)Math.Round(1f - clb.tactic.fPassLeft,  2);
+        fRet = clb.tactic.fPassRight;
       }
       else if (iTaktik == 8) {
-        clb.taktik.fPassRight = fTaktik;
-        if (clb.taktik.fPassLeft + clb.taktik.fPassRight > 1f) clb.taktik.fPassLeft  = (float)Math.Round(1f - clb.taktik.fPassRight, 2);
-        fRet = clb.taktik.fPassLeft;
+        clb.tactic.fPassRight = fTaktik;
+        if (clb.tactic.fPassLeft + clb.tactic.fPassRight > 1f) clb.tactic.fPassLeft  = (float)Math.Round(1f - clb.tactic.fPassRight, 2);
+        fRet = clb.tactic.fPassLeft;
       }
 
       // Set tactic of current game
       if (usr.game != null) {
         if (!usr.game.data.bFinished) {
-          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].tc = clb.taktik;
-          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].tc = clb.taktik;
+          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].tc = clb.tactic;
+          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].tc = clb.tactic;
         }
       }
 
@@ -1725,13 +1725,13 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.User usr = AccountController.ckUser();
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      clb.taktik.iStandards[iStandard] = iIndexPlayer;
+      clb.tactic.iStandards[iStandard] = iIndexPlayer;
 
       // Set tactic of current game
       if (usr.game != null) {
         if (!usr.game.data.bFinished) {
-          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].tc = clb.taktik;
-          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].tc = clb.taktik;
+          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].tc = clb.tactic;
+          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].tc = clb.tactic;
         }
       }
 
@@ -1986,7 +1986,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadium = convertToStadion(iSeats, iArt, null);
       stadium.bTopring = clb.stadium.bTopring;
 
-      int[] iKostenDauer = MvcApplication.ckcore.st.iCostDaysContructStadium(stadium, clb.stadium, AccountController.ckUser());
+      int[] iKostenDauer = MvcApplication.ckcore.st.getCostDaysContructStadium(stadium, clb.stadium, AccountController.ckUser());
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
 
@@ -2015,7 +2015,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium;
       stadion.bTopring = !clb.stadium.bTopring;
 
-      int[] iKostenDauer = MvcApplication.ckcore.st.iCostDaysContructStadium(stadion, clb.stadium, AccountController.ckUser());
+      int[] iKostenDauer = MvcApplication.ckcore.st.getCostDaysContructStadium(stadion, clb.stadium, AccountController.ckUser());
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
 
@@ -2026,7 +2026,7 @@ namespace CornerkickWebMvc.Controllers
 
     private bool bStadiumGetTopring(CornerkickCore.Core.Club clb)
     {
-      return clb.stadium.bTopring && clb.stadium.iDaysConstructTopring == 0;
+      return clb.stadium.bTopring && clb.stadium.iTopringDaysConstruct == 0;
     }
 
     [HttpPost]
@@ -2057,10 +2057,10 @@ namespace CornerkickWebMvc.Controllers
 
       if (clb.stadium.iVideo != iVideo) {
         int iDispoOk = 0;
-        if (MvcApplication.ckcore.fz.checkDispoLimit(MvcApplication.ckcore.st.iVideoCost[iVideo], clb)) iDispoOk = 1;
+        if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickCore.csStadion.iVideoCost[iVideo], clb)) iDispoOk = 1;
 
-        sCostDaysDispo[0] = MvcApplication.ckcore.st.iVideoCost[iVideo].ToString("#,#", AccountController.ciUser);
-        sCostDaysDispo[1] = MvcApplication.ckcore.st.iVideoDaysConstruct[iVideo].ToString();
+        sCostDaysDispo[0] = CornerkickCore.csStadion.iVideoCost[iVideo].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[1] = CornerkickCore.csStadion.iVideoDaysConstruct[iVideo].ToString();
         sCostDaysDispo[2] = iDispoOk.ToString();
       }
 
@@ -2101,7 +2101,7 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      return Json(MvcApplication.ckcore.st.iCostStadiumRenewPitch(clb.stadium, 0.1f, AccountController.ckUser()).ToString("#,#", AccountController.ciUser), JsonRequestBehavior.AllowGet);
+      return Json(MvcApplication.ckcore.st.getCostStadiumRenewPitch(clb.stadium, 0.1f, AccountController.ckUser()).ToString("#,#", AccountController.ciUser), JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -2135,8 +2135,8 @@ namespace CornerkickWebMvc.Controllers
 
       mdStadionSurr.iTrainingsgel  = clb.iTrainingsgel  [0];
       mdStadionSurr.iJouthInternat = clb.iJugendinternat[0];
-      mdStadionSurr.iParkp         = Math.Max(clb.stadium.iParkp, clb.stadium.iParkpNeu);
-      mdStadionSurr.iParkpNeu      = clb.stadium.iParkpNeu;
+      mdStadionSurr.iParkp         = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
+      mdStadionSurr.iParkpNeu      = clb.stadium.iCarparkNew;
 
       return View(mdStadionSurr);
     }
@@ -2149,7 +2149,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(new string[3][] {
         new string [3] { MvcApplication.ckcore.sTrainingsgel [clb.iTrainingsgel  [0]], MvcApplication.ckcore.sTrainingsgel [clb.iTrainingsgel  [1]], clb.iTrainingsgel  [2].ToString() },
         new string [3] { MvcApplication.ckcore.sJouthInternat[clb.iJugendinternat[0]], MvcApplication.ckcore.sJouthInternat[clb.iJugendinternat[1]], clb.iJugendinternat[2].ToString() },
-        new string [3] { clb.stadium.iParkp.ToString(), clb.stadium.iParkpNeu.ToString(), clb.stadium.iAusbauParkp.ToString() }
+        new string [3] { clb.stadium.iCarpark.ToString(), clb.stadium.iCarparkNew.ToString(), clb.stadium.iCarparkDaysConstruct.ToString() }
       }, JsonRequestBehavior.AllowGet);
     }
 
@@ -2178,9 +2178,9 @@ namespace CornerkickWebMvc.Controllers
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
       } else if (iType == 2) {
-        if (clb.stadium.iParkpNeu != i) {
+        if (clb.stadium.iCarparkNew != i) {
           int iDispoOk = 0;
-          int iParkDiff = Math.Abs(clb.stadium.iParkp - i);
+          int iParkDiff = Math.Abs(clb.stadium.iCarpark - i);
           int iCost = iParkDiff * 2500;
           int iDays = (int)(iParkDiff * 0.25);
           if (MvcApplication.ckcore.fz.checkDispoLimit(iCost, clb)) iDispoOk = 1;
@@ -2225,13 +2225,13 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      clb.stadium.iParkpNeu = iPark;
+      clb.stadium.iCarparkNew = iPark;
 
-      int iParkDiff = Math.Abs(clb.stadium.iParkp - iPark);
+      int iParkDiff = Math.Abs(clb.stadium.iCarpark - iPark);
       int iCost = iParkDiff * 2500;
       int iDays = (int)(iParkDiff * 0.25);
 
-      clb.stadium.iAusbauParkp = iDays;
+      clb.stadium.iCarparkDaysConstruct = iDays;
 
       MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCost, "Bau Parkplätze", 110);
 
@@ -2369,6 +2369,8 @@ namespace CornerkickWebMvc.Controllers
       cupModel.ltScorer = MvcApplication.ckcore.ui.getScorer(2, cupModel.iLand, 0);
 
       CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(cupModel.iLand, 2);
+
+      if (cup == null) return View(cupModel);
       if (cup.ltMatchdays == null) return View(cupModel);
 
       foreach (CornerkickCore.Core.Matchday gd in cup.ltMatchdays) {
@@ -2680,9 +2682,9 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      financeModel.iEintritt1 = clb.iEintrittspreise[0];
-      financeModel.iEintritt2 = clb.iEintrittspreise[1];
-      financeModel.iEintritt3 = clb.iEintrittspreise[2];
+      financeModel.iEintritt1 = clb.iAdmissionPrice[0];
+      financeModel.iEintritt2 = clb.iAdmissionPrice[1];
+      financeModel.iEintritt3 = clb.iAdmissionPrice[2];
 
       financeModel.bEditable = MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date);
       financeModel.budgetPlan = AccountController.ckUser().budget;
@@ -2733,15 +2735,15 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      clb.iEintrittspreise[0] = iEintritt[0];
-      clb.iEintrittspreise[1] = iEintritt[1];
-      clb.iEintrittspreise[2] = iEintritt[2];
+      clb.iAdmissionPrice[0] = iEintritt[0];
+      clb.iAdmissionPrice[1] = iEintritt[1];
+      clb.iAdmissionPrice[2] = iEintritt[2];
 
       int iInSpec = 0;
       if (clb.iLand >= 0 && clb.iDivision >= 0) {
-        iInSpec = (MvcApplication.ckcore.st.getStadiumSeats(clb.stadium, 0) * clb.iEintrittspreise[0]) +
-                  (MvcApplication.ckcore.st.getStadiumSeats(clb.stadium, 1) * clb.iEintrittspreise[1]) +
-                  (MvcApplication.ckcore.st.getStadiumSeats(clb.stadium, 2) * clb.iEintrittspreise[2]);
+        iInSpec = (MvcApplication.ckcore.st.getStadiumSeats(clb.stadium, 0) * clb.iAdmissionPrice[0]) +
+                  (MvcApplication.ckcore.st.getStadiumSeats(clb.stadium, 1) * clb.iAdmissionPrice[1]) +
+                  (MvcApplication.ckcore.st.getStadiumSeats(clb.stadium, 2) * clb.iAdmissionPrice[2]);
         int nGamesHome = (MvcApplication.ckcore.ltLiga[clb.iLand][clb.iDivision].Count - 1);
         iInSpec *= nGamesHome;
       }

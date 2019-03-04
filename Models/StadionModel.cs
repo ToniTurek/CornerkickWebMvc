@@ -32,7 +32,7 @@ namespace CornerkickWebMvc.Models
       ltDdlStadionSeatType.Add(new SelectListItem { Text = "VIP",  Value = "2" });
 
       ltDdlVideo = new List<SelectListItem>();
-      for (byte iV = 0; iV < MvcApplication.ckcore.st.sVideo.Length; iV++) ltDdlVideo.Add(new SelectListItem { Text = MvcApplication.ckcore.st.sVideo[iV], Value = iV.ToString() });
+      for (byte iV = 0; iV < CornerkickCore.csStadion.sVideo.Length; iV++) ltDdlVideo.Add(new SelectListItem { Text = CornerkickCore.csStadion.sVideo[iV], Value = iV.ToString() });
     }
   }
 }

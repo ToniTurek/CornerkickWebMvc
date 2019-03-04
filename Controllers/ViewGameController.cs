@@ -202,7 +202,7 @@ namespace CornerkickWebMvc.Controllers
       //foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
       string sCommTmp = "";
       foreach (CornerkickGame.Game.Kommentar k in Enumerable.Reverse(state.ltCommend)) {
-        if (!string.IsNullOrEmpty(k.sKommentar)) sCommTmp += MvcApplication.ckcore.game.tl.sSpielmin(k.tsSpielminute, true) + k.sKommentar + '\n';
+        if (!string.IsNullOrEmpty(k.sKommentar)) sCommTmp += MvcApplication.ckcore.game.tl.sSpielmin(k.tsMinute, true) + k.sKommentar + '\n';
       }
 
       gD.sComment = sCommTmp + gD.sComment;
@@ -290,7 +290,7 @@ namespace CornerkickWebMvc.Controllers
       if (!bReduced) {
         if (gD.ltF[0].Count < state.i) {
           for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
-            gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFrische));
+            gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFresh));
           }
         }
         if (gD.ltM[0].Count < state.i) {

@@ -355,21 +355,21 @@
       }
     }
 
-    if (Model.stadion.iDaysConstructTopring > 0) {
+    if (Model.stadion.iTopringDaysConstruct > 0) {
       //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
       <tr>
         <td align="center">Oberring</td>
         <td align="center">N/A</td>
-        <td align="center">@Model.stadion.iDaysConstructTopring d</td>
+        <td align="center">@Model.stadion.iTopringDaysConstruct d</td>
       </tr>
     }
 
-    if (Model.stadion.iDaysConstructVideo > 0) {
+    if (Model.stadion.iVideoDaysConstruct > 0) {
       //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
       <tr>
         <td align="center">Anzeigetafel</td>
-        <td align="center">@MvcApplication.ckcore.st.sVideo[Model.iVideo]</td>
-        <td align="center">@Model.stadion.iDaysConstructVideo d</td>
+        <td align="center">@CornerkickCore.csStadion.sVideo[Model.iVideo]</td>
+        <td align="center">@Model.stadion.iVideoDaysConstruct d</td>
       </tr>
     }
   }

@@ -3,7 +3,7 @@
 @{
   ViewBag.Title = "Taktik";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().taktik;
+  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().tactic;
 }
 
 <!doctype html>
@@ -494,7 +494,7 @@
           <div id="slider-PassFreq" style="position: relative; float: left"></div>
         </div>
 
-        <div style="position: absolute; width: 60%; bottom: 20%; left: 20%; text-align: center">
+        <div style="position: absolute; width: 60%; top: 73%; left: 20%; text-align: center">
           @for (byte i = 0; i < 3; i++) {
             var htmlAttributesEditorFor = new Dictionary<string, object>
             {
