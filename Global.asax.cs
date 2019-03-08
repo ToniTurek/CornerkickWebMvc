@@ -197,14 +197,11 @@ namespace CornerkickWebMvc
       // Don't save if calendar to fast
       if (timerCkCalender.Interval < 10000 && !bForce) return;
 
-      string path = ".";
+      string path = getHomeDir();
 #if DEBUG
       path = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc";
 #else
       try {
-#if _DEPLOY_ON_APPHB
-        path = Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
-#endif
 #if _DEPLOY_ON_AZURE
         path = HttpContext.Current.Server.MapPath("~");
 #endif
@@ -335,7 +332,12 @@ namespace CornerkickWebMvc
 #if DEBUG
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #else
-      return System.Web.HttpContext.Current.Server.MapPath("~/");
+
+#if _DEPLOY_ON_APPHB
+      return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
+#endif
+
+      return HttpContext.Current.Server.MapPath("~/");
 #endif
     }
   }
