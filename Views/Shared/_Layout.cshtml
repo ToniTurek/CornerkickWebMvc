@@ -9,10 +9,14 @@
   @Scripts.Render("~/bundles/modernizr")
   @Scripts.Render("~/bundles/jquery")
   @{
-    var sEmblem = "/Content/Uploads/0.png";
+    string sEmblem = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "App_Data");
+    sEmblem = Path.Combine(sEmblem, "Uploads");
+
     if (Request.IsAuthenticated) {
       CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
-      sEmblem = "/Content/Uploads/" + clb.iId.ToString() + ".png";
+      sEmblem = Path.Combine(sEmblem, clb.iId.ToString() + ".png");
+    } else {
+      sEmblem = Path.Combine(sEmblem, "0.png");
     }
   }
   <div id="divDataEmblem" data-name="@sEmblem"></div>
