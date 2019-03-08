@@ -192,6 +192,8 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult getFilesInDirectory(string sDir)
     {
+      if (string.IsNullOrEmpty(sDir) || sDir.Equals(".")) sDir = Server.MapPath("~");
+
       List<string> ltFilenames = new List<string>();
 
       DirectoryInfo d = new DirectoryInfo(sDir);
