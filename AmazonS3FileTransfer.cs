@@ -42,8 +42,10 @@ namespace CornerkickWebMvc
             MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", MvcApplication.ckcore.sErrorFile);
           }
         }
+      } catch (Exception e) {
+        MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", MvcApplication.ckcore.sErrorFile);
       } catch {
-        MvcApplication.ckcore.tl.writeLog("ERROR! Unknown S3 Exception", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR! Unknown S3 Exception. File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
       }
     }
 
