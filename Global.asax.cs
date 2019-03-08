@@ -304,7 +304,7 @@ namespace CornerkickWebMvc
         bcontr.uploadBlob("blobSave", sFileSave);
 #endif
 #if _USE_AMAZON_S3
-          as3.uploadFile(sFileZipSave, "ckSave");
+          as3.uploadFile(sFileZipSave, "ckSave", "application/zip");
 #endif
         } catch {
 #if _USE_BLOB
@@ -348,7 +348,7 @@ namespace CornerkickWebMvc
           bcontr.uploadBlob("blobLog", sFileZipLog);
 #endif
 #if _USE_AMAZON_S3
-          as3.uploadFile(sFileZipLog, "ckLog");
+          as3.uploadFile(sFileZipLog, "ckLog", "application/zip");
 #endif
         } catch {
 #if _USE_BLOB

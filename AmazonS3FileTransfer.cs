@@ -17,7 +17,7 @@ namespace CornerkickWebMvc
     private const string sBucketName = "ckamazonbucket";
     private RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
 
-    public void uploadFile(string sFile, string sKey = null)
+    public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
       var client = new AmazonS3Client(bucketRegion);
 
@@ -28,7 +28,7 @@ namespace CornerkickWebMvc
           BucketName = sBucketName,
           Key = sKey,
           FilePath = sFile,
-          ContentType = "text/plain"
+          ContentType = sContentType
         };
 
         PutObjectResponse response = client.PutObject(putRequest);
