@@ -33,15 +33,14 @@ namespace CornerkickWebMvc
 
         PutObjectResponse response = client.PutObject(putRequest);
       } catch (AmazonS3Exception amazonS3Exception) {
-        if (amazonS3Exception.ErrorCode != null &&
-            (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
-            ||
-            amazonS3Exception.ErrorCode.Equals("InvalidSecurity"))) {
-          MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", MvcApplication.ckcore.sErrorFile);
-          throw new Exception("Check the provided AWS Credentials.");
-        } else {
-          MvcApplication.ckcore.tl.writeLog("Error occurred: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
-          throw new Exception("Error occurred: " + amazonS3Exception.Message);
+        MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception Message: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
+
+        if (amazonS3Exception.ErrorCode != null) {
+          MvcApplication.ckcore.tl.writeLog("Error Code: " + amazonS3Exception.ErrorCode, MvcApplication.ckcore.sErrorFile);
+
+          if (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")) {
+            MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", MvcApplication.ckcore.sErrorFile);
+          }
         }
       }
     }
