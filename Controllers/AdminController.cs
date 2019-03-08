@@ -1,4 +1,6 @@
 ﻿//#define _USE_BLOB
+#define _DEPLOY_ON_APPHB
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -223,6 +225,10 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #endif
+#if _DEPLOY_ON_APPHB
+      return Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "App_Data");
+#endif
+
       return System.Web.HttpContext.Current.Server.MapPath("~/");
     }
 
