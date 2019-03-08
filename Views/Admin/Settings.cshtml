@@ -103,7 +103,14 @@
   }
 }
 
+@{
+  string sMapPath1 = Server.MapPath("~");
+  string sMapPath2 = Server.MapPath(".");
+}
 <h3>File Explorer</h3>
+<text>@sMapPath1<br></text>
+<text>@sMapPath2<br></text>
+
 <textarea name="taFileExplorer" id="taFileExplorer" style="width: 100%; max-width: 100%" rows="30" cols="1000">
 
 </textarea>
