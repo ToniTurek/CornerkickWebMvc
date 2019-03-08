@@ -151,12 +151,14 @@
       }
     }
 
-    if (clb.iCaptainId[0] < 0) {
-      <div style="position: relative; width: 100%; text-align: center">
-        @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
-      </div>
+    if (clb != null && clb.iCaptainId != null) {
+      if (clb.iCaptainId[0] < 0) {
+        <div style="position: relative; width: 100%; text-align: center">
+          @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
+        </div>
+        }
+      }
     }
-  }
   @*
     <h2>Schreibtisch</h2>
   *@
