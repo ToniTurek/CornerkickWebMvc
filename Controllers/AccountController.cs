@@ -478,9 +478,10 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public bool uploadFile(HttpPostedFileBase file, int iClub)
     {
+#if !DEBUG
       try {
         if (file.ContentLength > 0) {
-          file.SaveAs(Path.Combine(Server.MapPath("~/App_Data/Uploads"), iClub.ToString() + ".png"));
+          file.SaveAs(Path.Combine(MvcApplication.getHomeDir() + "Content/Uploads", iClub.ToString() + ".png"));
 
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
           as3.uploadFile(file.FileName, "ckEmblem_" + iClub.ToString());
@@ -490,6 +491,7 @@ namespace CornerkickWebMvc.Controllers
       } catch {
         return false;
       }
+#endif
     }
 
     public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )

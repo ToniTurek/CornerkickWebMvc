@@ -226,10 +226,10 @@ namespace CornerkickWebMvc.Controllers
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #endif
 #if _DEPLOY_ON_APPHB
-      return Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "App_Data");
+      //return Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "App_Data");
 #endif
 
-      return System.Web.HttpContext.Current.Server.MapPath("~/");
+      return System.Web.HttpContext.Current.Server.MapPath("~");
     }
 
     public ActionResult SaveAutosave()

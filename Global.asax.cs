@@ -334,10 +334,10 @@ namespace CornerkickWebMvc
 #else
 
 #if _DEPLOY_ON_APPHB
-      return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
+      //return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
 #endif
 
-      return HttpContext.Current.Server.MapPath("~/");
+      return HttpContext.Current.Server.MapPath("~");
 #endif
     }
   }

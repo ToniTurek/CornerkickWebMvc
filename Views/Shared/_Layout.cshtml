@@ -9,8 +9,9 @@
   @Scripts.Render("~/bundles/modernizr")
   @Scripts.Render("~/bundles/jquery")
   @{
-    string sEmblem = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "App_Data");
-    sEmblem = Path.Combine(sEmblem, "Uploads");
+    //string sEmblem = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "App_Data");
+    //sEmblem = Path.Combine(sEmblem, "Uploads");
+    string sEmblem = @"/Content/Uploads";
 
     if (Request.IsAuthenticated) {
       CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
