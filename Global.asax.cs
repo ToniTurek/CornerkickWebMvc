@@ -99,7 +99,7 @@ namespace CornerkickWebMvc
         }
 
         Directory.CreateDirectory(sHomeDir + "save");
-        if (System.IO.File.Exists(sHomeDir + "ckSave.zip")) ZipFile.ExtractToDirectory(sHomeDir + "ckSave.zip", sHomeDir + "save");
+        if (System.IO.File.Exists(sHomeDir + "ckSave")) ZipFile.ExtractToDirectory(sHomeDir + "ckSave", sHomeDir + "save");
       }
 
       as3.downloadFile("ckLog", sHomeDir);
@@ -254,7 +254,11 @@ namespace CornerkickWebMvc
       System.IO.File.Copy(sFileSave, sFileSaveBasic);
 
       if (System.IO.Directory.Exists(path + "/save")) {
-        string sFileZipSave = path + "/ckSave.zip";
+#if _USE_AMAZON_S3
+        string sFileZipSave = path + "App_Data/ckSave";
+#else
+        string sFileZipSave = path + "/ckSave";
+#endif
 
         // Delete existing zip file
         if (System.IO.File.Exists(sFileZipSave)) {
