@@ -37,8 +37,10 @@ namespace CornerkickWebMvc
             (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
             ||
             amazonS3Exception.ErrorCode.Equals("InvalidSecurity"))) {
+          MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", MvcApplication.ckcore.sErrorFile);
           throw new Exception("Check the provided AWS Credentials.");
         } else {
+          MvcApplication.ckcore.tl.writeLog("Error occurred: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
           throw new Exception("Error occurred: " + amazonS3Exception.Message);
         }
       }
