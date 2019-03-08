@@ -281,7 +281,7 @@ namespace CornerkickWebMvc
         MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to blob", MvcApplication.ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
-          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to amazon s3", MvcApplication.ckcore.sErrorFile);
+          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileZipSave + " to amazon s3", MvcApplication.ckcore.sErrorFile);
 #endif
         }
 #endif

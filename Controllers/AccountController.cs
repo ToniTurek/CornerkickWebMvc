@@ -478,7 +478,10 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public bool uploadFile(HttpPostedFileBase file, int iClub)
     {
-#if !DEBUG
+#if DEBUG
+      return false;
+#endif
+
       try {
         if (file.ContentLength > 0) {
           file.SaveAs(Path.Combine(MvcApplication.getHomeDir() + "Content/Uploads", iClub.ToString() + ".png"));
@@ -491,9 +494,6 @@ namespace CornerkickWebMvc.Controllers
       } catch {
         return false;
       }
-#endif
-
-      return false;
     }
 
     public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
