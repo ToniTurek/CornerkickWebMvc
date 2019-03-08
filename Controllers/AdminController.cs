@@ -36,7 +36,7 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
       string sHomeDir = getHomeDir();
-      modelAdmin.bLogExist      = System.IO.File.Exists(sHomeDir + "log/ck.log");
+      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "log/ck.log");
 
       //DirectoryInfo d = new DirectoryInfo(sHomeDir + "save");
       //FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
@@ -138,15 +138,34 @@ namespace CornerkickWebMvc.Controllers
       foreach (string s in MvcApplication.ltLog) modelAdmin.sLog += s + '\n';
       */
 
+      // Log
       try {
         // Create an instance of StreamReader to read from a file.
         // The using statement also closes the StreamReader.
-        using (StreamReader sr = new StreamReader(getHomeDir() + "ck.log")) {
+        using (StreamReader sr = new StreamReader(getHomeDir() + "log/ck.log")) {
           string sLine;
           // Read and display lines from the file until the end of 
           // the file is reached.
           while ((sLine = sr.ReadLine()) != null) {
             modelAdmin.sLog += sLine + '\n';
+          }
+        }
+      } catch (Exception e) {
+        // Let the user know what went wrong.
+        Console.WriteLine("The file could not be read:");
+        Console.WriteLine(e.Message);
+      }
+
+      // Error
+      try {
+        // Create an instance of StreamReader to read from a file.
+        // The using statement also closes the StreamReader.
+        using (StreamReader sr = new StreamReader(getHomeDir() + "log/error.log")) {
+          string sLine;
+          // Read and display lines from the file until the end of 
+          // the file is reached.
+          while ((sLine = sr.ReadLine()) != null) {
+            modelAdmin.sErr += sLine + '\n';
           }
         }
       } catch (Exception e) {
@@ -169,6 +188,25 @@ namespace CornerkickWebMvc.Controllers
       if (System.IO.File.Exists(getHomeDir() + "log.zip")) System.IO.File.Delete(getHomeDir() + "log.zip");
 
       return RedirectToAction("Settings");
+    }
+
+    public ActionResult getFilesInDirectory(string sDir)
+    {
+      List<string> ltFilenames = new List<string>();
+
+      DirectoryInfo d = new DirectoryInfo(sDir);
+      if (!d.Exists) {
+        //Response.StatusCode = 1;
+        return Json(new string[] { "Directory does not exist!" }, JsonRequestBehavior.AllowGet);
+      }
+
+      /*
+      foreach (FileInfo fi in d.GetFiles("*")) {
+        ltContent.Add(fi.Name);
+      }
+      */
+
+      return Json(d.GetFiles("*"), JsonRequestBehavior.AllowGet);
     }
 
     public string getHomeDir()

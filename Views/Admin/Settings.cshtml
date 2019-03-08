@@ -5,6 +5,30 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<script type="text/javascript">
+  var sDir = "~";
+  $(document).ready(function () {
+    setFileExplorer();
+  });
+
+  function setFileExplorer() {
+    $.ajax({
+      url: '/Admin/getFilesInDirectory',
+      type: "GET",
+      dataType: "JSON",
+      data: { sDir: sDir },
+      success: function (ltFiles) {
+        sFileNames = "";
+        for (i = 0; i < ltFiles.length; ++i) {
+          sFileNames += ltFiles[i] + '\n';
+        }
+
+        document.getElementById('taFileExplorer').value = sFileNames;
+      }
+    });
+  }
+</script>
+
 <h2>Settings</h2>
 @{
   string sDtNow = DateTime.Now.ToString();
@@ -78,3 +102,8 @@
     <button type="submit" disabled>load autosave</button>
   }
 }
+
+<h3>File Explorer</h3>
+<textarea name="taFileExplorer" id="taFileExplorer" style="width: 100%; max-width: 100%" rows="30" cols="1000">
+
+</textarea>
