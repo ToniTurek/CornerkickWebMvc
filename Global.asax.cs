@@ -87,8 +87,22 @@ namespace CornerkickWebMvc
 #endif
 #if _USE_AMAZON_S3
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-      if (!System.IO.File.Exists(sFileLoad)) as3.downloadFile("ckSave", sHomeDir + "save");
-      as3.downloadFile("ckLog", sHomeDir + "log");
+      if (!System.IO.File.Exists(sFileLoad)) {
+        as3.downloadFile("ckSave", sHomeDir);
+
+        if (Directory.Exists(sHomeDir + "save")) {
+          try {
+            Directory.Delete(sHomeDir + "save", true);
+          } catch {
+            MvcApplication.ckcore.tl.writeLog("ERROR: unable to delete existing temp. load directory: " + sHomeDir + "save", MvcApplication.ckcore.sErrorFile);
+          }
+        }
+
+        Directory.CreateDirectory(sHomeDir + "save");
+        if (System.IO.File.Exists(sHomeDir + "ckSave.zip")) ZipFile.ExtractToDirectory(sHomeDir + "ckSave.zip", sHomeDir + "save");
+      }
+
+      as3.downloadFile("ckLog", sHomeDir);
 #endif
 #endif
 
@@ -224,39 +238,53 @@ namespace CornerkickWebMvc
 
       try {
         MvcApplication.ckcore.io.save(sFileSave);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave, MvcApplication.ckcore.sErrorFile);
+      }
+
+      // Copy autosave file with datum to basic one (could use file link)
+      string sFileSaveBasic = path + "/save/.autosave.ckx";
+      if (System.IO.File.Exists(sFileSaveBasic)) {
+        try {
+          System.IO.File.Delete(sFileSaveBasic);
+        } catch {
+        }
+      }
+
+      System.IO.File.Copy(sFileSave, sFileSaveBasic);
+
+      if (System.IO.Directory.Exists(path + "/save")) {
+        string sFileZipSave = path + "/ckSave.zip";
+
+        // Delete existing zip file
+        if (System.IO.File.Exists(sFileZipSave)) {
+          try {
+            System.IO.File.Delete(sFileZipSave);
+          } catch {
+          }
+        }
+
+        ZipFile.CreateFromDirectory(path + "/save", sFileZipSave);
 
 #if !DEBUG
         try {
 #if _USE_BLOB
-          CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
-          bcontr.uploadBlob("blobSave", sFileSave);
+        CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
+        bcontr.uploadBlob("blobSave", sFileSave);
 #endif
 #if _USE_AMAZON_S3
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-          as3.uploadFile(sFileSave);
+          as3.uploadFile(sFileZipSave, "ckSave");
 #endif
         } catch {
 #if _USE_BLOB
-          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to blob", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to blob", MvcApplication.ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
           MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to amazon s3", MvcApplication.ckcore.sErrorFile);
 #endif
         }
 #endif
-
-        // Copy autosave file with datum to basic one (could use file link)
-        string sFileSaveBasic = path + "/save/.autosave.ckx";
-        if (System.IO.File.Exists(sFileSaveBasic)) {
-          try {
-            System.IO.File.Delete(sFileSaveBasic);
-          } catch {
-          }
-        }
-
-        System.IO.File.Copy(sFileSave, sFileSaveBasic);
-      } catch {
-        MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave, MvcApplication.ckcore.sErrorFile);
       }
 
       // save log dir
@@ -264,6 +292,7 @@ namespace CornerkickWebMvc
         string sFileZipLog = path + "/log.zip";
 
 #if !DEBUG
+        // Delete existing zip file
         if (System.IO.File.Exists(sFileZipLog)) {
           try {
             System.IO.File.Delete(sFileZipLog);
