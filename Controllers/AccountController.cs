@@ -294,7 +294,7 @@ namespace CornerkickWebMvc.Controllers
         for (byte iPl = 0; iPl < 2; iPl++) {
           CornerkickGame.Player pl = MvcApplication.ckcore.plr.newPlayer(club, iPos);
 #if DEBUG
-          pl.fFrische = 1f;
+          pl.fFresh = 1f;
 #endif
           pl.contract.iLength = (byte)rnd.Next(1, 4);
           pl.contract.iSalary = MvcApplication.ckcore.plr.getSalary(pl, pl.contract.iLength, 0);

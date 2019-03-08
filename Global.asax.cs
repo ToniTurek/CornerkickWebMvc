@@ -225,7 +225,7 @@ namespace CornerkickWebMvc
 #endif
 #if _USE_AMAZON_S3
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-          as3.uploadFile(sFileSave, "ckSave");
+          as3.uploadFile(sFileSave);
 #endif
         } catch {
 #if _USE_BLOB
@@ -284,7 +284,7 @@ namespace CornerkickWebMvc
         }
 #endif
       }
-      }
+    }
 
 #if _USE_BLOB
     // Blob Container
