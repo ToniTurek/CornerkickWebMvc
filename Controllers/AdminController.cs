@@ -190,11 +190,10 @@ namespace CornerkickWebMvc.Controllers
       return RedirectToAction("Settings");
     }
 
-    public ActionResult getFilesInDirectory(string sDir)
+    public ActionResult getFilesInDirectory(string sDir = "")
     {
-      if (string.IsNullOrEmpty(sDir) || sDir.Equals(".")) sDir = Server.MapPath("~");
-
-      List<string> ltFilenames = new List<string>();
+      //if (string.IsNullOrEmpty(sDir) || sDir.Equals(".")) sDir = Server.MapPath("~");
+      sDir = Path.Combine(Server.MapPath("~"), sDir);
 
       DirectoryInfo d = new DirectoryInfo(sDir);
       if (!d.Exists) {
@@ -202,13 +201,21 @@ namespace CornerkickWebMvc.Controllers
         return Json(new string[] { "Directory does not exist!" }, JsonRequestBehavior.AllowGet);
       }
 
-      /*
+      List<string> ltContent = new List<string>();
+      ltContent.Add("..");
+
+      // First get directories
+      foreach (string sSubDir in Directory.GetDirectories(sDir)) {
+        ltContent.Add("<DIR> " + Path.GetFileName(sSubDir));
+      }
+
+      // then get files
+      //return Json(d.GetFiles("*").ToArray(), JsonRequestBehavior.AllowGet);
       foreach (FileInfo fi in d.GetFiles("*")) {
         ltContent.Add(fi.Name);
       }
-      */
 
-      return Json(d.GetFiles("*"), JsonRequestBehavior.AllowGet);
+      return Json(ltContent.ToArray(), JsonRequestBehavior.AllowGet);
     }
 
     public string getHomeDir()

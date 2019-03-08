@@ -1,5 +1,7 @@
 ﻿//#define _USE_BLOB
 #define _USE_AMAZON_S3
+//#define _DEPLOY_ON_AZURE
+#define _DEPLOY_ON_APPHB
 
 using System;
 using System.Collections.Generic;
@@ -195,19 +197,28 @@ namespace CornerkickWebMvc
       // Don't save if calendar to fast
       if (timerCkCalender.Interval < 10000 && !bForce) return;
 
-      string path = "";
+      string path = ".";
 #if DEBUG
       path = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc";
 #else
       try {
-        path = System.Web.HttpContext.Current.Server.MapPath("~");
+#if _DEPLOY_ON_APPHB
+        path = Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
+#endif
+#if _DEPLOY_ON_AZURE
+        path = HttpContext.Current.Server.MapPath("~");
+#endif
         if (path.EndsWith("\\")) path = path.Remove(path.Length - 1);
       } catch (HttpException exp) {
         MvcApplication.ckcore.tl.writeLog("save: HttpException: " + exp.Message.ToString());
+#if _DEPLOY_ON_AZURE
         path = "D:\\home\\site\\wwwroot";
+#endif
       } catch {
         MvcApplication.ckcore.tl.writeLog("save: unable to create path from Server.MapPath", MvcApplication.ckcore.sErrorFile);
+#if _DEPLOY_ON_AZURE
         path = "D:\\home\\site\\wwwroot";
+#endif
       }
 #endif
 

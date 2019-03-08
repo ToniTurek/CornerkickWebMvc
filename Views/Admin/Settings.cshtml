@@ -11,6 +11,11 @@
     setFileExplorer();
   });
 
+  function changeDir() {
+    sDir = document.getElementById('itCd').value;
+    setFileExplorer();
+  }
+
   function setFileExplorer() {
     $.ajax({
       url: '/Admin/getFilesInDirectory',
@@ -23,6 +28,7 @@
           sFileNames += ltFiles[i] + '\n';
         }
 
+        document.getElementById('itCurDir').value = sDir;
         document.getElementById('taFileExplorer').value = sFileNames;
       }
     });
@@ -104,13 +110,13 @@
 }
 
 @{
-  string sMapPath1 = Server.MapPath("~");
-  string sMapPath2 = Server.MapPath(".");
+  string sMapPath = Server.MapPath("~");
 }
 <h3>File Explorer</h3>
-<text>@sMapPath1<br></text>
-<text>@sMapPath2<br></text>
+<text>Home Dir: @sMapPath<br></text>
+<text id="txtCurDir">Current Dir: </text>
+<input id="itCurDir" style="width: 30%" type="text" readonly>
 
-<textarea name="taFileExplorer" id="taFileExplorer" style="width: 100%; max-width: 100%" rows="30" cols="1000">
-
-</textarea>
+<textarea name="taFileExplorer" id="taFileExplorer" style="width: 100%; max-width: 100%" rows="30" cols="1000"></textarea>
+<input id="itCd" style="width: 30%" type="text" autocomplete="off">
+<button id="bnCd" type="submit" onclick="changeDir();">Change Dir</button>
