@@ -106,9 +106,32 @@ namespace CornerkickWebMvc
 #endif
 #endif
 
-      //if (MvcApplication.ckcore.io.load(sFileLoad)) MvcApplication.ckcore.calcSpieltage();
+      // Load ck state
       if (MvcApplication.ckcore.io.load(sFileLoad)) {
         MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
+
+#if !DEBUG
+#if _USE_AMAZON_S3
+        if (!System.IO.File.Exists(sHomeDir + "/laststate.txt")) as3.downloadFile("laststate", sHomeDir);
+#endif
+
+        if (System.IO.File.Exists(sHomeDir + "/laststate.txt")) {
+          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "/laststate.txt");
+
+          DateTime dtLast = new DateTime();
+          if (sStateFileContent.Length > 1) {
+            int iInterval = 0; // Calendar interval [s]
+
+            int.TryParse(sStateFileContent[0], out iInterval);
+
+            if (iInterval > 0 && DateTime.TryParse(sStateFileContent[1], out dtLast)) {
+              double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
+              int iSteps = (int)(fTotalMin / (iInterval / 60));
+            }
+          }
+        }
+#endif
+
 #if !DEBUG
         if (!MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart)) timerCkCalender.Enabled = true;
 #endif
@@ -253,6 +276,10 @@ namespace CornerkickWebMvc
 
       System.IO.File.Copy(sFileSave, sFileSaveBasic);
 
+#if _USE_AMAZON_S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+#endif
+
       if (System.IO.Directory.Exists(path + "/save")) {
 #if _USE_AMAZON_S3
         string sFileZipSave = path + "/App_Data/ckSave";
@@ -277,7 +304,6 @@ namespace CornerkickWebMvc
         bcontr.uploadBlob("blobSave", sFileSave);
 #endif
 #if _USE_AMAZON_S3
-          AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
           as3.uploadFile(sFileZipSave, "ckSave");
 #endif
         } catch {
@@ -290,6 +316,16 @@ namespace CornerkickWebMvc
         }
 #endif
       }
+
+      // Write last ck Time to file
+      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(path + "/laststate.txt")) {
+        fileLastState.WriteLine((timerCkCalender.Interval / 1000).ToString());
+        fileLastState.WriteLine(DateTime.Now.ToString());
+      }
+
+#if _USE_AMAZON_S3
+      as3.uploadFile(path + "/laststate.txt", "laststate");
+#endif
 
       // save log dir
       if (System.IO.Directory.Exists(path + "/log")) {
@@ -312,7 +348,6 @@ namespace CornerkickWebMvc
           bcontr.uploadBlob("blobLog", sFileZipLog);
 #endif
 #if _USE_AMAZON_S3
-          AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
           as3.uploadFile(sFileZipLog, "ckLog");
 #endif
         } catch {
