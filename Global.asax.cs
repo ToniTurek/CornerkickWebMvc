@@ -255,7 +255,7 @@ namespace CornerkickWebMvc
 
       if (System.IO.Directory.Exists(path + "/save")) {
 #if _USE_AMAZON_S3
-        string sFileZipSave = path + "App_Data/ckSave";
+        string sFileZipSave = path + "/App_Data/ckSave";
 #else
         string sFileZipSave = path + "/ckSave";
 #endif
