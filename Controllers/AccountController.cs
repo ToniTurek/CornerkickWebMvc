@@ -492,6 +492,8 @@ namespace CornerkickWebMvc.Controllers
         return false;
       }
 #endif
+
+      return false;
     }
 
     public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )

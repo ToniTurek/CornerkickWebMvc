@@ -11,13 +11,13 @@
   @{
     //string sEmblem = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "App_Data");
     //sEmblem = Path.Combine(sEmblem, "Uploads");
-    string sEmblem = @"/Content/Uploads";
+    string sEmblem = @"/Content/Uploads/";
 
     if (Request.IsAuthenticated) {
       CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
-      sEmblem = Path.Combine(sEmblem, clb.iId.ToString() + ".png");
+      sEmblem += clb.iId.ToString() + ".png";
     } else {
-      sEmblem = Path.Combine(sEmblem, "0.png");
+      sEmblem += "0.png";
     }
   }
   <div id="divDataEmblem" data-name="@sEmblem"></div>
