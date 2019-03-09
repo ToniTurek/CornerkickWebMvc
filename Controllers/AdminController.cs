@@ -65,11 +65,7 @@ namespace CornerkickWebMvc.Controllers
         return View(modelAdmin);
       }
 
-      for (int iU = 0; iU < MvcApplication.ckcore.ltUser.Count; iU++) {
-        CornerkickCore.Core.User user = MvcApplication.ckcore.ltUser[iU];
-        user.nextGame.iGameSpeed = modelAdmin.iGameSpeed;
-        MvcApplication.ckcore.ltUser[iU] = user;
-      }
+      setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
 
       // Do one step now
       MvcApplication.ckcore.next(true);
@@ -79,6 +75,11 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.timerCkCalender.Enabled = true;
 
       return RedirectToAction("Settings");
+    }
+
+    internal void setGameSpeedToAllUsers(int iGameSpeed)
+    {
+      foreach (CornerkickCore.Core.User user in MvcApplication.ckcore.ltUser) user.nextGame.iGameSpeed = iGameSpeed;
     }
 
     public ActionResult StopCalendar(Models.AdminModel modelAdmin)

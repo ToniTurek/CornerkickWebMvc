@@ -119,14 +119,24 @@ namespace CornerkickWebMvc
           string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "/laststate.txt");
 
           DateTime dtLast = new DateTime();
-          if (sStateFileContent.Length > 1) {
+          if (sStateFileContent.Length > 2) {
             int iInterval = 0; // Calendar interval [s]
-
             int.TryParse(sStateFileContent[0], out iInterval);
 
             if (iInterval > 0 && DateTime.TryParse(sStateFileContent[1], out dtLast)) {
+              Controllers.AdminController adminController = new Controllers.AdminController();
+
+              adminController.setGameSpeedToAllUsers(0);
+
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
-              int iSteps = (int)(fTotalMin / (iInterval / 60));
+              int nSteps = (int)(fTotalMin / (iInterval / 60f));
+
+              for (int iS = 0; iS < nSteps; iS++) performCalendarStep();
+
+              int iGameSpeed = 0; // Calendar interval [s]
+              int.TryParse(sStateFileContent[2], out iGameSpeed);
+
+              if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
             }
           }
         }
@@ -147,6 +157,13 @@ namespace CornerkickWebMvc
         timerCkCalender.Enabled = false;
       }
 
+      performCalendarStep();
+
+      timerCkCalender.Enabled = true;
+    }
+
+    private static void performCalendarStep()
+    {
       if (ckcore.ltUser.Count == 0) return;
 
       if (iStartHour >= 0 && iStartHour <= 24) {
@@ -203,8 +220,6 @@ namespace CornerkickWebMvc
 
       int iRetCk = ckcore.next(true);
       if (iRetCk == 99) return; // Saisonende
-
-      timerCkCalender.Enabled = true;
     }
 
     private static int countCpuPlayerOnTransferlist()
@@ -321,6 +336,7 @@ namespace CornerkickWebMvc
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(path + "/laststate.txt")) {
         fileLastState.WriteLine((timerCkCalender.Interval / 1000).ToString());
         fileLastState.WriteLine(DateTime.Now.ToString());
+        fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
       }
 
 #if _USE_AMAZON_S3
