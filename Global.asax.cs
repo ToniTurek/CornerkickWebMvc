@@ -30,6 +30,8 @@ namespace CornerkickWebMvc
     public static int iStartHour = -1;
     private static Random random = new Random();
 
+    const string sSaveZip = "ckSave.zip";
+
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();
@@ -99,7 +101,7 @@ namespace CornerkickWebMvc
         }
 
         Directory.CreateDirectory(sHomeDir + "save");
-        if (System.IO.File.Exists(sHomeDir + "ckSave")) ZipFile.ExtractToDirectory(sHomeDir + "ckSave", sHomeDir + "save");
+        if (System.IO.File.Exists(sHomeDir + sSaveZip)) ZipFile.ExtractToDirectory(sHomeDir + sSaveZip, sHomeDir + "save");
       }
 
       as3.downloadFile("ckLog", sHomeDir);
@@ -297,9 +299,9 @@ namespace CornerkickWebMvc
 
       if (System.IO.Directory.Exists(path + "/save")) {
 #if _USE_AMAZON_S3
-        string sFileZipSave = path + "/App_Data/ckSave";
+        string sFileZipSave = path + "/App_Data/" + sSaveZip;
 #else
-        string sFileZipSave = path + "/ckSave";
+        string sFileZipSave = path + "/" + sSaveZip;
 #endif
 
         // Delete existing zip file
