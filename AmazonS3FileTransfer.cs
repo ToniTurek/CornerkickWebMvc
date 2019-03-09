@@ -48,8 +48,12 @@ namespace CornerkickWebMvc
         };
 
         MvcApplication.ckcore.tl.writeLog("putRequest: " + (putRequest != null).ToString());
-        PutObjectResponse response = client.PutObject(putRequest);
-        //using (S3Response r = client.PutObject(putRequest)) { }
+        try {
+         PutObjectResponse response = client.PutObject(putRequest);
+          //using (S3Response r = client.PutObject(putRequest)) { }
+        } catch (AmazonS3Exception amazonS3Exception) {
+          MvcApplication.ckcore.tl.writeLog("ERROR! S3 PutObjectResponse Exception Message: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
+        }
       } catch (AmazonS3Exception amazonS3Exception) {
         MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception Message: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
 
