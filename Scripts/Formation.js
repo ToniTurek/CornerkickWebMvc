@@ -97,7 +97,7 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
     iPos = 0;
   }
 
-  var iTop  = 100 - (((100 * player.ptPosDefault.X) / 122));
+  var iTop  = 100 - ((100 * player.ptPosDefault.X) / 122);
   var iLeft = (100 * (player.ptPosDefault.Y + 25)) / 50;
   if (bOpponentTeam) {
     iTop  = 100 - iTop;
@@ -109,7 +109,11 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
 
   var sName = player.sName;
   var sNameSplit = sName.split(' ');
-  if (sNameSplit.length > 1) sName = sNameSplit[0][0] + ". " + sNameSplit[sNameSplit.length - 1];
+  var sSurname = sName;
+  if (sNameSplit.length > 1) {
+    sSurname = sNameSplit[sNameSplit.length - 1];
+    sName = sNameSplit[0][0] + ". " + sSurname;
+  }
   if (sName.length > 11) sName = sName.substring(0, 11);
   var sPos = ["", "TW", "IV", "LV", "RV", "DM", "LM", "RM", "OM", "LA", "RA", "ST", "LIB", "OLV", "ORV", "ZM", "", "", "", "", "", "HS"];
 
@@ -136,29 +140,39 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   }
 
   var sBox = "";
+
+  //sBox += '<a href="">';
+
+  var fWidth = 26;
+  var iTextSize = 150;
+  var fWindowWidth = $(window).width();
+  if (fWindowWidth < 960) {
+    iTextSize = 130;
+    sName = sSurname;
+  }
+
   sBox +=
-  '<div' + sSelectPlayer + ' style="position: absolute; width: 26%; height: 3.5%; top: ' + iTop + '%; left: ' + iLeft + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
-    '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
-      '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 240%; color: white">' + player.iNr + '</h2>' +
-    '</div>' +
-    '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black">' +
-      '<div style="position: absolute; width: 100%; height: 65%; top: 0%; left: 0%; background-color: ' + color + '; word-break: break-word">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 150%; color: black">' + sName + '</h2>' +
+    '<div id="divPlayerBox_' + i.toString() + '" class="divPlayerBox"' + sSelectPlayer + ' style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 140px; height: 3.5%; min-height: 34px; top: ' + iTop + '%; left: ' + iLeft + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
+      '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
+        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + player.iNr + '</h2>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 0%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sPos[iPos] + '</h2>' +
+      '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black">' +
+        '<div style="position: absolute; width: 100%; height: 65%; top: 0%; left: 0%; background-color: ' + color + '; word-break: break-word">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</h2>' +
+        '</div>' +
+        '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 0%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sPos[iPos] + '</h2>' +
+        '</div>' +
+        '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 25%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sStrength + '</h2>' +
+        '</div>' +
+        '<div style="position: absolute; width: 50%; height: 35%; top: 65%; left: 50%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + player.ptPosDefault.Y.toString() + '/' + player.ptPosDefault.X.toString() + '</h2>' +
+        '</div>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 25%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sStrength + '</h2>' +
-      '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 50%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">X: ' + player.ptPosDefault.Y + '</h2>' +
-      '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 75%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">Y: ' + player.ptPosDefault.X + '</h2>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
+    '</div>';
+
+    //sBox += '</a>';
 
   return sBox;
 }
