@@ -20,20 +20,29 @@ namespace CornerkickWebMvc
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
       //var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
+      MvcApplication.ckcore.tl.writeLog("Bucket Region: " + bucketRegion.DisplayName);
 
       var client = new AmazonS3Client(bucketRegion);
+      MvcApplication.ckcore.tl.writeLog("AmazonS3Client: " + (client != null).ToString());
 
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
+      MvcApplication.ckcore.tl.writeLog(" BucketName: " + sBucketName);
+      MvcApplication.ckcore.tl.writeLog("        Key: " + sKey);
+      MvcApplication.ckcore.tl.writeLog("       File: " + sFile);
+      MvcApplication.ckcore.tl.writeLog("ContentType: " + sContentType);
 
       try {
         PutObjectRequest putRequest = new PutObjectRequest {
           BucketName = sBucketName,
           Key = sKey,
           FilePath = sFile,
-          ContentType = sContentType
+          ContentType = sContentType,
+          CannedACL = S3CannedACL.PublicRead
         };
 
+        MvcApplication.ckcore.tl.writeLog("putRequest: " + (putRequest != null).ToString());
         PutObjectResponse response = client.PutObject(putRequest);
+        //using (S3Response r = client.PutObject(putRequest)) { }
       } catch (AmazonS3Exception amazonS3Exception) {
         MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception Message: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
 
