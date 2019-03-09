@@ -20,7 +20,6 @@ namespace CornerkickWebMvc
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
       //var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
-      MvcApplication.ckcore.tl.writeLog("Bucket Region: " + bucketRegion.DisplayName);
 
       //var client = new AmazonS3Client(bucketRegion);
       //string accessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
@@ -30,13 +29,7 @@ namespace CornerkickWebMvc
 
       IAmazonS3 client = new AmazonS3Client(accessKey, secretAccessKey, bucketRegion);
 
-      MvcApplication.ckcore.tl.writeLog("AmazonS3Client: " + (client != null).ToString());
-
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
-      MvcApplication.ckcore.tl.writeLog(" BucketName: " + sBucketName);
-      MvcApplication.ckcore.tl.writeLog("        Key: " + sKey);
-      MvcApplication.ckcore.tl.writeLog("       File: " + sFile);
-      MvcApplication.ckcore.tl.writeLog("ContentType: " + sContentType);
 
       try {
         PutObjectRequest putRequest = new PutObjectRequest {
@@ -47,7 +40,6 @@ namespace CornerkickWebMvc
           CannedACL = S3CannedACL.PublicRead
         };
 
-        MvcApplication.ckcore.tl.writeLog("putRequest: " + (putRequest != null).ToString());
         try {
          PutObjectResponse response = client.PutObject(putRequest);
           //using (S3Response r = client.PutObject(putRequest)) { }
