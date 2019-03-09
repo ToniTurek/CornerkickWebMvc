@@ -22,7 +22,14 @@ namespace CornerkickWebMvc
       //var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
       MvcApplication.ckcore.tl.writeLog("Bucket Region: " + bucketRegion.DisplayName);
 
-      var client = new AmazonS3Client(bucketRegion);
+      //var client = new AmazonS3Client(bucketRegion);
+      //string accessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
+      //string secretAccessKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
+      string accessKey = "AKIAJKOOKK445KJRPY7Q";
+      string secretAccessKey = "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";
+
+      IAmazonS3 client = new AmazonS3Client(accessKey, secretAccessKey, bucketRegion);
+
       MvcApplication.ckcore.tl.writeLog("AmazonS3Client: " + (client != null).ToString());
 
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
@@ -54,7 +61,7 @@ namespace CornerkickWebMvc
           }
         }
       } catch (Exception e) {
-        MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception: " + e.Message + ". File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception: " + e.Message + " File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
       } catch {
         MvcApplication.ckcore.tl.writeLog("ERROR! Unknown S3 Exception. File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
       }
