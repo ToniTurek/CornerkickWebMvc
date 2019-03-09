@@ -19,9 +19,9 @@ namespace CornerkickWebMvc
 
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
-      var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
+      //var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
 
-      var client = new AmazonS3Client(credentials, bucketRegion);
+      var client = new AmazonS3Client(bucketRegion);
 
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
 
