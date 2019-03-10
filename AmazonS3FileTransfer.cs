@@ -16,6 +16,8 @@ namespace CornerkickWebMvc
   {
     private const string sBucketName = "ckamazonbucket";
     private RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
+    const string sAccessKey = "AKIAJKOOKK445KJRPY7Q";
+    const string sSecretAccessKey = "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";
 
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
@@ -24,10 +26,8 @@ namespace CornerkickWebMvc
       //var client = new AmazonS3Client(bucketRegion);
       //string accessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
       //string secretAccessKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
-      string accessKey = "AKIAJKOOKK445KJRPY7Q";
-      string secretAccessKey = "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";
 
-      IAmazonS3 client = new AmazonS3Client(accessKey, secretAccessKey, bucketRegion);
+      IAmazonS3 client = new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion);
 
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
 
@@ -82,10 +82,14 @@ namespace CornerkickWebMvc
       //IAmazonS3 client = new AmazonS3Client(bucketRegion);
       //ReadObjectDataAsync(client, sKey).Wait();
       try {
-        TransferUtility fileTransferUtility = new TransferUtility(new AmazonS3Client(bucketRegion));
+        TransferUtility fileTransferUtility = new TransferUtility(new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion));
 
         // 2. Specify object key name explicitly.
-        fileTransferUtility.Download(sTargetPath, sBucketName, sKey);
+        try {
+          fileTransferUtility.Download(sTargetPath, sBucketName, sKey);
+        } catch (AmazonS3Exception s3Exception) {
+          MvcApplication.ckcore.tl.writeLog(s3Exception.Message);
+        }
         MvcApplication.ckcore.tl.writeLog(String.Format("Succesfully downloaded file: {0} from bucket: {1} to location: {2}", sKey, sBucketName, sTargetPath));
       } catch (AmazonS3Exception s3Exception) {
         //Console.WriteLine(s3Exception.Message, s3Exception.InnerException);
