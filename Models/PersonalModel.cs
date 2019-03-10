@@ -16,10 +16,11 @@ namespace CornerkickWebMvc.Models
     {
       ltDdlPersonal = new List<SelectListItem>();
 
-      for (byte i = 0; i < 8; i++) {
+      ltDdlPersonal.Add(new SelectListItem { Text = "-", Value = "0" });
+      for (byte i = 1; i < 8; i++) {
         ltDdlPersonal.Add(
           new SelectListItem {
-            Text = "Level: " + (i + 1).ToString(),
+            Text = "Level: " + i.ToString(),
             Value = i.ToString()
           }
         );
