@@ -1,1 +1,5 @@
+*.mdf
+*.ldf
 *.bu
+CornerkickAll.sln
+*.ckx
