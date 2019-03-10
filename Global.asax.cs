@@ -224,7 +224,7 @@ namespace CornerkickWebMvc
       }
 
       System.IO.File.Copy(sFileSave2, sFileSave);
-      as3.uploadFile(sFileSave, sFileSave, "application/zip");
+      as3.uploadFile(sFileSave, sFilenameSave, "application/zip");
 
       /*
       if (System.IO.Directory.Exists(path + "/save")) {
