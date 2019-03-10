@@ -31,6 +31,7 @@ namespace CornerkickWebMvc
     private static Random random = new Random();
 
     const string sSaveZip = "ckSave.zip";
+    const string sFilenameSave = ".autosave.ckx";
 
     protected void Application_Start()
     {
@@ -77,87 +78,12 @@ namespace CornerkickWebMvc
       timerCkCalender.Enabled = false;
 
       // Load autosave
-      string sFileLoad = sHomeDir + "save/.autosave.ckx";
-
-#if !DEBUG
-      string sFileZipLog = sHomeDir + "log.zip";
-
-#if _USE_BLOB
-      CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
-      if (!System.IO.File.Exists(sFileLoad)) bcontr.downloadBlob("blobSave", sFileLoad);
-      bcontr.downloadBlob("blobLog", sFileZipLog);
-#endif
-#if _USE_AMAZON_S3
-      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-      if (!System.IO.File.Exists(sFileLoad)) {
-        as3.downloadFile("ckSave", sHomeDir);
-
-        if (Directory.Exists(sHomeDir + "save")) {
-          try {
-            Directory.Delete(sHomeDir + "save", true);
-          } catch {
-            MvcApplication.ckcore.tl.writeLog("ERROR: unable to delete existing temp. load directory: " + sHomeDir + "save", MvcApplication.ckcore.sErrorFile);
-          }
-        }
-
-        Directory.CreateDirectory(sHomeDir + "save");
-        if (System.IO.File.Exists(sHomeDir + sSaveZip)) ZipFile.ExtractToDirectory(sHomeDir + sSaveZip, sHomeDir + "save");
-      }
-
-      as3.downloadFile("ckLog", sHomeDir);
-#endif
-#endif
-
-      // Load ck state
-      if (MvcApplication.ckcore.io.load(sFileLoad)) {
-        MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
-
-#if !DEBUG
-#if _USE_AMAZON_S3
-        if (!System.IO.File.Exists(sHomeDir + "/laststate.txt")) as3.downloadFile("laststate", sHomeDir);
-#endif
-
-        if (System.IO.File.Exists(sHomeDir + "/laststate.txt")) {
-          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "/laststate.txt");
-
-          DateTime dtLast = new DateTime();
-          if (sStateFileContent.Length > 2) {
-            int iInterval = 0; // Calendar interval [s]
-            int.TryParse(sStateFileContent[0], out iInterval);
-
-            if (iInterval > 0 && DateTime.TryParse(sStateFileContent[1], out dtLast)) {
-              Controllers.AdminController adminController = new Controllers.AdminController();
-
-              adminController.setGameSpeedToAllUsers(0);
-
-              double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
-              int nSteps = (int)(fTotalMin / (iInterval / 60f));
-
-              for (int iS = 0; iS < nSteps; iS++) performCalendarStep();
-
-              int iGameSpeed = 0; // Calendar interval [s]
-              int.TryParse(sStateFileContent[2], out iGameSpeed);
-
-              if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
-            }
-          }
-        }
-#endif
-
-#if !DEBUG
-        if (!MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart)) timerCkCalender.Enabled = true;
-#endif
-      } else {
-        MvcApplication.ckcore.calcSpieltage();
-        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSaisonstart;
-      }
+      load();
     }
 
     static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-      if (timerCkCalender.Interval < 1000) {
-        timerCkCalender.Enabled = false;
-      }
+      if (timerCkCalender.Interval < 1000) timerCkCalender.Enabled = false;
 
       performCalendarStep();
 
@@ -273,30 +199,34 @@ namespace CornerkickWebMvc
       }
 #endif
 
-      string sFileSave = path + "/save/.autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
-      MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave);
-
-      try {
-        MvcApplication.ckcore.io.save(sFileSave);
-      } catch {
-        MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave, MvcApplication.ckcore.sErrorFile);
-      }
-
-      // Copy autosave file with datum to basic one (could use file link)
-      string sFileSaveBasic = path + "/save/.autosave.ckx";
-      if (System.IO.File.Exists(sFileSaveBasic)) {
-        try {
-          System.IO.File.Delete(sFileSaveBasic);
-        } catch {
-        }
-      }
-
-      System.IO.File.Copy(sFileSave, sFileSaveBasic);
-
 #if _USE_AMAZON_S3
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
 #endif
 
+      string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
+      string sFileSave2 = path + "/save/" + sFilenameSave2;
+      MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave2);
+      as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
+
+      try {
+        MvcApplication.ckcore.io.save(sFileSave2);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, MvcApplication.ckcore.sErrorFile);
+      }
+
+      // Copy autosave file with datum to basic one (could use file link)
+      string sFileSave = path + "/save/" + sFilenameSave;
+      if (System.IO.File.Exists(sFileSave)) {
+        try {
+          System.IO.File.Delete(sFileSave);
+        } catch {
+        }
+      }
+
+      System.IO.File.Copy(sFileSave2, sFileSave);
+      as3.uploadFile(sFileSave, sFileSave, "application/zip");
+
+      /*
       if (System.IO.Directory.Exists(path + "/save")) {
 #if _USE_AMAZON_S3
         string sFileZipSave = path + "/App_Data/" + sSaveZip;
@@ -318,14 +248,14 @@ namespace CornerkickWebMvc
         try {
 #if _USE_BLOB
         CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
-        bcontr.uploadBlob("blobSave", sFileSave);
+        bcontr.uploadBlob("blobSave", sFileSave2);
 #endif
 #if _USE_AMAZON_S3
           as3.uploadFile(sFileZipSave, "ckSave", "application/zip");
 #endif
         } catch {
 #if _USE_BLOB
-        MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave + " to blob", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave2 + " to blob", MvcApplication.ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
           MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileZipSave + " to amazon s3", MvcApplication.ckcore.sErrorFile);
@@ -333,6 +263,7 @@ namespace CornerkickWebMvc
         }
 #endif
       }
+      */
 
       // Write last ck Time to file
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(path + "/laststate.txt")) {
@@ -377,6 +308,88 @@ namespace CornerkickWebMvc
 #endif
         }
 #endif
+      }
+    }
+
+    public static void load()
+    {
+      string sHomeDir = getHomeDir();
+
+      string sFileLoad = sHomeDir + "save/" + sFilenameSave;
+
+#if !DEBUG
+      string sFileZipLog = sHomeDir + "log.zip";
+
+#if _USE_BLOB
+      CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
+      if (!System.IO.File.Exists(sFileLoad)) bcontr.downloadBlob("blobSave", sFileLoad);
+      bcontr.downloadBlob("blobLog", sFileZipLog);
+#endif
+#if _USE_AMAZON_S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+      if (!System.IO.File.Exists(sFileLoad)) {
+        as3.downloadFile(sFilenameSave, sHomeDir);
+
+        /*
+        if (Directory.Exists(sHomeDir + "save")) {
+          try {
+            Directory.Delete(sHomeDir + "save", true);
+          } catch {
+            MvcApplication.ckcore.tl.writeLog("ERROR: unable to delete existing temp. load directory: " + sHomeDir + "save", MvcApplication.ckcore.sErrorFile);
+          }
+        }
+
+        Directory.CreateDirectory(sHomeDir + "save");
+        if (System.IO.File.Exists(sHomeDir + sSaveZip)) ZipFile.ExtractToDirectory(sHomeDir + sSaveZip, sHomeDir + "save");
+        */
+      }
+
+      as3.downloadFile("ckLog", sHomeDir);
+#endif
+#endif
+
+      // Load ck state
+      if (MvcApplication.ckcore.io.load(sFileLoad)) {
+        MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
+
+#if !DEBUG
+#if _USE_AMAZON_S3
+        if (!System.IO.File.Exists(sHomeDir + "/laststate.txt")) as3.downloadFile("laststate", sHomeDir);
+#endif
+
+        if (System.IO.File.Exists(sHomeDir + "/laststate.txt")) {
+          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "/laststate.txt");
+
+          DateTime dtLast = new DateTime();
+          if (sStateFileContent.Length > 2) {
+            int iInterval = 0; // Calendar interval [s]
+            int.TryParse(sStateFileContent[0], out iInterval);
+
+            if (iInterval > 0 && DateTime.TryParse(sStateFileContent[1], out dtLast)) {
+              Controllers.AdminController adminController = new Controllers.AdminController();
+
+              adminController.setGameSpeedToAllUsers(0);
+
+              double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
+              int nSteps = (int)(fTotalMin / (iInterval / 60f));
+
+              for (int iS = 0; iS < nSteps; iS++) performCalendarStep();
+
+              int iGameSpeed = 0; // Calendar interval [s]
+              int.TryParse(sStateFileContent[2], out iGameSpeed);
+
+              if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
+            }
+          }
+        }
+#endif
+
+#if !DEBUG
+        if (!MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart)) timerCkCalender.Enabled = true;
+#endif
+      } else {
+        MvcApplication.ckcore.calcSpieltage();
+        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSaisonstart;
       }
     }
 
