@@ -31,6 +31,12 @@ namespace CornerkickWebMvc
 
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
 
+      // Try to delete existing file
+      try {
+        deleteFile(sKey, client);
+      } catch {
+      }
+
       try {
         PutObjectRequest putRequest = new PutObjectRequest {
           BucketName = sBucketName,
@@ -61,6 +67,14 @@ namespace CornerkickWebMvc
       } catch {
         MvcApplication.ckcore.tl.writeLog("ERROR! Unknown S3 Exception. File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
       }
+    }
+
+    private void deleteFile(string sKey, IAmazonS3 client)
+    {
+      DeleteObjectRequest deleteRequest = new DeleteObjectRequest();
+      deleteRequest.BucketName = sBucketName;
+      deleteRequest.Key = sKey;
+      client.DeleteObject(deleteRequest);
     }
 
     public void downloadFile(string sKey, string sTargetPath = "./")
