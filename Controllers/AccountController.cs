@@ -484,10 +484,11 @@ namespace CornerkickWebMvc.Controllers
 
       try {
         if (file.ContentLength > 0) {
-          file.SaveAs(Path.Combine(MvcApplication.getHomeDir() + "Content/Uploads", iClub.ToString() + ".png"));
+          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir() + "Content/Uploads", iClub.ToString() + ".png");
+          file.SaveAs(sFilenameLocal);
 
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-          as3.uploadFile(file.FileName, "ckEmblem_" + iClub.ToString(), "image/custom");
+          as3.uploadFile(sFilenameLocal, "ckEmblem_" + iClub.ToString(), "image/custom");
         }
 
         return true;
