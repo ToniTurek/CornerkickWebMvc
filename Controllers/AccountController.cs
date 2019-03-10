@@ -702,7 +702,7 @@ namespace CornerkickWebMvc.Controllers
             iniCk();
           }
 
-          MvcApplication.save();
+          MvcApplication.save(MvcApplication.timerCkCalender.Interval);
           /*
 #if DEBUG
           MvcApplication.ckcore.io.save("C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\save\\.autosave.ck");

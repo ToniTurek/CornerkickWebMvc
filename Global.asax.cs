@@ -81,7 +81,7 @@ namespace CornerkickWebMvc
       load();
     }
 
-    static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    private static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
       if (timerCkCalender.Interval < 1000) timerCkCalender.Enabled = false;
 
@@ -137,7 +137,7 @@ namespace CornerkickWebMvc
       // Save .autosave
       MvcApplication.ckcore.ltClubs[0].ltTrainingHist.Clear();
       MvcApplication.ckcore.ltClubs[0].ltAccount.Clear();
-      save();
+      save(timerCkCalender.Interval);
 
       if ((MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart) ||
           MvcApplication.ckcore.dtDatum.Year < 1900) &&
@@ -172,10 +172,10 @@ namespace CornerkickWebMvc
     }
     */
 
-    public static void save(bool bForce = false)
+    internal static void save(double fCalendarInterval, bool bForce = false)
     {
       // Don't save if calendar to fast
-      if (timerCkCalender.Interval < 10000 && !bForce) return;
+      if (fCalendarInterval < 10000 && !bForce) return;
 
       string path = getHomeDir();
 #if DEBUG
@@ -267,7 +267,7 @@ namespace CornerkickWebMvc
 
       // Write last ck Time to file
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(path + "/laststate.txt")) {
-        fileLastState.WriteLine((timerCkCalender.Interval / 1000).ToString());
+        fileLastState.WriteLine((fCalendarInterval / 1000).ToString());
         fileLastState.WriteLine(DateTime.Now.ToString());
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
       }
@@ -311,7 +311,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    public static void load()
+    internal static void load()
     {
       string sHomeDir = getHomeDir();
 
@@ -436,6 +436,7 @@ namespace CornerkickWebMvc
       //return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
 #endif
 
+      if (HttpContext.Current == null) return ".";
       return HttpContext.Current.Server.MapPath("~");
 #endif
     }

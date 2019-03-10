@@ -235,7 +235,7 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult SaveAutosave()
     {
-      MvcApplication.save(true);
+      MvcApplication.save(MvcApplication.timerCkCalender.Interval, true);
 
       return RedirectToAction("Settings");
     }
