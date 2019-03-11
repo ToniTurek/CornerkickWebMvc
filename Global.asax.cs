@@ -208,7 +208,7 @@ namespace CornerkickWebMvc
 #endif
 
       string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
-      string sFileSave2 = sHomeDir + "/App_Data/save/" + sFilenameSave2;
+      string sFileSave2 = sHomeDir + "/save/" + sFilenameSave2;
       MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave2);
 
       try {
@@ -219,7 +219,7 @@ namespace CornerkickWebMvc
       }
 
       // Copy autosave file with datum to basic one (could use file link)
-      string sFileSave = sHomeDir + "/App_Data/save/" + sFilenameSave;
+      string sFileSave = sHomeDir + "/save/" + sFilenameSave;
       if (System.IO.File.Exists(sFileSave)) {
         try {
           System.IO.File.Delete(sFileSave);
@@ -233,7 +233,7 @@ namespace CornerkickWebMvc
       /*
       if (System.IO.Directory.Exists(sHomeDir + "/save")) {
 #if _USE_AMAZON_S3
-        string sFileZipSave = sHomeDir + "/App_Data/" + sSaveZip;
+        string sFileZipSave = sHomeDir + "/" + sSaveZip;
 #else
         string sFileZipSave = sHomeDir + "/" + sSaveZip;
 #endif
@@ -319,7 +319,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      string sFileLoad = sHomeDir + "App_Data/save/" + sFilenameSave;
+      string sFileLoad = sHomeDir + "save/" + sFilenameSave;
 
 #if !DEBUG
 #if _USE_BLOB
@@ -352,7 +352,7 @@ namespace CornerkickWebMvc
       }
 
       // Download log
-      as3.downloadFile("ckLog", sHomeDir + "App_Data/log.zip");
+      as3.downloadFile("ckLog", sHomeDir + "log.zip");
 #endif
 #endif
 
@@ -362,11 +362,11 @@ namespace CornerkickWebMvc
 
 #if !DEBUG
 #if _USE_AMAZON_S3
-        if (!System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) as3.downloadFile("laststate", sHomeDir + "App_Data/laststate.txt");
+        if (!System.IO.File.Exists(sHomeDir + "laststate.txt")) as3.downloadFile("laststate", sHomeDir + "laststate.txt");
 #endif
 
-        if (System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) {
-          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "App_Data/laststate.txt");
+        if (System.IO.File.Exists(sHomeDir + "laststate.txt")) {
+          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "laststate.txt");
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 2) {
@@ -444,11 +444,12 @@ namespace CornerkickWebMvc
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #else
 
+      if (HttpContext.Current == null) return "./App_Data/";
+
 #if _DEPLOY_ON_APPHB
-      //return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
+      return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
 #endif
 
-      if (HttpContext.Current == null) return "./";
       return HttpContext.Current.Server.MapPath("~");
 #endif
     }

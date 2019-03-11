@@ -38,11 +38,11 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
       string sHomeDir = getHomeDir();
-      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "App_Data/log/ck.log");
+      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "log/ck.log");
 
       //DirectoryInfo d = new DirectoryInfo(sHomeDir + "save");
       //FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
-      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "App_Data/save/.autosave.ckx");
+      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "save/.autosave.ckx");
 
       return View(modelAdmin);
     }
@@ -226,7 +226,7 @@ namespace CornerkickWebMvc.Controllers
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #endif
 #if _DEPLOY_ON_APPHB
-      //return Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "App_Data");
+      return Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "App_Data");
 #endif
 
       return System.Web.HttpContext.Current.Server.MapPath("~");
