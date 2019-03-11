@@ -373,6 +373,7 @@ namespace CornerkickWebMvc
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (iInterval / 60f));
 
+              MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString() + "(now: " + DateTime.Now.ToString() + "). Performing " + nSteps.ToString() + " calendar steps");
               for (int iS = 0; iS < nSteps; iS++) performCalendarStep();
 
               int iGameSpeed = 0; // Calendar interval [s]
