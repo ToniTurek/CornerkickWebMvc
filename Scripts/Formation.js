@@ -3,8 +3,6 @@
   var textteamaverage = $("#average");
   var divTacticOrientation    = document.getElementById("divTacticOrientation");
   var divTacticIndOrientation = document.getElementById("divTacticIndOrientation");
-  var fStrength = 0.0;
-  var fStrengthAve = 0.0;
 
   // respond to the change event in here
   $.ajax({
@@ -131,12 +129,12 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   var sSelectPlayer = "";
   var sZIndex = "";
   if (!bOpponentTeam) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\"; ontouchstart=\"selectPlayer(" + i.toString() + ")\"";
     if (i === iSelectedPlayer) {
       sZIndex = ";z-index:99";
     }
   } else if (iSelectedPlayer >= 0) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\"; ontouchstart=\"selectPlayer(" + i.toString() + ")\"";
   }
 
   var sBox = "";
