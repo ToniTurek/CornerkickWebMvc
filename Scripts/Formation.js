@@ -160,14 +160,14 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
         '<div style="position: absolute; width: 100%; height: 65%; top: 0%; left: 0%; background-color: ' + color + '; word-break: break-word">' +
           '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</h2>' +
         '</div>' +
-        '<div style="position: absolute; width: 25%; height: 35%; min-height: 9px; bottom: 0px; left: 0%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.7).toString() + '%; color: black">' + sPos[iPos] + '</h2>' +
+        '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 0%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sPos[iPos] + '</h2>' +
         '</div>' +
-        '<div style="position: absolute; width: 25%; height: 35%; min-height: 9px; bottom: 0px; left: 25%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.7).toString() + '%; color: black">' + sStrength + '</h2>' +
+        '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 25%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sStrength + '</h2>' +
         '</div>' +
-        '<div style="position: absolute; width: 50%; height: 35%; min-height: 9px; bottom: 0px; left: 50%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.7).toString() + '%; color: black">' + player.ptPosDefault.Y.toString() + '/' + player.ptPosDefault.X.toString() + '</h2>' +
+        '<div style="position: absolute; width: 50%; height: 35%; min-height: 8px; bottom: 0px; left: 50%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + player.ptPosDefault.Y.toString() + '/' + player.ptPosDefault.X.toString() + '</h2>' +
         '</div>' +
       '</div>' +
     '</div>';
