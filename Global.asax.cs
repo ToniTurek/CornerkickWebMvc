@@ -443,7 +443,7 @@ namespace CornerkickWebMvc
       //return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
 #endif
 
-      if (HttpContext.Current == null) return ".";
+      if (HttpContext.Current == null) return "./";
       return HttpContext.Current.Server.MapPath("~");
 #endif
     }
