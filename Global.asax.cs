@@ -179,24 +179,26 @@ namespace CornerkickWebMvc
       // Don't save if calendar to fast
       if (fCalendarInterval < 10000 && !bForce) return;
 
-      string path = getHomeDir();
+      string sHomeDir = ckcore.sHomeDir;
+      if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = getHomeDir();
+
 #if DEBUG
-      path = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc";
+      sHomeDir = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc";
 #else
       try {
 #if _DEPLOY_ON_AZURE
-        path = HttpContext.Current.Server.MapPath("~");
+        sHomeDir = HttpContext.Current.Server.MapPath("~");
 #endif
-        if (path.EndsWith("\\")) path = path.Remove(path.Length - 1);
+        if (sHomeDir.EndsWith("\\")) sHomeDir = sHomeDir.Remove(sHomeDir.Length - 1);
       } catch (HttpException exp) {
         MvcApplication.ckcore.tl.writeLog("save: HttpException: " + exp.Message.ToString());
 #if _DEPLOY_ON_AZURE
-        path = "D:\\home\\site\\wwwroot";
+        sHomeDir = "D:\\home\\site\\wwwroot";
 #endif
       } catch {
-        MvcApplication.ckcore.tl.writeLog("save: unable to create path from Server.MapPath", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("save: unable to create sHomeDir from Server.MapPath", MvcApplication.ckcore.sErrorFile);
 #if _DEPLOY_ON_AZURE
-        path = "D:\\home\\site\\wwwroot";
+        sHomeDir = "D:\\home\\site\\wwwroot";
 #endif
       }
 #endif
@@ -206,7 +208,7 @@ namespace CornerkickWebMvc
 #endif
 
       string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
-      string sFileSave2 = path + "App_Data/save/" + sFilenameSave2;
+      string sFileSave2 = sHomeDir + "App_Data/save/" + sFilenameSave2;
       MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave2);
 
       try {
@@ -217,7 +219,7 @@ namespace CornerkickWebMvc
       }
 
       // Copy autosave file with datum to basic one (could use file link)
-      string sFileSave = path + "App_Data/save/" + sFilenameSave;
+      string sFileSave = sHomeDir + "App_Data/save/" + sFilenameSave;
       if (System.IO.File.Exists(sFileSave)) {
         try {
           System.IO.File.Delete(sFileSave);
@@ -229,11 +231,11 @@ namespace CornerkickWebMvc
       as3.uploadFile(sFileSave, sFilenameSave, "application/zip");
 
       /*
-      if (System.IO.Directory.Exists(path + "/save")) {
+      if (System.IO.Directory.Exists(sHomeDir + "/save")) {
 #if _USE_AMAZON_S3
-        string sFileZipSave = path + "/App_Data/" + sSaveZip;
+        string sFileZipSave = sHomeDir + "/App_Data/" + sSaveZip;
 #else
-        string sFileZipSave = path + "/" + sSaveZip;
+        string sFileZipSave = sHomeDir + "/" + sSaveZip;
 #endif
 
         // Delete existing zip file
@@ -244,7 +246,7 @@ namespace CornerkickWebMvc
           }
         }
 
-        ZipFile.CreateFromDirectory(path + "/save", sFileZipSave);
+        ZipFile.CreateFromDirectory(sHomeDir + "/save", sFileZipSave);
 
 #if !DEBUG
         try {
@@ -268,19 +270,19 @@ namespace CornerkickWebMvc
       */
 
       // Write last ck Time to file
-      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(path + "/laststate.txt")) {
+      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sHomeDir + "/laststate.txt")) {
         fileLastState.WriteLine((fCalendarInterval / 1000).ToString());
         fileLastState.WriteLine(DateTime.Now.ToString());
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
       }
 
 #if _USE_AMAZON_S3
-      as3.uploadFile(path + "/laststate.txt", "laststate");
+      as3.uploadFile(sHomeDir + "/laststate.txt", "laststate");
 #endif
 
       // save log dir
-      if (System.IO.Directory.Exists(path + "/log")) {
-        string sFileZipLog = path + "/log.zip";
+      if (System.IO.Directory.Exists(sHomeDir + "/log")) {
+        string sFileZipLog = sHomeDir + "/log.zip";
 
 #if !DEBUG
         // Delete existing zip file
@@ -291,7 +293,7 @@ namespace CornerkickWebMvc
           }
         }
 
-        ZipFile.CreateFromDirectory(path + "/log", sFileZipLog);
+        ZipFile.CreateFromDirectory(sHomeDir + "/log", sFileZipLog);
 
         try {
 #if _USE_BLOB
