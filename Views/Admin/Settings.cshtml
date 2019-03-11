@@ -9,7 +9,22 @@
   var sDir = "";
   $(document).ready(function () {
     setFileExplorer();
+
+    $("#bnSetWeeks1").click(function () {
+      setCalInterval(1);
+    });
+
+    $("#bnSetWeeks2").click(function () {
+      setCalInterval(2);
+    });
   });
+
+  function setCalInterval(iWeeks) {
+    // Capital letters = Real-time
+    //              MIN * S  * H   /   weeks * qu  * h  * d
+    var fInterval = (60 * 60 * 24) / (iWeeks * 4.0 * 24 * 7);
+    document.getElementById('fCalendarInterval').value = fInterval;
+  }
 
   function changeDir() {
     sDir = document.getElementById('itCd').value;
@@ -36,12 +51,15 @@
 }
 
 @using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
-  @Html.TextBoxFor(m => m.fCalenderInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 30%" })
+  @Html.TextBoxFor(m => m.fCalendarInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 30%" })
   @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 30%" })
   @Html.TextBoxFor(m => m.iGameSpeed, new { autocomplete = "off", style = "width: 30%" })
 
   <button type="submit">Start</button>
 }
+
+<button type="submit" id="bnSetWeeks1" style="position: relative">1 Day -> 1 Week</button>
+<button type="submit" id="bnSetWeeks2" style="position: relative">1 Day -> 2 Weeks</button>
 
 @using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
   <button type="submit">Stop</button>
@@ -57,7 +75,7 @@
   if (Model != null) {
     bCk = Model.bCk;
     bTimer = Model.bTimer;
-    sInterval = Model.fCalenderInterval.ToString() + " s";
+    sInterval = Model.fCalendarInterval.ToString() + " s";
     sHour = Model.sStartHour;
   }
 }

@@ -10,7 +10,7 @@ namespace CornerkickWebMvc.Models
   public class AdminModel
   {
     public bool bCk { get; set; }
-    public double fCalenderInterval { get; set; }
+    public double fCalendarInterval { get; set; }
     public bool bTimer { get; set; }
     public string sStartHour { get; set; }
     public string sLog { get; set; }
@@ -31,7 +31,7 @@ namespace CornerkickWebMvc.Models
     {
       ddlAutosaveFiles = new List<SelectListItem>();
 
-      DirectoryInfo d = new DirectoryInfo(MvcApplication.getHomeDir() + "/save");
+      DirectoryInfo d = new DirectoryInfo(MvcApplication.getHomeDir() + "App_Data/save");
       if (d.Exists) {
         FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
         int i = 0;

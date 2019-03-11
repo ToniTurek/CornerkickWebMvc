@@ -26,7 +26,7 @@ namespace CornerkickWebMvc.Controllers
     {
       modelAdmin.bCk = MvcApplication.ckcore != null;
       modelAdmin.bTimer = MvcApplication.timerCkCalender.Enabled;
-      modelAdmin.fCalenderInterval = MvcApplication.timerCkCalender.Interval / 1000;
+      modelAdmin.fCalendarInterval = MvcApplication.timerCkCalender.Interval / 1000;
 
       modelAdmin.sStartHour = "";
       if (MvcApplication.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.iStartHour.ToString();
@@ -60,7 +60,7 @@ namespace CornerkickWebMvc.Controllers
         int.TryParse(modelAdmin.sStartHour, out MvcApplication.iStartHour);
       }
 
-      if (modelAdmin.fCalenderInterval < 1E-6) {
+      if (modelAdmin.fCalendarInterval < 1E-6) {
         MvcApplication.timerCkCalender.Enabled = false;
         return View(modelAdmin);
       }
@@ -71,7 +71,7 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.next(true);
 
       // Start the timer
-      MvcApplication.timerCkCalender.Interval = modelAdmin.fCalenderInterval * 1000;
+      MvcApplication.timerCkCalender.Interval = modelAdmin.fCalendarInterval * 1000;
       MvcApplication.timerCkCalender.Enabled = true;
 
       return RedirectToAction("Settings");
