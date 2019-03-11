@@ -208,7 +208,7 @@ namespace CornerkickWebMvc
 #endif
 
       string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
-      string sFileSave2 = sHomeDir + "App_Data/save/" + sFilenameSave2;
+      string sFileSave2 = sHomeDir + "/App_Data/save/" + sFilenameSave2;
       MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave2);
 
       try {
@@ -219,7 +219,7 @@ namespace CornerkickWebMvc
       }
 
       // Copy autosave file with datum to basic one (could use file link)
-      string sFileSave = sHomeDir + "App_Data/save/" + sFilenameSave;
+      string sFileSave = sHomeDir + "/App_Data/save/" + sFilenameSave;
       if (System.IO.File.Exists(sFileSave)) {
         try {
           System.IO.File.Delete(sFileSave);
