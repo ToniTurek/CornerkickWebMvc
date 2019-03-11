@@ -38,11 +38,11 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
       string sHomeDir = getHomeDir();
-      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "log/ck.log");
+      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "/log/ck.log");
 
       //DirectoryInfo d = new DirectoryInfo(sHomeDir + "save");
       //FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
-      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "save/.autosave.ckx");
+      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "/save/.autosave.ckx");
 
       return View(modelAdmin);
     }
@@ -104,7 +104,7 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult DeleteAutosave()
     {
-      if (System.IO.File.Exists(getHomeDir() + "save/.autosave.ckx")) System.IO.File.Delete(getHomeDir() + "save/.autosave.ckx");
+      if (System.IO.File.Exists(getHomeDir() + "/save/.autosave.ckx")) System.IO.File.Delete(getHomeDir() + "/save/.autosave.ckx");
 
       return RedirectToAction("Settings");
     }
@@ -112,12 +112,12 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public ActionResult LoadAutosave(Models.AdminModel modelAdmin)
     {
-      if (System.IO.File.Exists(getHomeDir() + "save/" + modelAdmin.sSelectedAutosaveFile)) {
+      if (System.IO.File.Exists(getHomeDir() + "/save/" + modelAdmin.sSelectedAutosaveFile)) {
         MvcApplication.timerCkCalender.Enabled = false;
 
         MvcApplication.newCk();
 
-        MvcApplication.ckcore.io.load(getHomeDir() + "save/" + modelAdmin.sSelectedAutosaveFile);
+        MvcApplication.ckcore.io.load(getHomeDir() + "/save/" + modelAdmin.sSelectedAutosaveFile);
       }
 
       return RedirectToAction("Settings");
@@ -145,7 +145,7 @@ namespace CornerkickWebMvc.Controllers
       try {
         // Create an instance of StreamReader to read from a file.
         // The using statement also closes the StreamReader.
-        using (StreamReader sr = new StreamReader(getHomeDir() + "log/ck.log")) {
+        using (StreamReader sr = new StreamReader(getHomeDir() + "/log/ck.log")) {
           string sLine;
           // Read and display lines from the file until the end of 
           // the file is reached.
@@ -163,7 +163,7 @@ namespace CornerkickWebMvc.Controllers
       try {
         // Create an instance of StreamReader to read from a file.
         // The using statement also closes the StreamReader.
-        using (StreamReader sr = new StreamReader(getHomeDir() + "log/error.log")) {
+        using (StreamReader sr = new StreamReader(getHomeDir() + "/log/error.log")) {
           string sLine;
           // Read and display lines from the file until the end of 
           // the file is reached.
@@ -184,11 +184,11 @@ namespace CornerkickWebMvc.Controllers
     {
       MvcApplication.ckcore.log.Clear();
 
-      var diLog = new DirectoryInfo(getHomeDir() + "log");
+      var diLog = new DirectoryInfo(getHomeDir() + "/log");
       foreach (var file in diLog.EnumerateFiles("*.log")) {
         file.Delete();
       }
-      if (System.IO.File.Exists(getHomeDir() + "log.zip")) System.IO.File.Delete(getHomeDir() + "log.zip");
+      if (System.IO.File.Exists(getHomeDir() + "/log.zip")) System.IO.File.Delete(getHomeDir() + "/log.zip");
 
       return RedirectToAction("Settings");
     }
