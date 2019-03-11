@@ -22,14 +22,9 @@
       type: "GET",
       dataType: "JSON",
       data: { sDir: sDir },
-      success: function (ltFiles) {
-        sFileNames = "";
-        for (i = 0; i < ltFiles.length; ++i) {
-          sFileNames += ltFiles[i] + '\n';
-        }
-
+      success: function (sContent) {
         document.getElementById('itCurDir').value = sDir;
-        document.getElementById('taFileExplorer').value = sFileNames;
+        document.getElementById('taFileExplorer').value = sContent;
       }
     });
   }
