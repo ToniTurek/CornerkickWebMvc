@@ -204,21 +204,20 @@ namespace CornerkickWebMvc.Controllers
         return Json(new string[] { "Directory does not exist!" }, JsonRequestBehavior.AllowGet);
       }
 
-      List<string> ltContent = new List<string>();
-      ltContent.Add("..");
+      string sContent = ".." + Environment.NewLine;
 
       // First get directories
       foreach (string sSubDir in Directory.GetDirectories(sDir)) {
-        ltContent.Add("<DIR> " + Path.GetFileName(sSubDir));
+        sContent += "<DIR> " + Path.GetFileName(sSubDir) + Environment.NewLine;
       }
 
       // then get files
       //return Json(d.GetFiles("*").ToArray(), JsonRequestBehavior.AllowGet);
       foreach (FileInfo fi in d.GetFiles("*")) {
-        ltContent.Add(fi.Name);
+        sContent += fi.Name + Environment.NewLine;
       }
 
-      return Json(ltContent.ToArray(), JsonRequestBehavior.AllowGet);
+      return Json(sContent, JsonRequestBehavior.AllowGet);
     }
 
     public string getHomeDir()
