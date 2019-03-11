@@ -206,18 +206,18 @@ namespace CornerkickWebMvc
 #endif
 
       string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
-      string sFileSave2 = path + "/save/" + sFilenameSave2;
+      string sFileSave2 = path + "App_Data/save/" + sFilenameSave2;
       MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave2);
-      as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
 
       try {
         MvcApplication.ckcore.io.save(sFileSave2);
+        as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
       } catch {
         MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, MvcApplication.ckcore.sErrorFile);
       }
 
       // Copy autosave file with datum to basic one (could use file link)
-      string sFileSave = path + "/save/" + sFilenameSave;
+      string sFileSave = path + "App_Data/save/" + sFilenameSave;
       if (System.IO.File.Exists(sFileSave)) {
         try {
           System.IO.File.Delete(sFileSave);
