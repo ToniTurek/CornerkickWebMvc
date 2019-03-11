@@ -272,7 +272,7 @@ namespace CornerkickWebMvc
       // Write last ck Time to file
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sHomeDir + "/laststate.txt")) {
         fileLastState.WriteLine((fCalendarInterval / 1000).ToString());
-        fileLastState.WriteLine(DateTime.Now.ToString());
+        fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
       }
 
@@ -381,8 +381,11 @@ namespace CornerkickWebMvc
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (iInterval / 60f));
 
-              MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString() + "(now: " + DateTime.Now.ToString() + "). Performing " + nSteps.ToString() + " calendar steps");
-              for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
+              MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + ")");
+              if (nSteps > 0) {
+                MvcApplication.ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
+                for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
+              }
 
               int iGameSpeed = 0; // Calendar interval [s]
               int.TryParse(sStateFileContent[2], out iGameSpeed);
