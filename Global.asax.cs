@@ -30,7 +30,7 @@ namespace CornerkickWebMvc
     public static int iStartHour = -1;
     private static Random random = new Random();
 
-    const string sSaveZip = "ckSave.zip";
+    //const string sSaveZip = "ckSave.zip";
     const string sFilenameSave = ".autosave.ckx";
 
     protected void Application_Start()
@@ -315,7 +315,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      string sFileLoad = sHomeDir + "save/" + sFilenameSave;
+      string sFileLoad = sHomeDir + "App_Data/save/" + sFilenameSave;
 
 #if !DEBUG
 #if _USE_BLOB
@@ -329,10 +329,9 @@ namespace CornerkickWebMvc
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
       if (!System.IO.File.Exists(sFileLoad)) {
         try {
-          as3.downloadFile(sFilenameSave, sHomeDir + "App_Data/save/");
-          sFileLoad = sHomeDir + "App_Data/save/" + sFilenameSave;
+          as3.downloadFile(sFilenameSave, sFileLoad);
         } catch {
-          MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to directory: " + sHomeDir + "App_Data/save", MvcApplication.ckcore.sErrorFile);
+          MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to: " + sFileLoad, MvcApplication.ckcore.sErrorFile);
         }
         /*
         if (Directory.Exists(sHomeDir + "save")) {
@@ -348,7 +347,8 @@ namespace CornerkickWebMvc
         */
       }
 
-      as3.downloadFile("ckLog", sHomeDir + "App_Data/");
+      // Download log
+      as3.downloadFile("ckLog", sHomeDir + "App_Data/log.zip");
 #endif
 #endif
 
@@ -358,7 +358,7 @@ namespace CornerkickWebMvc
 
 #if !DEBUG
 #if _USE_AMAZON_S3
-        if (!System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) as3.downloadFile("laststate", sHomeDir + "App_Data/");
+        if (!System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) as3.downloadFile("laststate", sHomeDir + "App_Data/laststate.txt");
 #endif
 
         if (System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) {
