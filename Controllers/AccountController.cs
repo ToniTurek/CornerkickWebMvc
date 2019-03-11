@@ -654,6 +654,13 @@ namespace CornerkickWebMvc.Controllers
 
       DebugInfo("Register");
 
+      // Set admin details
+      if (MvcApplication.ckcore.ltUser.Count == 0) {
+        model.Vorname = "Admin";
+        model.Nachname = "Admin";
+        model.Verein = "Computer";
+      }
+
       MvcApplication.ckcore.tl.writeLog("Register new user: " + model.Vorname + " " + model.Nachname + ", Team: " + model.Verein);
 
       if (ModelState.IsValid) {
