@@ -38,11 +38,11 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
       string sHomeDir = getHomeDir();
-      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "log/ck.log");
+      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "App_Data/log/ck.log");
 
       //DirectoryInfo d = new DirectoryInfo(sHomeDir + "save");
       //FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
-      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "save/.autosave.ckx");
+      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "App_Data/save/.autosave.ckx");
 
       return View(modelAdmin);
     }
