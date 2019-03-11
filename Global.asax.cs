@@ -328,8 +328,12 @@ namespace CornerkickWebMvc
 #if _USE_AMAZON_S3
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
       if (!System.IO.File.Exists(sFileLoad)) {
-        as3.downloadFile(sFilenameSave, sHomeDir);
-
+        try {
+          as3.downloadFile(sFilenameSave, sHomeDir + "App_Data/save");
+          sFileLoad = sHomeDir + "/App_Data/save/" + sFilenameSave;
+        } catch {
+          MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to directory: " + sHomeDir + "/App_Data/save", MvcApplication.ckcore.sErrorFile);
+        }
         /*
         if (Directory.Exists(sHomeDir + "save")) {
           try {
