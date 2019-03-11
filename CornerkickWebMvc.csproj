@@ -1171,8 +1171,7 @@
     <Content Include="Views\Blobs\ListBlobs.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="save\" />
+    <Folder Include="App_Data\save\" />
     <Folder Include="Views\MemberPages\" />
   </ItemGroup>
   <ItemGroup>
