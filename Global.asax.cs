@@ -90,7 +90,7 @@ namespace CornerkickWebMvc
       timerCkCalender.Enabled = true;
     }
 
-    private static void performCalendarStep()
+    private static void performCalendarStep(bool bSave = true)
     {
       if (ckcore.ltUser.Count == 0) return;
 
@@ -135,9 +135,11 @@ namespace CornerkickWebMvc
       }
 
       // Save .autosave
-      MvcApplication.ckcore.ltClubs[0].ltTrainingHist.Clear();
-      MvcApplication.ckcore.ltClubs[0].ltAccount.Clear();
-      save(timerCkCalender.Interval);
+      if (bSave) {
+        MvcApplication.ckcore.ltClubs[0].ltTrainingHist.Clear();
+        MvcApplication.ckcore.ltClubs[0].ltAccount.Clear();
+        save(timerCkCalender.Interval);
+      }
 
       if ((MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart) ||
           MvcApplication.ckcore.dtDatum.Year < 1900) &&
@@ -378,7 +380,7 @@ namespace CornerkickWebMvc
               int nSteps = (int)(fTotalMin / (iInterval / 60f));
 
               MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString() + "(now: " + DateTime.Now.ToString() + "). Performing " + nSteps.ToString() + " calendar steps");
-              for (int iS = 0; iS < nSteps; iS++) performCalendarStep();
+              for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
 
               int iGameSpeed = 0; // Calendar interval [s]
               int.TryParse(sStateFileContent[2], out iGameSpeed);
