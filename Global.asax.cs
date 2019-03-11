@@ -318,9 +318,9 @@ namespace CornerkickWebMvc
       string sFileLoad = sHomeDir + "save/" + sFilenameSave;
 
 #if !DEBUG
+#if _USE_BLOB
       string sFileZipLog = sHomeDir + "log.zip";
 
-#if _USE_BLOB
       CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
       if (!System.IO.File.Exists(sFileLoad)) bcontr.downloadBlob("blobSave", sFileLoad);
       bcontr.downloadBlob("blobLog", sFileZipLog);
@@ -330,9 +330,9 @@ namespace CornerkickWebMvc
       if (!System.IO.File.Exists(sFileLoad)) {
         try {
           as3.downloadFile(sFilenameSave, sHomeDir + "App_Data/save");
-          sFileLoad = sHomeDir + "/App_Data/save/" + sFilenameSave;
+          sFileLoad = sHomeDir + "App_Data/save/" + sFilenameSave;
         } catch {
-          MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to directory: " + sHomeDir + "/App_Data/save", MvcApplication.ckcore.sErrorFile);
+          MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to directory: " + sHomeDir + "App_Data/save", MvcApplication.ckcore.sErrorFile);
         }
         /*
         if (Directory.Exists(sHomeDir + "save")) {
@@ -348,7 +348,7 @@ namespace CornerkickWebMvc
         */
       }
 
-      as3.downloadFile("ckLog", sHomeDir);
+      as3.downloadFile("ckLog", sHomeDir + "App_Data");
 #endif
 #endif
 
@@ -358,11 +358,11 @@ namespace CornerkickWebMvc
 
 #if !DEBUG
 #if _USE_AMAZON_S3
-        if (!System.IO.File.Exists(sHomeDir + "/laststate.txt")) as3.downloadFile("laststate", sHomeDir);
+        if (!System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) as3.downloadFile("laststate", sHomeDir + "App_Data");
 #endif
 
-        if (System.IO.File.Exists(sHomeDir + "/laststate.txt")) {
-          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "/laststate.txt");
+        if (System.IO.File.Exists(sHomeDir + "App_Data/laststate.txt")) {
+          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "App_Data/laststate.txt");
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 2) {
