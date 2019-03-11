@@ -444,7 +444,7 @@ namespace CornerkickWebMvc
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #else
 
-      if (HttpContext.Current == null) return "./App_Data/";
+      if (HttpContext.Current == null) return "./App_Data";
 
 #if _DEPLOY_ON_APPHB
       return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
