@@ -138,7 +138,7 @@ namespace CornerkickWebMvc
       if (bSave) {
         MvcApplication.ckcore.ltClubs[0].ltTrainingHist.Clear();
         MvcApplication.ckcore.ltClubs[0].ltAccount.Clear();
-        save(timerCkCalender.Interval);
+        save(timerCkCalender);
       }
 
       if ((MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart) ||
@@ -174,10 +174,10 @@ namespace CornerkickWebMvc
     }
     */
 
-    internal static void save(double fCalendarInterval, bool bForce = false)
+    internal static void save(System.Timers.Timer timerCkCalender, bool bForce = false)
     {
       // Don't save if calendar to fast
-      if (fCalendarInterval < 10000 && !bForce) return;
+      if (timerCkCalender.Interval < 10000 && !bForce) return;
 
       string sHomeDir = ckcore.sHomeDir;
       if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = getHomeDir();
@@ -271,7 +271,8 @@ namespace CornerkickWebMvc
 
       // Write last ck Time to file
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sHomeDir + "/laststate.txt")) {
-        fileLastState.WriteLine((fCalendarInterval / 1000).ToString());
+        fileLastState.WriteLine((timerCkCalender.Interval / 1000).ToString());
+        fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
         fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
       }
@@ -369,11 +370,14 @@ namespace CornerkickWebMvc
           string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "laststate.txt");
 
           DateTime dtLast = new DateTime();
-          if (sStateFileContent.Length > 2) {
+          if (sStateFileContent.Length > 3) {
             int iInterval = 0; // Calendar interval [s]
             int.TryParse(sStateFileContent[0], out iInterval);
 
-            if (iInterval > 0 && DateTime.TryParse(sStateFileContent[1], out dtLast)) {
+            bool bCalendarRunning = false;
+            bool.TryParse(sStateFileContent[1], out bCalendarRunning);
+
+            if (iInterval > 0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
               Controllers.AdminController adminController = new Controllers.AdminController();
 
               adminController.setGameSpeedToAllUsers(0);
@@ -388,7 +392,7 @@ namespace CornerkickWebMvc
               }
 
               int iGameSpeed = 0; // Calendar interval [s]
-              int.TryParse(sStateFileContent[2], out iGameSpeed);
+              int.TryParse(sStateFileContent[3], out iGameSpeed);
 
               if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
             }
