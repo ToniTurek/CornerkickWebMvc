@@ -23,6 +23,8 @@ namespace CornerkickWebMvc.Models
 
     public List<SelectListItem> ltDdlVideo { get; set; }
     public byte iVideo { get; set; }
+    public byte iSnackbar { get; set; }
+    public byte iToilets { get; set; }
 
     public StadionModel()
     {

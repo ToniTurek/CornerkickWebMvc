@@ -35,6 +35,8 @@
 
       getStadion();
       getVideo();
+      getSnackbar();
+      getToilets();
 
       $('.tbSeats').each(function () {
         $(this).on('keyup', function (ev) {
@@ -54,6 +56,14 @@
 
       $("#bnBuildVideo").click(function () {
         buildVideo();
+      });
+
+      $("#bnBuildSnackbar").click(function () {
+        buildSnackbar();
+      });
+
+      $("#bnBuildToilets").click(function () {
+        buildToilets();
       });
 
       $("#bnRenewPitch").click(function () {
@@ -167,6 +177,7 @@
       });
     }
 
+    // Video-wall
     function getVideo() {
       bnBuildVideo = document.getElementById("bnBuildVideo");
       bnBuildVideo.disabled = true;
@@ -176,7 +187,7 @@
         type: 'post',
         url: '/Member/StadiumGetCostVideo',
         dataType: "json",
-        data: { iVideo: iVideo },
+        data: { iLevel: iVideo },
         success: function (sCostDaysDispo) {
           $("#bnBuildVideo").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
           if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
@@ -194,7 +205,79 @@
         type: 'post',
         url: '/Member/StadiumBuildVideo',
         dataType: "json",
-        data: { iVideo: iVideo },
+        data: { iLevel: iVideo },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    // Snackbars
+    function getSnackbar() {
+      bnBuildSnackbar = document.getElementById("bnBuildSnackbar");
+      bnBuildSnackbar.disabled = true;
+
+      var iSnackbar = $('#itSnackbar').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSnackbar',
+        dataType: "json",
+        data: { iCount: iSnackbar },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildSnackbar").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildSnackbar.disabled = true;
+          } else {
+            bnBuildSnackbar.disabled = false;
+          }
+        }
+      });
+    }
+
+    function buildSnackbar() {
+      var iSnackbar = $('#itSnackbar').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildSnackbar',
+        dataType: "json",
+        data: { iCount: iSnackbar },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    // Toilets
+    function getToilets() {
+      bnBuildToilets = document.getElementById("bnBuildToilets");
+      bnBuildToilets.disabled = true;
+
+      var iToilets = $('#itToilets').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostToilets',
+        dataType: "json",
+        data: { iCount: iToilets },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildToilets").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildToilets.disabled = true;
+          } else {
+            bnBuildToilets.disabled = false;
+          }
+        }
+      });
+    }
+
+    function buildToilets() {
+      var iToilets = $('#itToilets').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildToilets',
+        dataType: "json",
+        data: { iCount: iToilets },
         success: function (sMessage) {
           alert(sMessage);
           window.location.reload(true);
@@ -267,25 +350,25 @@
 
             var htmlAttributesEditorFor = new Dictionary<string, object>
             {
-              { "type", "number" },
-              { "class", "form-control tbSeats" },
-              { "id", "tbSeats_" + iB.ToString() },
-              //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
-              { "style", "position: relative width: 100%; text-align: right" },
-              { "autocomplete", "off" },
-              { "min", "0" }
-            };
+                          { "type", "number" },
+                          { "class", "form-control tbSeats" },
+                          { "id", "tbSeats_" + iB.ToString() },
+                          //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
+                          { "style", "position: relative width: 100%; text-align: right" },
+                          { "autocomplete", "off" },
+                          { "min", "0" }
+                        };
             if (Model.iSeatsBuild[iB] > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
 
             //@Html.EditorFor(model => model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
 
             var htmlAttributesDropDownListFor = new Dictionary<string, object>
             {
-              { "class", "form-control ddlSeatTypes" },
-              { "id", "iDdlId" + iB.ToString() },
-              { "style", "position: relative; text-align: right" },
-              { "onchange", "getStadion()" }
-            };
+                          { "class", "form-control ddlSeatTypes" },
+                          { "id", "iDdlId" + iB.ToString() },
+                          { "style", "position: relative; text-align: right" },
+                          { "onchange", "getStadion()" }
+                        };
 
             if (Model.iSeatsBuild[iB] > 0) { htmlAttributesDropDownListFor.Add("disabled", "disabled"); }
 
@@ -330,9 +413,23 @@
 </html>
 
 <legend style="position: relative; margin-top: 2%">Stadionextras</legend>
-<p><b>Anzeigetafel:</b></p>
-@Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 200px; margin-right: 2%" })
-<button type="submit" id="bnBuildVideo" class="btn btn-default" style="float: left; width: 400px">Kosten: 0</button>
+<div style="position: relative; float: left; width: 100%; height: 80px">
+  <p><b>Anzeigetafel:</b></p>
+  @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 200px; margin-right: 2%" })
+  <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 400px">Kosten: 0</button>
+</div>
+
+<div style="position: relative; float: left; width: 100%; height: 80px">
+  <p><b>Imbissbuden:</b></p>
+  <input id="itSnackbar" class="form-control" style="position: relative; float: left; width: 200px" type="tel" min="0" max="100" onkeyup="getSnackbar()">
+  <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 400px">Kosten: 0</button>
+</div>
+
+<div style="position: relative; float: left; width: 100%; height: 80px">
+  <p><b>Toiletten:</b></p>
+  <input id="itToilets" class="form-control" style="position: relative; float: left; width: 200px" type="tel" min="0" max="100" onkeyup="getToilets()">
+  <button type="submit" id="bnBuildToilets" class="btn btn-default" style="width: 400px">Kosten: 0</button>
+</div>
 
 <div style="float: left; position: relative; height: 60px"></div>
 <legend>Stadionausbau</legend>

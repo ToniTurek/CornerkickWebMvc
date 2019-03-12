@@ -2049,18 +2049,19 @@ namespace CornerkickWebMvc.Controllers
       return Json("Der Bau des Oberrings wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
 
+    // Video-wall
     [HttpPost]
-    public JsonResult StadiumGetCostVideo(byte iVideo)
+    public JsonResult StadiumGetCostVideo(byte iLevel)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      if (clb.stadium.iVideo != iVideo) {
+      if (clb.stadium.iVideo != iLevel) {
         int iDispoOk = 0;
-        if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickCore.csStadion.iVideoCost[iVideo], clb)) iDispoOk = 1;
+        if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickCore.csStadion.iVideoCost[iLevel], clb)) iDispoOk = 1;
 
-        sCostDaysDispo[0] = CornerkickCore.csStadion.iVideoCost[iVideo].ToString("#,#", AccountController.ciUser);
-        sCostDaysDispo[1] = CornerkickCore.csStadion.iVideoDaysConstruct[iVideo].ToString();
+        sCostDaysDispo[0] = CornerkickCore.csStadion.iVideoCost[iLevel].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[1] = CornerkickCore.csStadion.iVideoDaysConstruct[iLevel].ToString();
         sCostDaysDispo[2] = iDispoOk.ToString();
       }
 
@@ -2068,16 +2069,86 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult StadiumBuildVideo(byte iVideo)
+    public JsonResult StadiumBuildVideo(byte iLevel)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      CornerkickGame.Stadium stadion = clb.stadium;
-      stadion.iVideo = iVideo;
+      CornerkickGame.Stadium stadion = clb.stadium.Clone();
+      stadion.iVideoNew = iLevel;
 
       MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
 
       return Json("Der Bau der Anzeigentafel wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
+    }
+
+    // Snackbars
+    [HttpPost]
+    public JsonResult StadiumGetCostSnackbar(byte iCount)
+    {
+      string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
+
+      CornerkickCore.Core.User usr = AccountController.ckUser();
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if (clb.stadium.iSnackbar != iCount) {
+        int iDispoOk = 0;
+        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(iCount, clb.stadium.iSnackbar, usr);
+        if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
+
+        sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[1] = iCostDays[1].ToString();
+        sCostDaysDispo[2] = iDispoOk.ToString();
+      }
+
+      return Json(sCostDaysDispo, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult StadiumBuildSnackbar(byte iCount)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      CornerkickGame.Stadium stadion = clb.stadium.Clone();
+      stadion.iSnackbarNew = iCount;
+
+      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+
+      return Json("Der Ausbau der Imbissbuden wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
+    }
+
+    // Toilets
+    [HttpPost]
+    public JsonResult StadiumGetCostToilets(byte iCount)
+    {
+      string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
+
+      CornerkickCore.Core.User usr = AccountController.ckUser();
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      if (clb.stadium.iToilets != iCount) {
+        int iDispoOk = 0;
+        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(iCount, clb.stadium.iToilets, usr);
+        if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
+
+        sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[1] = iCostDays[1].ToString();
+        sCostDaysDispo[2] = iDispoOk.ToString();
+      }
+
+      return Json(sCostDaysDispo, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult StadiumBuildToilets(byte iCount)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      CornerkickGame.Stadium stadion = clb.stadium.Clone();
+      stadion.iToiletsNew = iCount;
+
+      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+
+      return Json("Der Ausbau der Toiletten wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
 
     internal CornerkickGame.Stadium convertToStadion(int[] iSeats, int[] iSeatType, int[] iSeatsBuild)
