@@ -2012,7 +2012,7 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      CornerkickGame.Stadium stadion = clb.stadium;
+      CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.bTopring = !clb.stadium.bTopring;
 
       int[] iKostenDauer = MvcApplication.ckcore.st.getCostDaysContructStadium(stadion, clb.stadium, AccountController.ckUser());
@@ -2041,7 +2041,7 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      CornerkickGame.Stadium stadion = clb.stadium;
+      CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.bTopring = !clb.stadium.bTopring;
 
       MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
