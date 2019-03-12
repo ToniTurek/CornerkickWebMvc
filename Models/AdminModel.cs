@@ -31,7 +31,7 @@ namespace CornerkickWebMvc.Models
     {
       ddlAutosaveFiles = new List<SelectListItem>();
 
-      DirectoryInfo d = new DirectoryInfo(MvcApplication.getHomeDir() + "App_Data/save");
+      DirectoryInfo d = new DirectoryInfo(MvcApplication.getHomeDir() + "/App_Data/save");
       if (d.Exists) {
         FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
         int i = 0;
