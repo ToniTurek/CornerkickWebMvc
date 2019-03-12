@@ -206,6 +206,17 @@
           <td style="width:20%" align="right">@Model.budgetReal.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
         </tr>
         <tr>
+          <td align="right">Prämien</td>
+          @{
+            if (Model.bEditable) {
+              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInBonusCup, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+            } else {
+              <td style="width:20%" align="right">@Model.budgetPlan.iInBonusCup.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
+            }
+          }
+          <td style="width:20%" align="right">@Model.budgetReal.iInBonusCup.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
+        </tr>
+        <tr>
           <td align="right">Sponsoren</td>
           @{
             if (Model.bEditable) {
@@ -236,7 +247,7 @@
     </table>
   </div>
 
-  <div style="position: relative; float: left; width: 49%; min-width: 400px; border: 0px solid blue">
+  <div style="position: relative; float: left; width: 49%; min-width: 400px">
     <table id="tableBudgetPay" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
       <thead>
         <tr>

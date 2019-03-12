@@ -2758,8 +2758,9 @@ namespace CornerkickWebMvc.Controllers
 
       if (iBudgetIn  != null) {
         user.budget.iInSpec         = iBudgetIn[0];
-        user.budget.iInBonusSponsor = iBudgetIn[1];
-        user.budget.iInTransfer     = iBudgetIn[2];
+        user.budget.iInBonusCup     = iBudgetIn[1];
+        user.budget.iInBonusSponsor = iBudgetIn[2];
+        user.budget.iInTransfer     = iBudgetIn[3];
       }
 
       if (iBudgetPay != null) {
