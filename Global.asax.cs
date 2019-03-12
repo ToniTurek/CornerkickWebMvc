@@ -276,6 +276,7 @@ namespace CornerkickWebMvc
         fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
         fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
+        fileLastState.Close();
       }
 
 #if _USE_AMAZON_S3
