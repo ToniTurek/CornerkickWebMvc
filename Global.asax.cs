@@ -320,7 +320,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      string sFileLoad = sHomeDir + "save/" + sFilenameSave;
+      string sFileLoad = Path.Combine(sHomeDir, "save", sFilenameSave);
 
 #if !DEBUG
 #if _USE_BLOB
@@ -353,7 +353,7 @@ namespace CornerkickWebMvc
       }
 
       // Download log
-      as3.downloadFile("ckLog", sHomeDir + "log.zip");
+      as3.downloadFile("ckLog", sHomeDir + "/log.zip");
 #endif
 #endif
 
@@ -361,13 +361,14 @@ namespace CornerkickWebMvc
       if (MvcApplication.ckcore.io.load(sFileLoad)) {
         MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
 
+        string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
 #if _USE_AMAZON_S3
-        if (!System.IO.File.Exists(sHomeDir + "laststate.txt")) as3.downloadFile("laststate", sHomeDir + "laststate.txt");
+        if (!System.IO.File.Exists(sFileLastState)) as3.downloadFile("laststate", sFileLastState);
 #endif
 
-        if (System.IO.File.Exists(sHomeDir + "laststate.txt")) {
-          string[] sStateFileContent = System.IO.File.ReadAllLines(sHomeDir + "laststate.txt");
+        if (System.IO.File.Exists(sFileLastState)) {
+          string[] sStateFileContent = System.IO.File.ReadAllLines(sFileLastState);
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
