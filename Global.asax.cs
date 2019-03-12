@@ -208,8 +208,8 @@ namespace CornerkickWebMvc
 #endif
 
       string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
-      string sFileSave2 = sHomeDir + "/save/" + sFilenameSave2;
-      MvcApplication.ckcore.tl.writeLog("save: filename: " + sFileSave2);
+      string sFileSave2 = Path.Combine(sHomeDir, "save", sFilenameSave2);
+      MvcApplication.ckcore.tl.writeLog("save file: " + sFileSave2);
 
       try {
         MvcApplication.ckcore.io.save(sFileSave2);
@@ -269,8 +269,9 @@ namespace CornerkickWebMvc
       }
       */
 
-      // Write last ck Time to file
-      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sHomeDir + "/laststate.txt")) {
+      // Write last ck state to file
+      string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
+      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
         fileLastState.WriteLine((timerCkCalender.Interval / 1000).ToString());
         fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
         fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
@@ -278,7 +279,7 @@ namespace CornerkickWebMvc
       }
 
 #if _USE_AMAZON_S3
-      as3.uploadFile(sHomeDir + "/laststate.txt", "laststate");
+      as3.uploadFile(sFileLastState, "laststate");
 #endif
 
       // save log dir
