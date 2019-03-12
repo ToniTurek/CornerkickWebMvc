@@ -2206,8 +2206,8 @@ namespace CornerkickWebMvc.Controllers
 
       mdStadionSurr.iTrainingsgel  = clb.iTrainingsgel  [0];
       mdStadionSurr.iJouthInternat = clb.iJugendinternat[0];
-      mdStadionSurr.iParkp         = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
-      mdStadionSurr.iParkpNeu      = clb.stadium.iCarparkNew;
+      mdStadionSurr.iCarpark       = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
+      mdStadionSurr.iCarparkNew    = clb.stadium.iCarparkNew;
 
       return View(mdStadionSurr);
     }

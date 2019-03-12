@@ -16,9 +16,10 @@ namespace CornerkickWebMvc.Models
 
     public int iVereinsheim { get; set; }
     public int iVereinsmuseum { get; set; }
-    public int iParkp { get; set; }
-    public int iParkpNeu { get; set; }
-    public int iTicketschalter { get; set; }
+    public int iCarpark { get; set; }
+    public int iCarparkNew { get; set; }
+    public int iCounter { get; set; }
+    public int iCounterNew { get; set; }
 
     public StadiumSurroundingsModel()
     {

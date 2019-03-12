@@ -369,6 +369,8 @@ namespace CornerkickWebMvc
 #endif
 
         if (System.IO.File.Exists(sFileLastState)) {
+          MvcApplication.ckcore.tl.writeLog("Reading laststate from file: " + sFileLastState);
+
           string[] sStateFileContent = System.IO.File.ReadAllLines(sFileLastState);
 
           DateTime dtLast = new DateTime();
@@ -399,6 +401,8 @@ namespace CornerkickWebMvc
               if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
             }
           }
+        } else {
+          MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
 #endif
 

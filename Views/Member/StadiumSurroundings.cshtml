@@ -204,21 +204,41 @@
     @{ 
       var htmlAttributesEditorFor = new Dictionary<string, object>
       {
-                              { "type", "number" },
-                              { "class", "form-control tbSeats" },
-                              { "id", "tbParkp" },
-                              { "style", "position: relative width: 100%; text-align: right" },
-                              { "autocomplete", "off" },
-                              { "min", "0" }
-                            };
-      if (Model.iParkpNeu > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
+        { "type", "number" },
+        { "class", "form-control" },
+        { "id", "tbParkp" },
+        { "style", "position: relative width: 100%; text-align: right" },
+        { "autocomplete", "off" },
+        { "min", "0" }
+      };
+      if (Model.iCarparkNew > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
     }
     <div style="position: relative; width: 100%; margin-top: 4%">
       <p><b>Parkplätze:</b></p>
       <text id="txtPark"></text>
       <p id="txtParkNew"></p>
-      @Html.EditorFor(Model => Model.iParkp, new { htmlAttributes = htmlAttributesEditorFor })
+      @Html.EditorFor(Model => Model.iCarpark, new { htmlAttributes = htmlAttributesEditorFor })
       <button type="submit" id="bnBuildPark" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+    </div>
+
+    @{ 
+      var htmlAttributesEditorForCounter = new Dictionary<string, object>
+      {
+        { "type", "number" },
+        { "class", "form-control" },
+        { "id", "tbCounter" },
+        { "style", "position: relative width: 100%; text-align: right" },
+        { "autocomplete", "off" },
+        { "min", "0" }
+      };
+      if (Model.iCounterNew > 0) { htmlAttributesEditorForCounter.Add("readonly", "readonly"); }
+    }
+    <div style="position: relative; width: 100%; margin-top: 4%">
+      <p><b>Ticketschalter:</b></p>
+      <text id="txtCounter"></text>
+      <p id="txtCounterNew"></p>
+      @Html.EditorFor(Model => Model.iCounter, new { htmlAttributes = htmlAttributesEditorForCounter })
+      <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 100%">Kosten: 0</button>
     </div>
   </div>
 </body>
