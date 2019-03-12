@@ -63,8 +63,13 @@
           }
 
           $("#txtPark").text("Aktuell: " + sCurrent[2][0]);
-         if (sCurrent[2][2] != "0") {
+          if (sCurrent[2][2] != "0") {
             $("#txtParkNew").text("Ausbau zu: " + sCurrent[2][1] + " (" + sCurrent[2][2] + " d)");
+          }
+
+          $("#txtCounter").text("Aktuell: " + sCurrent[3][0]);
+          if (sCurrent[3][2] != "0") {
+            $("txtCounterNew").text("Ausbau zu: " + sCurrent[3][1] + " (" + sCurrent[3][2] + " d)");
           }
         }
       });

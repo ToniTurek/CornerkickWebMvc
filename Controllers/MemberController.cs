@@ -2217,17 +2217,20 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      return Json(new string[3][] {
+      return Json(new string[4][] {
         new string [3] { MvcApplication.ckcore.sTrainingsgel [clb.iTrainingsgel  [0]], MvcApplication.ckcore.sTrainingsgel [clb.iTrainingsgel  [1]], clb.iTrainingsgel  [2].ToString() },
         new string [3] { MvcApplication.ckcore.sJouthInternat[clb.iJugendinternat[0]], MvcApplication.ckcore.sJouthInternat[clb.iJugendinternat[1]], clb.iJugendinternat[2].ToString() },
-        new string [3] { clb.stadium.iCarpark.ToString(), clb.stadium.iCarparkNew.ToString(), clb.stadium.iCarparkDaysConstruct.ToString() }
+        new string [3] { clb.stadium.iCarpark      .ToString(), clb.stadium.iCarparkNew      .ToString(), clb.stadium.iCarparkDaysConstruct      .ToString() },
+        new string [3] { clb.stadium.iTicketcounter.ToString(), clb.stadium.iTicketcounterNew.ToString(), clb.stadium.iTicketcounterDaysConstruct.ToString() }
       }, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
     public JsonResult StadiumGetCostSurr(int i, byte iType)
     {
-      string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
+      string[] sCostDaysDispo = new string[4] { "0", "0", "0", "0" };
+
+      CornerkickCore.Core.User usr = AccountController.ckUser();
       CornerkickCore.Core.Club clb = AccountController.ckClub();
 
       if (iType == 0) {
@@ -2251,13 +2254,23 @@ namespace CornerkickWebMvc.Controllers
       } else if (iType == 2) {
         if (clb.stadium.iCarparkNew != i) {
           int iDispoOk = 0;
-          int iParkDiff = Math.Abs(clb.stadium.iCarpark - i);
-          int iCost = iParkDiff * 2500;
-          int iDays = (int)(iParkDiff * 0.25);
-          if (MvcApplication.ckcore.fz.checkDispoLimit(iCost, clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = iCost.ToString("#,#", AccountController.ciUser);
-          sCostDaysDispo[1] = iDays.ToString();
+          int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructCarpark(i, clb.stadium.iCarpark, usr);
+          if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
+
+          sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+          sCostDaysDispo[1] = iCostDays[1].ToString();
+          sCostDaysDispo[2] = iDispoOk.ToString();
+        }
+      } else if (iType == 3) {
+        if (clb.stadium.iTicketcounterNew != i) {
+          int iDispoOk = 0;
+
+          int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(i, clb.stadium.iTicketcounter, usr);
+          if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
+
+          sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+          sCostDaysDispo[1] = iCostDays[1].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
       }
