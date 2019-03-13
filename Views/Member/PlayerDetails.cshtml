@@ -284,7 +284,7 @@
       </tr>
       <tr>
         <td align="right">Geburtsdatum:</td>
-        <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) (@player.getAge(MvcApplication.ckcore.dtDatum))</td>
+        <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
       </tr>
       <tr>
         <td align="right">Körpergröße/-gewicht:</td>
@@ -372,7 +372,7 @@
   }
 
   if (bOwnPlayer) {
-    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 1%">
+    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 2%">
       @* Extend player contract *@
       <button type="submit" id="bnContract" class="btn btn-default" style="width: 30%; min-width: 300px">@sExtendContract</button>
 
@@ -396,8 +396,8 @@
   }
 }
 
-<div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 1%">
-  <div style="position: relative; width: auto; height: auto; float: left; margin-right: 2%">
+<div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 2%">
+  <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
     <table border="1" cellpadding="4" style="width: auto">
       <thead>
         <tr>
@@ -431,7 +431,7 @@
     </table>
   </div>
 
-  <div style="position: relative; width: auto; height: auto; float: left; margin-right: 2%">
+  <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
     <table border="1" cellpadding="4" style="width: auto">
       <thead>
         <tr>
