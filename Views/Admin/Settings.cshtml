@@ -39,35 +39,39 @@
       data: { sDir: sDir },
       success: function (sContent) {
         document.getElementById('itCurDir').value = sDir;
-        document.getElementById('taFileExplorer').value = sContent;
+
+        $("#divFileExplorer").html(setFileExplorerTable(sContent)).show();
       }
     });
   }
+
+
+  function setFileExplorerTable(sContent) {
+    var sBox = '';
+    sBox += '<table id="tableFileExplorer" style="width: 100%; background-color: black; color: white">';
+
+    sNsplit = sContent.split('\n');
+    for (var i = 0; i < sNsplit.length; i++) {
+      sN = sNsplit[i];
+
+      sN = sN.replace("<", "&lt;");
+      sN = sN.replace(">", "&gt;");
+
+      sBox += '<tr>';
+      sBox += '<td>' + sN + '</td>';
+      sBox += '</tr>';
+    }
+
+    sBox += '</table>';
+
+    return sBox;
+  }
+
 </script>
 
 <h2>Settings</h2>
 @{
   string sDtNow = DateTime.Now.ToString();
-}
-
-@using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
-  @Html.TextBoxFor(m => m.fCalendarInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 30%" })
-  @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 30%" })
-  @Html.TextBoxFor(m => m.iGameSpeed, new { autocomplete = "off", style = "width: 30%" })
-
-  <button type="submit">Start</button>
-}
-
-<button type="submit" id="bnSetWeeks1" style="position: relative">1 Day -> 1 Week</button>
-<button type="submit" id="bnSetWeeks2" style="position: relative">1 Day -> 2 Weeks</button>
-
-@using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
-  <button type="submit">Stop</button>
-}
-
-<text>System time: @sDtNow<br></text>
-
-@{
   bool bCk = true;
   bool bTimer = false;
   string sInterval = "";
@@ -79,6 +83,27 @@
     sHour = Model.sStartHour;
   }
 }
+
+<div style="position: relative; width: 50%; min-width: 300px; margin-bottom: 10px">
+  @using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
+    @Html.TextBoxFor(m => m.fCalendarInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 33%" })
+    @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 33%" })
+    @Html.TextBoxFor(m => m.iGameSpeed, new { autocomplete = "off", style = "width: 33%" })
+
+    <p></p>
+    if (bTimer) {
+      <button type="submit" class="btn btn-default" style="position: relative; width: 200px">Stop</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: relative; width: 200px">Start</button>
+    }
+  }
+</div>
+
+<button type="submit" id="bnSetWeeks1" class="btn btn-default" style="position: relative; width: 200px">1 Day -> 1 Week</button>
+<button type="submit" id="bnSetWeeks2" class="btn btn-default" style="position: relative; width: 200px">1 Day -> 2 Weeks</button>
+
+<p></p>
+<text>System time: @sDtNow<br></text>
 <text>running: @bCk.ToString()<br></text>
 <text>timer: @bTimer.ToString()<br></text>
 <text>interval: @sInterval<br></text>
@@ -88,26 +113,26 @@
 <text>No. of Player: @Model.nPlayer<br></text>
 
 @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {
-  <button type="submit">Restart Cornerkick</button>
+  <button type="submit" class="btn btn-default">Restart Cornerkick</button>
 }
 
 @using (Html.BeginForm("DeleteLog", "Admin", FormMethod.Post)) {
   if (Model.bLogExist) {
-    <button type="submit">delete Log</button>
+    <button type="submit" class="btn btn-default">delete Log</button>
   } else {
-    <button type="submit" disabled>delete Log</button>
+    <button type="submit" class="btn btn-default" disabled>delete Log</button>
   }
 }
 
 @using (Html.BeginForm("SaveAutosave", "Admin", FormMethod.Post)) {
-  <button type="submit">save autosave</button>
+  <button type="submit" class="btn btn-default">save autosave</button>
 }
 
 @using (Html.BeginForm("DeleteAutosave", "Admin", FormMethod.Post)) {
   if (Model.bAutosaveExist) {
-    <button type="submit">delete autosave</button>
+    <button type="submit" class="btn btn-default">delete autosave</button>
   } else {
-    <button type="submit" disabled>delete autosave</button>
+    <button type="submit" class="btn btn-default" disabled>delete autosave</button>
   }
 }
 
@@ -116,9 +141,9 @@
   @Html.DropDownListFor(m => m.sSelectedAutosaveFile, Model.ddlAutosaveFiles, new { @class = "form-control" })
 
   if (Model.bAutosaveExist) {
-    <button type="submit">load autosave</button>
+    <button type="submit" class="btn btn-default">load autosave</button>
   } else {
-    <button type="submit" disabled>load autosave</button>
+    <button type="submit" class="btn btn-default" disabled>load autosave</button>
   }
 }
 
@@ -130,6 +155,7 @@
 <text id="txtCurDir">Current Dir: </text>
 <input id="itCurDir" style="width: 30%" type="text" readonly>
 
-<textarea name="taFileExplorer" id="taFileExplorer" style="width: 100%; max-width: 100%; background-color: black; color: white" rows="30" cols="1000" readonly></textarea>
+<p></p>
 <input id="itCd" style="width: 30%" type="text" autocomplete="off">
-<button id="bnCd" type="submit" onclick="changeDir();">Change Dir</button>
+<button id="bnCd" type="submit" class="btn btn-default" onclick="changeDir();">Change Dir</button>
+<div id="divFileExplorer"></div>
