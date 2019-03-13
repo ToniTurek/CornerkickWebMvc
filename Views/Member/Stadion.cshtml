@@ -413,21 +413,21 @@
 </html>
 
 <legend style="position: relative; margin-top: 2%">Stadionextras</legend>
-<div style="position: relative; float: left; width: 100%; height: 80px">
+<div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 2%">
   <p><b>Anzeigetafel:</b></p>
   @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 200px; margin-right: 2%" })
   <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 400px">Kosten: 0</button>
 </div>
 
-<div style="position: relative; float: left; width: 100%; height: 80px">
+<div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 2%">
   <p><b>Imbissbuden:</b></p>
-  <input id="itSnackbar" class="form-control" style="position: relative; float: left; width: 200px" type="tel" min="0" max="100" onkeyup="getSnackbar()">
+  <input id="itSnackbar" class="form-control" style="position: relative; float: left; width: 200px; margin-right: 24px" type="tel" min="0" max="100" onkeyup="getSnackbar()">
   <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 400px">Kosten: 0</button>
 </div>
 
-<div style="position: relative; float: left; width: 100%; height: 80px">
+<div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 2%">
   <p><b>Toiletten:</b></p>
-  <input id="itToilets" class="form-control" style="position: relative; float: left; width: 200px" type="tel" min="0" max="100" onkeyup="getToilets()">
+  <input id="itToilets" class="form-control" style="position: relative; float: left; width: 200px; margin-right: 24px" type="tel" min="0" max="100" onkeyup="getToilets()">
   <button type="submit" id="bnBuildToilets" class="btn btn-default" style="width: 400px">Kosten: 0</button>
 </div>
 
