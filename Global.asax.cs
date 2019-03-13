@@ -382,6 +382,7 @@ namespace CornerkickWebMvc
 
             NumberStyles style = NumberStyles.Number | NumberStyles.AllowDecimalPoint;
             fInterval = double.Parse(sStateFileContent[0], style, CultureInfo.InvariantCulture);
+            MvcApplication.ckcore.tl.writeLog(Convert.ToDouble(sStateFileContent[0]).ToString());
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
