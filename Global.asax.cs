@@ -272,7 +272,7 @@ namespace CornerkickWebMvc
       // Write last ck state to file
       string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
-        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString());
+        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", System.Globalization.CultureInfo.InvariantCulture));
         fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
         fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
@@ -376,6 +376,7 @@ namespace CornerkickWebMvc
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
+            sStateFileContent[0].Replace(',', '.');
             double fInterval = 0; // Calendar interval [s]
             double.TryParse(sStateFileContent[0], out fInterval);
 
@@ -408,10 +409,6 @@ namespace CornerkickWebMvc
         } else {
           MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
-#endif
-
-#if !DEBUG
-        if (!MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart)) timerCkCalender.Enabled = true;
 #endif
       } else {
         MvcApplication.ckcore.calcSpieltage();
