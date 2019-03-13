@@ -377,7 +377,7 @@ namespace CornerkickWebMvc
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
             sStateFileContent[0].Replace(',', '.');
-            double fInterval = 0; // Calendar interval [s]
+            double fInterval = 0.0; // Calendar interval [s]
             double.TryParse(sStateFileContent[0], out fInterval);
 
             bool bCalendarRunning = false;
@@ -405,7 +405,7 @@ namespace CornerkickWebMvc
               timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
               //timerCkCalender.Enabled  = bCalendarRunning;
 
-              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " (" + sStateFileContent[0] + ")");
+              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " / " + fInterval.ToString() + " (" + sStateFileContent[0] + ")");
             }
           }
         } else {
