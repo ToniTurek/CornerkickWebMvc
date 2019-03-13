@@ -405,7 +405,7 @@ namespace CornerkickWebMvc
               timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
               //timerCkCalender.Enabled  = bCalendarRunning;
 
-              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString());
+              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " (" + sStateFileContent[0] + ")");
             }
           }
         } else {
