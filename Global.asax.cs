@@ -417,6 +417,13 @@ namespace CornerkickWebMvc
         MvcApplication.ckcore.calcSpieltage();
         MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSaisonstart;
       }
+
+#if !DEBUG
+#if _USE_AMAZON_S3
+      // Download emblems
+      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
+#endif
+#endif
     }
 
 #if _USE_BLOB
