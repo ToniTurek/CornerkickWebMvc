@@ -89,6 +89,7 @@ namespace CornerkickWebMvc
           fileTransferUtility.Download(sTargetPath, sBucketName, sKey);
         } catch (AmazonS3Exception s3Exception) {
           MvcApplication.ckcore.tl.writeLog(s3Exception.Message);
+          return;
         }
         MvcApplication.ckcore.tl.writeLog(String.Format("Succesfully downloaded file: {0} from bucket: {1} to location: {2}", sKey, sBucketName, sTargetPath));
       } catch (AmazonS3Exception s3Exception) {
