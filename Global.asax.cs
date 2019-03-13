@@ -272,7 +272,7 @@ namespace CornerkickWebMvc
       // Write last ck state to file
       string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
-        fileLastState.WriteLine((timerCkCalender.Interval / 1000).ToString());
+        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString());
         fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
         fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
@@ -376,19 +376,19 @@ namespace CornerkickWebMvc
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
-            int iInterval = 0; // Calendar interval [s]
-            int.TryParse(sStateFileContent[0], out iInterval);
+            double fInterval = 0; // Calendar interval [s]
+            double.TryParse(sStateFileContent[0], out fInterval);
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
 
-            if (iInterval > 0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
+            if (fInterval > 0.0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
               Controllers.AdminController adminController = new Controllers.AdminController();
 
               adminController.setGameSpeedToAllUsers(0);
 
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
-              int nSteps = (int)(fTotalMin / (iInterval / 60f));
+              int nSteps = (int)(fTotalMin / (fInterval / 60f));
 
               MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + ")");
               if (nSteps > 0) {
@@ -400,6 +400,9 @@ namespace CornerkickWebMvc
               int.TryParse(sStateFileContent[3], out iGameSpeed);
 
               if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
+
+              timerCkCalender.Interval = fInterval * 1000;
+              timerCkCalender.Enabled  = bCalendarRunning;
             }
           }
         } else {
