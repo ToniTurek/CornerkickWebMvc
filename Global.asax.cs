@@ -377,11 +377,11 @@ namespace CornerkickWebMvc
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
-            sStateFileContent[0].Replace(',', '.');
+            //sStateFileContent[0].Replace(',', '.');
             double fInterval = 0.0; // Calendar interval [s]
 
-            NumberStyles style = NumberStyles.AllowDecimalPoint;
-            double.TryParse(sStateFileContent[0], style, CultureInfo.InvariantCulture, out fInterval);
+            NumberStyles style = NumberStyles.Number | NumberStyles.AllowDecimalPoint;
+            fInterval = double.Parse(sStateFileContent[0], style, CultureInfo.InvariantCulture);
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
