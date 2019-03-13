@@ -377,12 +377,10 @@ namespace CornerkickWebMvc
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
-            //sStateFileContent[0].Replace(',', '.');
             double fInterval = 0.0; // Calendar interval [s]
 
             NumberStyles style = NumberStyles.Number | NumberStyles.AllowDecimalPoint;
             fInterval = double.Parse(sStateFileContent[0], style, CultureInfo.InvariantCulture);
-            MvcApplication.ckcore.tl.writeLog(Convert.ToDouble(sStateFileContent[0]).ToString());
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
@@ -409,7 +407,7 @@ namespace CornerkickWebMvc
               timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
               //timerCkCalender.Enabled  = bCalendarRunning;
 
-              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " / " + fInterval.ToString() + " (" + sStateFileContent[0] + ")");
+              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
             }
           }
         } else {
