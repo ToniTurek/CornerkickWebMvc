@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -272,9 +273,9 @@ namespace CornerkickWebMvc
       // Write last ck state to file
       string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
       using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
-        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", System.Globalization.CultureInfo.InvariantCulture));
+        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", CultureInfo.InvariantCulture));
         fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
-        fileLastState.WriteLine(DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
+        fileLastState.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
         fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
         fileLastState.Close();
       }
@@ -378,7 +379,9 @@ namespace CornerkickWebMvc
           if (sStateFileContent.Length > 3) {
             sStateFileContent[0].Replace(',', '.');
             double fInterval = 0.0; // Calendar interval [s]
-            double.TryParse(sStateFileContent[0], out fInterval);
+
+            NumberStyles style = NumberStyles.AllowDecimalPoint;
+            double.TryParse(sStateFileContent[0], style, CultureInfo.InvariantCulture, out fInterval);
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
@@ -391,7 +394,7 @@ namespace CornerkickWebMvc
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (fInterval / 60f));
 
-              MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + ")");
+              MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
               if (nSteps > 0) {
                 MvcApplication.ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
                 for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
