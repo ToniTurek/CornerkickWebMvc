@@ -204,8 +204,8 @@
   <p></p>
   <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
   <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
-  <p>@Model.sStrength</p>
-  <p>@Model.sKFM</p>
+  <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
+  <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
 
   <h3>Letzte Spiele</h3>
 
@@ -257,16 +257,16 @@
               legendText: "Pokal",
               dataPoints: dataLastGames[1]
             }/*,
-                                        {
-                                          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-                                          type: "line",
-                                          lineColor: "white",
-                                          lineThickness: 0,
-                                          showInLegend: true,
-                                          markerSize: 20,
-                                          legendText: "Testspiel",
-                                          dataPoints: dataLastGames[2]
-                                        }*/
+                {
+                  // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                  type: "line",
+                  lineColor: "white",
+                  lineThickness: 0,
+                  showInLegend: true,
+                  markerSize: 20,
+                  legendText: "Testspiel",
+                  dataPoints: dataLastGames[2]
+                }*/
           ]
         });
 
