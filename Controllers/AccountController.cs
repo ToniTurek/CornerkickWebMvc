@@ -232,10 +232,10 @@ namespace CornerkickWebMvc.Controllers
     private CornerkickCore.Core.Club createClub(ApplicationUser applicationUser, int iLand, byte iLiga)
     {
       CornerkickCore.Core.Club clb = MvcApplication.ckcore.ini.newClub();
+
       clb.sName = applicationUser.Vereinsname;
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
       clb.iId = MvcApplication.ckcore.ltClubs.Count;
-      clb.stadium.sName = clb.sName +  " Stadion";
 
       clb.iLand = iLand;
       clb.iDivision = iLiga;
@@ -259,6 +259,10 @@ namespace CornerkickWebMvc.Controllers
       for (byte iB = 3; iB < 8; iB++) clb.stadium.blocks[iB].iSeats = 1000;
 
       clb.ltSponsorOffers.Add(createDefaultSponsor());
+
+      // Stadium
+      clb.stadium.sName = clb.sName +  " Stadion";
+      clb.stadium.iTicketcounter = 1;
 
       clb.iAdmissionPrice[0] =  10;
       clb.iAdmissionPrice[1] =  30;
