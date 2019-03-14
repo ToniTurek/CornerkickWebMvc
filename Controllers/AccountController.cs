@@ -75,13 +75,11 @@ namespace CornerkickWebMvc.Controllers
     {
       if (appUser != null) {
         foreach (CornerkickCore.Core.User usr in MvcApplication.ckcore.ltUser) {
-          if (usr.id.Equals(appUser.Id)) {
-            return usr;
-          }
+          if (usr.id.Equals(appUser.Id)) return usr;
         }
       }
 
-      return new CornerkickCore.Core.User();
+      return null;
     }
 
     public static int getiUser(CornerkickCore.Core.User usr)
@@ -106,11 +104,13 @@ namespace CornerkickWebMvc.Controllers
     public static CornerkickCore.Core.Club ckClub()
     {
       CornerkickCore.Core.User usr = ckUser();
-      if (usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+      if (usr == null) return null;
+
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
         return MvcApplication.ckcore.ltClubs[usr.iTeam];
       }
 
-      return new CornerkickCore.Core.Club();
+      return null;
     }
 
 #if DEBUG
