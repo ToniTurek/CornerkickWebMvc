@@ -405,7 +405,7 @@ namespace CornerkickWebMvc
               if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
 
               timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
-              //timerCkCalender.Enabled  = bCalendarRunning;
+              timerCkCalender.Enabled  = bCalendarRunning;
 
               MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
             }
