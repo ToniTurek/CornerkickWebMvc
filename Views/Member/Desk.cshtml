@@ -87,125 +87,126 @@
 
 <body>
   @{
+    int nPl = 0;
     CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
 
-    int nPl = 0;
-    if (clb.ltPlayerId != null) {
-      for (int iPl = 0; iPl < clb.ltPlayerId.Count; iPl++, nPl++) {
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
-        string sId = "idPlayerNames" + iPl.ToString();
-        <div id="@sId" data-name="@pl.sName,@clb.ltPlayerId[iPl]"></div>
-      }
-    }
-    if (clb.ltJugendspielerID != null) {
-      for (int iPl = 0; iPl < clb.ltJugendspielerID.Count; iPl++, nPl++) {
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltJugendspielerID[iPl]];
-        string sId = "idPlayerNames" + (iPl + clb.ltPlayerId.Count).ToString();
-        <div id="@sId" data-name="@pl.sName,@clb.ltJugendspielerID[iPl]"></div>
-      }
-    }
-
-    <div id="idPlayerCount" data-name="@nPl"></div>
-
-    @*
-      if (CornerkickWebMvc.Controllers.MemberController.countNewMails() > 0) {
-        <div style="position: relative; width: 100%; text-align: center">
-          @Html.ActionLink("Sie haben neue Nachrichten", "Mail", "Member", null)
-        </div>
-      }
-    *@
-
-    bool bTraining = false;
-    if (clb.training.iTraining != null) {
-      foreach (byte iT in clb.training.iTraining) {
-        if (iT > 0) {
-          bTraining = true;
-          break;
+    if (clb != null) {
+      if (clb.ltPlayerId != null) {
+        for (int iPl = 0; iPl < clb.ltPlayerId.Count; iPl++, nPl++) {
+          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
+          string sId = "idPlayerNames" + iPl.ToString();
+          <div id="@sId" data-name="@pl.sName,@clb.ltPlayerId[iPl]"></div>
         }
       }
-    }
-
-    if (!bTraining) {
-      <div style="position: relative; width: 100%; text-align: center">
-        @Html.ActionLink("ACHTUNG: Sie haben für die nächste Woche noch kein Training eingestellt!", "Training", "Member", null, new { @style = "color:red" })
-      </div>
-    }
-
-    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date)) {
-      if (clb.personal.iTrainerCo == 0 &&
-          clb.personal.iTrainerKondi == 0 &&
-          clb.personal.iMasseur == 0 &&
-          clb.personal.iTrainerMental == 0 &&
-          clb.personal.iArzt == 0 &&
-          clb.personal.iJugendScouting == 0 &&
-          clb.personal.iJugendTrainer == 0) {
-        <div style="position: relative; width: 100%; text-align: center">
-          @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
-        </div>
-      }
-
-      if (CornerkickWebMvc.Controllers.AccountController.ckUser().budget.iInSpec == 0) {
-        <div style="position: relative; width: 100%; text-align: center">
-          @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
-        </div>
-      }
-    }
-
-    if (clb != null && clb.iCaptainId != null) {
-      if (clb.iCaptainId[0] < 0) {
-        <div style="position: relative; width: 100%; text-align: center">
-          @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
-        </div>
-      }
-    }
-  }
-  @*
-    <h2>Schreibtisch</h2>
-  *@
-
-  <h3>Nächstes Spiel</h3>
-  @{
-    string sDt = "?";
-    CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
-    if (club.nextGame != null) {
-      if (club.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
-        sDt = "Heute";
-      } else {
-        sDt = club.nextGame.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + " (" + (club.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
-      }
-
-      sDt += " - ";
-
-      if (club.nextGame.iGameType == 99) {
-        sDt += "Saisonende";
-      } else {
-        sDt += club.nextGame.team[0].sTeam + " vs. " + club.nextGame.team[1].sTeam;
-        if (club.nextGame.iGameType == 1) {
-          sDt += " (Liga)";
-        } else if (club.nextGame.iGameType == 2) {
-          sDt += " (Pokal)";
-        } else if (club.nextGame.iGameType == 5) {
-          sDt += " (Testspiel)";
+      if (clb.ltJugendspielerID != null) {
+        for (int iPl = 0; iPl < clb.ltJugendspielerID.Count; iPl++, nPl++) {
+          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltJugendspielerID[iPl]];
+          string sId = "idPlayerNames" + (iPl + clb.ltPlayerId.Count).ToString();
+          <div id="@sId" data-name="@pl.sName,@clb.ltJugendspielerID[iPl]"></div>
         }
       }
-    }
-    string sWeatherIcon = "/Content/Icons/Weather/" + Model.iWeather.ToString() + ".gif";
-    string[] sWeatherTitleAll = new string[4] { "Sonne", "Bewölkt", "Regen", "Schnee" };
-    string sWeatherTitle = sWeatherTitleAll[Model.iWeather];
-  }
-  <text>@sDt</text>
 
-  <h3>Aktuelle Lage</h3>
-  @{
-    string sTabellenplatz = Model.sTabellenplatz;
+      <div id="idPlayerCount" data-name="@nPl"></div>
+
+      @*
+        if (CornerkickWebMvc.Controllers.MemberController.countNewMails() > 0) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("Sie haben neue Nachrichten", "Mail", "Member", null)
+          </div>
+        }
+      *@
+
+      bool bTraining = false;
+      if (clb.training.iTraining != null) {
+        foreach (byte iT in clb.training.iTraining) {
+          if (iT > 0) {
+            bTraining = true;
+            break;
+          }
+        }
+      }
+
+      if (!bTraining) {
+        <div style="position: relative; width: 100%; text-align: center">
+          @Html.ActionLink("ACHTUNG: Sie haben für die nächste Woche noch kein Training eingestellt!", "Training", "Member", null, new { @style = "color:red" })
+        </div>
+      }
+
+      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date)) {
+        if (clb.personal.iTrainerCo == 0 &&
+            clb.personal.iTrainerKondi == 0 &&
+            clb.personal.iMasseur == 0 &&
+            clb.personal.iTrainerMental == 0 &&
+            clb.personal.iArzt == 0 &&
+            clb.personal.iJugendScouting == 0 &&
+            clb.personal.iJugendTrainer == 0) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
+          </div>
+        }
+
+        if (CornerkickWebMvc.Controllers.AccountController.ckUser().budget.iInSpec == 0) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
+          </div>
+        }
+      }
+
+      if (clb.iCaptainId != null) {
+        if (clb.iCaptainId[0] < 0) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
+          </div>
+        }
+      }
+      @*
+        <h2>Schreibtisch</h2>
+      *@
+
+      <h3>Nächstes Spiel</h3>
+
+      string sDt = "?";
+      if (clb.nextGame != null) {
+        if (clb.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
+          sDt = "Heute";
+        } else {
+          sDt = clb.nextGame.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + " (" + (clb.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
+        }
+
+        sDt += " - ";
+
+        if (clb.nextGame.iGameType == 99) {
+          sDt += "Saisonende";
+        } else {
+          sDt += clb.nextGame.team[0].sTeam + " vs. " + clb.nextGame.team[1].sTeam;
+          if (clb.nextGame.iGameType == 1) {
+            sDt += " (Liga)";
+          } else if (clb.nextGame.iGameType == 2) {
+            sDt += " (Pokal)";
+          } else if (clb.nextGame.iGameType == 5) {
+            sDt += " (Testspiel)";
+          }
+        }
+      }
+      string sWeatherIcon = "/Content/Icons/Weather/" + Model.iWeather.ToString() + ".gif";
+      string[] sWeatherTitleAll = new string[4] { "Sonne", "Bewölkt", "Regen", "Schnee" };
+      string sWeatherTitle = sWeatherTitleAll[Model.iWeather];
+
+      <text>@sDt</text>
+
+      <h3>Aktuelle Lage</h3>
+
+      string sTabellenplatz = Model.sTabellenplatz;
+
+      <text>Wetter:</text>
+      <img src=@sWeatherIcon alt="Wetter" style="position: relative; top: 0px; left: 10px; width: 20px" title=@sWeatherTitle>
+      <p></p>
+      <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
+      <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
+      <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
+      <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
+    }
   }
-  <text>Wetter:</text>
-  <img src=@sWeatherIcon alt="Wetter" style="position: relative; top: 0px; left: 10px; width: 20px" title=@sWeatherTitle>
-  <p></p>
-  <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
-  <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
-  <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
-  <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
 
   <h3>Letzte Spiele</h3>
 
@@ -257,16 +258,16 @@
               legendText: "Pokal",
               dataPoints: dataLastGames[1]
             }/*,
-                {
-                  // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-                  type: "line",
-                  lineColor: "white",
-                  lineThickness: 0,
-                  showInLegend: true,
-                  markerSize: 20,
-                  legendText: "Testspiel",
-                  dataPoints: dataLastGames[2]
-                }*/
+                      {
+                        // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                        type: "line",
+                        lineColor: "white",
+                        lineThickness: 0,
+                        showInLegend: true,
+                        markerSize: 20,
+                        legendText: "Testspiel",
+                        dataPoints: dataLastGames[2]
+                      }*/
           ]
         });
 

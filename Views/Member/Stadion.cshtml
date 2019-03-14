@@ -350,25 +350,25 @@
 
             var htmlAttributesEditorFor = new Dictionary<string, object>
             {
-                          { "type", "number" },
-                          { "class", "form-control tbSeats" },
-                          { "id", "tbSeats_" + iB.ToString() },
-                          //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
-                          { "style", "position: relative width: 100%; text-align: right" },
-                          { "autocomplete", "off" },
-                          { "min", "0" }
-                        };
+                                { "type", "number" },
+                                { "class", "form-control tbSeats" },
+                                { "id", "tbSeats_" + iB.ToString() },
+                                //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
+                                { "style", "position: relative width: 100%; text-align: right" },
+                                { "autocomplete", "off" },
+                                { "min", "0" }
+                              };
             if (Model.iSeatsBuild[iB] > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
 
             //@Html.EditorFor(model => model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
 
             var htmlAttributesDropDownListFor = new Dictionary<string, object>
             {
-                          { "class", "form-control ddlSeatTypes" },
-                          { "id", "iDdlId" + iB.ToString() },
-                          { "style", "position: relative; text-align: right" },
-                          { "onchange", "getStadion()" }
-                        };
+                                { "class", "form-control ddlSeatTypes" },
+                                { "id", "iDdlId" + iB.ToString() },
+                                { "style", "position: relative; text-align: right" },
+                                { "onchange", "getStadion()" }
+                              };
 
             if (Model.iSeatsBuild[iB] > 0) { htmlAttributesDropDownListFor.Add("disabled", "disabled"); }
 
@@ -395,7 +395,10 @@
       @* Pitch quality *@
       <div style="position: absolute; left: 35%; width: 30%; min-width: 150px; height: auto; top: 40%">
         @{
-          string sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
+          string sPitchQuality = "100%";
+          if (Model.stadion != null) {
+            sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
+          }
         }
         <p style="text-align: center; font-weight:bold">Akt. Rasenqualität: @sPitchQuality</p>
         <button type="submit" id="bnRenewPitch" class="btn btn-default" style="width: 100%">Rasen +10%, Kosten: 0</button>
@@ -403,71 +406,130 @@
     </div>
   </div>
 
-  <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+  <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
   @{
-    if (!Model.stadion.bTopring) {
+    if (Model.stadion != null && !Model.stadion.bTopring) {
       <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
     }
   }
 </body>
 </html>
 
-<legend style="position: relative; margin-top: 2%">Stadionextras</legend>
-<div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 2%">
-  <p><b>Anzeigetafel:</b></p>
-  @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 200px; margin-right: 2%" })
-  <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 400px">Kosten: 0</button>
-</div>
+@{
+  if (Model.stadion != null && !Model.stadion.bTopring) {
+    <h3 style="position: relative; margin-top: 10px">Stadionextras</h3>
+    <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 10px">
+      <h4>Anzeigetafel</h4>
+      @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 260px; margin-right: 2%" })
+      <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+    </div>
 
-<div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 2%">
-  <p><b>Imbissbuden:</b></p>
-  <input id="itSnackbar" class="form-control" style="position: relative; float: left; width: 200px; margin-right: 24px" type="tel" min="0" max="100" onkeyup="getSnackbar()">
-  <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 400px">Kosten: 0</button>
-</div>
+    <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 10px">
+      <h4>Imbissbuden</h4>
+      <text id="txtSnackbar" style="position: relative; width: 100%; min-width: 260px; float: left">Aktuell: @Model.stadion.iSnackbar.ToString() (max: 100)</text>
+      <div style="position: relative; float: left; width: 260px; margin-right: 24px">
+        <text style="position: relative; top: 6px; width: 15%; float: left">Neu:</text>
+        <input id="itSnackbar" class="form-control" style="position: relative; width: 85%; float: left; text-align: right" type="tel" min="0" max="100" onkeyup="getSnackbar()" value="@Model.stadion.iSnackbarNew.ToString()">
+      </div>
+      <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+    </div>
 
-<div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 2%">
-  <p><b>Toiletten:</b></p>
-  <input id="itToilets" class="form-control" style="position: relative; float: left; width: 200px; margin-right: 24px" type="tel" min="0" max="100" onkeyup="getToilets()">
-  <button type="submit" id="bnBuildToilets" class="btn btn-default" style="width: 400px">Kosten: 0</button>
-</div>
+    <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 30px">
+      <h4>Toiletten</h4>
+      <text id="txtToilets" style="position: relative; width: 100%; min-width: 260px; float: left">Aktuell: @Model.stadion.iToilets.ToString() (max: 100)</text>
+      <div style="position: relative; float: left; width: 260px; margin-right: 24px">
+        <text style="position: relative; top: 6px; width: 15%; float: left">Neu:</text>
+        <input id="itToilets" class="form-control" style="position: relative; width: 85%; float: left; text-align: right" type="tel" min="0" max="100" onkeyup="getToilets()" value="@Model.stadion.iToiletsNew.ToString()">
+      </div>
+      <button type="submit" id="bnBuildToilets" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+    </div>
 
-<div style="float: left; position: relative; height: 60px"></div>
-<legend>Stadionausbau</legend>
-<table class="tStat" style="width: auto" border="1" cellpadding="3" summary="Stadionausbau">
-  <tr>
-    <th>Name</th>
-    <th>Art</th>
-    <th>Dauer</th>
-  </tr>
-
-  @{
+    bool bShow = false;
     for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
       if (Model.iSeatsBuild[iB] > 0) {
-        //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
-        <tr>
-          <td align="center">Block @Model.stadion.blocks[iB].sName</td>
-          <td align="center">@Model.iSeatType[iB]</td>
-          <td align="center">@Model.iSeatsBuild[iB] d</td>
-        </tr>
+        bShow = true;
+        break;
       }
     }
-
     if (Model.stadion.iTopringDaysConstruct > 0) {
-      //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
-      <tr>
-        <td align="center">Oberring</td>
-        <td align="center">N/A</td>
-        <td align="center">@Model.stadion.iTopringDaysConstruct d</td>
-      </tr>
+      bShow = true;
+    }
+    if (Model.stadion.iVideoDaysConstruct > 0) {
+      bShow = true;
+    }
+    if (Model.stadion.iSnackbarDaysConstruct > 0) {
+      bShow = true;
+    }
+    if (Model.stadion.iToiletsDaysConstruct > 0) {
+      bShow = true;
     }
 
-    if (Model.stadion.iVideoDaysConstruct > 0) {
-      //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
-      <tr>
-        <td align="center">Anzeigetafel</td>
-        <td align="center">@CornerkickCore.csStadion.sVideo[Model.iVideo]</td>
-        <td align="center">@Model.stadion.iVideoDaysConstruct d</td>
-      </tr>
+    if (bShow) {
+      <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 20px">
+        <h3 style="position: relative">Stadionausbau</h3>
+        <table class="tStat" style="position: relative; width: auto" border="1" cellpadding="3" summary="Stadionausbau">
+          <tr>
+            <th style="text-align:center">Name</th>
+            <th style="text-align:center">Art</th>
+            <th style="text-align:center">Menge</th>
+            <th style="text-align:center">Dauer</th>
+          </tr>
+
+          @{
+            for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
+              if (Model.iSeatsBuild[iB] > 0) {
+                //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+                <tr>
+                  <td align="center">Block @Model.stadion.blocks[iB].sName</td>
+                  <td align="center">@CornerkickCore.csStadion.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
+                  <td align="center">@Model.stadion.blocks[iB].iSeats</td>
+                  <td align="center">@Model.iSeatsBuild[iB] d</td>
+                </tr>
+              }
+            }
+
+            if (Model.stadion.iTopringDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              <tr>
+                <td align="center">Oberring</td>
+                <td align="center">-</td>
+                <td align="center">1</td>
+                <td align="center">@Model.stadion.iTopringDaysConstruct d</td>
+              </tr>
+            }
+
+            if (Model.stadion.iVideoDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              <tr>
+                <td align="center">Anzeigetafel</td>
+                <td align="center">@CornerkickCore.csStadion.sVideo[Model.stadion.iVideoNew]</td>
+                <td align="center">1</td>
+                <td align="center">@Model.stadion.iVideoDaysConstruct.ToString() d</td>
+              </tr>
+            }
+
+            if (Model.stadion.iSnackbarDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              <tr>
+                <td align="center">Imbissbuden</td>
+                <td align="center">-</td>
+                <td align="center">@Model.stadion.iSnackbarNew.ToString()</td>
+                <td align="center">@Model.stadion.iSnackbarDaysConstruct.ToString() d</td>
+              </tr>
+            }
+
+            if (Model.stadion.iToiletsDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              <tr>
+                <td align="center">Toiletten</td>
+                <td align="center">-</td>
+                <td align="center">@Model.stadion.iToiletsNew.ToString()</td>
+                <td align="center">@Model.stadion.iToiletsDaysConstruct.ToString() d</td>
+              </tr>
+            }
+          }
+        </table>
+      </div>
     }
   }
-</table>
+}

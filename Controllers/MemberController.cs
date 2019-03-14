@@ -128,6 +128,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       CornerkickCore.Core.User usr = AccountController.ckUser();
+      if (usr        == null) return View(desk);
       if (usr.ltNews == null) return View(desk);
 
       //desk.sNews += "Html.ActionLink(test, \"PlayerDetails\", \"Member\", new { i = 1 }, new { target = \"_blank\" })" + '\n';
@@ -1971,7 +1972,7 @@ namespace CornerkickWebMvc.Controllers
 
       stadionModel.bOberring = bStadiumGetTopring(clb);
 
-      stadionModel.iVideo = clb.stadium.iVideo;
+      stadionModel.iVideo = clb.stadium.iVideoNew;
 
       stadionModel.stadionNew = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);
 
@@ -2022,6 +2023,9 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Stadium stadium = convertToStadion(iSeats, iArt, null);
       stadium.bTopring = clb.stadium.bTopring;
+      stadium.iVideoNew    = clb.stadium.iVideoNew;
+      stadium.iSnackbarNew = clb.stadium.iSnackbarNew;
+      stadium.iToiletsNew  = clb.stadium.iToiletsNew;
 
       int[] iKostenDauer = MvcApplication.ckcore.st.getCostDaysContructStadium(stadium, clb.stadium, AccountController.ckUser());
       int iDispoOk = 0;
@@ -2097,7 +2101,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if (clb.stadium.iVideo != iLevel) {
+      if (clb.stadium.iVideoNew != iLevel) {
         int iDispoOk = 0;
         if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickCore.csStadion.iVideoCost[iLevel], clb)) iDispoOk = 1;
 
@@ -2133,9 +2137,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if (clb.stadium.iSnackbar != iCount) {
+      if (clb.stadium.iSnackbarNew != iCount) {
         int iDispoOk = 0;
-        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(iCount, clb.stadium.iSnackbar, usr);
+        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(iCount, clb.stadium.iSnackbarNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
         sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
@@ -2170,9 +2174,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if (clb.stadium.iToilets != iCount) {
+      if (clb.stadium.iToiletsNew != iCount) {
         int iDispoOk = 0;
-        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(iCount, clb.stadium.iToilets, usr);
+        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(iCount, clb.stadium.iToiletsNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
         sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
@@ -2259,6 +2263,7 @@ namespace CornerkickWebMvc.Controllers
       mdStadionSurr.iJouthInternat = clb.iJugendinternat[0];
       mdStadionSurr.iCarpark       = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
       mdStadionSurr.iCarparkNew    = clb.stadium.iCarparkNew;
+      mdStadionSurr.iCounterNew    = clb.stadium.iTicketcounterNew;
 
       return View(mdStadionSurr);
     }
@@ -2360,20 +2365,29 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult StadiumBuildPark(int iPark)
+    public JsonResult StadiumBuildPark(int iCount)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.stadium.iCarparkNew = iPark;
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.iCarparkNew = iCount;
 
-      int iParkDiff = Math.Abs(clb.stadium.iCarpark - iPark);
-      int iCost = iParkDiff * 2500;
-      int iDays = (int)(iParkDiff * 0.25);
+      MvcApplication.ckcore.ui.buildStadion(ref clb, stadiumNew);
 
-      clb.stadium.iCarparkDaysConstruct = iDays;
+      return Json("Der Bau der Parkplätze wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
+    }
 
-      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCost, "Bau Parkplätze", 110);
+    [HttpPost]
+    public JsonResult StadiumBuildCounter(byte iCount)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.iTicketcounterNew = iCount;
+
+      MvcApplication.ckcore.ui.buildStadion(ref clb, stadiumNew);
 
       return Json("Der Bau der Parkplätze wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3100,6 +3114,7 @@ namespace CornerkickWebMvc.Controllers
     public static int countNewMails()
     {
       CornerkickCore.Core.User user = AccountController.ckUser();
+      if (user == null) return 0;
 
       int iMails = 0;
       if (user.ltNews != null) {

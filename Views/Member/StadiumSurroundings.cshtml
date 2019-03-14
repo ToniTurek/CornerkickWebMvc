@@ -29,6 +29,14 @@
       $("#bnBuildPark").click(function () {
         buildPark();
       });
+
+      $("#tbCounter").on('keyup', function (ev) {
+        getCounter();
+      });
+
+      $("#bnBuildCounter").click(function () {
+        buildCounter();
+      });
     });
 
     function setImage() {
@@ -138,6 +146,27 @@
       });
     }
 
+    function getCounter() {
+      bnBuild = document.getElementById("bnBuildCounter");
+      bnBuild.disabled = true;
+
+      var iCount = $('#tbCounter').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSurr',
+        dataType: "json",
+        data: { i: iCount, iType: 3 },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildCounter").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuild.disabled = true;
+          } else {
+            bnBuild.disabled = false;
+          }
+        }
+      });
+    }
+
     function buildTrGel() {
       var iTG = $('#iDdlTrGel').val();
       $.ajax({
@@ -172,7 +201,21 @@
         type: 'post',
         url: '/Member/StadiumBuildPark',
         dataType: "json",
-        data: { iPark: iPark },
+        data: { iCount: iPark },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function buildCounter() {
+      var iCount = $('#tbCounter').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildCounter',
+        dataType: "json",
+        data: { iCount: iCount },
         success: function (sMessage) {
           alert(sMessage);
           window.location.reload(true);
@@ -189,21 +232,21 @@
     <img id="imgStadium" style="position: relative; width: 100%" src="~/Content/Images/stadium/stadion_S.jpg" alt="" />
   </div>
 
-  <div style="position: relative; width: 50%">
-    <div style="position: relative; width: 100%">
-      <p><b>Trainingsgelände:</b></p>
-      <text id="txtTrGel"></text>
-      <p id="txtTrGelNew"></p>
-      @Html.DropDownListFor(m => m.iTrainingsgel, Model.ddlTrainingsgel, new { @class = "form-control", @onchange = "getTrGel()", id = "iDdlTrGel", @style = "width: 300px; margin-right: 2%" })
-      <button type="submit" id="bnBuildTrGel" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+  <div style="position: relative; width: 50%; height: 600px">
+    <div style="position: relative; width: 100%; margin-top: 10px; float: left">
+      <h4>Trainingsgelände</h4>
+      <text id="txtTrGel" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
+      <p id="txtTrGelNew" style="position: relative; width: 100%; min-width: 260px; float: left"></p>
+      @Html.DropDownListFor(m => m.iTrainingsgel, Model.ddlTrainingsgel, new { @class = "form-control", @onchange = "getTrGel()", id = "iDdlTrGel", @style = "width: 49%; min-width: 260px; margin-right: 2%; float: left" })
+      <button type="submit" id="bnBuildTrGel" class="btn btn-default" style="width: 49%; min-width: 260px; float: left">Kosten: 0</button>
     </div>
 
-    <div style="position: relative; width: 100%; margin-top: 4%">
-      <p><b>Jugendinternat:</b></p>
-      <text id="txtJouthInt"></text>
-      <p id="txtJouthIntNew"></p>
-      @Html.DropDownListFor(m => m.iJouthInternat, Model.ddlJouthInternat, new { @class = "form-control", @onchange = "getJouthInt()", id = "iDdlJouthInt", @style = "width: 300px; margin-right: 2%" })
-      <button type="submit" id="bnBuildJouthInt" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+    <div style="position: relative; width: 100%; margin-top: 10px; float: left">
+      <h4>Jugendinternat</h4>
+      <text id="txtJouthInt" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
+      <p id="txtJouthIntNew" style="position: relative; width: 100%; min-width: 260px; float: left"></p>
+      @Html.DropDownListFor(m => m.iJouthInternat, Model.ddlJouthInternat, new { @class = "form-control", @onchange = "getJouthInt()", id = "iDdlJouthInt", @style = "width: 49%; min-width: 260px; margin-right: 2%; float: left" })
+      <button type="submit" id="bnBuildJouthInt" class="btn btn-default" style="width: 49%; min-width: 260px; float: left">Kosten: 0</button>
     </div>
 
     @{ 
@@ -212,18 +255,18 @@
         { "type", "number" },
         { "class", "form-control" },
         { "id", "tbParkp" },
-        { "style", "position: relative width: 100%; text-align: right" },
+        { "style", "position: relative; width: 49%; min-width: 260px; margin-right: 10px; float: left; text-align: right" },
         { "autocomplete", "off" },
         { "min", "0" }
       };
       if (Model.iCarparkNew > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
     }
-    <div style="position: relative; width: 100%; margin-top: 4%">
-      <p><b>Parkplätze:</b></p>
-      <text id="txtPark"></text>
-      <p id="txtParkNew"></p>
+    <div style="position: relative; width: 100%; margin-top: 10px; float: left">
+      <h4>Parkplätze</h4>
+      <text id="txtPark" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
+      <p id="txtParkNew" style="position: relative; width: 100%; min-width: 260px; float: left"></p>
       @Html.EditorFor(Model => Model.iCarpark, new { htmlAttributes = htmlAttributesEditorFor })
-      <button type="submit" id="bnBuildPark" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+      <button type="submit" id="bnBuildPark" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
     </div>
 
     @{ 
@@ -232,18 +275,18 @@
         { "type", "number" },
         { "class", "form-control" },
         { "id", "tbCounter" },
-        { "style", "position: relative width: 100%; text-align: right" },
+        { "style", "position: relative; width: 49%; min-width: 260px; margin-right: 10px; float: left; text-align: right" },
         { "autocomplete", "off" },
         { "min", "0" }
       };
       if (Model.iCounterNew > 0) { htmlAttributesEditorForCounter.Add("readonly", "readonly"); }
     }
-    <div style="position: relative; width: 100%; margin-top: 4%">
-      <p><b>Ticketschalter:</b></p>
-      <text id="txtCounter"></text>
-      <p id="txtCounterNew"></p>
+    <div style="position: relative; width: 100%; margin-top: 10px; float: left">
+      <h4>Ticketschalter</h4>
+      <text id="txtCounter" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
+      <p id="txtCounterNew" style="position: relative; width: 100%; min-width: 260px; float: left"></p>
       @Html.EditorFor(Model => Model.iCounter, new { htmlAttributes = htmlAttributesEditorForCounter })
-      <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+      <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
     </div>
   </div>
 </body>
