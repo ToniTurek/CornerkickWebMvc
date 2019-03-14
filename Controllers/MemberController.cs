@@ -2263,6 +2263,7 @@ namespace CornerkickWebMvc.Controllers
       mdStadionSurr.iJouthInternat = clb.iJugendinternat[0];
       mdStadionSurr.iCarpark       = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
       mdStadionSurr.iCarparkNew    = clb.stadium.iCarparkNew;
+      mdStadionSurr.iCounter       = Math.Max(clb.stadium.iTicketcounter, clb.stadium.iTicketcounterNew);
       mdStadionSurr.iCounterNew    = clb.stadium.iTicketcounterNew;
 
       return View(mdStadionSurr);
@@ -2389,7 +2390,7 @@ namespace CornerkickWebMvc.Controllers
 
       MvcApplication.ckcore.ui.buildStadion(ref clb, stadiumNew);
 
-      return Json("Der Bau der Parkplätze wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
+      return Json("Der Bau der Ticketschalter wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
