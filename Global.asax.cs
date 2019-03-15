@@ -271,18 +271,7 @@ namespace CornerkickWebMvc
       */
 
       // Write last ck state to file
-      string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
-      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
-        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", CultureInfo.InvariantCulture));
-        fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
-        fileLastState.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
-        fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
-        fileLastState.Close();
-      }
-
-#if _USE_AMAZON_S3
-      as3.uploadFile(sFileLastState, "laststate");
-#endif
+      saveLaststate(sHomeDir);
 
       // save log dir
       if (System.IO.Directory.Exists(sHomeDir + "/log")) {
@@ -317,6 +306,23 @@ namespace CornerkickWebMvc
         }
 #endif
       }
+    }
+
+    internal static void saveLaststate(string sTargetDir)
+    {
+      string sFileLastState = Path.Combine(sTargetDir, "laststate.txt");
+      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
+        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", CultureInfo.InvariantCulture));
+        fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
+        fileLastState.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
+        fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
+        fileLastState.Close();
+      }
+
+#if _USE_AMAZON_S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+      as3.uploadFile(sFileLastState, "laststate");
+#endif
     }
 
     internal static void load()
