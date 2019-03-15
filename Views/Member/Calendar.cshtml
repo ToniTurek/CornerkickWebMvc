@@ -63,6 +63,11 @@
           success: function (iCompare) {
             if (iCompare > 0) {
               dtStart = start;
+
+              // Set options from click
+              document.getElementById('selectH').value = start.format("H");
+              document.getElementById('selectM').value = start.format("m");
+
               $("#dialogOptions").dialog("open");
             } else if (iCompare === -2) {
               alert("Keine Aktion am Spieltag möglich!");
@@ -162,6 +167,10 @@
           "Bestätigen": function () {
             var iTeamId = $("#selectTeam").val();
             var sTitle = "Testspiel";
+
+            // Set time from options
+            dtStart = dtStart.hour  ($("#selectH").val());
+            dtStart = dtStart.minute($("#selectM").val());
 
             $.ajax({
               url: "/Member/AddTestGameToCalendar",
@@ -358,8 +367,23 @@
 </div>
 
 <div id="dialogTestgame" title="Testspielanfrage">
-  <p>Wählen Sie Ihren gewünschten Testspielgegner:</p>
+  <text>Beginn Testspiel: </text>
+  <select name="H" id="selectH">
+    @{
+      for (int iH = 0; iH < 24; iH++) {
+        <option value="@iH.ToString()">@iH.ToString("D2")</option>
+      }
+    }
+  </select>
+  <select name="M" id="selectM">
+    @{
+      for (int iM = 0; iM < 60; iM += 15) {
+        <option value="@iM.ToString()">@iM.ToString("D2")</option>
+      }
+    }
+  </select>
 
+  <p style="position: relative; margin-top: 10px">Wählen Sie Ihren gewünschten Testspielgegner:</p>
   <select name="Team" id="selectTeam">
     @{
       for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
