@@ -134,7 +134,7 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
       sZIndex = ";z-index:99";
     }
   } else if (iSelectedPlayer >= 0) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\"; ontouchstart=\"selectPlayer(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\"; ontouchstart=\"selectPlayerOpp(" + i.toString() + ")\"";
   }
 
   var sBox = "";
