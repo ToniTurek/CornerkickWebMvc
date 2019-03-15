@@ -3,7 +3,11 @@
 @{
   ViewBag.Title = "Taktik";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  var taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().tactic;
+  CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
+  CornerkickGame.Tactic taktik = null;
+  if (club != null) {
+    taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().tactic;
+  }
 }
 
 <!doctype html>
@@ -525,7 +529,7 @@
                   <option value="-1">aus</option>
                 </select>
               </div>
-              <div style="position: absolute; width: 20%; left: 80%">
+              <div style="position: absolute; width: 55px; left: 80%">
                 @Html.EditorFor(Model => Model.iAutoSubsMin[i], new { htmlAttributes = htmlAttributesEditorFor })
               </div>
             </div>
