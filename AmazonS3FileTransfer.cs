@@ -21,6 +21,10 @@ namespace CornerkickWebMvc
 
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
+#if _NO_UPLOAD
+      return;
+
+#endif
       //var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
 
       //var client = new AmazonS3Client(bucketRegion);
@@ -71,6 +75,10 @@ namespace CornerkickWebMvc
 
     private void deleteFile(string sKey, IAmazonS3 client)
     {
+#if _NO_UPLOAD
+      return;
+
+#endif
       DeleteObjectRequest deleteRequest = new DeleteObjectRequest();
       deleteRequest.BucketName = sBucketName;
       deleteRequest.Key = sKey;

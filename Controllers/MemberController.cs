@@ -2679,7 +2679,6 @@ namespace CornerkickWebMvc.Controllers
               foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
                 if (gd.team[1].iTeamId == club.iId) {
                   cup.iId = 5;
-                  MvcApplication.ckcore.ltCups[iC] = cup;
 
                   club.nextGame = MvcApplication.ckcore.tl.getNextGames(club)[0];
                   MvcApplication.ckcore.ltClubs[gd.team[1].iTeamId] = club;

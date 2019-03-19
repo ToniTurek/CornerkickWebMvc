@@ -53,6 +53,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       CornerkickCore.Core.User usr = ckUser();
+      if (usr == null) return;
       if (usr.iTeam >= MvcApplication.ckcore.ltClubs.Count) return;
 
       CornerkickCore.Core.Club clb = ckClub();
