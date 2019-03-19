@@ -168,7 +168,7 @@
       string sDt = "?";
       if (clb.nextGame != null) {
         if (clb.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
-          sDt = "Heute";
+          sDt = "Heute, " + clb.nextGame.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser) + " Uhr";
         } else {
           sDt = clb.nextGame.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + " (" + (clb.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
         }

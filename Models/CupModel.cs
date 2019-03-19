@@ -23,7 +23,7 @@ namespace CornerkickWebMvc.Models
     {
       ltDdlSpTg = new List<SelectListItem>();
 
-      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(iLand, 2);
+      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
 
       // Spieltage zu Dropdown Menü hinzufügen
       if (cup != null) {

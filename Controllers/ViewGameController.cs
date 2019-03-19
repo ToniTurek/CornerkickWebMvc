@@ -28,6 +28,7 @@ namespace CornerkickWebMvc.Controllers
       gD = new Models.ViewGameModel.gameData();
 
       CornerkickCore.Core.User user = AccountController.ckUser();
+      if (user == null) return View(view);
 
       view.bAdmin = AccountController.checkUserIsAdmin(AccountController.appUser);
 
@@ -167,12 +168,6 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Game.Data gameData = user.game.data;
 
-      gD.ltF = new List<Models.DataPointGeneral>[user.game.nPlStart];
-      for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
-
-      gD.ltM = new List<Models.DataPointGeneral>[user.game.nPlStart];
-      for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
-
       if (gD.nStates == 0) {
         gD = getGameData(view);
       } else if (iState >= 0) {
@@ -186,7 +181,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(gD, JsonRequestBehavior.AllowGet);
     }
 
-    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, int iHeatmap = -1, bool bReduced = false)
+    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, int iHeatmap = -1, bool bAddFMList = true)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
@@ -270,7 +265,7 @@ namespace CornerkickWebMvc.Controllers
                               card.plCard.sName;
 
           string sImg = "Y";
-          if (card.iType == 1) sImg = "YR";
+          if      (card.iType == 1) sImg = "YR";
           else if (card.iType == 2) sImg = "R";
 
           gD.sTimelineIcons += "<img " + sOnClick + "src=\"/Content/Icons/" + sImg + "Card.bmp\" alt=\"Karte\" style=\"position: absolute; top: " + iIconTop.ToString() + "px; width: 12px; left: " + (fLeft - 0.5).ToString(nfi) + "%" + sCursor + "\" title=\"" + sCardDesc + "\"/>";
@@ -287,7 +282,17 @@ namespace CornerkickWebMvc.Controllers
       if (user.game.data.team[1].iTeamId == club.iId) jHA = 1;
 
       // Chart
-      if (!bReduced) {
+      if (bAddFMList) {
+        if (gD.ltF == null) {
+          gD.ltF = new List<Models.DataPointGeneral>[user.game.nPlStart];
+          for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
+        }
+
+        if (gD.ltM == null) {
+          gD.ltM = new List<Models.DataPointGeneral>[user.game.nPlStart];
+          for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
+        }
+
         if (gD.ltF[0].Count < state.i) {
           for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
             gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFresh));
@@ -502,7 +507,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iStTmp = 0;
       foreach (CornerkickGame.Game.State state in gameData.ltState) {
-        addGameData(ref gD, gameData, user, club, iStTmp, iHeatmap, true);
+        addGameData(ref gD, gameData, user, club, iStTmp, iHeatmap, state.tsMinute.Seconds == 0 && state.bNewRound);
 
         if (iState == iStTmp) break;
 

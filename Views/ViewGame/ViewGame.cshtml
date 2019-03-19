@@ -100,7 +100,8 @@
       bnAdminPlay = document.getElementById("bnAdminPlay");
       bnAdminNext = document.getElementById("bnAdminNext");
 
-      var ddlHeatmap = $('#ddlHeatmap');
+      var ddlHeatmap   = $('#ddlHeatmap');
+      var ddlPositions = $('#ddlPositions');
 
       setView();
 
@@ -255,6 +256,7 @@
           showInLegend: true,
           type: "line",
           name: "1",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[0]
         },
         {
@@ -262,6 +264,7 @@
           showInLegend: true,
           type: "line",
           name: "2",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[1]
         },
         {
@@ -269,6 +272,7 @@
           showInLegend: true,
           type: "line",
           name: "3",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[2]
         },
         {
@@ -276,6 +280,7 @@
           showInLegend: true,
           type: "line",
           name: "4",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[3]
         },
         {
@@ -283,6 +288,7 @@
           showInLegend: true,
           type: "line",
           name: "5",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[4]
         },
         {
@@ -290,6 +296,7 @@
           showInLegend: true,
           type: "line",
           name: "6",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[5]
         },
         {
@@ -297,6 +304,7 @@
           showInLegend: true,
           type: "line",
           name: "7",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[6]
         },
         {
@@ -304,6 +312,7 @@
           showInLegend: true,
           type: "line",
           name: "8",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[7]
         },
         {
@@ -311,6 +320,7 @@
           showInLegend: true,
           type: "line",
           name: "9",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[8]
         },
         {
@@ -318,6 +328,7 @@
           showInLegend: true,
           type: "line",
           name: "10",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[9]
         },
         {
@@ -325,6 +336,7 @@
           showInLegend: true,
           type: "line",
           name: "11",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[10]
         }]
       });
@@ -360,6 +372,7 @@
           showInLegend: true,
           type: "line",
           name: "1",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[0]
         },
         {
@@ -367,6 +380,7 @@
           showInLegend: true,
           type: "line",
           name: "2",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[1]
         },
         {
@@ -374,6 +388,7 @@
           showInLegend: true,
           type: "line",
           name: "3",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[2]
         },
         {
@@ -381,6 +396,7 @@
           showInLegend: true,
           type: "line",
           name: "4",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[3]
         },
         {
@@ -388,6 +404,7 @@
           showInLegend: true,
           type: "line",
           name: "5",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[4]
         },
         {
@@ -395,6 +412,7 @@
           showInLegend: true,
           type: "line",
           name: "6",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[5]
         },
         {
@@ -402,6 +420,7 @@
           showInLegend: true,
           type: "line",
           name: "7",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[6]
         },
         {
@@ -409,6 +428,7 @@
           showInLegend: true,
           type: "line",
           name: "8",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[7]
         },
         {
@@ -416,6 +436,7 @@
           showInLegend: true,
           type: "line",
           name: "9",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[8]
         },
         {
@@ -423,6 +444,7 @@
           showInLegend: true,
           type: "line",
           name: "10",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[9]
         },
         {
@@ -430,6 +452,7 @@
           showInLegend: true,
           type: "line",
           name: "11",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[10]
         }]
       });
@@ -486,10 +509,17 @@
       var divDrawGame = document.getElementById("divDrawGame");
       var divHeader = document.getElementById("divHeader");
       var divTimeline = document.getElementById("divTimeline");
+
+      var divOptions = document.getElementById("divOptions");
+      var txtOptionsHeatmap = document.getElementById("txtOptionsHeatmap");
+      var divOptionsHeatmap = document.getElementById("divOptionsHeatmap");
+
       var divPlotStatistics = document.getElementById("divPlotStatistics");
       var divStat1 = document.getElementById("divStat1");
       var divStat2 = document.getElementById("divStat2");
       var tbKommentar = document.getElementById("tbKommentar");
+      var divChartContainerF = document.getElementById("chartContainerF");
+      var divChartContainerM = document.getElementById("chartContainerM");
 
       var fWidth = $(window).width();
       if (fWidth < 960 && $(window).height() < fWidth) {
@@ -499,38 +529,76 @@
         divStat2.style.display = 'none';
         //tbKommentar.style.display = 'none';
         divDrawGameContainer.style.position = "absolute";
-        divDrawGameContainer.style.top = "0px";
+        divDrawGameContainer.style.top  = "0px";
         divDrawGameContainer.style.left = "0px";
         divDrawGameContainer.style.height = "90%";
         imgGame.style.height = "100%";
         imgGame.style.width = "auto";
         divDrawGameContainer.style.width = imgGame.offsetWidth.toString() + "px";
         divDrawGame.style.width = "90%";
+
         tbKommentar.style.position = "absolute";
         tbKommentar.style.left = "0px";
-        tbKommentar.style.top = "90%";
+        tbKommentar.style.top  = "90%";
 
         var fInfoLeft = divDrawGameContainer.offsetWidth + 6;
         var fInfoWidth = fWidth - fInfoLeft - 6;
 
         divTimeline.style.position = "absolute";
         divTimeline.style.top = "0px";
-        divTimeline.style.left = fInfoLeft.toString() + "px";
+        divTimeline.style.left  = fInfoLeft .toString() + "px";
         divTimeline.style.width = fInfoWidth.toString() + "px";
 
+        divOptions.style.display = 'none';
+        /*
+        divOptions.style.position = "absolute";
+        divOptions.style.bottom = "50px";
+        divOptions.style.left = fInfoLeft.toString() + "px";
+        divOptions.style.width = fInfoWidth.toString() + "px";
+        divOptions.style.height = "100px";
+
+        txtOptionsHeatmap.innerHTML = "HM:";
+        txtOptionsHeatmap.style.left = "0px";
+        divOptionsHeatmap.style.left = "30px";
+        divOptionsHeatmap.style.top = "0px";
+
+        txtOptionsPos.innerHTML = "Pos:";
+        txtOptionsPos.style.top = "44px";
+        txtOptionsPos.style.left = "0px";
+        divOptionsPos.style.left = "30px";
+        divOptionsPos.style.top = "40px";
+        */
+
         divStat1.style.position = "absolute";
+        divStat1.style.top   = "50px";
         divStat1.style.left  = fInfoLeft .toString() + "px";
         divStat1.style.width = fInfoWidth.toString() + "px";
         divStat1.style.minWidth = "0px";
 
         var fCommY = tbKommentar.offsetTop + tbKommentar.offsetHeight;
-
         divPlotStatistics.style.position = "absolute";
         divPlotStatistics.style.left = "0px";
         divPlotStatistics.style.top = fCommY.toString() + "px";
+
+        var fStatY = divPlotStatistics.offsetTop + divPlotStatistics.offsetHeight;
+        divChartContainerF.style.left = "0px";
+        divChartContainerF.style.position = "absolute";
+        divChartContainerF.style.top = fStatY.toString() + "px";
+
+        var fFY = divChartContainerF.offsetTop + divChartContainerF.offsetHeight;
+        divChartContainerM.style.left = "0px";
+        divChartContainerM.style.position = "absolute";
+        divChartContainerM.style.top = fFY.toString() + "px";
       }
       else {
         divHeader.style.display = 'block';
+
+        divTimeline.style.position = "relative";
+        divTimeline.style.left  = "0px";
+        divTimeline.style.width = "100%";
+
+        divOptions.style.display = 'block';
+
         //divStat1.style.display = 'block';
         divStat2.style.display = 'block';
         //tbKommentar.style.display = 'block';
@@ -559,10 +627,10 @@
     <div style="position: absolute; width: 30px; height: 30px; left:  1%; margin-top: 12px">
       <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid blue; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
     </div>
-    <div style="position: absolute; width: 28%; height: 100%; left: 5%; top: 30%; text-align: right">
+    <div style="position: absolute; width: 30%; height: 100%; left: 5%; top: 30%; text-align: right">
       <font size="4">@sH</font>
     </div>
-    <div style="position: absolute; width: 6%; height: 100%; left: 34%">
+    <div style="position: absolute; width: 4%; height: 60%; top: 20%; left: 36%">
       <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@sEmblemH alt="" />
     </div>
 
@@ -581,10 +649,10 @@
       </div>
     </div>
 
-    <div style="position: absolute; width: 6%; height: 100%; right: 34%">
+    <div style="position: absolute; width: 4%; height: 60%; top: 20%; right: 36%">
       <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@sEmblemA alt="" />
     </div>
-    <div style="position: absolute; width: 28%; height: 100%; right: 5%; top: 30%; text-align: left">
+    <div style="position: absolute; width: 30%; height: 100%; right: 5%; top: 30%; text-align: left">
       <font size="4">@sA</font>
     </div>
     <div style="position: absolute; width: 30px; height: 30px; right: 1%; margin-top: 12px">
@@ -592,20 +660,20 @@
     </div>
   </div>
 
-  <div style="position: relative; left: 0px; width: 100%; height: 40px">
-    <div style="position: relative; float: left; width: 75%; min-width: 420px; height: 40px">
-      <b style="position: absolute; top: 6px">Heatmap:</b>
-      <div style="position: absolute; left: 70px; width: 110px; height: auto">
+  <div id="divOptions" style="position: relative; left: 0px; width: 100%; height: 40px">
+    <div style="position: relative; float: left; width: 60%; min-width: 420px; height: 40px">
+      <b id="txtOptionsHeatmap" style="position: absolute; top: 6px">Heatmap:</b>
+      <div id="divOptionsHeatmap" style="position: absolute; left: 70px; width: 110px; height: auto">
         @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
       </div>
-      <b style="position: absolute; top: 6px; left: 200px">Positionen:</b>
-      <div style="position: absolute; left: 280px; width: 120px; height: auto">
+      <b id="txtOptionsPos" style="position: absolute; top: 6px; left: 200px">Positionen:</b>
+      <div id="divOptionsPos" style="position: absolute; left: 280px; width: 120px; height: auto">
         @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
       </div>
     </div>
     @if (Model.game != null) {
       if (Model.bAdmin) {
-        <div style="position: relative; float: left; width: 25%; min-width: 160px; height: 40px">
+        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
           <input id="cbTargetPos" name="cbTargetPos" type="checkbox" value="0" style="position: absolute; left: 0px" class="checkbox">
           <input id="inputAdminGameSpeed" style="position: absolute; left: 22%; width: 18%" type="text" value="250" data-val-required='Das Feld "inputAdminGameSpeed" ist erforderlich.' data-val-number='Das Feld "inputAdminGameSpeed" muss eine Zahl sein.' data-val="true" autocomplete="off">
           <button type="submit" id="bnAdminPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
@@ -613,7 +681,7 @@
           <button type="submit" id="bnAdminNew" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">new</button>
         </div>
       } else if (Model.game.data.bFinished) {
-        <div style="position: relative; float: left; width: 25%; min-width: 160px; height: 40px">
+        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
           <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
           <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
           <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
@@ -635,10 +703,13 @@
     <img id="imgGame" style="position: relative; width: 100%" src="~/Content/Images/stadium/field_full.png" alt="" />
     <div id="drawHeatmap" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
     <div id="divDrawGame" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
-    <div id="divLinks" style="position: absolute; margin-left: 5%; top: 0px; width: 45%">
+    <div id="divLinkTeam" style="position: absolute; top: 0px; left: 5%; width: 30%">
       @Html.ActionLink("Aufstellung", "Team", "Member", null, new { @style = "color:#000aaa;" })
     </div>
-    <div id="divLinks" style="position: absolute; margin-right: 5%; top: 0px; left: 45%; width: 50%; text-align: right">
+    <div id="divLinkHome" style="position: absolute; top: 0px; left: 35%; width: 30%; text-align: center">
+      @Html.ActionLink("Home", "Desk", "Member", null, new { @style = "color:#000aaa;" })
+    </div>
+    <div id="divLinkTactic" style="position: absolute; top: 0px; right: 5%; width: 30%; text-align: right">
       @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
     </div>
   </div>
@@ -652,9 +723,9 @@
     }
   }
 
-  <textarea id="tbKommentar" readonly rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
+  <textarea id="tbKommentar" readonly rows='10' style="position: relative; width: 100%; max-width: 100%; float: left"></textarea>
 
-  <div id="divPlotStatistics" style="width: 100%; height: 250px"></div>
+  <div id="divPlotStatistics" style="width: 100%; height: 250px; float: left"></div>
 
   <div id="divStat1" style="position: relative; float: left; width: 50%; min-width: 300px; display: block; word-break: break-word">
     <text id="statistikGoals">Tore:</text>

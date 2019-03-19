@@ -241,9 +241,9 @@
             if (contract.fPlayerMood < 0) {
               alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
             } else {
-              $("#txtContractMoney").html(contract.iSalary + " €");
+              $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
               $("#txtContractMood") .html((contract.fPlayerMood * 100).toFixed(0) + "%");
-              $("#tbContractSalaryOffer").val(contract.iSalary);
+              $("#tbContractSalaryOffer").val(contract.iSalary.toLocaleString());
 
               $("#dialogContract").dialog("open");
             }
@@ -258,9 +258,9 @@
           var iIdPl = data[0].playerId;
 
           $.when(getSalary(iIdPl, $(this).val(), 0)).done(function (contract) {
-            $("#txtContractMoney").html(contract.iSalary + " €");
+            $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
             $("#txtContractMood" ).html((contract.fPlayerMood * 100).toFixed(0) + "%");
-            $("#tbContractSalaryOffer").val(contract.iSalary);
+            $("#tbContractSalaryOffer").val(contract.iSalary.toLocaleString());
           });
         }
       });
@@ -270,7 +270,6 @@
         if (data) {
           var iIdPl        = data[0].playerId;
           var iYears       = $("#iContractYears").val();
-          //var iSalaryOffer = $("#iContractSalaryOffer").val();
           var iSalaryOffer = getIntFromString($("#tbContractSalaryOffer").val());
 
           $.when(getSalary(iIdPl, iYears, iSalaryOffer)).done(function (contract) {
@@ -280,7 +279,7 @@
 
               $("#dialogContract").dialog("close");
             } else {
-              $("#txtContractMoney").html(contract.iSalary + " €");
+              $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
               $("#txtContractMood") .html((contract.fPlayerMood * 100).toFixed(0) + "%");
             }
           });

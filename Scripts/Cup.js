@@ -56,8 +56,8 @@ function drawCupTeams(ltGameData, iSpieltag) {
     sBox += '<td align="center">&nbsp;-&nbsp;</td>';
     sBox += '<td align="left">' + sClubNameA + '</td>';
 
-    if (gd.iGoalsH >= 0 && gd.iGoalsA >= 0) {
-      sBox += '<td align="center">' + gd.iGoalsH + ':' + gd.iGoalsA + '&nbsp;(' + gd.iGoalsHtH + ':' + gd.iGoalsHtA + ')</td>';
+    if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
+      sBox += '<td align="center">' + gd.team[0].iGoals + ':' + gd.team[1].iGoals + '&nbsp;(' + gd.team[0].iGoalsHt + ':' + gd.team[1].iGoalsHt + ')</td>';
     } else {
       sBox += '<td align="center">-</td>';
     }

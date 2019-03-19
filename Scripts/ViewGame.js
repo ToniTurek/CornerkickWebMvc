@@ -34,7 +34,7 @@
     complete: function (jqXHR, textStatus) {
       // Schedule the next request when the current one's complete
       if (iState === -1 && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
-        setTimeout(function () { drawGame(-1) }, 250);
+        setTimeout(function () { drawGame(-1); }, 250);
       }
     }
   });
@@ -371,7 +371,6 @@ function plotStatistics(jState = -1) {
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);
 
       //alert(iState);
-      //alert(ltF[0].length);
       var i = 0;
       var j = 0;
       for (i = 0; i < gD.ltF.length; ++i) {

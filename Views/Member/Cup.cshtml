@@ -30,7 +30,7 @@
 
 @{
   var dt = new DateTime();
-  CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(Model.iLand, 2);
+  CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, Model.iLand);
   if (Model.iSpTg < Model.ltErg.Count) {
     if (cup != null && cup.ltMatchdays != null) { dt = cup.ltMatchdays[Model.iSpTg].dt; }
   }

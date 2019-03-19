@@ -169,7 +169,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Get Cup Round
       desk.sPokalrunde = "-";
-      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(club.iLand, 2);
+      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, club.iLand);
       if (cup != null) {
         int nPartFirstRound = 0;
         if (cup.ltMatchdays != null) {
@@ -1188,14 +1188,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.csTransfer.TransferOffer offer = MvcApplication.ckcore.tr.getOffer(iPlayerId, club.iId);
 
       // get already negotiated contract (salary)
-      if (offer.contract.iLength > 0/* && offer.contract.iLength == iYears*/) {
+      if (offer.contract.iLength > 0) {
         if (offer.contract.iLength == iYears) {
           iSalary = offer.contract.iSalary;
         } else {
           double fFactorNego = offer.contract.iSalary / (double)MvcApplication.ckcore.plr.getSalary(MvcApplication.ckcore.ltPlayer[iPlayerId], offer.contract.iLength);
           iSalary = (int)(iSalary * fFactorNego);
         }
-        fMood   = offer.contract.fPlayerMood;
+
+        fMood = offer.contract.fPlayerMood;
       } else { // new offer
         offer.iClubId = club.iId;
         offer.dt = MvcApplication.ckcore.dtDatum;
@@ -1239,7 +1240,6 @@ namespace CornerkickWebMvc.Controllers
       if (iSalaryOffer > 0) MvcApplication.ckcore.tr.addChangeOffer(iPlayerId, offer);
 
       return Json(offer.contract, JsonRequestBehavior.AllowGet);
-      //return Json(iSalary.ToString("#,#", AccountController.ciUser), JsonRequestBehavior.AllowGet);
     }
 
     // iMode: 0 - Extention, 1 - new contract
@@ -2527,7 +2527,7 @@ namespace CornerkickWebMvc.Controllers
 
       cupModel.ltScorer = MvcApplication.ckcore.ui.getScorer(2, cupModel.iLand, 0);
 
-      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(cupModel.iLand, 2);
+      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, cupModel.iLand);
 
       if (cup == null) return View(cupModel);
       if (cup.ltMatchdays == null) return View(cupModel);
@@ -2543,7 +2543,7 @@ namespace CornerkickWebMvc.Controllers
     {
       cupModel.ltErg = new List<List<CornerkickGame.Game.Data>>();
 
-      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(cupModel.iLand, 2);
+      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, cupModel.iLand);
       if (cup.ltMatchdays == null) return Json("", JsonRequestBehavior.AllowGet);
 
       foreach (CornerkickCore.Core.Matchday gd in cup.ltMatchdays) {
@@ -2624,12 +2624,6 @@ namespace CornerkickWebMvc.Controllers
       //int iTeamId = -1;
       //int.TryParse(sTeamId, out iTeamId);
       if (iTeamId >= 0 && iTeamId < MvcApplication.ckcore.ltClubs.Count && iTeamId != iTeamIdUser) {
-        CornerkickCore.Core.Cup cup = MvcApplication.ckcore.ini.newCup();
-        cup.iId = -5;
-        cup.fAttraction = 0.5f;
-        cup.iNeutral = 1;
-        cup.sName = "Testspiel";
-
         CornerkickCore.Core.Matchday md = new CornerkickCore.Core.Matchday();
         DateTime.TryParse(start, out md.dt);
 
@@ -2640,19 +2634,22 @@ namespace CornerkickWebMvc.Controllers
 
         md.ltGameData.Add(gd);
 
-        cup.ltMatchdays.Add(md);
-
-        sReturn = "Anfrage für Testspiel am " + md.dt.ToString("d", AccountController.ciUser) + " " + md.dt.ToString("t", AccountController.ciUser) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
-
         // Inform user
         CornerkickCore.Core.Club clubRequest = MvcApplication.ckcore.ltClubs[iTeamId];
         if (clubRequest.iUser < 0) {
-          cup.iId = 5;
+          createTestgame(md);
+
+          sReturn = "Testspiel am " + md.dt.ToString("d", AccountController.ciUser) + " " + md.dt.ToString("t", AccountController.ciUser) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " vereinbart";
         } else {
+          CornerkickCore.Core.Cup cup = MvcApplication.ckcore.ini.newCup();
+          cup.iId = -5;
+          cup.ltMatchdays.Add(md);
+          MvcApplication.ckcore.ltCups.Add(cup);
+
+          sReturn = "Anfrage für Testspiel am " + md.dt.ToString("d", AccountController.ciUser) + " " + md.dt.ToString("t", AccountController.ciUser) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
+
           MvcApplication.ckcore.Info(clubRequest.iUser, "Sie haben eine neue Anfrage für ein Testspiel erhalten.", 2, iTeamId);
         }
-
-        MvcApplication.ckcore.ltCups.Add(cup);
       }
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
@@ -2678,17 +2675,15 @@ namespace CornerkickWebMvc.Controllers
             if (md.dt.Equals(dt)) {
               foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
                 if (gd.team[1].iTeamId == club.iId) {
-                  cup.iId = 5;
+                  createTestgame(md);
 
                   club.nextGame = MvcApplication.ckcore.tl.getNextGames(club)[0];
-                  MvcApplication.ckcore.ltClubs[gd.team[1].iTeamId] = club;
 
                   CornerkickCore.Core.Club clubH = MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId];
                   clubH.nextGame = MvcApplication.ckcore.tl.getNextGames(clubH)[0];
-                  MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId] = clubH;
 
                   if (clubH.iUser >= 0) {
-                    MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
+                    MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", AccountController.ciUser) + " um " + dt.ToString("t", AccountController.ciUser) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
                   }
 
                   return Json("", JsonRequestBehavior.AllowGet);
@@ -2700,6 +2695,22 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    private void createTestgame(CornerkickCore.Core.Matchday md)
+    {
+      CornerkickCore.Core.Cup cupTestGames = MvcApplication.ckcore.tl.getCup(5);
+
+      if (cupTestGames == null) {
+        cupTestGames = MvcApplication.ckcore.ini.newCup();
+        cupTestGames.iId = 5;
+        cupTestGames.fAttraction = 0.5f;
+        cupTestGames.iNeutral = 1;
+        cupTestGames.sName = "Testspiel";
+        MvcApplication.ckcore.ltCups.Add(cupTestGames);
+      }
+
+      cupTestGames.ltMatchdays.Add(md);
     }
 
     [HttpPost]
