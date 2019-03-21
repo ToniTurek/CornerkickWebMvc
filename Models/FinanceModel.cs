@@ -15,14 +15,17 @@ namespace CornerkickWebMvc.Models
     [DataType(DataType.Currency)]
     [Display(Name = "Stehplätze:")]
     public int iEintritt1 { get; set; }
+    public int iPriceSeason1 { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "Sitzplätze:")]
     public int iEintritt2 { get; set; }
+    public int iPriceSeason2 { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "V.I.P.:")]
     public int iEintritt3 { get; set; }
+    public int iPriceSeason3 { get; set; }
 
     public CornerkickCore.Finance.Budget budgetPlan { get; set; }
     public CornerkickCore.Finance.Budget budgetReal { get; set; }

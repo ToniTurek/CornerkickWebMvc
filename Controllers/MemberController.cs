@@ -220,7 +220,7 @@ namespace CornerkickWebMvc.Controllers
       dataPoints[1] = new List<Models.DataPointLastGames2>();
       dataPoints[2] = new List<Models.DataPointLastGames2>();
 
-      List<CornerkickGame.Game.Data> ltGameData = MvcApplication.ckcore.tl.getNextGames(club, false, true);
+      List<CornerkickGame.Game.Data> ltGameData = MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false, true);
       int iLg = 0;
       foreach (CornerkickGame.Game.Data gs in ltGameData) {
         if (gs.iGameType < 1 || gs.iGameType == 5) continue; // Testgame
@@ -2507,7 +2507,7 @@ namespace CornerkickWebMvc.Controllers
 
       List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
 
-      for (int iSpT = 1; iSpT < MvcApplication.ckcore.tl.iSpieltageGesFromClub(club); iSpT++) {
+      for (int iSpT = 1; iSpT < MvcApplication.ckcore.tl.getTotalMatchdays(club); iSpT++) {
         int iPlace = MvcApplication.ckcore.tl.getLeaguePlace(club, iSpT);
         if (iPlace > 0) dataPoints.Add(new Models.DataPointGeneral(iSpT, iPlace));
       }
@@ -2677,10 +2677,10 @@ namespace CornerkickWebMvc.Controllers
                 if (gd.team[1].iTeamId == club.iId) {
                   createTestgame(md);
 
-                  club.nextGame = MvcApplication.ckcore.tl.getNextGames(club)[0];
+                  club.nextGame = MvcApplication.ckcore.tl.getNextGame(club, MvcApplication.ckcore.dtDatum);
 
                   CornerkickCore.Core.Club clubH = MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId];
-                  clubH.nextGame = MvcApplication.ckcore.tl.getNextGames(clubH)[0];
+                  clubH.nextGame = MvcApplication.ckcore.tl.getNextGame(clubH, MvcApplication.ckcore.dtDatum);
 
                   if (clubH.iUser >= 0) {
                     MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", AccountController.ciUser) + " um " + dt.ToString("t", AccountController.ciUser) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
@@ -2766,7 +2766,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club club = AccountController.ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      foreach (CornerkickGame.Game.Data data in MvcApplication.ckcore.tl.getNextGames(club, false)) {
+      foreach (CornerkickGame.Game.Data data in MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false)) {
         if (data.iGameType == 5) continue;
 
         if (dtStart.Date.Date.CompareTo(data.dt) == 0) return Json(  "Abreise am Spieltag nicht erlaubt!", JsonRequestBehavior.AllowGet);
@@ -2807,7 +2807,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club club = AccountController.ckClub();
       if (club == null) return nDays;
 
-      foreach (CornerkickGame.Game.Data data in MvcApplication.ckcore.tl.getNextGames(club, false)) {
+      foreach (CornerkickGame.Game.Data data in MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false)) {
         if (data.iGameType == iIgnoreGameType) continue;
 
         nDays = Math.Min(nDays, (int)(data.dt - dtStart).TotalDays);
@@ -2862,6 +2862,10 @@ namespace CornerkickWebMvc.Controllers
       financeModel.iEintritt2 = clb.iAdmissionPrice[1];
       financeModel.iEintritt3 = clb.iAdmissionPrice[2];
 
+      financeModel.iPriceSeason1 = clb.iAdmissionPriceSeasonal[0];
+      financeModel.iPriceSeason2 = clb.iAdmissionPriceSeasonal[1];
+      financeModel.iPriceSeason3 = clb.iAdmissionPriceSeasonal[2];
+
       financeModel.bEditable = MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date);
       financeModel.budgetPlan = AccountController.ckUser().budget;
       financeModel.budgetReal = MvcApplication.ckcore.ui.getActualBudget(clb);
@@ -2907,8 +2911,26 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
+    public ContentResult GetFinanceSpec(Models.FinanceModel financeModel)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      if (clb == null) return Content("", "application/json");
+
+      List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
+
+      List<CornerkickGame.Game.Data> ltGdPast = MvcApplication.ckcore.tl.getNextGames(clb, MvcApplication.ckcore.dtDatum, false, true);
+      int i = 0;
+      foreach (CornerkickGame.Game.Data gd in ltGdPast) {
+        if (gd.team[0].iTeamId == clb.iId) dataPoints.Add(new Models.DataPointGeneral(--i, gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]));
+      }
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
     [HttpPost]
-    public JsonResult EintrittChange(int[] iEintritt)
+    public JsonResult FinanceSetAdmissionPrice(int[] iEintritt)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -2927,6 +2949,19 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(iInSpec.ToString("#,#", AccountController.ciUser) + "€", JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult FinanceSetAdmissionPriceSeasonal(int[] iPrice)
+    {
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.iAdmissionPriceSeasonal[0] = iPrice[0];
+      clb.iAdmissionPriceSeasonal[1] = iPrice[1];
+      clb.iAdmissionPriceSeasonal[2] = iPrice[2];
+
+      return Json(null, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -3142,7 +3177,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club club = AccountController.ckClub();
       if (club == null) return 0;
 
-      List<CornerkickGame.Game.Data> ltGd = MvcApplication.ckcore.tl.getNextGames(club, false);
+      List<CornerkickGame.Game.Data> ltGd = MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false);
 
       foreach (CornerkickGame.Game.Data gd in ltGd) {
         /*

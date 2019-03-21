@@ -19,11 +19,9 @@
 </head>
 
 <body>
-  <div id="chartContainer" style="height: 300px; width: 100%"></div>
-
   <script type="text/javascript">
     function setBudget() {
-      var iBudgetIn  = [];
+      var iBudgetIn = [];
       $('.tbBudgetIn').each(function () {
         iBudgetIn.push(getIntFromString($(this).val()));
       });
@@ -53,10 +51,10 @@
             sTotal[3] = sTotal[3].fontcolor("green");
           }
 
-          document.getElementById('tdTotalInPlan' ).innerHTML = sTotal[0];
+          document.getElementById('tdTotalInPlan').innerHTML = sTotal[0];
           document.getElementById('tdTotalPayPlan').innerHTML = sTotal[1];
-          document.getElementById('tdSumPlan'     ).innerHTML = sTotal[2];
-          document.getElementById('tdSumCurr'     ).innerHTML = sTotal[3];
+          document.getElementById('tdSumPlan').innerHTML = sTotal[2];
+          document.getElementById('tdSumCurr').innerHTML = sTotal[3];
 
           document.getElementById('tdSumPlan').style.fontWeight = "bold"
           document.getElementById('tdSumCurr').style.fontWeight = "bold"
@@ -102,12 +100,35 @@
 
         $.ajax({
           type: 'post',
-          url: '/Member/EintrittChange',
+          url: '/Member/FinanceSetAdmissionPrice',
           dataType: "json",
           data: { iEintritt: eintritt },
           success: function (sIncomeSpecExpected) {
             //alert("Eintrittspreise geändert");
             $("#lbInSpec").text("Einnahmen Liga bei 100% Auslastung: " + sIncomeSpecExpected);
+          }
+        });
+      }
+
+      $('.tbPriceSeason').each(function () {
+        $(this).on('keyup', function (ev) {
+          setAdmissionPriceSeasonal();
+        });
+      });
+
+      function setAdmissionPriceSeasonal() {
+        var price = [];
+        $('.tbPriceSeason').each(function () {
+          price.push($(this).val());
+        });
+
+        $.ajax({
+          type: 'post',
+          url: '/Member/FinanceSetAdmissionPriceSeasonal',
+          dataType: "json",
+          data: { iPrice: price },
+          success: function () {
+            //alert("Eintrittspreise geändert");
           }
         });
       }
@@ -160,28 +181,69 @@
 
         chart.render();
       });
+
+      $.get("/Member/GetFinanceSpec/", function (dataSpec) {
+        var chartSpec = new CanvasJS.Chart("divChartSpec", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            interval: 1,
+            labelFontColor: "white",
+            gridThickness: 1,
+            maximum: -0.9
+          },
+          axisY: {
+            title: "Zuschauer"
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              dataPoints: dataSpec
+            }
+          ]
+        });
+
+        chartSpec.render();
+      });
     });
   </script>
+
+  <div id="chartContainer" style="height: 300px; width: 100%"></div>
 </body>
 </html>
 
 @{ CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub(); }
 
 <h4>Eintrittspreise</h4>
-@Html.LabelFor(m => m.iEintritt1, new { @class = "col-md-2 control-label" })
-@Html.TextBoxFor(m => m.iEintritt1, new { @class = "form-control tbEintritt", autocomplete = "off", style = "width: 5%; min-width: 55px; text-align: right", type = "number" })
+<div style="position: relative; width: 100%; height: auto; float: left">
+  <div style="position: relative; width: 250px; height: 200px; top: 20px; float: left">
+    @Html.LabelFor(m => m.iEintritt1, new { @class = "col-md-2 control-label", style = "position: absolute; top:  2px" })
+    @Html.TextBoxFor(m => m.iEintritt1, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top:  0px; left: 50%; width: 5%; min-width: 55px; text-align: right", type = "number" })
+    @Html.TextBoxFor(m => m.iPriceSeason1, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top:  0px; right: 0px; width: 6%; min-width: 60px; text-align: right", type = "number" })
 
-@Html.LabelFor(m => m.iEintritt2, new { @class = "col-md-2 control-label" })
-@Html.TextBoxFor(m => m.iEintritt2, new { @class = "form-control tbEintritt", autocomplete = "off", style = "width: 5%; min-width: 55px; text-align: right", type = "number" })
+    @Html.LabelFor(m => m.iEintritt2, new { @class = "col-md-2 control-label", style = "position: absolute; top: 37px" })
+    @Html.TextBoxFor(m => m.iEintritt2, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 35px; left: 50%; width: 5%; min-width: 55px; text-align: right", type = "number" })
+    @Html.TextBoxFor(m => m.iPriceSeason2, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 35px; right: 0px; width: 6%; min-width: 60px; text-align: right", type = "number" })
 
-@Html.LabelFor(m => m.iEintritt3, new { @class = "col-md-2 control-label" })
-@Html.TextBoxFor(m => m.iEintritt3, new { @class = "form-control tbEintritt", autocomplete = "off", style = "width: 5%; min-width: 55px; text-align: right", type = "number" })
+    @Html.LabelFor(m => m.iEintritt3, new { @class = "col-md-2 control-label", style = "position: absolute; top: 72px" })
+    @Html.TextBoxFor(m => m.iEintritt3, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 70px; left: 50%; width: 5%; min-width: 55px; text-align: right", type = "number" })
+    @Html.TextBoxFor(m => m.iPriceSeason3, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 70px; right: 0px; width: 6%; min-width: 60px; text-align: right", type = "number" })
+    
+    <p id="lbInSpec" style="position: absolute; top: 110px; width: 100%; float: left"></p>
+  </div>
 
-<p id="lbInSpec"></p>
+  <div id="divChartSpec" style="position: relative; float: right; height: 180px; width: 75%"></div>
+</div>
 
 <h4>Finanzplanung</h4>
 <div style="position: relative; width: 100%; top: 5%; border: 0px solid red">
-  <div style="position: relative; float: left; width: 49%; min-width: 400px; margin-right: 2%; margin-bottom: 2%; height: auto; border: 0px solid green">
+  <div style="position: relative; float: left; width: 49%; min-width: 400px; margin-right: 2%; margin-bottom: 2%; height: auto">
     <table id="tableBudgetIn" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
       <thead>
         <tr>
@@ -343,7 +405,7 @@
 </div>
 
 @{
-  if (clb.ltAccount.Count > 0) {
+  if (clb != null && clb.ltAccount.Count > 0) {
     <h4>Kontoauszug</h4>
     <div style="position: relative; width: 100%; height: auto; top: 5%">
       <table border="1" cellpadding="4" style="width: auto">

@@ -84,7 +84,7 @@
   }
 }
 
-<div style="position: relative; width: 50%; min-width: 300px; margin-bottom: 10px">
+<div style="position: relative; width: 50%; min-width: 300px; height: 70px">
   @using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
     @Html.TextBoxFor(m => m.fCalendarInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 33%" })
     @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 33%" })
@@ -92,15 +92,19 @@
 
     <p></p>
     if (bTimer) {
-      <button type="submit" class="btn btn-default" style="position: relative; width: 200px">Stop</button>
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px">Update</button>
     } else {
-      <button type="submit" class="btn btn-default" style="position: relative; width: 200px">Start</button>
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px">Start</button>
     }
+  }
+
+  @using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
+    <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px; left: 184px">Stop</button>
   }
 </div>
 
-<button type="submit" id="bnSetWeeks1" class="btn btn-default" style="position: relative; width: 200px">1 Day -> 1 Week</button>
-<button type="submit" id="bnSetWeeks2" class="btn btn-default" style="position: relative; width: 200px">1 Day -> 2 Weeks</button>
+<button type="submit" id="bnSetWeeks1" class="btn btn-default" style="position: relative; width: 180px">1 Day -> 1 Week</button>
+<button type="submit" id="bnSetWeeks2" class="btn btn-default" style="position: relative; width: 180px">1 Day -> 2 Weeks</button>
 
 <p></p>
 <text>System time: @sDtNow<br></text>

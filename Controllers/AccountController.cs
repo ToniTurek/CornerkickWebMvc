@@ -269,6 +269,10 @@ namespace CornerkickWebMvc.Controllers
       clb.iAdmissionPrice[1] =  30;
       clb.iAdmissionPrice[2] = 100;
 
+      clb.iAdmissionPriceSeasonal[0] =  60;
+      clb.iAdmissionPriceSeasonal[1] = 180;
+      clb.iAdmissionPriceSeasonal[2] = 600;
+
       addPlayerToClub(ref clb);
 
       return clb;
