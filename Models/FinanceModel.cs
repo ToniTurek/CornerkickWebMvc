@@ -27,6 +27,8 @@ namespace CornerkickWebMvc.Models
     public int iEintritt3 { get; set; }
     public int iPriceSeason3 { get; set; }
 
+    public int[] iSeasonalTickets { get; set; }
+
     public CornerkickCore.Finance.Budget budgetPlan { get; set; }
     public CornerkickCore.Finance.Budget budgetReal { get; set; }
     public bool bEditable { get; set; }

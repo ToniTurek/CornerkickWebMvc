@@ -2866,6 +2866,9 @@ namespace CornerkickWebMvc.Controllers
       financeModel.iPriceSeason2 = clb.iAdmissionPriceSeasonal[1];
       financeModel.iPriceSeason3 = clb.iAdmissionPriceSeasonal[2];
 
+      financeModel.iSeasonalTickets = new int[clb.iSpectatorsSeasonal.Length];
+      financeModel.iSeasonalTickets = clb.iSpectatorsSeasonal;
+
       financeModel.bEditable = MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date);
       financeModel.budgetPlan = AccountController.ckUser().budget;
       financeModel.budgetReal = MvcApplication.ckcore.ui.getActualBudget(clb);
