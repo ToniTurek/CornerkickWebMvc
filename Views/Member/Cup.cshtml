@@ -63,36 +63,40 @@
 
 <div id="tableDivCupTeams"></div>
 
-<h4>Torschützen</h4>
-<table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
-  <tr>
-    <th colspan="2">Pl.</th>
-    <th>Spieler</th>
-    <th>Verein</th>
-    <th style="text-align:right">Tore</th>
-    <th style="text-align:right">Vorl.</th>
-    <th style="text-align:right">Scor.</th>
-  </tr>
-
-  @{ int iPlatz = 0; }
-  @{
-    foreach (CornerkickCore.UI.Scorer sc in Model.ltScorer) {
-      iPlatz++;
-      string sStyle2 = "";
-      if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == CornerkickWebMvc.Controllers.AccountController.ckClub().iId) {
-        sStyle2 = "font-weight:bold";
-      }
-      int iScorer = sc.iGoals + sc.iAssists;
-
-      <tr style=@sStyle2 class=" ">
-        <td class="first">@iPlatz</td>
-        <td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>
-        <td>@sc.sName</td>
-        <td>@sc.sTeam</td>
-        <td align="right">@sc.iGoals</td>
-        <td align="right">@sc.iAssists</td>
-        <td align="right">@iScorer</td>
+@{
+  if (Model.ltScorer != null && Model.ltScorer.Count > 0) {
+    <h4>Torschützen</h4>
+    <table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
+      <tr>
+        <th colspan="2">Pl.</th>
+        <th>Spieler</th>
+        <th>Verein</th>
+        <th style="text-align:right">Tore</th>
+        <th style="text-align:right">Vorl.</th>
+        <th style="text-align:right">Scor.</th>
       </tr>
-    }
+
+      @{ int iPlatz = 0; }
+      @{
+        foreach (CornerkickCore.UI.Scorer sc in Model.ltScorer) {
+          iPlatz++;
+          string sStyle2 = "";
+          if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == CornerkickWebMvc.Controllers.AccountController.ckClub().iId) {
+            sStyle2 = "font-weight:bold";
+          }
+          int iScorer = sc.iGoals + sc.iAssists;
+
+          <tr style=@sStyle2 class=" ">
+            <td class="first">@iPlatz</td>
+            <td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>
+            <td>@sc.sName</td>
+            <td>@sc.sTeam</td>
+            <td align="right">@sc.iGoals</td>
+            <td align="right">@sc.iAssists</td>
+            <td align="right">@iScorer</td>
+          </tr>
+        }
+      }
+    </table>
   }
-</table>
+}
