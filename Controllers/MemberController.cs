@@ -1196,7 +1196,7 @@ namespace CornerkickWebMvc.Controllers
           iSalary = (int)(iSalary * fFactorNego);
         }
 
-        fMood = offer.contract.fPlayerMood;
+        fMood = offer.contract.fMood;
       } else { // new offer
         offer.iClubId = club.iId;
         offer.dt = MvcApplication.ckcore.dtDatum;
@@ -1234,8 +1234,8 @@ namespace CornerkickWebMvc.Controllers
 
       if (fMood < 0.1) fMood = -1f; // negotiation cancelled
 
-      offer.contract.fPlayerMood = fMood;
-      offer.contract.iSalary     = iSalary;
+      offer.contract.fMood   = (float)fMood;
+      offer.contract.iSalary = iSalary;
 
       if (iSalaryOffer > 0) MvcApplication.ckcore.tr.addChangeOffer(iPlayerId, offer);
 
@@ -1261,9 +1261,9 @@ namespace CornerkickWebMvc.Controllers
       sPlayerMood = sPlayerMood.Replace("%", string.Empty);
       sPlayerMood = sPlayerMood.Replace(".", string.Empty);
       sPlayerMood = sPlayerMood.Trim();
-      double fPlayerMood = 1.0;
-      if (!double.TryParse(sPlayerMood, out fPlayerMood)) return Json("Error", JsonRequestBehavior.AllowGet);
-      fPlayerMood /= 100.0;
+      float fPlayerMood = 1f;
+      if (!float.TryParse(sPlayerMood, out fPlayerMood)) return Json("Error", JsonRequestBehavior.AllowGet);
+      fPlayerMood /= 100f;
 
       string sReturn = "";
       if (iMode == 0) { // contract extention
@@ -1273,7 +1273,7 @@ namespace CornerkickWebMvc.Controllers
 
         player.contract.iLength += (byte)iYears;
         player.contract.iSalary = iSalary;
-        player.contract.fPlayerMood = fPlayerMood;
+        player.contract.fMood = fPlayerMood;
         MvcApplication.ckcore.ltPlayer[iId] = player;
 
         sReturn = "Der Vertrag mit " + player.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.";
@@ -1285,7 +1285,7 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Player.Contract contract = new CornerkickGame.Player.Contract();
         contract.iLength = (byte)iYears;
         contract.iSalary = iSalary;
-        contract.fPlayerMood = fPlayerMood;
+        contract.fMood = fPlayerMood;
         offer.contract = contract;
         offer.iClubId = AccountController.ckClub().iId;
 
