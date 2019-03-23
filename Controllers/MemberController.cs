@@ -759,7 +759,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(ltsSubstitution, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult CkAufstellungFormation(int iF, int iSP = -1)
+    public JsonResult CkAufstellungFormation(int iF, int iSP = -1, bool bMobile = false)
     {
       CornerkickCore.Core.User usr  = AccountController.ckUser();
       CornerkickCore.Core.Club club = AccountController.ckClub();
@@ -787,7 +787,9 @@ namespace CornerkickWebMvc.Controllers
         tD.ltPlayerPos     .Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl)));
         tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(pl, 99).ToString("0.0"));
       }
-      tD.sDivPlayer = TeamGetPlayerOffence(tD.ltPlayer, club);
+
+      tD.sDivPlayer = TeamGetPlayerOffence(tD.ltPlayer, club, bMobile);
+
       if (iSP >= 0) {
         tD.plSelected = tD.ltPlayer[iSP];
         tD.fIndOrientation = tD.plSelected.fIndOrientation;
@@ -897,7 +899,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(f, JsonRequestBehavior.AllowGet);
     }
 
-    private string TeamGetPlayerOffence(List<CornerkickGame.Player> ltPlayer, CornerkickCore.Core.Club club)
+    private string TeamGetPlayerOffence(List<CornerkickGame.Player> ltPlayer, CornerkickCore.Core.Club club, bool bMobile = false)
     {
       string sDiv = "";
 
@@ -908,29 +910,35 @@ namespace CornerkickWebMvc.Controllers
       foreach (CornerkickGame.Player pl in ltPlayer) {
         if (iPl >= MvcApplication.ckcore.game.nPlStart) break;
 
-        if (MvcApplication.ckcore.game.tl.getPosRole(pl.ptPosDefault) != 1) {
-          float fHeight = 0.04f;
+        if (!MvcApplication.ckcore.game.tl.checkPlayerIsKeeper(pl)) {
+          float fHeight = 0.05f;
+          if (bMobile) fHeight = 0.07f;
+
           float fWidth  = fHeight * (3f / 2f);
 
           int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.tactic.fOrientation);
-          float fTop = 1f - (iXOffence / (float)MvcApplication.ckcore.game.ptPitch.X);
+          float fTop  = 1f - (iXOffence / (float)MvcApplication.ckcore.game.ptPitch.X);
           float fLeft = (pl.ptPosDefault.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
 
           fTop  -= fHeight / 2f;
           fLeft -= fWidth  / 2f;
 
           sDiv += "<div onclick=\"javascript: selectPlayer(" + iPl.ToString() + ")\" style=\"position: absolute; ";
-          sDiv += "top: "  + fTop .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
-          sDiv += "left: " + fLeft.ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
-          sDiv += "height: 5%; ";
-          sDiv += "width: 7.5%; ";
+          sDiv += "top: "    + fTop   .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
+          sDiv += "left: "   + fLeft  .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
+          sDiv += "height: " + fHeight.ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
+          sDiv += "width: "  + fWidth .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
           sDiv += "border: 4px solid blue; ";
           sDiv += "background-color: white; ";
           sDiv += "-webkit-border-radius: 50%; ";
           sDiv += "-moz-border-radius: 50%; ";
           sDiv += "cursor: pointer; ";
+          sDiv += "-webkit-box-shadow: 0px 0px 8px 8px rgba(0, 0, 0, .3); box-shadow: 0px 0px 8px 8px rgba(0, 0, 0, .3)";
           sDiv += "\">";
-          sDiv += "<b style=\"position: absolute; width: 100%; text-align:center; font-size:200%; color: black\">";
+
+          int iFontSize = 230;
+          if (bMobile) iFontSize = 125;
+          sDiv += "<b style=\"position: absolute; width: 100%; text-align:center; font-size:" + iFontSize.ToString() + "%; color: black\">";
           sDiv += pl.iNr.ToString();
           sDiv += "</b>";
           sDiv += "</div>";
@@ -996,28 +1004,28 @@ namespace CornerkickWebMvc.Controllers
 
       float fTopButton  = 1f - (iXOffence / (float)MvcApplication.ckcore.game.ptPitch.X);
       float fLeftButton = (pl.ptPosDefault.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
-      sDiv += "<div style=\"position: absolute; width: 8%; top: "
+      sDiv += "<div style=\"position: absolute; width: 8%; min-width: 40px; top: "
                 + (fTopButton  - 0.100f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)
                 + "; left: " 
                 + (fLeftButton - 0.030f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) 
                 + "; z-index: 10\"> " +
                 "<img id=\"img_arrow_1\" onclick =\"javascript:moveRoa(1)\" style =\"position: relative; width: 100%; cursor: pointer\" src=\"/Content/Images/arrow_up.png\"/>" +
               "</div>";
-      sDiv += "<div style=\"position: absolute; width: 8%; top: "
+      sDiv += "<div style=\"position: absolute; width: 8%; min-width: 40px; top: "
                 + (fTopButton  - 0.045f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)
                 + "; left: "
                 + (fLeftButton - 0.030f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)
                 + "; z-index: 10\"> " +
                 "<img id=\"img_arrow_1\" onclick =\"javascript:moveRoa(2)\" style =\"position: relative; width: 100%; cursor: pointer\" src=\"/Content/Images/arrow_down.png\"/>" +
               "</div>";
-      sDiv += "<div style=\"position: absolute; width: 3%; top: "
+      sDiv += "<div style=\"position: absolute; width: 3%; min-width: 15px; top: "
                 + (fTopButton  - 0.015f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)
                 + "; left: "
                 + (fLeftButton - 0.120f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)
                 + "; z-index: 10\"> " +
                 "<img id=\"img_arrow_1\" onclick =\"javascript:moveRoa(3)\" style =\"position: relative; width: 100%; cursor: pointer\" src=\"/Content/Images/arrow_left.png\"/>" +
               "</div>";
-      sDiv += "<div style=\"position: absolute; width: 3%; top: "
+      sDiv += "<div style=\"position: absolute; width: 3%; min-width: 15px; top: "
                 + (fTopButton  - 0.015f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)
                 + "; left: "
                 + (fLeftButton - 0.070f).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture)

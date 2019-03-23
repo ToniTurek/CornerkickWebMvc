@@ -4,12 +4,15 @@
   var divTacticOrientation    = document.getElementById("divTacticOrientation");
   var divTacticIndOrientation = document.getElementById("divTacticIndOrientation");
 
+  var fWindowWidth = $(window).width();
+  var bMobile = fWindowWidth < 960;
+
   // respond to the change event in here
   $.ajax({
     cache: false,
     url: "/Member/CkAufstellungFormation",
     type: "GET",
-    data: { iF: iFormation - 1, iSP: iSelectedPlayer - 1 },
+    data: { iF: iFormation - 1, iSP: iSelectedPlayer - 1, bMobile: bMobile },
     success: function (teamData) {
       if (teamData) {  // check if data is defined
         var result = "";
@@ -26,18 +29,18 @@
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
-            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i]);
+            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile);
 
             i = i + 1;
-            return (i !== 11);
+            return i !== 11;
           });
 
           // opponent player
           $.each(teamData.ltPlayerOpp, function (iFormation, player) {
-            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1);
+            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, 0, bMobile);
 
             i = i + 1;
-            return (i !== 11);
+            return i !== 11;
           });
 
           // hide orientation slider on start
@@ -90,7 +93,7 @@
   });
 }
 
-function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos) {
+function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile) {
   if (!iPos) {
     iPos = 0;
   }
@@ -143,8 +146,7 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
 
   var fWidth = 26;
   var iTextSize = 150;
-  var fWindowWidth = $(window).width();
-  if (fWindowWidth < 960) {
+  if (bMobile) {
     iTextSize = 100;
     sName = sSurname;
   }
