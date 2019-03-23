@@ -1176,8 +1176,8 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0)
     {
-      if (iPlayerId < 1) return Json("Error", JsonRequestBehavior.AllowGet);
-      if (iYears    < 1) return Json("0",     JsonRequestBehavior.AllowGet);
+      if (iPlayerId < 0) return Json("Invalid player",                    JsonRequestBehavior.AllowGet);
+      if (iYears    < 1) return Json("Invalid number of contract length", JsonRequestBehavior.AllowGet);
 
       int iSalary = MvcApplication.ckcore.plr.getSalary(MvcApplication.ckcore.ltPlayer[iPlayerId], iYears);
       double fMood = 1.0;
