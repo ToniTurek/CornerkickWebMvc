@@ -13,7 +13,8 @@
       type: "GET",
       dataType: "JSON",
       data: { iTraining: iTr, iTag: iTg },
-      success: function (iTraining) {
+      success: function () {
+        plotTrainingDevelopment(false);
         //alert(iTg);
       }
     });
@@ -34,60 +35,7 @@
     dataPointsNew = [];
 
     $(document).ready(function () {
-      $.get("/Member/GetTeamDevelopmentData/", function (dataKFM) {
-        var chart = new CanvasJS.Chart("chartContainer", {
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          title: {
-            text: "Mannschaftsentwicklung"
-          },
-          axisX: {
-            gridThickness: 1,
-            interval: 1,
-            intervalType: "day",
-            valueFormatString: "DD MMM",
-            labelAngle: -20
-          },
-          axisY: {
-            valueFormatString: "0.0%",
-            includeZero: false
-          },
-          legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },
-          data: [
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              showInLegend: true,
-              legendText: "Kondition",
-              xValueType: "dateTime",
-              yValueFormatString: "0.0%",
-              dataPoints: dataKFM[0]
-            },
-            {
-              type: "line",
-              showInLegend: true,
-              legendText: "Frische",
-              xValueType: "dateTime",
-              yValueFormatString: "0.0%",
-              dataPoints: dataKFM[1]
-            },
-            {
-              type: "line",
-              showInLegend: true,
-              legendText: "Moral",
-              xValueType: "dateTime",
-              yValueFormatString: "0.0%",
-              dataPoints: dataKFM[2]
-            }
-          ]
-        });
-
-        chart.render();
-      });
+      plotTrainingDevelopment(true);
 
       $.get("/Member/GetTeamFAve/", function (dataFAve) {
         var chartFAve = new CanvasJS.Chart("chartContainerFAve", {
@@ -132,8 +80,105 @@
 
         chartFAve.render();
       });
-
     });
+
+    function plotTrainingDevelopment(bAnimate) {
+      var bExpected = document.getElementById("cbPlotExpected").checked;
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/GetTeamDevelopmentData',
+        dataType: "json",
+        data: { bExpected: bExpected },
+        success: function (dataKFM) {
+          var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: bAnimate,
+            theme: "theme2",//theme1
+            title: {
+              text: "Mannschaftsentwicklung"
+            },
+            axisX: {
+              gridThickness: 1,
+              interval: 1,
+              intervalType: "day",
+              valueFormatString: "DDD DD MMM",
+              labelAngle: -20
+            },
+            axisY: {
+              valueFormatString: "0.0%",
+              includeZero: false
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                color: "blue",
+                showInLegend: true,
+                legendText: "Kondition",
+                xValueType: "dateTime",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[0][0]
+              },
+              {
+                type: "line",
+                color: "green",
+                showInLegend: true,
+                legendText: "Frische",
+                xValueType: "dateTime",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[0][1]
+              },
+              {
+                type: "line",
+                color: "red",
+                showInLegend: true,
+                legendText: "Moral",
+                xValueType: "dateTime",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[0][2]
+              },
+              {
+                type: "line",
+                color: "blue",
+                lineDashType: "dash",
+                lineThickness: 1,
+                showInLegend: false,
+                xValueType: "dateTime",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[1][0]
+              },
+              {
+                type: "line",
+                color: "green",
+                lineDashType: "dash",
+                lineThickness: 1,
+                showInLegend: false,
+                xValueType: "dateTime",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[1][1]
+              },
+              {
+                type: "line",
+                color: "red",
+                lineDashType: "dash",
+                lineThickness: 1,
+                showInLegend: false,
+                xValueType: "dateTime",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[1][2]
+              }
+            ]
+          });
+
+          chart.render();
+        }
+      });
+    }
   </script>
 
   <h2>Training</h2>
@@ -141,14 +186,23 @@
   <div class="form-group">
     @{
       CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
-    }
-    @for (int i = 0; i < club.training.iTraining.Length; i++) {
-      <label for="Wochentag">@MvcApplication.ckcore.sWochentag[i]</label>
-      @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", club.training.iTraining[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString() })
+      if (club != null) {
+        for (int i = 0; i < club.training.iTraining.Length; i++) {
+          <label for="Wochentag">@MvcApplication.ckcore.sWochentag[i]</label>
+          @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", club.training.iTraining[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString() })
+        }
+      }
     }
   </div>
 
-  <div id="chartContainer" style="height: 400px; width: 100%"></div>
+  <div style="position: relative; width: 100%">
+    <div id="chartContainer" style="height: 400px; width: 100%"></div>
+
+    <label style="position: absolute; top: 0px; right: 0px">
+      <input type="checkbox" id="cbPlotExpected" name="cbPlotExpected" value="0" onclick="plotTrainingDevelopment(true);">
+      Vorschau
+    </label>
+  </div>
 
   <div id="chartContainerFAve" style="height: 400px; width: 100%; margin-top: 60px"></div>
 </body>

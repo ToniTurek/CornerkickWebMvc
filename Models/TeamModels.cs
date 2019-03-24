@@ -38,10 +38,16 @@ namespace CornerkickWebMvc.Models
 
     public struct TeamData
     {
+      // Player details
       public List<CornerkickGame.Player> ltPlayer { get; set; }
       public List<byte> ltPlayerPos { get; set; }
       public List<string> ltPlayerAveSkill { get; set; }
+
+      // Opponent player details
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
+      public List<byte> ltPlayerOppPos { get; set; }
+      public List<string> ltPlayerOppAveSkill { get; set; }
+
       public CornerkickGame.Player plSelected { get; set; }
       public string sDivPlayer { get; set; }
       public string sDivRoa { get; set; }

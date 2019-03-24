@@ -246,7 +246,7 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
-    public ContentResult GetTeamDevelopmentData()
+    public ContentResult GetTeamDevelopmentData(bool bExpected = false)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Content("", "application/json");
@@ -255,20 +255,58 @@ namespace CornerkickWebMvc.Controllers
       trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
       trHistCurrent.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb);
 
-      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
-      for (byte j = 0; j < dataPoints.Length; j++) {
-        dataPoints[j] = new List<Models.DataPointGeneral>();
+      List<Models.DataPointGeneral>[][] dataPoints = new List<Models.DataPointGeneral>[2][];
+      dataPoints[0] = new List<Models.DataPointGeneral>[3];
+      dataPoints[1] = new List<Models.DataPointGeneral>[3];
+
+      for (byte j = 0; j < dataPoints[0].Length; j++) {
+        dataPoints[0][j] = new List<Models.DataPointGeneral>();
 
         for (int i = 0; i < clb.ltTrainingHist.Count; i++) {
           CornerkickCore.Core.TrainingHistory trHist = clb.ltTrainingHist[i];
           if (trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-7)) > 0) {
             long iDate = convertDateTimeToTimestamp(trHist.dt);
-            dataPoints[j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j]));
+            dataPoints[0][j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j]));
           }
         }
 
         long iDateCurrent = convertDateTimeToTimestamp(trHistCurrent.dt);
-        dataPoints[j].Add(new Models.DataPointGeneral(iDateCurrent, trHistCurrent.fKFM[j]));
+        dataPoints[0][j].Add(new Models.DataPointGeneral(iDateCurrent, trHistCurrent.fKFM[j]));
+      }
+
+      if (bExpected) {
+        // Initialize dataPoints list
+        for (byte j = 0; j < dataPoints[1].Length; j++) dataPoints[1][j] = new List<Models.DataPointGeneral>();
+
+        // Create temp. player
+        List<CornerkickGame.Player> ltPlayerTmp = new List<CornerkickGame.Player>();
+        foreach (int iPlId in clb.ltPlayerId) ltPlayerTmp.Add(MvcApplication.ckcore.ltPlayer[iPlId].Clone());
+
+        // For the next 7 days ...
+        for (byte iD = 0; iD < 7; iD++) {
+          DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iD);
+
+          if (iD > 0) {
+            if ((int)dtTmp.DayOfWeek == 0) break;
+
+            // ... do training for each player
+            for (int iP = 0; iP < ltPlayerTmp.Count; iP++) {
+              CornerkickGame.Player plTmp = ltPlayerTmp[iP];
+              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp);
+            }
+          }
+
+          // ... get training history data
+          CornerkickCore.Core.TrainingHistory trHistExp = new CornerkickCore.Core.TrainingHistory();
+          trHistExp.dt   = dtTmp;
+          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTmp);
+
+          // ... add training history data to dataPoints
+          for (byte j = 0; j < dataPoints[1].Length; j++) {
+            long iDate = convertDateTimeToTimestamp(trHistExp.dt);
+            dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j]));
+          }
+        }
       }
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
@@ -363,8 +401,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club club = AccountController.ckClub();
       if (club == null) return;
 
-      foreach (int iSp in club.ltPlayerId) {
-        Models.TeamModels.ltPlayer.Add(MvcApplication.ckcore.ltPlayer[iSp]);
+      foreach (int iPl in club.ltPlayerId) {
+        Models.TeamModels.ltPlayer.Add(MvcApplication.ckcore.ltPlayer[iPl]);
       }
 
       if (user.game != null) {
@@ -802,11 +840,19 @@ namespace CornerkickWebMvc.Controllers
       if (club.nextGame != null) {
         int iClubOpp = club.nextGame.team[1].iTeamId;
         if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
+
         tD.ltPlayerOpp = new List<CornerkickGame.Player>();
+        tD.ltPlayerOppPos = new List<byte>();
+        tD.ltPlayerOppAveSkill = new List<string>();
+
         if (iClubOpp > 0) {
           for (byte iPl = 0; iPl < 11; iPl++) {
             int iPlId = MvcApplication.ckcore.ltClubs[iClubOpp].ltPlayerId[iPl];
-            tD.ltPlayerOpp.Add(MvcApplication.ckcore.ltPlayer[iPlId]);
+            CornerkickGame.Player plOpp = MvcApplication.ckcore.ltPlayer[iPlId];
+
+            tD.ltPlayerOpp.Add(plOpp);
+            tD.ltPlayerOppPos.Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(plOpp)));
+            tD.ltPlayerOppAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(plOpp, 99).ToString("0.0"));
           }
         }
       }

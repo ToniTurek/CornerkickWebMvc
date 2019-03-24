@@ -37,7 +37,7 @@
 
           // opponent player
           $.each(teamData.ltPlayerOpp, function (iFormation, player) {
-            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, 0, bMobile);
+            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, teamData.ltPlayerOppPos[i], bMobile);
 
             i = i + 1;
             return i !== 11;
