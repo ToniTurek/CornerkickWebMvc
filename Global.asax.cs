@@ -391,7 +391,7 @@ namespace CornerkickWebMvc
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
 
-            if (fInterval > 0.0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
+            if (fInterval > 10.0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
               Controllers.AdminController adminController = new Controllers.AdminController();
 
               adminController.setGameSpeedToAllUsers(0);
