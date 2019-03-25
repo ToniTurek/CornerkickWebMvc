@@ -174,12 +174,16 @@ namespace CornerkickWebMvc.Controllers
         int nPartFirstRound = 0;
         if (cup.ltMatchdays != null) {
           if (cup.ltMatchdays.Count > 0) {
-            if (cup.ltMatchdays[0].ltGameData != null) nPartFirstRound = cup.ltMatchdays[0].ltGameData.Count * 2;
+            if (cup.ltMatchdays[0].ltGameData != null) {
+              nPartFirstRound = cup.ltMatchdays[0].ltGameData.Count * 2;
+
+              if (nPartFirstRound > 0) {
+                int nRound = MvcApplication.ckcore.tl.getPokalRundeVonNTeiln(nPartFirstRound);
+                if (nRound - club.iPokalrunde > 0 && nRound - club.iPokalrunde < MvcApplication.ckcore.sPokalrunde.Length) desk.sPokalrunde = MvcApplication.ckcore.sPokalrunde[nRound - club.iPokalrunde];
+              }
+            }
           }
         }
-
-        int nRound = MvcApplication.ckcore.tl.getPokalRundeVonNTeiln(nPartFirstRound);
-        if (nRound - club.iPokalrunde > 0 && nRound - club.iPokalrunde < MvcApplication.ckcore.sPokalrunde.Length) desk.sPokalrunde = MvcApplication.ckcore.sPokalrunde[nRound - club.iPokalrunde];
       }
 
       /*
@@ -2730,6 +2734,8 @@ namespace CornerkickWebMvc.Controllers
               foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
                 if (gd.team[1].iTeamId == club.iId) {
                   createTestgame(md);
+
+                  MvcApplication.ckcore.ltCups.RemoveAt(iC);
 
                   club.nextGame = MvcApplication.ckcore.tl.getNextGame(club, MvcApplication.ckcore.dtDatum);
 

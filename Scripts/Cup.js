@@ -1,11 +1,11 @@
-﻿function setCup2(iSpTg) {
+﻿function setCup2(iMd) {
   $.ajax({
     url: '/Member/setCup',
     type: "GET",
     dataType: "JSON",
-    data: { iGameday: iSpTg },
+    data: { iGameday: iMd },
     success: function (ltGameData) {
-      actionDrawTeams(ltGameData, iSpTg - 1);
+      actionDrawTeams(ltGameData, iMd - 1);
     }
   });
 }
@@ -34,7 +34,7 @@ function drawCupTeams(ltGameData, iSpieltag) {
   var sDateHour = $('#idDtHour' + iSpieltag).data('name');
   var iClubUser = $('#idClubUser').data('name');
   for (var i = 0; i < ltGameData.length; i++) {
-    gd = ltGameData[i];
+    var gd = ltGameData[i];
     var sClubNameH = "freilos";
     var sClubNameA = "freilos";
     if (gd.team[0].iTeamId >= 0) {

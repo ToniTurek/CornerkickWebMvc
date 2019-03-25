@@ -368,8 +368,6 @@ namespace CornerkickWebMvc
 
       // Load ck state
       if (MvcApplication.ckcore.io.load(sFileLoad)) {
-        MvcApplication.ckcore.ltClubs[0].iUser = -1; // Can be removed next time
-
         MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
