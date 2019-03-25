@@ -55,28 +55,24 @@ namespace CornerkickWebMvc.Controllers
         MvcApplication.ckcore.setNeueSaison();
       }
       */
-      if (MvcApplication.timerCkCalender.Enabled) {
-        MvcApplication.timerCkCalender.Enabled = false;
-      } else {
-        MvcApplication.iStartHour = -1;
-        if (!string.IsNullOrEmpty(modelAdmin.sStartHour)) {
-          int.TryParse(modelAdmin.sStartHour, out MvcApplication.iStartHour);
-        }
-
-        if (modelAdmin.fCalendarInterval < 1E-6) {
-          MvcApplication.timerCkCalender.Enabled = false;
-          return View(modelAdmin);
-        }
-
-        setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
-
-        // Do one step now
-        MvcApplication.ckcore.next(true);
-
-        // Start the timer
-        MvcApplication.timerCkCalender.Interval = modelAdmin.fCalendarInterval * 1000;
-        MvcApplication.timerCkCalender.Enabled = true;
+      MvcApplication.iStartHour = -1;
+      if (!string.IsNullOrEmpty(modelAdmin.sStartHour)) {
+        int.TryParse(modelAdmin.sStartHour, out MvcApplication.iStartHour);
       }
+
+      if (modelAdmin.fCalendarInterval < 1E-6) {
+        MvcApplication.timerCkCalender.Enabled = false;
+        return View(modelAdmin);
+      }
+
+      setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
+
+      // Do one step now
+      MvcApplication.ckcore.next(true);
+
+      // Start the timer
+      MvcApplication.timerCkCalender.Interval = modelAdmin.fCalendarInterval * 1000;
+      MvcApplication.timerCkCalender.Enabled = true;
 
       // Save last state
       MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
