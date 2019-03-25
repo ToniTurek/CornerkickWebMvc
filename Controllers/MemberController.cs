@@ -292,7 +292,7 @@ namespace CornerkickWebMvc.Controllers
             // ... do training for each player
             for (int iP = 0; iP < ltPlayerTmp.Count; iP++) {
               CornerkickGame.Player plTmp = ltPlayerTmp[iP];
-              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp);
+              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp, false, true);
             }
           }
 
