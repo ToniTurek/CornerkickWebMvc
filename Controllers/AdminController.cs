@@ -89,6 +89,9 @@ namespace CornerkickWebMvc.Controllers
     {
       MvcApplication.timerCkCalender.Enabled = false;
 
+      // Save last state
+      MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
+
       return RedirectToAction("Settings");
       //return View("Settings", "");
       //return View(modelAdmin);
