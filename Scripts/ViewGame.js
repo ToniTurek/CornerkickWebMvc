@@ -363,9 +363,7 @@ function plotStatistics(jState = -1) {
       $("#statistikSubs") .html(gD.sStatSubs);
 
       // Heatmap
-      if (iHeatmapValue >= 0) {
-        $("#drawHeatmap").html(gD.sDivHeatmap);
-      }
+      $("#drawHeatmap").html(gD.sDivHeatmap);
 
       $("#txtAdminChanceShootOnGoal").html(gD.sAdminChanceShootOnGoal);
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);

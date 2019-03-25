@@ -511,8 +511,8 @@
       var divTimeline = document.getElementById("divTimeline");
 
       var divOptions = document.getElementById("divOptions");
-      var txtOptionsHeatmap = document.getElementById("txtOptionsHeatmap");
-      var divOptionsHeatmap = document.getElementById("divOptionsHeatmap");
+      //var txtOptionsHeatmap = document.getElementById("txtOptionsHeatmap");
+      //var divOptionsHeatmap = document.getElementById("divOptionsHeatmap");
 
       var divPlotStatistics = document.getElementById("divPlotStatistics");
       var divStat1 = document.getElementById("divStat1");
@@ -667,8 +667,8 @@
       <div id="divOptionsHeatmap" style="position: absolute; left: 70px; width: 110px; height: auto">
         @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
       </div>
-      <b id="txtOptionsPos" style="position: absolute; top: 6px; left: 200px">Positionen:</b>
-      <div id="divOptionsPos" style="position: absolute; left: 280px; width: 120px; height: auto">
+      <b id="txtOptionsPos" style="position: absolute; top: 6px; left: 190px">Positionen:</b>
+      <div id="divOptionsPos" style="position: absolute; left: 270px; width: 120px; height: auto">
         @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
       </div>
     </div>
