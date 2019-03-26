@@ -370,6 +370,9 @@ namespace CornerkickWebMvc
       if (MvcApplication.ckcore.io.load(sFileLoad)) {
         MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
 
+        // Set admin user to CPU
+        MvcApplication.ckcore.ltClubs[0].iUser = -1;
+
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
 #if _USE_AMAZON_S3
