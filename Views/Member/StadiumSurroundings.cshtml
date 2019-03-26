@@ -62,22 +62,22 @@
         success: function (sCurrent) {
           $("#txtTrGel").text("Aktuell: " + sCurrent[0][0]);
           if (sCurrent[0][2] != "0") {
-            $("#txtTrGelNew").text("Ausbau zu: " + sCurrent[0][1] + " (" + sCurrent[0][2] + " d)");
+            $("#txtTrGelNew").text("Ausbau zu: " + sCurrent[0][1] + " (noch " + sCurrent[0][2] + " d / " + sCurrent[0][3] + " fertig)");
           }
 
           $("#txtJouthInt"   ).text("Aktuell: "   + sCurrent[1][0]);
           if (sCurrent[1][2] != "0") {
-            $("#txtJouthIntNew").text("Ausbau zu: " + sCurrent[1][1] + " (" + sCurrent[1][2] + " d)");
+            $("#txtJouthIntNew").text("Ausbau zu: " + sCurrent[1][1] + " (noch " + sCurrent[1][2] + " d / " + sCurrent[1][3] + " fertig)");
           }
 
           $("#txtPark").text("Aktuell: " + sCurrent[2][0]);
           if (sCurrent[2][2] != "0") {
-            $("#txtParkNew").text("Ausbau zu: " + sCurrent[2][1] + " (" + sCurrent[2][2] + " d)");
+            $("#txtParkNew").text("Ausbau zu: " + sCurrent[2][1] + " (noch " + sCurrent[2][2] + " d / " + sCurrent[2][3] + " fertig)");
           }
 
           $("#txtCounter").text("Aktuell: " + sCurrent[3][0]);
           if (sCurrent[3][2] != "0") {
-            $("txtCounterNew").text("Ausbau zu: " + sCurrent[3][1] + " (" + sCurrent[3][2] + " d)");
+            $("txtCounterNew").text("Ausbau zu: " + sCurrent[3][1] + " (noch " + sCurrent[3][2] + " d / " + sCurrent[3][3] + " fertig)");
           }
         }
       });
