@@ -2953,13 +2953,13 @@ namespace CornerkickWebMvc.Controllers
       return View(financeModel);
     }
 
-    public ContentResult GetFinanceDevelopmentData(Models.FinanceModel financeModel)
+    public ContentResult FinanceGetDevelopmentData(Models.FinanceModel financeModel)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Content("", "application/json");
 
       CornerkickCore.Core.TrainingHistory trHistCurrent = new CornerkickCore.Core.TrainingHistory();
-      trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
+      trHistCurrent.dt   = MvcApplication.ckcore.dtDatum;
       trHistCurrent.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb);
 
       List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
@@ -2979,17 +2979,24 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
-    public ContentResult GetFinanceSpec(Models.FinanceModel financeModel)
+    public ContentResult FinanceGetSpec(Models.FinanceModel financeModel)
     {
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Content("", "application/json");
 
-      List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
+      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[2];
+      dataPoints[0] = new List<Models.DataPointGeneral>(); // Actual spec.
+      dataPoints[1] = new List<Models.DataPointGeneral>(); // Stadium size
 
       List<CornerkickGame.Game.Data> ltGdPast = MvcApplication.ckcore.tl.getNextGames(clb, MvcApplication.ckcore.dtDatum, false, true);
       int i = 0;
       foreach (CornerkickGame.Game.Data gd in ltGdPast) {
-        if (gd.team[0].iTeamId == clb.iId) dataPoints.Add(new Models.DataPointGeneral(--i, gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]));
+        if (gd.team[0].iTeamId == clb.iId) {
+          i--;
+
+          dataPoints[0].Add(new Models.DataPointGeneral(i, gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]));
+          dataPoints[1].Add(new Models.DataPointGeneral(i, MvcApplication.ckcore.st.getStadiumSeats(gd.stadium)));
+        }
       }
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
