@@ -2705,6 +2705,7 @@ namespace CornerkickWebMvc.Controllers
         } else {
           CornerkickCore.Core.Cup cup = MvcApplication.ckcore.ini.newCup();
           cup.iId = -5;
+          cup.sName = "Anfrage Testspiel";
           cup.ltMatchdays.Add(md);
           MvcApplication.ckcore.ltCups.Add(cup);
 
