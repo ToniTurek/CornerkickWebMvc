@@ -253,6 +253,7 @@
               // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
               type: "line",
               xValueType: "dateTime",
+              yValueFormatString: "0.00",
               dataPoints: dataDev
             }
           ]
@@ -419,7 +420,7 @@
   }
 
   if (bOwnPlayer) {
-    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 2%">
+    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 10px">
       @* Extend player contract *@
       <button type="submit" id="bnContract" class="btn btn-default" style="width: 30%; min-width: 300px">@sExtendContract</button>
 
@@ -431,7 +432,7 @@
       }
     </div>
 
-    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 1%">
+    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 6px">
       @if (clubUser.iCaptainId[0] != player.iId) {
         <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
       }
