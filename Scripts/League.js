@@ -50,8 +50,8 @@ function drawTable(ltTbl) {
   sBox += '<th style="text-align:right">Pkte.</th>';
   sBox += '</tr>';
 
-  for (var i = 0; i < ltTbl.length; i++) {
-    var tbpl = ltTbl[i];
+  for (var i = 0; i < ltTbl[0].length; i++) {
+    var tbpl = ltTbl[0][i];
     var iGames = tbpl.iGUV[0] + tbpl.iGUV[1] + tbpl.iGUV[2];
     var iDiff = tbpl.iGoals - tbpl.iGoalsOpp;
 
@@ -61,9 +61,27 @@ function drawTable(ltTbl) {
     }
 
     var k = i + 1;
+
+    var sPlaceLast = "-";
+    var sColor = "black";
+    for (var iLast = 0; iLast < ltTbl[1].length; iLast++) {
+      if (ltTbl[1][iLast].iId === tbpl.iId) {
+        if (i !== iLast) {
+          sPlaceLast = (iLast + 1).toString();
+          if (i > iLast) {
+            sColor = "red";
+          } else {
+            sColor = "green";
+          }
+        }
+        break;
+      }
+    }
+
     sBox += '<tr style=' + sStyle + '>';
     sBox += '<td class="first"><b>' + k + '</b></td>';
-    sBox += '<td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>';
+    //sBox += '<td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>';
+    sBox += '<td style="color: ' + sColor + '">' + sPlaceLast + '</td>';
     sBox += '<td><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", tbpl.sName).replace("__id", tbpl.iId);
     //sBox += '<td><a>' + tbpl.sName + '</a></td>';
     sBox += '<td>&nbsp;</td>';

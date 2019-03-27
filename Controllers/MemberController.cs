@@ -2570,9 +2570,10 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult setLeague(Models.LeagueModels league, int iGameday)
     {
-      league.ltTbl = MvcApplication.ckcore.tl.getLeagueTable(league.iSaison, league.iLand, league.iSpKl, iGameday, 0);
+      league.ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league.iSaison, league.iLand, league.iSpKl, iGameday - 1, 0);
+      league.ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league.iSaison, league.iLand, league.iSpKl, iGameday,     0);
 
-      return Json(league.ltTbl, JsonRequestBehavior.AllowGet);
+      return Json(new List<CornerkickCore.Tool.TableItem>[2] { league.ltTbl, league.ltTblLast }, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setLeagueTeams(Models.LeagueModels league, int iGameday)
