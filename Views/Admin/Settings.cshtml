@@ -116,40 +116,45 @@
 <text>No. of User: @Model.nUser<br></text>
 <text>No. of Player: @Model.nPlayer<br></text>
 
-@using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {
-  <button type="submit" class="btn btn-default">Restart Cornerkick</button>
-}
-
-@using (Html.BeginForm("DeleteLog", "Admin", FormMethod.Post)) {
-  if (Model.bLogExist) {
-    <button type="submit" class="btn btn-default">delete Log</button>
-  } else {
-    <button type="submit" class="btn btn-default" disabled>delete Log</button>
+<div style="position: relative; width: 50%; min-width: 300px; height: 75px; margin-top: 10px">
+  @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {
+    <button type="submit" class="btn btn-default" style="position: relative; width: 180px">Restart Cornerkick</button>
   }
-}
 
-@using (Html.BeginForm("SaveAutosave", "Admin", FormMethod.Post)) {
-  <button type="submit" class="btn btn-default">save autosave</button>
-}
-
-@using (Html.BeginForm("DeleteAutosave", "Admin", FormMethod.Post)) {
-  if (Model.bAutosaveExist) {
-    <button type="submit" class="btn btn-default">delete autosave</button>
-  } else {
-    <button type="submit" class="btn btn-default" disabled>delete autosave</button>
+  @using (Html.BeginForm("DeleteLog", "Admin", FormMethod.Post)) {
+    if (Model.bLogExist) {
+      <button type="submit" class="btn btn-default" style="position: relative; width: 180px">delete Log</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: relative; width: 180px" disabled>delete Log</button>
+    }
   }
-}
+</div>
 
-@using (Html.BeginForm("LoadAutosave", "Admin", FormMethod.Post)) {
-  <label for="files">autosave files:</label>
-  @Html.DropDownListFor(m => m.sSelectedAutosaveFile, Model.ddlAutosaveFiles, new { @class = "form-control" })
-
-  if (Model.bAutosaveExist) {
-    <button type="submit" class="btn btn-default">load autosave</button>
-  } else {
-    <button type="submit" class="btn btn-default" disabled>load autosave</button>
+<div style="position: relative; width: 50%; min-width: 300px; height: 40px">
+  @using (Html.BeginForm("SaveAutosave", "Admin", FormMethod.Post)) {
+    <button type="submit" class="btn btn-default" style="position: absolute; width: 180px">save autosave</button>
   }
-}
+
+  @using (Html.BeginForm("DeleteAutosave", "Admin", FormMethod.Post)) {
+    if (Model.bAutosaveExist) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px">delete autosave</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px" disabled>delete autosave</button>
+    }
+  }
+</div>
+
+<div style="position: relative; width: 50%; min-width: 300px; height: 40px">
+  @using (Html.BeginForm("LoadAutosave", "Admin", FormMethod.Post)) {
+    @Html.DropDownListFor(m => m.sSelectedAutosaveFile, Model.ddlAutosaveFiles, new { @class = "form-control", style = "position: absolute; width: 180px" })
+
+    if (Model.bAutosaveExist) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px">load autosave</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px" disabled>load autosave</button>
+    }
+  }
+</div>
 
 @{
   string sMapPath = Server.MapPath("~");
