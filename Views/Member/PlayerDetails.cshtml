@@ -3,9 +3,10 @@
 <head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
-  <script src="~/Scripts/jquery-2.0.0.min.js"></script>
-  <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
-  <script src="~/Scripts/Player.js" type="text/javascript"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
 </head>
 
 @{
@@ -61,6 +62,8 @@
   }
 
   $(document).ready(function () {
+    plotPlayerDevelopment();
+
     setSalary(@player.contract.iLength + 1);
 
     $("#iContractYears").keyup(function () {
@@ -219,6 +222,46 @@
       }
     });
   }
+
+  function plotPlayerDevelopment() {
+    $.ajax({
+      type: 'post',
+      url: '/Member/PlayerDetailsGetDevelopmentData',
+      dataType: "json",
+      data: { iPlId: @Model.iPlayer },
+      success: function (dataDev) {
+        var chartDev = new CanvasJS.Chart("divChartDevelopment", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            gridThickness: 1,
+            interval: 12,
+            valueFormatString: "DD MMM",
+            labelAngle: -20
+          },
+          axisY: {
+            title: "Stärke",
+            includeZero: false
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              xValueType: "dateTime",
+              dataPoints: dataDev
+            }
+          ]
+        });
+
+        chartDev.render();
+      }
+    });
+  }
 </script>
 
 @{
@@ -271,98 +314,102 @@
   }
 }
 
-<div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-  <table cellpadding="1" style="width: auto">
-    <tbody>
-      <tr>
-        <td align="right">Verein:</td>
-        <td align="right">@sClub</td>
-      </tr>
-      <tr>
-        <td align="right">Rückennummer:</td>
-        <td align="right">@player.iNr.ToString()</td>
-      </tr>
-      <tr>
-        <td align="right">Geburtsdatum:</td>
-        <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
-      </tr>
-      <tr>
-        <td align="right">Körpergröße/-gewicht:</td>
-        <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
-      </tr>
-      <tr>
-        <td align="right">Positionen:</td>
-        <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
-      </tr>
-      <tr>
-        <td align="right">Stärke (bereinigt):</td>
-        <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
-      </tr>
-      <tr>
-        <td align="right">Talent:</td>
-        <td align="right">@sTalent</td>
-      </tr>
-      <tr>
-        <td align="right">Fuß (links/rechts):</td>
-        @{
-          if (player.fFootL > 0.99 && player.fFootR > 0.99) {
-            <td align="right">beidfüßig</td>
-          } else {
-            <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+<div style="position: relative; width: 100%; height: auto">
+  <div style="position: relative; width: 25%; min-width: 260px; height: auto; float: left">
+    <table cellpadding="1" style="width: auto">
+      <tbody>
+        <tr>
+          <td align="right">Verein:</td>
+          <td align="right">@sClub</td>
+        </tr>
+        <tr>
+          <td align="right">Rückennummer:</td>
+          <td align="right">@player.iNr.ToString()</td>
+        </tr>
+        <tr>
+          <td align="right">Geburtsdatum:</td>
+          <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
+        </tr>
+        <tr>
+          <td align="right">Körpergröße/-gewicht:</td>
+          <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
+        </tr>
+        <tr>
+          <td align="right">Positionen:</td>
+          <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
+        </tr>
+        <tr>
+          <td align="right">Stärke (bereinigt):</td>
+          <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
+        </tr>
+        <tr>
+          <td align="right">Talent:</td>
+          <td align="right">@sTalent</td>
+        </tr>
+        <tr>
+          <td align="right">Fuß (links/rechts):</td>
+          @{
+            if (player.fFootL > 0.99 && player.fFootR > 0.99) {
+              <td align="right">beidfüßig</td>
+            } else {
+              <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+            }
           }
-        }
-      </tr>
-      <tr>
-        @{
-          string sVerletzung = "keine";
-          if (player.fVerletzung[0] > 0.0) {
-            sVerletzung = player.fVerletzung[0].ToString("0.0") + " Tage (" + (player.fVerletzung[0] / player.fVerletzung[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fVerletzung[2]];
+        </tr>
+        <tr>
+          @{
+            string sVerletzung = "keine";
+            if (player.fVerletzung[0] > 0.0) {
+              sVerletzung = player.fVerletzung[0].ToString("0.0") + " Tage (" + (player.fVerletzung[0] / player.fVerletzung[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fVerletzung[2]];
+            }
           }
-        }
-        <td align="right">Verletzung:</td>
-        <td align="right">@sVerletzung</td>
-      </tr>
-      <tr>
-        <td align="right">Gehalt:</td>
-        <td align="right">@player.contract.iSalary.ToString("#,# €", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-      </tr>
-      <tr>
-        @{
-          string sDauer = player.contract.iLength.ToString() + " Jahre";
-          if (MvcApplication.ckcore.ltClubs[player.iClubId].ltJugendspielerID.IndexOf(player.iId) >= 0) {
-            sDauer = "Jugendspieler";
-          } else if (player.contract.iLength < 2) {
-            sDauer = "Saisonende";
+          <td align="right">Verletzung:</td>
+          <td align="right">@sVerletzung</td>
+        </tr>
+        <tr>
+          <td align="right">Gehalt:</td>
+          <td align="right">@player.contract.iSalary.ToString("#,# €", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
+        </tr>
+        <tr>
+          @{
+            string sDauer = player.contract.iLength.ToString() + " Jahre";
+            if (MvcApplication.ckcore.ltClubs[player.iClubId].ltJugendspielerID.IndexOf(player.iId) >= 0) {
+              sDauer = "Jugendspieler";
+            } else if (player.contract.iLength < 2) {
+              sDauer = "Saisonende";
+            }
           }
-        }
-        <td align="right">Laufzeit:</td>
-        <td align="right">@sDauer</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+          <td align="right">Laufzeit:</td>
+          <td align="right">@sDauer</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-  <table cellpadding="1" style="width: auto">
-    <tbody>
-      <tr>
-        <td align="right">Führungspersönlichkeit:</td>
-        <td align="right">@player.character.fLeader.ToString("0.0%")</td>
-      </tr>
-      <tr>
-        <td align="right">Schußhäufigkeit:</td>
-        <td align="right">@player.character.fShoot.ToString("0.0%")</td>
-      </tr>
-      <tr>
-        <td align="right">Teamplayer:</td>
-        <td align="right">@player.character.fPass.ToString("0.0%")</td>
-      </tr>
-      <tr>
-        <td align="right">Dribbler:</td>
-        <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
-      </tr>
-    </tbody>
-  </table>
+  <div style="position: relative; width: 25%; min-width: 200px; height: auto; float: left">
+    <table cellpadding="1" style="width: auto">
+      <tbody>
+        <tr>
+          <td align="right">Führungspersönlichkeit:</td>
+          <td align="right">@player.character.fLeader.ToString("0.0%")</td>
+        </tr>
+        <tr>
+          <td align="right">Schußhäufigkeit:</td>
+          <td align="right">@player.character.fShoot.ToString("0.0%")</td>
+        </tr>
+        <tr>
+          <td align="right">Teamplayer:</td>
+          <td align="right">@player.character.fPass.ToString("0.0%")</td>
+        </tr>
+        <tr>
+          <td align="right">Dribbler:</td>
+          <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="divChartDevelopment" style="position: relative; height: 240px; width: 50%; min-width: 320px; float: left"></div>
 </div>
 
 @{

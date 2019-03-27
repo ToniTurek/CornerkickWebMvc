@@ -1231,6 +1231,25 @@ namespace CornerkickWebMvc.Controllers
       return Json("", JsonRequestBehavior.AllowGet);
     }
 
+    public ContentResult PlayerDetailsGetDevelopmentData(int iPlId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+
+      List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
+
+      foreach (CornerkickGame.Player.History hty in pl.ltHistory) {
+        long iDate = convertDateTimeToTimestamp(hty.dt);
+        dataPoints.Add(new Models.DataPointGeneral(iDate, hty.fStrength));
+      }
+
+      long iDateCurrent = convertDateTimeToTimestamp(MvcApplication.ckcore.dtDatum);
+      dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, MvcApplication.ckcore.game.tl.getAveSkill(pl, 0, false)));
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
     [HttpPost]
     public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0)
     {
