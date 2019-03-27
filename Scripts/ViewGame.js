@@ -33,7 +33,7 @@
     },
     complete: function (jqXHR, textStatus) {
       // Schedule the next request when the current one's complete
-      if (iState === -1 && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
+      if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
         setTimeout(function () { drawGame(-1); }, 250);
       }
     }
@@ -368,7 +368,7 @@ function plotStatistics(jState = -1) {
       $("#txtAdminChanceShootOnGoal").html(gD.sAdminChanceShootOnGoal);
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);
 
-      //alert(iState);
+      //alert(jState);
       var i = 0;
       var j = 0;
       for (i = 0; i < gD.ltF.length; ++i) {
@@ -382,7 +382,6 @@ function plotStatistics(jState = -1) {
         if (gD.ltF[i]) {
           if (gD.ltF[i].length > 0) {
             if (jState === -1) {
-              //alert(gD.ltF[i][gD.ltF[i].length - 1]);
               ltF[i].push(gD.ltF[i][0]);
             } else {
               ltF[i].length = 0;
@@ -417,7 +416,7 @@ function plotStatistics(jState = -1) {
         }
       }
 
-      //alert(ltF[0].length);
+      //alert(ltF[0][0].x + ", " + ltF[0][ltF[0].length - 1].x);
       /*
       var chartF = new CanvasJS.Chart("chartContainerF", {
         animationEnabled: false,

@@ -283,12 +283,12 @@ namespace CornerkickWebMvc.Controllers
 
       // Chart
       if (bAddFMList) {
-        if (gD.ltF == null) {
+        if (gD.ltF == null || iState == -1) {
           gD.ltF = new List<Models.DataPointGeneral>[user.game.nPlStart];
           for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
         }
 
-        if (gD.ltM == null) {
+        if (gD.ltM == null || iState == -1) {
           gD.ltM = new List<Models.DataPointGeneral>[user.game.nPlStart];
           for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
         }
