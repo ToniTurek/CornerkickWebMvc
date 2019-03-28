@@ -415,9 +415,14 @@
 
       @{
         string sNat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[player.iNat1 + 1]];
-        string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+
+        if (string.IsNullOrEmpty(sNat)) {
+          <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+        } else {
+          string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+          <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+        }
       }
-      <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
     </div>
 
     <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
