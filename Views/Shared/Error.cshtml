@@ -1,9 +1,15 @@
 ﻿@model System.Web.Mvc.HandleErrorInfo
 
 @{
-    ViewBag.Title = "Fehler";
+  ViewBag.Title = "Fehler";
 }
 
 <h1 class="text-danger">Fehler</h1>
-<h2 class="text-danger">Fehler beim Verarbeiten Ihrer Anforderung.</h2>
 
+@{
+  if (String.IsNullOrEmpty(ViewBag.errorMessage)) {
+    <h2 class="text-danger">Fehler beim Verarbeiten Ihrer Anforderung.</h2>
+  } else {
+    <h2 class="text-danger">@ViewBag.errorMessage</h2>
+  }
+}

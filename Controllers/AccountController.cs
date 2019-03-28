@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if !DEBUG
+#define _EMAIL_CONFIRMATION
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -17,6 +21,12 @@ namespace CornerkickWebMvc.Controllers
   [Authorize]
   public class AccountController : Controller
   {
+    public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+    {
+      UserManager = userManager;
+      SignInManager = signInManager;
+    }
+
 #if _CONSOLE
     public static CornerkickConsole.CUI ckconsole;
 #endif
@@ -506,12 +516,6 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
-    {
-      UserManager = userManager;
-      SignInManager = signInManager;
-    }
-
     public ApplicationSignInManager SignInManager
     {
         get
@@ -554,10 +558,18 @@ namespace CornerkickWebMvc.Controllers
     {
       MvcApplication.ckcore.tl.writeLog("Login of user: " + model.Email);
 
-      if (!ModelState.IsValid)
-      {
-        return View(model);
+      if (!ModelState.IsValid) return View(model);
+
+#if _EMAIL_CONFIRMATION
+      // Require the user to have a confirmed email before they can log on.
+      var user = await UserManager.FindByNameAsync(model.Email);
+      if (user != null) {
+        if (!await UserManager.IsEmailConfirmedAsync(user.Id)) {
+          ViewBag.errorMessage = "Um Dich einloggen zu können, musst Du deine e-mail bestätigen! Bitte überprüfe Deinen e-mail Account.";
+          return View("Error");
+        }
       }
+#endif
 
       // Anmeldefehler werden bezüglich einer Kontosperre nicht gezählt.
       // Wenn Sie aktivieren möchten, dass Kennwortfehler eine Sperre auslösen, ändern Sie in "shouldLockout: true".
@@ -593,56 +605,51 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-      //
-      // GET: /Account/VerifyCode
-      [AllowAnonymous]
-      public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
-      {
-          // Verlangen, dass sich der Benutzer bereits mit seinem Benutzernamen/Kennwort oder einer externen Anmeldung angemeldet hat.
-          if (!await SignInManager.HasBeenVerifiedAsync())
-          {
-              return View("Error");
-          }
-          return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
-      }
+    //
+    // GET: /Account/VerifyCode
+    [AllowAnonymous]
+    public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
+    {
+      // Verlangen, dass sich der Benutzer bereits mit seinem Benutzernamen/Kennwort oder einer externen Anmeldung angemeldet hat.
+      if (!await SignInManager.HasBeenVerifiedAsync()) return View("Error");
 
-      //
-      // POST: /Account/VerifyCode
-      [HttpPost]
-      [AllowAnonymous]
-      [ValidateAntiForgeryToken]
-      public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
-      {
-          if (!ModelState.IsValid)
-          {
-              return View(model);
-          }
+      return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+    }
 
-          // Der folgende Code schützt vor Brute-Force-Angriffen der zweistufigen Codes. 
-          // Wenn ein Benutzer in einem angegebenen Zeitraum falsche Codes eingibt, wird das Benutzerkonto 
-          // für einen bestimmten Zeitraum gesperrt. 
-          // Sie können die Einstellungen für Kontosperren in "IdentityConfig" konfigurieren.
-          var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
-          switch (result)
-          {
-              case SignInStatus.Success:
-                  return RedirectToLocal(model.ReturnUrl);
-              case SignInStatus.LockedOut:
-                  return View("Lockout");
-              case SignInStatus.Failure:
-              default:
-                  ModelState.AddModelError("", "Ungültiger Code.");
-                  return View(model);
-          }
-      }
+    //
+    // POST: /Account/VerifyCode
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
+    {
+      if (!ModelState.IsValid) return View(model);
 
-      //
-      // GET: /Account/Register
-      [AllowAnonymous]
-      public ActionResult Register()
+      // Der folgende Code schützt vor Brute-Force-Angriffen der zweistufigen Codes. 
+      // Wenn ein Benutzer in einem angegebenen Zeitraum falsche Codes eingibt, wird das Benutzerkonto 
+      // für einen bestimmten Zeitraum gesperrt. 
+      // Sie können die Einstellungen für Kontosperren in "IdentityConfig" konfigurieren.
+      var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+      switch (result)
       {
-          return View();
+        case SignInStatus.Success:
+            return RedirectToLocal(model.ReturnUrl);
+        case SignInStatus.LockedOut:
+            return View("Lockout");
+        case SignInStatus.Failure:
+        default:
+            ModelState.AddModelError("", "Ungültiger Code.");
+            return View(model);
       }
+    }
+
+    //
+    // GET: /Account/Register
+    [AllowAnonymous]
+    public ActionResult Register()
+    {
+        return View();
+    }
 
     //
     // POST: /Account/Register
@@ -685,17 +692,11 @@ namespace CornerkickWebMvc.Controllers
         MvcApplication.ckcore.tl.writeLog("  Register succeeded: " + result.Succeeded.ToString());
 
         if (result.Succeeded) {
-          await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
-
-          // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
-          // E-Mail-Nachricht mit diesem Link senden
-          // string code = await UserManager.GenerateEmailConfirmationTokenAsync(usr.Id);
-          // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = usr.Id, code = code }, protocol: Request.Url.Scheme);
-          // await UserManager.SendEmailAsync(usr.Id, "Konto bestätigen", "Bitte bestätigen Sie Ihr Konto. Klicken Sie dazu <a href=\"" + callbackUrl + "\">hier</a>");
-
           rvmDEBUG = model;
 
           if (MvcApplication.ckcore.ltUser.Count == 0/* && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
+            await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
+
             CornerkickCore.Core.User usrAdmin = createUser(appUser);
             MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
@@ -714,26 +715,34 @@ namespace CornerkickWebMvc.Controllers
             MvcApplication.ckcore.ltClubs.Add(club0);
             // END Initialize dummy club
           } else { // no admin
+#if _EMAIL_CONFIRMATION
+            // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
+            // E-Mail-Nachricht mit diesem Link senden
+            string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
+            await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+
+            // Uncomment to debug locally 
+            // TempData["ViewBagLink"] = callbackUrl;
+
+            ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-Konto zu bestätigen!";
+#else
+            await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
+#endif
+
+            // Create club
             addUserToCk(appUser, model);
             uploadFile(file, ckClub().iId);
             iniCk();
           }
 
           MvcApplication.save(MvcApplication.timerCkCalender);
-          /*
-#if DEBUG
-          MvcApplication.ckcore.io.save("C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\save\\.autosave.ck");
-#else
-          var path = Server.MapPath("~/save");
-          if (!System.IO.Directory.Exists(path)) {
-            System.IO.Directory.CreateDirectory(path);
-          }
-          MvcApplication.ckcore.io.save(System.Web.HttpContext.Current.Server.MapPath("~/save/.autosave.ck"));
+
+#if _EMAIL_CONFIRMATION
+          return View("Info");
 #endif
-          */
 
           return RedirectToAction("Desk", "Member");
-          //return RedirectToAction("Index", "Home");
         }
 
         AddErrors(result);
@@ -761,15 +770,18 @@ namespace CornerkickWebMvc.Controllers
     //
     // GET: /Account/ConfirmEmail
     [AllowAnonymous]
-      public async Task<ActionResult> ConfirmEmail(string userId, string code)
-      {
-          if (userId == null || code == null)
-          {
-              return View("Error");
-          }
-          var result = await UserManager.ConfirmEmailAsync(userId, code);
-          return View(result.Succeeded ? "ConfirmEmail" : "Error");
+    public async Task<ActionResult> ConfirmEmail(string userId, string code)
+    {
+      if (userId == null || code == null) return View("Error");
+
+      var result = await UserManager.ConfirmEmailAsync(userId, code);
+
+      if (result.Succeeded) {
+
       }
+
+      return View(result.Succeeded ? "ConfirmEmail" : "Error");
+    }
 
       //
       // GET: /Account/ForgotPassword
