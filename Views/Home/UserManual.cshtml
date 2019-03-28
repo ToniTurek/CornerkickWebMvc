@@ -69,7 +69,7 @@
 </html>
 
 <h2>Erste Schritte</h2>
-Einige Einstellungen können nur zu bestimmten Zeitpunkten (zu Beginn einer Saison oder am ersten jeden Monats) vorgenommen werden.
+Einige Einstellungen können nur zu bestimmten Zeitpunkten (zu Beginn einer Saison oder am ersten Tag jeden Monats) vorgenommen werden.
 
 <h4>Erster Tag des Spiels</h4>
 Nur am ersten Tag des Spiels können:
@@ -86,65 +86,12 @@ Am ersten Tag jeder Saison kann:
   <li>das Personal geändert werden. Dies ist auch am ersten Tag jeden Monats möglich.</li>
 </ul>
 
-<h2>Spieler</h2>
-<h4>Konstitution</h4>
-<ul>
-  <li>
-    <u>Kondition</u><br />
-    Je besser die Kondition des Spielers, desto geringer fällt der Frischeverlust in Spiel und Training aus.<br />
-    Der Konditionsbereich liegt zwischen 10 < Kondition < 100 (durch Spielerdoping kann die maximale Kondition erhöht werden).
-  </li>
-  <li>
-    <u>Frische</u><br />
-    Je größer die Frische des Spielers, desto mehr Strecke kann er zurücklegen.<br />
-    Der Frischebereich liegt zwischen 10 < Frische < 100.
-  </li>
-</ul>
-
-<h4>Soft-skills</h4>
-<ul>
-  <li>
-    <u>Moral</u><br />
-    Die Moral wirkt sich auf die Fähigkeiten des Spielers aus.<br />
-    Der Moralbereich liegt zwischen 10 < Moral < inf. Ist ein Spieler hoch motiviert (Moral > 100) ist es schwerer die Motivation zu steigern als wenn er schwach motiviert ist. Mit der Zeit nähert sich die Motivation dem Normwert von 100 an.
-  </li>
-  <li>
-    <u>Erfahrung</u><br />
-    Je höher die Erfahrung des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
-    Die Erfahrung steigt mit jeder gespielten Spielminute und sinkt im Lauf der Zeit kontinuierlich ab. Junge Spieler gewinnen schneller/verlieren langsamer Erfahrung als ältere.<br />
-    Der Erfahrungbereich liegt zwischen 10 < Erfahrung < 100.
-  </li>
-  <li>
-    <u>Talent</u><br />
-    Das Talent ist für jeden Spieler konstant. Je größer das Talent des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
-    Das Talent liegt üblicherweise zwischen 1 und 10. In Ausnahmefällen ist jedoch auch ein Talent größer 10 möglich.
-  </li>
-  <li>
-    <u>Tagesform</u><br />
-    Die Tagesform wirkt sich auf die Fähigkeiten des Spielers aus und ändert sich jeden Tag.<br />
-  </li>
-</ul>
-
-<h4>Fähigkeiten</h4>
-Die Fähigkeiten des Spielers werden beeinflußt durch seine Frische, seine Moral, seine Tagesform und seine Position (wenn nicht auf Hauptposition eingesetzt).
-<ul>
-  @{
-    foreach (string sSkill in MvcApplication.ckcore.plr.sSkills) {
-      <li>@sSkill</li>
-    }
-  }
-</ul>
-
-<h4>Character</h4>
-<ul>
-  <li>
-    <u>Führungspersönlichkeit (FP)</u><br />
-    Je höher der mittlere Wert der Führungspersönlichkeit einer Mannschaft ist, desto geringer wirken sich Gegentore negativ auf die Moral der Mannschaft aus.
-  </li>
-</ul>
-
 <h2>Mannschaft</h2>
-<h4>Mannschaftstraining</h4>
+<h3>Aufstellung</h3>
+tbd
+<h3>Taktik</h3>
+tbd
+<h3>Mannschaftstraining</h3>
 <table class="tStat" style="width: auto" border="1" cellpadding="3" summary="Teamtraining">
   <tr>
     <th style="text-align:center">Art</th>
@@ -195,11 +142,69 @@ Die Fähigkeiten des Spielers werden beeinflußt durch seine Frische, seine Mora
 
 Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leichter Kondition auf, ältere schwerer.
 
-<h4>Kapitäne</h4>
+<h3>Kapitäne</h3>
 Nach Ernennung eines Spielers zum Kapitän gewinnt er 15% Moral (Vize-Kapitän: 5%). Wird durch die Ernennung ein anderer Spieler als Kapitän abgelöst, verliert dieser 20% Moral (Vize-Kapitän: 8%).
 Zu Beginn eines jeden Spiels erhält der Kaptiän zusätzlich einen Moralbonus von 2%. Bei einem Gegentor wird der Einfluß der Führungspersönlichkeit des Kapitäns (FP) um 10% erhöht.
 
-<h2>Personal</h2>
+<h2>Spieler</h2>
+<h3>Konstitution</h3>
+<ul>
+  <li>
+    <u>Kondition</u><br />
+    Je besser die Kondition des Spielers, desto geringer fällt der Frischeverlust in Spiel und Training aus.<br />
+    Der Konditionsbereich liegt zwischen 10 < Kondition < 100 (durch Spielerdoping kann die maximale Kondition erhöht werden).
+  </li>
+  <li>
+    <u>Frische</u><br />
+    Je größer die Frische des Spielers, desto mehr Strecke kann er zurücklegen.<br />
+    Der Frischebereich liegt zwischen 10 < Frische < 100.
+  </li>
+</ul>
+
+<h3>Soft-skills</h3>
+<ul>
+  <li>
+    <u>Moral</u><br />
+    Die Moral wirkt sich auf die Fähigkeiten des Spielers aus.<br />
+    Der Moralbereich liegt zwischen 10 < Moral < inf. Ist ein Spieler hoch motiviert (Moral > 100) ist es schwerer die Motivation zu steigern als wenn er schwach motiviert ist. Mit der Zeit nähert sich die Motivation dem Normwert von 100 an.
+  </li>
+  <li>
+    <u>Erfahrung</u><br />
+    Je höher die Erfahrung des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
+    Die Erfahrung steigt mit jeder gespielten Spielminute und sinkt im Lauf der Zeit kontinuierlich ab. Junge Spieler gewinnen schneller/verlieren langsamer Erfahrung als ältere.<br />
+    Der Erfahrungbereich liegt zwischen 10 < Erfahrung < 100.
+  </li>
+  <li>
+    <u>Talent</u><br />
+    Das Talent ist für jeden Spieler konstant. Je größer das Talent des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
+    Das Talent liegt üblicherweise zwischen 1 und 10. In Ausnahmefällen ist jedoch auch ein Talent größer 10 möglich.
+  </li>
+  <li>
+    <u>Tagesform</u><br />
+    Die Tagesform wirkt sich auf die Fähigkeiten des Spielers aus und ändert sich jeden Tag.<br />
+  </li>
+</ul>
+
+<h3>Fähigkeiten</h3>
+Die Fähigkeiten des Spielers werden beeinflußt durch seine Frische, seine Moral, seine Tagesform und seine Position (wenn nicht auf Hauptposition eingesetzt).
+<ul>
+  @{
+    foreach (string sSkill in MvcApplication.ckcore.plr.sSkills) {
+      <li>@sSkill</li>
+    }
+  }
+</ul>
+
+<h3>Character</h3>
+<ul>
+  <li>
+    <u>Führungspersönlichkeit (FP)</u><br />
+    Je höher der mittlere Wert der Führungspersönlichkeit einer Mannschaft ist, desto geringer wirken sich Gegentore negativ auf die Moral der Mannschaft aus.
+  </li>
+</ul>
+
+<h2>Verein</h2>
+<h3>Personal</h3>
 <ul>
   <li>
     <u>Co-Trainer</u><br />
@@ -231,7 +236,7 @@ Zu Beginn eines jeden Spiels erhält der Kaptiän zusätzlich einen Moralbonus v
   </li>
 </ul>
 
-<h2>Stadion</h2>
+<h3>Stadion</h3>
 <h4>Ausbaukosten</h4>
 Die Kosten für den Ausbau der Stadionplätze ist abhängig von der Anzahl der neu zu bauenden Plätze und der bereits vorhandenen Plätze.<br />
 Je mehr Plätze gebaut werden und je mehr Plätze bereits vorhanden sind, desto teurer sind die Kosten pro Platz.
