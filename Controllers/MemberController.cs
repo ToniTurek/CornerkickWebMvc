@@ -541,6 +541,7 @@ namespace CornerkickWebMvc.Controllers
       public string sLz { get; set; }
       public string sNat { get; set; }
       public int iSuspended { get; set; }
+      public string sCaptain { get; set; }
     }
 
     public ActionResult getTableTeam()
@@ -580,8 +581,11 @@ namespace CornerkickWebMvc.Controllers
 
         if (i == MvcApplication.ckcore.plr.getCaptainIx(club)) sName += " (C)";
 
+        int iNat = int.Parse(ltLV[i][12]);
+        string sNat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[iNat + 1]];
+
         //Hard coded data here that I want to replace with query results
-        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = ltLV[i][12], sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", fLeader = Convert.ToSingle(ltLV[i][19]), sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp };
+        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", fLeader = Convert.ToSingle(ltLV[i][19]), sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20] };
       }
 
       return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
@@ -1142,6 +1146,9 @@ namespace CornerkickWebMvc.Controllers
           }
         );
       }
+
+      plModel.bCaptain  = i == club.iCaptainId[0];
+      plModel.bCaptain2 = i == club.iCaptainId[1];
 
       // Next / Prev. Player
       plModel.iPlIdPrev = -1;

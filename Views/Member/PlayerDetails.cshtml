@@ -406,6 +406,18 @@
           </tr>
         </tbody>
       </table>
+
+      @if (Model.bCaptain) {
+        <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+      } else if (Model.bCaptain2) {
+        <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+      }
+
+      @{
+        string sNat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[player.iNat1 + 1]];
+        string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+      }
+      <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
     </div>
 
     <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
@@ -431,11 +443,11 @@
       </div>
 
       <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 6px">
-        @if (clubUser.iCaptainId[0] != player.iId) {
+        @if (!Model.bCaptain) {
           <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
         }
 
-        @if (clubUser.iCaptainId[1] != player.iId) {
+        @if (!Model.bCaptain2) {
           <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Vize-Kapitän machen</button>
         }
       </div>

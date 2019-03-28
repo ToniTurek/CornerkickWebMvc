@@ -25,5 +25,8 @@ namespace CornerkickWebMvc.Models
     public int iNo { get; set; }
 
     public List<SelectListItem> ltDdlNo { get; set; }
+
+    public bool bCaptain  { get; set; }
+    public bool bCaptain2 { get; set; }
   }
 }

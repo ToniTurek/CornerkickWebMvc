@@ -170,10 +170,20 @@
           { "data": "sAlter" },
           { "data": "sTalent" },
           { "data": "fLeader" },
+          { "data": "sCaptain" },
           { "data": "sMarktwert" },
           { "data": "sGehalt" },
           { "data": "sLz" },
-          { "data": "sNat" },
+          {
+            "data": "sNat",
+            "render": function (sNat, type, row) {
+              if (sNat) {
+                return '<img src="/Content/Icons/flags/' + sNat + '.png" title="' + sNat + '" style="width: 16px"/>';
+              } else {
+                return '<img src="/Content/Icons/flags/0.png" title="unknown" style="width: 16px"/>';
+              }
+            }
+          },
           { "data": "iSuspended" }
         ],
         rowReorder: {
@@ -186,12 +196,12 @@
         "searching": false,
         columnDefs: [
           {
-            targets: [1, 2, 20],
+            targets: [1, 2, 21],
             "orderable": false,
             "visible": false,
             "searchable": false
           },
-          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "className": "dt-center" }
+          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "className": "dt-center" }
         ],
         select: true,
         select: {
@@ -620,6 +630,7 @@
           <th>Alter</th>
           <th>Talent</th>
           <th>FP</th>
+          <th>C</th>
           <th>Marktwert [€]</th>
           <th>Gehalt [€/a]</th>
           <th>Lz [a]</th>
