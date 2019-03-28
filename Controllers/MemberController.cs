@@ -1323,6 +1323,9 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sPlayerMood, int iMode)
     {
+      // Initialize status code with ERROR
+      Response.StatusCode = 1;
+
       if (iId    < 0) return Json("Error", JsonRequestBehavior.AllowGet);
       if (iYears < 1) return Json("0",     JsonRequestBehavior.AllowGet);
 
@@ -1346,7 +1349,7 @@ namespace CornerkickWebMvc.Controllers
       if (iMode == 0) { // contract extention
         CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iId];
 
-        if (player.contract.iLength + iYears > 9) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
+        if (player.contract.iLength + iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
 
         player.contract.iLength += (byte)iYears;
         player.contract.iSalary = iSalary;
@@ -1355,7 +1358,7 @@ namespace CornerkickWebMvc.Controllers
 
         sReturn = "Der Vertrag mit " + player.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.";
       } else { // new contract
-        if (iYears > 9) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
+        if (iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
 
         // create new offer
         CornerkickCore.csTransfer.TransferOffer offer = new CornerkickCore.csTransfer.TransferOffer();
@@ -1368,29 +1371,10 @@ namespace CornerkickWebMvc.Controllers
 
         MvcApplication.ckcore.tr.addChangeOffer(iId, offer);
         sReturn = "Sie haben sich mit dem Spieler " + MvcApplication.ckcore.ltPlayer[iId].sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
-        /*
-        for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-          CornerkickCore.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
-
-          if (transfer.iPlayerId == iId) {
-            if (transfer.ltOffers == null) transfer.ltOffers = new List<CornerkickCore.csTransfer.TransferOffer>();
-
-            // Remove offer if already exist
-            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
-              if (transfer.ltOffers[iO].iClubId == offer.iClubId) {
-                transfer.ltOffers.RemoveAt(iO);
-                break;
-              }
-            }
-
-            transfer.ltOffers.Add(offer);
-            MvcApplication.ckcore.ltTransfer[iT] = transfer;
-
-            sReturn = "Sie haben sich mit dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
-          }
-        }
-        */
       }
+
+      // Set status code to OK
+      Response.StatusCode = 200;
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
@@ -1399,7 +1383,7 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult ExtentPlayerContract(int iPlayer, int iYears, string sSalary)
     {
       if (iPlayer < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-      if (iYears  < 1) return Json("0", JsonRequestBehavior.AllowGet);
+      if (iYears  < 1) return Json("0",     JsonRequestBehavior.AllowGet);
 
       sSalary = sSalary.Replace("€", string.Empty);
       sSalary = sSalary.Replace(".", string.Empty);
