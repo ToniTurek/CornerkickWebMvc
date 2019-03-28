@@ -442,15 +442,17 @@
         }
       </div>
 
-      <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 6px">
-        @if (!Model.bCaptain) {
-          <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
-        }
+      if (clubUser.ltJugendspielerID.IndexOf(player.iId) < 0) {
+        <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 6px">
+          @if (!Model.bCaptain) {
+            <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
+          }
 
-        @if (!Model.bCaptain2) {
-          <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Vize-Kapitän machen</button>
-        }
-      </div>
+          @if (!Model.bCaptain2) {
+            <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Vize-Kapitän machen</button>
+          }
+        </div>
+      }
     }
   }
 
