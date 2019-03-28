@@ -35,13 +35,15 @@
             return i !== 11;
           });
 
-          // opponent player
-          $.each(teamData.ltPlayerOpp, function (iFormation, player) {
-            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, teamData.ltPlayerOppPos[i], bMobile);
+          if (teamData.ltPlayerOpp) {
+            // opponent player
+            $.each(teamData.ltPlayerOpp, function (iFormation, player) {
+              result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, teamData.ltPlayerOppPos[i], bMobile);
 
-            i = i + 1;
-            return i !== 11;
-          });
+              i = i + 1;
+              return i !== 11;
+            });
+          }
 
           // hide orientation slider on start
           divTacticOrientation   .style.display = 'none';
