@@ -1,28 +1,29 @@
 ﻿<!DOCTYPE html>
+@{
+  //string sEmblem = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "App_Data");
+  //sEmblem = Path.Combine(sEmblem, "Uploads");
+  string sEmblem = @"/Content/Uploads/";
+
+  if (Request.IsAuthenticated) {
+    CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    if (clb != null) {
+      sEmblem += clb.iId.ToString() + ".png";
+    } else {
+      sEmblem += "0.png";
+    }
+  }
+}
+<div id="divDataEmblem" data-name="@sEmblem"></div>
+
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@ViewBag.Title - Cornerkick</title>
   @Styles.Render("~/Content/css")
   @Scripts.Render("~/bundles/modernizr")
   @Scripts.Render("~/bundles/jquery")
-  @{
-    //string sEmblem = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "App_Data");
-    //sEmblem = Path.Combine(sEmblem, "Uploads");
-    string sEmblem = @"/Content/Uploads/";
-
-    if (Request.IsAuthenticated) {
-      CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
-      if (clb != null) {
-        sEmblem += clb.iId.ToString() + ".png";
-      }
-    } else {
-      sEmblem += "0.png";
-    }
-  }
-  <div id="divDataEmblem" data-name="@sEmblem"></div>
   <style>
     body {
       background-repeat: no-repeat;

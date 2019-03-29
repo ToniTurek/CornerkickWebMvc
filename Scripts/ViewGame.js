@@ -2,7 +2,6 @@
   //alert("drawGame: " + iState);
 
   var drawGameDiv = $("#divDrawGame");
-  var playerAction = $("#playerAction");
   var bFinished = false;
   var iPositionsValue = $('#ddlPositions').val();
   var bAverage = iPositionsValue > 0;
