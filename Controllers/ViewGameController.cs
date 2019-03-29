@@ -390,10 +390,11 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // Shoots
-      int[] nPossession   = new int[2];
-      int[] nDuel         = new int[2];
-      int[] nCornerkick   = new int[2];
-      int[] nOffsite      = new int[2];
+      int[] nPossession = new int[2];
+      int[] nDuel       = new int[2];
+      int[] nCornerkick = new int[2];
+      int[] nOffsite    = new int[2];
+      int[] nFouls      = new int[2];
 
       for (byte iHA = 0; iHA < 2; iHA++) {
         int iIconTop = 2;
@@ -412,12 +413,14 @@ namespace CornerkickWebMvc.Controllers
           nDuel      [0] = state.iDuelH;
           nCornerkick[0] = state.iCornerkickH;
           nOffsite   [0] = state.iOffsiteH;
+          nFouls     [0] = state.iFoulsH;
         } else {
           gD.iGoalsA = state.iGoalsA;
           nPossession[1] = state.iPossessionA;
           nDuel      [1] = state.iDuelA;
           nCornerkick[1] = state.iCornerkickA;
           nOffsite   [1] = state.iOffsiteA;
+          nFouls     [1] = state.iFoulsA;
         }
 
         //iStTmp++;
@@ -450,8 +453,8 @@ namespace CornerkickWebMvc.Controllers
       float fDuelH = 50f;
       if (nDuel[0] + nDuel[1] > 0) fDuelH = 100 * nDuel[0] / (float)(nDuel[0] + nDuel[1]);
 
-      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] {        fDuelH, -4f }, new float[2] { (float)nCornerkick[0], -5f }, new float[2] { (float)nOffsite[0], -6f } };
-      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { 100f - fDuelH, -4f }, new float[2] { (float)nCornerkick[1], -5f }, new float[2] { (float)nOffsite[1], -6f } };
+      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] {        fDuelH, -4f }, new float[2] { (float)nCornerkick[0], -5f }, new float[2] { (float)nOffsite[0], -6f }, new float[2] { (float)nFouls[0], -7f } };
+      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { 100f - fDuelH, -4f }, new float[2] { (float)nCornerkick[1], -5f }, new float[2] { (float)nOffsite[1], -6f }, new float[2] { (float)nFouls[1], -7f } };
 
       if (AccountController.checkUserIsAdmin(AccountController.appUser)) {
         if (user.game.ball.plAtBall != null) {

@@ -218,16 +218,18 @@ function plotStatistics(jState = -1) {
       var dataH = gD.fDataH;
       var dataA = gD.fDataA;
 
-      var iGoalsH  = dataH[0][0];
-      var iGoalsA  = dataA[0][0];
-      var iShootsH = dataH[1][0];
-      var iShootsA = dataA[1][0];
+      var iGoalsH        = dataH[0][0];
+      var iGoalsA        = dataA[0][0];
+      var iShootsH       = dataH[1][0];
+      var iShootsA       = dataA[1][0];
       var iShootsOnGoalH = dataH[2][0];
       var iShootsOnGoalA = dataA[2][0];
-      var iCornerkickH = dataH[5][0];
-      var iCornerkickA = dataA[5][0];
-      var iOffsiteH = dataH[6][0];
-      var iOffsiteA = dataA[6][0];
+      var iCornerkickH   = dataH[5][0];
+      var iCornerkickA   = dataA[5][0];
+      var iOffsiteH      = dataH[6][0];
+      var iOffsiteA      = dataA[6][0];
+      var iFoulsH        = dataH[7][0];
+      var iFoulsA        = dataA[7][0];
       if (iGoalsH + iGoalsA > 0) {
         dataH[0][0] = 100 * iGoalsH / (iGoalsH + iGoalsA);
         dataA[0][0] = 100 - dataH[0][0];
@@ -248,6 +250,10 @@ function plotStatistics(jState = -1) {
         dataH[6][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
         dataA[6][0] = 100 - dataH[6][0];
       }
+      if (iFoulsH + iFoulsA > 0) {
+        dataH[7][0] = 100 * iFoulsH / (iFoulsH + iFoulsA);
+        dataA[7][0] = 100 - dataH[7][0];
+      }
 
       // Statistic bars
       var flotDataset = [
@@ -256,7 +262,7 @@ function plotStatistics(jState = -1) {
       ];
 
       var ticks = [
-        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Ecken"], [-6, "Abseits"]
+        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Ecken"], [-6, "Abseits"], [-7, "Fouls"]
       ];
 
       var flotOptions = {
@@ -283,7 +289,7 @@ function plotStatistics(jState = -1) {
         },
         yaxis: {
           show: true,
-          min: -6.6,
+          min: -7.6,
           max: 0.6,
           ticks: ticks
         },
@@ -312,6 +318,8 @@ function plotStatistics(jState = -1) {
             s = iCornerkickH.toString();
           } else if (ii === 6) {
             s = iOffsiteH.toString();
+          } else if (ii === 7) {
+            s = iFoulsH.toString();
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({
@@ -340,6 +348,8 @@ function plotStatistics(jState = -1) {
             s = iCornerkickA.toString();
           } else if (ii === 6) {
             s = iOffsiteA.toString();
+          } else if (ii === 7) {
+            s = iFoulsA.toString();
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({

@@ -151,6 +151,20 @@ namespace CornerkickWebMvc
 
       int iRetCk = ckcore.next(true);
       if (iRetCk == 99) return; // Saisonende
+
+      // Remove testgame requests if in past
+      List<CornerkickCore.Core.Cup> ltCupsTmp = new List<CornerkickCore.Core.Cup>(MvcApplication.ckcore.ltCups);
+      foreach (CornerkickCore.Core.Cup cup in ltCupsTmp) {
+        if (cup == null) continue;
+
+        if (cup.iId == -5) {
+          if (cup.ltMatchdays.Count < 1) continue;
+
+          if (cup.ltMatchdays[0].dt.CompareTo(MvcApplication.ckcore.dtDatum) <= 0) { // if request in past or now ...
+            MvcApplication.ckcore.ltCups.Remove(cup); // ... remove cup
+          }
+        }
+      }
     }
 
     private static int countCpuPlayerOnTransferlist()
@@ -371,7 +385,7 @@ namespace CornerkickWebMvc
         MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
 
         // Set admin user to CPU
-        MvcApplication.ckcore.ltClubs[0].iUser = -1;
+        if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
