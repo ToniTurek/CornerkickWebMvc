@@ -13,10 +13,12 @@
     dataType: "JSON",
     data: { iState: iState, bAverage: bAverage },
     success: function (gLoc) {
-      data = getPlayer(gLoc);
-
       drawGameDiv.html('');
-      drawGameDiv.html(data);
+
+      if (iPositionsValue >= 0) {
+        data = getPlayer(gLoc, iPositionsValue == 0);
+        drawGameDiv.html(data);
+      }
 
       bFinished = gLoc.bFinished;
 
@@ -39,7 +41,7 @@
   });
 }
 
-function getPlayer(gLoc) {
+function getPlayer(gLoc, bShowLookAt = true) {
   var sBox = "";
 
   if (gLoc.ltPlayer.length < 1) return sBox;
@@ -75,7 +77,12 @@ function getPlayer(gLoc) {
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
                   '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: black; z-index:22">' + gLoc.ltPlayer[iP +  0].iNo.toString() + '</h2>' + 
                 '</div>';
-      sBox   += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+
+      // draw look-at circle
+      if (bShowLookAt) {
+        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+      }
+
       sBox += '</div>';
     }
 
@@ -101,7 +108,12 @@ function getPlayer(gLoc) {
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
                   '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: black; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</h2>' + 
                 '</div>';
-      sBox   += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+
+      // draw look-at circle
+      if (bShowLookAt) {
+        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+      }
+
       sBox += '</div>';
 
       if (cbTargetPos) {
@@ -227,12 +239,14 @@ function plotStatistics(jState = -1) {
       var iShootsA       = dataA[1][0];
       var iShootsOnGoalH = dataH[2][0];
       var iShootsOnGoalA = dataA[2][0];
-      var iCornerkickH   = dataH[5][0];
-      var iCornerkickA   = dataA[5][0];
-      var iOffsiteH      = dataH[6][0];
-      var iOffsiteA      = dataA[6][0];
-      var iFoulsH        = dataH[7][0];
-      var iFoulsA        = dataA[7][0];
+      var iDuelsH        = dataH[4][0];
+      var iDuelsA        = dataA[4][0];
+      var iFoulsH        = dataH[5][0];
+      var iFoulsA        = dataA[5][0];
+      var iCornerkickH   = dataH[6][0];
+      var iCornerkickA   = dataA[6][0];
+      var iOffsiteH      = dataH[7][0];
+      var iOffsiteA      = dataA[7][0];
       if (iGoalsH + iGoalsA > 0) {
         dataH[0][0] = 100 * iGoalsH / (iGoalsH + iGoalsA);
         dataA[0][0] = 100 - dataH[0][0];
@@ -245,16 +259,20 @@ function plotStatistics(jState = -1) {
         dataH[2][0] = 100 * iShootsOnGoalH / (iShootsOnGoalH + iShootsOnGoalA);
         dataA[2][0] = 100 - dataH[2][0];
       }
-      if (iCornerkickH + iCornerkickA > 0) {
-        dataH[5][0] = 100 * iCornerkickH / (iCornerkickH + iCornerkickA);
-        dataA[5][0] = 100 - dataH[5][0];
-      }
-      if (iOffsiteH + iOffsiteA > 0) {
-        dataH[6][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
-        dataA[6][0] = 100 - dataH[6][0];
+      if (iDuelsH + iDuelsA > 0) {
+        dataH[4][0] = 100 * iDuelsH / (iDuelsH + iDuelsA);
+        dataA[4][0] = 100 - dataH[4][0];
       }
       if (iFoulsH + iFoulsA > 0) {
-        dataH[7][0] = 100 * iFoulsH / (iFoulsH + iFoulsA);
+        dataH[5][0] = 100 * iFoulsH / (iFoulsH + iFoulsA);
+        dataA[5][0] = 100 - dataH[5][0];
+      }
+      if (iCornerkickH + iCornerkickA > 0) {
+        dataH[6][0] = 100 * iCornerkickH / (iCornerkickH + iCornerkickA);
+        dataA[6][0] = 100 - dataH[6][0];
+      }
+      if (iOffsiteH + iOffsiteA > 0) {
+        dataH[7][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
         dataA[7][0] = 100 - dataH[7][0];
       }
 
@@ -265,7 +283,7 @@ function plotStatistics(jState = -1) {
       ];
 
       var ticks = [
-        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Ecken"], [-6, "Abseits"], [-7, "Fouls"]
+        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"]
       ];
 
       var flotOptions = {
@@ -318,11 +336,11 @@ function plotStatistics(jState = -1) {
           } else if (ii === 2) {
             s = iShootsOnGoalH.toString();
           } else if (ii === 5) {
-            s = iCornerkickH.toString();
-          } else if (ii === 6) {
-            s = iOffsiteH.toString();
-          } else if (ii === 7) {
             s = iFoulsH.toString();
+          } else if (ii === 6) {
+            s = iCornerkickH.toString();
+          } else if (ii === 7) {
+            s = iOffsiteH.toString();
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({
@@ -348,11 +366,11 @@ function plotStatistics(jState = -1) {
           } else if (ii === 2) {
             s = iShootsOnGoalA.toString();
           } else if (ii === 5) {
-            s = iCornerkickA.toString();
-          } else if (ii === 6) {
-            s = iOffsiteA.toString();
-          } else if (ii === 7) {
             s = iFoulsA.toString();
+          } else if (ii === 6) {
+            s = iCornerkickA.toString();
+          } else if (ii === 7) {
+            s = iOffsiteA.toString();
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({

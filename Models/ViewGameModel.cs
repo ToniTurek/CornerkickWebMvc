@@ -64,6 +64,8 @@ namespace CornerkickWebMvc.Models
       public int iGoalsA { get; set; }
       public int[] iShoots { get; set; }
       public int[] iShootsOnGoal { get; set; }
+      public int[] iDuels { get; set; }
+      public int[] iFouls { get; set; }
 
       public int iState  { get; set; }
       public int nStates { get; set; }
@@ -115,8 +117,9 @@ namespace CornerkickWebMvc.Models
       iPasses  = -1;
 
       ddlPositions = new List<SelectListItem>();
-      ddlPositions.Add(new SelectListItem { Text = "tatsächlich", Value = "0" });
-      ddlPositions.Add(new SelectListItem { Text = "gemittelt",   Value = "1" });
+      ddlPositions.Add(new SelectListItem { Text = "aus",         Value = "-1" });
+      ddlPositions.Add(new SelectListItem { Text = "tatsächlich", Value =  "0" });
+      ddlPositions.Add(new SelectListItem { Text = "gemittelt",   Value =  "1" });
       iPositions = 0;
     }
   }

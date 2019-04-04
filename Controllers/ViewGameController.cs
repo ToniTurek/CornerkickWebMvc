@@ -47,17 +47,18 @@ namespace CornerkickWebMvc.Controllers
         if (!System.IO.File.Exists(sEmblemDir + view.sEmblemH)) view.sEmblemH = "0.png";
         if (!System.IO.File.Exists(sEmblemDir + view.sEmblemA)) view.sEmblemA = "0.png";
 
+        string[] sHA = new string[2] { "H", "A" };
         // Add player to heatmap
         for (byte iHA = 0; iHA < 2; iHA++) {
           for (byte iPl = 0; iPl < user.game.nPlStart; iPl++) {
-            view.ddlHeatmap.Add(new SelectListItem { Text = user.game.player[iHA][iPl].sName, Value = (2 + (iHA * user.game.nPlStart) + iPl).ToString() });
+            view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + user.game.player[iHA][iPl].sName + " - " + user.game.player[iHA][iPl].iNr, Value = (2 + (iHA * user.game.nPlStart) + iPl).ToString() });
           }
         }
-
-        view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
-        view.ddlDuels  = new List<SelectListItem>(view.ddlHeatmap);
-        view.ddlPasses = new List<SelectListItem>(view.ddlHeatmap);
       }
+
+      view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
+      view.ddlDuels  = new List<SelectListItem>(view.ddlHeatmap);
+      view.ddlPasses = new List<SelectListItem>(view.ddlHeatmap);
 
       fHeatmapMax = 0f;
 
@@ -262,20 +263,26 @@ namespace CornerkickWebMvc.Controllers
 
         // Duels
         CornerkickGame.Game.Duel duel = state.duel;
-        if (duel.iResult > 2 && duel.plDef != null && duel.plDef.iHA == iHA) {
-          string sCardDesc = MvcApplication.ckcore.game.tl.sSpielmin(duel.tsMinute, false) +
-                              sTeam +
-                              " - " +
-                              duel.plDef.sName;
+        if (duel.plDef != null && duel.plDef.iHA == iHA) {
+          if (duel.iResult > 2) {
+            string sCardDesc = MvcApplication.ckcore.game.tl.sSpielmin(duel.tsMinute, false) +
+                                sTeam +
+                                " - " +
+                                duel.plDef.sName;
 
-          string sImg = "Y";
-          if      (duel.iResult == 4) sImg = "YR";
-          else if (duel.iResult == 5) sImg = "R";
+            string sImg = "y";
+            if      (duel.iResult == 4) sImg = "yr";
+            else if (duel.iResult == 5) sImg = "r";
 
-          gD.sTimelineIcons += "<img " + sOnClick + "src=\"/Content/Icons/" + sImg + "Card.bmp\" alt=\"Karte\" style=\"position: absolute; top: " + iIconTop.ToString() + "px; width: 12px; left: " + (fLeft - 0.5).ToString(nfi) + "%" + sCursor + "\" title=\"" + sCardDesc + "\"/>";
+            gD.sTimelineIcons += "<img " + sOnClick + "src=\"/Content/Icons/" + sImg + "Card.png\" alt=\"Karte\" style=\"position: absolute; top: " + iIconTop.ToString() + "px; width: 12px; left: " + (fLeft - 0.5).ToString(nfi) + "%" + sCursor + "\" title=\"" + sCardDesc + "\"/>";
 
-          if (string.IsNullOrEmpty(gD.sStatCards)) gD.sStatCards = "<br/><u>Karten:</u>";
-          gD.sStatCards += "<br/><img " + sOnClick + "style=\"position: relative" + sCursor + "\" src ='/Content/Icons/" + sImg + "Card.bmp'/>" + sCardDesc;
+            if (string.IsNullOrEmpty(gD.sStatCards)) gD.sStatCards = "<br/><u>Karten:</u>";
+            gD.sStatCards += "<br/><img " + sOnClick + "style=\"position: relative" + sCursor + "\" src ='/Content/Icons/" + sImg + "Card.png'/>" + sCardDesc;
+          }
+
+          // Count duels (fouls)
+          gD.iDuels[iHA]++;
+          if (duel.iResult > 1) gD.iFouls[iHA]++;
         }
 
         //iStTmp++;
@@ -368,10 +375,8 @@ namespace CornerkickWebMvc.Controllers
 
       // Shoots
       int[] nPossession = new int[2];
-      int[] nDuel       = new int[2];
       int[] nCornerkick = new int[2];
       int[] nOffsite    = new int[2];
-      int[] nFouls      = new int[2];
 
       for (byte iHA = 0; iHA < 2; iHA++) {
         int iIconTop = 2;
@@ -387,17 +392,13 @@ namespace CornerkickWebMvc.Controllers
         if (iHA == 0) {
           gD.iGoalsH = state.iGoalsH;
           nPossession[0] = state.iPossessionH;
-          nDuel      [0] = state.iDuelH;
           nCornerkick[0] = state.iCornerkickH;
           nOffsite   [0] = state.iOffsiteH;
-          nFouls     [0] = state.iFoulsH;
         } else {
           gD.iGoalsA = state.iGoalsA;
           nPossession[1] = state.iPossessionA;
-          nDuel      [1] = state.iDuelA;
           nCornerkick[1] = state.iCornerkickA;
           nOffsite   [1] = state.iOffsiteA;
-          nFouls     [1] = state.iFoulsA;
         }
 
         //iStTmp++;
@@ -426,12 +427,8 @@ namespace CornerkickWebMvc.Controllers
       float fPossessionH = 50f;
       if (nPossession[0] + nPossession[1] > 0) fPossessionH = 100f * nPossession[0] / (float)(nPossession[0] + nPossession[1]);
 
-      // Zweikämpfe
-      float fDuelH = 50f;
-      if (nDuel[0] + nDuel[1] > 0) fDuelH = 100 * nDuel[0] / (float)(nDuel[0] + nDuel[1]);
-
-      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] {        fDuelH, -4f }, new float[2] { (float)nCornerkick[0], -5f }, new float[2] { (float)nOffsite[0], -6f }, new float[2] { (float)nFouls[0], -7f } };
-      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { 100f - fDuelH, -4f }, new float[2] { (float)nCornerkick[1], -5f }, new float[2] { (float)nOffsite[1], -6f }, new float[2] { (float)nFouls[1], -7f } };
+      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] { (float)gD.iDuels[0], -4f }, new float[2] { (float)gD.iFouls[0], -5f }, new float[2] { (float)nCornerkick[0], -6f }, new float[2] { (float)nOffsite[0], -7f } };
+      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { (float)gD.iDuels[1], -4f }, new float[2] { (float)gD.iFouls[1], -5f }, new float[2] { (float)nCornerkick[1], -6f }, new float[2] { (float)nOffsite[1], -7f } };
 
       if (AccountController.checkUserIsAdmin(AccountController.appUser)) {
         if (user.game.ball.plAtBall != null) {
@@ -526,25 +523,33 @@ namespace CornerkickWebMvc.Controllers
     private string getDuelIcon(CornerkickGame.Game.State state, CornerkickGame.Game game, int iHA = -1, int iPlIx = -1)
     {
       CornerkickGame.Player plDef = state.duel.plDef;
+      if (plDef == null) return "";
 
-      if (plDef == null)                       return "";
-      //if (iHA   >= 0 && plDef.iHA    != iHA)   return "";
-      if (iPlIx >= 0 && plDef.iIndex != iPlIx) return "";
+      CornerkickGame.Player plOff = state.duel.plOff;
+      if (plOff == null) return "";
+
+      if (iPlIx >= 0 && plDef.iIndex != iPlIx && plOff.iIndex != iPlIx) return "";
 
       string sDuelDesc = MvcApplication.ckcore.game.tl.sSpielmin(state.duel.tsMinute, false) +
-                         " - " + state.duel.plDef.sName;
+                         " - " + state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
 
       string sDefOff = "def";
-      if (iHA == state.duel.plOff.iHA) sDefOff = "off";
+      if (iHA == state.duel.plOff.iHA) {
+        sDefOff = "off";
+      }
 
-      string sImg = "duel_" + sDefOff + "_0";
-      if      (state.duel.iResult == 1) sImg = "duel_" + sDefOff + "_1";
-      else if (state.duel.iResult == 2) sImg = "whistle";
-      else if (state.duel.iResult == 3) sImg = "yCard";
-      else if (state.duel.iResult == 4) sImg = "yrCard";
-      else if (state.duel.iResult == 5) sImg = "rCard";
+      string sImg = "duel_" + sDefOff + "_1"; // win off. / loose def.
+      if (state.duel.iResult == 0) sImg = "duel_" + sDefOff + "_0"; // win def. / loose off.
 
-      return "<img src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "\" title=\"" + sDuelDesc + "\" z-index=\"99\"/>";
+      // win off. / fould (and card) def.
+      if (iHA < 0 || iHA == state.duel.plDef.iHA) {
+        if      (state.duel.iResult == 2) sImg = "whistle";
+        else if (state.duel.iResult == 3) sImg = "yCard";
+        else if (state.duel.iResult == 4) sImg = "yrCard";
+        else if (state.duel.iResult == 5) sImg = "rCard";
+      }
+
+      return "<img src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; z-index: 99\" title=\"" + sDuelDesc + "\" />";
     }
 
     public Models.ViewGameModel.gameData getGameData(Models.ViewGameModel view, int iState = -1)
@@ -571,6 +576,8 @@ namespace CornerkickWebMvc.Controllers
 
       gD.iShoots       = new int[2];
       gD.iShootsOnGoal = new int[2];
+      gD.iDuels        = new int[2];
+      gD.iFouls        = new int[2];
 
       CornerkickGame.Game.Data gameData = user.game.data;
 
