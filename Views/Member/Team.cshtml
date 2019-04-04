@@ -21,6 +21,7 @@
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script type="text/javascript" src="~/Scripts/draw.js"></script>
   <script type="text/javascript" src="~/Scripts/Formation.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
 
   <style>
     .disabledDiv {
@@ -177,11 +178,7 @@
           {
             "data": "sNat",
             "render": function (sNat, type, row) {
-              if (sNat) {
-                return '<img src="/Content/Icons/flags/' + sNat + '.png" title="' + sNat + '" style="width: 16px"/>';
-              } else {
-                return '<img src="/Content/Icons/flags/0.png" title="unknown" style="width: 16px"/>';
-              }
+              return getNatIcon(sNat);
             }
           },
           { "data": "iSuspended" }

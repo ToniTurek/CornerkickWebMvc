@@ -85,3 +85,11 @@ function createTableTransferDetails() {
 
   return sReturn;
 }
+
+function getNatIcon(sNat) {
+  if (sNat) {
+    return '<img src="/Content/Icons/flags/' + sNat + '.png" title="' + sNat + '" style="width: 16px"/>';
+  } else {
+    return '<img src="/Content/Icons/flags/0.png" title="unknown" style="width: 16px"/>';
+  }
+}
