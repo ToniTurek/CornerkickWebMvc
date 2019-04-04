@@ -53,6 +53,10 @@ namespace CornerkickWebMvc.Controllers
             view.ddlHeatmap.Add(new SelectListItem { Text = user.game.player[iHA][iPl].sName, Value = (2 + (iHA * user.game.nPlStart) + iPl).ToString() });
           }
         }
+
+        view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
+        view.ddlDuels  = new List<SelectListItem>(view.ddlHeatmap);
+        view.ddlPasses = new List<SelectListItem>(view.ddlHeatmap);
       }
 
       fHeatmapMax = 0f;
@@ -161,7 +165,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(gLoc, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1)
+    public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       CornerkickCore.Core.User user = AccountController.ckUser();
       CornerkickCore.Core.Club club = AccountController.ckClub();
@@ -173,15 +177,15 @@ namespace CornerkickWebMvc.Controllers
       } else if (iState >= 0) {
         gD = getGameData(view, iState);
       } else if (iState <  0) {
-        addGameData(ref gD, gameData, user, club, iState, iHeatmap);
+        addGameData(ref gD, gameData, user, club, iState);
       }
 
-      setGameData(ref gD, gameData, user, club, iState, iHeatmap);
+      setGameData(ref gD, gameData, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
 
       return Json(gD, JsonRequestBehavior.AllowGet);
     }
 
-    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, int iHeatmap = -1, bool bAddFMList = true)
+    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, bool bAddFMList = true)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
@@ -256,17 +260,17 @@ namespace CornerkickWebMvc.Controllers
           if (shoot.iResult > 0 && shoot.iResult < 7) gD.iShootsOnGoal[iHA]++;
         } // shoot
 
-        // Cards
-        CornerkickGame.Game.Card card = state.card;
-        if (card.plCard != null && card.iHA == iHA) {
-          string sCardDesc = MvcApplication.ckcore.game.tl.sSpielmin(card.tsMinute, false) +
+        // Duels
+        CornerkickGame.Game.Duel duel = state.duel;
+        if (duel.iResult > 2 && duel.plDef != null && duel.plDef.iHA == iHA) {
+          string sCardDesc = MvcApplication.ckcore.game.tl.sSpielmin(duel.tsMinute, false) +
                               sTeam +
                               " - " +
-                              card.plCard.sName;
+                              duel.plDef.sName;
 
           string sImg = "Y";
-          if      (card.iType == 1) sImg = "YR";
-          else if (card.iType == 2) sImg = "R";
+          if      (duel.iResult == 4) sImg = "YR";
+          else if (duel.iResult == 5) sImg = "R";
 
           gD.sTimelineIcons += "<img " + sOnClick + "src=\"/Content/Icons/" + sImg + "Card.bmp\" alt=\"Karte\" style=\"position: absolute; top: " + iIconTop.ToString() + "px; width: 12px; left: " + (fLeft - 0.5).ToString(nfi) + "%" + sCursor + "\" title=\"" + sCardDesc + "\"/>";
 
@@ -306,7 +310,7 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, int iHeatmap = -1)
+    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
@@ -325,67 +329,40 @@ namespace CornerkickWebMvc.Controllers
       gD.ltDrawLineShoot = new List<Models.ViewGameModel.drawLine>();
       gD.sCard = "";
 
-      // Draw shoot line / card on pitch
-      if (iState >= 0 && iState < gameData.ltState.Count) {
-        // set shoot line
-        if (state.shoot.plShoot != null) {
-          CornerkickGame.Player plShoot = state.shoot.plShoot;
+      // Draw shoot on pitch
+      if ((iState >= 0 && iState < gameData.ltState.Count) || iAllShoots >= 0) {
+        if (iAllShoots >= 0) {
+          byte iHA   =  0;
+          int  iPlIx = -1;
+          getStatisticHAPlayerIx(iAllShoots, user.game.nPlStart, out iHA, out iPlIx);
 
-          Models.ViewGameModel.drawLine drawLine = new Models.ViewGameModel.drawLine();
-          drawLine.X0 = state.shoot.plShoot.ptPos.X;
-          drawLine.Y0 = state.shoot.plShoot.ptPos.Y;
-          if (state.shoot.iResult == 3) { // keeper
-            CornerkickGame.Player plKeeper = user.game.tl.getKeeper(state.shoot.iHA == 1);
+          int iStTmp = 0;
+          foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
+            gD.ltDrawLineShoot.AddRange(getShootLine(stateTmp, user.game, iHA, iPlIx));
 
-            drawLine.X1 = plKeeper.ptPos.X;
-            drawLine.Y1 = plKeeper.ptPos.Y;
-            drawLine.sColor = "yellow";
-
-            gD.ltDrawLineShoot.Add(drawLine);
-
-            drawLine = new Models.ViewGameModel.drawLine();
-            drawLine.X0 = gD.ltDrawLineShoot[0].X1;
-            drawLine.Y0 = gD.ltDrawLineShoot[0].Y1;
-          } else if (state.shoot.iResult == 5) { // post
-            drawLine.X1 = (1 - state.shoot.iHA) * user.game.ptPitch.X;
-            drawLine.Y1 = -2;
-            drawLine.sColor = "yellow";
-
-            gD.ltDrawLineShoot.Add(drawLine);
-
-            drawLine = new Models.ViewGameModel.drawLine();
-            drawLine.X0 = gD.ltDrawLineShoot[0].X1;
-            drawLine.Y0 = gD.ltDrawLineShoot[0].Y1;
-          } else if (state.shoot.iResult == 6) { // bar
-            drawLine.X1 = (1 - state.shoot.iHA) * user.game.ptPitch.X;
-            drawLine.Y1 = 0;
-            drawLine.sColor = "yellow";
-
-            gD.ltDrawLineShoot.Add(drawLine);
-
-            drawLine = new Models.ViewGameModel.drawLine();
-            drawLine.X0 = gD.ltDrawLineShoot[0].X1;
-            drawLine.Y0 = gD.ltDrawLineShoot[0].Y1;
+            if (iState >= 0 && iStTmp++ >= iState) break; // If review --> stop at selected state
           }
-          drawLine.X1 = state.ball.ptPos.X;
-          drawLine.Y1 = state.ball.ptPos.Y;
-          if      (state.shoot.iResult == 1)                             drawLine.sColor = "red";
-          else if (state.shoot.iResult == 0 || state.shoot.iResult == 7) drawLine.sColor = "cyan";
-          else                                                           drawLine.sColor = "yellow";
-
-          gD.ltDrawLineShoot.Add(drawLine);
+        } else {
+          gD.ltDrawLineShoot = getShootLine(state, user.game);
         }
+      }
 
-        if (state.card.plCard != null) {
-          string sCardDesc = MvcApplication.ckcore.game.tl.sSpielmin(state.card.tsMinute, false) +
-                             " - " +
-                             state.card.plCard.sName;
+      // Draw duel on pitch
+      if ((iState >= 0 && iState < gameData.ltState.Count) || iAllDuels >= 0) {
+        // Show duel on pitch
+        if (iAllDuels >= 0) {
+          byte iHA   =  0;
+          int  iPlIx = -1;
+          getStatisticHAPlayerIx(iAllDuels, user.game.nPlStart, out iHA, out iPlIx);
 
-          string sImg = "Y";
-          if      (state.card.iType == 1) sImg = "YR";
-          else if (state.card.iType == 2) sImg = "R";
+          int iStTmp = 0;
+          foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
+            gD.sCard += getDuelIcon(stateTmp, user.game, iHA, iPlIx);
 
-          gD.sCard = "<img src=\"/Content/Icons/" + sImg + "Card.bmp\" alt=\"Karte\" style=\"position: absolute; top: " + ((state.card.plCard.ptPos.Y + user.game.ptPitch.Y) / (float)(2 * user.game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (state.card.plCard.ptPos.X / (float)user.game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "\" title=\"" + sCardDesc + "\"/>";
+            if (iState >= 0 && iStTmp++ >= iState) break; // If review --> stop at selected state
+          }
+        } else {
+          gD.sCard = getDuelIcon(state, user.game);
         }
       }
 
@@ -469,19 +446,108 @@ namespace CornerkickWebMvc.Controllers
       // Heatmap
       gD.sDivHeatmap = "";
       if (iHeatmap >= 0) {
-        byte iHA =  0;
-        int  iPl = -1;
-        if (iHeatmap < 2) {
-          iHA = (byte)iHeatmap;
-        } else {
-          iHA = (byte)((iHeatmap - 2) / user.game.nPlStart);
-          iPl = (iHeatmap - 2) - (iHA * user.game.nPlStart);
-        }
-        gD.sDivHeatmap = getDivHeatmap(iHA, iState, iPl);
+        byte iHA   =  0;
+        int  iPlIx = -1;
+        getStatisticHAPlayerIx(iHeatmap, user.game.nPlStart, out iHA, out iPlIx);
+        gD.sDivHeatmap = getDivHeatmap(iHA, iState, iPlIx);
       }
     }
 
-    public Models.ViewGameModel.gameData getGameData(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1)
+    private void getStatisticHAPlayerIx(int i, byte nPlStart, out byte iHA, out int iPl)
+    {
+      iHA =  0;
+      iPl = -1;
+      if (i < 2) {
+        iHA = (byte)i;
+      } else {
+        iHA = (byte)((i - 2) / nPlStart);
+        iPl = (i - 2) - (iHA * nPlStart);
+      }
+    }
+
+    private List<Models.ViewGameModel.drawLine> getShootLine(CornerkickGame.Game.State state, CornerkickGame.Game game, int iHA = -1, int iPlIx = -1)
+    {
+      List<Models.ViewGameModel.drawLine> ltDrawLine = new List<Models.ViewGameModel.drawLine>();
+
+      CornerkickGame.Player plShoot = state.shoot.plShoot;
+
+      if (plShoot == null) return ltDrawLine;
+      if (iHA   >= 0 && plShoot.iHA    != iHA)   return ltDrawLine;
+      if (iPlIx >= 0 && plShoot.iIndex != iPlIx) return ltDrawLine;
+
+      Models.ViewGameModel.drawLine drawLine = new Models.ViewGameModel.drawLine();
+
+      drawLine.X0 = state.shoot.plShoot.ptPos.X;
+      drawLine.Y0 = state.shoot.plShoot.ptPos.Y;
+      if (state.shoot.iResult == 3) { // keeper
+        CornerkickGame.Player plKeeper = game.tl.getKeeper(state.shoot.iHA == 1);
+
+        drawLine.X1 = plKeeper.ptPos.X;
+        drawLine.Y1 = plKeeper.ptPos.Y;
+        drawLine.sColor = "yellow";
+
+        ltDrawLine.Add(drawLine);
+
+        drawLine = new Models.ViewGameModel.drawLine();
+        drawLine.X0 = ltDrawLine[0].X1;
+        drawLine.Y0 = ltDrawLine[0].Y1;
+      } else if (state.shoot.iResult == 5) { // post
+        drawLine.X1 = (1 - state.shoot.iHA) * game.ptPitch.X;
+        drawLine.Y1 = -2;
+        drawLine.sColor = "yellow";
+
+        ltDrawLine.Add(drawLine);
+
+        drawLine = new Models.ViewGameModel.drawLine();
+        drawLine.X0 = ltDrawLine[0].X1;
+        drawLine.Y0 = ltDrawLine[0].Y1;
+      } else if (state.shoot.iResult == 6) { // bar
+        drawLine.X1 = (1 - state.shoot.iHA) * game.ptPitch.X;
+        drawLine.Y1 = 0;
+        drawLine.sColor = "yellow";
+
+        ltDrawLine.Add(drawLine);
+
+        drawLine = new Models.ViewGameModel.drawLine();
+        drawLine.X0 = ltDrawLine[0].X1;
+        drawLine.Y0 = ltDrawLine[0].Y1;
+      }
+      drawLine.X1 = state.ball.ptPos.X;
+      drawLine.Y1 = state.ball.ptPos.Y;
+      if      (state.shoot.iResult == 1)                             drawLine.sColor = "red";
+      else if (state.shoot.iResult == 0 || state.shoot.iResult == 7) drawLine.sColor = "cyan";
+      else                                                           drawLine.sColor = "yellow";
+
+      ltDrawLine.Add(drawLine);
+
+      return ltDrawLine;
+    }
+
+    private string getDuelIcon(CornerkickGame.Game.State state, CornerkickGame.Game game, int iHA = -1, int iPlIx = -1)
+    {
+      CornerkickGame.Player plDef = state.duel.plDef;
+
+      if (plDef == null)                       return "";
+      //if (iHA   >= 0 && plDef.iHA    != iHA)   return "";
+      if (iPlIx >= 0 && plDef.iIndex != iPlIx) return "";
+
+      string sDuelDesc = MvcApplication.ckcore.game.tl.sSpielmin(state.duel.tsMinute, false) +
+                         " - " + state.duel.plDef.sName;
+
+      string sDefOff = "def";
+      if (iHA == state.duel.plOff.iHA) sDefOff = "off";
+
+      string sImg = "duel_" + sDefOff + "_0";
+      if      (state.duel.iResult == 1) sImg = "duel_" + sDefOff + "_1";
+      else if (state.duel.iResult == 2) sImg = "whistle";
+      else if (state.duel.iResult == 3) sImg = "yCard";
+      else if (state.duel.iResult == 4) sImg = "yrCard";
+      else if (state.duel.iResult == 5) sImg = "rCard";
+
+      return "<img src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "\" title=\"" + sDuelDesc + "\" z-index=\"99\"/>";
+    }
+
+    public Models.ViewGameModel.gameData getGameData(Models.ViewGameModel view, int iState = -1)
     {
       gD = new Models.ViewGameModel.gameData();
 
@@ -510,7 +576,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iStTmp = 0;
       foreach (CornerkickGame.Game.State state in gameData.ltState) {
-        addGameData(ref gD, gameData, user, club, iStTmp, iHeatmap, state.tsMinute.Seconds == 0 && state.bNewRound);
+        addGameData(ref gD, gameData, user, club, iStTmp, state.tsMinute.Seconds == 0 && state.bNewRound);
 
         if (iState == iStTmp) break;
 

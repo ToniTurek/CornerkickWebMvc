@@ -100,8 +100,16 @@
       bnAdminPlay = document.getElementById("bnAdminPlay");
       bnAdminNext = document.getElementById("bnAdminNext");
 
-      var ddlHeatmap   = $('#ddlHeatmap');
       var ddlPositions = $('#ddlPositions');
+      var ddlHeatmap   = $('#ddlHeatmap');
+      var ddlShoots    = $('#ddlShoots');
+      var ddlDuels     = $('#ddlDuels');
+      var ddlPasses    = $('#ddlPasses');
+
+      $("a#aOptions").click(function (e) {
+        e.preventDefault();
+        $("#dialogOptions").dialog("open");
+      });
 
       setView();
 
@@ -457,7 +465,28 @@
         }]
       });
 
+      // Dialogs
+      $(function () {
+        $("#dialogOptions").dialog({
+          autoOpen: false,
+          height: 300,
+          width: 260
+        });
+      });
+
       ddlHeatmap.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
+      ddlShoots.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
+      ddlDuels.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
+      ddlPasses.change(function () {
         plotStatistics(pMainSlider.slider("value"));
       });
 
@@ -662,19 +691,9 @@
   </div>
 
   <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: auto">
-    <div style="position: relative; float: left; width: 60%; min-width: 420px; height: 40px">
-      <b id="txtOptionsHeatmap" style="position: absolute; top: 6px">Heatmap:</b>
-      <div id="divOptionsHeatmap" style="position: absolute; left: 70px; width: 110px; height: auto">
-        @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
-      </div>
-      <b id="txtOptionsPos" style="position: absolute; top: 6px; left: 190px">Positionen:</b>
-      <div id="divOptionsPos" style="position: absolute; left: 270px; width: 120px; height: auto">
-        @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
-      </div>
-    </div>
     @if (Model.game != null) {
       if (Model.bAdmin) {
-        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
+        <div style="position: relative; float: left; width: 25%; min-width: 200px; height: 40px">
           <input id="cbTargetPos" name="cbTargetPos" type="checkbox" value="0" style="position: absolute; left: 0px" class="checkbox">
           <input id="inputAdminGameSpeed" style="position: absolute; left: 22%; width: 18%" type="text" value="250" data-val-required='Das Feld "inputAdminGameSpeed" ist erforderlich.' data-val-number='Das Feld "inputAdminGameSpeed" muss eine Zahl sein.' data-val="true" autocomplete="off">
           <button type="submit" id="bnAdminPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
@@ -682,7 +701,7 @@
           <button type="submit" id="bnAdminNew" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">new</button>
         </div>
       } else if (Model.game.data.bFinished) {
-        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
+        <div style="position: relative; float: left; width: 25%; min-width: 200px; height: 40px">
           <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
           <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
           <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
@@ -707,11 +726,14 @@
     <div id="divLinkTeam" style="position: absolute; top: 0px; left: 5%; width: 30%">
       @Html.ActionLink("Aufstellung", "Team", "Member", null, new { @style = "color:#000aaa;" })
     </div>
+    <div id="divLinkTactic" style="position: absolute; top: 20px; left: 5%; width: 30%">
+      @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
+    </div>
     <div id="divLinkHome" style="position: absolute; top: 0px; left: 35%; width: 30%; text-align: center">
       @Html.ActionLink("Home", "Desk", "Member", null, new { @style = "color:#000aaa;" })
     </div>
     <div id="divLinkTactic" style="position: absolute; top: 0px; right: 5%; width: 30%; text-align: right">
-      @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
+      <a href="#" id="aOptions">Optionen</a>
     </div>
   </div>
 
@@ -739,5 +761,28 @@
 
   <div id="chartContainerF" style="position: relative; float: left; height: 300px; width: 100%"></div>
   <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
+
+  <div id="dialogOptions" title="Optionen">
+    <b id="txtOptionsHeatmap" style="position: absolute; top: 6px">Heatmap:</b>
+    <div id="divOptionsHeatmap" style="position: absolute; top: 4px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
+    </div>
+    <b id="txtOptionsShoots" style="position: absolute; top: 50px">Schüsse:</b>
+    <div id="divOptionsShoots" style="position: absolute; top: 44px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iShoots, Model.ddlShoots, new { @Id = "ddlShoots", @class = "form-control" })
+    </div>
+    <b id="txtOptionsDuels" style="position: absolute; top: 90px">Zweikämpfe:</b>
+    <div id="divOptionsDuels" style="position: absolute; top: 84px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iDuels, Model.ddlDuels, new { @Id = "ddlDuels", @class = "form-control" })
+    </div>
+    <b id="txtOptionsPasses" style="position: absolute; top: 130px">Pässe:</b>
+    <div id="divOptionsPasses" style="position: absolute; top: 124px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iPasses, Model.ddlPasses, new { @Id = "ddlPasses", @class = "form-control" })
+    </div>
+    <b id="txtOptionsPos" style="position: absolute; top: 170px">Positionen:</b>
+    <div id="divOptionsPos" style="position: absolute; top: 164px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
+    </div>
+  </div>
 </body>
 </html>

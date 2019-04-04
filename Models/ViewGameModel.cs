@@ -17,10 +17,16 @@ namespace CornerkickWebMvc.Models
     public static List<float[]> ltLoc { get; set; }
     //public string sKommentar { get; set; }
 
-    public int iHeatmap { get; set; }
-    public List<SelectListItem> ddlHeatmap { get; set; }
     public int iPositions { get; set; }
     public List<SelectListItem> ddlPositions { get; set; }
+    public int iHeatmap   { get; set; }
+    public List<SelectListItem> ddlHeatmap   { get; set; }
+    public int iShoots    { get; set; }
+    public List<SelectListItem> ddlShoots    { get; set; }
+    public int iDuels     { get; set; }
+    public List<SelectListItem> ddlDuels     { get; set; }
+    public int iPasses    { get; set; }
+    public List<SelectListItem> ddlPasses    { get; set; }
 
     //public List<CornerkickGame.Game.Shoot>[] ltShoots { get; set; }
 
@@ -62,7 +68,7 @@ namespace CornerkickWebMvc.Models
       public int iState  { get; set; }
       public int nStates { get; set; }
       public CornerkickGame.Game.Shoot[][] ltShoots { get; set; }
-      public CornerkickGame.Game.Card [][] ltCards  { get; set; }
+      public CornerkickGame.Game.Duel [][] ltDuels  { get; set; }
 
       // Bar statistics
       public float[][] fDataH { get; set; }
@@ -104,6 +110,9 @@ namespace CornerkickWebMvc.Models
       ddlHeatmap.Add(new SelectListItem { Text = "Heim",     Value =  "0" });
       ddlHeatmap.Add(new SelectListItem { Text = "Auswärts", Value =  "1" });
       iHeatmap = -1;
+      iShoots  = -1;
+      iDuels   = -1;
+      iPasses  = -1;
 
       ddlPositions = new List<SelectListItem>();
       ddlPositions.Add(new SelectListItem { Text = "tatsächlich", Value = "0" });

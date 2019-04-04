@@ -18,10 +18,7 @@
     by = by - ay;
   }
 
-  var angle = Math.atan((ay - by) / (bx - ax));
-
-  angle = (angle * 180 / Math.PI);
-  angle = -angle;
+  var angle = -Math.atan((ay - by) / (bx - ax)) * (180.0 / Math.PI);
 
   var length = Math.sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
 
@@ -48,7 +45,6 @@
     style += ";z-index:" + izIndex.toString();
   }
 
-  //$("<div style='" + style + "'></div>").appendTo('#divDrawGame');
   return "<div style='" + style + "'></div>";
 }
 

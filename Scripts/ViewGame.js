@@ -142,12 +142,15 @@ function plotStatistics(jState = -1) {
   iState = jState;
 
   var iHeatmapValue = $('#ddlHeatmap').val();
+  var iShootsValue  = $('#ddlShoots').val();
+  var iDuelsValue   = $('#ddlDuels').val();
+  var iPassesValue  = $('#ddlPasses').val();
 
   $.ajax({
     url: '/ViewGame/ViewGameGetDataStatisticObject',
     type: "GET",
     dataType: "JSON",
-    data: { iState: iState, iHeatmap: iHeatmapValue },
+    data: { iState: iState, iHeatmap: iHeatmapValue, iAllShoots: iShootsValue, iAllDuels: iDuelsValue, iAllPasses: iPassesValue },
     cache: false,
     contentType: "application/json; charset=utf-8",
     error: function (xhr) {
@@ -192,6 +195,8 @@ function plotStatistics(jState = -1) {
 
       $("#divTimelineIcons").html(gD.sTimelineIcons);
 
+      $("#drawHeatmap").html('');
+
       // draw shoot lines
       if (gD.ltDrawLineShoot) {
         gD.ltDrawLineShoot.forEach(function (drawLineShoot) {
@@ -203,14 +208,13 @@ function plotStatistics(jState = -1) {
           iY0 = ((drawLineShoot.Y0 + 25) * iDivHeightPix) /  50;
           iX1 = ( drawLineShoot.X1       * iDivWidthPix ) / 122;
           iY1 = ((drawLineShoot.Y1 + 25) * iDivHeightPix) /  50;
-          //alert(iX0 + ", " + iY0 + ", " + iX1 + ", " + iY1);
 
-          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, 1, 20)).appendTo('#divDrawGame');
+          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, 1, 20)).appendTo('#drawHeatmap');
         });
       }
 
       if (gD.sCard) {
-        $(gD.sCard).appendTo('#divDrawGame');
+        $(gD.sCard).appendTo('#drawHeatmap');
       }
 
       // Bar statistics
@@ -372,7 +376,7 @@ function plotStatistics(jState = -1) {
       $("#statistikSubs") .html(gD.sStatSubs);
 
       // Heatmap
-      $("#drawHeatmap").html(gD.sDivHeatmap);
+      $(gD.sDivHeatmap).appendTo('#drawHeatmap');
 
       $("#txtAdminChanceShootOnGoal").html(gD.sAdminChanceShootOnGoal);
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);
