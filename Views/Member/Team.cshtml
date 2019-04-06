@@ -5,8 +5,13 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 
   var clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
-  var plSelected = MvcApplication.ckcore.ltPlayer[clubUser.ltPlayerId[0]];
-  var tactic = clubUser.tactic;
+  CornerkickGame.Player plSelected;
+  CornerkickGame.Tactic tactic = new CornerkickGame.Tactic();
+
+  if (clubUser != null) {
+    plSelected = MvcApplication.ckcore.ltPlayer[clubUser.ltPlayerId[0]];
+    tactic = clubUser.tactic;
+  }
 }
 
 <!DOCTYPE html>
@@ -20,8 +25,8 @@
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script type="text/javascript" src="~/Scripts/draw.js"></script>
-  <script type="text/javascript" src="~/Scripts/Formation.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
+  <script type="text/javascript" src="~/Scripts/Formation.js"></script>
 
   <style>
     .disabledDiv {
@@ -167,7 +172,12 @@
           { "data": "sMoral" },
           { "data": "sStaerkeIdeal" },
           { "data": "sErf" },
-          { "data": "sForm" },
+          {
+            "data": "sForm",
+            "render": function (sForm, type, row) {
+              return getFormIcon(sForm);
+            }
+          },
           { "data": "sAlter" },
           { "data": "sTalent" },
           { "data": "fLeader" },

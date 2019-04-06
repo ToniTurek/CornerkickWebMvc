@@ -26,7 +26,6 @@
               alert(response);
             },
             error: function (xhr) {
-              debugger;
               alert(xhr);
             }
           });
@@ -86,10 +85,47 @@ function createTableTransferDetails() {
   return sReturn;
 }
 
-function getNatIcon(sNat) {
+function getNatIcon(sNat, sStyle) {
+  var sIcon = '<img src="/Content/Icons/flags/';
+
   if (sNat) {
-    return '<img src="/Content/Icons/flags/' + sNat + '.png" title="' + sNat + '" style="width: 16px"/>';
+    sIcon += sNat + '.png" title="' + sNat;
   } else {
-    return '<img src="/Content/Icons/flags/0.png" title="unknown" style="width: 16px"/>';
+    sIcon += '0.png" title="unknown"';
   }
+
+  sIcon += '" style="';
+
+  if (sStyle) {
+    sIcon += sStyle;
+  } else {
+    sIcon += 'width: 16px';
+  }
+
+  sIcon += '"/>';
+
+  return sIcon;
+}
+
+function getFormIcon(sForm) {
+  if (!sForm) return 'o';
+
+  sForm = sForm.trim();
+
+  var sIcon = '<img src="/Content/Icons/form';
+  if        (sForm === '---') {
+    sIcon += '0';
+  } else if (sForm ===  '-')  {
+    sIcon += '1';
+  } else if (sForm ===  'o')  {
+    sIcon += '2';
+  } else if (sForm ===  '+')  {
+    sIcon += '3';
+  } else if (sForm === '+++') {
+    sIcon += '4';
+  }
+
+  sIcon += '.png" title="' + sForm + '" style="width: 16px"/>';
+
+  return sIcon;
 }

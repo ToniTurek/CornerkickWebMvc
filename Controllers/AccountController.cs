@@ -130,8 +130,8 @@ namespace CornerkickWebMvc.Controllers
     private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false)
 #endif
     {
-      int  iLand = 0;
-      byte iLiga = 0;
+      int iLand = 0;
+      int iLiga = 0;
 
       MvcApplication.ckcore.tl.writeLog("  add User to Ck: " + applicationUser.Vorname + " " + applicationUser.Nachname);
 
@@ -144,8 +144,8 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (registerViewModel != null) {
-        iLand = registerViewModel.Land - 1;
-        iLiga = (byte)(registerViewModel.Liga - 1);
+        iLand = registerViewModel.Land;
+        iLiga = (byte)(registerViewModel.Liga);
       }
 
       if (iLand < 0) return;
@@ -155,7 +155,7 @@ namespace CornerkickWebMvc.Controllers
       for (byte iU = 0; iU < 8; iU++) {
 #endif
       CornerkickCore.Core.User usr = createUser(applicationUser);
-      CornerkickCore.Core.Club clb = createClub(applicationUser, iLand, iLiga);
+      CornerkickCore.Core.Club clb = createClub(applicationUser, (byte)iLand, (byte)iLiga);
       usr.iLevel = 1;
       usr.iTeam = clb.iId;
       usr.nextGame.iGameSpeed = 250;
@@ -240,7 +240,7 @@ namespace CornerkickWebMvc.Controllers
       return checkUserIsAdmin(regModel.Email, regModel.Password);
     }
 
-    private CornerkickCore.Core.Club createClub(ApplicationUser applicationUser, int iLand, byte iLiga)
+    private CornerkickCore.Core.Club createClub(ApplicationUser applicationUser, byte iLand, byte iLiga)
     {
       CornerkickCore.Core.Club clb = MvcApplication.ckcore.ini.newClub();
 
@@ -660,6 +660,10 @@ namespace CornerkickWebMvc.Controllers
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase file)
     {
+      // Set land hard-coded. Can be removed when disabled is removed from DropDownListFor in Register.cshtml
+      model.Land = 36; // GER
+
+      // Check emblem
       if (file != null) {
         List<string> sImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
         if (!sImageExtensions.Contains(Path.GetExtension(file.FileName).ToUpperInvariant())) {

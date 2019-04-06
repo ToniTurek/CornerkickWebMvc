@@ -12,7 +12,7 @@
 
   <script>
     $(document).ready(function () {
-      setLeague2();
+      setLeague2(1, 36, 0);
 
       var iLigaMax = 8.1;
 
@@ -58,7 +58,7 @@
 
 <body style="height: 100%; min-height: 100%">
   @{
-    var sLand = MvcApplication.ckcore.sLand[MvcApplication.ckcore.iNatUmrechnung[Model.iLand + 1]];
+    var sLand = MvcApplication.ckcore.sLand[Model.iLand];
     var sLiga = (Model.iSpKl + 1).ToString();
   }
 

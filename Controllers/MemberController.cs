@@ -582,7 +582,7 @@ namespace CornerkickWebMvc.Controllers
         if (i == MvcApplication.ckcore.plr.getCaptainIx(club)) sName += " (C)";
 
         int iNat = int.Parse(ltLV[i][12]);
-        string sNat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[iNat + 1]];
+        string sNat = MvcApplication.ckcore.sLandShort[iNat];
 
         //Hard coded data here that I want to replace with query results
         query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", fLeader = Convert.ToSingle(ltLV[i][19]), sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20] };
@@ -829,9 +829,11 @@ namespace CornerkickWebMvc.Controllers
       tD.ltPlayer = Models.TeamModels.ltPlayer;
       tD.ltPlayerPos      = new List<byte>  ();
       tD.ltPlayerAveSkill = new List<string>();
+      tD.ltPlayerNat      = new List<string>();
       foreach (CornerkickGame.Player pl in tD.ltPlayer) {
         tD.ltPlayerPos     .Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl)));
-        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(pl, 99).ToString("0.0"));
+        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(pl).ToString("0.0"));
+        tD.ltPlayerNat     .Add(MvcApplication.ckcore.sLandShort[pl.iNat1]);
       }
 
       tD.sDivPlayer = TeamGetPlayerOffence(tD.ltPlayer, club, bMobile);
@@ -1658,7 +1660,7 @@ namespace CornerkickWebMvc.Controllers
           talent = (plTr.iTalent + 1).ToString(),
           mw = (MvcApplication.ckcore.plr.getValue(plTr) * 1000).ToString("#,#", AccountController.ciUser),
           club = sClub,
-          nat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[plTr.iNat1 + 1]]
+          nat = MvcApplication.ckcore.sLandShort[plTr.iNat1]
         });
 
         iTr++;
@@ -2553,23 +2555,31 @@ namespace CornerkickWebMvc.Controllers
       league.ltScorer = MvcApplication.ckcore.ui.getScorer(1, league.iLand, league.iSpKl);
 
       league.iSpTg = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
-      league.ltErg = MvcApplication.ckcore.tl.getLtErgLiga(league.iSaison, league.iLand, league.iSpKl, false);
+      league.ltErg = MvcApplication.ckcore.tl.getLtErgLiga  (league.iSaison, league.iLand, league.iSpKl, false);
       league.ltTbl = MvcApplication.ckcore.tl.getLeagueTable(league.iSaison, league.iLand, league.iSpKl, league.iSpTg - 1, 0);
+
+      // Spieltage zu Dropdown Menü hinzufügen
+      if (MvcApplication.ckcore.ltLiga[league.iLand].Count > league.iSpKl) {
+        while (league.ltDdlSpTg.Count < (MvcApplication.ckcore.ltLiga[league.iLand][league.iSpKl].Count - 1) * 2) {
+          int iSpTg = league.ltDdlSpTg.Count + 1;
+          league.ltDdlSpTg.Add(new SelectListItem { Text = iSpTg.ToString().PadLeft(2), Value = iSpTg.ToString() });
+        }
+      }
 
       return View(league);
     }
 
-    public JsonResult setLeague(Models.LeagueModels league, int iGameday)
+    public JsonResult setLeague(Models.LeagueModels league, ushort iSaison, int iLand, byte iDivision, int iGameday)
     {
-      league.ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league.iSaison, league.iLand, league.iSpKl, iGameday - 1, 0);
-      league.ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league.iSaison, league.iLand, league.iSpKl, iGameday,     0);
+      league.ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(iSaison, iLand, iDivision, iGameday - 1, 0);
+      league.ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(iSaison, iLand, iDivision, iGameday,     0);
 
       return Json(new List<CornerkickCore.Tool.TableItem>[2] { league.ltTbl, league.ltTblLast }, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult setLeagueTeams(Models.LeagueModels league, int iGameday)
+    public JsonResult setLeagueTeams(Models.LeagueModels league, ushort iSaison, int iLand, byte iDivision, int iGameday)
     {
-      league.ltErg = MvcApplication.ckcore.tl.getLtErgLiga(league.iSaison, league.iLand, league.iSpKl, false);
+      league.ltErg = MvcApplication.ckcore.tl.getLtErgLiga(iSaison, iLand, iDivision, false);
 
       return Json(league.ltErg[iGameday - 1], JsonRequestBehavior.AllowGet);
     }
@@ -3183,6 +3193,85 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(new { aaData = query.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Transfer
+    /// </summary>
+    /// <param name="Transfer"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult Statistic(Models.StatisticModel statisticModel)
+    {
+      statisticModel.ltsFormations = new List<SelectListItem>();
+
+      for (int i = 0; i < MvcApplication.ckcore.ltFormationen.Count; i++) {
+        statisticModel.ltsFormations.Add(new SelectListItem {
+            Text  = (i + 1).ToString() + " - " + MvcApplication.ckcore.ltFormationen[i].sName,
+            Value = i.ToString(),
+            Selected = i == 12
+          }
+        );
+      }
+
+      return View(statisticModel);
+    }
+
+    public JsonResult StatisticGetBest11(int iF, bool bJouth = false)
+    {
+      Models.TeamModels.TeamData tD = new Models.TeamModels.TeamData();
+      tD.ltPlayer         = new List<CornerkickGame.Player>();
+      tD.ltPlayerAveSkill = new List<string>();
+      tD.ltPlayerPos      = new List<byte>  ();
+      tD.ltPlayerTeamname = new List<string>();
+      tD.ltPlayerAge      = new List<string>();
+      tD.ltPlayerNat      = new List<string>();
+
+      for (byte iP = 0; iP < 11; iP++) {
+        float fStrength = 0f;
+        tD.ltPlayer        .Add(null);
+        tD.ltPlayerPos     .Add(0);
+        tD.ltPlayerAveSkill.Add(null);
+        tD.ltPlayerTeamname.Add("vereinslos");
+        tD.ltPlayerAge     .Add(null);
+        tD.ltPlayerNat     .Add(null);
+
+        byte iPosExact = MvcApplication.ckcore.game.tl.getPosRole(MvcApplication.ckcore.ltFormationen[iF].ptPos[iP]);
+        byte iPos = MvcApplication.ckcore.game.tl.getBasisPos(iPosExact);
+
+        foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
+          if (bJouth && pl.getAge(MvcApplication.ckcore.dtDatum) > 18f) continue;
+
+          // Check if same player already in same role
+          bool bSame = false;
+          foreach (CornerkickGame.Player plSame in tD.ltPlayer) {
+            if (plSame != null && plSame.iId == pl.iId && MvcApplication.ckcore.game.tl.getPosRole(plSame.ptPosDefault) == iPosExact) {
+              bSame = true;
+              break;
+            }
+          }
+          if (bSame) continue;
+
+          float fStrengthTmp = MvcApplication.ckcore.game.tl.getAveSkill(pl, iPos);
+          if (fStrengthTmp > fStrength) {
+            tD.ltPlayer[iP] = pl.CloneReduced();
+
+            tD.ltPlayer        [iP].ptPosDefault = MvcApplication.ckcore.ltFormationen[iF].ptPos[iP];
+            tD.ltPlayer        [iP].iNr = (byte)(iP + 1);
+            tD.ltPlayerAveSkill[iP] = fStrengthTmp.ToString("0.0");
+
+            fStrength = fStrengthTmp;
+          }
+        }
+
+        tD.ltPlayerPos[iP] = iPos;
+        if (tD.ltPlayer[iP].iClubId >= 0) tD.ltPlayerTeamname[iP] = MvcApplication.ckcore.ltClubs[tD.ltPlayer[iP].iClubId].sName;
+        tD.ltPlayerAge[iP] = tD.ltPlayer[iP].getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
+        tD.ltPlayerNat[iP] = MvcApplication.ckcore.sLandShort[tD.ltPlayer[iP].iNat1];
+      }
+
+      return Json(tD, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////

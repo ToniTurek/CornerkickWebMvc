@@ -36,20 +36,20 @@
     </div>
     <div class="form-group">
       <label class="col-md-2 control-label" for="Wappen">Wappen</label>
-      <div>
-        @Html.TextBox("file", "", new { type = "file", accept = "*.png" }) <br />
+      <div class="col-md-10">
+        @Html.TextBox("file", "", new { @class = "form-control", type = "file", accept = "*.png" }) <br />
       </div>
     </div>
     <div class="form-group">
       @Html.LabelFor(m => m.Land, new { @class = "col-md-2 control-label" })
       <div class="col-md-10">
-        @Html.DropDownListFor(m => m.Land, CornerkickWebMvc.Models.RegisterViewModel.ltLand, "Land wählen", new { @class = "form-control" })
+        @Html.DropDownListFor(m => m.Land, CornerkickWebMvc.Models.RegisterViewModel.ltLand, new { @class = "form-control", @disabled = "disabled" })
       </div>
     </div>
     <div class="form-group">
       @Html.LabelFor(m => m.Liga, new { @class = "col-md-2 control-label" })
       <div class="col-md-10">
-        @Html.DropDownListFor(m => m.Liga, CornerkickWebMvc.Models.RegisterViewModel.ltSpKl, "Spielklasse wählen", new { @class = "form-control" })
+        @Html.DropDownListFor(m => m.Liga, CornerkickWebMvc.Models.RegisterViewModel.ltSpKl, new { @class = "form-control", @disabled = "disabled" })
       </div>
     </div>
     <div class="form-group">

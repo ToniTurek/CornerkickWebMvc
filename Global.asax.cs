@@ -48,6 +48,17 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
+      byte[] iNations = new byte[8] {
+        36, // GER
+        29, // ENG
+        30, // ESP
+        45, // ITA
+        33, // FRA
+        54, // NED
+        13, // BRA
+         3  // ARG
+      }; // [CK Nat.] = sLand Nat.
+
       ckcore = new CornerkickCore.Core();
 
 #if !DEBUG
@@ -57,7 +68,7 @@ namespace CornerkickWebMvc
       ckcore.tl.writeLog("WebMvc START");
 
       Models.RegisterViewModel.ltLand.Clear();
-      Models.RegisterViewModel.ltLand.Add(new SelectListItem { Text = ckcore.sLand[ckcore.iNatUmrechnung[1]], Value = "1", Selected = true });
+      foreach (byte iN in iNations) Models.RegisterViewModel.ltLand.Add(new SelectListItem { Text = ckcore.sLand[iN], Value = iN.ToString(), Selected = iN == 36 });
 
       Models.RegisterViewModel.ltSpKl.Clear();
       Models.RegisterViewModel.ltSpKl.Add(new SelectListItem { Text = "Liga 1", Value = "1", Selected = true });

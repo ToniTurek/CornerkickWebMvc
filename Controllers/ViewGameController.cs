@@ -62,7 +62,7 @@ namespace CornerkickWebMvc.Controllers
 
       fHeatmapMax = 0f;
 
-      gD = getGameData(view);
+      gD = getAllGameData(view);
 
       view.gD = gD;
 
@@ -81,17 +81,7 @@ namespace CornerkickWebMvc.Controllers
         return Json(Models.ViewGameModel.ltLoc, JsonRequestBehavior.AllowGet);
       }
 
-      /*
-      if (iSleep > 0) {
-        System.Threading.Thread.Sleep(iSleep);
-      }
-      */
-
-      /*
-      if (user.game.data.bFinished) {
-        Response.StatusCode = 1;
-      }
-      */
+      if (MvcApplication.ckcore.ltUser.Count > 0) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
 
       CornerkickGame.Game.State state = user.game.newState();
       if (user.game.data.ltState.Count > 0) state = user.game.data.ltState[0];
@@ -174,9 +164,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Game.Data gameData = user.game.data;
 
       if (gD.nStates == 0) {
-        gD = getGameData(view);
+        gD = getAllGameData(view);
       } else if (iState >= 0) {
-        gD = getGameData(view, iState);
+        gD = getAllGameData(view, iState);
       } else if (iState <  0) {
         addGameData(ref gD, gameData, user, club, iState);
       }
@@ -552,7 +542,7 @@ namespace CornerkickWebMvc.Controllers
       return "<img src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; z-index: 99\" title=\"" + sDuelDesc + "\" />";
     }
 
-    public Models.ViewGameModel.gameData getGameData(Models.ViewGameModel view, int iState = -1)
+    public Models.ViewGameModel.gameData getAllGameData(Models.ViewGameModel view, int iState = -1)
     {
       gD = new Models.ViewGameModel.gameData();
 

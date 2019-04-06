@@ -33,9 +33,12 @@
       return false;
     },
     complete: function (jqXHR, textStatus) {
+      var iInterval = 300;
+      if (gLoc.iInterval > 0) iInterval = gLoc.iInterval;
+
       // Schedule the next request when the current one's complete
       if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
-        setTimeout(function () { drawGame(-1); }, 250);
+        setTimeout(function () { drawGame(-1); }, iInterval);
       }
     }
   });

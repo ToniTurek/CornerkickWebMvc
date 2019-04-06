@@ -1,0 +1,104 @@
+﻿@model CornerkickWebMvc.Models.StatisticModel
+
+@{
+  ViewBag.Title = "Statistik";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <title>Statistik</title>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
+  <script type="text/javascript" src="~/Scripts/Formation.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var ddlFormation = $('#ddlFormation');
+
+      $("#rbProfi").on('change', function (ev) {
+        drawBest11();
+      });
+
+      $("#rbJouth").on('change', function (ev) {
+        drawBest11();
+      });
+
+      ddlFormation.change(function () {
+        drawBest11();
+      });
+
+      drawBest11();
+    });
+
+    function drawBest11() {
+      var bJouth = document.getElementById("rbJouth").checked;
+      var ddlFormation = $('#ddlFormation');
+      // end declarations
+
+      // Formation
+      iFormation = ddlFormation.val();
+
+      $.ajax({
+        cache: false,
+        url: "/Member/StatisticGetBest11",
+        type: "GET",
+        data: { iF: iFormation, bJouth: bJouth },
+        success: function (teamData) {
+          if (teamData) {  // check if data is defined
+            var bMobile = $(window).width() < 960;
+            var result = "";
+            var i = 0;
+            var drawFormation = $("#drawFormation");
+
+            $.each(teamData.ltPlayer, function (j, player) {
+              result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, -1, teamData.ltPlayerPos[i], bMobile, 0.5, teamData.ltPlayerTeamname[i], teamData.ltPlayerAge[i], teamData.ltPlayerNat[i]);
+
+              i = i + 1;
+              return i !== 11;
+            });
+
+            drawFormation.html(result).fadeIn('slow');
+          } else {
+            alert("data hasn't worked!");
+          }
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <h3>Weltauswahl</h3>
+
+  <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 1%">
+    <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
+    <div style="position: absolute; margin-left: 5%; width: 90%; height: 94%; top: 3%; left: 0%">
+      <div id="drawFormation" style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%"></div>
+    </div>
+    <div align="center" style="position: absolute; top: 2px; width: 100%">
+      <div style="position: relative; width: 300px; height: 30px; top: -15px; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+        <form>
+          <fieldset>
+            <label style="font-size:140%; color: black; margin-right: 4%">
+              <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+              Profis
+            </label>
+            <label style="font-size:140%; color: black">
+              <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+              U18
+            </label>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+
+    <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
+  </div>
+
+  <div style="position: relative; width: 120px; height: auto">
+    @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlFormation", @class = "form-control" })
+  </div>
+</body>
+</html>

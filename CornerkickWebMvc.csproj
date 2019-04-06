@@ -319,6 +319,7 @@
     <Compile Include="Models\SponsorModel.cs" />
     <Compile Include="Models\StadionModel.cs" />
     <Compile Include="Models\StadiumSurroundingsModel.cs" />
+    <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="Models\TaktikModel.cs" />
     <Compile Include="Models\TeamModels.cs" />
     <Compile Include="Models\TrainingModel.cs" />
@@ -505,11 +506,6 @@
     <Content Include="Content\fullcalendar.print.min.css" />
     <Content Include="Content\Icons\ambulance.ico" />
     <Content Include="Content\Icons\ambulance2.ico" />
-    <Content Include="Content\Icons\arrow_down.ico" />
-    <Content Include="Content\Icons\arrow_downleft.ico" />
-    <Content Include="Content\Icons\arrow_left.ico" />
-    <Content Include="Content\Icons\arrow_up.ico" />
-    <Content Include="Content\Icons\arrow_upleft.ico" />
     <Content Include="Content\Icons\ball_cyan.png" />
     <Content Include="Content\Icons\ball_white.png" />
     <Content Include="Content\Icons\ball_yellow.png" />
@@ -832,6 +828,7 @@
     <Content Include="Views\Member\Mail.cshtml" />
     <Content Include="Views\ViewGame\ViewGame.cshtml" />
     <Content Include="Views\Shared\Info.cshtml" />
+    <Content Include="Views\Member\Statistic.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

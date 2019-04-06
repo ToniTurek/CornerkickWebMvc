@@ -1,11 +1,11 @@
-﻿function setLeague2() {
+﻿function setLeague2(iSaison, iLand, iDivision) {
   var iSpTg = $('#ddlSpieltag').val();
 
   $.ajax({
     url: '/Member/setLeague',
     type: "GET",
     dataType: "JSON",
-    data: { iGameday: iSpTg },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iGameday: iSpTg },
     success: function (ltTbl) {
       actionDrawTable(ltTbl);
     }
@@ -15,7 +15,7 @@
     url: '/Member/setLeagueTeams',
     type: "GET",
     dataType: "JSON",
-    data: { iGameday: iSpTg },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iGameday: iSpTg },
     success: function (ltErg) {
       actionDrawTeams(ltErg, iSpTg - 1);
     }

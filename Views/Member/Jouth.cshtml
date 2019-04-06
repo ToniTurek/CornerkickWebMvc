@@ -93,7 +93,7 @@
           <td align="center">@MvcApplication.ckcore.plr.getStrPos(plJouth)</td>
           <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(plJouth).ToString("0.0")</td>
           <td align="center">@(plJouth.iTalent + 1)</td>
-          <td align="center">@MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[plJouth.iNat1 + 1]]</td>
+          <td align="center">@MvcApplication.ckcore.sLandShort[plJouth.iNat1]</td>
           <td align="center">@plJouth.getAge(MvcApplication.ckcore.dtDatum).ToString("0")</td>
         </tr>
       }

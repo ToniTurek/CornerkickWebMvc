@@ -36,6 +36,7 @@ namespace CornerkickWebMvc.Models
     public struct gameLoc
     {
       public bool bFinished { get; set; }
+      public int iInterval { get; set; }
       public List<gamePlayer> ltPlayer { get; set; }
       public gameBall gBall { get; set; }
     }

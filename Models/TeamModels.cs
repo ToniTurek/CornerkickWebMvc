@@ -42,6 +42,9 @@ namespace CornerkickWebMvc.Models
       public List<CornerkickGame.Player> ltPlayer { get; set; }
       public List<byte> ltPlayerPos { get; set; }
       public List<string> ltPlayerAveSkill { get; set; }
+      public List<string> ltPlayerTeamname { get; set; }
+      public List<string> ltPlayerAge      { get; set; }
+      public List<string> ltPlayerNat      { get; set; }
 
       // Opponent player details
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }

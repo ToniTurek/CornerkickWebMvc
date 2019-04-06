@@ -29,14 +29,6 @@ namespace CornerkickWebMvc.Models
     public LeagueModels()
     {
       ltDdlSpTg = new List<SelectListItem>();
-
-      // Spieltage zu Dropdown Menü hinzufügen
-      if (MvcApplication.ckcore.ltLiga[iLand].Count > iSpKl) {
-        while (ltDdlSpTg.Count < (MvcApplication.ckcore.ltLiga[iLand][iSpKl].Count - 1) * 2) {
-          int iSpTg = ltDdlSpTg.Count + 1;
-          ltDdlSpTg.Add(new SelectListItem { Text = iSpTg.ToString().PadLeft(2), Value = iSpTg.ToString() });
-        }
-      }
     }
 
   }
