@@ -414,7 +414,7 @@
       }
 
       @{
-        string sNat = MvcApplication.ckcore.sLandShort[MvcApplication.ckcore.iNatUmrechnung[player.iNat1 + 1]];
+        string sNat = MvcApplication.ckcore.sLandShort[player.iNat1];
 
         if (string.IsNullOrEmpty(sNat)) {
           <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
