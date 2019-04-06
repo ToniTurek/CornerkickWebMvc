@@ -112,17 +112,21 @@ function getFormIcon(sForm) {
 
   sForm = sForm.trim();
 
-  var sIcon = '<img src="/Content/Icons/form';
+  var sIcon = '<img src="/Content/Icons/';
   if        (sForm === '---') {
-    sIcon += '0';
+    sIcon += 'form0';
   } else if (sForm ===  '-')  {
-    sIcon += '1';
+    sIcon += 'form1';
   } else if (sForm ===  'o')  {
-    sIcon += '2';
+    sIcon += 'form2';
   } else if (sForm ===  '+')  {
-    sIcon += '3';
+    sIcon += 'form3';
   } else if (sForm === '+++') {
-    sIcon += '4';
+    sIcon += 'form4';
+  } else if (sForm === 'verl') {
+    sIcon += 'ambulance';
+  } else if (sForm === 'ang.') {
+    sIcon += 'ambulance2';
   }
 
   sIcon += '.png" title="' + sForm + '" style="width: 16px"/>';

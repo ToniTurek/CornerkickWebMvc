@@ -504,8 +504,8 @@
     <Content Include="Content\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar.print.css" />
     <Content Include="Content\fullcalendar.print.min.css" />
-    <Content Include="Content\Icons\ambulance.ico" />
-    <Content Include="Content\Icons\ambulance2.ico" />
+    <Content Include="Content\Icons\ambulance.png" />
+    <Content Include="Content\Icons\ambulance2.png" />
     <Content Include="Content\Icons\ball_cyan.png" />
     <Content Include="Content\Icons\ball_white.png" />
     <Content Include="Content\Icons\ball_yellow.png" />
