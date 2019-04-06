@@ -536,6 +536,11 @@
     <Content Include="Content\Icons\flags\SWE.png" />
     <Content Include="Content\Icons\flags\TUR.png" />
     <Content Include="Content\Icons\flags\USA.png" />
+    <Content Include="Content\Icons\form0.png" />
+    <Content Include="Content\Icons\form1.png" />
+    <Content Include="Content\Icons\form2.png" />
+    <Content Include="Content\Icons\form3.png" />
+    <Content Include="Content\Icons\form4.png" />
     <Content Include="Content\Icons\minus.png" />
     <Content Include="Content\Icons\plus.png" />
     <Content Include="Content\Icons\rCard.png" />
