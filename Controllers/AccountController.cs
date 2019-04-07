@@ -1,5 +1,5 @@
 ﻿#if !DEBUG
-//#define _EMAIL_CONFIRMATION
+#define _EMAIL_CONFIRMATION
 #endif
 
 using System;
