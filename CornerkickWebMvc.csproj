@@ -549,6 +549,7 @@
     <Content Include="Content\Icons\weather\1.gif" />
     <Content Include="Content\Icons\weather\2.gif" />
     <Content Include="Content\Icons\weather\3.gif" />
+    <Content Include="Content\Icons\whistle.png" />
     <Content Include="Content\Icons\yCard.png" />
     <Content Include="Content\Icons\yrCard.png" />
     <Content Include="Content\Images\10.jpg" />
