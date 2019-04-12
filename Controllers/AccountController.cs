@@ -263,12 +263,13 @@ namespace CornerkickWebMvc.Controllers
 #endif
       MvcApplication.ckcore.ltClubs.Add(clb);
 
-      if (MvcApplication.ckcore.ltLiga[iLand] == null) MvcApplication.ckcore.ltLiga[iLand] = new List<List<int>>();
-      while (MvcApplication.ckcore.ltLiga[iLand].Count <= iLiga) MvcApplication.ckcore.ltLiga[iLand].Add(new List<int>());
-      MvcApplication.ckcore.ltLiga[iLand][iLiga].Add(clb.iId);
-
-      // do initial formation
+      
+      // Do initial formation
       MvcApplication.ckcore.doFormationKI(clb.iId, true);
+
+      // Add club to league/cup
+      MvcApplication.ckcore.ltCups[0].ltClubs[0].Add(clb); // nat. cup
+      MvcApplication.ckcore.ltCups[1].ltClubs[0].Add(clb); // league
 
 #if DEBUG
       if (iU == 0) {
@@ -283,7 +284,10 @@ namespace CornerkickWebMvc.Controllers
       }
 #endif
 
-      if (!MvcApplication.timerCkCalender.Enabled) MvcApplication.ckcore.calcSpieltage();
+      if (!MvcApplication.timerCkCalender.Enabled) {
+        MvcApplication.ckcore.calcMatchdays();
+        MvcApplication.ckcore.drawCup(MvcApplication.ckcore.ltCups[1]);
+      }
     }
 
     private CornerkickCore.Core.User createUser(ApplicationUser applicationUser)
@@ -333,7 +337,6 @@ namespace CornerkickWebMvc.Controllers
 
       clb.iLand = iLand;
       clb.iDivision = iLiga;
-      clb.iPokalrunde = 0;
 
       MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[12]);
 
@@ -757,6 +760,13 @@ namespace CornerkickWebMvc.Controllers
 
       DebugInfo("Register");
 
+      bool bAdminFirst = false;
+#if !DEBUG
+      // first user must be admin
+      if (MvcApplication.ckcore.ltUser.Count == 0) {
+        if (!checkUserIsAdmin(model)) return View(model);
+      }
+
       // Set admin details
       if (MvcApplication.ckcore.ltUser.Count == 0) {
         model.Vorname = "Admin";
@@ -764,16 +774,14 @@ namespace CornerkickWebMvc.Controllers
         model.Verein = "Computer";
       }
 
+      bAdminFirst = true;
+#endif
+
       MvcApplication.ckcore.tl.writeLog("Register new user: " + model.Vorname + " " + model.Nachname + ", Team: " + model.Verein);
 
       if (ModelState.IsValid) {
         //appUser = new ApplicationUser { UserName = model.Vorname + " " + model.Nachname, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
         appUser = new ApplicationUser { UserName = model.Email, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
-
-        // first user must be admin
-        if (MvcApplication.ckcore.ltUser.Count == 0) {
-          if (!checkUserIsAdmin(model)) return View(model);
-        }
 
         var result = await UserManager.CreateAsync(appUser, model.Password);
         MvcApplication.ckcore.tl.writeLog("  Register succeeded: " + result.Succeeded.ToString());
@@ -781,7 +789,7 @@ namespace CornerkickWebMvc.Controllers
         if (result.Succeeded) {
           rvmDEBUG = model;
 
-          if (MvcApplication.ckcore.ltUser.Count == 0/* && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
+          if (MvcApplication.ckcore.ltUser.Count == 0 && bAdminFirst/* && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
             await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
 
             CornerkickCore.Core.User usrAdmin = createUser(appUser);
@@ -862,10 +870,6 @@ namespace CornerkickWebMvc.Controllers
       if (userId == null || code == null) return View("Error");
 
       var result = await UserManager.ConfirmEmailAsync(userId, code);
-
-      if (result.Succeeded) {
-
-      }
 
       return View(result.Succeeded ? "ConfirmEmail" : "Error");
     }

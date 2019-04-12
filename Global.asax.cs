@@ -34,6 +34,17 @@ namespace CornerkickWebMvc
     //const string sSaveZip = "ckSave.zip";
     const string sFilenameSave = ".autosave.ckx";
 
+    static byte[] iNations = new byte[8] {
+      36, // GER
+      29, // ENG
+      30, // ESP
+      45, // ITA
+      33, // FRA
+      54, // NED
+      13, // BRA
+       3  // ARG
+    }; // [CK Nat.] = sLand Nat.
+
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();
@@ -47,17 +58,6 @@ namespace CornerkickWebMvc
     internal static void newCk()
     {
       string sHomeDir = getHomeDir();
-
-      byte[] iNations = new byte[8] {
-        36, // GER
-        29, // ENG
-        30, // ESP
-        45, // ITA
-        33, // FRA
-        54, // NED
-        13, // BRA
-         3  // ARG
-      }; // [CK Nat.] = sLand Nat.
 
       ckcore = new CornerkickCore.Core();
 
@@ -108,7 +108,7 @@ namespace CornerkickWebMvc
 
       if (iStartHour >= 0 && iStartHour <= 24) {
         if (DateTime.Now.Hour != iStartHour && DateTime.Now.Hour > 13) {
-          if (MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart) ||
+          if (MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart) ||
              ((int)MvcApplication.ckcore.dtDatum.DayOfWeek == 1 && MvcApplication.ckcore.dtDatum.Hour == 0 && MvcApplication.ckcore.dtDatum.Minute == 0)) {
             timerCkCalender.Enabled = true;
             return;
@@ -153,7 +153,7 @@ namespace CornerkickWebMvc
         save(timerCkCalender);
       }
 
-      if ((MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSaisonstart) ||
+      if ((MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart) ||
           MvcApplication.ckcore.dtDatum.Year < 1900) &&
           MvcApplication.ckcore.iSaisonCount == 0) {
         MvcApplication.ltLog.Clear();
@@ -164,8 +164,8 @@ namespace CornerkickWebMvc
       if (iRetCk == 99) return; // Saisonende
 
       // Remove testgame requests if in past
-      List<CornerkickCore.Core.Cup> ltCupsTmp = new List<CornerkickCore.Core.Cup>(MvcApplication.ckcore.ltCups);
-      foreach (CornerkickCore.Core.Cup cup in ltCupsTmp) {
+      List<CornerkickCore.Cup> ltCupsTmp = new List<CornerkickCore.Cup>(MvcApplication.ckcore.ltCups);
+      foreach (CornerkickCore.Cup cup in ltCupsTmp) {
         if (cup == null) continue;
 
         if (cup.iId == -5) {
@@ -448,9 +448,26 @@ namespace CornerkickWebMvc
           MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
 #endif
-      } else {
-        MvcApplication.ckcore.calcSpieltage();
-        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSaisonstart;
+      } else { // New game
+        foreach (int iLand in iNations) {
+          // Create nat. cup
+          CornerkickCore.Cup cup = new CornerkickCore.Cup(bKo: true);
+          cup.iId = 2;
+          cup.iId2 = iLand;
+          ckcore.ltCups.Add(cup);
+
+          // Create league
+          CornerkickCore.Cup league = new CornerkickCore.Cup(nGroups: 1, bGroupsTwoGames: true);
+          league.iId = 1;
+          league.iId2 = iLand;
+          ckcore.ltCups.Add(league);
+
+          // Only GER (remove to use full iNations)
+          break;
+        }
+
+        MvcApplication.ckcore.calcMatchdays();
+        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSeasonStart;
       }
 
 #if !DEBUG

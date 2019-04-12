@@ -14,7 +14,7 @@
 
   function setCup() {
     var iSpTg = $('#ddlCupSpieltag').val();
-    setCup2(iSpTg);
+    setCup2(1, 36, 0, iSpTg);
   }
 </script>
 
@@ -30,7 +30,7 @@
 
 @{
   var dt = new DateTime();
-  CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, Model.iLand);
+  CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, Model.iLand);
   if (Model.iSpTg < Model.ltErg.Count) {
     if (cup != null && cup.ltMatchdays != null) { dt = cup.ltMatchdays[Model.iSpTg].dt; }
   }
@@ -43,9 +43,9 @@
   }
 
   if (Model.iLand >= 0) {
-    if (cup != null && MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
+    if (cup != null) {
       int j = 0;
-      foreach (CornerkickCore.Core.Matchday gd in cup.ltMatchdays) {
+      foreach (CornerkickCore.Cup.Matchday gd in cup.ltMatchdays) {
         string sIdDay = "idDtDay" + j.ToString();
         <div id="@sIdDay" data-name="@gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
 

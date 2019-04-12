@@ -66,20 +66,6 @@
     <h2>@sLand, Liga @sLiga</h2>
 
     @{
-      var ltBeg = new List<int[]>();
-      var dt = new DateTime();
-      if (Model.iSpTg >= 0 && Model.iSpTg < Model.ltErg.Count) {
-        if (Model.iLand >= 0) {
-          if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
-            if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand].Count > Model.iSpKl) {
-              if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl].Count > Model.iSpTg) {
-                dt = MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl][Model.iSpTg];
-              }
-            }
-          }
-        }
-      }
-
       string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
       int i = 0;
       foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
@@ -87,22 +73,24 @@
         <div id="@sId" data-name="@club.sName"></div>
       }
 
-      if (Model.iLand >= 0) {
-        if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
-          if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand].Count > Model.iSpKl) {
-            if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl].Count > Model.iSpTg) {
-              int j = 0;
-              foreach (DateTime dtTmp in MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl]) {
-                string sIdDay = "idDtDay" + j.ToString();
-                <div id="@sIdDay" data-name="@dtTmp.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-                string sIdHour = "idDtHour" + j.ToString();
-                <div id="@sIdHour" data-name="@dtTmp.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-                j++;
-              }
-            }
+      var ltBeg = new List<int[]>();
+      var dt = new DateTime();
+      if (Model.iLand >= 0 && Model.league != null) {
+        if (Model.iSpTg >= 0 && Model.iSpTg < Model.league.ltMatchdays.Count) {
+          if (Model.iLand >= 0) {
+            dt = Model.league.ltMatchdays[Model.iSpTg].dt;
           }
+        }
+
+        int j = 0;
+        foreach (CornerkickCore.Cup.Matchday md in Model.league.ltMatchdays) {
+          string sIdDay = "idDtDay" + j.ToString();
+          <div id="@sIdDay" data-name="@md.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
+
+          string sIdHour = "idDtHour" + j.ToString();
+          <div id="@sIdHour" data-name="@md.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
+
+          j++;
         }
       }
     }

@@ -22,20 +22,6 @@ namespace CornerkickWebMvc.Models
     public CupModel()
     {
       ltDdlSpTg = new List<SelectListItem>();
-
-      CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
-
-      // Spieltage zu Dropdown Menü hinzufügen
-      if (cup != null) {
-        if (cup.ltMatchdays[0].ltGameData != null) {
-          int nRound = MvcApplication.ckcore.tl.getPokalRundeVonNTeiln(cup.ltMatchdays[0].ltGameData.Count * 2);
-          while (ltDdlSpTg.Count < nRound) {
-            int iSpTg = ltDdlSpTg.Count + 1;
-            ltDdlSpTg.Add(new SelectListItem { Text = MvcApplication.ckcore.sPokalrunde[nRound - iSpTg + 1], Value = iSpTg.ToString() });
-          }
-        }
-      }
-
     }
   }
 }

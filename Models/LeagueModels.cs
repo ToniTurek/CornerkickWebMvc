@@ -16,7 +16,7 @@ namespace CornerkickWebMvc.Models
     public int iSpTg { get; set; }
 
     // List<CornerkickCore.Core.Tabellenplatz> ltTbpl = cr.getTabelleLiga(iSaison, iLand, iSpielklasse, iSpieltag, 0);
-    public List<List<int[]>> ltErg { get; set; }
+    public CornerkickCore.Cup league { get; set; }
     public List<CornerkickCore.Tool.TableItem> ltTbl { get; set; }
     public List<CornerkickCore.Tool.TableItem> ltTblLast { get; set; } // Table last matchday
     public List<CornerkickCore.UI.Scorer> ltScorer { get; set; }

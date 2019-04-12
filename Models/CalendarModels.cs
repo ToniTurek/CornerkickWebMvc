@@ -61,8 +61,8 @@ namespace CornerkickWebMvc.Models
       CornerkickCore.Core.Club club = MvcApplication.ckcore.ltClubs[iTeam];
 
       //DateTime dt = new DateTime(MvcApplication.ckcore.dtDatum.Year, MvcApplication.ckcore.dtDatum.Month, MvcApplication.ckcore.dtDatum.Day);
-      DateTime dt = MvcApplication.ckcore.dtSaisonstart.Date;
-      while (dt.CompareTo(MvcApplication.ckcore.dtSaisonende) < 0) {
+      DateTime dt = MvcApplication.ckcore.dtSeasonStart.Date;
+      while (dt.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         // New Year
         if (dt.Day == 1 && dt.Month == 1) {
           ltEvents.Add(new DiaryEvent {
@@ -136,49 +136,10 @@ namespace CornerkickWebMvc.Models
           });
         }
 
-        // Liga
-        for (int iSpTg = 0; iSpTg < MvcApplication.ckcore.ltDtSpieltagLiga[club.iLand][club.iDivision].Count; iSpTg++) {
-          if (MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision].Count <= iSpTg) break;
-
-          DateTime dtTmp = MvcApplication.ckcore.ltDtSpieltagLiga[club.iLand][club.iDivision][iSpTg];
-          if (dt.Date.Equals(dtTmp.Date)) {
-            string sErg = "";
-            string sH = "";
-            string sA = "";
-            for (int iB = 0; iB < MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg].Count; iB++) {
-              if (MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][0] == club.iId) {
-                sH = club.sName;
-                sA = MvcApplication.ckcore.ltClubs[MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][1]].sName;
-                sErg = " ," + MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][2] + ":" + MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][3];
-                break;
-              } else if (MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][1] == club.iId) {
-                sH = MvcApplication.ckcore.ltClubs[MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][0]].sName;
-                sA = club.sName;
-                if (MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][2] >= 0 && MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][3] >= 0) {
-                  sErg = " ," + MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][2] + ":" + MvcApplication.ckcore.ltErgebnisseLiga[club.iLand][club.iDivision][iSpTg][iB][3];
-                }
-                break;
-              }
-            }
-
-            ltEvents.Add(new DiaryEvent {
-              iID = ltEvents.Count,
-              sTitle = " Liga, " + (iSpTg + 1).ToString().PadLeft(2) + ". Spieltag: " + sH + " vs. " + sA + sErg,
-              sStartDate = dtTmp.ToString("yyyy-MM-ddTHH:mm:ss"),
-              sEndDate = dtTmp.AddMinutes(105).ToString("yyyy-MM-ddTHH:mm:ss"),
-              sColor = "rgb(0, 175, 100)",
-              bEditable = false,
-              bAllDay = false
-            });
-
-            break;
-          }
-        }
-
         // Cup
-        foreach (CornerkickCore.Core.Cup cup in MvcApplication.ckcore.ltCups) {
+        foreach (CornerkickCore.Cup cup in MvcApplication.ckcore.ltCups) {
           int iSpTg = 0;
-          foreach (CornerkickCore.Core.Matchday md in cup.ltMatchdays) {
+          foreach (CornerkickCore.Cup.Matchday md in cup.ltMatchdays) {
             if (dt.Date.Equals(md.dt.Date)) {
               if (md.ltGameData == null) continue;
 
@@ -187,29 +148,36 @@ namespace CornerkickWebMvc.Models
                     gd.team[1].iTeamId == club.iId) {
                   string sH = "";
                   string sA = "";
+                  string sRes= "";
                   for (int iB = 0; iB < md.ltGameData.Count; iB++) {
                     if (md.ltGameData[iB].team[0].iTeamId == club.iId) {
                       sH = club.sName;
                       sA = MvcApplication.ckcore.ltClubs[md.ltGameData[iB].team[1].iTeamId].sName;
+                      sRes = " ," + md.ltGameData[iB].team[0].iGoals + ":" + md.ltGameData[iB].team[1].iGoals;
                       break;
                     } else if (md.ltGameData[iB].team[1].iTeamId == club.iId) {
                       sH = MvcApplication.ckcore.ltClubs[md.ltGameData[iB].team[0].iTeamId].sName;
                       sA = club.sName;
+                      sRes = " ," + md.ltGameData[iB].team[0].iGoals + ":" + md.ltGameData[iB].team[1].iGoals;
+                      break;
                     }
                   }
 
                   string sTitle = " " + cup.sName;
                   string sColor = "rgb(200, 0, 200)";
-                  if (cup.iId == 2) {
+                  if (cup.iId == 1) {
+                    sTitle = " Liga, " + (iSpTg + 1).ToString().PadLeft(2) + ". Spieltag";
+                    sColor = "rgb(0, 175, 100)";
+                  } else if (cup.iId == 2) {
                     string sPokalrunde = "";
-                    sPokalrunde = MvcApplication.ckcore.sPokalrunde[MvcApplication.ckcore.tl.getPokalRundeVonNTeiln(md.ltGameData.Count) + 1];
+                    sPokalrunde = MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count)];
                     sTitle += ", " + sPokalrunde;
 
                     sColor = "rgb(100, 100, 255)";
                   } else if (cup.iId == -5) {
                     sColor = "rgb(255, 200, 255)";
                   }
-                  sTitle += ": " + sH + " vs. " + sA;
+                  sTitle += ": " + sH + " vs. " + sA + sRes;
 
                   ltEvents.Add(new DiaryEvent {
                     iID = ltEvents.Count,
@@ -225,7 +193,7 @@ namespace CornerkickWebMvc.Models
                   if (cup.iId == 2 && md.ltGameData.Count > 1) {
                     ltEvents.Add(new DiaryEvent {
                       iID = ltEvents.Count,
-                      sTitle = " " + cup.sName + ", Auslosung " + MvcApplication.ckcore.sPokalrunde[MvcApplication.ckcore.tl.getPokalRundeVonNTeiln(md.ltGameData.Count)],
+                      sTitle = " " + cup.sName + ", Auslosung " + MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count) - 1],
                       sStartDate = new DateTime(md.dt.Year, md.dt.Month, md.dt.AddDays(1).Day, 12,  0, 0).ToString("yyyy-MM-ddTHH:mm:ss"),
                       sEndDate   = new DateTime(md.dt.Year, md.dt.Month, md.dt.AddDays(1).Day, 12, 30, 0).ToString("yyyy-MM-ddTHH:mm:ss"),
                       sColor     = "rgb(100, 200, 255)",
@@ -236,7 +204,7 @@ namespace CornerkickWebMvc.Models
                   break;
                 }
               }
-            } else if (cup.iId == 2 && iSpTg == 0 && dt.Date.Equals(MvcApplication.ckcore.dtSaisonstart.AddDays(6).Date)) {
+            } else if (cup.iId == 2 && iSpTg == 0 && dt.Date.Equals(MvcApplication.ckcore.dtSeasonStart.AddDays(6).Date)) {
               ltEvents.Add(new DiaryEvent {
                 iID = ltEvents.Count,
                 sTitle = " " + cup.sName + ", Auslosung 1. Runde",

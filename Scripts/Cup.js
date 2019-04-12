@@ -1,9 +1,9 @@
-﻿function setCup2(iMd) {
+﻿function setCup2(iSaison, iLand, iDivision, iMd) {
   $.ajax({
     url: '/Member/setCup',
     type: "GET",
     dataType: "JSON",
-    data: { iGameday: iMd },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
     success: function (ltGameData) {
       actionDrawTeams(ltGameData, iMd - 1);
     }

@@ -5,7 +5,7 @@
     url: '/Member/setLeague',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iGameday: iSpTg },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iSpTg },
     success: function (ltTbl) {
       actionDrawTable(ltTbl);
     }
@@ -15,9 +15,9 @@
     url: '/Member/setLeagueTeams',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iGameday: iSpTg },
-    success: function (ltErg) {
-      actionDrawTeams(ltErg, iSpTg - 1);
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iSpTg },
+    success: function (ltGamedata) {
+      actionDrawTeams(ltGamedata, iSpTg - 1);
     }
   });
 }
@@ -102,14 +102,14 @@ function drawTable(ltTbl) {
   return sBox;
 }
 
-function actionDrawTeams(ltErg, iSpieltag) {
+function actionDrawTeams(ltGamedata, iMd) {
   var divDrawTeams = $("#tableDivTeams");
   divDrawTeams.html('');
-  result = drawTeams(ltErg, iSpieltag);
+  result = drawTeams(ltGamedata, iMd);
   divDrawTeams.html(result).show();
 }
 
-function drawTeams(ltErg, iSpieltag) {
+function drawTeams(ltGamedata, iMd) {
   var sBox = '';
 
   sBox += '<table id="tableLeagueTeams" border="0" cellpadding="2" style="width: 100%">';
@@ -121,28 +121,28 @@ function drawTeams(ltErg, iSpieltag) {
   sBox += '  <th style="text-align:center">Erg.</th>';
   sBox += '</tr>';
 
-  var sDateDay  = $('#idDtDay' + iSpieltag).data('name');
-  var sDateHour = $('#idDtHour' + iSpieltag).data('name');
+  var sDateDay  = $('#idDtDay' + iMd).data('name');
+  var sDateHour = $('#idDtHour' + iMd).data('name');
   var iClubUser = $('#idClubUser').data('name');
-  for (var i = 0; i < ltErg.length; i++) {
-    iBeg = ltErg[i];
-    var sClubNameH = $('#idClubNames' + iBeg[0]).data('name');
-    var sClubNameA = $('#idClubNames' + iBeg[1]).data('name');
+  for (var i = 0; i < ltGamedata.length; i++) {
+    gd = ltGamedata[i];
+    var sClubNameH = $('#idClubNames' + gd.team[0].iTeamId).data('name');
+    var sClubNameA = $('#idClubNames' + gd.team[1].iTeamId).data('name');
 
     var sStyle = "";
-    if (iBeg[0] === iClubUser || iBeg[1] === iClubUser) {
+    if (gd.team[0].iTeamId === iClubUser || gd.team[1].iTeamId === iClubUser) {
       sStyle = "font-weight:bold";
     }
 
     sBox += '<tr style=' + sStyle + '>';
     sBox += '  <td>' + sDateDay + '&nbsp;' + sDateHour + '</td>';
 
-    sBox += '<td align="right"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameH).replace("__id", iBeg[0]) + '</td>';
+    sBox += '<td align="right"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameH).replace("__id", gd.team[0].iTeamId) + '</td>';
     sBox += '<td align="center">&nbsp;-&nbsp;</td>';
-    sBox += '<td align="left"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameA).replace("__id", iBeg[1]) + '</td>';
+    sBox += '<td align="left"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameA).replace("__id", gd.team[1].iTeamId) + '</td>';
 
-    if (iBeg[2] >= 0 && iBeg[3] >= 0) {
-      sBox += '<td align="center">' + iBeg[2] + ':' + iBeg[3] + '&nbsp;(' + iBeg[4] + ':' + iBeg[5] + ')</td>';
+    if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
+      sBox += '<td align="center">' + gd.team[0].iGoals + ':' + gd.team[1].iGoals + '&nbsp;(' + gd.team[0].iGoalsHt + ':' + gd.team[1].iGoalsHt + ')</td>';
     } else {
       sBox += '<td align="center">-</td>';
     }
