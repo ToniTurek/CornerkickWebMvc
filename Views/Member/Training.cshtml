@@ -187,8 +187,9 @@
     @{
       CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
       if (club != null) {
+        string[] sDayOfWeek = new string[7] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
         for (int i = 0; i < club.training.iTraining.Length; i++) {
-          <label for="Wochentag">@MvcApplication.ckcore.sWochentag[i]</label>
+          <label for="Wochentag">@sDayOfWeek[i]</label>
           @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", club.training.iTraining[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString() })
         }
       }

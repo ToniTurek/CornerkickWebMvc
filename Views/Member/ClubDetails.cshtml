@@ -15,7 +15,8 @@
   }
 
   string sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
-  string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(Model.club).ToString();
+  CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
+  string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club).ToString();
   float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
   string sAveStrength = fAve[3].ToString("0.0");
   string sAveAge = fAve[4].ToString("0.0");

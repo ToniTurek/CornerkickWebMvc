@@ -32,7 +32,7 @@
     CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
   }
 
-  @if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date) || MvcApplication.ckcore.dtDatum.Day == 1) {
+  @if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1) {
     <label for="Trainer">Co-Trainer</label>
     @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0" })
     <label for="Trainer">Konditionstrainer</label>
