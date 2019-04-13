@@ -2565,13 +2565,25 @@ namespace CornerkickWebMvc.Controllers
       mlLeague.league = league;
       mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, mlLeague.iSpTg - 1, 0);
 
-      // Spieltage zu Dropdown Menü hinzufügen
-      while (mlLeague.ltDdlSpTg.Count < league.getMatchdaysTotal()) {
-        int iSpTg = mlLeague.ltDdlSpTg.Count + 1;
-        mlLeague.ltDdlSpTg.Add(new SelectListItem { Text = iSpTg.ToString().PadLeft(2), Value = iSpTg.ToString() });
+      // Add lands to dropdown list
+      foreach (int iLand in MvcApplication.iNations) {
+        mlLeague.ddlLand.Add(new SelectListItem { Text = MvcApplication.ckcore.sLand[iLand], Value = iLand.ToString() });
       }
 
       return View(mlLeague);
+    }
+
+    public JsonResult getDdlMatchdays(ushort iSaison, int iLand, byte iDivision)
+    {
+      CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
+
+      string[] ltMd = new string[league.getMatchdaysTotal()];
+      // Spieltage zu Dropdown Menü hinzufügen
+      for (int iMd = 0; iMd < ltMd.Length; iMd++) {
+        ltMd[iMd] = (iMd + 1).ToString();
+      }
+
+      return Json(ltMd, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
@@ -2586,9 +2598,18 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult setLeagueTeams(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
     {
+      if (iMatchday < 1) return Json("", JsonRequestBehavior.AllowGet);
+
       CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
 
-      return Json(league.ltMatchdays[iMatchday - 1].ltGameData, JsonRequestBehavior.AllowGet);
+      CornerkickCore.Cup.Matchday md = new CornerkickCore.Cup.Matchday();
+      md.ltGameData = new List<CornerkickGame.Game.Data>();
+
+      foreach (CornerkickGame.Game.Data gd in league.ltMatchdays[iMatchday - 1].ltGameData) {
+        md.ltGameData.Add(gd.Clone(true));
+      }
+
+      return Json(md.ltGameData, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult GetLeaguePlaceHistory()
@@ -2634,9 +2655,11 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      /*
       foreach (CornerkickCore.Cup.Matchday gd in cup.ltMatchdays) {
         cupModel.ltErg.Add(gd.ltGameData);
       }
+      */
 
       return View(cupModel);
     }
@@ -2649,8 +2672,13 @@ namespace CornerkickWebMvc.Controllers
       if (cup == null) return Json("", JsonRequestBehavior.AllowGet);
       if (cup.ltMatchdays == null) return Json("", JsonRequestBehavior.AllowGet);
 
-      foreach (CornerkickCore.Cup.Matchday gd in cup.ltMatchdays) {
-        cupModel.ltErg.Add(gd.ltGameData);
+      foreach (CornerkickCore.Cup.Matchday md in cup.ltMatchdays) {
+        List<CornerkickGame.Game.Data> ltGd = new List<CornerkickGame.Game.Data>();
+        foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
+          ltGd.Add(gd.Clone(true));
+        }
+
+        cupModel.ltErg.Add(ltGd);
       }
 
       return Json(cupModel.ltErg[iMatchday - 1], JsonRequestBehavior.AllowGet);

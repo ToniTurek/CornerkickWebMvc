@@ -1,11 +1,31 @@
-﻿function setLeague2(iSaison, iLand, iDivision) {
-  var iSpTg = $('#ddlSpieltag').val();
+﻿function changeLand(iSaison, iDivision) {
+  var iLand = $('#ddlLand').val();
+
+  $.ajax({
+    url: '/Member/getDdlMatchdays',
+    type: "GET",
+    dataType: "JSON",
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision },
+    success: function (ltMd) {
+      $('#ddlMatchday').empty();
+      $.each(ltMd, function (i, p) {
+        $('#ddlMatchday').append($('<option></option>').val(p).html(p));
+      });
+
+      setLeague2(iSaison, iDivision);
+    }
+  });
+}
+
+function setLeague2(iSaison, iDivision) {
+  var iLand = $('#ddlLand').val();
+  var iMd = $('#ddlMatchday').val();
 
   $.ajax({
     url: '/Member/setLeague',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iSpTg },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
     success: function (ltTbl) {
       actionDrawTable(ltTbl);
     }
@@ -15,9 +35,9 @@
     url: '/Member/setLeagueTeams',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iSpTg },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
     success: function (ltGamedata) {
-      actionDrawTeams(ltGamedata, iSpTg - 1);
+      actionDrawTeams(ltGamedata, iMd - 1);
     }
   });
 }

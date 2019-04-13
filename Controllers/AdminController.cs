@@ -31,7 +31,7 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.sStartHour = "";
       if (MvcApplication.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.iStartHour.ToString();
 
-      if (MvcApplication.ckcore.ltUser.Count > 0) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
 
       modelAdmin.nClubs  = MvcApplication.ckcore.ltClubs .Count;
       modelAdmin.nUser   = MvcApplication.ckcore.ltUser  .Count;
@@ -66,6 +66,50 @@ namespace CornerkickWebMvc.Controllers
       }
 
       setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
+
+      // If first step: Add CPU teams
+      if (MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart)) {
+        Controllers.AccountController accountController = new Controllers.AccountController();
+
+        MvcApplication.ckcore.setNewSeason();
+
+        foreach (int iLand in MvcApplication.iNations) {
+          CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
+          if (cup == null) {
+            // Create nat. cup
+            cup = new CornerkickCore.Cup(bKo: true);
+            cup.iId = 2;
+            cup.iId2 = iLand;
+            MvcApplication.ckcore.ltCups.Add(cup);
+          }
+
+          // Create league
+          CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand);
+          if (league == null) {
+            league = new CornerkickCore.Cup(nGroups: 1, bGroupsTwoGames: true);
+            league.iId = 1;
+            league.iId2 = iLand;
+            MvcApplication.ckcore.ltCups.Add(league);
+          }
+
+          // Only GER (remove to use full iNations)
+          //break;
+
+          int iC = 0;
+          while (league.ltClubs[0].Count < 16) {
+            CornerkickCore.Core.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[iLand] + "_" + (iC + 1).ToString(), (byte)iLand, 0);
+            MvcApplication.ckcore.ltClubs.Add(clb);
+
+            cup   .ltClubs[0].Add(clb);
+            league.ltClubs[0].Add(clb);
+
+            iC++;
+          }
+
+          MvcApplication.ckcore.calcMatchdays();
+          MvcApplication.ckcore.drawCup(league);
+        }
+      }
 
       // Do one step now
       MvcApplication.ckcore.next(true);

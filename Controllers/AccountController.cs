@@ -238,7 +238,7 @@ namespace CornerkickWebMvc.Controllers
       for (byte iU = 0; iU < 8; iU++) {
 #endif
       CornerkickCore.Core.User usr = createUser(applicationUser);
-      CornerkickCore.Core.Club clb = createClub(applicationUser, (byte)iLand, (byte)iLiga);
+      CornerkickCore.Core.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iLiga);
       usr.iLevel = 1;
       usr.iTeam = clb.iId;
       usr.nextGame.iGameSpeed = 250;
@@ -327,11 +327,11 @@ namespace CornerkickWebMvc.Controllers
       return checkUserIsAdmin(regModel.Email, regModel.Password);
     }
 
-    private CornerkickCore.Core.Club createClub(ApplicationUser applicationUser, byte iLand, byte iLiga)
+    internal CornerkickCore.Core.Club createClub(string sTeamname, byte iLand, byte iLiga)
     {
       CornerkickCore.Core.Club clb = MvcApplication.ckcore.ini.newClub();
 
-      clb.sName = applicationUser.Vereinsname;
+      clb.sName = sTeamname;
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
       clb.iId = MvcApplication.ckcore.ltClubs.Count;
 
@@ -789,7 +789,7 @@ namespace CornerkickWebMvc.Controllers
         if (result.Succeeded) {
           rvmDEBUG = model;
 
-          if (MvcApplication.ckcore.ltUser.Count == 0 && bAdminFirst/* && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
+          if (MvcApplication.ckcore.ltUser.Count == 0/* && bAdminFirst && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
             await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
 
             CornerkickCore.Core.User usrAdmin = createUser(appUser);

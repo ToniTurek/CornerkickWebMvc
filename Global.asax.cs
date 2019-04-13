@@ -34,7 +34,7 @@ namespace CornerkickWebMvc
     //const string sSaveZip = "ckSave.zip";
     const string sFilenameSave = ".autosave.ckx";
 
-    static byte[] iNations = new byte[8] {
+    internal static byte[] iNations = new byte[8] {
       36, // GER
       29, // ENG
       30, // ESP
@@ -340,7 +340,11 @@ namespace CornerkickWebMvc
         fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", CultureInfo.InvariantCulture));
         fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
         fileLastState.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
-        fileLastState.WriteLine(MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed.ToString());
+
+        int iGameSpeed = 0;
+        if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+        fileLastState.WriteLine(iGameSpeed.ToString());
+
         fileLastState.Close();
       }
 

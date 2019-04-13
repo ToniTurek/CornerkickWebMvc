@@ -10,8 +10,12 @@ namespace CornerkickWebMvc.Models
   public class LeagueModels
   {
     public ushort iSaison { get; set; }
+
+    [Display(Name = "Land: ")]
     public int iLand { get; set; }
+
     public byte iSpKl { get; set; }
+
     [Display(Name = "Spieltag: ")]
     public int iSpTg { get; set; }
 
@@ -20,6 +24,8 @@ namespace CornerkickWebMvc.Models
     public List<CornerkickCore.Tool.TableItem> ltTbl { get; set; }
     public List<CornerkickCore.Tool.TableItem> ltTblLast { get; set; } // Table last matchday
     public List<CornerkickCore.UI.Scorer> ltScorer { get; set; }
+
+    public List<SelectListItem> ddlLand { get; set; }
     public List<SelectListItem> ltDdlSpTg { get; set; }
 
     public static List<System.Web.Mvc.SelectListItem> ltSasn = new List<System.Web.Mvc.SelectListItem>();
@@ -28,6 +34,7 @@ namespace CornerkickWebMvc.Models
 
     public LeagueModels()
     {
+      ddlLand   = new List<SelectListItem>();
       ltDdlSpTg = new List<SelectListItem>();
     }
 
