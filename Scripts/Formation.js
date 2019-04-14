@@ -149,7 +149,7 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
     sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\" ontouchstart=\"selectPlayerOpp(" + i.toString() + ")\"";
   }
 
-  var fWidth = 24;
+  var fWidth = 26;
   var iTextSize = 150;
   if (bMobile) {
     iTextSize = 100;
