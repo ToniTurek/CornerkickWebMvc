@@ -2589,11 +2589,78 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
     {
       CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
 
-      mlLeague.ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday - 1, 0);
-      mlLeague.ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday,     0);
+      List<CornerkickCore.Tool.TableItem> ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday - 1, 0);
+      List<CornerkickCore.Tool.TableItem> ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday,     0);
 
-      return Json(new List<CornerkickCore.Tool.TableItem>[2] { mlLeague.ltTbl, mlLeague.ltTblLast }, JsonRequestBehavior.AllowGet);
+      string sBox = "";
+      sBox += "<table id=\"tableLeague\" style=\"width: 100%\">";
+      sBox += "<tr>";
+      sBox += "<th colspan=\"2\">Pl.</th>";
+      sBox += "<th>Verein</th>";
+      sBox += "<th style=\"text-align:right; width: 3%\">&nbsp;</th>";
+      sBox += "<th style=\"text-align:right\">Sp.</th>";
+      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+      sBox += "<th style=\"text-align:right\">g.</th>";
+      sBox += "<th style=\"text-align:right\">u.</th>";
+      sBox += "<th style=\"text-align:right\">v.</th>";
+      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+      sBox += "<th style=\"text-align:center\">Tore</th>";
+      sBox += "<th style=\"text-align:right\">Diff.</th>";
+      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+      sBox += "<th style=\"text-align:right\"> Pkte.</th>";
+      sBox += "</tr>";
+
+      for (var i = 0; i < ltTbl.Count; i++) {
+        CornerkickCore.Tool.TableItem tbpl = ltTbl[i];
+        int iGames = tbpl.iGUV[0] + tbpl.iGUV[1] + tbpl.iGUV[2];
+        int iDiff = tbpl.iGoals - tbpl.iGoalsOpp;
+
+        string sStyle = "";
+        if (clb != null && tbpl.iId == clb.iId) {
+          sStyle = "font-weight:bold";
+        }
+
+        var k = i + 1;
+
+        string sPlaceLast = "-";
+        string sColor = "black";
+        for (var iLast = 0; iLast < ltTblLast.Count; iLast++) {
+          if (ltTblLast[iLast].iId == tbpl.iId) {
+            if (i != iLast) {
+              sPlaceLast = (iLast + 1).ToString();
+              if (i > iLast) {
+                sColor = "red";
+              } else {
+                sColor = "green";
+              }
+            }
+            break;
+          }
+        }
+
+        sBox += "<tr style=" + sStyle + ">";
+        sBox += "<td class=\"first\"><b>" + k + "</b></td>";
+        sBox += "<td style=\"color: " + sColor + "\"> " + sPlaceLast + "</td>";
+        sBox += "<td><a href=\"/Member/ClubDetails?iClub=__id\" target =\"_blank\">__name</a></td>)".Replace("__name", tbpl.sName).Replace("__id", tbpl.iId.ToString());
+        sBox += "<td>&nbsp;</td>";
+        sBox += "<td align=\"right\">" + iGames.ToString() + "</td>";
+        sBox += "<td>&nbsp;</td>";
+        sBox += "<td align=\"right\">" + tbpl.iGUV[0].ToString() + "</td>";
+        sBox += "<td align=\"right\">" + tbpl.iGUV[1].ToString() + "</td>";
+        sBox += "<td align=\"right\">" + tbpl.iGUV[2].ToString() + "</td>";
+        sBox += "<td>&nbsp;</td>";
+        sBox += "<td align=\"center\">" + tbpl.iGoals.ToString() + ":" + tbpl.iGoalsOpp.ToString() + "</td>";
+        sBox += "<td align=\"right\">" + iDiff.ToString() + "</td>";
+        sBox += "<td>&nbsp;</td>";
+        sBox += "<td align=\"right\">" + tbpl.iPoints.ToString() + "</td>";
+        sBox += "</tr>";
+      }
+      sBox += "</table>";
+
+      //return Json(new List<CornerkickCore.Tool.TableItem>[2] { mlLeague.ltTbl, mlLeague.ltTblLast }, JsonRequestBehavior.AllowGet);
+      return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setLeagueTeams(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
