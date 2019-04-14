@@ -1,9 +1,32 @@
-﻿function setCup2(iSaison, iLand, iDivision, iMd) {
+﻿function changeLand(iSaison) {
+  var iLand = $('#ddlLandCup').val();
+
+  $.ajax({
+    url: '/Member/CupGetDdlMatchdays',
+    type: "GET",
+    dataType: "JSON",
+    data: { iSaison: iSaison, iLand: iLand },
+    success: function (ltMd) {
+      $('#ddlMatchdayCup').empty();
+      $.each(ltMd, function (i, p) {
+        ltS = p.split(';');
+        $('#ddlMatchdayCup').append($('<option></option>').val(ltS[0]).html(ltS[1]));
+      });
+
+      setCup2(iSaison);
+    }
+  });
+}
+
+function setCup2(iSaison) {
+  var iLand = $('#ddlLandCup').val();
+  var iMd = $('#ddlMatchdayCup').val();
+
   $.ajax({
     url: '/Member/setCup',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
+    data: { iSaison: iSaison, iLand: iLand, iMatchday: iMd },
     success: function (ltGameData) {
       actionDrawTeams(ltGameData, iMd - 1);
     }

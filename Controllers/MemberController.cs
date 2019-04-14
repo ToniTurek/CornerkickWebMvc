@@ -2713,6 +2713,29 @@ namespace CornerkickWebMvc.Controllers
       if (cup.ltMatchdays == null) return View(cupModel);
       if (cup.ltMatchdays.Count < 1) return View(cupModel);
 
+      // Add lands to dropdown list
+      foreach (int iLand in MvcApplication.iNations) {
+        cupModel.ddlLand.Add(new SelectListItem { Text = MvcApplication.ckcore.sLand[iLand], Value = iLand.ToString() });
+      }
+
+      return View(cupModel);
+    }
+
+    public JsonResult CupGetDdlMatchdays(ushort iSaison, int iLand)
+    {
+      CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
+      CornerkickCore.Core.Club clb = AccountController.ckClub();
+
+      string[] ltMd = new string[cup.getMatchdaysTotal()];
+      // Spieltage zu Dropdown Menü hinzufügen
+      for (int iMd = 0; iMd < ltMd.Length; iMd++) {
+        ltMd[iMd] = (iMd + 1).ToString();
+
+        int nRound = cup.getKoRound(cup.ltClubs[0].Count);
+        ltMd[iMd] += ";" + MvcApplication.ckcore.sCupRound[nRound - iMd - 1];
+      }
+
+      /*
       // Spieltage zu Dropdown Menü hinzufügen
       if (cup.ltMatchdays[0].ltGameData != null) {
         int nRound = cup.getKoRound(cup.ltClubs[0].Count);
@@ -2721,25 +2744,22 @@ namespace CornerkickWebMvc.Controllers
           cupModel.ltDdlSpTg.Add(new SelectListItem { Text = MvcApplication.ckcore.sCupRound[nRound - iMd], Value = iMd.ToString() });
         }
       }
-
-      /*
-      foreach (CornerkickCore.Cup.Matchday gd in cup.ltMatchdays) {
-        cupModel.ltErg.Add(gd.ltGameData);
-      }
       */
 
-      return View(cupModel);
+      return Json(ltMd, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult setCup(Models.CupModel cupModel, ushort iSaison, int iLand, byte iDivision, int iMatchday)
+    public JsonResult setCup(Models.CupModel cupModel, ushort iSaison, int iLand, int iMatchday)
     {
       cupModel.ltErg = new List<List<CornerkickGame.Game.Data>>();
 
-      CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand, iDivision);
+      CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
       if (cup == null) return Json("", JsonRequestBehavior.AllowGet);
       if (cup.ltMatchdays == null) return Json("", JsonRequestBehavior.AllowGet);
 
       foreach (CornerkickCore.Cup.Matchday md in cup.ltMatchdays) {
+        if (md.ltGameData == null) break;
+
         List<CornerkickGame.Game.Data> ltGd = new List<CornerkickGame.Game.Data>();
         foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
           ltGd.Add(gd.Clone(true));

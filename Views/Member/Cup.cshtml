@@ -9,12 +9,11 @@
 
 <script>
   $(document).ready(function () {
-    setCup();
+    changeLand(1);
   });
 
   function setCup() {
-    var iSpTg = $('#ddlCupSpieltag').val();
-    setCup2(1, 36, 0, iSpTg);
+    setCup2(1);
   }
 </script>
 
@@ -24,12 +23,15 @@
     sLand = MvcApplication.ckcore.sLand[Model.iLand];
   }
 }
-<h2>Land @sLand</h2>
+<label>
+  Land:
+  @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLandCup" })
+</label>
 
 <h4>Begegnungen</h4>
 
 @Html.LabelFor(m => m.iSpTg, new { @class = "col-md-2 control-label" })
-@Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlCupSpieltag" })
+@Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlMatchdayCup" })
 
 @{
   var dt = new DateTime();
