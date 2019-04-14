@@ -67,11 +67,14 @@ namespace CornerkickWebMvc.Controllers
 
       setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
 
-      // If first step: Add CPU teams
-      if (MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart)) {
-        Controllers.AccountController accountController = new Controllers.AccountController();
+      bool bFirstStep = MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart);
 
-        MvcApplication.ckcore.setNewSeason();
+      // Do one step now
+      MvcApplication.ckcore.next(true);
+
+      // If first step: Add CPU teams
+      if (bFirstStep) {
+        Controllers.AccountController accountController = new Controllers.AccountController();
 
         foreach (int iLand in MvcApplication.iNations) {
           CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
@@ -110,9 +113,6 @@ namespace CornerkickWebMvc.Controllers
           MvcApplication.ckcore.drawCup(league);
         }
       }
-
-      // Do one step now
-      MvcApplication.ckcore.next(true);
 
       // Start the timer
       MvcApplication.timerCkCalender.Interval = modelAdmin.fCalendarInterval * 1000;
