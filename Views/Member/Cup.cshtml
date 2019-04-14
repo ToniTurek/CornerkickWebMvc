@@ -19,7 +19,10 @@
 </script>
 
 @{
-  string sLand = MvcApplication.ckcore.sLand[Model.iLand];
+  string sLand = "";
+  if (Model.iLand >= 0 && Model.iLand < MvcApplication.ckcore.sLand.Length) {
+    sLand = MvcApplication.ckcore.sLand[Model.iLand];
+  }
 }
 <h2>Land @sLand</h2>
 

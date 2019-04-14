@@ -126,7 +126,9 @@ namespace CornerkickWebMvc.Controllers
 
     internal void setGameSpeedToAllUsers(int iGameSpeed)
     {
-      foreach (CornerkickCore.Core.User user in MvcApplication.ckcore.ltUser) user.nextGame.iGameSpeed = iGameSpeed;
+      foreach (CornerkickCore.Core.User user in MvcApplication.ckcore.ltUser) {
+        if (user.nextGame != null) user.nextGame.iGameSpeed = iGameSpeed;
+      }
     }
 
     public ActionResult StopCalendar(Models.AdminModel modelAdmin)
