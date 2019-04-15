@@ -52,7 +52,10 @@ namespace CornerkickWebMvc
       RouteConfig.RegisterRoutes(RouteTable.Routes);
       BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-      newCk();
+      try {
+        newCk();
+      } catch {
+      }
     }
 
     internal static void newCk()
