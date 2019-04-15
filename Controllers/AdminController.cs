@@ -43,6 +43,7 @@ namespace CornerkickWebMvc.Controllers
       //DirectoryInfo d = new DirectoryInfo(sHomeDir + "save");
       //FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
       modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "/save/.autosave.ckx");
+      modelAdmin.bSaveDirExist  = System.IO.Directory.Exists(sHomeDir + "/save");
 
       return View(modelAdmin);
     }
@@ -155,6 +156,13 @@ namespace CornerkickWebMvc.Controllers
     public ActionResult DeleteAutosave()
     {
       if (System.IO.File.Exists(getHomeDir() + "/save/.autosave.ckx")) System.IO.File.Delete(getHomeDir() + "/save/.autosave.ckx");
+
+      return RedirectToAction("Settings");
+    }
+
+    public ActionResult DeleteSaveFolder()
+    {
+      if (System.IO.Directory.Exists(getHomeDir() + "/save")) System.IO.Directory.Delete(getHomeDir() + "/save", true);
 
       return RedirectToAction("Settings");
     }

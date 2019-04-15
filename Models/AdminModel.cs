@@ -22,6 +22,7 @@ namespace CornerkickWebMvc.Models
 
     public bool bLogExist { get; set; }
     public bool bAutosaveExist { get; set; }
+    public bool bSaveDirExist { get; set; }
 
     public string sSelectedAutosaveFile { get; set; }
     public int iAutosaveFile { get; set; }
