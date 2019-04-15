@@ -5,8 +5,26 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h3>Log</h3>
-@Html.TextAreaFor(x => x.sLog, 30, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script>
+    $(document).ready(function () {
+      //var sLogText = @Html.Raw(Json.Encode(Model.sLog));
+      //sLogText = sLogText.replace("\n", "<br/>");
+      //sLogText = sLogText.replace(/\r?\n/g, '\n\r');
+      //$("textarea#sLog").val(sLogText);
+    });
+  </script>
+</head>
 
-<h3>Error</h3>
-@Html.TextAreaFor(x => x.sErr, 30, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
+<body style="height: 100%; min-height: 100%">
+  @Html.ActionLink("Settings", "Settings", "Admin")
+
+  <h3>Log</h3>
+  @Html.TextAreaFor(x => x.sLog, 30, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
+  @*<textarea id="sLog" style="width: 100%; max-width: 100%" rows="30" cols="1000"></textarea>*@
+
+  <h3>Error</h3>
+  @Html.TextAreaFor(x => x.sErr, 30, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
+</body>
+</html>
