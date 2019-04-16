@@ -162,7 +162,8 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult DeleteSaveFolder()
     {
-      if (System.IO.Directory.Exists(getHomeDir() + "/save")) System.IO.Directory.Delete(getHomeDir() + "/save", true);
+      if (System.IO.Directory.Exists(getHomeDir() + "/save"))          System.IO.Directory.Delete(getHomeDir() + "/save", true);
+      if (System.IO.File     .Exists(getHomeDir() + "/laststate.txt")) System.IO.File     .Delete(getHomeDir() + "/laststate.txt");
 
       return RedirectToAction("Settings");
     }
