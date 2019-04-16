@@ -150,7 +150,7 @@ namespace CornerkickWebMvc
       }
 
       // Save .autosave
-      if (bSave) {
+      if (bSave && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Hour % 2 == 0) {
         MvcApplication.ckcore.ltClubs[0].ltTrainingHist.Clear();
         MvcApplication.ckcore.ltClubs[0].ltAccount.Clear();
         save(timerCkCalender);
@@ -236,7 +236,7 @@ namespace CornerkickWebMvc
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
 #endif
 
-      string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
+      string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + "_" + DateTime.Now.ToString() + ".ckx";
       string sFileSave2 = Path.Combine(sHomeDir, "save", sFilenameSave2);
       MvcApplication.ckcore.tl.writeLog("save file: " + sFileSave2);
 
