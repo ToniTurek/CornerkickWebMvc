@@ -151,8 +151,13 @@ namespace CornerkickWebMvc
 
       // Save .autosave
       if (bSave && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Hour % 2 == 0) {
-        MvcApplication.ckcore.ltClubs[0].ltTrainingHist.Clear();
-        MvcApplication.ckcore.ltClubs[0].ltAccount.Clear();
+        foreach (CornerkickCore.Core.Club clb in MvcApplication.ckcore.ltClubs) {
+          if (clb.iUser < 0) {
+            clb.ltTrainingHist.Clear();
+            clb.ltAccount     .Clear();
+          }
+        }
+
         save(timerCkCalender);
       }
 
