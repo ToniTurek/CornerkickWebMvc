@@ -24,9 +24,16 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult Settings(Models.AdminModel modelAdmin)
     {
-      modelAdmin.bCk = MvcApplication.ckcore != null;
-      modelAdmin.bTimer = MvcApplication.timerCkCalender.Enabled;
-      modelAdmin.fCalendarInterval = MvcApplication.timerCkCalender.Interval / 1000;
+      if (MvcApplication.ckcore == null) {
+        modelAdmin.bCk = false;
+        return View(modelAdmin);
+      }
+      modelAdmin.bCk = true;
+
+      if (MvcApplication.timerCkCalender != null) {
+        modelAdmin.bTimer            = MvcApplication.timerCkCalender.Enabled;
+        modelAdmin.fCalendarInterval = MvcApplication.timerCkCalender.Interval / 1000;
+      }
 
       modelAdmin.sStartHour = "";
       if (MvcApplication.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.iStartHour.ToString();
