@@ -153,6 +153,13 @@ namespace CornerkickWebMvc.Controllers
       //return View(modelAdmin);
     }
 
+    public ActionResult SaveAutosave()
+    {
+      MvcApplication.save(MvcApplication.timerCkCalender, true);
+
+      return RedirectToAction("Settings");
+    }
+
     public ActionResult DeleteAutosave()
     {
       if (System.IO.File.Exists(getHomeDir() + "/save/.autosave.ckx")) System.IO.File.Delete(getHomeDir() + "/save/.autosave.ckx");
@@ -241,8 +248,6 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult DeleteLog(Models.AdminModel modelAdmin)
     {
-      MvcApplication.ckcore.log.Clear();
-
       var diLog = new DirectoryInfo(getHomeDir() + "/log");
       foreach (var file in diLog.EnumerateFiles("*.log")) {
         file.Delete();
@@ -289,13 +294,6 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       return System.Web.HttpContext.Current.Server.MapPath("~");
-    }
-
-    public ActionResult SaveAutosave()
-    {
-      MvcApplication.save(MvcApplication.timerCkCalender, true);
-
-      return RedirectToAction("Settings");
     }
 
 #if _USE_BLOB
