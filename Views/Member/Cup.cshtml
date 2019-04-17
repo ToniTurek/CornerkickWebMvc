@@ -28,10 +28,12 @@
   @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLandCup" })
 </label>
 
-<h4>Begegnungen</h4>
+<label style="margin-left: 10px">
+  Spieltag:
+  @Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlMatchdayCup" })
+</label>
 
-@Html.LabelFor(m => m.iSpTg, new { @class = "col-md-2 control-label" })
-@Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlMatchdayCup" })
+<h4>Begegnungen</h4>
 
 @{
   var dt = new DateTime();

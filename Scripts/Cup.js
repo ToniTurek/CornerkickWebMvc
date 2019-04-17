@@ -75,9 +75,9 @@ function drawCupTeams(ltGameData, iSpieltag) {
     sBox += '<tr style=' + sStyle + '>';
     sBox += '<td>' + sDateDay + '&nbsp;' + sDateHour + '</td>';
 
-    sBox += '<td align="right">' + sClubNameH + '</td>';
+    sBox += '<td align="right"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameH).replace("__id", gd.team[0].iTeamId) + '</td>';
     sBox += '<td align="center">&nbsp;-&nbsp;</td>';
-    sBox += '<td align="left">' + sClubNameA + '</td>';
+    sBox += '<td align="left"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameA).replace("__id", gd.team[1].iTeamId) + '</td>';
 
     if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
       sBox += '<td align="center">' + gd.team[0].iGoals + ':' + gd.team[1].iGoals + '&nbsp;(' + gd.team[0].iGoalsHt + ':' + gd.team[1].iGoalsHt + ')</td>';
