@@ -27,6 +27,7 @@ namespace CornerkickWebMvc
   {
     public static CornerkickCore.Core ckcore;
     public static System.Timers.Timer timerCkCalender = null;
+    public static System.Timers.Timer timerSave = null;
     public static List<string> ltLog = new List<string>();
     public static int iStartHour = -1;
     private static Random random = new Random();
@@ -92,6 +93,12 @@ namespace CornerkickWebMvc
       }
       timerCkCalender.Enabled = false;
 
+      if (timerSave == null) {
+        timerSave = new System.Timers.Timer(15 * 60 * 1000); // 15 min.
+        timerSave.Elapsed += new System.Timers.ElapsedEventHandler(timerSave_Elapsed);
+      }
+      timerSave.Enabled = false;
+
       // Load autosave
       if (!load()) {
         // New game
@@ -117,15 +124,26 @@ namespace CornerkickWebMvc
         MvcApplication.ckcore.calcMatchdays();
         MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSeasonStart;
       }
+
+      // If no calendar timer --> enable save timer to save every 15 min.
+      timerSave.Enabled = !timerCkCalender.Enabled;
     }
 
     private static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
+      // Disable save timer (not needed if calendar timer is on)
+      timerSave.Enabled = false;
+
       if (timerCkCalender.Interval < 1000) timerCkCalender.Enabled = false;
 
       performCalendarStep();
 
       timerCkCalender.Enabled = true;
+    }
+
+    private static void timerSave_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+      save(timerCkCalender, true);
     }
 
     private static void performCalendarStep(bool bSave = true)
