@@ -13,7 +13,7 @@
   <script>
     $(document).ready(function () {
       changeLand(1, 0);
-
+      
       var iLigaMax = 8.1;
 
       $.get("/Member/GetLeaguePlaceHistory/", function (ltPlace) {
@@ -72,12 +72,19 @@
       @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLand" })
     </label>
 
+    <label style="margin-left: 10px">
+      Spieltag:
+      <select id="ddlMatchday" onchange="setLeague2(1, 0)"></select>
+    </label>
+
     @{
       string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
       int i = 0;
       foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
-        string sId = "idClubNames" + i++.ToString();
-        <div id="@sId" data-name="@club.sName"></div>
+        if (club.iLand == Model.iLand) {
+          string sId = "idClubNames" + i++.ToString();
+          <div id="@sId" data-name="@club.sName"></div>
+        }
       }
 
       var ltBeg = new List<int[]>();
@@ -101,11 +108,6 @@
         }
       }
     }
-
-    <label>
-      Spieltag:
-      <select id="ddlMatchday" onchange="setLeague2(1, 0)"></select>
-    </label>
     @*@Html.DropDownListFor(m => m.sSpTg, Model.ltDdlSpTg, new { @class = "form-control", @onchange = "setLeague2(1, 0)", id = "ddlSpieltag" })*@
 
     <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">

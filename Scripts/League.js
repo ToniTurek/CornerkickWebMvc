@@ -12,7 +12,15 @@
         $('#ddlMatchday').append($('<option></option>').val(p).html(p));
       });
 
-      setLeague2(iSaison, iDivision);
+      $.ajax({
+        url: '/Member/LeagueGetMatchday',
+        type: "GET",
+        dataType: "JSON",
+        success: function (iMd) {
+          document.getElementById("ddlMatchday").value = iMd;
+          setLeague2(iSaison, iDivision);
+        }
+      });
     }
   });
 }
