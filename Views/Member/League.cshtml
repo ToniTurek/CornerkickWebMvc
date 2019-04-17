@@ -82,9 +82,11 @@
       int i = 0;
       foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
         if (club.iLand == Model.iLand) {
-          string sId = "idClubNames" + i++.ToString();
+          string sId = "idClubNames" + i.ToString();
           <div id="@sId" data-name="@club.sName"></div>
         }
+
+        i++;
       }
 
       var ltBeg = new List<int[]>();
