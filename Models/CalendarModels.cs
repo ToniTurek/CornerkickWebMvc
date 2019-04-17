@@ -174,7 +174,6 @@ namespace CornerkickWebMvc.Models
 
                   ltEvents.Add(new DiaryEvent {
                     iID = ltEvents.Count,
-                    //sTitle = " " + cup.sName + ", " + (iSpTg + 1).ToString().PadLeft(2) + ". Spieltag: " + sH + " vs. " + sA,
                     sTitle = sTitle,
                     sStartDate = md.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
                     sEndDate = md.dt.AddMinutes(105).ToString("yyyy-MM-ddTHH:mm:ss"),
