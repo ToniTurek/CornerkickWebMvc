@@ -193,8 +193,23 @@ namespace CornerkickWebMvc.Controllers
       //int iStComm = 0;
       //foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
       string sCommTmp = "";
+      string sLastComment = "";
+
+      if (!string.IsNullOrEmpty(gD.sComment)) {
+        string[] ltLastComment = gD.sComment.Split('\n');
+        if (ltLastComment.Length > 0) {
+          sLastComment = ltLastComment[0];
+        }
+      }
+
       foreach (CornerkickGame.Game.Kommentar k in Enumerable.Reverse(state.ltCommend)) {
-        if (!string.IsNullOrEmpty(k.sKommentar)) sCommTmp += MvcApplication.ckcore.game.tl.sSpielmin(k.tsMinute, true) + k.sKommentar + '\n';
+        if (!string.IsNullOrEmpty(k.sKommentar)) {
+          string sCommentarNew = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + k.sKommentar;
+
+          if (sLastComment.Equals(sCommentarNew)) break;
+
+          sCommTmp += sCommentarNew + '\n';
+        }
       }
 
       gD.sComment = sCommTmp + gD.sComment;
@@ -229,7 +244,7 @@ namespace CornerkickWebMvc.Controllers
         if (shoot.plShoot != null && shoot.iHA == iHA) {
           float fDist = MvcApplication.ckcore.game.tl.getDistanceToGoal(shoot.plShoot)[0];
 
-          string sShootDesc = MvcApplication.ckcore.game.tl.sSpielmin(shoot.tsMinute, false) +
+          string sShootDesc = MvcApplication.ckcore.ui.getMinuteString(shoot.tsMinute, false) +
                               shoot.iGoalsH.ToString() + ":" + shoot.iGoalsA.ToString();
           sShootDesc += " - " + shoot.plShoot.sName;
           if (shoot.iType == 5) sShootDesc += ", FE";
@@ -257,7 +272,7 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Game.Duel duel = state.duel;
         if (duel.plDef != null && duel.plDef.iHA == iHA) {
           if (duel.iResult > 2) {
-            string sCardDesc = MvcApplication.ckcore.game.tl.sSpielmin(duel.tsMinute, false) +
+            string sCardDesc = MvcApplication.ckcore.ui.getMinuteString(duel.tsMinute, false) +
                                 sTeam +
                                 " - " +
                                 duel.plDef.sName;
@@ -522,7 +537,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (iPlIx >= 0 && plDef.iIndex != iPlIx && plOff.iIndex != iPlIx) return "";
 
-      string sDuelDesc = MvcApplication.ckcore.game.tl.sSpielmin(state.duel.tsMinute, false) +
+      string sDuelDesc = MvcApplication.ckcore.ui.getMinuteString(state.duel.tsMinute, false) +
                          " - " + state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
 
       string sDefOff = "def";
