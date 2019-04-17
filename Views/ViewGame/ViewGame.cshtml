@@ -721,7 +721,7 @@
     </div>
   </div>
 
-  <div id="divDrawGameContainer" style="position: relative; float: left; width: auto; margin-bottom: 2%">
+  <div id="divDrawGameContainer" style="position: relative; float: left; width: auto; margin-bottom: 4px">
     <img id="imgGame" style="position: relative; width: 100%" src="~/Content/Images/stadium/field_full.png" alt="" />
     <div id="drawHeatmap" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
     <div id="divDrawGame" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
@@ -737,11 +737,17 @@
     <div id="divLinkTactic" style="position: absolute; top: 0px; right: 5%; width: 30%; text-align: right">
       <a href="#" id="aOptions" style="color:#000aaa">Optionen</a>
     </div>
+    <div id="divCbUpdate" style="position: absolute; bottom: 20px; right: 0px; width: 200px; text-align: right">
+      <label style="position: absolute; top: 0px; right: 4px">
+        <input type="checkbox" id="cbUpdateStatistic" name="cbUpdateStatistic" value="0" checked>
+        Update Statistik
+      </label>
+    </div>
   </div>
 
   @if (Model.game != null) {
     if (Model.bAdmin) {
-      <div style="position: relative; float: left; width: 100%; height: 60px; margin-top: -2%">
+      <div style="position: relative; float: left; width: 50%; height: 60px; margin-top: -4%">
         <text id="txtAdminChanceShootOnGoal"></text>
         <text id="txtAdminChanceGoal"></text>
       </div>

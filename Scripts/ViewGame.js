@@ -26,7 +26,13 @@
         iState = -2;
       }
 
-      plotStatistics(iState);
+      var bUpdate = true;
+      if (iState === -1) {
+        bUpdate = document.getElementById("cbUpdateStatistic").checked;
+      }
+      if (bUpdate === true) {
+        plotStatistics(iState);
+      }
     },
     error: function () {
       //alert("ERROR");
