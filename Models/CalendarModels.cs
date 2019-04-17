@@ -144,24 +144,16 @@ namespace CornerkickWebMvc.Models
               if (md.ltGameData == null) continue;
 
               foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
-                if (gd.team[0].iTeamId == club.iId ||
-                    gd.team[1].iTeamId == club.iId) {
+                int iIdH = gd.team[0].iTeamId;
+                int iIdA = gd.team[1].iTeamId;
+                if (iIdH == club.iId ||
+                    iIdA == club.iId) {
                   string sH = "";
                   string sA = "";
-                  string sRes= "";
-                  for (int iB = 0; iB < md.ltGameData.Count; iB++) {
-                    if (md.ltGameData[iB].team[0].iTeamId == club.iId) {
-                      sH = club.sName;
-                      sA = MvcApplication.ckcore.ltClubs[md.ltGameData[iB].team[1].iTeamId].sName;
-                      sRes = " ," + md.ltGameData[iB].team[0].iGoals + ":" + md.ltGameData[iB].team[1].iGoals;
-                      break;
-                    } else if (md.ltGameData[iB].team[1].iTeamId == club.iId) {
-                      sH = MvcApplication.ckcore.ltClubs[md.ltGameData[iB].team[0].iTeamId].sName;
-                      sA = club.sName;
-                      sRes = " ," + md.ltGameData[iB].team[0].iGoals + ":" + md.ltGameData[iB].team[1].iGoals;
-                      break;
-                    }
-                  }
+                  if (iIdH >= 0 && iIdH < MvcApplication.ckcore.ltClubs.Count) sH = MvcApplication.ckcore.ltClubs[iIdH].sName;
+                  if (iIdA >= 0 && iIdA < MvcApplication.ckcore.ltClubs.Count) sA = MvcApplication.ckcore.ltClubs[iIdA].sName;
+
+                  string sRes = MvcApplication.ckcore.ui.getResultString(gd);
 
                   string sTitle = " " + cup.sName;
                   string sColor = "rgb(200, 0, 200)";
@@ -177,7 +169,8 @@ namespace CornerkickWebMvc.Models
                   } else if (cup.iId == -5) {
                     sColor = "rgb(255, 200, 255)";
                   }
-                  sTitle += ": " + sH + " vs. " + sA + sRes;
+                  sTitle += ": " + sH + " vs. " + sA;
+                  if (!string.IsNullOrEmpty(sRes)) sTitle += ", " + sRes;
 
                   ltEvents.Add(new DiaryEvent {
                     iID = ltEvents.Count,
@@ -190,7 +183,7 @@ namespace CornerkickWebMvc.Models
                     bAllDay = false
                   });
 
-                  if (cup.iId == 2 && md.ltGameData.Count > 1) {
+                  if (cup.iId == 2 && cup.iId2 == club.iLand && md.ltGameData.Count > 1) {
                     ltEvents.Add(new DiaryEvent {
                       iID = ltEvents.Count,
                       sTitle = " " + cup.sName + ", Auslosung " + MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count) - 1],
@@ -201,10 +194,11 @@ namespace CornerkickWebMvc.Models
                       bAllDay = false
                     });
                   }
+
                   break;
                 }
               }
-            } else if (cup.iId == 2 && iSpTg == 0 && dt.Date.Equals(MvcApplication.ckcore.dtSeasonStart.AddDays(6).Date)) {
+            } else if (cup.iId == 2 && cup.iId2 == club.iLand && iSpTg == 0 && dt.Date.Equals(MvcApplication.ckcore.dtSeasonStart.AddDays(6).Date)) {
               ltEvents.Add(new DiaryEvent {
                 iID = ltEvents.Count,
                 sTitle = " " + cup.sName + ", Auslosung 1. Runde",
