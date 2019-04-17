@@ -400,10 +400,11 @@ namespace CornerkickWebMvc
       bcontr.downloadBlob("blobLog", sFileZipLog);
 #endif
 #if _USE_AMAZON_S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+      
       // Download emblems
       for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
 
-      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
       if (!System.IO.File.Exists(sFileLoad)) {
         try {
           as3.downloadFile(sFilenameSave, sFileLoad);
