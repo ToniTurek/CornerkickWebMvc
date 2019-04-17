@@ -54,6 +54,8 @@ namespace CornerkickWebMvc.Controllers
             view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + user.game.player[iHA][iPl].sName + " - " + user.game.player[iHA][iPl].iNr, Value = (2 + (iHA * user.game.nPlStart) + iPl).ToString() });
           }
         }
+
+        view.iGameSpeed = user.game.iGameSpeed;
       }
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);

@@ -33,6 +33,8 @@ namespace CornerkickWebMvc.Models
     public string sEmblemH { get; set; }
     public string sEmblemA { get; set; }
 
+    public int iGameSpeed { get; set; }
+
     public struct gameLoc
     {
       public bool bFinished { get; set; }

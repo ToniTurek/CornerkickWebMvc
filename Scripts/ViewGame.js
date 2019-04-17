@@ -1,4 +1,4 @@
-﻿function drawGame(iState) {
+﻿function drawGame(iState, iGameSpeed) {
   //alert("drawGame: " + iState);
 
   var drawGameDiv = $("#divDrawGame");
@@ -33,12 +33,13 @@
       return false;
     },
     complete: function (jqXHR, textStatus) {
-      var iInterval = 300;
-      if (gLoc.iInterval > 0) iInterval = gLoc.iInterval;
+      if (!iGameSpeed) {
+        iGameSpeed = 300;
+      }
 
       // Schedule the next request when the current one's complete
       if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
-        setTimeout(function () { drawGame(-1); }, iInterval);
+        setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
       }
     }
   });

@@ -113,7 +113,9 @@
 
       setView();
 
-      drawGame(-3);
+      var iGameSpeed = @Html.Raw(Json.Encode(Model.iGameSpeed));
+
+      drawGame(-3, iGameSpeed);
 
       pMainSlider = $('#slider-Minute');
 
