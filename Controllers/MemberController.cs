@@ -2591,7 +2591,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Core.Club clb = AccountController.ckClub();
       if (clb == null) return Json("1", JsonRequestBehavior.AllowGet);
 
-      return Json(MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1), JsonRequestBehavior.AllowGet);
+      return Json(Math.Max(MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1), 1), JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
