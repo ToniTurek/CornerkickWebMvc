@@ -33,35 +33,91 @@
   }
 
   @if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1) {
-    <label for="Trainer">Co-Trainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0" })
-    <label for="Trainer">Konditionstrainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerKondi),   /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1" })
-    <label for="Trainer">Masseur</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iMasseur),        /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2" })
-    <label for="Trainer">Mentaltrainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerMental),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3" })
-    <label for="Trainer">Medizinische Abteilung</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iArzt),           /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4" })
-    <label for="Trainer">Jugendtrainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendTrainer),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5" })
-    <label for="Trainer">Jugendscouting</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendScouting), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6" })
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerKondi),   /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iMasseur),        /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerMental),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iArzt),           /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendTrainer),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendScouting), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6" })
+      </div>
+    </div>
   } else {
-    <label for="Trainer">Co-Trainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0", @disabled = "disabled" })
-    <label for="Trainer">Konditionstrainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerKondi),   /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1", @disabled = "disabled" })
-    <label for="Trainer">Masseur</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iMasseur),        /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2", @disabled = "disabled" })
-    <label for="Trainer">Mentaltrainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerMental),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3", @disabled = "disabled" })
-    <label for="Trainer">Medizinische Abteilung</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iArzt),           /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4", @disabled = "disabled" })
-    <label for="Trainer">Jugendtrainer</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendTrainer),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5", @disabled = "disabled" })
-    <label for="Trainer">Jugendscouting</label>
-    @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendScouting), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6", @disabled = "disabled" })
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0", @disabled = "disabled" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerKondi),   /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1", @disabled = "disabled" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iMasseur),        /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2", @disabled = "disabled" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iTrainerMental),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3", @disabled = "disabled" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iArzt),           /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4", @disabled = "disabled" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendTrainer),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5", @disabled = "disabled" })
+      </div>
+    </div>
+    <div style="position: relative; height: 40px">
+      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting</label>
+      <div style="position: absolute; height: 30px; left: 190px">
+        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", club.personal.iJugendScouting), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6", @disabled = "disabled" })
+      </div>
+    </div>
   }
 </div>
 
