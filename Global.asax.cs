@@ -93,7 +93,30 @@ namespace CornerkickWebMvc
       timerCkCalender.Enabled = false;
 
       // Load autosave
-      load();
+      if (!load()) {
+        // New game
+        foreach (int iLand in iNations) {
+          // Create nat. cup
+          CornerkickCore.Cup cup = new CornerkickCore.Cup(bKo: true);
+          cup.iId = 2;
+          cup.iId2 = iLand;
+          cup.sName = "Pokal " + ckcore.sLand[iLand];
+          ckcore.ltCups.Add(cup);
+
+          // Create league
+          CornerkickCore.Cup league = new CornerkickCore.Cup(nGroups: 1, bGroupsTwoGames: true);
+          league.iId = 1;
+          league.iId2 = iLand;
+          cup.sName = "Liga " + ckcore.sLand[iLand];
+          ckcore.ltCups.Add(league);
+
+          // Only GER (remove to use full iNations)
+          break;
+        }
+
+        MvcApplication.ckcore.calcMatchdays();
+        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSeasonStart;
+      }
     }
 
     private static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -362,7 +385,7 @@ namespace CornerkickWebMvc
 #endif
     }
 
-    internal static void load()
+    internal static bool load()
     {
       string sHomeDir = getHomeDir();
 
@@ -377,6 +400,9 @@ namespace CornerkickWebMvc
       bcontr.downloadBlob("blobLog", sFileZipLog);
 #endif
 #if _USE_AMAZON_S3
+      // Download emblems
+      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
+
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
       if (!System.IO.File.Exists(sFileLoad)) {
         try {
@@ -460,34 +486,11 @@ namespace CornerkickWebMvc
           MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
 #endif
-      } else { // New game
-        foreach (int iLand in iNations) {
-          // Create nat. cup
-          CornerkickCore.Cup cup = new CornerkickCore.Cup(bKo: true);
-          cup.iId = 2;
-          cup.iId2 = iLand;
-          ckcore.ltCups.Add(cup);
 
-          // Create league
-          CornerkickCore.Cup league = new CornerkickCore.Cup(nGroups: 1, bGroupsTwoGames: true);
-          league.iId = 1;
-          league.iId2 = iLand;
-          ckcore.ltCups.Add(league);
-
-          // Only GER (remove to use full iNations)
-          break;
-        }
-
-        MvcApplication.ckcore.calcMatchdays();
-        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSeasonStart;
+        return true;
       }
 
-#if !DEBUG
-#if _USE_AMAZON_S3
-      // Download emblems
-      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
-#endif
-#endif
+      return false;
     }
 
 #if _USE_BLOB
