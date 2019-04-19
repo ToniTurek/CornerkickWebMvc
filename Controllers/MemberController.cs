@@ -2623,19 +2623,23 @@ namespace CornerkickWebMvc.Controllers
           if (ltTblLast[iLast].iId == tbpl.iId) {
             if (i != iLast) {
               sPlaceLast = (iLast + 1).ToString();
-              if (i > iLast) {
-                sColor = "red";
-              } else {
-                sColor = "green";
-              }
+              if (i > iLast) sColor = "red";
+              else           sColor = "green";
             }
             break;
           }
         }
 
-        sBox += "<tr " + sStyle + "bgcolor=\"" + sBgColor + "\">";
-        sBox += "<td class=\"first\"><b>" + k + "</b></td>";
-        sBox += "<td style=\"color: " + sColor + "\"> " + sPlaceLast + "</td>";
+        string sEmblem = "<img src=\"/Content/Uploads/";
+        string sEmblemFile = MvcApplication.getHomeDir() + "Content/Uploads/" + tbpl.iId.ToString() + ".png";
+        if (System.IO.File.Exists(sEmblemFile)) sEmblem += tbpl.iId.ToString();
+        else                                    sEmblem += "0";
+        sEmblem += ".png\" alt=\"Wappen\" style=\"width: 12px\" title=\"" + tbpl.sName + "\"/>";
+
+        sBox += "<tr " + sStyle + "\">";
+        sBox += "<td class=\"first\" bgcolor=\"" + sBgColor + "\" align=\"center\"><b>" + k + "</b></td>";
+        sBox += "<td style=\"color: " + sColor + "\" align=\"center\"> " + sPlaceLast + "</td>";
+        sBox += "<td>" + sEmblem + "</td>";
         sBox += "<td><a href=\"/Member/ClubDetails?iClub=" + tbpl.iId.ToString() + "\" target=\"_blank\">" + tbpl.sName + "</a></td>";
         sBox += "<td>&nbsp;</td>";
         sBox += "<td align=\"right\">" + iGames.ToString() + "</td>";

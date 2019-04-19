@@ -42,6 +42,7 @@ function setLeague2(iSaison, iDivision) {
       sBox += "<table id=\"tableLeague\" style=\"width: 100%\">";
       sBox += "<tr>";
       sBox += "<th colspan=\"2\">Pl.</th>";
+      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
       sBox += "<th>Verein</th>";
       sBox += "<th style=\"text-align:right; width: 3%\">&nbsp;</th>";
       sBox += "<th style=\"text-align:right\">Sp.</th>";
