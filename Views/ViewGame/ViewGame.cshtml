@@ -737,22 +737,25 @@
     <div id="divLinkTactic" style="position: absolute; top: 0px; right: 5%; width: 30%; text-align: right">
       <a href="#" id="aOptions" style="color:#000aaa">Optionen</a>
     </div>
+    <div style="position: absolute; width: 30%; left: 5%; bottom: 0px; height: 40px; text-align: left">
+      <text id="txtReferee"></text>
+    </div>
     <div id="divCbUpdate" style="position: absolute; bottom: 20px; right: 0px; width: 200px; text-align: right">
       <label style="position: absolute; top: 0px; right: 4px">
         <input type="checkbox" id="cbUpdateStatistic" name="cbUpdateStatistic" value="0" checked>
         Update Statistik
       </label>
     </div>
-  </div>
 
-  @if (Model.game != null) {
-    if (Model.bAdmin) {
-      <div style="position: relative; float: left; width: 50%; height: 60px; margin-top: -4%">
-        <text id="txtAdminChanceShootOnGoal"></text>
-        <text id="txtAdminChanceGoal"></text>
-      </div>
+    @if (Model.game != null) {
+      if (Model.bAdmin) {
+        <div style="position: absolute; width: 30%; left: 35%; bottom: 0px; height: 60px; text-align: center">
+          <text id="txtAdminChanceShootOnGoal"></text>
+          <text id="txtAdminChanceGoal"></text>
+        </div>
+      }
     }
-  }
+  </div>
 
   <textarea id="tbKommentar" readonly rows='10' style="position: relative; width: 100%; max-width: 100%; float: left"></textarea>
 

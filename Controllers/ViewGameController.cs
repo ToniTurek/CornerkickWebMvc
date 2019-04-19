@@ -178,6 +178,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(gD, JsonRequestBehavior.AllowGet);
     }
 
+    // Adds comment, shoots/cards and chart data of current state to gD
     private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, bool bAddFMList = true)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
@@ -248,7 +249,7 @@ namespace CornerkickWebMvc.Controllers
                               shoot.iGoalsH.ToString() + ":" + shoot.iGoalsA.ToString();
           sShootDesc += " - " + shoot.plShoot.sName;
           if (shoot.iType == 5) sShootDesc += ", FE";
-          else sShootDesc += ", Entf.:" + fDist.ToString("0.0").PadLeft(5) + "m";
+          else                  sShootDesc += ", Entf.:" + fDist.ToString("0.0").PadLeft(5) + "m";
           if (shoot.plAssist != null) sShootDesc += " (" + shoot.plAssist.sName + ")";
 
           string sImg = "yellow";
@@ -427,10 +428,12 @@ namespace CornerkickWebMvc.Controllers
         }
       } // iHA
 
-      //////////////////////////////////////////////////////////////////////////////////
+      // Referee quality
+      gD.sRefereeQuality   = gameData.referee.fQuality.ToString("0.0%");
+      gD.sRefereeDecisions = "-";
+      if (gameData.referee.iDecisions[0] > 0) gD.sRefereeDecisions = (gameData.referee.iDecisions[1] / (float)gameData.referee.iDecisions[0]).ToString("0.0%");
+
       // Bar statistics
-      //////////////////////////////////////////////////////////////////////////////////
-      // Ballbesitz
       float fPossessionH = 50f;
       if (nPossession[0] + nPossession[1] > 0) fPossessionH = 100f * nPossession[0] / (float)(nPossession[0] + nPossession[1]);
 
@@ -443,7 +446,7 @@ namespace CornerkickWebMvc.Controllers
           float fKeeperSave  = user.game.ai.getChanceKeeperSave (user.game.ball.plAtBall);
 
           gD.sAdminChanceShootOnGoal = "<br/><u>Change Schuss aufs Tor:</u> " + fShootOnGoal.ToString("0.0%");
-          gD.sAdminChanceGoal = "<br/><u>Change Tor:</u> " + (fShootOnGoal * (1f - fKeeperSave)).ToString("0.0%");
+          gD.sAdminChanceGoal        = "<br/><u>Change Tor:</u> " + (fShootOnGoal * (1f - fKeeperSave)).ToString("0.0%");
         }
       }
 

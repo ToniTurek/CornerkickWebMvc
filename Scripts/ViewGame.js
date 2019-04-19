@@ -395,6 +395,8 @@ function plotStatistics(jState = -1) {
         ii = ii + 1;
       });
 
+      $("#txtReferee").html("Schiedsrichter: " + gD.sRefereeQuality + "<br/>Fehlentscheidungen: " + gD.sRefereeDecisions);
+
       // Comment box
       var tbKomm = document.getElementById("tbKommentar");
       tbKomm.value = gD.sComment;

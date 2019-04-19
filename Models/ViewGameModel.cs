@@ -87,6 +87,9 @@ namespace CornerkickWebMvc.Models
       public string sStatCards { get; set; }
       public string sStatSubs  { get; set; }
 
+      public string sRefereeQuality { get; set; }
+      public string sRefereeDecisions { get; set; }
+
       public string sDivHeatmap { get; set; }
 
       public string sComment { get; set; }
