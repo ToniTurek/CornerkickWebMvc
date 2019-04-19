@@ -34,40 +34,6 @@
 </label>
 
 <h4>Begegnungen</h4>
-
-@{
-  var dt = new DateTime();
-  CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, Model.iLand);
-  if (Model.iSpTg < Model.ltErg.Count) {
-    if (cup != null && cup.ltMatchdays != null) { dt = cup.ltMatchdays[Model.iSpTg].dt; }
-  }
-
-  string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
-  int i = 0;
-  foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
-    string sId = "idClubNames" + i++.ToString();
-    <div id="@sId" data-name="@club.sName"></div>
-  }
-
-  if (Model.iLand >= 0) {
-    if (cup != null) {
-      int j = 0;
-      foreach (CornerkickCore.Cup.Matchday gd in cup.ltMatchdays) {
-        string sIdDay = "idDtDay" + j.ToString();
-        <div id="@sIdDay" data-name="@gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-        string sIdHour = "idDtHour" + j.ToString();
-        <div id="@sIdHour" data-name="@gd.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-        j++;
-      }
-    }
-  }
-}
-<div id="dtDayId" data-name="@dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-<div id="dtHourId" data-name="@dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-<div id="idClubUser" data-name="@CornerkickWebMvc.Controllers.AccountController.ckClub().iId"></div>
-
 <div id="tableDivCupTeams"></div>
 
 @{
@@ -75,7 +41,7 @@
     <h4>Torschützen</h4>
     <table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
       <tr>
-        <th colspan="2">Pl.</th>
+        <th>#</th>
         <th>Spieler</th>
         <th>Verein</th>
         <th style="text-align:right">Tore</th>
@@ -95,7 +61,6 @@
 
           <tr style=@sStyle2 class=" ">
             <td class="first">@iPlatz</td>
-            <td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>
             <td>@sc.sName</td>
             <td>@sc.sTeam</td>
             <td align="right">@sc.iGoals</td>
