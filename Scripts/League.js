@@ -68,20 +68,20 @@ function setLeague2(iSaison, iDivision) {
     type: "GET",
     dataType: "JSON",
     data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
-    success: function (ltGamedata) {
-      actionDrawTeams(ltGamedata, iMd - 1);
+    success: function (sTeams) {
+      actionDrawTeams(sTeams);
     }
   });
 }
 
-function actionDrawTeams(ltGamedata, iMd) {
+function actionDrawTeams(sTeams) {
   var divDrawTeams = $("#tableDivTeams");
   divDrawTeams.html('');
-  result = drawTeams(ltGamedata, iMd);
+  result = drawTeams(sTeams);
   divDrawTeams.html(result).show();
 }
 
-function drawTeams(ltGamedata, iMd) {
+function drawTeams(sTeams) {
   var sBox = '';
 
   sBox += '<table id="tableLeagueTeams" border="0" cellpadding="2" style="width: 100%">';
@@ -91,35 +91,9 @@ function drawTeams(ltGamedata, iMd) {
   sBox += '  <th style="text-align:center">&nbsp;</th>';
   sBox += '  <th style="text-align:left">Auswärts</th>';
   sBox += '  <th style="text-align:center">Erg.</th>';
+  sBox += sTeams;
   sBox += '</tr>';
 
-  var sDateDay  = $('#idDtDay' + iMd).data('name');
-  var sDateHour = $('#idDtHour' + iMd).data('name');
-  var iClubUser = $('#idClubUser').data('name');
-  for (var i = 0; i < ltGamedata.length; i++) {
-    gd = ltGamedata[i];
-    var sClubNameH = $('#idClubNames' + gd.team[0].iTeamId).data('name');
-    var sClubNameA = $('#idClubNames' + gd.team[1].iTeamId).data('name');
-
-    var sStyle = "";
-    if (gd.team[0].iTeamId === iClubUser || gd.team[1].iTeamId === iClubUser) {
-      sStyle = "font-weight:bold";
-    }
-
-    sBox += '<tr style=' + sStyle + '>';
-    sBox += '  <td>' + sDateDay + '&nbsp;' + sDateHour + '</td>';
-
-    sBox += '<td align="right"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameH).replace("__id", gd.team[0].iTeamId) + '</td>';
-    sBox += '<td align="center">&nbsp;-&nbsp;</td>';
-    sBox += '<td align="left"><a href="/Member/ClubDetails?iClub=__id" target="_blank">__name</a></td>)'.replace("__name", sClubNameA).replace("__id", gd.team[1].iTeamId) + '</td>';
-
-    if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
-      sBox += '<td align="center">' + gd.team[0].iGoals + ':' + gd.team[1].iGoals + '&nbsp;(' + gd.team[0].iGoalsHt + ':' + gd.team[1].iGoalsHt + ')</td>';
-    } else {
-      sBox += '<td align="center">-</td>';
-    }
-    sBox += '</tr>';
-  }
   sBox += '</table>';
 
   return sBox;

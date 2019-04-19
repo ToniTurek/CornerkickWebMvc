@@ -17,13 +17,14 @@ namespace CornerkickWebMvc.Models
     public byte iSpKl { get; set; }
 
     [Display(Name = "Spieltag: ")]
-    public int iSpTg { get; set; }
+    public int iMd { get; set; }
 
     // List<CornerkickCore.Core.Tabellenplatz> ltTbpl = cr.getTabelleLiga(iSaison, iLand, iSpielklasse, iSpieltag, 0);
     public CornerkickCore.Cup league { get; set; }
     public List<CornerkickCore.Tool.TableItem> ltTbl { get; set; }
     public List<CornerkickCore.Tool.TableItem> ltTblLast { get; set; } // Table last matchday
     public List<CornerkickCore.UI.Scorer> ltScorer { get; set; }
+    public int iLeagueSize { get; set; }
 
     public List<SelectListItem> ddlLand { get; set; }
     public List<SelectListItem> ltDdlSpTg { get; set; }

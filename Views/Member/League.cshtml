@@ -14,7 +14,8 @@
     $(document).ready(function () {
       changeLand(1, 0);
       
-      var iLigaMax = 8.1;
+      var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
+      fLigaMax = fLigaMax + 0.1;
 
       $.get("/Member/GetLeaguePlaceHistory/", function (ltPlace) {
         var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
@@ -31,7 +32,7 @@
             labelFontSize: 16,
             interval: 1,
             minimum: 0.9,
-            //maximum: iLigaMax,
+            maximum: fLigaMax,
             reversed: true
           },
           /*legend: {
@@ -77,50 +78,11 @@
       <select id="ddlMatchday" onchange="setLeague2(1, 0)"></select>
     </label>
 
-    @{
-      string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
-      int i = 0;
-      foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
-        if (club.iLand == Model.iLand) {
-          string sId = "idClubNames" + i.ToString();
-          <div id="@sId" data-name="@club.sName"></div>
-        }
-
-        i++;
-      }
-
-      var ltBeg = new List<int[]>();
-      var dt = new DateTime();
-      if (Model.iLand >= 0 && Model.league != null) {
-        if (Model.iSpTg >= 0 && Model.iSpTg < Model.league.ltMatchdays.Count) {
-          if (Model.iLand >= 0) {
-            dt = Model.league.ltMatchdays[Model.iSpTg].dt;
-          }
-        }
-
-        int j = 0;
-        foreach (CornerkickCore.Cup.Matchday md in Model.league.ltMatchdays) {
-          string sIdDay = "idDtDay" + j.ToString();
-          <div id="@sIdDay" data-name="@md.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-          string sIdHour = "idDtHour" + j.ToString();
-          <div id="@sIdHour" data-name="@md.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-          j++;
-        }
-      }
-    }
-    @*@Html.DropDownListFor(m => m.sSpTg, Model.ltDdlSpTg, new { @class = "form-control", @onchange = "setLeague2(1, 0)", id = "ddlSpieltag" })*@
-
     <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">
       <div style="position: relative; width: 47%; min-width: 350px; margin-right: 6%; margin-bottom: 20px; float: left">
         <h4>Begegnungen</h4>
         <div id="tableDivTeams" style="position: relative"></div>
       </div>
-      <div id="dtDayId" data-name="@dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-      <div id="dtHourId" data-name="@dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-      <div id="idClubUser" data-name="@CornerkickWebMvc.Controllers.AccountController.ckClub().iId"></div>
-
       <div style="position: relative; width: 47%; min-width: 350px; float: left">
         <h4>Tabelle</h4>
         <div id="tableDivLeague" style="position: relative; width: 100%"></div>
@@ -168,7 +130,7 @@
 
     <div style="height: auto; width: 54%; min-width: 350px; margin-top: 20px; float: left">
       <h4>Tabellenplatzentwicklung</h4>
-      <div id="chartContainerPlaceHist" style="height: 250px; width: 100%"></div>
+      <div id="chartContainerPlaceHist" style="height: 400px; width: 100%"></div>
     </div>
   </div>
 </body>

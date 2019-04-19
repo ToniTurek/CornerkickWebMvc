@@ -2561,9 +2561,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, clb.iLand, clb.iDivision);
       if (league == null) return View(mlLeague);
 
-      mlLeague.iSpTg  = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
+      mlLeague.iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
       mlLeague.league = league;
-      mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, mlLeague.iSpTg - 1, 0);
+      mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, mlLeague.iMd - 1, 0);
+      mlLeague.iLeagueSize = MvcApplication.ckcore.tl.getCupParticipants(league, mlLeague.iMd).Count;
 
       // Add lands to dropdown list
       foreach (int iLand in MvcApplication.iNations) {
@@ -2614,6 +2615,8 @@ namespace CornerkickWebMvc.Controllers
         string sBgColor = "white";
         if      (i == 0) sBgColor = "#ffffcc";
         else if (i <  4) sBgColor = "#ccffcc";
+        else if (i <  8) sBgColor = "#cce5ff";
+        else if (i == ltTbl.Count - 1) sBgColor = "#ffcccc";
 
         var k = i + 1;
 
@@ -2662,16 +2665,41 @@ namespace CornerkickWebMvc.Controllers
     {
       if (iMatchday < 1) return Json("", JsonRequestBehavior.AllowGet);
 
+      CornerkickCore.Core.Club clbUser = AccountController.ckClub();
+
       CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
 
       CornerkickCore.Cup.Matchday md = new CornerkickCore.Cup.Matchday();
       md.ltGameData = new List<CornerkickGame.Game.Data>();
 
+      string sBox = "";
       foreach (CornerkickGame.Game.Data gd in league.ltMatchdays[iMatchday - 1].ltGameData) {
-        md.ltGameData.Add(gd.Clone(true));
+        string sClubNameH = "-";
+        string sClubNameA = "-";
+        int iIdH = gd.team[0].iTeamId;
+        int iIdA = gd.team[1].iTeamId;
+        if (gd.team[0].iTeamId >= 0) sClubNameH = MvcApplication.ckcore.ltClubs[iIdH].sName;
+        if (gd.team[1].iTeamId >= 0) sClubNameA = MvcApplication.ckcore.ltClubs[iIdA].sName;
+
+        string sStyle = "";
+        if (clbUser != null && (iIdH == clbUser.iId || iIdA == clbUser.iId)) sStyle = " style=\"font-weight:bold\"";
+
+        sBox += "<tr" + sStyle + ">";
+        sBox += "<td>" + gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + "&nbsp;" + gd.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser) + "</td>";
+
+        sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td>";
+        sBox += "<td align=\"center\">&nbsp;-&nbsp;</td>";
+        sBox += "<td align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"_blank\">" + sClubNameA + "</a></td>";
+
+        if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
+          sBox += "<td align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";
+        } else {
+          sBox += "<td align=\"center\">-</td>";
+        }
+        sBox += "</tr>";
       }
 
-      return Json(md.ltGameData, JsonRequestBehavior.AllowGet);
+      return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult GetLeaguePlaceHistory()
@@ -2784,14 +2812,14 @@ namespace CornerkickWebMvc.Controllers
         if (gd.team[1].iTeamId >= 0) sClubNameA = MvcApplication.ckcore.ltClubs[iIdA].sName;
 
         var sStyle = "";
-        if (iIdH == clbUser.iId || iIdA == clbUser.iId) sStyle = "font-weight:bold";
+        if (clbUser != null && (iIdH == clbUser.iId || iIdA == clbUser.iId)) sStyle = "font-weight:bold";
 
         sBox += "<tr style=" + sStyle + ">";
         sBox += "<td>" + gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + "&nbsp;" + gd.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser) + "</td>";
 
-        sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td></td>";
+        sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td>";
         sBox += "<td align=\"center\">&nbsp;-&nbsp;</td>";
-        sBox += "<td align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"_blank\">" + sClubNameA + "</a></td></td>";
+        sBox += "<td align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"_blank\">" + sClubNameA + "</a></td>";
 
         if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
           sBox += "<td align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";
