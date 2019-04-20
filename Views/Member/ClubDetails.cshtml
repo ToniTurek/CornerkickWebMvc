@@ -1,125 +1,153 @@
-﻿@model CornerkickWebMvc.Models.ClubModel
+﻿<!DOCTYPE html>
+@model CornerkickWebMvc.Models.ClubModel
 
 @{
   ViewBag.Title = Model.club.sName;
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@Model.club.sName</h2>
+<html>
+<head>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
+      $("#divEmblemClub").html(sEmblemImg);
+    });
+  </script>
+</head>
+<body>
+  <h2>@Model.club.sName</h2>
 
-@{
-  string sUser = "Computer";
-  int iUser = Model.club.iUser;
-  if (iUser >= 0) {
-    sUser = MvcApplication.ckcore.ltUser[iUser].sVorname + " " + MvcApplication.ckcore.ltUser[iUser].sNachname;
+  @{
+    string sUser = "Computer";
+    int iUser = Model.club.iUser;
+    if (iUser >= 0) {
+      sUser = MvcApplication.ckcore.ltUser[iUser].sVorname + " " + MvcApplication.ckcore.ltUser[iUser].sNachname;
+    }
+
+    string sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
+    CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
+    string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club).ToString();
+    float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
+    string sAveStrength = fAve[3].ToString("0.0");
+    string sAveAge = fAve[4].ToString("0.0");
+
+    string sStadium = Model.club.stadium.sName + " (" + MvcApplication.ckcore.st.getStadiumSeats(Model.club.stadium).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
   }
 
-  string sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
-  CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
-  string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club).ToString();
-  float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
-  string sAveStrength = fAve[3].ToString("0.0");
-  string sAveAge = fAve[4].ToString("0.0");
-}
+  <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
+    <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
+      <table cellpadding="3" style="width: auto">
+        <tbody>
+          <tr>
+            <td align="right">Manager:</td>
+            <td align="left">@Html.ActionLink(sUser, "Mail", "Member")</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td align="right">Land:</td>
+            <td align="left">@MvcApplication.ckcore.sLand[@Model.club.iLand]</td>
+          </tr>
+          <tr>
+            <td align="right">Liga:</td>
+            <td align="left">@sDivision</td>
+          </tr>
+          <tr>
+            <td align="right">akt. Tabellenplatz:</td>
+            <td align="left">@sPlace</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td align="right">Anzahl Spieler:</td>
+            <td align="left">@Model.club.ltPlayerId.Count</td>
+          </tr>
+          <tr>
+            <td align="right">Durchschnittstärke:</td>
+            <td align="left">@sAveStrength</td>
+          </tr>
+          <tr>
+            <td align="right">Durchschnittsalter:</td>
+            <td align="left">@sAveAge</td>
+          </tr>
+          <tr>
+            <td align="right">Anzahl Jugendspieler:</td>
+            <td align="left">@Model.club.ltJugendspielerID.Count</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td align="right">Stadion:</td>
+            <td align="left">@sStadium</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-  <table cellpadding="3" style="width: auto">
-    <tbody>
-      <tr>
-        <td align="right">Manager:</td>
-        <td align="left">@Html.ActionLink(sUser, "Mail", "Member")</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td align="right">Land:</td>
-        <td align="left">@MvcApplication.ckcore.sLand[@Model.club.iLand]</td>
-      </tr>
-      <tr>
-        <td align="right">Liga:</td>
-        <td align="left">@sDivision</td>
-      </tr>
-      <tr>
-        <td align="right">akt. Tabellenplatz:</td>
-        <td align="left">@sPlace</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td align="right">Anzahl Spieler:</td>
-        <td align="left">@Model.club.ltPlayerId.Count</td>
-      </tr>
-      <tr>
-        <td align="right">Durchschnittstärke:</td>
-        <td align="left">@sAveStrength</td>
-      </tr>
-      <tr>
-        <td align="right">Durchschnittsalter:</td>
-        <td align="left">@sAveAge</td>
-      </tr>
-      <tr>
-        <td align="right">Anzahl Jugendspieler:</td>
-        <td align="left">@Model.club.ltJugendspielerID.Count</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+    <h4>Rekorde</h4>
+    <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
+      <table cellpadding="1" style="width: auto">
+        <tbody>
+          <tr>
+            <td align="right">Höchster Heimsieg Liga:</td>
+            <td align="left">@Model.sRecordLWinH</td>
+          </tr>
+          <tr>
+            <td align="right">Höchster Auswärtssieg Liga:</td>
+            <td align="left">@Model.sRecordLWinA</td>
+          </tr>
+          <tr>
+            <td align="right">Höchste Heimniederlage Liga:</td>
+            <td align="left">@Model.sRecordLDefH</td>
+          </tr>
+          <tr>
+            <td align="right">Höchste Auswärtsniederlage Liga:</td>
+            <td align="left">@Model.sRecordLDefA</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td align="right">Höchster Heimsieg Pokal:</td>
+            <td align="left">@Model.sRecordCWinH</td>
+          </tr>
+          <tr>
+            <td align="right">Höchster Auswärtssieg Pokal:</td>
+            <td align="left">@Model.sRecordCWinA</td>
+          </tr>
+          <tr>
+            <td align="right">Höchste Heimniederlage Pokal:</td>
+            <td align="left">@Model.sRecordCDefH</td>
+          </tr>
+          <tr>
+            <td align="right">Höchste Auswärtsniederlage Pokal:</td>
+            <td align="left">@Model.sRecordCDefA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-  <table cellpadding="1" style="width: auto">
-    <tbody>
-      <tr>
-        <td align="right">Höchster Heimsieg Liga:</td>
-        <td align="left">@Model.sRecordLWinH</td>
-      </tr>
-      <tr>
-        <td align="right">Höchster Auswärtssieg Liga:</td>
-        <td align="left">@Model.sRecordLWinA</td>
-      </tr>
-      <tr>
-        <td align="right">Höchste Heimniederlage Liga:</td>
-        <td align="left">@Model.sRecordLDefH</td>
-      </tr>
-      <tr>
-        <td align="right">Höchste Auswärtsniederlage Liga:</td>
-        <td align="left">@Model.sRecordLDefA</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td align="right">Höchster Heimsieg Pokal:</td>
-        <td align="left">@Model.sRecordCWinH</td>
-      </tr>
-      <tr>
-        <td align="right">Höchster Auswärtssieg Pokal:</td>
-        <td align="left">@Model.sRecordCWinA</td>
-      </tr>
-      <tr>
-        <td align="right">Höchste Heimniederlage Pokal:</td>
-        <td align="left">@Model.sRecordCDefH</td>
-      </tr>
-      <tr>
-        <td align="right">Höchste Auswärtsniederlage Pokal:</td>
-        <td align="left">@Model.sRecordCDefA</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+    <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; border: 1px solid black"></div>
+  </div>
+</body>
+</html>

@@ -9,6 +9,9 @@ namespace CornerkickWebMvc.Models
   {
     public CornerkickCore.Core.Club club { get; set; }
 
+    // Emblem
+    public string sEmblem { get; set; }
+
     // Record games
     // League
     public string sRecordLWinH;

@@ -2516,19 +2516,44 @@ namespace CornerkickWebMvc.Controllers
     {
       if (iClub >= 0 && iClub < MvcApplication.ckcore.ltClubs.Count) {
         mdClub.club = MvcApplication.ckcore.ltClubs[iClub];
-      }
-    
-      mdClub.sRecordLWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 0));
-      mdClub.sRecordLWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 1));
-      mdClub.sRecordLDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, -1, 0));
-      mdClub.sRecordLDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, -1, 1));
 
-      mdClub.sRecordCWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 0));
-      mdClub.sRecordCWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 1));
-      mdClub.sRecordCDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 0));
-      mdClub.sRecordCDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 1));
+        mdClub.sEmblem = getClubEmblem(mdClub.club, "height: 100%; width: 100%; object-fit: contain");
+
+        mdClub.sRecordLWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 0));
+        mdClub.sRecordLWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 1));
+        mdClub.sRecordLDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, -1, 0));
+        mdClub.sRecordLDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, -1, 1));
+
+        mdClub.sRecordCWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 0));
+        mdClub.sRecordCWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 1));
+        mdClub.sRecordCDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 0));
+        mdClub.sRecordCDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 1));
+      }
 
       return View(mdClub);
+    }
+
+    private string getClubEmblem(int iClubId, string sStyle = "")
+    {
+      CornerkickCore.Core.Club clb = null;
+      if (iClubId >= 0 && iClubId < MvcApplication.ckcore.ltClubs.Count) clb = MvcApplication.ckcore.ltClubs[iClubId];
+
+      return getClubEmblem(clb, sStyle);
+    }
+    private string getClubEmblem(CornerkickCore.Core.Club clb, string sStyle = "")
+    {
+      string sEmblem = "<img src=\"/Content/Uploads/";
+
+      if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"" + clb.sName + "\"/>";
+
+      string sEmblemFile = MvcApplication.getHomeDir() + "Content/Uploads/" + clb.iId.ToString() + ".png";
+      if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
+      else                                    sEmblem += "0";
+
+      if (!string.IsNullOrEmpty(sStyle)) sStyle = " style=\"" + sStyle + "\"";
+      sEmblem += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + clb.sName + "\"/>";
+
+      return sEmblem;
     }
 
     private string getStringRecordGame(CornerkickGame.Game.Data gdRecord)
@@ -2633,11 +2658,7 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
-        string sEmblem = "<img src=\"/Content/Uploads/";
-        string sEmblemFile = MvcApplication.getHomeDir() + "Content/Uploads/" + tbpl.iId.ToString() + ".png";
-        if (System.IO.File.Exists(sEmblemFile)) sEmblem += tbpl.iId.ToString();
-        else                                    sEmblem += "0";
-        sEmblem += ".png\" alt=\"Wappen\" style=\"width: 12px\" title=\"" + tbpl.sName + "\"/>";
+        string sEmblem = getClubEmblem(tbpl.iId, "width: 12px");
 
         sBox += "<tr " + sStyle + "\">";
         sBox += "<td class=\"first\" bgcolor=\"" + sBgColor + "\" align=\"center\"><b>" + k + "</b></td>";
