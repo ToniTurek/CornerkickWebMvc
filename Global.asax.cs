@@ -439,9 +439,6 @@ namespace CornerkickWebMvc
         if (System.IO.File.Exists(sHomeDir + sSaveZip)) ZipFile.ExtractToDirectory(sHomeDir + sSaveZip, sHomeDir + "save");
         */
       }
-      
-      // Download emblems
-      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
 
       // Download log
       as3.downloadFile("ckLog", sHomeDir + "/log.zip");
@@ -505,6 +502,9 @@ namespace CornerkickWebMvc
           MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
 #endif
+      
+        // Download emblems
+        for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
 
         return true;
       }
