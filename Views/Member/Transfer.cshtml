@@ -134,7 +134,12 @@
           { "data": "age", "className": "dt-center" },
           { "data": "talent", "className": "dt-center" },
           { "data": "mw", "className": "dt-right" },
-          { "data": "nat", "className": "dt-center" }
+          {
+            "data": "nat",
+            "render": function (nat, type, row) {
+              return getNatIcon(nat);
+            }
+          }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
           if (aData.iOffer > 0) { // already offered or own player
