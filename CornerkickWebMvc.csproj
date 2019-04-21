@@ -534,6 +534,7 @@
     <Content Include="Content\Icons\flags\COG.png" />
     <Content Include="Content\Icons\flags\COL.png" />
     <Content Include="Content\Icons\flags\CRC.png" />
+    <Content Include="Content\Icons\flags\CRO.png" />
     <Content Include="Content\Icons\flags\DEN.png" />
     <Content Include="Content\Icons\flags\ECU.png" />
     <Content Include="Content\Icons\flags\EGY.png" />
@@ -554,6 +555,7 @@
     <Content Include="Content\Icons\flags\MEX.png" />
     <Content Include="Content\Icons\flags\MKD.png" />
     <Content Include="Content\Icons\flags\MNE.png" />
+    <Content Include="Content\Icons\flags\NED.png" />
     <Content Include="Content\Icons\flags\NGA.png" />
     <Content Include="Content\Icons\flags\NOR.png" />
     <Content Include="Content\Icons\flags\PAR.png" />
