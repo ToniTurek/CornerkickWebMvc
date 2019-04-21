@@ -2546,7 +2546,11 @@ namespace CornerkickWebMvc.Controllers
 
       if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"" + clb.sName + "\"/>";
 
+#if DEBUG
       string sEmblemFile = MvcApplication.getHomeDir() + "/Content/Uploads/" + clb.iId.ToString() + ".png";
+#else
+      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", clb.iId.ToString() + ".png");
+#endif
       if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
       else                                    sEmblem += "0";
 
