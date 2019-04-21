@@ -521,9 +521,11 @@
     <Content Include="Content\Icons\flags\AUS.png" />
     <Content Include="Content\Icons\flags\AUT.png" />
     <Content Include="Content\Icons\flags\BEL.png" />
+    <Content Include="Content\Icons\flags\BFA.png" />
     <Content Include="Content\Icons\flags\BIH.png" />
     <Content Include="Content\Icons\flags\BOL.png" />
     <Content Include="Content\Icons\flags\BRA.png" />
+    <Content Include="Content\Icons\flags\BUL.png" />
     <Content Include="Content\Icons\flags\CAN.png" />
     <Content Include="Content\Icons\flags\CH.png" />
     <Content Include="Content\Icons\flags\CHI.png" />
@@ -542,6 +544,7 @@
     <Content Include="Content\Icons\flags\ESP.png" />
     <Content Include="Content\Icons\flags\FIN.png" />
     <Content Include="Content\Icons\flags\FRA.png" />
+    <Content Include="Content\Icons\flags\GEO.png" />
     <Content Include="Content\Icons\flags\GER.png" />
     <Content Include="Content\Icons\flags\GHA.png" />
     <Content Include="Content\Icons\flags\GRE.png" />
@@ -557,6 +560,7 @@
     <Content Include="Content\Icons\flags\MNE.png" />
     <Content Include="Content\Icons\flags\NED.png" />
     <Content Include="Content\Icons\flags\NGA.png" />
+    <Content Include="Content\Icons\flags\NIR.png" />
     <Content Include="Content\Icons\flags\NOR.png" />
     <Content Include="Content\Icons\flags\PAR.png" />
     <Content Include="Content\Icons\flags\PER.png" />
@@ -575,6 +579,7 @@
     <Content Include="Content\Icons\flags\TGO.png" />
     <Content Include="Content\Icons\flags\TUN.png" />
     <Content Include="Content\Icons\flags\TUR.png" />
+    <Content Include="Content\Icons\flags\UKR.png" />
     <Content Include="Content\Icons\flags\URU.png" />
     <Content Include="Content\Icons\flags\USA.png" />
     <Content Include="Content\Icons\flags\VEN.png" />
