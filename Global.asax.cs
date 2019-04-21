@@ -501,10 +501,12 @@ namespace CornerkickWebMvc
         } else {
           MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
-#endif
       
         // Download emblems
+#if _USE_AMAZON_S3
         for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
+#endif
+#endif
 
         return true;
       }
