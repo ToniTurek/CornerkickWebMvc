@@ -74,7 +74,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // If first step: Add CPU teams
-      if (MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart)) {
+      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
         Controllers.AccountController accountController = new Controllers.AccountController();
 
         foreach (int iLand in MvcApplication.iNations) {
