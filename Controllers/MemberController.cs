@@ -1128,6 +1128,8 @@ namespace CornerkickWebMvc.Controllers
       plModel.ltDdlNo = new List<SelectListItem>();
       plModel.iNo = plDetails.iNr;
 
+      plModel.sEmblem = getClubEmblem(plDetails.iClubId, "height: 100%; width: 100%; object-fit: contain");
+
       List<int> ltNoExist = new List<int>();
       foreach (int iPlId in club.ltPlayerId) {
         ltNoExist.Add(MvcApplication.ckcore.ltPlayer[iPlId].iNr);

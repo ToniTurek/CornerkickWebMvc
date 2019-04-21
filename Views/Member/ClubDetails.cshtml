@@ -10,6 +10,7 @@
 <head>
   <script type="text/javascript">
     $(document).ready(function () {
+      document.getElementById("divEmblem").style.backgroundImage = '';
       var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
       $("#divEmblemClub").html(sEmblemImg);
     });

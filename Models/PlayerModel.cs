@@ -15,6 +15,9 @@ namespace CornerkickWebMvc.Models
     public int iPlIdPrev { get; set; }
     public int iPlIdNext { get; set; }
 
+    // Emblem
+    public string sEmblem { get; set; }
+
     // Contract
     [Display(Name = "zusätzl. Laufzeit [a]:")]
     public int iContractYears { get; set; }
