@@ -298,7 +298,7 @@
       }
     }
 
-    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount == 0) {
+    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) {
       <div class="form-group">
         @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
       </div>
