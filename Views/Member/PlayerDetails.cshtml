@@ -302,7 +302,7 @@
 
     <div style="position: relative; width: 100%; height: auto; margin-top: 1%">
       @{
-        if ((bOwnPlayer && MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount == 0) || clubUser.ltJugendspielerID.IndexOf(Model.iPlayer) >= 0) {
+        if ((bOwnPlayer && MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) || clubUser.ltJugendspielerID.IndexOf(Model.iPlayer) >= 0) {
           <div class="form-group">
             @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
           </div>
