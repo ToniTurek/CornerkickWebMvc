@@ -461,6 +461,11 @@ namespace CornerkickWebMvc
         // TEMP: Set stadium name for fiffi
         MvcApplication.ckcore.ltClubs[2].stadium.sName = "Stadion an der Busseallee";
 
+        // TEMP: Clear sponsor offers
+        for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
+          ckcore.ltClubs[iC].ltSponsorOffers.Clear();
+        }
+
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
 #if _USE_AMAZON_S3
