@@ -23,17 +23,17 @@
     string sUser = "Computer";
     int iUser = Model.club.iUser;
     if (iUser >= 0) {
-      sUser = MvcApplication.ckcore.ltUser[iUser].sVorname + " " + MvcApplication.ckcore.ltUser[iUser].sNachname;
+      sUser = MvcApplication.ckcore.ltUser[iUser].sFirstname + " " + MvcApplication.ckcore.ltUser[iUser].sSurname;
     }
 
     string sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
-    CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
+    CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
     string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club).ToString();
     float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
     string sAveStrength = fAve[3].ToString("0.0");
     string sAveAge = fAve[4].ToString("0.0");
 
-    string sStadium = Model.club.stadium.sName + " (" + MvcApplication.ckcore.st.getStadiumSeats(Model.club.stadium).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
+    string sStadium = Model.club.stadium.sName + " (" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
   }
 
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">

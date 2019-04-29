@@ -23,7 +23,7 @@ namespace CornerkickWebMvc.Models
 
     public StadiumSurroundingsModel()
     {
-      CornerkickCore.Core.Club clb = Controllers.AccountController.ckClub();
+      CornerkickManager.Club clb = Controllers.AccountController.ckClub();
 
       ddlTrainingsgel  = new List<SelectListItem>();
       ddlJouthInternat = new List<SelectListItem>();

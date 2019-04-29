@@ -25,7 +25,7 @@ namespace CornerkickWebMvc
 {
   public class MvcApplication : System.Web.HttpApplication
   {
-    public static CornerkickCore.Core ckcore;
+    public static CornerkickManager.Main ckcore;
     public static System.Timers.Timer timerCkCalender = null;
     public static System.Timers.Timer timerSave = null;
     public static List<string> ltLog = new List<string>();
@@ -63,7 +63,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickCore.Core();
+      ckcore = new CornerkickManager.Main();
 
 #if !DEBUG
       ckcore.sHomeDir = sHomeDir;
@@ -104,14 +104,14 @@ namespace CornerkickWebMvc
         // New game
         foreach (int iLand in iNations) {
           // Create nat. cup
-          CornerkickCore.Cup cup = new CornerkickCore.Cup(bKo: true);
+          CornerkickManager.Cup cup = new CornerkickManager.Cup(bKo: true);
           cup.iId = 2;
           cup.iId2 = iLand;
           cup.sName = "Pokal " + ckcore.sLand[iLand];
           ckcore.ltCups.Add(cup);
 
           // Create league
-          CornerkickCore.Cup league = new CornerkickCore.Cup(nGroups: 1, bGroupsTwoGames: true);
+          CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
           league.iId = 1;
           league.iId2 = iLand;
           cup.sName = "Liga " + ckcore.sLand[iLand];
@@ -162,7 +162,7 @@ namespace CornerkickWebMvc
 
       // Check if new jouth player and put on transferlist
       if (MvcApplication.ckcore.dtDatum.Hour == 0 && MvcApplication.ckcore.dtDatum.Minute == 0) {
-        CornerkickCore.Core.Club club0 = MvcApplication.ckcore.ltClubs[0];
+        CornerkickManager.Club club0 = MvcApplication.ckcore.ltClubs[0];
 
         CornerkickGame.Player plNew = MvcApplication.ckcore.plr.newPlayer(club0);
         MvcApplication.ckcore.ui.putPlayerOnTransferlist(plNew.iId, 0);
@@ -174,7 +174,7 @@ namespace CornerkickWebMvc
 
         if (countCpuPlayerOnTransferlist() > 200) {
           for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-            CornerkickCore.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+            CornerkickManager.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
             if (club0.ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) {
               MvcApplication.ckcore.tr.removePlayerFromTransferlist(MvcApplication.ckcore.ltPlayer[transfer.iPlayerId]);
               break;
@@ -192,7 +192,7 @@ namespace CornerkickWebMvc
 
       // Save .autosave
       if (bSave && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Hour % 2 == 0) {
-        foreach (CornerkickCore.Core.Club clb in MvcApplication.ckcore.ltClubs) {
+        foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
           if (clb.iUser < 0) {
             clb.ltTrainingHist.Clear();
             clb.ltAccount     .Clear();
@@ -213,8 +213,8 @@ namespace CornerkickWebMvc
       if (iRetCk == 99) return; // Saisonende
 
       // Remove testgame requests if in past
-      List<CornerkickCore.Cup> ltCupsTmp = new List<CornerkickCore.Cup>(MvcApplication.ckcore.ltCups);
-      foreach (CornerkickCore.Cup cup in ltCupsTmp) {
+      List<CornerkickManager.Cup> ltCupsTmp = new List<CornerkickManager.Cup>(MvcApplication.ckcore.ltCups);
+      foreach (CornerkickManager.Cup cup in ltCupsTmp) {
         if (cup == null) continue;
 
         if (cup.iId == -5) {
@@ -230,7 +230,7 @@ namespace CornerkickWebMvc
     private static int countCpuPlayerOnTransferlist()
     {
       int nPl = 0;
-      foreach (CornerkickCore.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
+      foreach (CornerkickManager.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
         if (MvcApplication.ckcore.ltClubs[0].ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) nPl++;
       }
 
@@ -451,6 +451,12 @@ namespace CornerkickWebMvc
 
         // Set admin user to CPU
         if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
+
+        // TEMP: Set cup names
+        for (int iC = 0; iC < ckcore.ltCups.Count; iC++) {
+          if      (ckcore.ltCups[iC].iId == 1) ckcore.ltCups[iC].sName = "Liga "  + ckcore.sLand[ckcore.ltCups[iC].iId2];
+          else if (ckcore.ltCups[iC].iId == 2) ckcore.ltCups[iC].sName = "Pokal " + ckcore.sLand[ckcore.ltCups[iC].iId2];
+        }
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG

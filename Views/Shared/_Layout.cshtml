@@ -3,7 +3,7 @@
   string sEmblem = @"/Content/Uploads/";
 
   if (Request.IsAuthenticated) {
-    CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    CornerkickManager.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
     if (clb != null) {
       sEmblem += clb.iId.ToString() + ".png";
     } else {
@@ -120,7 +120,7 @@
 
       @{
         if (Request.IsAuthenticated && MvcApplication.ckcore != null) {
-          CornerkickCore.Core.User usr = CornerkickWebMvc.Controllers.AccountController.ckUser();
+          CornerkickManager.User usr = CornerkickWebMvc.Controllers.AccountController.ckUser();
           <div class="" style="position: relative; width: 100%; margin-top: 2px; height: 0px">
             <div id="divSidebarLeft" style="position: absolute; width: 120px; height: 600px; top: 100px; left: -200px">
               <iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=29&l=ez&f=ifr&linkID=c4a136973d3f4339112f667dda767f3b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="120" height="600" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>
@@ -133,7 +133,7 @@
               <div style="position: absolute; height: 0px; width: 49%; left: 50%; text-align: right">
                 @{
                   string sCash = "0";
-                  CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
+                  CornerkickManager.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
                   if (clb != null) {
                     int iCash = clb.iBalance;
                     if (iCash != 0) { sCash = iCash.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser); }

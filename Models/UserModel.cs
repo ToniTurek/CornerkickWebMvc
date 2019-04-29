@@ -8,7 +8,7 @@ namespace CornerkickWebMvc.Models
 {
   public class UserModel
   {
-    public List<CornerkickCore.Core.News> ltUserMail { get; set; }
+    public List<CornerkickManager.Main.News> ltUserMail { get; set; }
     public List<SelectListItem> ltDdlUser { get; set; }
     public string sMailTo { get; set; }
 
@@ -33,10 +33,10 @@ namespace CornerkickWebMvc.Models
 
       // Positionen zu Dropdown Menü hinzufügen
       for (int iU = 0; iU < MvcApplication.ckcore.ltUser.Count; iU++) {
-        CornerkickCore.Core.User user = MvcApplication.ckcore.ltUser[iU];
+        CornerkickManager.User user = MvcApplication.ckcore.ltUser[iU];
         if (user.id == Controllers.AccountController.appUser.Id) continue;
 
-        string sName = user.sVorname + " " + user.sNachname;
+        string sName = user.sFirstname + " " + user.sSurname;
 
         sName += " (" + MvcApplication.ckcore.ltClubs[user.iTeam].sName + ")";
 

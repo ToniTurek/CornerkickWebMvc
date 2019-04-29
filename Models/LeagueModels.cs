@@ -19,11 +19,11 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Spieltag: ")]
     public int iMd { get; set; }
 
-    // List<CornerkickCore.Core.Tabellenplatz> ltTbpl = cr.getTabelleLiga(iSaison, iLand, iSpielklasse, iSpieltag, 0);
-    public CornerkickCore.Cup league { get; set; }
-    public List<CornerkickCore.Tool.TableItem> ltTbl { get; set; }
-    public List<CornerkickCore.Tool.TableItem> ltTblLast { get; set; } // Table last matchday
-    public List<CornerkickCore.UI.Scorer> ltScorer { get; set; }
+    // List<CornerkickManager.Core.Tabellenplatz> ltTbpl = cr.getTabelleLiga(iSaison, iLand, iSpielklasse, iSpieltag, 0);
+    public CornerkickManager.Cup league { get; set; }
+    public List<CornerkickManager.Tool.TableItem> ltTbl { get; set; }
+    public List<CornerkickManager.Tool.TableItem> ltTblLast { get; set; } // Table last matchday
+    public List<CornerkickManager.UI.Scorer> ltScorer { get; set; }
     public int iLeagueSize { get; set; }
 
     public List<SelectListItem> ddlLand { get; set; }

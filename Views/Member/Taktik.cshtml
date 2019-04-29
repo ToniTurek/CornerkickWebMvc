@@ -3,7 +3,7 @@
 @{
   ViewBag.Title = "Taktik";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
+  CornerkickManager.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
   CornerkickGame.Tactic taktik = null;
   if (club != null) {
     taktik = CornerkickWebMvc.Controllers.AccountController.ckClub().tactic;

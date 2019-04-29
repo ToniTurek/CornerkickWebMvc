@@ -27,7 +27,7 @@ namespace CornerkickWebMvc.Controllers
       view.iStateGlobal = 0;
       gD = new Models.ViewGameModel.gameData();
 
-      CornerkickCore.Core.User user = AccountController.ckUser();
+      CornerkickManager.User user = AccountController.ckUser();
       if (user == null) return View(view);
 
       view.bAdmin = AccountController.checkUserIsAdmin(AccountController.appUser);
@@ -76,7 +76,7 @@ namespace CornerkickWebMvc.Controllers
       Models.ViewGameModel.ltLoc = new List<float[]>();
       Models.ViewGameModel.gameLoc gLoc = new Models.ViewGameModel.gameLoc();
 
-      CornerkickCore.Core.User user = AccountController.ckUser();
+      CornerkickManager.User user = AccountController.ckUser();
 
       if (user.game == null) {
         Response.StatusCode = 1;
@@ -160,8 +160,8 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
-      CornerkickCore.Core.User user = AccountController.ckUser();
-      CornerkickCore.Core.Club club = AccountController.ckClub();
+      CornerkickManager.User user = AccountController.ckUser();
+      CornerkickManager.Club club = AccountController.ckClub();
 
       CornerkickGame.Game.Data gameData = user.game.data;
 
@@ -179,7 +179,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Adds comment, shoots/cards and chart data of current state to gD
-    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, bool bAddFMList = true)
+    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, bool bAddFMList = true)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
@@ -325,7 +325,7 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickCore.Core.User user, CornerkickCore.Core.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
@@ -569,8 +569,8 @@ namespace CornerkickWebMvc.Controllers
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
-      CornerkickCore.Core.User user = AccountController.ckUser();
-      CornerkickCore.Core.Club club = AccountController.ckClub();
+      CornerkickManager.User user = AccountController.ckUser();
+      CornerkickManager.Club club = AccountController.ckClub();
 
       if (user.game == null) return gD;
 
@@ -606,7 +606,7 @@ namespace CornerkickWebMvc.Controllers
     float fHeatmapMax = 0f;
     private string getDivHeatmap(byte iHA = 0, int iStateMax = 0, int iPlayer = -1)
     {
-      CornerkickCore.Core.User user = AccountController.ckUser();
+      CornerkickManager.User user = AccountController.ckUser();
 
       if (user.game == null) return "";
 
@@ -666,7 +666,7 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult AdminPlay(Models.ViewGameModel view)
     {
-      CornerkickCore.Core.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = AccountController.ckUser();
 
       if (userAdmin.game == null) {
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
@@ -681,7 +681,7 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult AdminStop(Models.ViewGameModel view)
     {
-      CornerkickCore.Core.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = AccountController.ckUser();
 
       if (userAdmin.game == null) Json(false, JsonRequestBehavior.AllowGet);
 
@@ -690,24 +690,24 @@ namespace CornerkickWebMvc.Controllers
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult AdminNext(Models.ViewGameModel view)
+    public JsonResult AdminNext(Models.ViewGameModel view, sbyte iNextAction)
     {
-      CornerkickCore.Core.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = AccountController.ckUser();
 
       if (userAdmin.game == null) {
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
       }
 
-      userAdmin.game.iGameSpeed =  1;
+      userAdmin.game.iGameSpeed = 1;
 
-      userAdmin.game.next();
+      userAdmin.game.next(iPlayerNextAction: iNextAction);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult AdminNew(Models.ViewGameModel view)
     {
-      CornerkickCore.Core.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = AccountController.ckUser();
 
       userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
 

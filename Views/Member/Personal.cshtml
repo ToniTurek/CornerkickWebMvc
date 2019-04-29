@@ -29,7 +29,7 @@
 
 <div class="form-group">
   @{
-    CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    CornerkickManager.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
   }
 
   @if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1) {

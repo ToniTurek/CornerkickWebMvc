@@ -400,7 +400,7 @@
 
   <select name="Camp" id="selectCamp">
     @{
-      foreach (CornerkickCore.csTrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
+      foreach (CornerkickManager.csTrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
         <option value="@camp.iId.ToString()">@camp.sName</option>
       }
     }

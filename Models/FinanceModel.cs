@@ -10,7 +10,7 @@ namespace CornerkickWebMvc.Models
   public class FinanceModel
   {
     public string sKonto { get; set; }
-    public List<CornerkickCore.Finance.Account[]> ltKonto { get; set; }
+    public List<CornerkickManager.Finance.Account[]> ltKonto { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "Stehplätze:")]
@@ -29,8 +29,8 @@ namespace CornerkickWebMvc.Models
 
     public int[] iSeasonalTickets { get; set; }
 
-    public CornerkickCore.Finance.Budget budgetPlan { get; set; }
-    public CornerkickCore.Finance.Budget budgetReal { get; set; }
+    public CornerkickManager.Finance.Budget budgetPlan { get; set; }
+    public CornerkickManager.Finance.Budget budgetReal { get; set; }
     public bool bEditable { get; set; }
   }
 

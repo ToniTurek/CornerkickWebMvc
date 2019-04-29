@@ -145,17 +145,17 @@ namespace CornerkickWebMvc.Controllers
       //ckconsole = new CornerkickConsole.CUI(MvcApplication.ckcore);
 #endif
 
-      CornerkickCore.Core.User usr = ckUser();
+      CornerkickManager.User usr = ckUser();
       if (usr == null) return;
       if (usr.iTeam >= MvcApplication.ckcore.ltClubs.Count) return;
 
-      CornerkickCore.Core.Club clb = ckClub();
+      CornerkickManager.Club clb = ckClub();
       int iLandUser = clb.iLand;
       if (iLandUser >= 0 && iLandUser < sCultureInfo.Length) ciUser = new CultureInfo(sCultureInfo[iLandUser]);
 
       if (usr.ltNews != null) {
         for (int iN = 0; iN < usr.ltNews.Count; iN++) {
-          CornerkickCore.Core.News news = usr.ltNews[iN];
+          CornerkickManager.Main.News news = usr.ltNews[iN];
           if (news.bRead2) news.bRead = true;
 
           news.bRead2 = true;
@@ -165,10 +165,10 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    public static CornerkickCore.Core.User ckUser()
+    public static CornerkickManager.User ckUser()
     {
       if (appUser != null) {
-        foreach (CornerkickCore.Core.User usr in MvcApplication.ckcore.ltUser) {
+        foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
           if (usr.id.Equals(appUser.Id)) return usr;
         }
       }
@@ -176,7 +176,7 @@ namespace CornerkickWebMvc.Controllers
       return null;
     }
 
-    public static int getiUser(CornerkickCore.Core.User usr)
+    public static int getiUser(CornerkickManager.User usr)
     {
       for (int iU = 0; iU < MvcApplication.ckcore.ltUser.Count; iU++) {
         if (MvcApplication.ckcore.ltUser[iU].id.Equals(usr.id)) {
@@ -187,7 +187,7 @@ namespace CornerkickWebMvc.Controllers
       return -1;
     }
 
-    public static void setCkUser(CornerkickCore.Core.User usr)
+    public static void setCkUser(CornerkickManager.User usr)
     {
       int iU = getiUser(usr);
       if (iU >= 0 && iU < MvcApplication.ckcore.ltUser.Count) {
@@ -195,9 +195,9 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    public static CornerkickCore.Core.Club ckClub()
+    public static CornerkickManager.Club ckClub()
     {
-      CornerkickCore.Core.User usr = ckUser();
+      CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
       if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
@@ -220,7 +220,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (bAdmin) {
         MvcApplication.ckcore.ltClubs.Add(MvcApplication.ckcore.ini.newClub());
-        CornerkickCore.Core.User usrAdmin = createUser(applicationUser);
+        CornerkickManager.User usrAdmin = createUser(applicationUser);
         MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
         return;
@@ -237,8 +237,8 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       for (byte iU = 0; iU < 8; iU++) {
 #endif
-      CornerkickCore.Core.User usr = createUser(applicationUser);
-      CornerkickCore.Core.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iLiga);
+      CornerkickManager.User usr = createUser(applicationUser);
+      CornerkickManager.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iLiga);
       usr.iLevel = 1;
       usr.iTeam = clb.iId;
       usr.nextGame.iGameSpeed = 250;
@@ -274,8 +274,8 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       if (iU == 0) {
 #endif
-      MvcApplication.ckcore.Info(clb.iUser, usr.sVorname + " " + usr.sNachname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
-      MvcApplication.ckcore.Info(clb.iUser, usr.sVorname + " " + usr.sNachname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
+      MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
+      MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
 #if DEBUG
       }
 #endif
@@ -290,16 +290,16 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    private CornerkickCore.Core.User createUser(ApplicationUser applicationUser)
+    private CornerkickManager.User createUser(ApplicationUser applicationUser)
     {
-      CornerkickCore.Core.User usr = MvcApplication.ckcore.ini.newUser();
+      CornerkickManager.User usr = new CornerkickManager.User();
 
       if (applicationUser == null) return usr;
 
       usr.id = applicationUser.Id;
 
-      usr.sVorname  = applicationUser.Vorname;
-      usr.sNachname = applicationUser.Nachname;
+      usr.sFirstname = applicationUser.Vorname;
+      usr.sSurname   = applicationUser.Nachname;
       
       return usr;
     }
@@ -327,9 +327,9 @@ namespace CornerkickWebMvc.Controllers
       return checkUserIsAdmin(regModel.Email, regModel.Password);
     }
 
-    internal CornerkickCore.Core.Club createClub(string sTeamname, byte iLand, byte iLiga)
+    internal CornerkickManager.Club createClub(string sTeamname, byte iLand, byte iLiga)
     {
-      CornerkickCore.Core.Club clb = MvcApplication.ckcore.ini.newClub();
+      CornerkickManager.Club clb = MvcApplication.ckcore.ini.newClub();
 
       clb.sName = sTeamname;
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
@@ -374,9 +374,9 @@ namespace CornerkickWebMvc.Controllers
       return clb;
     }
 
-    private CornerkickCore.Finance.Sponsor createDefaultSponsor()
+    private CornerkickManager.Finance.Sponsor createDefaultSponsor()
     {
-      CornerkickCore.Finance.Sponsor sponUser = MvcApplication.ckcore.fz.newSponsor();
+      CornerkickManager.Finance.Sponsor sponUser = MvcApplication.ckcore.fz.newSponsor();
 
       sponUser.bMain = true;
       sponUser.iId = 1;
@@ -388,7 +388,7 @@ namespace CornerkickWebMvc.Controllers
       return sponUser;
     }
 
-    private void addPlayerToClub(ref CornerkickCore.Core.Club club)
+    private void addPlayerToClub(ref CornerkickManager.Club club)
     {
       int   iSpeed  = 0;
       int   iTalent = 0;
@@ -566,7 +566,7 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    private float getAgeTalent(CornerkickCore.Core.Club club)
+    private float getAgeTalent(CornerkickManager.Club club)
     {
       float fAgeTalent = 0f;
 
@@ -792,11 +792,11 @@ namespace CornerkickWebMvc.Controllers
           if (MvcApplication.ckcore.ltUser.Count == 0/* && bAdminFirst && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
             await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
 
-            CornerkickCore.Core.User usrAdmin = createUser(appUser);
+            CornerkickManager.User usrAdmin = createUser(appUser);
             MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
             // Initialize dummy club
-            CornerkickCore.Core.Club club0 = MvcApplication.ckcore.ini.newClub();
+            CornerkickManager.Club club0 = MvcApplication.ckcore.ini.newClub();
             club0.iId = 0;
             club0.sName = "Computer";
 
@@ -852,7 +852,7 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public ActionResult CheckExistingTeamName(string Verein)
     {
-      foreach (CornerkickCore.Core.Club clubExist in MvcApplication.ckcore.ltClubs) {
+      foreach (CornerkickManager.Club clubExist in MvcApplication.ckcore.ltClubs) {
         if (clubExist.sName.Equals(Verein)) return Json(false, JsonRequestBehavior.AllowGet);
       }
       return Json(true, JsonRequestBehavior.AllowGet);

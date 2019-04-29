@@ -51,7 +51,7 @@
 
       @{ int iPlatz = 0; }
       @{
-        foreach (CornerkickCore.UI.Scorer sc in Model.ltScorer) {
+        foreach (CornerkickManager.UI.Scorer sc in Model.ltScorer) {
           iPlatz++;
           string sStyle2 = "";
           if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == CornerkickWebMvc.Controllers.AccountController.ckClub().iId) {

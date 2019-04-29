@@ -37,10 +37,10 @@ namespace CornerkickWebMvc.Controllers
 
     public ContentResult UmGetStadiumCost()
     {
-      CornerkickCore.Core.Club club = AccountController.ckClub();
+      CornerkickManager.Club club = AccountController.ckClub();
 
-      CornerkickCore.Core.User user = MvcApplication.ckcore.ini.newUser();
-      user.sNachname = "manual";
+      CornerkickManager.User user = new CornerkickManager.User();
+      user.sSurname = "manual";
       user.iLevel = 1;
 
       List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
@@ -51,10 +51,10 @@ namespace CornerkickWebMvc.Controllers
       int[] iCostDays;
 
       for (int iDp = 0; iDp < 3; iDp++) {
-        CornerkickGame.Stadium stDatum = MvcApplication.ckcore.ini.newStadium();
+        CornerkickGame.Stadium stDatum = new CornerkickGame.Stadium();
         stDatum.blocks[0].iSeats = iDp * 1000;
 
-        CornerkickGame.Stadium stNew = MvcApplication.ckcore.ini.newStadium();
+        CornerkickGame.Stadium stNew = new CornerkickGame.Stadium();
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats +  500;
         iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);

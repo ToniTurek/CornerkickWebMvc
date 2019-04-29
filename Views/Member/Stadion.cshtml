@@ -294,7 +294,7 @@
     if (Model != null) {
       if (!string.IsNullOrEmpty(Model.sName)) {
         sName = Model.sName;
-        sStadion = MvcApplication.ckcore.st.getStadiumSeats(Model.stadion).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+        sStadion = Model.stadion.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
       }
     }
 
@@ -481,7 +481,7 @@
                 //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
                 <tr>
                   <td align="center">Block @Model.stadion.blocks[iB].sName</td>
-                  <td align="center">@CornerkickCore.csStadion.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
+                  <td align="center">@CornerkickManager.csStadion.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
                   <td align="center">@Model.stadion.blocks[iB].iSeats</td>
                   <td align="center">@Model.iSeatsBuild[iB] d</td>
                 </tr>
@@ -502,7 +502,7 @@
               //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
               <tr>
                 <td align="center">Anzeigetafel</td>
-                <td align="center">@CornerkickCore.csStadion.sVideo[Model.stadion.iVideoNew]</td>
+                <td align="center">@CornerkickManager.csStadion.sVideo[Model.stadion.iVideoNew]</td>
                 <td align="center">1</td>
                 <td align="center">@Model.stadion.iVideoDaysConstruct.ToString() d</td>
               </tr>

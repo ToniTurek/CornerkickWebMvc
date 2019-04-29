@@ -222,7 +222,7 @@
     });
   </script>
 
-  @{ CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub(); }
+  @{ CornerkickManager.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub(); }
 
   <div id="chartContainer" style="height: 300px; width: 100%"></div>
 
@@ -430,7 +430,7 @@
           </thead>
           <tbody>
             @for (int i = clb.ltAccount.Count - 1; i >= 0; i--) {
-              CornerkickCore.Finance.Account kto = clb.ltAccount[i];
+              CornerkickManager.Finance.Account kto = clb.ltAccount[i];
               string sUmsatz = "0";
               if (kto.iValue != 0) { sUmsatz = kto.iValue.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR")); }
               string sKontostand = "0";

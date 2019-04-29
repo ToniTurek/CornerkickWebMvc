@@ -30,7 +30,7 @@ namespace CornerkickWebMvc.Models
 
     public List<Testgame> ltTestgames { get; set; }
 
-    public CornerkickCore.csTrainingCamp.Camp camp { get; set; }
+    public CornerkickManager.csTrainingCamp.Camp camp { get; set; }
   }
 
   public class DiaryEvent
@@ -58,7 +58,7 @@ namespace CornerkickWebMvc.Models
 
       if (iTeam >= MvcApplication.ckcore.ltClubs.Count) return ltEvents;
 
-      CornerkickCore.Core.Club club = MvcApplication.ckcore.ltClubs[iTeam];
+      CornerkickManager.Club club = MvcApplication.ckcore.ltClubs[iTeam];
 
       //DateTime dt = new DateTime(MvcApplication.ckcore.dtDatum.Year, MvcApplication.ckcore.dtDatum.Month, MvcApplication.ckcore.dtDatum.Day);
       DateTime dt = MvcApplication.ckcore.dtSeasonStart.Date;
@@ -78,7 +78,7 @@ namespace CornerkickWebMvc.Models
 
         // Trainingscamp
         bool bCampTravelDay = false;
-        CornerkickCore.csTrainingCamp.Booking booking = MvcApplication.ckcore.tcp.getCurrentCamp(club, dt, true);
+        CornerkickManager.csTrainingCamp.Booking booking = MvcApplication.ckcore.tcp.getCurrentCamp(club, dt, true);
         if (booking.camp.iId > 0) {
           if (dt.Date.Equals(booking.dtArrival.Date)) {
             ltEvents.Add(new DiaryEvent {
@@ -137,9 +137,9 @@ namespace CornerkickWebMvc.Models
         }
 
         // Cup
-        foreach (CornerkickCore.Cup cup in MvcApplication.ckcore.ltCups) {
+        foreach (CornerkickManager.Cup cup in MvcApplication.ckcore.ltCups) {
           int iSpTg = 0;
-          foreach (CornerkickCore.Cup.Matchday md in cup.ltMatchdays) {
+          foreach (CornerkickManager.Cup.Matchday md in cup.ltMatchdays) {
             if (dt.Date.Equals(md.dt.Date)) {
               if (md.ltGameData == null) continue;
 

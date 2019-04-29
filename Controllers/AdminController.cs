@@ -78,19 +78,19 @@ namespace CornerkickWebMvc.Controllers
         Controllers.AccountController accountController = new Controllers.AccountController();
 
         foreach (int iLand in MvcApplication.iNations) {
-          CornerkickCore.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
+          CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
           if (cup == null) {
             // Create nat. cup
-            cup = new CornerkickCore.Cup(bKo: true);
+            cup = new CornerkickManager.Cup(bKo: true);
             cup.iId = 2;
             cup.iId2 = iLand;
             MvcApplication.ckcore.ltCups.Add(cup);
           }
 
           // Create league
-          CornerkickCore.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand);
+          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand);
           if (league == null) {
-            league = new CornerkickCore.Cup(nGroups: 1, bGroupsTwoGames: true);
+            league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
             league.iId = 1;
             league.iId2 = iLand;
             MvcApplication.ckcore.ltCups.Add(league);
@@ -101,7 +101,7 @@ namespace CornerkickWebMvc.Controllers
 
           int iC = 0;
           while (league.ltClubs[0].Count < 16) {
-            CornerkickCore.Core.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[iLand] + "_" + (iC + 1).ToString(), (byte)iLand, 0);
+            CornerkickManager.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[iLand] + "_" + (iC + 1).ToString(), (byte)iLand, 0);
             MvcApplication.ckcore.ltClubs.Add(clb);
 
             cup   .ltClubs[0].Add(clb);
@@ -132,7 +132,7 @@ namespace CornerkickWebMvc.Controllers
 
     internal void setGameSpeedToAllUsers(int iGameSpeed)
     {
-      foreach (CornerkickCore.Core.User user in MvcApplication.ckcore.ltUser) {
+      foreach (CornerkickManager.User user in MvcApplication.ckcore.ltUser) {
         if (user.nextGame != null) user.nextGame.iGameSpeed = iGameSpeed;
       }
     }

@@ -184,7 +184,7 @@
   <h2>Training</h2>
 
   @{
-    CornerkickCore.Core.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    CornerkickManager.Club club = CornerkickWebMvc.Controllers.AccountController.ckClub();
     if (club != null) {
       string[] sDayOfWeek = new string[7] { "So.:", "Mo.:", "Di.:", "Mi.:", "Do.:", "Fr.:", "Sa.:" };
       for (int i = 0; i < club.training.iTraining.Length; i++) {
