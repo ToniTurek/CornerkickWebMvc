@@ -295,20 +295,20 @@
   <div style="position: relative; width: 50%; height: 700px">
     <div style="position: relative; width: 100%; margin-top: 10px; float: left">
       <h4>Trainingsgelände</h4>
-      <text id="txtTrGel" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <text id="txtTrGelNew" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <div id="pbTrGel"><div id="plTrGel" class="progress-label"></div></div>
-      @Html.DropDownListFor(m => m.iTrainingsgel, Model.ddlTrainingsgel, new { @class = "form-control", @onchange = "getTrGel()", id = "iDdlTrGel", @style = "width: 49%; min-width: 260px; margin-right: 2%; float: left" })
-      <button type="submit" id="bnBuildTrGel" class="btn btn-default" style="width: 49%; min-width: 260px; float: left">Kosten: 0</button>
+      <text id="txtTrGel" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <text id="txtTrGelNew" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <div id="pbTrGel" style="position: relative; width: 49%; min-width: 320px"><div id="plTrGel" class="progress-label"></div></div>
+      @Html.DropDownListFor(m => m.iTrainingsgel, Model.ddlTrainingsgel, new { @class = "form-control", @onchange = "getTrGel()", id = "iDdlTrGel", @style = "width: 49%; min-width: 320px; margin-right: 2%; float: left" })
+      <button type="submit" id="bnBuildTrGel" class="btn btn-default" style="width: 49%; min-width: 320px; float: left">Kosten: 0</button>
     </div>
 
     <div style="position: relative; width: 100%; margin-top: 10px; float: left">
       <h4>Jugendinternat</h4>
-      <text id="txtJouthInt" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <text id="txtJouthIntNew" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <div id="pbJouth"><div id="plJouth" class="progress-label"></div></div>
-      @Html.DropDownListFor(m => m.iJouthInternat, Model.ddlJouthInternat, new { @class = "form-control", @onchange = "getJouthInt()", id = "iDdlJouthInt", @style = "width: 49%; min-width: 260px; margin-right: 2%; float: left" })
-      <button type="submit" id="bnBuildJouthInt" class="btn btn-default" style="width: 49%; min-width: 260px; float: left">Kosten: 0</button>
+      <text id="txtJouthInt" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <text id="txtJouthIntNew" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <div id="pbJouth" style="position: relative; width: 49%; min-width: 320px"><div id="plJouth" class="progress-label"></div></div>
+      @Html.DropDownListFor(m => m.iJouthInternat, Model.ddlJouthInternat, new { @class = "form-control", @onchange = "getJouthInt()", id = "iDdlJouthInt", @style = "width: 49%; min-width: 320px; margin-right: 2%; float: left" })
+      <button type="submit" id="bnBuildJouthInt" class="btn btn-default" style="width: 49%; min-width: 320px; float: left">Kosten: 0</button>
     </div>
 
     @{ 
@@ -317,7 +317,7 @@
         { "type", "number" },
         { "class", "form-control" },
         { "id", "tbParkp" },
-        { "style", "position: relative; width: 49%; min-width: 260px; margin-right: 10px; float: left; text-align: right" },
+        { "style", "position: relative; width: 49%; min-width: 320px; margin-right: 10px; float: left; text-align: right" },
         { "autocomplete", "off" },
         { "min", "0" }
       };
@@ -325,11 +325,11 @@
     }
     <div style="position: relative; width: 100%; margin-top: 10px; float: left">
       <h4>Parkplätze</h4>
-      <text id="txtPark" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <text id="txtParkNew" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <div id="pbCarpark"><div id="plCarpark" class="progress-label"></div></div>
+      <text id="txtPark" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <text id="txtParkNew" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <div id="pbCarpark" style="position: relative; width: 49%; min-width: 320px"><div id="plCarpark" class="progress-label"></div></div>
       @Html.EditorFor(Model => Model.iCarpark, new { htmlAttributes = htmlAttributesEditorFor })
-      <button type="submit" id="bnBuildPark" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+      <button type="submit" id="bnBuildPark" class="btn btn-default" style="width: 49%; min-width: 320px">Kosten: 0</button>
     </div>
 
     @{ 
@@ -338,7 +338,7 @@
         { "type", "number" },
         { "class", "form-control" },
         { "id", "tbCounter" },
-        { "style", "position: relative; width: 49%; min-width: 260px; margin-right: 10px; float: left; text-align: right" },
+        { "style", "position: relative; width: 49%; min-width: 320px; margin-right: 10px; float: left; text-align: right" },
         { "autocomplete", "off" },
         { "min", "0" }
       };
@@ -346,11 +346,11 @@
     }
     <div style="position: relative; width: 100%; margin-top: 10px; float: left">
       <h4>Ticketschalter</h4>
-      <text id="txtCounter" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <text id="txtCounterNew" style="position: relative; width: 100%; min-width: 260px; float: left"></text>
-      <div id="pbCounter"><div id="plCounter" class="progress-label"></div></div>
+      <text id="txtCounter" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <text id="txtCounterNew" style="position: relative; width: 100%; min-width: 320px; float: left"></text>
+      <div id="pbCounter" style="position: relative; width: 49%; min-width: 320px"><div id="plCounter" class="progress-label"></div></div>
       @Html.EditorFor(Model => Model.iCounter, new { htmlAttributes = htmlAttributesEditorForCounter })
-      <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+      <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 49%; min-width: 320px">Kosten: 0</button>
     </div>
   </div>
 </body>
