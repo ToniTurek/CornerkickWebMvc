@@ -458,6 +458,9 @@ namespace CornerkickWebMvc
           else if (ckcore.ltCups[iC].iId == 2) ckcore.ltCups[iC].sName = "Pokal " + ckcore.sLand[ckcore.ltCups[iC].iId2];
         }
 
+        // TEMP: Set stadium name for fiffi
+        MvcApplication.ckcore.ltClubs[2].stadium.sName = "Stadion an der Busseallee";
+
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
 #if _USE_AMAZON_S3
