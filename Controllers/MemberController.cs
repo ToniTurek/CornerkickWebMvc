@@ -2102,6 +2102,8 @@ namespace CornerkickWebMvc.Controllers
       stadium.iVideoNew    = clb.stadium.iVideoNew;
       stadium.iSnackbarNew = clb.stadium.iSnackbarNew;
       stadium.iToiletsNew  = clb.stadium.iToiletsNew;
+      stadium.iCarparkNew  = clb.stadium.iCarparkNew;
+      stadium.iTicketcounterNew = clb.stadium.iTicketcounterNew;
 
       int[] iKostenDauer = MvcApplication.ckcore.st.getCostDaysContructStadium(stadium, clb.stadium, AccountController.ckUser());
       int iDispoOk = 0;
