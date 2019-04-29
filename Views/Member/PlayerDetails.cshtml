@@ -273,7 +273,7 @@
   <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; border: 1px solid black"></div>
 
   @{
-    CornerkickCore.Core.Club clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    CornerkickManager.Club clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
     bool bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(clubUser, player);
 
     string sTalent = (player.iTalent + 1).ToString();
