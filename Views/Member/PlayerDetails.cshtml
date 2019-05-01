@@ -361,8 +361,8 @@
           <tr>
             @{
               string sVerletzung = "keine";
-              if (player.fVerletzung[0] > 0.0) {
-                sVerletzung = player.fVerletzung[0].ToString("0.0") + " Tage (" + (player.fVerletzung[0] / player.fVerletzung[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fVerletzung[2]];
+              if (player.fInjury[0] > 0.0) {
+                sVerletzung = player.fInjury[0].ToString("0.0") + " Tage (" + (player.fInjury[0] / player.fInjury[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fInjury[2]];
               }
             }
             <td align="right">Verletzung:</td>
@@ -548,8 +548,8 @@
               nStat = 2;
             }
 
-            CornerkickGame.Player.Statistic[] plStatSeason = new CornerkickGame.Player.Statistic[2] { MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 1, true), MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 2, true) };
-            CornerkickGame.Player.Statistic[] plStatTotal = new CornerkickGame.Player.Statistic[2] { MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 1, false), MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 2, false) };
+            CornerkickGame.Player.Statistic[] plStatSeason = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, true), player.getStatistic(2, true) };
+            CornerkickGame.Player.Statistic[] plStatTotal = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, false), player.getStatistic(2, false) };
           }
           <tr>
             <td align="right">Spiele</td>
