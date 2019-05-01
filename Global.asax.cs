@@ -452,20 +452,6 @@ namespace CornerkickWebMvc
         // Set admin user to CPU
         if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
 
-        // TEMP: Set cup names
-        for (int iC = 0; iC < ckcore.ltCups.Count; iC++) {
-          if      (ckcore.ltCups[iC].iId == 1) ckcore.ltCups[iC].sName = "Liga "  + ckcore.sLand[ckcore.ltCups[iC].iId2];
-          else if (ckcore.ltCups[iC].iId == 2) ckcore.ltCups[iC].sName = "Pokal " + ckcore.sLand[ckcore.ltCups[iC].iId2];
-        }
-
-        // TEMP: Set stadium name for fiffi
-        MvcApplication.ckcore.ltClubs[2].stadium.sName = "Stadion an der Busseallee";
-
-        // TEMP: Clear sponsor offers
-        for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
-          ckcore.ltClubs[iC].ltSponsorOffers.Clear();
-        }
-
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
 #if _USE_AMAZON_S3
