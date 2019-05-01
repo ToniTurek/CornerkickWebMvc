@@ -20,18 +20,5 @@ namespace CornerkickWebMvc.Models
     public int iCarparkNew { get; set; }
     public int iCounter { get; set; }
     public int iCounterNew { get; set; }
-
-    public StadiumSurroundingsModel()
-    {
-      CornerkickManager.Club clb = Controllers.AccountController.ckClub();
-
-      ddlTrainingsgel  = new List<SelectListItem>();
-      ddlJouthInternat = new List<SelectListItem>();
-
-      if (clb == null) return;
-
-      for (int i = clb.iTrainingsgel  [1] + 1; i < MvcApplication.ckcore.st.sTrainingsgel.Length; i++) ddlTrainingsgel .Add(new SelectListItem { Text = MvcApplication.ckcore.st.sTrainingsgel[i], Value = i.ToString() });
-      for (int i = clb.iJugendinternat[1] + 1; i < MvcApplication.ckcore.st.sTrainingsgel.Length; i++) ddlJouthInternat.Add(new SelectListItem { Text = MvcApplication.ckcore.st.sJouthInternat[i], Value = i.ToString() });
-    }
   }
 }

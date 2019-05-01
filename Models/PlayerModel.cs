@@ -15,6 +15,9 @@ namespace CornerkickWebMvc.Models
     public int iPlIdPrev { get; set; }
     public int iPlIdNext { get; set; }
 
+    public bool bOwnPlayer { get; set; }
+    public bool bJouth { get; set; }
+
     // Emblem
     public string sEmblem { get; set; }
 

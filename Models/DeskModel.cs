@@ -8,6 +8,8 @@ namespace CornerkickWebMvc.Models
 {
   public class DeskModel
   {
+    public CornerkickManager.User user { get; set; }
+    public CornerkickManager.Club club { get; set; }
     public string sNews { get; set; }
     public string sNewsOld { get; set; }
     public string sTabellenplatz { get; set; }

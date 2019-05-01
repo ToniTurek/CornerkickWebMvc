@@ -9,6 +9,8 @@ namespace CornerkickWebMvc.Models
 {
   public class CupModel
   {
+    public int iClubId { get; set; }
+
     public int iLand { get; set; }
 
     [Display(Name = "Spieltag: ")]

@@ -108,7 +108,7 @@
               foreach (CornerkickManager.UI.Scorer sc in Model.ltScorer) {
                 iPlatz++;
                 string sStyle2 = "";
-                if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == CornerkickWebMvc.Controllers.AccountController.ckClub().iId) {
+                if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == Model.iClubId) {
                   sStyle2 = "font-weight:bold";
                 }
                 int iScorer = sc.iGoals + sc.iAssists;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 
 namespace CornerkickWebMvc.Controllers
@@ -35,9 +36,31 @@ namespace CornerkickWebMvc.Controllers
       return View();
     }
 
+    private CornerkickManager.User ckUser()
+    {
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
+      }
+
+      return null;
+    }
+
+    private CornerkickManager.Club ckClub()
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return null;
+
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+        return MvcApplication.ckcore.ltClubs[usr.iTeam];
+      }
+
+      return null;
+    }
+
     public ContentResult UmGetStadiumCost()
     {
-      CornerkickManager.Club club = AccountController.ckClub();
+      CornerkickManager.Club club = ckClub();
 
       CornerkickManager.User user = new CornerkickManager.User();
       user.sSurname = "manual";

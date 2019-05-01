@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 //using System.Web.Script.Serialization;
+using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 
 namespace CornerkickWebMvc.Controllers
@@ -13,6 +14,28 @@ namespace CornerkickWebMvc.Controllers
   public class ViewGameController : Controller
   {
     private static Models.ViewGameModel.gameData gD;
+
+    private CornerkickManager.User ckUser()
+    {
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
+      }
+
+      return null;
+    }
+
+    private CornerkickManager.Club ckClub()
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return null;
+
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+        return MvcApplication.ckcore.ltClubs[usr.iTeam];
+      }
+
+      return null;
+    }
 
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -27,15 +50,14 @@ namespace CornerkickWebMvc.Controllers
       view.iStateGlobal = 0;
       gD = new Models.ViewGameModel.gameData();
 
-      CornerkickManager.User user = AccountController.ckUser();
+      CornerkickManager.User user = ckUser();
       if (user == null) return View(view);
 
-      view.bAdmin = AccountController.checkUserIsAdmin(AccountController.appUser);
+      view.bAdmin = AccountController.checkUserIsAdmin(User.Identity.GetUserName());
 
       if (view.bAdmin && user.game == null) {
         user.game = MvcApplication.ckcore.game.tl.getDefaultGame();
         user.game.iGameSpeed = 300;
-        AccountController.setCkUser(user);
       }
 
       view.game = user.game;
@@ -76,7 +98,7 @@ namespace CornerkickWebMvc.Controllers
       Models.ViewGameModel.ltLoc = new List<float[]>();
       Models.ViewGameModel.gameLoc gLoc = new Models.ViewGameModel.gameLoc();
 
-      CornerkickManager.User user = AccountController.ckUser();
+      CornerkickManager.User user = ckUser();
 
       if (user.game == null) {
         Response.StatusCode = 1;
@@ -160,8 +182,8 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
-      CornerkickManager.User user = AccountController.ckUser();
-      CornerkickManager.Club club = AccountController.ckClub();
+      CornerkickManager.User user = ckUser();
+      CornerkickManager.Club club = ckClub();
 
       CornerkickGame.Game.Data gameData = user.game.data;
 
@@ -440,7 +462,7 @@ namespace CornerkickWebMvc.Controllers
       gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] { (float)gD.iDuels[0], -4f }, new float[2] { (float)gD.iFouls[0], -5f }, new float[2] { (float)nCornerkick[0], -6f }, new float[2] { (float)nOffsite[0], -7f } };
       gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { (float)gD.iDuels[1], -4f }, new float[2] { (float)gD.iFouls[1], -5f }, new float[2] { (float)nCornerkick[1], -6f }, new float[2] { (float)nOffsite[1], -7f } };
 
-      if (AccountController.checkUserIsAdmin(AccountController.appUser)) {
+      if (AccountController.checkUserIsAdmin(User.Identity.GetUserName())) {
         if (user.game.ball.plAtBall != null) {
           float fShootOnGoal = user.game.ai.getChanceShootOnGoal(user.game.ball.plAtBall);
           float fKeeperSave  = user.game.ai.getChanceKeeperSave (user.game.ball.plAtBall);
@@ -569,8 +591,8 @@ namespace CornerkickWebMvc.Controllers
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
-      CornerkickManager.User user = AccountController.ckUser();
-      CornerkickManager.Club club = AccountController.ckClub();
+      CornerkickManager.User user = ckUser();
+      CornerkickManager.Club club = ckClub();
 
       if (user.game == null) return gD;
 
@@ -606,7 +628,7 @@ namespace CornerkickWebMvc.Controllers
     float fHeatmapMax = 0f;
     private string getDivHeatmap(byte iHA = 0, int iStateMax = 0, int iPlayer = -1)
     {
-      CornerkickManager.User user = AccountController.ckUser();
+      CornerkickManager.User user = ckUser();
 
       if (user.game == null) return "";
 
@@ -666,7 +688,7 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult AdminPlay(Models.ViewGameModel view)
     {
-      CornerkickManager.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = ckUser();
 
       if (userAdmin.game == null) {
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
@@ -681,7 +703,7 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult AdminStop(Models.ViewGameModel view)
     {
-      CornerkickManager.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = ckUser();
 
       if (userAdmin.game == null) Json(false, JsonRequestBehavior.AllowGet);
 
@@ -692,7 +714,7 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult AdminNext(Models.ViewGameModel view, sbyte iNextAction)
     {
-      CornerkickManager.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = ckUser();
 
       if (userAdmin.game == null) {
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
@@ -707,13 +729,11 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult AdminNew(Models.ViewGameModel view)
     {
-      CornerkickManager.User userAdmin = AccountController.ckUser();
+      CornerkickManager.User userAdmin = ckUser();
 
       userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
 
       userAdmin.game.iGameSpeed = 300;
-
-      AccountController.setCkUser(userAdmin);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

@@ -165,12 +165,11 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    public static CornerkickManager.User ckUser()
+    public CornerkickManager.User ckUser()
     {
-      if (appUser != null) {
-        foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
-          if (usr.id.Equals(appUser.Id)) return usr;
-        }
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
       }
 
       return null;
@@ -187,15 +186,7 @@ namespace CornerkickWebMvc.Controllers
       return -1;
     }
 
-    public static void setCkUser(CornerkickManager.User usr)
-    {
-      int iU = getiUser(usr);
-      if (iU >= 0 && iU < MvcApplication.ckcore.ltUser.Count) {
-        MvcApplication.ckcore.ltUser[iU] = usr;
-      }
-    }
-
-    public static CornerkickManager.Club ckClub()
+    public CornerkickManager.Club ckClub()
     {
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
@@ -338,7 +329,7 @@ namespace CornerkickWebMvc.Controllers
       clb.iLand = iLand;
       clb.iDivision = iLiga;
 
-      MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[12]);
+      MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[7]);
 
 #if DEBUG
       clb.training.iTraining[1] = 2;
@@ -358,7 +349,7 @@ namespace CornerkickWebMvc.Controllers
       clb.ltSponsorOffers.Add(createDefaultSponsor());
 
       // Stadium
-      clb.stadium.sName = clb.sName +  " Stadion";
+      clb.stadium.sName = clb.sName + " Stadion";
       clb.stadium.iTicketcounter = 1;
 
       clb.iAdmissionPrice[0] =  10;
@@ -666,7 +657,7 @@ namespace CornerkickWebMvc.Controllers
       {
         case SignInStatus.Success:
           //appUser = new ApplicationUser { UserName = model.Email, Email = model.Email };
-          appUser = await UserManager.FindByNameAsync(model.Email);
+          ApplicationUser appUser = await UserManager.FindByNameAsync(model.Email);
           if (appUser == null/* || !(await UserManager.IsEmailConfirmedAsync(appUser.Id))*/) {
             // Don't reveal that the user does not exist or is not confirmed
 
@@ -719,13 +710,13 @@ namespace CornerkickWebMvc.Controllers
       switch (result)
       {
         case SignInStatus.Success:
-            return RedirectToLocal(model.ReturnUrl);
+          return RedirectToLocal(model.ReturnUrl);
         case SignInStatus.LockedOut:
-            return View("Lockout");
+          return View("Lockout");
         case SignInStatus.Failure:
         default:
-            ModelState.AddModelError("", "Ungültiger Code.");
-            return View(model);
+          ModelState.AddModelError("", "Ungültiger Code.");
+          return View(model);
       }
     }
 
@@ -734,12 +725,11 @@ namespace CornerkickWebMvc.Controllers
     [AllowAnonymous]
     public ActionResult Register()
     {
-        return View();
+      return View();
     }
 
     //
     // POST: /Account/Register
-    public static ApplicationUser appUser;
     private RegisterViewModel rvmDEBUG;
     [HttpPost]
     [AllowAnonymous]
@@ -781,7 +771,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (ModelState.IsValid) {
         //appUser = new ApplicationUser { UserName = model.Vorname + " " + model.Nachname, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
-        appUser = new ApplicationUser { UserName = model.Email, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
+        ApplicationUser appUser = new ApplicationUser { UserName = model.Email, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
 
         var result = await UserManager.CreateAsync(appUser, model.Password);
         MvcApplication.ckcore.tl.writeLog("  Register succeeded: " + result.Succeeded.ToString());

@@ -273,9 +273,6 @@
   <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; border: 1px solid black"></div>
 
   @{
-    CornerkickManager.Club clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
-    bool bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(clubUser, player);
-
     string sTalent = (player.iTalent + 1).ToString();
     string sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
 
@@ -302,7 +299,7 @@
 
     <div style="position: relative; width: 100%; height: auto; margin-top: 1%">
       @{
-        if ((bOwnPlayer && MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) || clubUser.ltJugendspielerID.IndexOf(Model.iPlayer) >= 0) {
+        if ((Model.bOwnPlayer && MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) || Model.bJouth) {
           <div class="form-group">
             @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
           </div>
@@ -313,7 +310,7 @@
       }
     </div>
 
-    if (bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1))) {
+    if (Model.bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1))) {
       <div class="form-group">
         @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
@@ -436,11 +433,11 @@
 
   @{
     string sExtendContract = "Vertrag verlängern";
-    if (clubUser.ltJugendspielerID.IndexOf(player.iId) >= 0) {
+    if (Model.bJouth) {
       sExtendContract = "Profivertrag aushandeln";
     }
 
-    if (bOwnPlayer) {
+    if (Model.bOwnPlayer) {
       <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 10px">
         @* Extend player contract *@
         <button type="submit" id="bnContract" class="btn btn-default" style="width: 30%; min-width: 300px">@sExtendContract</button>
@@ -453,7 +450,7 @@
         }
       </div>
 
-      if (clubUser.ltJugendspielerID.IndexOf(player.iId) < 0) {
+      if (!Model.bJouth) {
         <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 6px">
           @if (!Model.bCaptain) {
             <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
@@ -475,7 +472,7 @@
             <th style="text-align:center">Fähigkeit</th>
             <th>Wert</th>
             @{
-              if (bOwnPlayer) {
+              if (Model.bOwnPlayer) {
                 <th>Training</th>
                 <th>Ind.</th>
                 <th>Bonus</th>
@@ -490,7 +487,7 @@
               <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
               <td align="center">@player.iSkill[i]</td>
               @{
-                if (bOwnPlayer) {
+                if (Model.bOwnPlayer) {
                   <td align="right">@fTraining.ToString("0.0%")</td>
                   <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
                   <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>

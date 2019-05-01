@@ -10,6 +10,7 @@ namespace CornerkickWebMvc.Models
 {
   public class TrainingModel
   {
+    public CornerkickManager.Main.Training training { get; set; }
     public string sTraining { get; set; }
     public List<SelectListItem> ltDdlTraining { get; set; }
 

@@ -88,7 +88,7 @@
 <body>
   @{
     int nPl = 0;
-    CornerkickManager.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
+    CornerkickManager.Club clb = Model.club;
 
     if (clb != null) {
       if (clb.ltPlayerId != null) {
@@ -145,7 +145,7 @@
           </div>
         }
 
-        if (CornerkickWebMvc.Controllers.AccountController.ckUser().budget.iInSpec == 0) {
+        if (Model.user.budget.iInSpec == 0) {
           <div style="position: relative; width: 100%; text-align: center">
             @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
           </div>

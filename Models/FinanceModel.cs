@@ -9,8 +9,9 @@ namespace CornerkickWebMvc.Models
 {
   public class FinanceModel
   {
+    public List<CornerkickManager.Finance.Account> ltAccount { get; set; }
+
     public string sKonto { get; set; }
-    public List<CornerkickManager.Finance.Account[]> ltKonto { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "Stehplätze:")]

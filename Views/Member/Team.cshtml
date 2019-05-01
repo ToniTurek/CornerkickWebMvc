@@ -4,7 +4,7 @@
   ViewBag.Title = "Aufstellung";
   Layout = "~/Views/Shared/_Layout.cshtml";
 
-  var clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
+  var clubUser = Model.club;
   CornerkickGame.Player plSelected;
   CornerkickGame.Tactic tactic = new CornerkickGame.Tactic();
 

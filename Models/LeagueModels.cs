@@ -9,6 +9,8 @@ namespace CornerkickWebMvc.Models
 {
   public class LeagueModels
   {
+    public int iClubId { get; set; }
+
     public ushort iSaison { get; set; }
 
     [Display(Name = "Land: ")]
