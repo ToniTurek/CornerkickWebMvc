@@ -225,7 +225,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      for (int iC = state.ltCommend.Count; iC >= 0; iC--) {
+      for (int iC = state.ltCommend.Count - 1; iC >= 0; iC--) {
         CornerkickGame.Game.Kommentar k = state.ltCommend[iC];
 
         if (!string.IsNullOrEmpty(k.sKommentar)) {
