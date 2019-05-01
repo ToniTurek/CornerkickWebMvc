@@ -225,7 +225,9 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      foreach (CornerkickGame.Game.Kommentar k in Enumerable.Reverse(state.ltCommend)) {
+      for (int iC = state.ltCommend.Count; iC >= 0; iC--) {
+        CornerkickGame.Game.Kommentar k = state.ltCommend[iC];
+
         if (!string.IsNullOrEmpty(k.sKommentar)) {
           string sCommentarNew = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + k.sKommentar;
 
@@ -373,11 +375,11 @@ namespace CornerkickWebMvc.Controllers
           int  iPlIx = -1;
           getStatisticHAPlayerIx(iAllShoots, user.game.nPlStart, out iHA, out iPlIx);
 
-          int iStTmp = 0;
-          foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
+          for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
+            CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
             gD.ltDrawLineShoot.AddRange(getShootLine(stateTmp, user.game, iHA, iPlIx));
 
-            if (iState >= 0 && iStTmp++ >= iState) break; // If review --> stop at selected state
+            if (iState >= 0 && iSt >= iState) break; // If review --> stop at selected state
           }
         } else {
           gD.ltDrawLineShoot = getShootLine(state, user.game);
@@ -392,11 +394,11 @@ namespace CornerkickWebMvc.Controllers
           int  iPlIx = -1;
           getStatisticHAPlayerIx(iAllDuels, user.game.nPlStart, out iHA, out iPlIx);
 
-          int iStTmp = 0;
-          foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
+          for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
+            CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
             gD.sCard += getDuelIcon(stateTmp, user.game, iHA, iPlIx);
 
-            if (iState >= 0 && iStTmp++ >= iState) break; // If review --> stop at selected state
+            if (iState >= 0 && iSt >= iState) break; // If review --> stop at selected state
           }
         } else {
           gD.sCard = getDuelIcon(state, user.game);
@@ -437,7 +439,8 @@ namespace CornerkickWebMvc.Controllers
         // Substitutions
         gD.sStatSubs = "";
         if (gameData.team[iHA].ltSubstitutions != null) {
-          foreach (int[] iSub in gameData.team[iHA].ltSubstitutions) {
+          for (int iS = 0; iS < gameData.team[iHA].ltSubstitutions.Count; iS++) {
+            int[] iSub = gameData.team[iHA].ltSubstitutions[iS];
             float fMin = iSub[2];
 
             string sSubDesc = iSub[2].ToString() + ". Min.: " + sTeam + " - " + MvcApplication.ckcore.ltPlayer[iSub[1]].sName + " für " + MvcApplication.ckcore.ltPlayer[iSub[0]].sName;
@@ -613,13 +616,12 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Game.Data gameData = user.game.data;
 
-      int iStTmp = 0;
-      foreach (CornerkickGame.Game.State state in gameData.ltState) {
-        addGameData(ref gD, gameData, user, club, iStTmp, state.tsMinute.Seconds == 0 && state.bNewRound);
+      
+      for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
+        CornerkickGame.Game.State state = gameData.ltState[iSt];
+        addGameData(ref gD, gameData, user, club, iSt, state.tsMinute.Seconds == 0 && state.bNewRound);
 
-        if (iState == iStTmp) break;
-
-        iStTmp++;
+        if (iState == iSt) break;
       }
 
       return gD;
