@@ -58,7 +58,7 @@
           var sPlayerName = sPlayer[0];
           var sPlayerId   = sPlayer[1];
           if (sN.includes(sPlayerName)) {
-            sN = sN.replace(sPlayerName, '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "_blank" })'.replace("name", sPlayerName).replace("id", sPlayerId));
+            sN = sN.replace(sPlayerName, '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "" })'.replace("name", sPlayerName).replace("id", sPlayerId));
             break;
           }
         }
