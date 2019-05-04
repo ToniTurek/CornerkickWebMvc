@@ -210,7 +210,7 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.tl.writeLog("  add User to Ck: " + applicationUser.Vorname + " " + applicationUser.Nachname);
 
       if (bAdmin) {
-        MvcApplication.ckcore.ltClubs.Add(MvcApplication.ckcore.ini.newClub());
+        MvcApplication.ckcore.ltClubs.Add(new CornerkickManager.Club());
         CornerkickManager.User usrAdmin = createUser(applicationUser);
         MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
@@ -320,7 +320,7 @@ namespace CornerkickWebMvc.Controllers
 
     internal CornerkickManager.Club createClub(string sTeamname, byte iLand, byte iLiga)
     {
-      CornerkickManager.Club clb = MvcApplication.ckcore.ini.newClub();
+      CornerkickManager.Club clb = new CornerkickManager.Club();
 
       clb.sName = sTeamname;
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
@@ -786,7 +786,7 @@ namespace CornerkickWebMvc.Controllers
             MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
             // Initialize dummy club
-            CornerkickManager.Club club0 = MvcApplication.ckcore.ini.newClub();
+            CornerkickManager.Club club0 = new CornerkickManager.Club();
             club0.iId = 0;
             club0.sName = "Computer";
 
