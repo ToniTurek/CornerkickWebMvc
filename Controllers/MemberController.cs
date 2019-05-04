@@ -3414,10 +3414,6 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Content("", "application/json");
 
-      CornerkickManager.Main.TrainingHistory trHistCurrent = new CornerkickManager.Main.TrainingHistory();
-      trHistCurrent.dt   = MvcApplication.ckcore.dtDatum;
-      trHistCurrent.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb);
-
       List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
 
       foreach (CornerkickManager.Finance.Account kto in clb.ltAccount) {
@@ -3427,7 +3423,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      long iDateCurrent = convertDateTimeToTimestamp(trHistCurrent.dt);
+      long iDateCurrent = convertDateTimeToTimestamp(MvcApplication.ckcore.dtDatum);
       dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, clb.iBalance));
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
