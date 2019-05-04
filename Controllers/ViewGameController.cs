@@ -714,7 +714,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult AdminNext(Models.ViewGameModel view, sbyte iNextAction)
+    public JsonResult AdminNext(Models.ViewGameModel view, sbyte iNextAction, int iX = -1, int iY = -1)
     {
       CornerkickManager.User userAdmin = ckUser();
 
@@ -724,7 +724,7 @@ namespace CornerkickWebMvc.Controllers
 
       userAdmin.game.iGameSpeed = 1;
 
-      userAdmin.game.next(iPlayerNextAction: iNextAction);
+      userAdmin.game.next(iPlayerNextAction: iNextAction, iPassNextActionX: iX, iPassNextActionY: iY);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }
@@ -736,6 +736,19 @@ namespace CornerkickWebMvc.Controllers
       userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
 
       userAdmin.game.iGameSpeed = 300;
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult AdminSetPos(Models.ViewGameModel view, int iHA, int iPl, int iX, int iY)
+    {
+      CornerkickManager.User userAdmin = ckUser();
+
+      if (userAdmin.game == null) {
+        userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
+      }
+
+      userAdmin.game.player[iHA][iPl].ptPos = new System.Drawing.Point(iX, iY);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

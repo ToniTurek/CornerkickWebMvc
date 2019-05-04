@@ -60,7 +60,7 @@
 
   <script type="text/javascript">
     var bStopPlay = false;
-    var bAdminStopPlay = false;
+    var bAdminStop = true;
 
     var ltF = [];
     var ltM = [];
@@ -183,23 +183,42 @@
       });
 
       $("#bnAdminPlay").click(function () {
-        if (bAdminStopPlay) {
-          bAdminStopPlay = false;
+        if (bAdminStop) {
+          bAdminStop = false;
           bnAdminPlay.innerText = "◼";
 
           playAdmin();
         } else {
-          bAdminStopPlay = true;
+          bAdminStop = true;
           bnAdminPlay.innerText = '►';
         }
       });
 
       $("#bnAdminNext").click(function () {
-        bAdminStopPlay = true;
+        bAdminStop = true;
         bnAdminPlay.innerText = '►';
+
+        var iNextAction = document.getElementById("ddlAdminNextAction").value;
+        var iX = document.getElementById("inputAdminSetPosX").value;
+        var iY = document.getElementById("inputAdminSetPosY").value;
 
         $.ajax({
           url: '/ViewGame/AdminNext',
+          type: "GET",
+          dataType: "JSON",
+          data: { iNextAction: iNextAction, iX: iX, iY: iY },
+          success: function () {
+            drawGame(-2);
+          }
+        });
+      });
+
+      $("#bnAdminNew").click(function () {
+        bAdminStop = true;
+        bnAdminPlay.innerText = '►';
+
+        $.ajax({
+          url: '/ViewGame/AdminNew',
           type: "GET",
           dataType: "JSON",
           success: function () {
@@ -208,14 +227,16 @@
         });
       });
 
-      $("#bnAdminNew").click(function () {
-        bAdminStopPlay = true;
-        bnAdminPlay.innerText = '►';
-
+      $("#bnAdminSetPos").click(function () {
+        var iHA = document.getElementById("ddlAdminSetPosHA").value;
+        var iPl = document.getElementById("ddlAdminSetPosPl").value;
+        var iX = document.getElementById("inputAdminSetPosX").value;
+        var iY = document.getElementById("inputAdminSetPosY").value;
         $.ajax({
-          url: '/ViewGame/AdminNew',
+          url: '/ViewGame/AdminSetPos',
           type: "GET",
           dataType: "JSON",
+          data: { iHA: iHA, iPl: iPl, iX: iX, iY: iY },
           success: function () {
             drawGame(-2);
           }
@@ -498,7 +519,7 @@
     }); // $(document).ready(function () {});
 
     function playAdmin() {
-      if (bAdminStopPlay === true) return;
+      if (bAdminStop === true) return;
 
       var iAdminGameSpeed = document.getElementById("inputAdminGameSpeed").value;
 
@@ -507,6 +528,7 @@
           url: '/ViewGame/AdminNext',
           type: "GET",
           dataType: "JSON",
+          data: { iNextAction: -1 },
           success: function () {
             $.when(drawGame(-2)).done(function () {
               setTimeout(function () { playAdmin() }, iAdminGameSpeed);
@@ -701,6 +723,42 @@
           <button type="submit" id="bnAdminPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
           <button type="submit" id="bnAdminNext" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
           <button type="submit" id="bnAdminNew" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">new</button>
+        </div>
+        <div style="position: relative; float: left; width: 25%; min-width: 200px; height: 40px; margin-left: 6px">
+          <label>
+            Aktion:
+            <select id="ddlAdminNextAction">
+              <option value="-1">AI</option>
+              <option value="0">Schuss</option>
+              <option value="1">Pass</option>
+              <option value="2">Solo</option>
+              <option value="3">Warten</option>
+              <option value="4">BS</option>
+            </select>
+          </label>
+        </div>
+        <div style="position: relative; float: left; width: 240px; height: 40px; margin-left: 6px; border: 1px solid black">
+          <select id="ddlAdminSetPosHA">
+            <option value="0">H</option>
+            <option value="1">A</option>
+          </select>
+          <select id="ddlAdminSetPosPl">
+            <option value="-1">Ball</option>
+            <option value="0">1</option>
+            <option value="1">2</option>
+            <option value="2">3</option>
+            <option value="3">4</option>
+            <option value="4">5</option>
+            <option value="5">6</option>
+            <option value="6">7</option>
+            <option value="7">8</option>
+            <option value="8">9</option>
+            <option value="9">10</option>
+            <option value="10">11</option>
+          </select>
+          <input id="inputAdminSetPosX" style="width: 40px" type="text" value="61" data-val="true" autocomplete="off">
+          <input id="inputAdminSetPosY" style="width: 40px" type="text" value="0" data-val="true" autocomplete="off">
+          <button type="submit" id="bnAdminSetPos" style="width: 40px; height: auto">set</button>
         </div>
       } else if (Model.game.data.bFinished) {
         <div style="position: relative; float: left; width: 25%; min-width: 200px; height: 40px">
