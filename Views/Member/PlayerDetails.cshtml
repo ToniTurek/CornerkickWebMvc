@@ -321,8 +321,8 @@
   }
 
   <div style="position: relative; width: 100%; height: auto">
-    <div style="position: relative; width: 28%; min-width: 300px; height: auto; margin-bottom: 10px; float: left">
-      <table cellpadding="1" style="width: auto">
+    <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
+      <table cellpadding="1" style="width: 100%">
         <tbody>
           <tr>
             <td align="right">Verein:</td>
@@ -388,8 +388,8 @@
       </table>
     </div>
 
-    <div style="position: relative; width: 22%; min-width: 200px; height: auto; margin-bottom: 10px; float: left">
-      <table cellpadding="1" style="width: auto">
+    <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+      <table cellpadding="1" style="width: 100%">
         <tbody>
           <tr>
             <td align="right">Führungspersönlichkeit:</td>
@@ -409,26 +409,26 @@
           </tr>
         </tbody>
       </table>
+    </div>
 
+    <div style="position: relative; width: 40px; height: auto; float: left; text-align: right">
       @if (Model.bCaptain) {
-        <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+        <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
       } else if (Model.bCaptain2) {
-        <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+        <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
       }
 
       @{
         string sNat = MvcApplication.ckcore.sLandShort[player.iNat1];
 
         if (string.IsNullOrEmpty(sNat)) {
-          <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+          <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
         } else {
           string sFlag = "/Content/Icons/flags/" + sNat + ".png";
-          <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; right: 0px; margin-top: 4px" />
+          <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
         }
       }
     </div>
-
-    <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
   </div>
 
   @{
@@ -463,6 +463,8 @@
       }
     }
   }
+
+  <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
 
   <div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 10px">
     <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
