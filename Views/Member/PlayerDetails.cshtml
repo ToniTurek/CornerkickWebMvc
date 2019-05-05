@@ -1,7 +1,6 @@
 ﻿@model CornerkickWebMvc.Models.PlayerModel
 
 <head>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
@@ -66,6 +65,7 @@
     var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
     $("#divEmblemClub").html(sEmblemImg);
 
+    plotCFM();
     plotPlayerDevelopment();
 
     setSalary(@player.contract.iLength + 1);
@@ -223,6 +223,55 @@
       error: function (xhr) {
         debugger;
         alert(xhr);
+      }
+    });
+  }
+
+  function plotCFM() {
+    $.ajax({
+      type: 'post',
+      url: '/Member/PlayerDetailsGetCFM',
+      dataType: "json",
+      data: { iPlId: @Model.iPlayer },
+      success: function (dataCFM) {
+        CanvasJS.addColorSet("customColorSet1",
+          [
+            "lightblue",
+            "blue",
+            "green",
+            "red",
+          ]);
+
+        var chartCFM = new CanvasJS.Chart("divChartCFM", {
+          colorSet: "customColorSet1",
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            gridThickness: 1,
+            interval: 1
+          },
+          axisY: {
+            valueFormatString: "0.0%",
+            includeZero: true
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "column",
+              indexLabel: "{z}",
+              indexLabelFontColor: "#EEEEEE",
+              indexLabelPlacement: "inside",
+              dataPoints: dataCFM
+            }
+          ]
+        });
+
+        chartCFM.render();
       }
     });
   }
@@ -429,6 +478,8 @@
         }
       }
     </div>
+
+    <div id="divChartCFM" style="position: relative; height: 220px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
   </div>
 
   @{

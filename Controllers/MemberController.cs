@@ -1270,6 +1270,24 @@ namespace CornerkickWebMvc.Controllers
       return Json("", JsonRequestBehavior.AllowGet);
     }
 
+    public ContentResult PlayerDetailsGetCFM(int iPlId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+
+      Models.DataPointGeneral[] dataPoints = new Models.DataPointGeneral[4];
+
+      float fCondiMax = 1f;
+      if (pl.doping != null) fCondiMax += pl.doping.fEffect;
+      dataPoints[0] = new Models.DataPointGeneral(0, fCondiMax,     "");
+      dataPoints[1] = new Models.DataPointGeneral(0, pl.fCondition, pl.fCondition.ToString("0.00%"));
+      dataPoints[2] = new Models.DataPointGeneral(1, pl.fFresh,     pl.fFresh.ToString("0.00%"));
+      dataPoints[3] = new Models.DataPointGeneral(2, pl.fMoral,     pl.fMoral.ToString("0.00%"));
+
+      //JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints), "application/json");
+    }
+
     public ContentResult PlayerDetailsGetDevelopmentData(int iPlId)
     {
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
