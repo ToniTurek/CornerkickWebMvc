@@ -16,7 +16,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
   public class MemberController : Controller
   {
-    readonly string[] sCultureInfo = new string[82] {
+    public readonly static string[] sCultureInfo = new string[82] {
       "",
       "",
       "",
@@ -124,7 +124,7 @@ namespace CornerkickWebMvc.Controllers
       return HttpUtility.HtmlEncode("Hello " + name + ", NumTimes is: " + numTimes);
     }
 
-    private CultureInfo getCi()
+    public CultureInfo getCi()
     {
       CornerkickManager.Club clb = ckClub();
       if (clb != null) {
@@ -268,6 +268,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return View(desk);
       desk.club = club;
+
+      // Date next game
+      desk.sDtNextGame = "";
+      if (club.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
+        desk.sDtNextGame = "Heute, " + club.nextGame.dt.ToString("t", getCi()) + " Uhr";
+      } else {
+        desk.sDtNextGame = club.nextGame.dt.ToString("d", getCi()) + " (" + (club.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
+      }
 
       // Weather
       if (club.nextGame != null) desk.iWeather = club.nextGame.iWeather;

@@ -18,10 +18,16 @@
   }
 
   string sEmblem = @"/Content/Uploads/";
+  System.Globalization.CultureInfo ci = System.Globalization.CultureInfo.CurrentCulture;
 
   if (Request.IsAuthenticated) {
     if (clb != null) {
       sEmblem += clb.iId.ToString() + ".png";
+
+      int iLandUser = clb.iLand;
+      if (iLandUser >= 0 && iLandUser < CornerkickWebMvc.Controllers.MemberController.sCultureInfo.Length) {
+        ci = new System.Globalization.CultureInfo(CornerkickWebMvc.Controllers.MemberController.sCultureInfo[iLandUser]);
+      }
     } else {
       sEmblem += "0.png";
     }
@@ -151,14 +157,14 @@
 
             <div style="position: relative; width: 100%; height: 20px; background-color: white; border: 1px solid black">
               <div style="position: absolute; height: 0px; margin-left: 1%; width: 49%; left:  0%; text-align: left">
-                @Html.ActionLink(MvcApplication.ckcore.dtDatum.ToString("ddd", CornerkickWebMvc.Controllers.AccountController.ciUser) + ", " + MvcApplication.ckcore.dtDatum.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser), "Calendar", "Member")
+                @Html.ActionLink(MvcApplication.ckcore.dtDatum.ToString("ddd", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("d", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", ci), "Calendar", "Member")
               </div>
               <div style="position: absolute; height: 0px; width: 49%; left: 50%; text-align: right">
                 @{
                   string sCash = "0";
                   if (clb != null) {
                     int iCash = clb.iBalance;
-                    if (iCash != 0) { sCash = iCash.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser); }
+                    if (iCash != 0) { sCash = iCash.ToString("#,#", ci); }
                   }
                 }
                 @Html.ActionLink(sCash + " €", "Finance", "Member")

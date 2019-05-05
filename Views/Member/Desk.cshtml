@@ -182,13 +182,7 @@
 
       string sDt = "?";
       if (clb.nextGame != null) {
-        if (clb.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
-          sDt = "Heute, " + clb.nextGame.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser) + " Uhr";
-        } else {
-          sDt = clb.nextGame.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + " (" + (clb.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
-        }
-
-        sDt += " - ";
+        sDt = Model.sDtNextGame + " - ";
 
         if (clb.nextGame.iGameType == 99) {
           sDt += "Saisonende";
