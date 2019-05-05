@@ -3464,8 +3464,9 @@ namespace CornerkickWebMvc.Controllers
         if (gd.team[0].iTeamId == clb.iId) {
           i--;
 
-          dataPoints[0].Add(new Models.DataPointGeneral(i, gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]));
-          dataPoints[1].Add(new Models.DataPointGeneral(i, gd.stadium.getSeats()));
+          string sInfo = gd.team[1].sTeam + ", " + gd.dt.ToShortDateString();
+          dataPoints[0].Add(new Models.DataPointGeneral(i, gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2], sInfo));
+          dataPoints[1].Add(new Models.DataPointGeneral(i, gd.stadium.getSeats(), sInfo));
         }
       }
 
