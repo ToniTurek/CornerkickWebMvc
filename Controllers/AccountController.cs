@@ -36,7 +36,7 @@ namespace CornerkickWebMvc.Controllers
     private ApplicationSignInManager _signInManager;
     private ApplicationUserManager _userManager;
     public static CultureInfo ciUser;
-    string[] sCultureInfo = new string[82] {
+    readonly string[] sCultureInfo = new string[82] {
       "",
       "",
       "",

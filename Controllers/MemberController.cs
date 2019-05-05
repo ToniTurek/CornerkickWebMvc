@@ -16,9 +16,94 @@ namespace CornerkickWebMvc.Controllers
 #endif
   public class MemberController : Controller
   {
+    readonly string[] sCultureInfo = new string[82] {
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "en-GB",
+      "",
+      "",
+      "",
+      "fr-FR",
+      "",
+      "",
+      "de-DE",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    };
+
     public MemberController()
     {
-#if _CONSOLE
+      #if _CONSOLE
       ConsoleNews();
 #endif
     }
@@ -37,6 +122,17 @@ namespace CornerkickWebMvc.Controllers
     public string Welcome(string name, int numTimes = 1)
     {
       return HttpUtility.HtmlEncode("Hello " + name + ", NumTimes is: " + numTimes);
+    }
+
+    private CultureInfo getCi()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb != null) {
+        int iLandUser = clb.iLand;
+        if (iLandUser >= 0 && iLandUser < sCultureInfo.Length) return new CultureInfo(sCultureInfo[iLandUser]);
+      }
+
+      return CultureInfo.CurrentCulture;
     }
 
 #if _CONSOLE
@@ -159,7 +255,7 @@ namespace CornerkickWebMvc.Controllers
       for (int iN = usr.ltNews.Count - 1; iN >= 0; iN--) {
         CornerkickManager.Main.News news = usr.ltNews[iN];
         if (news.iType < 99/* && news.bUnread*/) {
-          string sNews = news.dt.ToString("d", AccountController.ciUser) + " " + news.dt.ToString("t", AccountController.ciUser) + " - " + news.sText + '\n';
+          string sNews = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi()) + " - " + news.sText + '\n';
           if (news.bRead) desk.sNewsOld += sNews;
           else            desk.sNews    += sNews;
 
@@ -1637,7 +1733,7 @@ namespace CornerkickWebMvc.Controllers
                 clubTake.iKontostand -= offer.iMoney;
                 clubTake.ltPlayerId.Add(iPlayerId);
                 MvcApplication.ckcore.fz.setKonto(ref clubTake, MvcApplication.ckcore.dtDatum, -offer.iMoney, "Spielertransfer");
-                MvcApplication.ckcore.Info("Ihr Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " von " + offer.iMoney.ToString("#,#", AccountController.ciUser) + " wurde angenommen!", clubTake.iUser, 3, 0, clubTake.iUser);
+                MvcApplication.ckcore.Info("Ihr Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " von " + offer.iMoney.ToString("#,#", getCi()) + " wurde angenommen!", clubTake.iUser, 3, 0, clubTake.iUser);
                 MvcApplication.ckcore.ltClubs[iClubId] = clubTake;
 
                 MvcApplication.ckcore.ltTransfer.Remove(transfer);
@@ -1699,14 +1795,14 @@ namespace CornerkickWebMvc.Controllers
           empty = "",
           iOffer = iOffer,
           index = (iTr + 1).ToString(),
-          datum = transfer.dt.ToString("d", AccountController.ciUser),
+          datum = transfer.dt.ToString("d", getCi()),
           name = plTr.sName,
           position = MvcApplication.ckcore.plr.getStrPos(plTr),
           strength = MvcApplication.ckcore.game.tl.getAveSkill(plTr, 0, true).ToString("0.0"),
           strengthIdeal = MvcApplication.ckcore.game.tl.getAveSkill(plTr, 0, false).ToString("0.0"),
           age = plTr.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
           talent = (plTr.iTalent + 1).ToString(),
-          mw = (MvcApplication.ckcore.plr.getValue(plTr) * 1000).ToString("#,#", AccountController.ciUser),
+          mw = (MvcApplication.ckcore.plr.getValue(plTr) * 1000).ToString("#,#", getCi()),
           club = sClub,
           nat = MvcApplication.ckcore.sLandShort[plTr.iNat1]
         });
@@ -1756,9 +1852,9 @@ namespace CornerkickWebMvc.Controllers
 
               sTable += "<tr id=\"rowTransferDetail_" + offer.iClubId.ToString() + "\" style=" + sStyle + ">";
               sTable += "<td>" + (iTr + 1).ToString() + "</td>";
-              sTable += "<td align=\"center\">" + offer.dt.ToString("d", AccountController.ciUser) + "</td>";
+              sTable += "<td align=\"center\">" + offer.dt.ToString("d", getCi()) + "</td>";
               sTable += "<td align=\"center\">" + sClub + "</td>";
-              sTable += "<td align=\"right\">" + offer.iFee.ToString("#,#", AccountController.ciUser) + " €" + "</td>";
+              sTable += "<td align=\"right\">" + offer.iFee.ToString("#,#", getCi()) + " €" + "</td>";
 
               if (bOwnPlayer) {
                 string sChecked = "";
@@ -2155,7 +2251,7 @@ namespace CornerkickWebMvc.Controllers
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
 
-      string[] sKostenDauer = new string[] { iKostenDauer[0].ToString("#,#", AccountController.ciUser), iKostenDauer[1].ToString(), iDispoOk.ToString() };
+      string[] sKostenDauer = new string[] { iKostenDauer[0].ToString("#,#", getCi()), iKostenDauer[1].ToString(), iDispoOk.ToString() };
 
       return Json(sKostenDauer, JsonRequestBehavior.AllowGet);
     }
@@ -2186,7 +2282,7 @@ namespace CornerkickWebMvc.Controllers
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
 
-      string[] sKostenDauer = new string[] { iKostenDauer[0].ToString("#,#", AccountController.ciUser), iKostenDauer[1].ToString(), iDispoOk.ToString() };
+      string[] sKostenDauer = new string[] { iKostenDauer[0].ToString("#,#", getCi()), iKostenDauer[1].ToString(), iDispoOk.ToString() };
 
       return Json(sKostenDauer, JsonRequestBehavior.AllowGet);
     }
@@ -2229,7 +2325,7 @@ namespace CornerkickWebMvc.Controllers
         int iDispoOk = 0;
         if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickManager.csStadion.iVideoCost[iLevel], clb)) iDispoOk = 1;
 
-        sCostDaysDispo[0] = CornerkickManager.csStadion.iVideoCost[iLevel].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[0] = CornerkickManager.csStadion.iVideoCost[iLevel].ToString("#,#", getCi());
         sCostDaysDispo[1] = CornerkickManager.csStadion.iVideoDaysConstruct[iLevel].ToString();
         sCostDaysDispo[2] = iDispoOk.ToString();
       }
@@ -2266,7 +2362,7 @@ namespace CornerkickWebMvc.Controllers
         int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(iCount, clb.stadium.iSnackbarNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
-        sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[0] = iCostDays[0].ToString("#,#", getCi());
         sCostDaysDispo[1] = iCostDays[1].ToString();
         sCostDaysDispo[2] = iDispoOk.ToString();
       }
@@ -2303,7 +2399,7 @@ namespace CornerkickWebMvc.Controllers
         int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(iCount, clb.stadium.iToiletsNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
-        sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+        sCostDaysDispo[0] = iCostDays[0].ToString("#,#", getCi());
         sCostDaysDispo[1] = iCostDays[1].ToString();
         sCostDaysDispo[2] = iDispoOk.ToString();
       }
@@ -2347,7 +2443,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      return Json(MvcApplication.ckcore.st.getCostStadiumRenewPitch(clb.stadium, 0.1f, ckUser()).ToString("#,#", AccountController.ciUser), JsonRequestBehavior.AllowGet);
+      return Json(MvcApplication.ckcore.st.getCostStadiumRenewPitch(clb.stadium, 0.1f, ckUser()).ToString("#,#", getCi()), JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -2431,7 +2527,7 @@ namespace CornerkickWebMvc.Controllers
           int iDispoOk = 0;
           if (MvcApplication.ckcore.fz.checkDispoLimit(MvcApplication.ckcore.st.iTrainingsgelCost[i], clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = MvcApplication.ckcore.st.iTrainingsgelCost[i].ToString("#,#", AccountController.ciUser);
+          sCostDaysDispo[0] = MvcApplication.ckcore.st.iTrainingsgelCost[i].ToString("#,#", getCi());
           sCostDaysDispo[1] = MvcApplication.ckcore.st.iTrainingsgelDaysConstruct[i].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
@@ -2440,7 +2536,7 @@ namespace CornerkickWebMvc.Controllers
           int iDispoOk = 0;
           if (MvcApplication.ckcore.fz.checkDispoLimit(MvcApplication.ckcore.st.iJouthInternatCost[i], clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = MvcApplication.ckcore.st.iJouthInternatCost[i].ToString("#,#", AccountController.ciUser);
+          sCostDaysDispo[0] = MvcApplication.ckcore.st.iJouthInternatCost[i].ToString("#,#", getCi());
           sCostDaysDispo[1] = MvcApplication.ckcore.st.iJouthInternatDaysConstruct[i].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
@@ -2451,7 +2547,7 @@ namespace CornerkickWebMvc.Controllers
           int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructCarpark(i, clb.stadium.iCarpark, usr);
           if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+          sCostDaysDispo[0] = iCostDays[0].ToString("#,#", getCi());
           sCostDaysDispo[1] = iCostDays[1].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
@@ -2462,7 +2558,7 @@ namespace CornerkickWebMvc.Controllers
           int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(i, clb.stadium.iTicketcounter, usr);
           if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = iCostDays[0].ToString("#,#", AccountController.ciUser);
+          sCostDaysDispo[0] = iCostDays[0].ToString("#,#", getCi());
           sCostDaysDispo[1] = iCostDays[1].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
@@ -2559,7 +2655,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iKosten = (int)(MvcApplication.ckcore.tl.getStuffSalary(clb) / 12f);
       string sKosten = "0";
-      if (iKosten != 0) sKosten = iKosten.ToString("#,#", AccountController.ciUser);
+      if (iKosten != 0) sKosten = iKosten.ToString("#,#", getCi());
 
       return Json(sKosten, JsonRequestBehavior.AllowGet);
     }
@@ -2771,7 +2867,7 @@ namespace CornerkickWebMvc.Controllers
         if (clbUser != null && (iIdH == clbUser.iId || iIdA == clbUser.iId)) sStyle = " style=\"font-weight:bold\"";
 
         sBox += "<tr" + sStyle + ">";
-        sBox += "<td>" + gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + "&nbsp;" + gd.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser) + "</td>";
+        sBox += "<td>" + gd.dt.ToString("d", getCi()) + "&nbsp;" + gd.dt.ToString("t", getCi()) + "</td>";
 
         sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td>";
         sBox += "<td align=\"center\">&nbsp;-&nbsp;</td>";
@@ -2904,7 +3000,7 @@ namespace CornerkickWebMvc.Controllers
         if (clbUser != null && (iIdH == clbUser.iId || iIdA == clbUser.iId)) sStyle = "font-weight:bold";
 
         sBox += "<tr style=" + sStyle + ">";
-        sBox += "<td>" + gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + "&nbsp;" + gd.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser) + "</td>";
+        sBox += "<td>" + gd.dt.ToString("d", getCi()) + "&nbsp;" + gd.dt.ToString("t", getCi()) + "</td>";
 
         sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td>";
         sBox += "<td align=\"center\">&nbsp;-&nbsp;</td>";
@@ -3173,7 +3269,7 @@ namespace CornerkickWebMvc.Controllers
         if (clubRequest.iUser < 0) {
           createTestgame(md);
 
-          sReturn = "Testspiel am " + md.dt.ToString("d", AccountController.ciUser) + " " + md.dt.ToString("t", AccountController.ciUser) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " vereinbart";
+          sReturn = "Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " vereinbart";
         } else {
           CornerkickManager.Cup cup = new CornerkickManager.Cup();
           cup.iId = -5;
@@ -3181,7 +3277,7 @@ namespace CornerkickWebMvc.Controllers
           cup.ltMatchdays.Add(md);
           MvcApplication.ckcore.ltCups.Add(cup);
 
-          sReturn = "Anfrage für Testspiel am " + md.dt.ToString("d", AccountController.ciUser) + " " + md.dt.ToString("t", AccountController.ciUser) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
+          sReturn = "Anfrage für Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
 
           MvcApplication.ckcore.Info(clubRequest.iUser, "Sie haben eine neue Anfrage für ein Testspiel erhalten.", 2, iTeamId);
         }
@@ -3220,7 +3316,7 @@ namespace CornerkickWebMvc.Controllers
                   clubH.nextGame = MvcApplication.ckcore.tl.getNextGame(clubH, MvcApplication.ckcore.dtDatum);
 
                   if (clubH.iUser >= 0) {
-                    MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", AccountController.ciUser) + " um " + dt.ToString("t", AccountController.ciUser) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
+                    MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", getCi()) + " um " + dt.ToString("t", getCi()) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
                   }
 
                   return Json("", JsonRequestBehavior.AllowGet);
@@ -3330,7 +3426,7 @@ namespace CornerkickWebMvc.Controllers
       List<string> ltDays = new List<string>();
       for (int iDay = 1; iDay < nDays; iDay++) {
         ltDays.Add(iDay.ToString().PadLeft(2) + " (Abreise: " + dtStart.Date.AddDays(iDay).ToLongDateString() + ")");
-        //ltDays.Add((iDay + 1).ToString().PadLeft(2) + " (Rückreise: " + dtStart.Date.AddDays(iDay).ToString("d", AccountController.ciUser) + ")");
+        //ltDays.Add((iDay + 1).ToString().PadLeft(2) + " (Rückreise: " + dtStart.Date.AddDays(iDay).ToString("d", getCi()) + ")");
       }
 
       return Json(ltDays.ToArray(), JsonRequestBehavior.AllowGet);
@@ -3495,7 +3591,7 @@ namespace CornerkickWebMvc.Controllers
         iInSpec *= nGamesHome;
       }
 
-      return Json(iInSpec.ToString("#,#", AccountController.ciUser) + "€", JsonRequestBehavior.AllowGet);
+      return Json(iInSpec.ToString("#,#", getCi()) + "€", JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -3540,7 +3636,7 @@ namespace CornerkickWebMvc.Controllers
       long iPlannedResult = iInPlanTotal - iPayPlanTotal;
       string sPlannedResult = "0";
       if (iPlannedResult != 0) {
-        sPlannedResult = iPlannedResult.ToString("#,#", AccountController.ciUser);
+        sPlannedResult = iPlannedResult.ToString("#,#", getCi());
       }
 
       CornerkickManager.Finance.Budget bgReal = MvcApplication.ckcore.ui.getActualBudget(clb);
@@ -3548,12 +3644,12 @@ namespace CornerkickWebMvc.Controllers
       long iPayCurrTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bgReal);
       string sCurrentResult = "0";
       if (iInCurrTotal - iPayCurrTotal != 0) {
-        sCurrentResult = (iInCurrTotal - iPayCurrTotal).ToString("#,#", AccountController.ciUser);
+        sCurrentResult = (iInCurrTotal - iPayCurrTotal).ToString("#,#", getCi());
       }
 
       string[] sTotal = new string[4] {
-        iInPlanTotal .ToString("#,#", AccountController.ciUser),
-        iPayPlanTotal.ToString("#,#", AccountController.ciUser),
+        iInPlanTotal .ToString("#,#", getCi()),
+        iPayPlanTotal.ToString("#,#", getCi()),
         sPlannedResult,
         sCurrentResult
       };
@@ -3592,7 +3688,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      string sCash = MvcApplication.ckcore.ui.setSponsor(ref clb, clb.ltSponsorOffers[iSponsorIndex]).ToString("#,#", AccountController.ciUser);
+      string sCash = MvcApplication.ckcore.ui.setSponsor(ref clb, clb.ltSponsorOffers[iSponsorIndex]).ToString("#,#", getCi());
 
       return Json(sCash, JsonRequestBehavior.AllowGet);
     }
@@ -3632,7 +3728,7 @@ namespace CornerkickWebMvc.Controllers
           deSponsorBoard.iId = spon.iId;
           if (bOffer) deSponsorBoard.iIndex = iSpOffer - 1;
           deSponsorBoard.sName = MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName;
-          deSponsorBoard.sMoneyVicHome = spon.iMoneyVicHome.ToString("#,#", AccountController.ciUser);
+          deSponsorBoard.sMoneyVicHome = spon.iMoneyVicHome.ToString("#,#", getCi());
           deSponsorBoard.nBoards = spon.nBoards;
           deSponsorBoard.iYears = spon.iYears;
 
