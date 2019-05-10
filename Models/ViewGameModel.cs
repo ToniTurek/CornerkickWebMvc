@@ -67,6 +67,8 @@ namespace CornerkickWebMvc.Models
       public int iGoalsA { get; set; }
       public int[] iShoots { get; set; }
       public int[] iShootsOnGoal { get; set; }
+      public int[] iPassesGood { get; set; }
+      public int[] iPassesBad  { get; set; }
       public int[] iDuels { get; set; }
       public int[] iFouls { get; set; }
 
@@ -80,6 +82,7 @@ namespace CornerkickWebMvc.Models
       public float[][] fDataA { get; set; }
 
       public List<drawLine> ltDrawLineShoot { get; set; }
+      public List<drawLine> ltDrawLinePass { get; set; }
       public string sCard { get; set; }
 
       public string sTimelineIcons { get; set; }

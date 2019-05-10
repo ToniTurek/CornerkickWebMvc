@@ -293,6 +293,14 @@ namespace CornerkickWebMvc.Controllers
           if (shoot.iResult > 0 && shoot.iResult < 7) gD.iShootsOnGoal[iHA]++;
         } // shoot
 
+        // Passes
+        CornerkickGame.Game.Pass pass = state.pass;
+        if (pass.plPasser != null && pass.plPasser.iHA == iHA) {
+          if      (pass.plReceiver     == null)              gD.iPassesBad [iHA]++;
+          else if (pass.plReceiver.iHA != pass.plPasser.iHA) gD.iPassesBad [iHA]++;
+          else if (pass.plReceiver     != pass.plPasser)     gD.iPassesGood[iHA]++;
+        }
+
         // Duels
         CornerkickGame.Game.Duel duel = state.duel;
         if (duel.plDef != null && duel.plDef.iHA == iHA) {
@@ -366,6 +374,7 @@ namespace CornerkickWebMvc.Controllers
       gD.tsMinute = state.tsMinute;
 
       gD.ltDrawLineShoot = new List<Models.ViewGameModel.drawLine>();
+      gD.ltDrawLinePass  = new List<Models.ViewGameModel.drawLine>();
       gD.sCard = "";
 
       // Draw shoot on pitch
@@ -383,6 +392,25 @@ namespace CornerkickWebMvc.Controllers
           }
         } else {
           gD.ltDrawLineShoot = getShootLine(state, user.game);
+        }
+      }
+
+      // Draw pass on pitch
+      if ((iState >= 0 && iState < gameData.ltState.Count) || iAllPasses >= 0) {
+        if (iAllPasses >= 0) {
+          byte iHA = 0;
+          int iPlIx = -1;
+          getStatisticHAPlayerIx(iAllPasses, user.game.nPlStart, out iHA, out iPlIx);
+
+          for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
+            CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
+            gD.ltDrawLinePass.Add(getPassLine(stateTmp, user.game, iHA, iPlIx));
+
+            if (iState >= 0 && iSt >= iState) break; // If review --> stop at selected state
+          }
+        } else {
+          gD.ltDrawLinePass.Clear();
+          gD.ltDrawLinePass.Add(getPassLine(state, user.game));
         }
       }
 
@@ -405,10 +433,10 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      // Shoots
-      int[] nPossession = new int[2];
-      int[] nCornerkick = new int[2];
-      int[] nOffsite    = new int[2];
+      int  [] nPossession = new int  [2];
+      int  [] nCornerkick = new int  [2];
+      int  [] nOffsite    = new int  [2];
+      float[] fPasses     = new float[2];
 
       for (byte iHA = 0; iHA < 2; iHA++) {
         int iIconTop = 2;
@@ -432,6 +460,7 @@ namespace CornerkickWebMvc.Controllers
           nCornerkick[1] = state.iCornerkickA;
           nOffsite   [1] = state.iOffsiteA;
         }
+        if (gD.iPassesGood[iHA] + gD.iPassesBad[iHA] > 0) fPasses[iHA] = (100 * gD.iPassesGood[iHA]) / (float)(gD.iPassesGood[iHA] + gD.iPassesBad[iHA]);
 
         //iStTmp++;
         //} // foreach state
@@ -462,8 +491,8 @@ namespace CornerkickWebMvc.Controllers
       float fPossessionH = 50f;
       if (nPossession[0] + nPossession[1] > 0) fPossessionH = 100f * nPossession[0] / (float)(nPossession[0] + nPossession[1]);
 
-      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] { (float)gD.iDuels[0], -4f }, new float[2] { (float)gD.iFouls[0], -5f }, new float[2] { (float)nCornerkick[0], -6f }, new float[2] { (float)nOffsite[0], -7f } };
-      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { (float)gD.iDuels[1], -4f }, new float[2] { (float)gD.iFouls[1], -5f }, new float[2] { (float)nCornerkick[1], -6f }, new float[2] { (float)nOffsite[1], -7f } };
+      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] { (float)gD.iDuels[0], -4f }, new float[2] { (float)gD.iFouls[0], -5f }, new float[2] { (float)nCornerkick[0], -6f }, new float[2] { (float)nOffsite[0], -7f }, new float[2] { fPasses[0], -8f } };
+      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { (float)gD.iDuels[1], -4f }, new float[2] { (float)gD.iFouls[1], -5f }, new float[2] { (float)nCornerkick[1], -6f }, new float[2] { (float)nOffsite[1], -7f }, new float[2] { fPasses[1], -8f } };
 
       if (AccountController.checkUserIsAdmin(User.Identity.GetUserName())) {
         if (user.game.ball.plAtBall != null) {
@@ -509,8 +538,8 @@ namespace CornerkickWebMvc.Controllers
 
       Models.ViewGameModel.drawLine drawLine = new Models.ViewGameModel.drawLine();
 
-      drawLine.X0 = state.shoot.plShoot.ptPos.X;
-      drawLine.Y0 = state.shoot.plShoot.ptPos.Y;
+      drawLine.X0 = plShoot.ptPos.X;
+      drawLine.Y0 = plShoot.ptPos.Y;
       if (state.shoot.iResult == 3) { // keeper
         CornerkickGame.Player plKeeper = game.tl.getKeeper(state.shoot.iHA == 1);
 
@@ -553,6 +582,27 @@ namespace CornerkickWebMvc.Controllers
       ltDrawLine.Add(drawLine);
 
       return ltDrawLine;
+    }
+
+    private Models.ViewGameModel.drawLine getPassLine(CornerkickGame.Game.State state, CornerkickGame.Game game, int iHA = -1, int iPlIx = -1)
+    {
+      Models.ViewGameModel.drawLine drawLine = new Models.ViewGameModel.drawLine();
+
+      CornerkickGame.Player plPass = state.pass.plPasser;
+
+      if (plPass == null) return drawLine;
+      if (iHA >= 0 && plPass.iHA != iHA) return drawLine;
+      if (iPlIx >= 0 && plPass.iIndex != iPlIx) return drawLine;
+
+      drawLine.X0 = plPass.ptPos.X;
+      drawLine.Y0 = plPass.ptPos.Y;
+      drawLine.X1 = state.ball.ptPos.X;
+      drawLine.Y1 = state.ball.ptPos.Y;
+      drawLine.sColor = "lime";
+      if      (state.pass.plReceiver == null) drawLine.sColor = "red";
+      else if (state.pass.plReceiver.iHA != plPass.iHA) drawLine.sColor = "red";
+
+      return drawLine;
     }
 
     private string getDuelIcon(CornerkickGame.Game.State state, CornerkickGame.Game game, int iHA = -1, int iPlIx = -1)
@@ -611,12 +661,13 @@ namespace CornerkickWebMvc.Controllers
 
       gD.iShoots       = new int[2];
       gD.iShootsOnGoal = new int[2];
+      gD.iPassesGood   = new int[2];
+      gD.iPassesBad    = new int[2];
       gD.iDuels        = new int[2];
       gD.iFouls        = new int[2];
 
       CornerkickGame.Game.Data gameData = user.game.data;
 
-      
       for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
         CornerkickGame.Game.State state = gameData.ltState[iSt];
         addGameData(ref gD, gameData, user, club, iSt, state.tsMinute.Seconds == 0 && state.bNewRound);

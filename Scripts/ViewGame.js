@@ -235,6 +235,22 @@ function plotStatistics(jState = -1) {
         });
       }
 
+      // draw pass lines
+      if (gD.ltDrawLinePass) {
+        gD.ltDrawLinePass.forEach(function (drawLinePass) {
+          var divGame = document.getElementById("divDrawGame");
+          iDivWidthPix  = divGame.offsetWidth.toString();
+          iDivHeightPix = divGame.offsetHeight.toString();
+
+          iX0 = (drawLinePass.X0 * iDivWidthPix) / 122;
+          iY0 = ((drawLinePass.Y0 + 25) * iDivHeightPix) / 50;
+          iX1 = (drawLinePass.X1 * iDivWidthPix) / 122;
+          iY1 = ((drawLinePass.Y1 + 25) * iDivHeightPix) / 50;
+
+          $(drawLine(iX0, iY0, iX1, iY1, drawLinePass.sColor, 2, 20, "dashed")).appendTo('#drawHeatmap');
+        });
+      }
+
       if (gD.sCard) {
         $(gD.sCard).appendTo('#drawHeatmap');
       }
@@ -257,6 +273,8 @@ function plotStatistics(jState = -1) {
       var iCornerkickA   = dataA[6][0];
       var iOffsiteH      = dataH[7][0];
       var iOffsiteA      = dataA[7][0];
+      var fPassGoodH     = dataH[8][0];
+      var fPassGoodA     = dataA[8][0];
       if (iGoalsH + iGoalsA > 0) {
         dataH[0][0] = 100 * iGoalsH / (iGoalsH + iGoalsA);
         dataA[0][0] = 100 - dataH[0][0];
@@ -285,6 +303,10 @@ function plotStatistics(jState = -1) {
         dataH[7][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
         dataA[7][0] = 100 - dataH[7][0];
       }
+      if (fPassGoodH + fPassGoodA > 0) {
+        dataH[8][0] = 100 * fPassGoodH / (fPassGoodH + fPassGoodA);
+        dataA[8][0] = 100 - dataH[8][0];
+      }
 
       // Statistic bars
       var flotDataset = [
@@ -293,7 +315,7 @@ function plotStatistics(jState = -1) {
       ];
 
       var ticks = [
-        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"]
+        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"], [-8, "Passquote"]
       ];
 
       var flotOptions = {
@@ -320,7 +342,7 @@ function plotStatistics(jState = -1) {
         },
         yaxis: {
           show: true,
-          min: -7.6,
+          min: -8.6,
           max: 0.6,
           ticks: ticks
         },
@@ -351,6 +373,8 @@ function plotStatistics(jState = -1) {
             s = iCornerkickH.toString();
           } else if (ii === 7) {
             s = iOffsiteH.toString();
+          } else if (ii === 8) {
+            s = fPassGoodH.toFixed(1) + '%';
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({
@@ -381,6 +405,8 @@ function plotStatistics(jState = -1) {
             s = iCornerkickA.toString();
           } else if (ii === 7) {
             s = iOffsiteA.toString();
+          } else if (ii === 8) {
+            s = fPassGoodA.toFixed(1) + '%';
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({
