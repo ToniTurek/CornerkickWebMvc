@@ -271,14 +271,16 @@ namespace CornerkickWebMvc.Controllers
 
       // Date next game
       desk.sDtNextGame = "";
-      if (club.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
-        desk.sDtNextGame = "Heute, " + club.nextGame.dt.ToString("t", getCi()) + " Uhr";
-      } else {
-        desk.sDtNextGame = club.nextGame.dt.ToString("d", getCi()) + " (" + (club.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
-      }
+      if (club.nextGame != null) {
+        if (club.nextGame.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
+          desk.sDtNextGame = "Heute, " + club.nextGame.dt.ToString("t", getCi()) + " Uhr";
+        } else {
+          desk.sDtNextGame = club.nextGame.dt.ToString("d", getCi()) + " (" + (club.nextGame.dt.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
+        }
 
-      // Weather
-      if (club.nextGame != null) desk.iWeather = club.nextGame.iWeather;
+        // Weather
+        desk.iWeather = club.nextGame.iWeather;
+      }
 
       // Get Table
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
