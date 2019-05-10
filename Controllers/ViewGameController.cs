@@ -618,10 +618,8 @@ namespace CornerkickWebMvc.Controllers
       string sDuelDesc = MvcApplication.ckcore.ui.getMinuteString(state.duel.tsMinute, false) +
                          " - " + state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
 
-      string sDefOff = "def";
-      if (iHA == state.duel.plOff.iHA) {
-        sDefOff = "off";
-      }
+      string sDefOff = "off";
+      if (iHA >= 0 && iHA != state.duel.plOff.iHA) sDefOff = "def";
 
       string sImg = "duel_" + sDefOff + "_1"; // win off. / loose def.
       if (state.duel.iResult == 0) sImg = "duel_" + sDefOff + "_0"; // win def. / loose off.
