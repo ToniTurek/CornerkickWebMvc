@@ -1,6 +1,7 @@
 ﻿@model CornerkickWebMvc.Models.PlayerModel
 
 <head>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
@@ -76,7 +77,7 @@
 
     function setSalary(iYears) {
       $.when(getSalary(@Model.iPlayer, iYears, 0)).done(function (contract) {
-        $("#txtContractMoney").html(contract.iSalary + " €");
+        $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
       });
     }
 
