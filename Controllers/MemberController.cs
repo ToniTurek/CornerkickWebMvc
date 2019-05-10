@@ -1283,8 +1283,21 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      // Captain
       plModel.bCaptain  = i == club.iCaptainId[0];
       plModel.bCaptain2 = i == club.iCaptainId[1];
+
+      // Doping
+      plModel.ddlDoping = new List<SelectListItem>();
+      byte iDp = 0;
+      foreach (CornerkickGame.Player.Doping dp in MvcApplication.ckcore.ltDoping) {
+        plModel.ddlDoping.Add(
+          new SelectListItem {
+            Text  = dp.sName,
+            Value = iDp++.ToString()
+          }
+        );
+      }
 
       // Next / Prev. Player
       plModel.iPlIdPrev = -1;
@@ -1304,7 +1317,6 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
       player.iIndTraining = (byte)iIndTr;
-      //MvcApplication.ckcore.ltPlayer[iPlayer] = player;
 
       return Json(iIndTr, JsonRequestBehavior.AllowGet);
     }
@@ -1329,7 +1341,6 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
       player.sName = sName;
-      //MvcApplication.ckcore.ltPlayer[iPlayer] = player;
 
       return Json(player.sName, JsonRequestBehavior.AllowGet);
     }
@@ -1359,8 +1370,6 @@ namespace CornerkickWebMvc.Controllers
 
       MvcApplication.ckcore.plr.makePlayerCaptain(iPlayerId, iC, club);
 
-      //MvcApplication.ckcore.ltPlayer[iPlayerId] = player;
-
       return Json("Sie haben " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " zum " + sCaptain + " ernannt.", JsonRequestBehavior.AllowGet);
     }
 
@@ -1372,6 +1381,32 @@ namespace CornerkickWebMvc.Controllers
       if (club.iCaptainId[iC] >= 0) return Json(MvcApplication.ckcore.ltPlayer[club.iCaptainId[iC]].sName, JsonRequestBehavior.AllowGet);
 
       return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult PlayerDetailsDoDoping(int iPlayerId, byte iDp)
+    {
+      if (iPlayerId < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (iDp >= MvcApplication.ckcore.ltDoping.Count) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      MvcApplication.ckcore.plr.doDoping(pl, MvcApplication.ckcore.ltDoping[iDp]);
+
+      return Json("", JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult PlayerDetailsGetDopingDesc(byte iDp)
+    {
+      if (iDp >= MvcApplication.ckcore.ltDoping.Count) return Json("", JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player.Doping dp = MvcApplication.ckcore.ltDoping[iDp];
+
+      string sDesc = "Steigerung max. Kondition: " + dp.fEffectMax    .ToString("0.0%") + "<br>" +
+                     "       Reduktionsrate / d: " + dp.fReductionRate.ToString("0.0%") + "<br>" +
+                     "    Max. Detektionsrisiko: " + dp.fDetectable   .ToString("0.0%") + "<br>" +
+                     "                   Kosten: " + dp.iCost.ToString("#,#", getCi()) + " €";
+
+      return Json(sDesc, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult PlayerDetailsGetCFM(int iPlId)

@@ -60,6 +60,20 @@
       }
     });
   }
+  
+  function setDopingDesc() {
+    var iDp = $('#ddlDoping').val();
+
+    $.ajax({
+      url: '/Member/PlayerDetailsGetDopingDesc',
+      type: "GET",
+      dataType: "JSON",
+      data: { iDp: iDp },
+      success: function (sDopDesc) {
+        $("#txtDialogDoping").html(sDopDesc);
+      }
+    });
+  }
 
   $(document).ready(function () {
     document.getElementById("divEmblem").style.backgroundImage = '';
@@ -192,6 +206,41 @@
           $(this).dialog("close");
         }
       }
+    });
+
+    $("#bnDoping").click(function () {
+      setDopingDesc();
+      $("#dialogDoping").dialog("open");
+    });
+
+    $(function () {
+      $("#dialogDoping").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            var iDp = $('#ddlDoping').val();
+
+            $.ajax({
+              url: "/Member/PlayerDetailsDoDoping",
+              type: 'POST',
+              traditional: true,
+              data: { iPlayerId: @Model.iPlayer, iDp: iDp },
+              dataType: "json",
+              success: function () {
+                plotCFM();
+              },
+              error: function (xhr) {
+                alert(xhr.error);
+              }
+            });
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
     });
   }); // $(document).ready(function () {
 
@@ -490,29 +539,29 @@
     }
 
     if (Model.bOwnPlayer) {
-      <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 10px">
+      <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px; text-align: center">
         @* Extend player contract *@
-        <button type="submit" id="bnContract" class="btn btn-default" style="width: 30%; min-width: 300px">@sExtendContract</button>
+        <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
 
         @* Put on / take from transferlist *@
         @if (MvcApplication.ckcore.plr.onTransferlist(player)) {
-          <button type="submit" id="bnTakeFromTransfer" class="btn btn-default" style="width: 30%; min-width: 300px">Von Transferliste nehmen</button>
+          <button type="submit" id="bnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
         } else {
-          <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 30%; min-width: 300px">Auf Transferliste setzen</button>
+          <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
+        }
+
+        @if (!Model.bJouth) {
+          if (!Model.bCaptain) {
+            <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Kapitän machen</button>
+          }
+
+          if (!Model.bCaptain2) {
+            <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Vize-Kapitän machen</button>
+          }
+
+          <button type="submit" id="bnDoping" class="btn btn-default" style="width: 100%; margin-top: 4px">Spieler dopen</button>
         }
       </div>
-
-      if (!Model.bJouth) {
-        <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 6px">
-          @if (!Model.bCaptain) {
-            <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
-          }
-
-          @if (!Model.bCaptain2) {
-            <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Vize-Kapitän machen</button>
-          }
-        </div>
-      }
     }
   }
 
@@ -935,4 +984,19 @@
 
 <div id="dialogCaptain" title="Bitte bestätigen...">
   <p id="txtCaptain"></p>
+</div>
+
+<div id="dialogDoping" title="Spieler dopen">
+  <div style="position: relative; width: 100%; height: 40px" class="form-group">
+    <div style="position: absolute; width: 35%; height: auto; top: 10px" class="form-group">
+      <b class="left">Dopingmittel:</b>
+    </div>
+    <div style="position: absolute; width: 65%; left: 35%" class="col-md-10">
+      @Html.DropDownListFor(m => m.iDp, new SelectList(Model.ddlDoping, "Value", "Text", Model.iDp), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setDopingDesc()", id = "ddlDoping", style = "width: 100%" })
+    </div>
+  </div>
+  <div style="position: relative" class="form-group">
+    <b>Eigenschaften:</b>
+    <p id="txtDialogDoping"></p>
+  </div>
 </div>
