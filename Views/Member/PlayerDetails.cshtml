@@ -313,11 +313,16 @@
             {
               // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
               type: "column",
-              indexLabel: "{z}",
-              indexLabelFontColor: "#EEEEEE",
-              indexLabelPlacement: "inside",
+              indexLabel: "{y}",
+              indexLabelFontColor: "black",
+              indexLabelPlacement: "outside",
               yValueFormatString: "0.0%",
-              dataPoints: dataCFM
+              dataPoints: [
+                { label: "Kondition", x: 0, y: dataCFM[0].y },
+                { label: "",          x: 0, y: dataCFM[1].y },
+                { label: "Frische",   x: 1, y: dataCFM[2].y },
+                { label: "Moral",     x: 2, y: dataCFM[3].y }
+              ]
             }
           ]
         });
