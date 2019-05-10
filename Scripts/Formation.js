@@ -96,6 +96,10 @@
 }
 
 function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat) {
+  if (!player) {
+    return "";
+  }
+
   if (!iPos) {
     iPos = 0;
   }

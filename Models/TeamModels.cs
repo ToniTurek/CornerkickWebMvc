@@ -58,6 +58,9 @@ namespace CornerkickWebMvc.Models
       public string sDivRoa { get; set; }
       public float   fIndOrientation       { get; set; }
       public float[] fIndOrientationMinMax { get; set; }
+
+      public float fTeamAveStrength { get; set; }
+      public float fTeamAveAge { get; set; }
     }
 
     public TeamModels()

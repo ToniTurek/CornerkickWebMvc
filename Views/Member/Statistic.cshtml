@@ -15,7 +15,8 @@
 
   <script type="text/javascript">
     $(document).ready(function () {
-      var ddlFormation = $('#ddlFormation');
+      var ddlStatNations   = $('#ddlStatNations');
+      var ddlStatFormation = $('#ddlStatFormation');
 
       $("#rbProfi").on('change', function (ev) {
         drawBest11();
@@ -25,7 +26,11 @@
         drawBest11();
       });
 
-      ddlFormation.change(function () {
+      ddlStatNations.change(function () {
+        drawBest11();
+      });
+
+      ddlStatFormation.change(function () {
         drawBest11();
       });
 
@@ -34,19 +39,20 @@
 
     function drawBest11() {
       var bJouth = document.getElementById("rbJouth").checked;
-      var ddlFormation = $('#ddlFormation');
+      var ddlStatNations   = $('#ddlStatNations');
+      var ddlStatFormation = $('#ddlStatFormation');
       // end declarations
 
-      // Formation
-      iFormation = ddlFormation.val();
+      iNation    = ddlStatNations  .val();
+      iFormation = ddlStatFormation.val();
 
       $.ajax({
         cache: false,
         url: "/Member/StatisticGetBest11",
         type: "GET",
-        data: { iF: iFormation, bJouth: bJouth },
+        data: { iNat: iNation, iF: iFormation, bJouth: bJouth },
         success: function (teamData) {
-          if (teamData) {  // check if data is defined
+          if (teamData) { // check if data is defined
             var bMobile = $(window).width() < 960;
             var result = "";
             var i = 0;
@@ -60,6 +66,9 @@
             });
 
             drawFormation.html(result).fadeIn('slow');
+
+            var txtStatAverage = $("#txtStatAverage");
+            txtStatAverage.html("Durchschnittsstärke (-alter): " + teamData.fTeamAveStrength.toFixed(2) + " (" + teamData.fTeamAveAge.toFixed(1) + ")");
           } else {
             alert("data hasn't worked!");
           }
@@ -70,11 +79,13 @@
 </head>
 
 <body>
-  <h3>Weltauswahl</h3>
+  <div style="position: relative; width: 160px; height: auto; margin-bottom: 6px">
+    @Html.DropDownListFor(m => m.iNation, Model.ddlNations, new { @Id = "ddlStatNations", @class = "form-control" })
+  </div>
 
-  <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 1%">
+  <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 6px">
     <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
-    <div style="position: absolute; margin-left: 5%; width: 90%; height: 94%; top: 3%; left: 0%">
+    <div style="position: absolute; margin-left: 5%; width: 90%; height: 94%; top: 0px; left: 0%">
       <div id="drawFormation" style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%"></div>
     </div>
     <div align="center" style="position: absolute; top: 2px; width: 100%">
@@ -98,7 +109,8 @@
   </div>
 
   <div style="position: relative; width: 120px; height: auto">
-    @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlFormation", @class = "form-control" })
+    @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlStatFormation", @class = "form-control" })
   </div>
+  <text id="txtStatAverage" style="position: relative; width: 100%"></text>
 </body>
 </html>

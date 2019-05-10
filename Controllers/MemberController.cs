@@ -3795,21 +3795,35 @@ namespace CornerkickWebMvc.Controllers
     //////////////////////////////////////////////////////////////////////////
     public ActionResult Statistic(Models.StatisticModel statisticModel)
     {
-      statisticModel.ltsFormations = new List<SelectListItem>();
+      statisticModel.ddlNations = new List<SelectListItem>();
+      statisticModel.ddlNations.Add(new SelectListItem {
+                                      Text = "Weltauswahl",
+                                      Value = "-1",
+                                      Selected = true
+                                    }
+      );
+      for (int iN = 0; iN < MvcApplication.iNations.Length; iN++) {
+        statisticModel.ddlNations.Add(new SelectListItem {
+                                        Text  = MvcApplication.ckcore.sLand[MvcApplication.iNations[iN]],
+                                        Value = MvcApplication.iNations[iN].ToString()
+                                      }
+        );
+      }
 
+      statisticModel.ltsFormations = new List<SelectListItem>();
       for (int i = 0; i < MvcApplication.ckcore.ltFormationen.Count; i++) {
         statisticModel.ltsFormations.Add(new SelectListItem {
-            Text  = (i + 1).ToString() + " - " + MvcApplication.ckcore.ltFormationen[i].sName,
-            Value = i.ToString(),
-            Selected = i == 12
-          }
+                                           Text = (i + 1).ToString() + " - " + MvcApplication.ckcore.ltFormationen[i].sName,
+                                           Value = i.ToString(),
+                                           Selected = i == 9
+                                         }
         );
       }
 
       return View(statisticModel);
     }
 
-    public JsonResult StatisticGetBest11(int iF, bool bJouth = false)
+    public JsonResult StatisticGetBest11(int iNat, int iF, bool bJouth = false)
     {
       Models.TeamModels.TeamData tD = new Models.TeamModels.TeamData();
       tD.ltPlayer         = new List<CornerkickGame.Player>();
@@ -3833,6 +3847,7 @@ namespace CornerkickWebMvc.Controllers
 
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
           if (bJouth && pl.getAge(MvcApplication.ckcore.dtDatum) > 18f) continue;
+          if (iNat >= 0 && pl.iNat1 != iNat) continue;
 
           // Check if same player already in same role
           bool bSame = false;
@@ -3857,10 +3872,16 @@ namespace CornerkickWebMvc.Controllers
         }
 
         tD.ltPlayerPos[iP] = iPos;
-        if (tD.ltPlayer[iP].iClubId >= 0) tD.ltPlayerTeamname[iP] = MvcApplication.ckcore.ltClubs[tD.ltPlayer[iP].iClubId].sName;
-        tD.ltPlayerAge[iP] = tD.ltPlayer[iP].getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
-        tD.ltPlayerNat[iP] = MvcApplication.ckcore.sLandShort[tD.ltPlayer[iP].iNat1];
+        if (tD.ltPlayer[iP] != null) {
+          if (tD.ltPlayer[iP].iClubId >= 0) tD.ltPlayerTeamname[iP] = MvcApplication.ckcore.ltClubs[tD.ltPlayer[iP].iClubId].sName;
+          tD.ltPlayerAge[iP] = tD.ltPlayer[iP].getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
+          tD.ltPlayerNat[iP] = MvcApplication.ckcore.sLandShort[tD.ltPlayer[iP].iNat1];
+        }
       }
+
+      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(tD.ltPlayer, 11);
+      tD.fTeamAveStrength = fTeamAve11[3];
+      tD.fTeamAveAge      = fTeamAve11[4];
 
       return Json(tD, JsonRequestBehavior.AllowGet);
     }
