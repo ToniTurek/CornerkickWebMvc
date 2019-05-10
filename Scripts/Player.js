@@ -91,7 +91,7 @@ function getNatIcon(sNat, sStyle) {
   if (sNat) {
     sIcon += sNat + '.png" title="' + sNat;
   } else {
-    sIcon += '0.png" title="unknown"';
+    sIcon += '0.png" title="unknown';
   }
 
   sIcon += '" style="';

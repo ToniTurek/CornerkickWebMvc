@@ -54,6 +54,7 @@ namespace CornerkickWebMvc.Models
       public List<string> ltPlayerOppAveSkill { get; set; }
 
       public CornerkickGame.Player plSelected { get; set; }
+      public byte iCaptainIx { get; set; }
       public string sDivPlayer { get; set; }
       public string sDivRoa { get; set; }
       public float   fIndOrientation       { get; set; }

@@ -981,6 +981,8 @@ namespace CornerkickWebMvc.Controllers
         tD.fIndOrientationMinMax = TeamGetIndOrientationMinMax(iSP, club);
       }
 
+      tD.iCaptainIx = MvcApplication.ckcore.plr.getCaptainIx(club);
+
       if (club.nextGame != null) {
         int iClubOpp = club.nextGame.team[1].iTeamId;
         if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;

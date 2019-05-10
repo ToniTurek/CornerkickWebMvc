@@ -29,7 +29,7 @@
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
-            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile);
+            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx);
 
             i = i + 1;
             return i !== 11;
@@ -95,7 +95,7 @@
   });
 }
 
-function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat) {
+function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain) {
   if (!player) {
     return "";
   }
@@ -172,6 +172,10 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   if (sNat) {
     sBox +=
       getNatIcon(sNat, "position: absolute; width: 16px; top: 0px; right: 1px");
+  }
+  if (bCaptain) {
+    sBox +=
+      '<img src="/Content/Icons/captain.png" title="Kapitän" style="position: absolute; width: 16px; top: 2px; left: 2px"/>';
   }
   sBox +=
           '<h2 style="position: absolute; text-align: center; width: 100%; margin: 0; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</h2>' +
