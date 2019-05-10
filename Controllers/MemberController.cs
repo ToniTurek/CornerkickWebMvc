@@ -1072,16 +1072,11 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      float[] f = new float[2];
-      for (byte i = 0; i < MvcApplication.ckcore.game.nPlStart; i++) {
-        CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[i]];
-        f[1] += player.getAge(MvcApplication.ckcore.dtDatum);
-      }
-
       float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(club, 11);
 
+      float[] f = new float[2];
       f[0] = fTeamAve11[3];
-      f[1] /= MvcApplication.ckcore.game.nPlStart;
+      f[1] = fTeamAve11[4];
 
       return Json(f, JsonRequestBehavior.AllowGet);
     }
