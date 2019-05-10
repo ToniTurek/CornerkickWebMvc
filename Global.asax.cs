@@ -192,13 +192,6 @@ namespace CornerkickWebMvc
 
       // Save .autosave
       if (bSave && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Hour % 2 == 0) {
-        foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
-          if (clb.iUser < 0) {
-            clb.ltTrainingHist.Clear();
-            clb.ltAccount     .Clear();
-          }
-        }
-
         save(timerCkCalender);
       }
 
@@ -282,67 +275,45 @@ namespace CornerkickWebMvc
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
 #endif
 
+      // Clear CPU clubs before saving
+      foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
+        if (clb.iUser < 0) {
+          clb.ltAccount      .Clear();
+          clb.ltTrainingHist .Clear();
+          clb.ltSponsorOffers.Clear();
+          clb.iBalance = 0;
+        }
+      }
+
+      // Compose filename
       string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
       string sFileSave2 = Path.Combine(sHomeDir, "save", sFilenameSave2);
       MvcApplication.ckcore.tl.writeLog("save file: " + sFileSave2);
 
+      // Save
+      bool bSaveOk = false;
       try {
-        MvcApplication.ckcore.io.save(sFileSave2);
-        as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
+        bSaveOk = MvcApplication.ckcore.io.save(sFileSave2);
       } catch {
         MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, MvcApplication.ckcore.sErrorFile);
       }
 
-      // Copy autosave file with datum to basic one (could use file link)
-      string sFileSave = sHomeDir + "/save/" + sFilenameSave;
-      if (System.IO.File.Exists(sFileSave)) {
-        try {
-          System.IO.File.Delete(sFileSave);
-        } catch {
-        }
-      }
+      // Upload
+      if (bSaveOk) {
+        as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
 
-      System.IO.File.Copy(sFileSave2, sFileSave);
-      as3.uploadFile(sFileSave, sFilenameSave, "application/zip");
-
-      /*
-      if (System.IO.Directory.Exists(sHomeDir + "/save")) {
-#if _USE_AMAZON_S3
-        string sFileZipSave = sHomeDir + "/" + sSaveZip;
-#else
-        string sFileZipSave = sHomeDir + "/" + sSaveZip;
-#endif
-
-        // Delete existing zip file
-        if (System.IO.File.Exists(sFileZipSave)) {
+        // Copy autosave file with datum to basic one (could use file link)
+        string sFileSave = sHomeDir + "/save/" + sFilenameSave;
+        if (System.IO.File.Exists(sFileSave)) {
           try {
-            System.IO.File.Delete(sFileZipSave);
+            System.IO.File.Delete(sFileSave);
           } catch {
           }
         }
 
-        ZipFile.CreateFromDirectory(sHomeDir + "/save", sFileZipSave);
-
-#if !DEBUG
-        try {
-#if _USE_BLOB
-        CornerkickWebMvc.Controllers.BlobsController bcontr = new Controllers.BlobsController();
-        bcontr.uploadBlob("blobSave", sFileSave2);
-#endif
-#if _USE_AMAZON_S3
-          as3.uploadFile(sFileZipSave, "ckSave", "application/zip");
-#endif
-        } catch {
-#if _USE_BLOB
-        MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileSave2 + " to blob", MvcApplication.ckcore.sErrorFile);
-#endif
-#if _USE_AMAZON_S3
-          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload file " + sFileZipSave + " to amazon s3", MvcApplication.ckcore.sErrorFile);
-#endif
-        }
-#endif
+        System.IO.File.Copy(sFileSave2, sFileSave);
+        as3.uploadFile(sFileSave, sFilenameSave, "application/zip");
       }
-      */
 
       // Write last ck state to file
       saveLaststate(sHomeDir);
