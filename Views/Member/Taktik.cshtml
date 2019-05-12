@@ -104,6 +104,7 @@
   <script>
     @{
       int iAusrichtung = (int)(taktik.fOrientation       * 100);
+      int iDistOffsite =   3 - taktik.iAngriffAbseits;
       int iEinsatz     = (int)(taktik.fPower             * 100);
       int iSchussentf  = (int)((taktik.fShootFreq * -1f) * 100);
       int iZK          = (int)(taktik.fAggressive        * 100);
@@ -129,6 +130,27 @@
             type: "GET",
             dataType: "JSON",
             data: { iTaktik: 0, fTaktik: ui.value / 100 },
+            success: function (fTaktik) {
+              //alert("Ausrichtung set to " + fTaktik);
+            }
+          });
+        }
+      });
+
+      $("#slider-DistOffence").slider({
+        range: "min",
+        value: @iDistOffsite,
+        min: 0,
+        max: 3,
+        step: 1,
+        orientation: "vertical",
+        slide: function (event, ui) {
+          $("#inputDistOffence").val(3 - ui.value);
+          $.ajax({
+            url: '/Member/setTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 9, fTaktik: 3 - ui.value },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -326,6 +348,7 @@
 
     function setInputs() {
       $("#inputAusrichtung").val($("#slider-Ausrichtung").slider("value") + "%");
+      $("#inputDistOffence").val((3 - $("#slider-DistOffence").slider("value")));
       $("#inputEinsatz")    .val($("#slider-Einsatz")    .slider("value") + "%");
       $("#inputSchussentf") .val($("#slider-Schussentf") .slider("value") + "%");
       $("#inputZweikampf")  .val($("#slider-Zweikampf")  .slider("value") + "%");
@@ -440,6 +463,13 @@
             <input type="text" id="inputAusrichtung" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
           </p>
           <div id="slider-Ausrichtung" style="position: relative; float: left; height: 100%"></div>
+        </div>
+
+        <div style="position: absolute; width: 0%; height: 15%; top: 20%; left: 18%">
+          <p>
+            <input type="text" id="inputDistOffence" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+          </p>
+          <div id="slider-DistOffence" style="position: relative; float: left; height: 100%"></div>
         </div>
 
         <div style="position: absolute; width: 0%; height: 25%; top: 2%; left: 65%">

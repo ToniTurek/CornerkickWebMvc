@@ -1994,7 +1994,7 @@ namespace CornerkickWebMvc.Controllers
         clb.tactic.fPassRight = fTaktik;
         if (clb.tactic.fPassLeft + clb.tactic.fPassRight > 1f) clb.tactic.fPassLeft  = (float)Math.Round(1f - clb.tactic.fPassRight, 2);
         fRet = clb.tactic.fPassLeft;
-      }
+      } else if (iTaktik == 9) clb.tactic.iAngriffAbseits = (int)Math.Round(fTaktik);
 
       // Set tactic of current game
       if (usr.game != null) {
