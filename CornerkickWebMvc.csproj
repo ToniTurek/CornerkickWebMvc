@@ -507,8 +507,11 @@
     <Content Include="Content\Icons\ambulance.png" />
     <Content Include="Content\Icons\ambulance2.png" />
     <Content Include="Content\Icons\ball_cyan.png" />
+    <Content Include="Content\Icons\ball_cyan_penalty.png" />
     <Content Include="Content\Icons\ball_white.png" />
+    <Content Include="Content\Icons\ball_white_penalty.png" />
     <Content Include="Content\Icons\ball_yellow.png" />
+    <Content Include="Content\Icons\ball_yellow_penalty.png" />
     <Content Include="Content\Icons\captain.png" />
     <Content Include="Content\Icons\captain2.png" />
     <Content Include="Content\Icons\duel_def_0.png" />

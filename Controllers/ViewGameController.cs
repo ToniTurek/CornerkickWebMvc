@@ -286,6 +286,8 @@ namespace CornerkickWebMvc.Controllers
             sImg = "cyan";
           }
 
+          if (shoot.iType == 5) sImg += "_penalty";
+
           gD.sTimelineIcons += "<img " + sOnClick + "src=\"/Content/Icons/ball_" + sImg + ".png\" alt=\"Torschuss\" style=\"position: absolute; top: " + iIconTop.ToString() + "px; width: 12px; left: " + (fLeft - 0.5).ToString(nfi) + "%" + sCursor + "\" title=\"" + sShootDesc + "\"/>";
 
           // Count shoots
