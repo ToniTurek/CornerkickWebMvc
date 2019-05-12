@@ -966,7 +966,7 @@ namespace CornerkickWebMvc.Controllers
       tD.ltPlayerNat      = new List<string>();
       foreach (CornerkickGame.Player pl in tD.ltPlayer) {
         tD.ltPlayerPos     .Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl)));
-        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(pl).ToString("0.0"));
+        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(pl, 99).ToString("0.0"));
         tD.ltPlayerNat     .Add(MvcApplication.ckcore.sLandShort[pl.iNat1]);
       }
 
