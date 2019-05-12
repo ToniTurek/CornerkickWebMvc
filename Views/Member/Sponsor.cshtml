@@ -18,7 +18,7 @@
     var bMobile = false;
 
     var sponsorBoards = [];
-    sponsorBoards.push('<img src="/Content/Images/sponsors/0.png" style="position: relative; width: 320px; height: 50px" />');
+    sponsorBoards.push('<img src="/Content/Images/sponsors/0.png" style="position: relative; width: 320px; height: 50px"/>');
     //var iB = 1;
     while (sponsorBoards.length < 10) {
       sponsorBoards.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=288&l=ez&f=ifr&linkID=304dbf1425f3596b252609b0812b5e4b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="320" height="50" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
@@ -38,9 +38,11 @@
     }
 
     function loadImageMain(iSponsorID) {
-      if (iSponsorID >= 0) {
-        divSponsorMain = document.getElementById("divSponsorMain");
+      divSponsorMain = document.getElementById("divSponsorMain");
+      if (iSponsorID > 0) {
         divSponsorMain.innerHTML = '<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=12&l=ez&f=ifr&linkID=af710bb1d1484bd029e76eeada862979&t=cornerkick03-21&tracking_id=cornerkick03-21" width="300" height="250" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>';
+      } else {
+        divSponsorMain.innerHTML = '<img src="/Content/Images/sponsors/0.png" style="position: relative; width: 100%"/>';
       }
     }
 
@@ -310,7 +312,7 @@
     }
     string sImgId = "divSponsorBoard_" + iB.ToString();
     <div class="image" style="position: relative; width: 100%; margin-top: 2%">
-      <div id=@sImgId style="position: relative; float: left; width: 48%; margin-right: 2%; margin-bottom: 2%; height: auto; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
+      <div id=@sImgId style="position: relative; float: left; width: 48%; min-width: 330px; margin-right: 2%; margin-bottom: 2%; height: auto; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
     </div>
   }
 }
