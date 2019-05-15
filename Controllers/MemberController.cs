@@ -734,7 +734,7 @@ namespace CornerkickWebMvc.Controllers
         if (!user.game.data.bFinished) return RedirectToAction("Team");
       }
 
-      MvcApplication.ckcore.doFormationKI(user.iTeam, true);
+      MvcApplication.ckcore.doFormationKI(user.iTeam);
 
       return RedirectToAction("Team");
     }
@@ -747,7 +747,7 @@ namespace CornerkickWebMvc.Controllers
         if (!user.game.data.bFinished) return Json("error", JsonRequestBehavior.AllowGet);
       }
 
-      MvcApplication.ckcore.doFormationKI(user.iTeam, true, iType);
+      MvcApplication.ckcore.doFormationKI(user.iTeam, iType);
 
       return Json("success", JsonRequestBehavior.AllowGet);
     }
