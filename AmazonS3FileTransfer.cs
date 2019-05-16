@@ -108,6 +108,30 @@ namespace CornerkickWebMvc
       }
     }
 
+    public void downloadAllFiles(string sS3SubDir, string sTargetPath = "./")
+    {
+      IAmazonS3 client = new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion);
+
+      ListObjectsRequest request = new ListObjectsRequest();
+      request.BucketName = sBucketName;
+
+      do {
+        ListObjectsResponse response = client.ListObjects(sBucketName, sS3SubDir);
+
+        // Process response.
+        for (int iS3 = 0; iS3 < response.S3Objects.Count; iS3++) {
+          downloadFile(response.S3Objects[iS3].Key, Path.Combine(sTargetPath, response.S3Objects[iS3].Key));
+        }
+
+        // If response is truncated, set the marker to get the next set of keys
+        if (response.IsTruncated) {
+          request.Marker = response.NextMarker;
+        } else {
+          request = null;
+        }
+      } while (request != null);
+    }
+
     static async Task ReadObjectDataAsync(IAmazonS3 client, string sKey)
     {
       string responseBody = "";
