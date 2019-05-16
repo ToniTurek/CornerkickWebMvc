@@ -46,6 +46,8 @@ namespace CornerkickWebMvc
        3  // ARG
     }; // [CK Nat.] = sLand Nat.
 
+    static DateTime dtLoadCk = new DateTime(); // The ck DateTime when game was (re-)started
+
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();
@@ -300,7 +302,9 @@ namespace CornerkickWebMvc
 
       // Upload
       if (bSaveOk) {
+#if _USE_AMAZON_S3
         as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
+#endif
 
         // Copy autosave file with datum to basic one (could use file link)
         string sFileSave = sHomeDir + "/save/" + sFilenameSave;
@@ -312,11 +316,33 @@ namespace CornerkickWebMvc
         }
 
         System.IO.File.Copy(sFileSave2, sFileSave);
+#if _USE_AMAZON_S3
         as3.uploadFile(sFileSave, sFilenameSave, "application/zip");
+#endif
       }
 
       // Write last ck state to file
       saveLaststate(sHomeDir);
+
+#if _USE_AMAZON_S3
+      // Save games
+      DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save", "games"));
+      if (d.Exists) {
+        FileInfo[] ltCkgFiles = d.GetFiles("*.ckg");
+        foreach (FileInfo ckg in ltCkgFiles) {
+          DateTime dtGame;
+
+          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
+          if (sFilenameData.Length < 3) continue;
+
+          if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) continue;
+          if (dtGame.CompareTo(dtLoadCk) < 0) continue; // If game was already present when ck was started
+
+          string sFileGameSave = Path.Combine(sHomeDir, "save", "games", ckg.Name);
+          as3.uploadFile(sFileGameSave, ckg.Name, "application/zip");
+        }
+      }
+#endif
 
       // save log dir
       if (System.IO.Directory.Exists(sHomeDir + "/log")) {
@@ -422,6 +448,8 @@ namespace CornerkickWebMvc
 
         // Set admin user to CPU
         if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
+
+        dtLoadCk = MvcApplication.ckcore.dtDatum;
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
