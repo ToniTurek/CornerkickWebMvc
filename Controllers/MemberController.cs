@@ -108,20 +108,63 @@ namespace CornerkickWebMvc.Controllers
 #endif
     }
 
-    // 
-    // GET: /HelloWorld/ 
-    [Authorize]
-    public string Index()
+    public static CornerkickManager.User ckUserStatic(System.Security.Principal.IPrincipal User)
     {
-      return "This is my <b>default</b> action...";
+      if (User == null) return null;
+
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
+      }
+
+      return null;
     }
 
-    // 
-    // GET: /HelloWorld/Welcome/ 
-    [Authorize]
-    public string Welcome(string name, int numTimes = 1)
+    public static CornerkickManager.Club ckClubStatic(System.Security.Principal.IPrincipal User)
     {
-      return HttpUtility.HtmlEncode("Hello " + name + ", NumTimes is: " + numTimes);
+      CornerkickManager.User usr = ckUserStatic(User);
+      if (usr == null) return null;
+
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+        return MvcApplication.ckcore.ltClubs[usr.iTeam];
+      }
+
+      return null;
+    }
+
+    public CornerkickManager.User ckUser()
+    {
+      if (User == null) return null;
+
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
+      }
+
+      return null;
+    }
+
+    public CornerkickManager.Club ckClub()
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return null;
+
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+        return MvcApplication.ckcore.ltClubs[usr.iTeam];
+      }
+
+      return null;
+    }
+
+    public static CultureInfo getCiStatic(System.Security.Principal.IPrincipal User)
+    {
+      CornerkickManager.Club clb = ckClubStatic(User);
+      if (clb != null) {
+        int iLandUser = clb.iLand;
+        if (iLandUser >= 0 && iLandUser < sCultureInfo.Length) return new CultureInfo(sCultureInfo[iLandUser]);
+      }
+
+      return CultureInfo.CurrentCulture;
     }
 
     public CultureInfo getCi()
@@ -133,6 +176,22 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return CultureInfo.CurrentCulture;
+    }
+
+    //
+    // GET: /HelloWorld/
+    [Authorize]
+    public string Index()
+    {
+      return "This is my <b>default</b> action...";
+    }
+
+    //
+    // GET: /HelloWorld/Welcome/
+    [Authorize]
+    public string Welcome(string name, int numTimes = 1)
+    {
+      return HttpUtility.HtmlEncode("Hello " + name + ", NumTimes is: " + numTimes);
     }
 
 #if _CONSOLE
@@ -207,30 +266,6 @@ namespace CornerkickWebMvc.Controllers
       return true;
     }
 #endif
-
-    public CornerkickManager.User ckUser()
-    {
-      if (User == null) return null;
-
-      string sUserId = User.Identity.GetUserId();
-      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
-        if (usr.id.Equals(sUserId)) return usr;
-      }
-
-      return null;
-    }
-
-    public CornerkickManager.Club ckClub()
-    {
-      CornerkickManager.User usr = ckUser();
-      if (usr == null) return null;
-
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
-        return MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-
-      return null;
-    }
 
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
