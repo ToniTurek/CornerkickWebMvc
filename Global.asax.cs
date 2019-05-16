@@ -325,10 +325,10 @@ namespace CornerkickWebMvc
       saveLaststate(sHomeDir);
 
 #if _USE_AMAZON_S3
-      // Save games
+      // Upload games
       DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save", "games"));
       if (d.Exists) {
-        FileInfo[] ltCkgFiles = d.GetFiles("*.ckg");
+        FileInfo[] ltCkgFiles = d.GetFiles("*.ckgx");
         foreach (FileInfo ckg in ltCkgFiles) {
           DateTime dtGame;
 
@@ -339,7 +339,7 @@ namespace CornerkickWebMvc
           if (dtGame.CompareTo(dtLoadCk) < 0) continue; // If game was already present when ck was started
 
           string sFileGameSave = Path.Combine(sHomeDir, "save", "games", ckg.Name);
-          as3.uploadFile(sFileGameSave, ckg.Name, "application/zip");
+          as3.uploadFile(sFileGameSave, "save/games/" + ckg.Name, "application/zip");
         }
       }
 #endif
@@ -435,6 +435,12 @@ namespace CornerkickWebMvc
         Directory.CreateDirectory(sHomeDir + "save");
         if (System.IO.File.Exists(sHomeDir + sSaveZip)) ZipFile.ExtractToDirectory(sHomeDir + sSaveZip, sHomeDir + "save");
         */
+      }
+
+      try {
+        as3.downloadAllFiles("save/games/", sHomeDir);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download games", MvcApplication.ckcore.sErrorFile);
       }
 
       // Download log
