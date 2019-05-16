@@ -14,6 +14,10 @@ namespace CornerkickWebMvc.Models
     public int iStateGlobal { get; set; }
 
     public CornerkickGame.Game game { get; set; }
+
+    public List<SelectListItem> ddlGames { get; set; }
+    public string sSelectedGame { get; set; }
+
     public static List<float[]> ltLoc { get; set; }
     //public string sKommentar { get; set; }
 

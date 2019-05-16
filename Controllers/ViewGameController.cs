@@ -48,10 +48,13 @@ namespace CornerkickWebMvc.Controllers
     public ActionResult ViewGame(Models.ViewGameModel view)
     {
       view.iStateGlobal = 0;
-      gD = new Models.ViewGameModel.gameData();
 
+      // Get user
       CornerkickManager.User user = ckUser();
       if (user == null) return View(view);
+
+      // Get user club
+      CornerkickManager.Club clubUser = ckClub();
 
       view.bAdmin = AccountController.checkUserIsAdmin(User.Identity.GetUserName());
 
@@ -60,24 +63,27 @@ namespace CornerkickWebMvc.Controllers
         user.game.iGameSpeed = 300;
       }
 
-      view.game = user.game;
+      view.ddlGames = new List<SelectListItem>();
 
-      if (user.game != null) {
-        string sEmblemDir = MvcApplication.getHomeDir() + "Content/Uploads/";
-        view.sEmblemH = user.game.data.team[0].iTeamId.ToString() + ".png";
-        view.sEmblemA = user.game.data.team[1].iTeamId.ToString() + ".png";
-        if (!System.IO.File.Exists(sEmblemDir + view.sEmblemH)) view.sEmblemH = "0.png";
-        if (!System.IO.File.Exists(sEmblemDir + view.sEmblemA)) view.sEmblemA = "0.png";
+      List<FileInfo> fiGames = getFileInfoGames(clubUser);
 
-        string[] sHA = new string[2] { "H", "A" };
-        // Add player to heatmap
-        for (byte iHA = 0; iHA < 2; iHA++) {
-          for (byte iPl = 0; iPl < user.game.nPlStart; iPl++) {
-            view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + user.game.player[iHA][iPl].sName + " - " + user.game.player[iHA][iPl].iNr, Value = (2 + (iHA * user.game.nPlStart) + iPl).ToString() });
+      foreach (FileInfo ckg in fiGames) {
+        DateTime dtGame;
+        int iTeamIdH;
+        int iTeamIdA;
+        string sFilenameInfo = getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA);
+        if (string.IsNullOrEmpty(sFilenameInfo)) continue;
+
+        view.ddlGames.Insert(0,
+          new SelectListItem {
+            Text  = sFilenameInfo,
+            Value = ckg.Name
           }
-        }
+        );
+      }
 
-        view.iGameSpeed = user.game.iGameSpeed;
+      if (user.game == null && fiGames.Count > 0) {
+        user.game = MvcApplication.ckcore.io.loadGame(Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[0].Name));
       }
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
@@ -86,11 +92,99 @@ namespace CornerkickWebMvc.Controllers
 
       fHeatmapMax = 0f;
 
-      gD = getAllGameData(view);
-
-      view.gD = gD;
+      setGame(view, user.game);
 
       return View(view);
+    }
+
+    private List<FileInfo> getFileInfoGames(CornerkickManager.Club clubUser)
+    {
+      List<FileInfo> fiGames = new List<FileInfo>();
+
+      DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save", "games"));
+
+      if (d.Exists) {
+        FileInfo[] ltCkgFiles = d.GetFiles("*.ckg");
+
+        int iG = 0;
+        foreach (FileInfo ckg in ltCkgFiles) {
+          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
+          if (sFilenameData.Length < 3) continue;
+
+          DateTime dtGame = new DateTime();
+          int iTeamIdH = -1;
+          int iTeamIdA = -1;
+          if (string.IsNullOrEmpty(getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA))) continue;
+
+          if (iTeamIdH == clubUser.iId || iTeamIdA == clubUser.iId) fiGames.Add(ckg);
+        }
+      }
+
+      return fiGames;
+    }
+
+    private string getFilenameInfo(FileInfo fiGame, out DateTime dtGame, out int iTeamIdH, out int iTeamIdA)
+    {
+      string sFilenameInfo = "";
+
+      dtGame = new DateTime();
+      iTeamIdH = -1;
+      iTeamIdA = -1;
+
+      string[] sFilenameData = Path.GetFileNameWithoutExtension(fiGame.Name).Split('_');
+      if (sFilenameData.Length < 3) return null;
+
+      // Date/Time
+      if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) return null;
+
+      // Team names
+      string[] sFilenameDataTeamIds = sFilenameData[2].Split('-');
+      if (!int.TryParse(sFilenameDataTeamIds[0], out iTeamIdH)) return null;
+      if (!int.TryParse(sFilenameDataTeamIds[1], out iTeamIdA)) return null;
+
+      return dtGame.ToString("d", Controllers.MemberController.getCiStatic(User)) + " " + dtGame.ToString("t", Controllers.MemberController.getCiStatic(User)) + ": " + MvcApplication.ckcore.ltClubs[iTeamIdH].sName + " - " + MvcApplication.ckcore.ltClubs[iTeamIdA].sName;
+    }
+
+    public JsonResult loadGame(Models.ViewGameModel view, string sFilename)
+    {
+      // Get user
+      CornerkickManager.User user = ckUser();
+      if (user == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      user.game = MvcApplication.ckcore.io.loadGame(Path.Combine(MvcApplication.getHomeDir(), "save", "games", sFilename));
+
+      setGame(view, user.game);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public void setGame(Models.ViewGameModel view, CornerkickGame.Game game)
+    {
+      if (game != null) {
+        gD = new Models.ViewGameModel.gameData();
+
+        string sEmblemDir = MvcApplication.getHomeDir() + "Content/Uploads/";
+        view.sEmblemH = game.data.team[0].iTeamId.ToString() + ".png";
+        view.sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
+        if (!System.IO.File.Exists(sEmblemDir + view.sEmblemH)) view.sEmblemH = "0.png";
+        if (!System.IO.File.Exists(sEmblemDir + view.sEmblemA)) view.sEmblemA = "0.png";
+
+        string[] sHA = new string[2] { "H", "A" };
+        // Add player to heatmap
+        for (byte iHA = 0; iHA < 2; iHA++) {
+          for (byte iPl = 0; iPl < game.nPlStart; iPl++) {
+            view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.nPlStart) + iPl).ToString() });
+          }
+        }
+
+        view.iGameSpeed = game.iGameSpeed;
+
+        view.game = game;
+
+        gD = getAllGameData(view);
+
+        view.gD = gD;
+      }
     }
 
     public JsonResult ViewGameLocations(int iState = -1/*, int iSleep = 0*/, bool bAverage = false)
