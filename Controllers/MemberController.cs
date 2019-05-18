@@ -387,10 +387,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Content("", "application/json");
 
-      List<Models.DataPointLastGames2>[] dataPoints = new List<Models.DataPointLastGames2>[3];
-      dataPoints[0] = new List<Models.DataPointLastGames2>();
-      dataPoints[1] = new List<Models.DataPointLastGames2>();
-      dataPoints[2] = new List<Models.DataPointLastGames2>();
+      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
+      dataPoints[0] = new List<Models.DataPointGeneral>();
+      dataPoints[1] = new List<Models.DataPointGeneral>();
+      dataPoints[2] = new List<Models.DataPointGeneral>();
 
       List<CornerkickGame.Game.Data> ltGameData = MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false, true);
       int iLg = 0;
@@ -398,18 +398,27 @@ namespace CornerkickWebMvc.Controllers
         if (gs.iGameType < 1 || gs.iGameType == 5) continue; // Testgame
         if (gs.team[0].iTeamId == 0 && gs.team[1].iTeamId == 0) continue;
 
+        CornerkickManager.Club clubH = null;
+        if (gs.team[0].iTeamId >= 0 && gs.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) clubH = MvcApplication.ckcore.ltClubs[gs.team[0].iTeamId];
+        CornerkickManager.Club clubA = null;
+        if (gs.team[1].iTeamId >= 0 && gs.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) clubA = MvcApplication.ckcore.ltClubs[gs.team[1].iTeamId];
+
+        string sDesc = gs.dt.ToString("d", getCi()) + "</br>";
+        if (clubH != null && clubA != null) sDesc += clubH.sName + " - " + clubA.sName + "</br>";
+        sDesc += MvcApplication.ckcore.ui.getResultString(gs);
+
         int iGameType = 0;
         if      (gs.iGameType == 2) iGameType = 1;
         else if (gs.iGameType == 5) iGameType = 2;
 
         if (gs.team[0].iGoals == gs.team[1].iGoals) {
-          dataPoints[iGameType].Add(new Models.DataPointLastGames2(--iLg, 0));
+          dataPoints[iGameType].Add(new Models.DataPointGeneral(--iLg,  0, sDesc));
         } else if ((gs.team[0].iGoals > gs.team[1].iGoals && gs.team[0].iTeamId == club.iId) || 
                    (gs.team[0].iGoals < gs.team[1].iGoals && gs.team[1].iTeamId == club.iId)) {
-          dataPoints[iGameType].Add(new Models.DataPointLastGames2(--iLg, +1));
+          dataPoints[iGameType].Add(new Models.DataPointGeneral(--iLg, +1, sDesc));
         } else if ((gs.team[0].iGoals < gs.team[1].iGoals && gs.team[0].iTeamId == club.iId) ||
                    (gs.team[0].iGoals > gs.team[1].iGoals && gs.team[1].iTeamId == club.iId)) {
-          dataPoints[iGameType].Add(new Models.DataPointLastGames2(--iLg, -1));
+          dataPoints[iGameType].Add(new Models.DataPointGeneral(--iLg, -1, sDesc));
         }
       }
 
