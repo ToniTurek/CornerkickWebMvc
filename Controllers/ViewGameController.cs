@@ -104,7 +104,7 @@ namespace CornerkickWebMvc.Controllers
       DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save", "games"));
 
       if (d.Exists) {
-        FileInfo[] ltCkgFiles = d.GetFiles("*.ckg");
+        FileInfo[] ltCkgFiles = d.GetFiles("*.ckgx");
 
         int iG = 0;
         foreach (FileInfo ckg in ltCkgFiles) {
