@@ -438,7 +438,7 @@ namespace CornerkickWebMvc
       }
 
       try {
-        as3.downloadAllFiles("save/games/", sHomeDir);
+        as3.downloadAllFiles("save/games/", sHomeDir, null, ".ckgx");
       } catch {
         MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download games", MvcApplication.ckcore.sErrorFile);
       }

@@ -108,7 +108,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    public void downloadAllFiles(string sS3SubDir, string sTargetPath = "./")
+    public void downloadAllFiles(string sS3SubDir, string sTargetPath = "./", string sStartsWith = null, string sEndsWith = null)
     {
       IAmazonS3 client = new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion);
 
@@ -120,6 +120,9 @@ namespace CornerkickWebMvc
 
         // Process response.
         for (int iS3 = 0; iS3 < response.S3Objects.Count; iS3++) {
+          if (!string.IsNullOrEmpty(sStartsWith) && !response.S3Objects[iS3].Key.StartsWith(sStartsWith)) continue;
+          if (!string.IsNullOrEmpty(sEndsWith)   && !response.S3Objects[iS3].Key.EndsWith  (sEndsWith))   continue;
+
           downloadFile(response.S3Objects[iS3].Key, Path.Combine(sTargetPath, response.S3Objects[iS3].Key));
         }
 
