@@ -300,7 +300,7 @@ namespace CornerkickWebMvc
         MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, MvcApplication.ckcore.sErrorFile);
       }
 
-      // Upload
+      // Upload save
       if (bSaveOk) {
 #if _USE_AMAZON_S3
         as3.uploadFile(sFileSave2, sFilenameSave2, "application/zip");
@@ -506,10 +506,10 @@ namespace CornerkickWebMvc
         } else {
           MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
-      
+
         // Download emblems
 #if _USE_AMAZON_S3
-        for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) as3.downloadFile("ckEmblem_" + iC.ToString(), sHomeDir + "/../Content/Uploads/" + iC.ToString() + ".png");
+        as3.downloadAllFiles("emblems/", sHomeDir + "/../Content/Uploads/", "ckEmblem_");
 #endif
 #endif
 
