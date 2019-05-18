@@ -162,7 +162,7 @@
           {
             "data": "sName",
             "render": function (data, type, row) {
-              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "_blank" })'.replace("name", data).replace("id", row.sID);
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "" })'.replace("name", data).replace("id", row.sID);
             }
           },
           { "data": "sPosition" },

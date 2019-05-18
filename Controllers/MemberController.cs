@@ -2911,7 +2911,7 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td class=\"first\" bgcolor=\"" + sBgColor + "\" align=\"center\"><b>" + k + "</b></td>";
         sBox += "<td style=\"color: " + sColor + "\" align=\"center\"> " + sPlaceLast + "</td>";
         sBox += "<td>" + sEmblem + "</td>";
-        sBox += "<td><a href=\"/Member/ClubDetails?iClub=" + tbpl.iId.ToString() + "\" target=\"_blank\">" + tbpl.sName + "</a></td>";
+        sBox += "<td><a href=\"/Member/ClubDetails?iClub=" + tbpl.iId.ToString() + "\" target=\"\">" + tbpl.sName + "</a></td>";
         sBox += "<td>&nbsp;</td>";
         sBox += "<td align=\"right\">" + iGames.ToString() + "</td>";
         sBox += "<td>&nbsp;</td>";
@@ -2955,9 +2955,9 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<tr" + sStyle + ">";
         sBox += "<td>" + gd.dt.ToString("d", getCi()) + "&nbsp;" + gd.dt.ToString("t", getCi()) + "</td>";
 
-        sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td>";
+        sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"\">" + sClubNameH + "</a></td>";
         sBox += "<td align=\"center\">&nbsp;-&nbsp;</td>";
-        sBox += "<td align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"_blank\">" + sClubNameA + "</a></td>";
+        sBox += "<td align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"\">" + sClubNameA + "</a></td>";
 
         if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
           sBox += "<td align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";

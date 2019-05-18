@@ -89,7 +89,7 @@
       foreach (CornerkickGame.Player plJouth in CornerkickWebMvc.Models.JouthModel.ltPlayerJouth) {
         <tr>
           <td align="center">@plJouth.iId</td>
-          <td align="center">@Html.ActionLink(plJouth.sName, "PlayerDetails", "Member", new { i = plJouth.iId }, new { target = "_blank" })</td>
+          <td align="center">@Html.ActionLink(plJouth.sName, "PlayerDetails", "Member", new { i = plJouth.iId }, new { target = "" })</td>
           <td align="center">@MvcApplication.ckcore.plr.getStrPos(plJouth)</td>
           <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(plJouth).ToString("0.0")</td>
           <td align="center">@(plJouth.iTalent + 1)</td>
