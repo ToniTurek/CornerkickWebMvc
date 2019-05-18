@@ -157,7 +157,13 @@
 
             <div style="position: relative; width: 100%; height: 20px; background-color: white; border: 1px solid black">
               <div style="position: absolute; height: 0px; margin-left: 1%; width: 49%; left:  0%; text-align: left">
-                @Html.ActionLink(MvcApplication.ckcore.dtDatum.ToString("ddd", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("d", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", ci), "Calendar", "Member")
+                @{
+                  string sCkTime = MvcApplication.ckcore.dtDatum.ToString("ddd", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("d", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", ci);
+                  if (!MvcApplication.timerCkCalender.Enabled) {
+                    sCkTime += " (Pause)";
+                  }
+                  @Html.ActionLink(sCkTime, "Calendar", "Member");
+                }
               </div>
               <div style="position: absolute; height: 0px; width: 49%; left: 50%; text-align: right">
                 @{
