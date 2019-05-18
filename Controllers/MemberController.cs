@@ -2185,7 +2185,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult setAutoSubs(int iAS, byte iIndexPlayerOut, byte iIndexPlayerIn, byte iMin)
+    public ActionResult setAutoSubs(int iAS, int iIndexPlayerOut, int iIndexPlayerIn, byte iMin)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -2197,11 +2197,15 @@ namespace CornerkickWebMvc.Controllers
 
       while (clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count <= iAS) clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Add(new byte[3] { 0, 0, 0 });
 
-      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0] = iIndexPlayerOut;
-      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1] = iIndexPlayerIn;
+      if (iIndexPlayerOut < 0 || iIndexPlayerIn < 0) {
+        iIndexPlayerOut = 0;
+        iIndexPlayerIn  = 0;
+      }
+      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0] = (byte)iIndexPlayerOut;
+      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1] = (byte)iIndexPlayerIn;
       clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][2] = iMin;
 
-      bool bValid = iIndexPlayerOut >= 0 && iIndexPlayerIn >= 0 && iMin >= 0;
+      bool bValid = iIndexPlayerOut >= 0 && iIndexPlayerIn >= 0 && iIndexPlayerOut != iIndexPlayerIn && iMin >= 0;
 
       if (!bValid) {
         int jAS = iAS + 1;
