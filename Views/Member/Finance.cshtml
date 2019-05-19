@@ -200,11 +200,13 @@
             verticalAlign: "bottom",  // top, center, bottom
             dockInsidePlotArea: true
           },
+          toolTip: {
+            content: "{z}"
+          },
           data: [
             {
               // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
               type: "line",
-              indexLabel: "{z}",
               dataPoints: dataSpec[0]
             },
             {
