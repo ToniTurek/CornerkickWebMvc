@@ -3359,7 +3359,9 @@ namespace CornerkickWebMvc.Controllers
         if (clubRequest.iUser < 0) {
           createTestgame(md);
 
-          sReturn = "Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " vereinbart";
+          sReturn = "Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + clubRequest.sName + " vereinbart";
+
+          club.nextGame = MvcApplication.ckcore.tl.getNextGame(club, MvcApplication.ckcore.dtDatum);
         } else {
           CornerkickManager.Cup cup = new CornerkickManager.Cup();
           cup.iId = -5;
