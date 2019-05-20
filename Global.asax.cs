@@ -455,8 +455,6 @@ namespace CornerkickWebMvc
         // Set admin user to CPU
         if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
 
-        MvcApplication.ckcore.fz.fKreditZins = 0.05f;
-
         dtLoadCk = MvcApplication.ckcore.dtDatum;
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
