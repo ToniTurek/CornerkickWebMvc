@@ -509,7 +509,7 @@ namespace CornerkickWebMvc
 
         // Download emblems
 #if _USE_AMAZON_S3
-        as3.downloadAllFiles("emblems/", sHomeDir + "/../Content/Uploads/", "ckEmblem_");
+        as3.downloadAllFiles("emblems/", sHomeDir + "/../Content/Uploads/", null, ".png");
 #endif
 #endif
 
