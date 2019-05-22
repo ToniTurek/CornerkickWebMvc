@@ -425,118 +425,153 @@
     }
   }
 
-  <div style="position: relative; width: 100%; height: auto">
-    <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
-      <table cellpadding="1" style="width: 100%">
-        <tbody>
-          <tr>
-            <td align="right">Verein:</td>
-            <td align="right">@sClub</td>
-          </tr>
-          <tr>
-            <td align="right">Geburtsdatum:</td>
-            <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
-          </tr>
-          <tr>
-            <td align="right">Körpergröße/-gewicht:</td>
-            <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
-          </tr>
-          <tr>
-            <td align="right">Positionen:</td>
-            <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
-          </tr>
-          <tr>
-            <td align="right">Stärke (bereinigt):</td>
-            <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
-          </tr>
-          <tr>
-            <td align="right">Talent:</td>
-            <td align="right">@sTalent</td>
-          </tr>
-          <tr>
-            <td align="right">Fuß (links/rechts):</td>
-            @{
-              if (player.fFootL > 0.99 && player.fFootR > 0.99) {
-                <td align="right">beidfüßig</td>
-              } else {
-                <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+      <div style="position: relative; width: 100%; height: auto">
+        <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
+          <table cellpadding="1" style="width: 100%">
+            <tbody>
+              <tr>
+                <td align="right">Verein:</td>
+                <td align="right">@sClub</td>
+              </tr>
+              <tr>
+                <td align="right">Geburtsdatum:</td>
+                <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
+              </tr>
+              <tr>
+                <td align="right">Körpergröße/-gewicht:</td>
+                <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
+              </tr>
+              <tr>
+                <td align="right">Positionen:</td>
+                <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
+              </tr>
+              <tr>
+                <td align="right">Stärke (bereinigt):</td>
+                <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
+              </tr>
+              <tr>
+                <td align="right">Talent:</td>
+                <td align="right">@sTalent</td>
+              </tr>
+              <tr>
+                <td align="right">Fuß (links/rechts):</td>
+                @{
+                  if (player.fFootL > 0.99 && player.fFootR > 0.99) {
+                    <td align="right">beidfüßig</td>
+                  } else {
+                    <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+                  }
+                }
+              </tr>
+              <tr>
+                @{
+                  string sVerletzung = "keine";
+                  if (player.fInjury[0] > 0.0) {
+                    sVerletzung = player.fInjury[0].ToString("0.0") + " Tage (" + (player.fInjury[0] / player.fInjury[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fInjury[2]];
+                  }
+                }
+                <td align="right">Verletzung:</td>
+                <td align="right">@sVerletzung</td>
+              </tr>
+              <tr>
+                <td align="right">Gehalt:</td>
+                <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+              </tr>
+              <tr>
+                @{
+                  string sDauer = player.contract.iLength.ToString() + " Jahre";
+                  if (MvcApplication.ckcore.ltClubs[player.iClubId].ltJugendspielerID.IndexOf(player.iId) >= 0) {
+                    sDauer = "Jugendspieler";
+                  } else if (player.contract.iLength < 2) {
+                    sDauer = "Saisonende";
+                  }
+                }
+                <td align="right">Laufzeit:</td>
+                <td align="right">@sDauer</td>
+              </tr>
+              <tr>
+                @{
+                  string sVal = (MvcApplication.ckcore.plr.getValue(player, 100) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";
+                }
+                <td align="right">Marktwert:</td>
+                <td align="right">@sVal</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+          <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
+            <tbody>
+              <tr>
+                <td align="right">Führungspersönlichkeit:</td>
+                <td align="right">@player.character.fLeader.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Schußhäufigkeit:</td>
+                <td align="right">@player.character.fShoot.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Teamplayer:</td>
+                <td align="right">@player.character.fPass.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Dribbler:</td>
+                <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
+            <tbody>
+              <tr>
+                <td align="right"><ins>Sperren:</ins></td>
+              </tr>
+              @{
+                if (player.iSperre[0] + player.iSperre[1] == 0) {
+                  <tr>
+                    <td align="right">keine</td>
+                  </tr>
+                } else {
+                  if (player.iSperre[0] > 0) {
+                    string sSp = "Liga: " + player.iSperre[0].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSperre[1] > 0) {
+                    string sSp = "Pokal: " + player.iSperre[1].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                }
               }
+            </tbody>
+          </table>
+        </div>
+
+        <div style="position: relative; width: 40px; height: auto; float: left; text-align: right">
+          @if (Model.bCaptain) {
+            <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+          } else if (Model.bCaptain2) {
+            <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+          }
+
+          @{
+            string sNat = MvcApplication.ckcore.sLandShort[player.iNat1];
+
+            if (string.IsNullOrEmpty(sNat)) {
+              <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
+            } else {
+              string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+              <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
             }
-          </tr>
-          <tr>
-            @{
-              string sVerletzung = "keine";
-              if (player.fInjury[0] > 0.0) {
-                sVerletzung = player.fInjury[0].ToString("0.0") + " Tage (" + (player.fInjury[0] / player.fInjury[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fInjury[2]];
-              }
-            }
-            <td align="right">Verletzung:</td>
-            <td align="right">@sVerletzung</td>
-          </tr>
-          <tr>
-            <td align="right">Gehalt:</td>
-            <td align="right">@player.contract.iSalary.ToString("#,# €", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-          </tr>
-          <tr>
-            @{
-              string sDauer = player.contract.iLength.ToString() + " Jahre";
-              if (MvcApplication.ckcore.ltClubs[player.iClubId].ltJugendspielerID.IndexOf(player.iId) >= 0) {
-                sDauer = "Jugendspieler";
-              } else if (player.contract.iLength < 2) {
-                sDauer = "Saisonende";
-              }
-            }
-            <td align="right">Laufzeit:</td>
-            <td align="right">@sDauer</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          }
+        </div>
 
-    <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
-      <table cellpadding="1" style="width: 100%">
-        <tbody>
-          <tr>
-            <td align="right">Führungspersönlichkeit:</td>
-            <td align="right">@player.character.fLeader.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Schußhäufigkeit:</td>
-            <td align="right">@player.character.fShoot.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Teamplayer:</td>
-            <td align="right">@player.character.fPass.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Dribbler:</td>
-            <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div style="position: relative; width: 40px; height: auto; float: left; text-align: right">
-      @if (Model.bCaptain) {
-        <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
-      } else if (Model.bCaptain2) {
-        <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
-      }
-
-      @{
-        string sNat = MvcApplication.ckcore.sLandShort[player.iNat1];
-
-        if (string.IsNullOrEmpty(sNat)) {
-          <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
-        } else {
-          string sFlag = "/Content/Icons/flags/" + sNat + ".png";
-          <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
-        }
-      }
-    </div>
-
-    <div id="divChartCFM" style="position: relative; height: 220px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
-  </div>
+        <div id="divChartCFM" style="position: relative; height: 250px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
+      </div>
 
   @{
     string sExtendContract = "Vertrag verlängern";
