@@ -878,6 +878,7 @@
     <Content Include="Connected Services\ckstoredAzureStorage\ConnectedService.json" />
     <Content Include="Scripts\Numbers.js" />
     <Content Include="Scripts\Player.js" />
+    <Content Include="Scripts\Scorer.js" />
     <Content Include="Views\Shared\_Layout_plain.cshtml" />
     <Content Include="Views\Member\Transfer.cshtml" />
     <Content Include="Views\Home\UserManual.cshtml" />

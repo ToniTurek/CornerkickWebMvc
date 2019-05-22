@@ -8,12 +8,13 @@
 <html style="height: 100%; min-height: 100%">
 <head>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
   <script type="text/javascript" src="~/Scripts/League.js"></script>
 
   <script>
     $(document).ready(function () {
       changeLand(1, 0);
-      
+
       var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
       fLigaMax = fLigaMax + 0.1;
 
@@ -88,49 +89,12 @@
       </div>
     </div>
 
-    <div style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left">
-      @{
-        if (Model.ltScorer != null && Model.ltScorer.Count > 0) {
-          <h4>Torschützen</h4>
-          <table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
-            <tr>
-              <th>#</th>
-              <th>Spieler</th>
-              <th>Verein</th>
-              <th style="text-align:right">Tore</th>
-              <th style="text-align:right">Vorl.</th>
-              <th style="text-align:right">Scor.</th>
-            </tr>
-
-            @{ int iPlatz = 0; }
-            @{
-              foreach (CornerkickManager.UI.Scorer sc in Model.ltScorer) {
-                iPlatz++;
-                string sStyle2 = "";
-                if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == Model.iClubId) {
-                  sStyle2 = "font-weight:bold";
-                }
-                int iScorer = sc.iGoals + sc.iAssists;
-
-                <tr style=@sStyle2 class=" ">
-                  <td class="first">@iPlatz</td>
-                  <td>@sc.sName</td>
-                  <td>@sc.sTeam</td>
-                  <td align="right">@sc.iGoals</td>
-                  <td align="right">@sc.iAssists</td>
-                  <td align="right">@iScorer</td>
-                </tr>
-              }
-            }
-          </table>
-        }
-      }
-    </div>
-
-    <div style="height: auto; width: 54%; min-width: 350px; margin-top: 20px; float: left">
+    <div style="height: auto; width: 54%; min-width: 350px; margin-top: 20px; float: right">
       <h4>Tabellenplatzentwicklung</h4>
       <div id="chartContainerPlaceHist" style="height: 400px; width: 100%"></div>
     </div>
+
+    <div id="divLeagueScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
   </div>
 </body>
 </html>

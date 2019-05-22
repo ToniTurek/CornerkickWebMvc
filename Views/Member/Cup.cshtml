@@ -5,70 +5,42 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script src="~/Scripts/Cup.js" type="text/javascript"></script>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
+  <script type="text/javascript" src="~/Scripts/Cup.js"></script>
 
-<script>
-  $(document).ready(function () {
-    changeLand(1);
-  });
+  <script>
+    $(document).ready(function () {
+      changeLand(1);
+    });
 
-  function setCup() {
-    setCup2(1);
+    function setCup() {
+      setCup2(1);
+    }
+  </script>
+</head>
+
+<body style="height: 100%; min-height: 100%">
+  @{
+    string sLand = "";
+    if (Model.iLand >= 0 && Model.iLand < MvcApplication.ckcore.sLand.Length) {
+      sLand = MvcApplication.ckcore.sLand[Model.iLand];
+    }
   }
-</script>
+  <label>
+    Land:
+    @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLandCup" })
+  </label>
 
-@{
-  string sLand = "";
-  if (Model.iLand >= 0 && Model.iLand < MvcApplication.ckcore.sLand.Length) {
-    sLand = MvcApplication.ckcore.sLand[Model.iLand];
-  }
-}
-<label>
-  Land:
-  @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLandCup" })
-</label>
+  <label style="margin-left: 10px">
+    Spieltag:
+    @Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlMatchdayCup" })
+  </label>
 
-<label style="margin-left: 10px">
-  Spieltag:
-  @Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlMatchdayCup" })
-</label>
+  <h4>Begegnungen</h4>
+  <div id="tableDivCupTeams"></div>
 
-<h4>Begegnungen</h4>
-<div id="tableDivCupTeams"></div>
-
-@{
-  if (Model.ltScorer != null && Model.ltScorer.Count > 0) {
-    <h4>Torschützen</h4>
-    <table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
-      <tr>
-        <th>#</th>
-        <th>Spieler</th>
-        <th>Verein</th>
-        <th style="text-align:right">Tore</th>
-        <th style="text-align:right">Vorl.</th>
-        <th style="text-align:right">Scor.</th>
-      </tr>
-
-      @{ int iPlatz = 0; }
-      @{
-        foreach (CornerkickManager.UI.Scorer sc in Model.ltScorer) {
-          iPlatz++;
-          string sStyle2 = "";
-          if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == Model.iClubId) {
-            sStyle2 = "font-weight:bold";
-          }
-          int iScorer = sc.iGoals + sc.iAssists;
-
-          <tr style=@sStyle2 class=" ">
-            <td class="first">@iPlatz</td>
-            <td>@sc.sName</td>
-            <td>@sc.sTeam</td>
-            <td align="right">@sc.iGoals</td>
-            <td align="right">@sc.iAssists</td>
-            <td align="right">@iScorer</td>
-          </tr>
-        }
-      }
-    </table>
-  }
-}
+  <div id="divCupScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+</body>
+</html>

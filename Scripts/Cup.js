@@ -31,6 +31,18 @@ function setCup2(iSaison) {
       actionDrawTeams(sTable);
     }
   });
+
+  $.ajax({
+    url: '/Member/LeagueCupGetScorer',
+    type: "GET",
+    dataType: "JSON",
+    data: { iGameType: 2, iLand: iLand, iDivision: -1 },
+    success: function (sText) {
+      if (sText) {
+        $("#divCupScorer").html(getScorerTable(sText)).show();
+      }
+    }
+  });
 }
 
 function actionDrawTeams(sTable) {

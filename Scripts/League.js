@@ -28,8 +28,11 @@
 function setLeague2(iSaison, iDivision) {
   var iLand = $('#ddlLand').val();
   var iMd = $('#ddlMatchday').val();
-  var divDrawTable = $("#tableDivLeague");
-  divDrawTable.html('');
+  var divDrawTable    = $("#tableDivLeague");
+  var divLeagueScorer = $("#divLeagueScorer");
+
+  divDrawTable   .html('');
+  divLeagueScorer.html('');
 
   $.ajax({
     url: '/Member/setLeague',
@@ -70,6 +73,18 @@ function setLeague2(iSaison, iDivision) {
     data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
     success: function (sTeams) {
       actionDrawTeams(sTeams);
+    }
+  });
+
+  $.ajax({
+    url: '/Member/LeagueCupGetScorer',
+    type: "GET",
+    dataType: "JSON",
+    data: { iGameType: 1, iLand: iLand, iDivision: iDivision },
+    success: function (sText) {
+      if (sText) {
+        divLeagueScorer.html(getScorerTable(sText)).show();
+      }
     }
   });
 }

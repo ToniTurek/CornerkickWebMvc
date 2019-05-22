@@ -25,7 +25,6 @@ namespace CornerkickWebMvc.Models
     public CornerkickManager.Cup league { get; set; }
     public List<CornerkickManager.Tool.TableItem> ltTbl { get; set; }
     public List<CornerkickManager.Tool.TableItem> ltTblLast { get; set; } // Table last matchday
-    public List<CornerkickManager.UI.Scorer> ltScorer { get; set; }
     public int iLeagueSize { get; set; }
 
     public List<SelectListItem> ddlLand { get; set; }

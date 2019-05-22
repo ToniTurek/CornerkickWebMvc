@@ -17,7 +17,6 @@ namespace CornerkickWebMvc.Models
     public int iSpTg { get; set; }
 
     public List<List<CornerkickGame.Game.Data>> ltErg { get; set; }
-    public List<CornerkickManager.UI.Scorer> ltScorer { get; set; }
 
     public List<SelectListItem> ddlLand { get; set; }
     public List<SelectListItem> ltDdlSpTg { get; set; }
