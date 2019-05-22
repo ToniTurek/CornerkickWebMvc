@@ -482,6 +482,7 @@ namespace CornerkickWebMvc.Controllers
       gD.ltDrawLineShoot = new List<Models.ViewGameModel.drawLine>();
       gD.ltDrawLinePass  = new List<Models.ViewGameModel.drawLine>();
       gD.sCard = "";
+      gD.sStatSubs = "";
 
       // Draw shoot on pitch
       if ((iState >= 0 && iState < gameData.ltState.Count) || iAllShoots >= 0) {
@@ -572,7 +573,6 @@ namespace CornerkickWebMvc.Controllers
         //} // foreach state
 
         // Substitutions
-        gD.sStatSubs = "";
         if (gameData.team[iHA].ltSubstitutions != null) {
           for (int iS = 0; iS < gameData.team[iHA].ltSubstitutions.Count; iS++) {
             int[] iSub = gameData.team[iHA].ltSubstitutions[iS];
