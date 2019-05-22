@@ -90,7 +90,7 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           @{
-            if (Request.IsAuthenticated) {
+            if (Request.IsAuthenticated && usr != null) {
               int iMails = 0;
               if (usr.ltNews != null) {
                 foreach (CornerkickManager.Main.News news in usr.ltNews) {
