@@ -83,7 +83,12 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (user.game == null && fiGames.Count > 0) {
-        user.game = MvcApplication.ckcore.io.loadGame(Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[0].Name));
+        string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[0].Name);
+        try {
+          user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
+        } catch {
+          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", MvcApplication.ckcore.sErrorFile);
+        }
       }
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
@@ -151,9 +156,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User user = ckUser();
       if (user == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      user.game = MvcApplication.ckcore.io.loadGame(Path.Combine(MvcApplication.getHomeDir(), "save", "games", sFilename));
+      string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", sFilename);
 
-      setGame(view, user.game);
+      try {
+        user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
+        setGame(view, user.game);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", MvcApplication.ckcore.sErrorFile);
+      }
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }
