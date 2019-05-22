@@ -294,7 +294,7 @@
     if (Model != null) {
       if (!string.IsNullOrEmpty(Model.sName)) {
         sName = Model.sName;
-        sStadion = Model.stadion.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+        sStadion = Model.stadion.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
       }
     }
 
@@ -478,7 +478,7 @@
           @{
             for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
               if (Model.iSeatsBuild[iB] > 0) {
-                //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+                //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
                 <tr>
                   <td align="center">Block @Model.stadion.blocks[iB].sName</td>
                   <td align="center">@CornerkickManager.csStadion.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
@@ -489,7 +489,7 @@
             }
 
             if (Model.stadion.iTopringDaysConstruct > 0) {
-              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
               <tr>
                 <td align="center">Oberring</td>
                 <td align="center">-</td>
@@ -499,7 +499,7 @@
             }
 
             if (Model.stadion.iVideoDaysConstruct > 0) {
-              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
               <tr>
                 <td align="center">Anzeigetafel</td>
                 <td align="center">@CornerkickManager.csStadion.sVideo[Model.stadion.iVideoNew]</td>
@@ -509,7 +509,7 @@
             }
 
             if (Model.stadion.iSnackbarDaysConstruct > 0) {
-              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
               <tr>
                 <td align="center">Imbissbuden</td>
                 <td align="center">-</td>
@@ -519,7 +519,7 @@
             }
 
             if (Model.stadion.iToiletsDaysConstruct > 0) {
-              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
               <tr>
                 <td align="center">Toiletten</td>
                 <td align="center">-</td>

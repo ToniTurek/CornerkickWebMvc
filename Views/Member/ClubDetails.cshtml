@@ -33,7 +33,7 @@
     string sAveStrength = fAve[3].ToString("0.0");
     string sAveAge = fAve[4].ToString("0.0");
 
-    string sStadium = Model.club.stadium.sName + " (" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
+    string sStadium = Model.club.stadium.sName + " (" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
   }
 
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">

@@ -435,7 +435,7 @@
           </tr>
           <tr>
             <td align="right">Geburtsdatum:</td>
-            <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
+            <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
           </tr>
           <tr>
             <td align="right">Körpergröße/-gewicht:</td>
@@ -475,7 +475,7 @@
           </tr>
           <tr>
             <td align="right">Gehalt:</td>
-            <td align="right">@player.contract.iSalary.ToString("#,# €", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
+            <td align="right">@player.contract.iSalary.ToString("#,# €", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
           </tr>
           <tr>
             @{

@@ -21,7 +21,7 @@
   var sStadion = "";
   if (Model.game != null) {
     sStadion = Model.game.data.stadium.sName;
-    sStadion += " (" + (Model.game.data.iSpectators[0] + Model.game.data.iSpectators[1] + Model.game.data.iSpectators[2]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + " / " + Model.game.data.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
+    sStadion += " (" + (Model.game.data.iSpectators[0] + Model.game.data.iSpectators[1] + Model.game.data.iSpectators[2]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / " + Model.game.data.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
   }
 
   ViewBag.Title = sHeader;
