@@ -6,16 +6,16 @@
   var sA = "";
   var sGoalsH = "";
   var sGoalsA = "";
-  var sEmblemH = "/Content/Uploads/0.png";
-  var sEmblemA = "/Content/Uploads/0.png";
+  var sEmblemH = "/Content/Uploads/emblems/0.png";
+  var sEmblemA = "/Content/Uploads/emblems/0.png";
   if (Model.game != null) {
     sHeader = Model.game.data.team[0].sTeam + " - " + Model.game.data.team[1].sTeam;
     sH = Model.game.data.team[0].sTeam;
     sA = Model.game.data.team[1].sTeam;
     sGoalsH = Model.game.data.team[0].iGoals.ToString();
     sGoalsA = Model.game.data.team[1].iGoals.ToString();
-    sEmblemH = "/Content/Uploads/" + Model.sEmblemH;
-    sEmblemA = "/Content/Uploads/" + Model.sEmblemA;
+    sEmblemH = "/Content/Uploads/emblems/" + Model.sEmblemH;
+    sEmblemA = "/Content/Uploads/emblems/" + Model.sEmblemA;
   }
 
   var sStadion = "";

@@ -163,7 +163,7 @@ namespace CornerkickWebMvc.Controllers
       if (game != null) {
         gD = new Models.ViewGameModel.gameData();
 
-        string sEmblemDir = MvcApplication.getHomeDir() + "Content/Uploads/";
+        string sEmblemDir = MvcApplication.getHomeDir() + "Content/Uploads/emblems/";
         view.sEmblemH = game.data.team[0].iTeamId.ToString() + ".png";
         view.sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
         if (!System.IO.File.Exists(sEmblemDir + view.sEmblemH)) view.sEmblemH = "0.png";
