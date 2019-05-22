@@ -818,7 +818,8 @@ namespace CornerkickWebMvc.Controllers
 
             // Create club
             addUserToCk(appUser, model);
-            uploadFile(file, ckClub().iId);
+            CornerkickManager.Club clb = ckClub();
+            if (clb != null) uploadFile(file, ckClub().iId);
             iniCk();
           }
 
