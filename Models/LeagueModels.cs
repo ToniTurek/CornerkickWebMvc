@@ -18,9 +18,6 @@ namespace CornerkickWebMvc.Models
 
     public byte iSpKl { get; set; }
 
-    [Display(Name = "Spieltag: ")]
-    public int iMd { get; set; }
-
     // List<CornerkickManager.Core.Tabellenplatz> ltTbpl = cr.getTabelleLiga(iSaison, iLand, iSpielklasse, iSpieltag, 0);
     public CornerkickManager.Cup league { get; set; }
     public List<CornerkickManager.Tool.TableItem> ltTbl { get; set; }
@@ -28,16 +25,12 @@ namespace CornerkickWebMvc.Models
     public int iLeagueSize { get; set; }
 
     public List<SelectListItem> ddlLand { get; set; }
-    public List<SelectListItem> ltDdlSpTg { get; set; }
 
     public static List<System.Web.Mvc.SelectListItem> ltSasn = new List<System.Web.Mvc.SelectListItem>();
-    //public static List<System.Web.Mvc.SelectListItem> ltLand = new List<System.Web.Mvc.SelectListItem>();
-    //public static List<System.Web.Mvc.SelectListItem> ltSpKl = new List<System.Web.Mvc.SelectListItem>();
 
     public LeagueModels()
     {
       ddlLand   = new List<SelectListItem>();
-      ltDdlSpTg = new List<SelectListItem>();
     }
 
   }

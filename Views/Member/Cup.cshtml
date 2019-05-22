@@ -35,7 +35,7 @@
 
   <label style="margin-left: 10px">
     Spieltag:
-    @Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlMatchdayCup" })
+    <select id="ddlMatchdayCup" onchange="setCup()"></select>
   </label>
 
   <h4>Begegnungen</h4>

@@ -13,7 +13,15 @@
         $('#ddlMatchdayCup').append($('<option></option>').val(ltS[0]).html(ltS[1]));
       });
 
-      setCup2(iSaison);
+      $.ajax({
+        url: '/Member/CupGetMatchday',
+        type: "GET",
+        dataType: "JSON",
+        success: function (iMd) {
+          document.getElementById("ddlMatchdayCup").value = iMd;
+          setCup2(iSaison);
+        }
+      });
     }
   });
 }

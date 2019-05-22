@@ -2835,10 +2835,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, clb.iLand, clb.iDivision);
       if (league == null) return View(mlLeague);
 
-      mlLeague.iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
+      int iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
       mlLeague.league = league;
-      mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, mlLeague.iMd - 1, 0);
-      mlLeague.iLeagueSize = MvcApplication.ckcore.tl.getCupParticipants(league, mlLeague.iMd).Count;
+      mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, iMd - 1, 0);
+      mlLeague.iLeagueSize = MvcApplication.ckcore.tl.getCupParticipants(league, iMd).Count;
 
       // Add lands to dropdown list
       foreach (int iLand in MvcApplication.iNations) {
@@ -2864,9 +2864,19 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult LeagueGetMatchday()
     {
       CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json("1", JsonRequestBehavior.AllowGet);
+      if (clb == null) return Json(1, JsonRequestBehavior.AllowGet);
 
-      return Json(Math.Max(MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1), 1), JsonRequestBehavior.AllowGet);
+      // Get current matchday
+      int iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
+
+      // Increment matchday match is if today or tomorrow
+      CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 1);
+      if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+
+      // Limit to 1
+      iMd = Math.Max(iMd, 1);
+
+      return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
@@ -3023,6 +3033,7 @@ namespace CornerkickWebMvc.Controllers
       cupModel.ltErg = new List<List<CornerkickGame.Game.Data>>();
 
       CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(cupModel);
 
       cupModel.iClubId = clb.iId;
 
@@ -3044,8 +3055,11 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult CupGetDdlMatchdays(ushort iSaison, int iLand)
     {
-      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
       CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
+      if (cup == null) return Json(null, JsonRequestBehavior.AllowGet);
 
       string[] ltMd = new string[cup.getMatchdaysTotal()];
       // Spieltage zu Dropdown Menü hinzufügen
@@ -3068,6 +3082,24 @@ namespace CornerkickWebMvc.Controllers
       */
 
       return Json(ltMd, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult CupGetMatchday()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(1, JsonRequestBehavior.AllowGet);
+
+      // Get current matchday
+      int iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 2);
+
+      // Increment matchday match is if today or tomorrow
+      CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 2);
+      if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+
+      // Limit to 1
+      iMd = Math.Max(iMd, 1);
+
+      return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setCup(Models.CupModel cupModel, ushort iSaison, int iLand, int iMatchday)
