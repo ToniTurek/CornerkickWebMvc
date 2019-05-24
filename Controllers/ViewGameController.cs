@@ -296,6 +296,7 @@ namespace CornerkickWebMvc.Controllers
       } else if (iState >= 0) {
         gD = getAllGameData(view, iState);
       } else if (iState <  0) {
+        gD.ltComments.Clear();
         addGameData(ref gD, gameData, user, club, iState);
       }
 
@@ -317,36 +318,16 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Game.State state = gameData.ltState[gameData.ltState.Count - 1];
       if (iState >= 0 && iState < gameData.ltState.Count) state = gameData.ltState[iState];
 
-      //int iStComm = 0;
-      //foreach (CornerkickGame.Game.State stateTmp in gameData.ltState) {
-      string sCommTmp = "";
-      string sLastComment = "";
-
-      if (!string.IsNullOrEmpty(gD.sComment)) {
-        string[] ltLastComment = gD.sComment.Split('\n');
-        if (ltLastComment.Length > 0) {
-          sLastComment = ltLastComment[0];
-        }
-      }
-
-      for (int iC = state.ltCommend.Count - 1; iC >= 0; iC--) {
+      for (int iC = 0; iC < state.ltCommend.Count; iC++) {
         CornerkickGame.Game.Kommentar k = state.ltCommend[iC];
 
-        if (!string.IsNullOrEmpty(k.sKommentar)) {
-          string sCommentarNew = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + k.sKommentar;
+        if (string.IsNullOrEmpty(k.sKommentar)) continue;
 
-          if (sLastComment.Equals(sCommentarNew)) break;
-
-          sCommTmp += sCommentarNew + '\n';
-        }
+        string[] sCommentarNew = new string[2];
+        sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true);
+        sCommentarNew[1] = k.sKommentar;
+        gD.ltComments.Add(sCommentarNew);
       }
-
-      gD.sComment = sCommTmp + gD.sComment;
-
-      //if (iState == iStComm) break;
-
-      //iStComm++;
-      //}
 
       float fLeft = ((state.tsMinute.Hours * 60f) + state.tsMinute.Minutes + (state.tsMinute.Seconds / 60f)) / 0.9f;
       if (gameData.bFinished) fLeft = (100.0f * state.i) / gameData.ltState.Count;
@@ -358,9 +339,6 @@ namespace CornerkickWebMvc.Controllers
         string sTeam = gameData.team[0].sTeam;
         if (iHA > 0) sTeam = gameData.team[1].sTeam;
 
-        //int iStTmp = 0;
-        // loop over states
-        //foreach (CornerkickGame.Game.State state in gameData.ltState) {
         string sOnClick = "";
         string sCursor = "";
         if (gameData.bFinished) {
@@ -430,9 +408,6 @@ namespace CornerkickWebMvc.Controllers
           gD.iDuels[iHA]++;
           if (duel.iResult > 1) gD.iFouls[iHA]++;
         }
-
-        //iStTmp++;
-        //} // foreach state
       } // iHA
 
       byte jHA = 0;
@@ -755,7 +730,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (view.game == null) view.game = user.game;
 
-      gD.sComment = "";
+      gD.ltComments = new List<string[]>();
 
       // initialize chart values
       gD.ltF = new List<Models.DataPointGeneral>[user.game.nPlStart];

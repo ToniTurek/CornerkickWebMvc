@@ -99,7 +99,7 @@ namespace CornerkickWebMvc.Models
 
       public string sDivHeatmap { get; set; }
 
-      public string sComment { get; set; }
+      public List<string[]> ltComments { get; set; }
 
       public string sAdminChanceShootOnGoal { get; set; }
       public string sAdminChanceGoal { get; set; }

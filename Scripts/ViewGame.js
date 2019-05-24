@@ -424,8 +424,15 @@ function plotStatistics(jState = -1) {
       $("#txtReferee").html("Schiedsrichter: " + gD.sRefereeQuality + "<br/>Fehlentscheidungen: " + gD.sRefereeDecisions);
 
       // Comment box
-      var tbKomm = document.getElementById("tbKommentar");
-      tbKomm.value = gD.sComment;
+      var tblComments = document.getElementById('tblComments');
+      var iC = 0;
+      for (iC = 0; iC < gD.ltComments.length; ++iC) {
+        var rowComments = tblComments.insertRow(0);
+        var cellComments0 = rowComments.insertCell(0);
+        var cellComments1 = rowComments.insertCell(1);
+        cellComments0.innerHTML = gD.ltComments[iC][0];
+        cellComments1.innerHTML = gD.ltComments[iC][1];
+      }
 
       $("#statistikGoals").html(gD.sStatGoals);
       $("#statistikCards").html(gD.sStatCards);
