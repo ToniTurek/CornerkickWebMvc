@@ -42,6 +42,8 @@ namespace CornerkickWebMvc
       }
 
       try {
+        MvcApplication.ckcore.tl.writeLog("Try to upload file '" + sFile + "' to key '" + sKey + "' (Type: '" + sContentType + "')", MvcApplication.ckcore.sErrorFile);
+
         PutObjectRequest putRequest = new PutObjectRequest {
           BucketName = sBucketName,
           Key = sKey,
