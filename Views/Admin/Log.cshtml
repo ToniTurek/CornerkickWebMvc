@@ -9,10 +9,25 @@
 <head>
   <script>
     $(document).ready(function () {
-      //var sLogText = @Html.Raw(Json.Encode(Model.sLog));
-      //sLogText = sLogText.replace("\n", "<br/>");
-      //sLogText = sLogText.replace(/\r?\n/g, '\n\r');
-      //$("textarea#sLog").val(sLogText);
+      // Fill Log table
+      var ltLog = @Html.Raw(Json.Encode(Model.ltLog));
+      var tblLog = document.getElementById('tblLog');
+      var iL = 0;
+      for (iL = 0; iL < ltLog.length; ++iL) {
+        var rowComments = tblLog.insertRow(0);
+        var cellComments = rowComments.insertCell(0);
+        cellComments.innerHTML = ltLog[iL];
+      }
+
+      // Fill Error table
+      var ltErr = @Html.Raw(Json.Encode(Model.ltErr));
+      var tblErr = document.getElementById('tblErr');
+      var iE = 0;
+      for (iE = 0; iE < ltErr.length; ++iE) {
+        var rowComments = tblErr.insertRow(0);
+        var cellComments = rowComments.insertCell(0);
+        cellComments.innerHTML = ltErr[iE];
+      }
     });
   </script>
 </head>
@@ -21,10 +36,13 @@
   @Html.ActionLink("Settings", "Settings", "Admin")
 
   <h3>Log</h3>
-  @Html.TextAreaFor(x => x.sLog, 30, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
-  @*<textarea id="sLog" style="width: 100%; max-width: 100%" rows="30" cols="1000"></textarea>*@
+  <table id="tblLog" style="width: 100%; height: auto">
+    <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+  </table>
 
   <h3>Error</h3>
-  @Html.TextAreaFor(x => x.sErr, 30, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
+  <table id="tblErr" style="width: 100%; height: auto">
+    <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+  </table>
 </body>
 </html>

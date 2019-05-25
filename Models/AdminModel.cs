@@ -13,8 +13,8 @@ namespace CornerkickWebMvc.Models
     public double fCalendarInterval { get; set; }
     public bool bTimer { get; set; }
     public string sStartHour { get; set; }
-    public string sLog { get; set; }
-    public string sErr { get; set; }
+    public List<string> ltLog { get; set; }
+    public List<string> ltErr { get; set; }
     public int nClubs { get; set; }
     public int nUser { get; set; }
     public int nPlayer { get; set; }

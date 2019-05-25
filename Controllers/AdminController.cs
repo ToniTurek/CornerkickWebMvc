@@ -198,7 +198,8 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult Log(Models.AdminModel modelAdmin)
     {
-      modelAdmin.sLog = "";
+      modelAdmin.ltLog = new List<string>();
+      modelAdmin.ltErr = new List<string>();
 
       /*
       if (MvcApplication.ckcore != null) {
@@ -223,7 +224,7 @@ namespace CornerkickWebMvc.Controllers
           // Read and display lines from the file until the end of 
           // the file is reached.
           while ((sLine = sr.ReadLine()) != null) {
-            modelAdmin.sLog += sLine + '\n';
+            modelAdmin.ltLog.Add(sLine);
           }
         }
       } catch (Exception e) {
@@ -241,7 +242,7 @@ namespace CornerkickWebMvc.Controllers
           // Read and display lines from the file until the end of 
           // the file is reached.
           while ((sLine = sr.ReadLine()) != null) {
-            modelAdmin.sErr += sLine + '\n';
+            modelAdmin.ltErr.Add(sLine);
           }
         }
       } catch (Exception e) {
