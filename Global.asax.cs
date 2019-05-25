@@ -326,11 +326,13 @@ namespace CornerkickWebMvc
 
 #if _USE_AMAZON_S3
       // Upload games
-      DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save", "games"));
-      if (d.Exists) {
-        FileInfo[] ltCkgFiles = d.GetFiles("*.ckgx");
+      DirectoryInfo diGames = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save", "games"));
+      MvcApplication.ckcore.tl.writeLog("Directory info games: '" + diGames.FullName + "'. Exist: " + diGames.Exists.ToString());
+      if (diGames.Exists) {
+        FileInfo[] ltCkgFiles = diGames.GetFiles("*.ckgx");
+        MvcApplication.ckcore.tl.writeLog("File info games length: " + ltCkgFiles.Length.ToString());
         foreach (FileInfo ckg in ltCkgFiles) {
-          DateTime dtGame;
+          //DateTime dtGame;
 
           string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
           if (sFilenameData.Length < 3) continue;
