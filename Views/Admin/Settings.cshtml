@@ -76,11 +76,13 @@
   string sDtNow = DateTime.Now.ToString();
   bool bCk = true;
   bool bTimer = false;
+  bool bTimerSave = false;
   string sInterval = "";
   string sHour = "";
   if (Model != null) {
     bCk = Model.bCk;
     bTimer = Model.bTimer;
+    bTimerSave = Model.bTimerSave;
     sInterval = Model.fCalendarInterval.ToString() + " s";
     sHour = Model.sStartHour;
   }
@@ -114,6 +116,7 @@
 <text>timer: @bTimer.ToString()<br></text>
 <text>interval: @sInterval<br></text>
 <text>hour: @sHour<br></text>
+<text>save timer: @bTimerSave.ToString()<br></text>
 <text>No. of Teams: @Model.nClubs<br></text>
 <text>No. of User: @Model.nUser<br></text>
 <text>No. of Player: @Model.nPlayer<br></text>

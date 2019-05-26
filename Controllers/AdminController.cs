@@ -35,6 +35,10 @@ namespace CornerkickWebMvc.Controllers
         modelAdmin.fCalendarInterval = MvcApplication.timerCkCalender.Interval / 1000;
       }
 
+      if (MvcApplication.timerSave != null) {
+        modelAdmin.bTimerSave = MvcApplication.timerSave.Enabled;
+      }
+
       modelAdmin.sStartHour = "";
       if (MvcApplication.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.iStartHour.ToString();
 

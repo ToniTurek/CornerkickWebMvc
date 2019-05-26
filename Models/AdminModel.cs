@@ -12,6 +12,7 @@ namespace CornerkickWebMvc.Models
     public bool bCk { get; set; }
     public double fCalendarInterval { get; set; }
     public bool bTimer { get; set; }
+    public bool bTimerSave { get; set; }
     public string sStartHour { get; set; }
     public List<string> ltLog { get; set; }
     public List<string> ltErr { get; set; }
