@@ -44,7 +44,7 @@
       }
 
       // Schedule the next request when the current one's complete
-      if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
+      if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && bAdminStop) {
         setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
       }
     }
