@@ -47,6 +47,7 @@ namespace CornerkickWebMvc.Models
       public List<string> ltPlayerTeamname { get; set; }
       public List<string> ltPlayerAge      { get; set; }
       public List<string> ltPlayerNat      { get; set; }
+      public List<bool>   ltPlayerSusp     { get; set; } // List of suspended player
 
       // Opponent player details
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }

@@ -318,41 +318,32 @@
           drawAufstellung(iFormation, iSelectedPlayer, true);
           oTable.rows('.selected').nodes().to$().removeClass('selected'); // if no data --> remove all selected classes
         } else if (data.length == 1) {
-          if (data[0].iSuspended < 1) {
-            $(this).toggleClass('selected'); // add selected class to row
+          $(this).toggleClass('selected'); // add selected class to row
 
-            iSelectedPlayer = data[0].iIndex;
-            drawAufstellung(iFormation, iSelectedPlayer, true);
-          } else {
-            // suspended
-            oTable.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp'); // remove all selected_tmp classes
-          }
+          iSelectedPlayer = data[0].iIndex;
+          drawAufstellung(iFormation, iSelectedPlayer, true);
         } else if (data.length == 2) {
-          if (data[0].iSuspended < 1 && data[1].iSuspended < 1) {
-            $(this).toggleClass('selected'); // add selected class to row
+          $(this).toggleClass('selected'); // add selected class to row
 
-            var i1 = data[0].sID;
-            var i2 = data[1].sID;
+          var i1 = data[0].sID;
+          var i2 = data[1].sID;
 
-            $.ajax({
-              url: '/Member/SwitchPlayerByID',
-              type: "GET",
-              dataType: "JSON",
-              data: { iID1: i1, iID2: i2 },
-              success: function (ltPlayer) {
-                //console.log(ltPlayer);
-                if (ltPlayer) {
-                  iSelectedPlayer = 0;
-                  drawAufstellung(iFormation, iSelectedPlayer, true);
-                  oTable.ajax.reload();
+          $.ajax({
+            url: '/Member/SwitchPlayerByID',
+            type: "GET",
+            dataType: "JSON",
+            data: { iID1: i1, iID2: i2 },
+            success: function (ltPlayer) {
+              //console.log(ltPlayer);
+              if (ltPlayer) {
+                iSelectedPlayer = 0;
+                drawAufstellung(iFormation, iSelectedPlayer, true);
+                oTable.ajax.reload();
 
-                  getSubstitutionList();
-                }
+                getSubstitutionList();
               }
-            });
-          } else {
-            oTable.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp'); // remove all selected_tmp classes
-          }
+            }
+          });
         }
       });
 

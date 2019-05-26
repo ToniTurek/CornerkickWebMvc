@@ -29,7 +29,7 @@
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
-            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx);
+            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
 
             i = i + 1;
             return i !== 11;
@@ -95,7 +95,7 @@
   });
 }
 
-function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain) {
+function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
   if (!player) {
     return "";
   }
@@ -135,6 +135,9 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   var color2 = "black";
   if (bOpponentTeam) {
     color = "lightgray";
+  } else if (bSuspended) {
+    color  = "rgba(255, 30, 0, .3)";
+    color2 = "rgba(0, 0, 0, .5)";
   } else if (player.bYellowCard) {
     color = "yellow";
   } else if (iSelectedPlayer >= 0 && i !== iSelectedPlayer) {
