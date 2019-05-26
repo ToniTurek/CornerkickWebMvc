@@ -83,7 +83,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (user.game == null && fiGames.Count > 0) {
-        string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[0].Name);
+        string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
         try {
           user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
         } catch {
