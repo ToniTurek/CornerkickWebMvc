@@ -659,7 +659,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      if (jPosMin < user.game.nPlStart) {
+      if (jPosMin < 11) {
         CornerkickGame.Player sp1 = MvcApplication.ckcore.ltPlayer[iPlayerID1];
         CornerkickGame.Player sp2 = MvcApplication.ckcore.ltPlayer[iPlayerID2];
 
