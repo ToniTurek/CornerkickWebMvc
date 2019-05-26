@@ -425,8 +425,20 @@ function plotStatistics(jState = -1) {
 
       // Comment box
       var tblComments = document.getElementById('tblComments');
+
+      var sLastComment = [];
+      var colLast = tblComments.getElementsByTagName("tbody")[0];
+      if (colLast.getElementsByTagName('td').length > 1) {
+        sLastComment[0] = colLast.getElementsByTagName('td')[0].innerHTML;
+        sLastComment[1] = colLast.getElementsByTagName('td')[1].innerHTML;
+      }
+
       var iC = 0;
       for (iC = 0; iC < gD.ltComments.length; ++iC) {
+        if (sLastComment[0] === gD.ltComments[iC][0] && sLastComment[1] === gD.ltComments[iC][1]) {
+          continue;
+        }
+
         var rowComments = tblComments.insertRow(0);
         var cellComments0 = rowComments.insertCell(0);
         var cellComments1 = rowComments.insertCell(1);
