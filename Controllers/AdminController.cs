@@ -140,6 +140,7 @@ namespace CornerkickWebMvc.Controllers
     public ActionResult StopCalendar(Models.AdminModel modelAdmin)
     {
       MvcApplication.timerCkCalender.Enabled = false;
+      MvcApplication.timerSave.Enabled = true;
 
       // Save last state
       MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
