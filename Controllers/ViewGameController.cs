@@ -173,11 +173,11 @@ namespace CornerkickWebMvc.Controllers
       if (game != null) {
         gD = new Models.ViewGameModel.gameData();
 
-        string sEmblemDir = MvcApplication.getHomeDir() + "Content/Uploads/emblems/";
+        string sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems");
         view.sEmblemH = game.data.team[0].iTeamId.ToString() + ".png";
         view.sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
-        if (!System.IO.File.Exists(sEmblemDir + view.sEmblemH)) view.sEmblemH = "0.png";
-        if (!System.IO.File.Exists(sEmblemDir + view.sEmblemA)) view.sEmblemA = "0.png";
+        if (!System.IO.File.Exists(Path.Combine(sEmblemDir, view.sEmblemH))) view.sEmblemH = "0.png";
+        if (!System.IO.File.Exists(Path.Combine(sEmblemDir, view.sEmblemA))) view.sEmblemA = "0.png";
 
         string[] sHA = new string[2] { "H", "A" };
         // Add player to heatmap
