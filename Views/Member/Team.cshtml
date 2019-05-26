@@ -594,14 +594,20 @@
     // Substitutions
     if (Model.bGame) {
       if (CornerkickWebMvc.Models.TeamModels.ltsSubstitution != null) {
-        <h4>Geplante Spielerwechsel</h4>
-        <div id="drawSubstitutions" style="position: relative"></div>
-        using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
-          <input type="submit" value="bestätigen" style="position: relative; width: 20%; min-width: 100px; height: 100%" />
-        }
-        using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
-          <input type="submit" value="zurücksetzen" style="position: relative; width: 20%; min-width: 100px; height: 100%" />
-        }
+        <div style="position: relative; float: left; width: 70%; min-width: 320px; height: auto; min-height: 85px; border: 1px solid black">
+          <div style="position: relative; left: 2%; width: 96%">
+            <h4>Geplante Spielerwechsel</h4>
+            <div id="drawSubstitutions" style="position: relative; width: 50%; margin-bottom: 4px"></div>
+            <div style="position: absolute; left: 50%; top: 0px; width: 50%; height: 75px; text-align: right">
+              @using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
+                <input type="submit" style="width: 100%" class="btn btn-default" value="bestätigen" />
+              }
+              @using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
+                <input type="submit" value="zurücksetzen" class="btn btn-default" style="width: 100%" />
+              }
+            </div>
+          </div>
+        </div>
       }
     }
   }
