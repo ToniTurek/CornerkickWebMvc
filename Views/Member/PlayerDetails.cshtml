@@ -521,7 +521,7 @@
               </tr>
               <tr>
                 <td align="right">Flexibilität:</td>
-                <td align="right">@player.fFlexibel.ToString("0.0%")</td>
+                <td align="right">@player.character.fFlexibel.ToString("0.0%")</td>
               </tr>
             </tbody>
           </table>
@@ -630,7 +630,7 @@
         </thead>
         <tbody>
           @for (int i = 0; i < player.iSkill.Length; i++) {
-            var fTraining = player.fFTraining[i] + 1.0;
+            var fTraining = player.fSkillTraining[i] + 1.0;
             <tr>
               <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
               <td align="center">@player.iSkill[i]</td>
@@ -657,19 +657,19 @@
           </tr>
         </thead>
         <tbody>
-          @for (byte i = 0; i < player.fPosSkill.Length; i++) {
+          @for (byte i = 0; i < player.fExperiencePos.Length; i++) {
             byte j = (byte)(i + 1);
 
             string sColor = "";
             string sBold = "";
-            if (player.fPosSkill[i] > 0.99) {
+            if (player.fExperiencePos[i] > 0.99) {
               sBold = "style=font-weight:bold";
-            } else if (player.fPosSkill[i] > 0.8) {
+            } else if (player.fExperiencePos[i] > 0.8) {
               sColor = "style=color:blue";
             }
             <tr @sBold>
               <td align="center">@MvcApplication.ckcore.sPosition[i + 1]</td>
-              <td align="right"><span @sColor>@player.fPosSkill[i].ToString("0.0%")</span></td>
+              <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
               <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(player, j, true).ToString("0.0")</td>
             </tr>
           }

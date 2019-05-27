@@ -459,7 +459,7 @@ namespace CornerkickWebMvc
 
         MvcApplication.ckcore.fz.fGlobalCreditInterest = 0.05f;
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
-          if (pl.fFlexibel < 0.1f) pl.fFlexibel = 1f;
+          if (pl.character.fFlexibel < 0.1f) pl.character.fFlexibel = 1f;
         }
 
         dtLoadCk = MvcApplication.ckcore.dtDatum;

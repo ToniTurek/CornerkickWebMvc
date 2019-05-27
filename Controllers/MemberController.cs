@@ -506,13 +506,13 @@ namespace CornerkickWebMvc.Controllers
       foreach (int iPlId in clb.ltPlayerId) {
         CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
 
-        fFAve[0] +=  pl.fFTraining[ 0];
-        fFAve[1] += (pl.fFTraining[ 1] + pl.fFTraining[ 2])                                        / 2f; // Technik + Dribbling
-        fFAve[2] +=  pl.fFTraining[ 3];                                                                  // Zweikampf
-        fFAve[3] += (pl.fFTraining[ 4] + pl.fFTraining[ 5] + pl.fFTraining[ 6] + pl.fFTraining[7]) / 4f; // Abspiel
-        fFAve[4] += (pl.fFTraining[ 8] + pl.fFTraining[ 9] + pl.fFTraining[10])                    / 3f; // Abschluss
-        fFAve[5] += (pl.fFTraining[11] + pl.fFTraining[12])                                        / 2f; // Standards
-        fFAve[6] += (pl.fFTraining[13] + pl.fFTraining[14] + pl.fFTraining[15])                    / 3f; // TW
+        fFAve[0] +=  pl.fSkillTraining[ 0];
+        fFAve[1] += (pl.fSkillTraining[ 1] + pl.fSkillTraining[ 2])                                                / 2f; // Technik + Dribbling
+        fFAve[2] +=  pl.fSkillTraining[ 3];                                                                              // Zweikampf
+        fFAve[3] += (pl.fSkillTraining[ 4] + pl.fSkillTraining[ 5] + pl.fSkillTraining[ 6] + pl.fSkillTraining[7]) / 4f; // Abspiel
+        fFAve[4] += (pl.fSkillTraining[ 8] + pl.fSkillTraining[ 9] + pl.fSkillTraining[10])                        / 3f; // Abschluss
+        fFAve[5] += (pl.fSkillTraining[11] + pl.fSkillTraining[12])                                                / 2f; // Standards
+        fFAve[6] += (pl.fSkillTraining[13] + pl.fSkillTraining[14] + pl.fSkillTraining[15])                        / 3f; // TW
       }
 
       for (int iF = 0; iF < fFAve.Length; iF++) {
@@ -2285,7 +2285,7 @@ namespace CornerkickWebMvc.Controllers
 
       stadionModel.iSeatsBuild = new int[clb.stadium.blocks.Length];
       for (int i = 0; i < clb.stadium.blocks.Length; i++) {
-        stadionModel.iSeatsBuild[i] = clb.stadium.blocks[i].iDaysConstructSeats;
+        stadionModel.iSeatsBuild[i] = clb.stadium.blocks[i].iSeatsDaysConstruct;
       }
 
       stadionModel.bOberring = bStadiumGetTopring(clb);
@@ -2531,7 +2531,7 @@ namespace CornerkickWebMvc.Controllers
         for (int i = 0; i < iSeatType.Length; i++) stadium.blocks[i].iType = (byte)iSeatType[i];
       }
       if (iSeatsBuild != null) {
-        for (int i = 0; i < iSeatsBuild.Length; i++) stadium.blocks[i].iDaysConstructSeats = iSeatsBuild[i];
+        for (int i = 0; i < iSeatsBuild.Length; i++) stadium.blocks[i].iSeatsDaysConstruct = iSeatsBuild[i];
       }
 
       return stadium;
