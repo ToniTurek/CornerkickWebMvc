@@ -3157,14 +3157,14 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<tr style=" + sStyle + ">";
         sBox += "<td>" + gd.dt.ToString("d", getCi()) + "&nbsp;" + gd.dt.ToString("t", getCi()) + "</td>";
 
-        sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"_blank\">" + sClubNameH + "</a></td>";
-        sBox += "<td align=\"center\">&nbsp;-&nbsp;</td>";
-        sBox += "<td align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"_blank\">" + sClubNameA + "</a></td>";
+        sBox += "<td style=\"white-space: nowrap\" align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + iIdH.ToString() + "\" target=\"\">" + sClubNameH + "</a></td>";
+        sBox += "<td style=\"white-space: nowrap\" align=\"center\">&nbsp;-&nbsp;</td>";
+        sBox += "<td style=\"white-space: nowrap\" align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"\">" + sClubNameA + "</a></td>";
 
         if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
-          sBox += "<td align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";
+          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";
         } else {
-          sBox += "<td align=\"center\">-</td>";
+          sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
         }
         sBox += "</tr>";
       }
