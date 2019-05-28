@@ -60,7 +60,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (view.bAdmin && user.game == null) {
         user.game = MvcApplication.ckcore.game.tl.getDefaultGame();
-        user.game.iGameSpeed = 300;
+        user.game.data.iGameSpeed = 300;
       }
 
       view.ddlGames = new List<SelectListItem>();
@@ -182,12 +182,12 @@ namespace CornerkickWebMvc.Controllers
         string[] sHA = new string[2] { "H", "A" };
         // Add player to heatmap
         for (byte iHA = 0; iHA < 2; iHA++) {
-          for (byte iPl = 0; iPl < game.nPlStart; iPl++) {
-            view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.nPlStart) + iPl).ToString() });
+          for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
+            view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.data.nPlStart) + iPl).ToString() });
           }
         }
 
-        view.iGameSpeed = game.iGameSpeed;
+        view.iGameSpeed = game.data.iGameSpeed;
 
         view.game = game;
 
@@ -244,7 +244,7 @@ namespace CornerkickWebMvc.Controllers
       gLoc.ltPlayer = new List<Models.ViewGameModel.gamePlayer>();
 
       for (byte iHA = 0; iHA < 2; iHA++) {
-        for (int iP = 0; iP < MvcApplication.ckcore.game.nPlStart; iP++) {
+        for (int iP = 0; iP < MvcApplication.ckcore.game.data.nPlStart; iP++) {
           Models.ViewGameModel.gamePlayer gPlayer = new Models.ViewGameModel.gamePlayer();
 
           CornerkickGame.Player pl;
@@ -416,12 +416,12 @@ namespace CornerkickWebMvc.Controllers
       // Chart
       if (bAddFMList) {
         if (gD.ltF == null || iState == -1) {
-          gD.ltF = new List<Models.DataPointGeneral>[user.game.nPlStart];
+          gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
           for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
         }
 
         if (gD.ltM == null || iState == -1) {
-          gD.ltM = new List<Models.DataPointGeneral>[user.game.nPlStart];
+          gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
           for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
         }
 
@@ -464,7 +464,7 @@ namespace CornerkickWebMvc.Controllers
         if (iAllShoots >= 0) {
           byte iHA   =  0;
           int  iPlIx = -1;
-          getStatisticHAPlayerIx(iAllShoots, user.game.nPlStart, out iHA, out iPlIx);
+          getStatisticHAPlayerIx(iAllShoots, user.game.data.nPlStart, out iHA, out iPlIx);
 
           for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
             CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
@@ -482,7 +482,7 @@ namespace CornerkickWebMvc.Controllers
         if (iAllPasses >= 0) {
           byte iHA = 0;
           int iPlIx = -1;
-          getStatisticHAPlayerIx(iAllPasses, user.game.nPlStart, out iHA, out iPlIx);
+          getStatisticHAPlayerIx(iAllPasses, user.game.data.nPlStart, out iHA, out iPlIx);
 
           for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
             CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
@@ -502,7 +502,7 @@ namespace CornerkickWebMvc.Controllers
         if (iAllDuels >= 0) {
           byte iHA   =  0;
           int  iPlIx = -1;
-          getStatisticHAPlayerIx(iAllDuels, user.game.nPlStart, out iHA, out iPlIx);
+          getStatisticHAPlayerIx(iAllDuels, user.game.data.nPlStart, out iHA, out iPlIx);
 
           for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
             CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
@@ -590,7 +590,7 @@ namespace CornerkickWebMvc.Controllers
       if (iHeatmap >= 0) {
         byte iHA   =  0;
         int  iPlIx = -1;
-        getStatisticHAPlayerIx(iHeatmap, user.game.nPlStart, out iHA, out iPlIx);
+        getStatisticHAPlayerIx(iHeatmap, user.game.data.nPlStart, out iHA, out iPlIx);
         gD.sDivHeatmap = getDivHeatmap(iHA, iState, iPlIx);
       }
     }
@@ -733,9 +733,9 @@ namespace CornerkickWebMvc.Controllers
       gD.ltComments = new List<string[]>();
 
       // initialize chart values
-      gD.ltF = new List<Models.DataPointGeneral>[user.game.nPlStart];
+      gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
-      gD.ltM = new List<Models.DataPointGeneral>[user.game.nPlStart];
+      gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
 
       gD.iShoots       = new int[2];
@@ -826,7 +826,7 @@ namespace CornerkickWebMvc.Controllers
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
       }
 
-      userAdmin.game.iGameSpeed = 300;
+      userAdmin.game.data.iGameSpeed = 300;
 
       userAdmin.game.start();
 
@@ -852,7 +852,7 @@ namespace CornerkickWebMvc.Controllers
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
       }
 
-      userAdmin.game.iGameSpeed = 1;
+      userAdmin.game.data.iGameSpeed = 1;
 
       userAdmin.game.next(iPlayerNextAction: iNextAction, iPassNextActionX: iX, iPassNextActionY: iY);
 
@@ -865,7 +865,7 @@ namespace CornerkickWebMvc.Controllers
 
       userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
 
-      userAdmin.game.iGameSpeed = 300;
+      userAdmin.game.data.iGameSpeed = 300;
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

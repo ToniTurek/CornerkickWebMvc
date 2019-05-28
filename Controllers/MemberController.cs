@@ -641,7 +641,7 @@ namespace CornerkickWebMvc.Controllers
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
           // If switch of player in starting 11 --> do it directly
-          if (jPosMin < user.game.nPlStart && jPosMax >= user.game.nPlStart) {
+          if (jPosMin < user.game.data.nPlStart && jPosMax >= user.game.data.nPlStart) {
             // Return if ...
             if (user.game.player[iHA][jPosMax].bGespielt) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
             if (user.game.iSubstitutionsLeft[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... no subs left
@@ -1069,7 +1069,7 @@ namespace CornerkickWebMvc.Controllers
       byte iHA = 0;
       if (game.data.team[1].iTeamId == club.iId) iHA = 1;
 
-      for (byte iPl = 0; iPl < game.nPlStart; iPl++) {
+      for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
         foreach (int iPlId in club.ltPlayerId) {
           if (iPlId == game.player[iHA][iPl].iId) {
             game.player[iHA][iPl] = MvcApplication.ckcore.ltPlayer[iPlId];
@@ -1146,7 +1146,7 @@ namespace CornerkickWebMvc.Controllers
 
       byte iPl = 0;
       foreach (CornerkickGame.Player pl in ltPlayer) {
-        if (iPl >= MvcApplication.ckcore.game.nPlStart) break;
+        if (iPl >= MvcApplication.ckcore.game.data.nPlStart) break;
 
         if (!MvcApplication.ckcore.game.tl.checkPlayerIsKeeper(pl)) {
           float fHeight = 0.05f;
@@ -1192,7 +1192,7 @@ namespace CornerkickWebMvc.Controllers
     {
       string sDiv = "";
 
-      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.nPlStart || iPlayerIndex >= club.ltPlayerId.Count) return "";
+      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.data.nPlStart || iPlayerIndex >= club.ltPlayerId.Count) return "";
 
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPlayerIndex]];
 
@@ -1278,7 +1278,7 @@ namespace CornerkickWebMvc.Controllers
     {
       float[] fIndOrientationMinMax = new float[2];
 
-      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.nPlStart || iPlayerIndex >= club.ltPlayerId.Count) return fIndOrientationMinMax;
+      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.data.nPlStart || iPlayerIndex >= club.ltPlayerId.Count) return fIndOrientationMinMax;
 
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPlayerIndex]];
 
@@ -1998,7 +1998,7 @@ namespace CornerkickWebMvc.Controllers
       for (byte iS = 0; iS < 4; iS++) {
         tactic.ltDdlStandards[iS] = new List<SelectListItem>();
         tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = "auto (" + sStandards[iS] + ")", Value = "-1" });
-        for (byte iPl = 0; iPl < MvcApplication.ckcore.game.nPlStart; iPl++) {
+        for (byte iPl = 0; iPl < MvcApplication.ckcore.game.data.nPlStart; iPl++) {
           if (clb.ltPlayerId.Count <= iPl) break;
 
           CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
@@ -2109,7 +2109,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           string sPos = "";
-          if (iPl < MvcApplication.ckcore.game.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
+          if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
           else                                           sPos = MvcApplication.ckcore.plr.getStrPos(pl);
           string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl, 0, true).ToString(" (0.0)");
           SelectListItem sliAutoSub = new SelectListItem { Text = pl.sName + " - " + sPos + sStrength,
@@ -2117,7 +2117,7 @@ namespace CornerkickWebMvc.Controllers
                                                            Selected = bSelected
                                                          };
 
-          if (iPl < MvcApplication.ckcore.game.nPlStart) {
+          if (iPl < MvcApplication.ckcore.game.data.nPlStart) {
             if (!checkIfAlreadyInDdl(iPl, tactic.ddlAutoSubsOut, iAS)) tactic.ddlAutoSubsOut[iAS].Add(sliAutoSub);
           } else {
             if (!checkIfAlreadyInDdl(iPl, tactic.ddlAutoSubsIn,  iAS)) tactic.ddlAutoSubsIn[iAS].Add(sliAutoSub);
@@ -2159,10 +2159,10 @@ namespace CornerkickWebMvc.Controllers
       sBox[1] += "<select name=\"sAutoSubsIn" + iAS.ToString() + "\" class=\"form-control\" id =\"ddlAutoSubIn" + iAS.ToString() + "\" onchange =\"setAutoSubs(" + iAS.ToString() + ")\"><option value=\"-1\">aus</option>";
 
       // foreach player
-      for (int iPl = 0; iPl < MvcApplication.ckcore.game.nPlStart + MvcApplication.ckcore.game.nPlRes; iPl++) {
+      for (int iPl = 0; iPl < MvcApplication.ckcore.game.data.nPlStart + MvcApplication.ckcore.game.data.nPlRes; iPl++) {
         CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
 
-        bool bOut = iPl < MvcApplication.ckcore.game.nPlStart;
+        bool bOut = iPl < MvcApplication.ckcore.game.data.nPlStart;
 
         bool bContinue = false;
         byte jAS = 0;
@@ -2181,7 +2181,7 @@ namespace CornerkickWebMvc.Controllers
         }
 
         string sPos = "";
-        if (iPl < MvcApplication.ckcore.game.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
+        if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
         else                                           sPos = MvcApplication.ckcore.plr.getStrPos(pl);
         string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl).ToString(" (0.0)");
 
