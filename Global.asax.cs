@@ -462,6 +462,10 @@ namespace CornerkickWebMvc
           if (pl.character.fFlexibel < 0.1f) pl.character.fFlexibel = 1f;
         }
 
+        if (MvcApplication.ckcore.ltClubs.Count > 3) {
+          if (MvcApplication.ckcore.ltClubs[3].iBalance > 1000000000) MvcApplication.ckcore.ltClubs[3].iBalance = 10000000;
+        }
+
         dtLoadCk = MvcApplication.ckcore.dtDatum;
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
