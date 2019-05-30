@@ -469,9 +469,9 @@ namespace CornerkickWebMvc
         // Tmp set keeper skills to 1
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
           if (!ckcore.game.tl.checkPlayerIsKeeper(pl)) {
-            pl.fSkillTraining[13] = 1f;
-            pl.fSkillTraining[14] = 1f;
-            pl.fSkillTraining[15] = 1f;
+            pl.fSkillTraining[13] = 0f;
+            pl.fSkillTraining[14] = 0f;
+            pl.fSkillTraining[15] = 0f;
           }
         }
 
