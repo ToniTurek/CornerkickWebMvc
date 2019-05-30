@@ -459,14 +459,30 @@ namespace CornerkickWebMvc
         // Set admin user to CPU
         if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
 
+        // TMP section
         MvcApplication.ckcore.fz.fGlobalCreditInterest = 0.05f;
+
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
           if (pl.character.fFlexibel < 0.1f) pl.character.fFlexibel = 1f;
+        }
+
+        // Tmp set keeper skills to 1
+        foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
+          if (!ckcore.game.tl.checkPlayerIsKeeper(pl)) {
+            pl.fSkillTraining[13] = 1f;
+            pl.fSkillTraining[14] = 1f;
+            pl.fSkillTraining[15] = 1f;
+          }
         }
 
         if (MvcApplication.ckcore.ltClubs.Count > 3) {
           if (MvcApplication.ckcore.ltClubs[3].iBalance > 1000000000) MvcApplication.ckcore.ltClubs[3].iBalance = 10000000;
         }
+
+        foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
+          foreach (CornerkickGame.Stadium.Block block in clb.stadium.blocks) block.iSeatsDaysConstructIni = Math.Max(block.iSeatsDaysConstructIni, block.iSeatsDaysConstruct);
+        }
+        // END TMP section
 
         dtLoadCk = MvcApplication.ckcore.dtDatum;
 
