@@ -253,8 +253,8 @@ namespace CornerkickWebMvc.Controllers
 
           if (string.IsNullOrEmpty(pl.sName)) continue;
 
-          if      (pl.bYellowCard)                         gPlayer.iCard = 1;
-          else if (pl.iSperre[user.game.iIndexSperre] > 0) gPlayer.iCard = 2;
+          if      (pl.bYellowCard)                              gPlayer.iCard = 1;
+          else if (pl.iSuspension[user.game.iSuspensionIx] > 0) gPlayer.iCard = 2;
 
           gPlayer.ptPos = pl.ptPos;
           if (bAverage) {
@@ -577,8 +577,8 @@ namespace CornerkickWebMvc.Controllers
 
       if (AccountController.checkUserIsAdmin(User.Identity.GetUserName())) {
         if (user.game.ball.plAtBall != null) {
-          float fShootOnGoal = user.game.ai.getChanceShootOnGoal(user.game.ball.plAtBall);
-          float fKeeperSave  = user.game.ai.getChanceKeeperSave (user.game.ball.plAtBall);
+          float fShootOnGoal = user.game.ai.getChanceShootOnGoal    (user.game.ball.plAtBall);
+          float fKeeperSave  = user.game.ai.getChanceShootKeeperSave(user.game.ball.plAtBall);
 
           gD.sAdminChanceShootOnGoal = "<br/><u>Change Schuss aufs Tor:</u> " + fShootOnGoal.ToString("0.0%");
           gD.sAdminChanceGoal        = "<br/><u>Change Tor:</u> " + (fShootOnGoal * (1f - fKeeperSave)).ToString("0.0%");
