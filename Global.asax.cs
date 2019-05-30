@@ -461,27 +461,6 @@ namespace CornerkickWebMvc
 
         // TMP section
         MvcApplication.ckcore.fz.fGlobalCreditInterest = 0.05f;
-
-        foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
-          if (pl.character.fFlexibel < 0.1f) pl.character.fFlexibel = 1f;
-        }
-
-        // Tmp set keeper skills to 1
-        foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
-          if (pl.fExperiencePos[0] < 0.999) {
-            pl.fSkillTraining[13] = 0f;
-            pl.fSkillTraining[14] = 0f;
-            pl.fSkillTraining[15] = 0f;
-          }
-        }
-
-        if (MvcApplication.ckcore.ltClubs.Count > 3) {
-          if (MvcApplication.ckcore.ltClubs[3].iBalance > 1000000000) MvcApplication.ckcore.ltClubs[3].iBalance = 10000000;
-        }
-
-        foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
-          foreach (CornerkickGame.Stadium.Block block in clb.stadium.blocks) block.iSeatsDaysConstructIni = Math.Max(block.iSeatsDaysConstructIni, block.iSeatsDaysConstruct);
-        }
         // END TMP section
 
         dtLoadCk = MvcApplication.ckcore.dtDatum;
