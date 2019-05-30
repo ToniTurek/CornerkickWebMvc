@@ -256,7 +256,7 @@ namespace CornerkickWebMvc.Controllers
 
       
       // Do initial formation
-      MvcApplication.ckcore.doFormationKI(clb.iId);
+      MvcApplication.ckcore.doFormation(clb.iId);
 
       // Add club to league/cup
       MvcApplication.ckcore.ltCups[0].ltClubs[0].Add(clb); // nat. cup

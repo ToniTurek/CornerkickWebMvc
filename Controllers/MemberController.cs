@@ -617,7 +617,7 @@ namespace CornerkickWebMvc.Controllers
       int iC = user.iTeam;
 
       int iPlayerID = MvcApplication.ckcore.ltClubs[iC].ltPlayerId[fromPosition - 1];
-      if (!MvcApplication.ckcore.ltPlayer[iPlayerID].bGespielt) {
+      if (!MvcApplication.ckcore.ltPlayer[iPlayerID].bPlayed) {
         MvcApplication.ckcore.ltClubs[iC].ltPlayerId.RemoveAt(fromPosition - 1);
         MvcApplication.ckcore.ltClubs[iC].ltPlayerId.Insert(toPosition - 1, iPlayerID);
 
@@ -647,11 +647,11 @@ namespace CornerkickWebMvc.Controllers
           // If switch of player in starting 11 --> do it directly
           if (jPosMin < user.game.data.nPlStart && jPosMax >= user.game.data.nPlStart) {
             // Return if ...
-            if (user.game.player[iHA][jPosMax].bGespielt) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
+            if (user.game.player[iHA][jPosMax].bPlayed) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
             if (user.game.iSubstitutionsLeft[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... no subs left
             if (user.game.data.iGameType >                                              0 &&
-                user.game.data.iGameType <= user.game.player[iHA][jPosMin].iSperre.Length &&
-                user.game.player[iHA][jPosMin].iSperre[user.game.data.iGameType - 1] > 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player out is suspended
+                user.game.data.iGameType <= user.game.player[iHA][jPosMin].iSuspension.Length &&
+                user.game.player[iHA][jPosMin].iSuspension[user.game.data.iGameType - 1] > 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player out is suspended
 
             if (Models.TeamModels.ltiSubstitution == null) {
               Models.TeamModels.ltiSubstitution = new List<int[]>();
@@ -784,7 +784,7 @@ namespace CornerkickWebMvc.Controllers
         if (!user.game.data.bFinished) return RedirectToAction("Team");
       }
 
-      MvcApplication.ckcore.doFormationKI(user.iTeam);
+      MvcApplication.ckcore.doFormation(user.iTeam);
 
       return RedirectToAction("Team");
     }
@@ -797,7 +797,9 @@ namespace CornerkickWebMvc.Controllers
         if (!user.game.data.bFinished) return Json("error", JsonRequestBehavior.AllowGet);
       }
 
-      MvcApplication.ckcore.doFormationKI(user.iTeam, iType);
+      CornerkickManager.Club club = ckClub();
+
+      MvcApplication.ckcore.doFormation(club.iId, iType);
 
       return Json("success", JsonRequestBehavior.AllowGet);
     }
@@ -1022,9 +1024,12 @@ namespace CornerkickWebMvc.Controllers
 
         // Check if player is suspended
         bool bSusp = false;
-        if (usr.game != null) {
-          if (usr.game.data.iGameType > 0 && usr.game.data.iGameType <= pl.iSperre.Length) bSusp = pl.iSperre[usr.game.data.iGameType - 1] > 0;
-        }
+        int iSuspIx = 0;
+        if      (usr.game      != null && !usr.game.data.bFinished) iSuspIx = usr.game.data.iGameType - 1;
+        else if (club.nextGame != null)                             iSuspIx = club.nextGame.iGameType - 1;
+
+        if (iSuspIx >= 0 && iSuspIx < pl.iSuspension.Length) bSusp = pl.iSuspension[iSuspIx] > 0;
+
         tD.ltPlayerSusp.Add(bSusp);
       }
 

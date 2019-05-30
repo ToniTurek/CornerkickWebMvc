@@ -532,19 +532,19 @@
                 <td align="right"><ins>Sperren:</ins></td>
               </tr>
               @{
-                if (player.iSperre[0] + player.iSperre[1] == 0) {
+                if (player.iSuspension[0] + player.iSuspension[1] == 0) {
                   <tr>
                     <td align="right">keine</td>
                   </tr>
                 } else {
-                  if (player.iSperre[0] > 0) {
-                    string sSp = "Liga: " + player.iSperre[0].ToString() + " Spiele";
+                  if (player.iSuspension[0] > 0) {
+                    string sSp = "Liga: " + player.iSuspension[0].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
                   }
-                  if (player.iSperre[1] > 0) {
-                    string sSp = "Pokal: " + player.iSperre[1].ToString() + " Spiele";
+                  if (player.iSuspension[1] > 0) {
+                    string sSp = "Pokal: " + player.iSuspension[1].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
@@ -703,8 +703,8 @@
               nStat = 2;
             }
 
-            CornerkickGame.Player.Statistic[] plStatSeason = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, true), player.getStatistic(2, true) };
-            CornerkickGame.Player.Statistic[] plStatTotal = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, false), player.getStatistic(2, false) };
+            CornerkickGame.Player.Statistic[] plStatSeason = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, true),  player.getStatistic(2, true)  };
+            CornerkickGame.Player.Statistic[] plStatTotal  = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, false), player.getStatistic(2, false) };
           }
           <tr>
             <td align="right">Spiele</td>
