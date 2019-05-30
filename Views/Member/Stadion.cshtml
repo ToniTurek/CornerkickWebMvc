@@ -8,6 +8,26 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <style>
+    .ui-widget-header {
+      background: lime;
+    }
+
+    .ui-progressbar {
+      position: relative;
+      height: 14px;
+      display: none;
+    }
+
+    .progress-label {
+      position: absolute;
+      left: 50%;
+      top: -4px;
+      text-shadow: 1px 1px 0 #fff;
+    }
+  </style>
+
   <script type="text/javascript">
     function setName() {
       var sNewName = $("#sName").val();
@@ -147,6 +167,25 @@
             bnRenewPitch.disabled = true;
           } else {
             bnRenewPitch.disabled = false;
+          }
+        }
+      });
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetBlockProgress',
+        dataType: "json",
+        success: function (ltfPg) {
+          var iB = 0;
+          for (iB = 0; iB < ltfPg.length; iB++) {
+            if (ltfPg[iB] >= 0.0) {
+              // Create progress bars
+              var pbBlock = $("#pbBlock_" + iB.toString());
+              pbBlock.progressbar({
+                value: ltfPg[iB] * 100
+              });
+              pbBlock.css("display", "block");
+            }
           }
         }
       });
@@ -355,32 +394,35 @@
 
             var htmlAttributesEditorFor = new Dictionary<string, object>
             {
-                                { "type", "number" },
-                                { "class", "form-control tbSeats" },
-                                { "id", "tbSeats_" + iB.ToString() },
-                                //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
-                                { "style", "position: relative width: 100%; text-align: right" },
-                                { "autocomplete", "off" },
-                                { "min", "0" }
-                              };
+              { "type", "number" },
+              { "class", "form-control tbSeats" },
+              { "id", "tbSeats_" + iB.ToString() },
+              //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
+              { "style", "position: relative width: 100%; text-align: right" },
+              { "autocomplete", "off" },
+              { "min", "0" }
+            };
             if (Model.iSeatsBuild[iB] > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
 
             //@Html.EditorFor(model => model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
 
             var htmlAttributesDropDownListFor = new Dictionary<string, object>
             {
-                                { "class", "form-control ddlSeatTypes" },
-                                { "id", "iDdlId" + iB.ToString() },
-                                { "style", "position: relative; text-align: right" },
-                                { "onchange", "getStadion()" }
-                              };
+              { "class", "form-control ddlSeatTypes" },
+              { "id", "iDdlId" + iB.ToString() },
+              { "style", "position: relative; text-align: right" },
+              { "onchange", "getStadion()" }
+            };
 
-            if (Model.iSeatsBuild[iB] > 0) { htmlAttributesDropDownListFor.Add("disabled", "disabled"); }
+            if (Model.iSeatsBuild[iB] > 0) {
+              htmlAttributesDropDownListFor.Add("disabled", "disabled");
+            }
 
             string sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; left: " + (sLoc[iB, 0] - 0.03).ToString("0%");
             if (iB == 8 || iB == 9) {
               sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; right: " + (1.0 - sLoc[iB, 0] - 0.03).ToString("0%");
             }
+
             <div style="@sStyle">
               <div style="position: relative">
                 @Html.EditorFor(Model => Model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
@@ -390,6 +432,12 @@
                 @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right", @disabled = "disabled" })
               } else {
                 @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right" })
+              }
+
+              @if (Model.iSeatsBuild[iB] > 0) {
+                // Progress bar
+                string sPbId = "pbBlock_" + iB.ToString();
+                <div id="@sPbId" style="position: absolute; width: 100%; top: 28px"></div>
               }
             </div>
             //@Html.DropDownListFor(m => m.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { htmlAttributes = htmlAttributesDropDownListFor })

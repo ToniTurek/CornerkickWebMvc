@@ -2409,6 +2409,24 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
+    public JsonResult StadiumGetBlockProgress()
+    {
+      CornerkickManager.Club clb = ckClub();
+
+      int nBlocksMax = clb.stadium.blocks.Length;
+      if (!clb.stadium.bTopring) nBlocksMax = 10;
+      float[] fPg = new float[nBlocksMax];
+
+      for (byte iB = 0; iB < nBlocksMax; iB++) {
+        int iDaysMax = MvcApplication.ckcore.st.getCostDaysContructStadiumBlock(clb.stadium.blocks[iB], clb.stadium.blocks[iB], 0, ckUser())[0];
+        if (clb.stadium.blocks[iB].iSeatsDaysConstruct > 0) fPg[iB] = (clb.stadium.blocks[iB].iSeatsDaysConstructIni - clb.stadium.blocks[iB].iSeatsDaysConstruct) / (float)clb.stadium.blocks[iB].iSeatsDaysConstructIni;
+        else                                                fPg[iB] = -1f;
+      }
+
+      return Json(fPg, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
     public JsonResult StadiumBuildTopring()
     {
       CornerkickManager.Club clb = ckClub();
