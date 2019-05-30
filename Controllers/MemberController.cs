@@ -507,6 +507,7 @@ namespace CornerkickWebMvc.Controllers
       Models.DataPointGeneral[] dataPoints = new Models.DataPointGeneral[7];
 
       double[] fFAve = new double[7];
+      int nPlKeeper = 0;
       foreach (int iPlId in clb.ltPlayerId) {
         CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
 
@@ -517,10 +518,13 @@ namespace CornerkickWebMvc.Controllers
         fFAve[4] += (pl.fSkillTraining[ 8] + pl.fSkillTraining[ 9] + pl.fSkillTraining[10])                        / 3f; // Abschluss
         fFAve[5] += (pl.fSkillTraining[11] + pl.fSkillTraining[12])                                                / 2f; // Standards
         fFAve[6] += (pl.fSkillTraining[13] + pl.fSkillTraining[14] + pl.fSkillTraining[15])                        / 3f; // TW
+
+        if (pl.fExperiencePos[0] > 0.999) nPlKeeper++;
       }
 
       for (int iF = 0; iF < fFAve.Length; iF++) {
-        dataPoints[iF] = new Models.DataPointGeneral(iF, fFAve[iF] / clb.ltPlayerId.Count);
+        if (iF < fFAve.Length - 1) dataPoints[iF] = new Models.DataPointGeneral(iF, fFAve[iF] / clb.ltPlayerId.Count);
+        else if (nPlKeeper > 0)    dataPoints[iF] = new Models.DataPointGeneral(iF, fFAve[iF] / nPlKeeper);
       }
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
