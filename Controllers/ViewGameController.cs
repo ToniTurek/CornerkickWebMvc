@@ -324,7 +324,7 @@ namespace CornerkickWebMvc.Controllers
         if (string.IsNullOrEmpty(k.sKommentar)) continue;
 
         string[] sCommentarNew = new string[2];
-        sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true);
+        sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + ": ";
         sCommentarNew[1] = k.sKommentar;
         gD.ltComments.Add(sCommentarNew);
       }
