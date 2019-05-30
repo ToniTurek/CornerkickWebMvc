@@ -26,13 +26,15 @@ namespace CornerkickWebMvc.Models
     public bool bSaveDirExist { get; set; }
 
     public string sSelectedAutosaveFile { get; set; }
-    public int iAutosaveFile { get; set; }
     public List<SelectListItem> ddlAutosaveFiles { get; set; }
+
+    // CPU Clubs to be selected by admin
+    public List<SelectListItem> ddlClubsAdmin { get; set; }
+    public int iSelectedClubAdmin { get; set; }
 
     public AdminModel()
     {
       ddlAutosaveFiles = new List<SelectListItem>();
-
       DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save"));
       if (d.Exists) {
         FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
@@ -40,12 +42,27 @@ namespace CornerkickWebMvc.Models
         foreach (FileInfo ckx in ltCkxFiles) {
           ddlAutosaveFiles.Add(
             new SelectListItem {
-              Text = ckx.Name,
+              Text  = ckx.Name,
               Value = ckx.Name
             }
           );
         }
       }
+
+      ddlClubsAdmin = new List<SelectListItem>();
+      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
+        CornerkickManager.Club clbCPU = MvcApplication.ckcore.ltClubs[iC];
+
+        if (clbCPU.iUser < 0) {
+          ddlClubsAdmin.Add(
+            new SelectListItem {
+              Text  = clbCPU.sName,
+              Value = iC.ToString()
+            }
+          );
+        }
+      }
     }
+
   }
 }

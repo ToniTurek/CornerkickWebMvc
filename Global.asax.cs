@@ -48,6 +48,8 @@ namespace CornerkickWebMvc
 
     static DateTime dtLoadCk = new DateTime(); // The ck DateTime when game was (re-)started
 
+    public static CornerkickManager.Club clubAdmin;
+
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();

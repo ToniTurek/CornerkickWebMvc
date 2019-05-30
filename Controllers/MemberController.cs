@@ -146,6 +146,10 @@ namespace CornerkickWebMvc.Controllers
 
     public CornerkickManager.Club ckClub()
     {
+      if (AccountController.checkUserIsAdmin(User.Identity.Name)) {
+        if (MvcApplication.clubAdmin != null) return MvcApplication.clubAdmin;
+      }
+
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
@@ -546,7 +550,7 @@ namespace CornerkickWebMvc.Controllers
       team.bAdmin = AccountController.checkUserIsAdmin(User.Identity.GetUserName());
 
       team.bGame = false;
-      if (user.game != null) team.bGame = !user.game.data.bFinished;
+      if (user != null && user.game != null) team.bGame = !user.game.data.bFinished;
 
       setModelLtPlayer(user);
 
@@ -563,7 +567,7 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
-      if (user.ltFormations != null) {
+      if (user != null && user.ltFormations != null) {
         for (int i = 0; i < user.ltFormations.Count; i++) {
           team.ltsFormations.Add(new SelectListItem { Text     = (MvcApplication.ckcore.ltFormationen.Count + i + 1).ToString() + " - " + user.ltFormations[i].sName,
                                                       Value    = (MvcApplication.ckcore.ltFormationen.Count + i + 1).ToString(),

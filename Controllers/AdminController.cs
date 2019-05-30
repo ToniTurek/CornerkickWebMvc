@@ -56,6 +56,8 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "/save/.autosave.ckx");
       modelAdmin.bSaveDirExist  = System.IO.Directory.Exists(sHomeDir + "/save");
 
+      if (MvcApplication.clubAdmin != null) modelAdmin.iSelectedClubAdmin = MvcApplication.clubAdmin.iId;
+
       return View(modelAdmin);
     }
 
@@ -295,6 +297,14 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(sContent, JsonRequestBehavior.AllowGet);
+    }
+
+    public void SetAdminClub(int iClubIx)
+    {
+      if (iClubIx <                                    0) return;
+      if (iClubIx >= MvcApplication.ckcore.ltClubs.Count) return;
+
+      MvcApplication.clubAdmin = MvcApplication.ckcore.ltClubs[iClubIx];
     }
 
     public string getHomeDir()

@@ -17,6 +17,17 @@
     $("#bnSetWeeks2").click(function () {
       setCalInterval(2);
     });
+
+    $('#iSelectedClubAdmin').change(function () {
+      $.ajax({
+        url: '/Admin/SetAdminClub',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        data: { iClubIx: $(this).val() }
+      });
+    });
   });
 
   function setCalInterval(iWeeks) {
@@ -167,6 +178,10 @@
       <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px" disabled>load autosave</button>
     }
   }
+</div>
+
+<div style="position: relative; width: 50%; min-width: 300px; height: 40px">
+  @Html.DropDownListFor(m => m.iSelectedClubAdmin, Model.ddlClubsAdmin, new { @class = "form-control", style = "position: absolute; width: 180px" })
 </div>
 
 @{
