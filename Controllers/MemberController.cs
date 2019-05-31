@@ -298,7 +298,7 @@ namespace CornerkickWebMvc.Controllers
       for (int iN = usr.ltNews.Count - 1; iN >= 0; iN--) {
         CornerkickManager.Main.News news = usr.ltNews[iN];
         if (news.iType < 99/* && news.bUnread*/) {
-          if (!news.bRead && !news.bRead2) {
+          if (news.bRead && news.bRead2) {
             if        (desk.iDeleteLog == 1 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays >  7) {
               usr.ltNews.Remove(news);
               continue;
