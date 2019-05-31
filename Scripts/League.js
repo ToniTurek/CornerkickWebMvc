@@ -31,6 +31,13 @@ function setLeague2(iSaison, iDivision) {
   var divDrawTable    = $("#tableDivLeague");
   var divLeagueScorer = $("#divLeagueScorer");
 
+  var iHA = 0;
+  if (document.getElementById("rbTableH").checked) {
+    iHA = 1;
+  } else if (document.getElementById("rbTableA").checked) {
+    iHA = 2;
+  }
+
   divDrawTable   .html('');
   divLeagueScorer.html('');
 
@@ -38,7 +45,7 @@ function setLeague2(iSaison, iDivision) {
     url: '/Member/setLeague',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
+    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd, iHA: iHA },
     success: function (sTable) {
       var sBox = '';
 

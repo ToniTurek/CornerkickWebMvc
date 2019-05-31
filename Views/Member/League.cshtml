@@ -18,6 +18,19 @@
       var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
       fLigaMax = fLigaMax + 0.1;
 
+      // Radio-buttons league
+      $("#rbTableTotal").on('change', function (ev) {
+        setLeague2(1, 0);
+      });
+
+      $("#rbTableH").on('change', function (ev) {
+        setLeague2(1, 0);
+      });
+
+      $("#rbTableA").on('change', function (ev) {
+        setLeague2(1, 0);
+      });
+
       $.get("/Member/GetLeaguePlaceHistory/", function (ltPlace) {
         var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
           animationEnabled: true,
@@ -83,8 +96,27 @@
         <h4>Begegnungen</h4>
         <div id="tableDivTeams" style="position: relative"></div>
       </div>
+
       <div style="position: relative; width: 47%; min-width: 350px; float: left">
         <h4>Tabelle</h4>
+        <div style="position: absolute; width: 250px; top: 10px; right: 0px; text-align: right">
+          <form>
+            <fieldset>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbTableTotal" name="rbTableHA" value="0" checked>
+                Gesamt
+              </label>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbTableH" name="rbTableHA" value="1">
+                Heim
+              </label>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbTableA" name="rbTableHA" value="2">
+                Auswärts
+              </label>
+            </fieldset>
+          </form>
+        </div>
         <div id="tableDivLeague" style="position: relative; width: 100%"></div>
       </div>
     </div>

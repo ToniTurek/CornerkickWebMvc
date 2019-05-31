@@ -2948,13 +2948,13 @@ namespace CornerkickWebMvc.Controllers
       return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday)
+    public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday, byte iHA)
     {
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
       CornerkickManager.Club clb = ckClub();
 
-      List<CornerkickManager.Tool.TableItem> ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday - 1, 0);
-      List<CornerkickManager.Tool.TableItem> ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday,     0);
+      List<CornerkickManager.Tool.TableItem> ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday - 1, iHA);
+      List<CornerkickManager.Tool.TableItem> ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday,     iHA);
 
       string sBox = "";
       for (var i = 0; i < ltTbl.Count; i++) {
