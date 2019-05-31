@@ -8,6 +8,17 @@
 <script>
   $(document).ready(function () {
     setNews();
+
+    $('#iDeleteLog').change(function () {
+      $.ajax({
+        url: '/Member/SetDeleteLog',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        data: { iDeleteAfter: $(this).val() }
+      });
+    });
   });
 
   function setNews() {
@@ -273,14 +284,19 @@
   </script>
 
   <h3>News</h3>
-  @*
-    @Html.TextAreaFor(x => Model.sNews, 10, 100, htmlAttributes: new { @readonly = "readonly", style = "width: 100%; max-width: 100%; readonly: readonly" })
-  *@
+  <div style="position: relative; width: 100%">
+    <div style="position: absolute; top: -40px; right: 0px">
+      <label>
+        News löschen nach:
+        @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-control", @style = "position: absolute; right: 0px; width: 130px; text-align: right" })
+      </label>
+    </div>
 
-  <div id="divNews" data-name="@Model.sNews"></div>
-  <div id="tableDivNews"></div>
+    <div id="divNews" data-name="@Model.sNews"></div>
+    <div id="tableDivNews"></div>
 
-  <div id="divNewsOld" data-name="@Model.sNewsOld"></div>
-  <div id="tableDivNewsOld" style="color:gray"></div>
+    <div id="divNewsOld" data-name="@Model.sNewsOld"></div>
+    <div id="tableDivNewsOld" style="color:gray"></div>
+  </div>
 </body>
 </html>

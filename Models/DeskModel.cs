@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
+using System.Web.Mvc;
 
 namespace CornerkickWebMvc.Models
 {
@@ -19,6 +20,18 @@ namespace CornerkickWebMvc.Models
     public string sKFM { get; set; }
     public string sStrength { get; set; }
     public byte   iWeather { get; set; }
+
+    public List<SelectListItem> ddlDeleteLog { get; set; }
+    public int iDeleteLog { get; set; }
+
+    public DeskModel()
+    {
+      ddlDeleteLog = new List<SelectListItem>();
+      ddlDeleteLog.Add(new SelectListItem { Text = "7 Tagen",  Value = "1" });
+      ddlDeleteLog.Add(new SelectListItem { Text = "14 Tagen", Value = "2" });
+      ddlDeleteLog.Add(new SelectListItem { Text = "1 Monat",  Value = "3" });
+      ddlDeleteLog.Add(new SelectListItem { Text = "Nie",      Value = "0"});
+    }
   }
 
   //DataContract for Serializing Data - required to serve in JSON format

@@ -291,9 +291,26 @@ namespace CornerkickWebMvc.Controllers
       if (usr.ltNews == null) return View(desk);
       desk.user = usr;
 
+      if (usr.lti != null) {
+        if (usr.lti.Count > 0) desk.iDeleteLog = usr.lti[0];
+      }
+
       for (int iN = usr.ltNews.Count - 1; iN >= 0; iN--) {
         CornerkickManager.Main.News news = usr.ltNews[iN];
         if (news.iType < 99/* && news.bUnread*/) {
+          if (!news.bRead && !news.bRead2) {
+            if        (desk.iDeleteLog == 1 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays >  7) {
+              usr.ltNews.Remove(news);
+              continue;
+            } else if (desk.iDeleteLog == 2 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 14) {
+              usr.ltNews.Remove(news);
+              continue;
+            } else if (desk.iDeleteLog == 3 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 30) {
+              usr.ltNews.Remove(news);
+              continue;
+            }
+          }
+
           string sNews = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi()) + " - " + news.sText + '\n';
           if (news.bRead) desk.sNewsOld += sNews;
           else            desk.sNews    += sNews;
@@ -385,7 +402,18 @@ namespace CornerkickWebMvc.Controllers
 
       return View(desk);
     }
-    
+
+    public void SetDeleteLog(int iDeleteAfter)
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return;
+
+      if (usr.lti == null) usr.lti = new List<int>();
+      if (usr.lti.Count < 1) usr.lti.Add(0);
+
+      usr.lti[0] = iDeleteAfter;
+    }
+
     public ContentResult GetLastGames()
     {
       CornerkickManager.Club club = ckClub();
