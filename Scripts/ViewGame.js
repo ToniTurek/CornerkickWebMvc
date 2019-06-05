@@ -161,7 +161,7 @@ function getPlayer(gLoc, bShowLookAt = true) {
 
 function plotStatistics(jState = -1) {
   //alert(jState);
-  iState = jState;
+  var iState = jState;
 
   var iHeatmapValue = $('#ddlHeatmap').val();
   var iShootsValue  = $('#ddlShoots').val();
@@ -425,6 +425,9 @@ function plotStatistics(jState = -1) {
 
       // Comment box
       var tblComments = document.getElementById('tblComments');
+      if (jState !== -1) {
+        $("#tblComments tr").remove();
+      }
 
       var sLastComment = [];
       var colLast = tblComments.getElementsByTagName("tbody")[0];
