@@ -532,7 +532,7 @@
                 <td align="right"><ins>Sperren:</ins></td>
               </tr>
               @{
-                if (player.iSuspension[0] + player.iSuspension[1] == 0) {
+                if (player.iSuspension[0] + player.iSuspension[1] + player.iSuspension[4] == 0) {
                   <tr>
                     <td align="right">keine</td>
                   </tr>
@@ -545,6 +545,12 @@
                   }
                   if (player.iSuspension[1] > 0) {
                     string sSp = "Pokal: " + player.iSuspension[1].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[4] > 0) {
+                    string sSp = "Testspiele: " + player.iSuspension[4].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
