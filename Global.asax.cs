@@ -334,13 +334,13 @@ namespace CornerkickWebMvc
         FileInfo[] ltCkgFiles = diGames.GetFiles("*.ckgx");
         ckcore.tl.writeLog("File info games length: " + ltCkgFiles.Length.ToString());
         foreach (FileInfo ckg in ltCkgFiles) {
-          //DateTime dtGame;
+          DateTime dtGame;
 
           string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
           if (sFilenameData.Length < 3) continue;
 
-          //if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) continue;
-          //if (dtGame.CompareTo(dtLoadCk) < 0) continue; // If game was already present when ck was started
+          if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) continue;
+          if (dtGame.CompareTo(dtLoadCk) < 0) continue; // If game was already present when ck was started
 
           string sFileGameSave = Path.Combine(sHomeDir, "save", "games", ckg.Name);
           as3.uploadFile(sFileGameSave, "save/games/" + ckg.Name, "application/zip");
