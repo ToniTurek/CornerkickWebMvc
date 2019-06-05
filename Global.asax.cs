@@ -125,8 +125,8 @@ namespace CornerkickWebMvc
           break;
         }
 
-        MvcApplication.ckcore.calcMatchdays();
-        MvcApplication.ckcore.dtDatum = MvcApplication.ckcore.dtSeasonStart;
+        ckcore.calcMatchdays();
+        ckcore.dtDatum = ckcore.dtSeasonStart;
       }
 
       // If no calendar timer --> enable save timer to save every 15 min.
@@ -156,8 +156,8 @@ namespace CornerkickWebMvc
 
       if (iStartHour >= 0 && iStartHour <= 24) {
         if (DateTime.Now.Hour != iStartHour && DateTime.Now.Hour > 13) {
-          if (MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart) ||
-             ((int)MvcApplication.ckcore.dtDatum.DayOfWeek == 1 && MvcApplication.ckcore.dtDatum.Hour == 0 && MvcApplication.ckcore.dtDatum.Minute == 0)) {
+          if (ckcore.dtDatum.Equals(ckcore.dtSeasonStart) ||
+             ((int)ckcore.dtDatum.DayOfWeek == 1 && ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0)) {
             timerCkCalender.Enabled = true;
             return;
           }
@@ -165,22 +165,22 @@ namespace CornerkickWebMvc
       }
 
       // Check if new jouth player and put on transferlist
-      if (MvcApplication.ckcore.dtDatum.Hour == 0 && MvcApplication.ckcore.dtDatum.Minute == 0) {
-        CornerkickManager.Club club0 = MvcApplication.ckcore.ltClubs[0];
+      if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0) {
+        CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
-        CornerkickGame.Player plNew = MvcApplication.ckcore.plr.newPlayer(club0);
-        MvcApplication.ckcore.ui.putPlayerOnTransferlist(plNew.iId, 0);
+        CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0);
+        ckcore.ui.putPlayerOnTransferlist(plNew.iId, 0);
 
         // Player jouth
         foreach (int iPlJouthId in club0.ltJugendspielerID) {
-          MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlJouthId, 0);
+          ckcore.ui.putPlayerOnTransferlist(iPlJouthId, 0);
         }
 
         if (countCpuPlayerOnTransferlist() > 200) {
-          for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-            CornerkickManager.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+          for (int iT = 0; iT < ckcore.ltTransfer.Count; iT++) {
+            CornerkickManager.csTransfer.Transfer transfer = ckcore.ltTransfer[iT];
             if (club0.ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) {
-              MvcApplication.ckcore.tr.removePlayerFromTransferlist(MvcApplication.ckcore.ltPlayer[transfer.iPlayerId]);
+              ckcore.tr.removePlayerFromTransferlist(ckcore.ltPlayer[transfer.iPlayerId]);
               break;
             }
           }
@@ -188,7 +188,7 @@ namespace CornerkickWebMvc
 
         // retire cpu player
         if (club0.ltPlayerId.Count > 500) {
-          MvcApplication.ckcore.plr.retirePlayer(MvcApplication.ckcore.ltPlayer[club0.ltPlayerId[0]]);
+          ckcore.plr.retirePlayer(ckcore.ltPlayer[club0.ltPlayerId[0]]);
         }
 
         //checkCpuJouth();
@@ -199,26 +199,26 @@ namespace CornerkickWebMvc
         save(timerCkCalender);
       }
 
-      if ((MvcApplication.ckcore.dtDatum.Equals(MvcApplication.ckcore.dtSeasonStart) ||
-          MvcApplication.ckcore.dtDatum.Year < 1900) &&
-          MvcApplication.ckcore.iSaisonCount == 0) {
-        MvcApplication.ltLog.Clear();
-        MvcApplication.ckcore.setNewSeason();
+      if ((ckcore.dtDatum.Equals(ckcore.dtSeasonStart) ||
+          ckcore.dtDatum.Year < 1900) &&
+          ckcore.iSaisonCount == 0) {
+        ltLog.Clear();
+        ckcore.setNewSeason();
       }
 
       int iRetCk = ckcore.next(true);
       if (iRetCk == 99) return; // Saisonende
 
       // Remove testgame requests if in past
-      List<CornerkickManager.Cup> ltCupsTmp = new List<CornerkickManager.Cup>(MvcApplication.ckcore.ltCups);
+      List<CornerkickManager.Cup> ltCupsTmp = new List<CornerkickManager.Cup>(ckcore.ltCups);
       foreach (CornerkickManager.Cup cup in ltCupsTmp) {
         if (cup == null) continue;
 
         if (cup.iId == -5) {
           if (cup.ltMatchdays.Count < 1) continue;
 
-          if (cup.ltMatchdays[0].dt.CompareTo(MvcApplication.ckcore.dtDatum) <= 0) { // if request in past or now ...
-            MvcApplication.ckcore.ltCups.Remove(cup); // ... remove cup
+          if (cup.ltMatchdays[0].dt.CompareTo(ckcore.dtDatum) <= 0) { // if request in past or now ...
+            ckcore.ltCups.Remove(cup); // ... remove cup
           }
         }
       }
@@ -227,8 +227,8 @@ namespace CornerkickWebMvc
     private static int countCpuPlayerOnTransferlist()
     {
       int nPl = 0;
-      foreach (CornerkickManager.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
-        if (MvcApplication.ckcore.ltClubs[0].ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) nPl++;
+      foreach (CornerkickManager.csTransfer.Transfer transfer in ckcore.ltTransfer) {
+        if (ckcore.ltClubs[0].ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) nPl++;
       }
 
       return nPl;
@@ -237,11 +237,11 @@ namespace CornerkickWebMvc
     /*
     private static void checkCpuJouth()
     {
-      while (MvcApplication.ckcore.ltClubs[0].ltJugendspielerID.Count > 0) {
-        int iPlId = MvcApplication.ckcore.ltClubs[0].ltJugendspielerID[0];
-        MvcApplication.ckcore.ltClubs[0].ltJugendspielerID.RemoveAt(0);
-        MvcApplication.ckcore.ltClubs[0].ltPlayerId.Add(iPlId);
-        MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlId, 0);
+      while (ckcore.ltClubs[0].ltJugendspielerID.Count > 0) {
+        int iPlId = ckcore.ltClubs[0].ltJugendspielerID[0];
+        ckcore.ltClubs[0].ltJugendspielerID.RemoveAt(0);
+        ckcore.ltClubs[0].ltPlayerId.Add(iPlId);
+        ckcore.ui.putPlayerOnTransferlist(iPlId, 0);
       }
     }
     */
@@ -263,12 +263,12 @@ namespace CornerkickWebMvc
 #endif
         if (sHomeDir.EndsWith("\\")) sHomeDir = sHomeDir.Remove(sHomeDir.Length - 1);
       } catch (HttpException exp) {
-        MvcApplication.ckcore.tl.writeLog("save: HttpException: " + exp.Message.ToString());
+        ckcore.tl.writeLog("save: HttpException: " + exp.Message.ToString());
 #if _DEPLOY_ON_AZURE
         sHomeDir = "D:\\home\\site\\wwwroot";
 #endif
       } catch {
-        MvcApplication.ckcore.tl.writeLog("save: unable to create sHomeDir from Server.MapPath", MvcApplication.ckcore.sErrorFile);
+        ckcore.tl.writeLog("save: unable to create sHomeDir from Server.MapPath", ckcore.sErrorFile);
 #if _DEPLOY_ON_AZURE
         sHomeDir = "D:\\home\\site\\wwwroot";
 #endif
@@ -280,7 +280,7 @@ namespace CornerkickWebMvc
 #endif
 
       // Clear CPU clubs before saving
-      foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
+      foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
         if (clb.iUser < 0) {
           clb.ltAccount      .Clear();
           clb.ltTrainingHist .Clear();
@@ -290,16 +290,16 @@ namespace CornerkickWebMvc
       }
 
       // Compose filename
-      string sFilenameSave2 = ".autosave_" + MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
+      string sFilenameSave2 = ".autosave_" + ckcore.dtDatum.ToString("yyyy-MM-dd_HH-mm") + ".ckx";
       string sFileSave2 = Path.Combine(sHomeDir, "save", sFilenameSave2);
-      MvcApplication.ckcore.tl.writeLog("save file: " + sFileSave2);
+      ckcore.tl.writeLog("save file: " + sFileSave2);
 
       // Save
       bool bSaveOk = false;
       try {
-        bSaveOk = MvcApplication.ckcore.io.save(sFileSave2);
+        bSaveOk = ckcore.io.save(sFileSave2);
       } catch {
-        MvcApplication.ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, MvcApplication.ckcore.sErrorFile);
+        ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, ckcore.sErrorFile);
       }
 
       // Upload save
@@ -329,10 +329,10 @@ namespace CornerkickWebMvc
 #if _USE_AMAZON_S3
       // Upload games
       DirectoryInfo diGames = new DirectoryInfo(Path.Combine(sHomeDir, "save", "games"));
-      MvcApplication.ckcore.tl.writeLog("Directory info games: '" + diGames.FullName + "'. Exist: " + diGames.Exists.ToString());
+      ckcore.tl.writeLog("Directory info games: '" + diGames.FullName + "'. Exist: " + diGames.Exists.ToString());
       if (diGames.Exists) {
         FileInfo[] ltCkgFiles = diGames.GetFiles("*.ckgx");
-        MvcApplication.ckcore.tl.writeLog("File info games length: " + ltCkgFiles.Length.ToString());
+        ckcore.tl.writeLog("File info games length: " + ltCkgFiles.Length.ToString());
         foreach (FileInfo ckg in ltCkgFiles) {
           //DateTime dtGame;
 
@@ -373,10 +373,10 @@ namespace CornerkickWebMvc
 #endif
         } catch {
 #if _USE_BLOB
-          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload log file to blob", MvcApplication.ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: could not upload log file to blob", ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
-          MvcApplication.ckcore.tl.writeLog("ERROR: could not upload log file to amazon s3", MvcApplication.ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: could not upload log file to amazon s3", ckcore.sErrorFile);
 #endif
         }
 #endif
@@ -392,7 +392,7 @@ namespace CornerkickWebMvc
         fileLastState.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
 
         int iGameSpeed = 0;
-        if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+        if (ckcore.ltUser.Count > 0 && ckcore.ltUser[0].nextGame != null) iGameSpeed = ckcore.ltUser[0].nextGame.iGameSpeed;
         fileLastState.WriteLine(iGameSpeed.ToString());
 
         fileLastState.Close();
@@ -425,14 +425,14 @@ namespace CornerkickWebMvc
         try {
           as3.downloadFile(sFilenameSave, sFileLoad);
         } catch {
-          MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to: " + sFileLoad, MvcApplication.ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to: " + sFileLoad, ckcore.sErrorFile);
         }
         /*
         if (Directory.Exists(sHomeDir + "save")) {
           try {
             Directory.Delete(sHomeDir + "save", true);
           } catch {
-            MvcApplication.ckcore.tl.writeLog("ERROR: unable to delete existing temp. load directory: " + sHomeDir + "save", MvcApplication.ckcore.sErrorFile);
+            ckcore.tl.writeLog("ERROR: unable to delete existing temp. load directory: " + sHomeDir + "save", ckcore.sErrorFile);
           }
         }
 
@@ -444,7 +444,7 @@ namespace CornerkickWebMvc
       try {
         as3.downloadAllFiles("save/games/", sHomeDir, null, ".ckgx");
       } catch {
-        MvcApplication.ckcore.tl.writeLog("ERROR: Unable to download games", MvcApplication.ckcore.sErrorFile);
+        ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
       }
 
       // Download log
@@ -453,17 +453,17 @@ namespace CornerkickWebMvc
 #endif
 
       // Load ck state
-      if (MvcApplication.ckcore.io.load(sFileLoad)) {
-        MvcApplication.ckcore.tl.writeLog("File " + sFileLoad + " loaded");
+      if (ckcore.io.load(sFileLoad)) {
+        ckcore.tl.writeLog("File " + sFileLoad + " loaded");
 
         // Set admin user to CPU
-        if (MvcApplication.ckcore.ltClubs.Count > 0) MvcApplication.ckcore.ltClubs[0].iUser = -1;
+        if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].iUser = -1;
 
         // TMP section
-        MvcApplication.ckcore.fz.fGlobalCreditInterest = 0.05f;
+        ckcore.fz.fGlobalCreditInterest = 0.05f;
         // END TMP section
 
-        dtLoadCk = MvcApplication.ckcore.dtDatum;
+        dtLoadCk = ckcore.dtDatum;
 
         string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
 #if !DEBUG
@@ -472,7 +472,7 @@ namespace CornerkickWebMvc
 #endif
 
         if (System.IO.File.Exists(sFileLastState)) {
-          MvcApplication.ckcore.tl.writeLog("Reading laststate from file: " + sFileLastState);
+          ckcore.tl.writeLog("Reading laststate from file: " + sFileLastState);
 
           string[] sStateFileContent = System.IO.File.ReadAllLines(sFileLastState);
 
@@ -494,9 +494,9 @@ namespace CornerkickWebMvc
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (fInterval / 60f));
 
-              MvcApplication.ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
+              ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
               if (nSteps > 0) {
-                MvcApplication.ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
+                ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
                 for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
               }
 
@@ -508,11 +508,11 @@ namespace CornerkickWebMvc
               timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
               timerCkCalender.Enabled  = bCalendarRunning;
 
-              MvcApplication.ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
+              ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
             }
           }
         } else {
-          MvcApplication.ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
+          ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
 
         // Download emblems
