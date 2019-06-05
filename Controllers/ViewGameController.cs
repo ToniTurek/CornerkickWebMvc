@@ -351,7 +351,7 @@ namespace CornerkickWebMvc.Controllers
         if (shoot.plShoot != null && shoot.iHA == iHA) {
           float fDist = MvcApplication.ckcore.game.tl.getDistanceToGoal(shoot.plShoot)[0];
 
-          string sShootDesc = MvcApplication.ckcore.ui.getMinuteString(shoot.tsMinute, false) +
+          string sShootDesc = MvcApplication.ckcore.ui.getMinuteString(shoot.tsMinute, false) + " Min.: " +
                               shoot.iGoalsH.ToString() + ":" + shoot.iGoalsA.ToString();
           sShootDesc += " - " + shoot.plShoot.sName;
           if (shoot.iType == 5) sShootDesc += ", FE";
@@ -389,7 +389,7 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Game.Duel duel = state.duel;
         if (duel.plDef != null && duel.plDef.iHA == iHA) {
           if (duel.iResult > 2) {
-            string sCardDesc = MvcApplication.ckcore.ui.getMinuteString(duel.tsMinute, false) +
+            string sCardDesc = MvcApplication.ckcore.ui.getMinuteString(duel.tsMinute, false) + " Min.: " +
                                 sTeam +
                                 " - " +
                                 duel.plDef.sName;
