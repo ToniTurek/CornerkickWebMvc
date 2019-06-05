@@ -110,7 +110,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    public void downloadAllFiles(string sS3SubDir, string sTargetPath = "./", string sStartsWith = null, string sEndsWith = null)
+    public void downloadAllFiles(string sS3SubDir, string sTargetPath = "./", string sStartsWith = null, string sEndsWith = null, bool bForce = false)
     {
       IAmazonS3 client = new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion);
 
@@ -120,12 +120,21 @@ namespace CornerkickWebMvc
       do {
         ListObjectsResponse response = client.ListObjects(sBucketName, sS3SubDir);
 
-        // Process response.
+        // Process response
         for (int iS3 = 0; iS3 < response.S3Objects.Count; iS3++) {
           if (!string.IsNullOrEmpty(sStartsWith) && !response.S3Objects[iS3].Key.StartsWith(sStartsWith)) continue;
           if (!string.IsNullOrEmpty(sEndsWith)   && !response.S3Objects[iS3].Key.EndsWith  (sEndsWith))   continue;
 
-          downloadFile(response.S3Objects[iS3].Key, Path.Combine(sTargetPath, response.S3Objects[iS3].Key));
+          string sTargetFilename = Path.Combine(sTargetPath, response.S3Objects[iS3].Key);
+
+          if (!bForce) {
+            // Check if file already present
+            if (File.Exists(sTargetFilename)) {
+              if (new System.IO.FileInfo(sTargetFilename).Length == response.S3Objects[iS3].Size) continue;
+            }
+          }
+
+          downloadFile(response.S3Objects[iS3].Key, sTargetFilename);
         }
 
         // If response is truncated, set the marker to get the next set of keys
