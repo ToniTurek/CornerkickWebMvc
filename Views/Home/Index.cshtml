@@ -1,20 +1,72 @@
 ﻿@{
   ViewBag.Title = "Cornerkick Home";
+  Random random = new Random();
 }
 
-<div class="jumbotron">
-  <h1>CORNERKICK</h1>
-  <p class="lead">Realistic football manager</p>
-  <p><a href="/Home/UserManual" class="btn btn-primary btn-lg">User manual &raquo;</a></p>
-</div>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <meta charset="utf-8">
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Registrieren</h2>
-        <p><a class="btn btn-default" href="/Account/Register">&raquo;</a></p>
+  <script type="text/javascript">
+    $(window).resize(function () {
+      setView();
+    });
+
+    $(document).ready(function () {
+      setView();
+    }); // $(document).ready(function () {});
+
+    function setView() {
+      var divImg = document.getElementById("divImg");
+
+      var fWidth = $(window).width();
+      if (fWidth < 1200) {
+        divImg.style.float = "left"
+      } else {
+        divImg.style.float = "right"
+      }
+
+      if (fWidth < 450) {
+        divImg.style.width = "280px"
+      } else {
+        divImg.style.width = "400px"
+      }
+    }
+  </script>
+</head>
+
+<body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
+  <div class="jumbotron">
+    <div id="divImg" style="position: relative; float: right; top: -40px">
+      @{
+        if (/*random.Next(2)*/0 == 0) {
+          <a id='uGXkqMoWSX1DHpI9KH2N4Q' class='gie-single' href='http://www.gettyimages.de/detail/515801825' target='_blank' style='color:#a7a7a7;text-decoration:none;font-weight:normal !important;border:none;display:inline-block;'>Embed from Getty Images</a>
+          <script>window.gie = window.gie || function (c) { (gie.q = gie.q || []).push(c) }; gie(function () { gie.widgets.load({ id: 'uGXkqMoWSX1DHpI9KH2N4Q', sig: 'vxdjXwdjyHE3dZqkkbo-xGqwKo4fb1ccjwMjoqw8Wmc=', w: '507px', h: '338px', items: '515801825', caption: false, tld: 'de', is360: false }) });</script>
+        } else {
+          <a id='m0PcGZvBSLp4lJoOjHI4cw' class='gie-single' href='http://www.gettyimages.de/detail/108194345' target='_blank' style='color:#a7a7a7;text-decoration:none;font-weight:normal !important;border:none;display:inline-block;'>Embed from Getty Images</a>
+          <script>window.gie = window.gie || function (c) { (gie.q = gie.q || []).push(c) }; gie(function () { gie.widgets.load({ id: 'm0PcGZvBSLp4lJoOjHI4cw', sig: 'algjK3EzHYA4Ofoq5HlPAWccvFH4QN1RAvSMUyIi0AI=', w: '339px', h: '509px', items: '108194345', caption: true, tld: 'de', is360: false }) });</script>
+        }
+        <script src='//embed-cdn.gettyimages.com/widgets.js' charset='utf-8' async></script>
+      }
+      @*
+      <a id='JMW_tkp8SjZ4sLTPTmdPaA' class='gie-slideshow' href='http://www.gettyimages.de/detail/907560098' target='_blank' style='color:#a7a7a7;text-decoration:none;font-weight:normal !important;border:none;display:inline-block;'>Embed from Getty Images</a>
+      <script>window.gie = window.gie || function (c) { (gie.q = gie.q || []).push(c) }; gie(function () { gie.widgets.load({ id: 'JMW_tkp8SjZ4sLTPTmdPaA', sig: 'vSKwUucTJdLwm_W8mxyQcTfmVTgft5P02Ti_vJVqX0w=', w: '509px', h: '339px', items: '907560098,977091432,98539673,1070436844,664201120', caption: false, tld: 'de', is360: false }) });</script>
+      <script src='//embed-cdn.gettyimages.com/widgets.js' charset='utf-8' async></script>
+      *@
     </div>
-    <div class="col-md-4">
-        <h2>Anmelden</h2>
-        <p><a class="btn btn-default" href="/Account/Login">&raquo;</a></p>
+
+    <div style="position: relative">
+      <h1>CORNERKICK</h1>
+      <p class="lead" style="position: relative">Football manager simulation</p>
+      <p><a href="/Account/Register" class="btn btn-primary btn-lg" style="width: 270px">Registrieren &raquo;</a></p>
+      <p><a href="/Account/Login" class="btn btn-primary btn-lg" style="width: 270px">Anmelden &raquo;</a></p>
     </div>
-</div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <p><a href="/Home/UserManual" class="btn btn-default" style="font-size:20px">Anleitung &raquo;</a></p>
+    </div>
+  </div>
+</body>
+</html>

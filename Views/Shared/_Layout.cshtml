@@ -1,13 +1,74 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNet.Identity
+
+<!DOCTYPE html>
+@{
+  CornerkickManager.User usr = null;
+  CornerkickManager.Club clb = null;
+
+  string sUserId = User.Identity.GetUserId();
+  foreach (CornerkickManager.User usrTmp in MvcApplication.ckcore.ltUser) {
+    if (usrTmp.id.Equals(sUserId)) {
+      usr = usrTmp;
+      break;
+    }
+  }
+
+  if (usr != null) {
+    clb = MvcApplication.ckcore.ltClubs[usr.iTeam];
+  }
+
+  string sEmblem = @"/Content/Uploads/";
+  System.Globalization.CultureInfo ci = System.Globalization.CultureInfo.CurrentCulture;
+
+  if (Request.IsAuthenticated) {
+    if (clb != null) {
+      sEmblem += clb.iId.ToString() + ".png";
+
+      int iLandUser = clb.iLand;
+      if (iLandUser >= 0 && iLandUser < CornerkickWebMvc.Controllers.MemberController.sCultureInfo.Length) {
+        ci = new System.Globalization.CultureInfo(CornerkickWebMvc.Controllers.MemberController.sCultureInfo[iLandUser]);
+      }
+    } else {
+      sEmblem += "0.png";
+    }
+  }
+}
+<div id="divDataEmblem" data-name="@sEmblem"></div>
+
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@ViewBag.Title - Cornerkick</title>
   @Styles.Render("~/Content/css")
   @Scripts.Render("~/bundles/modernizr")
   @Scripts.Render("~/bundles/jquery")
+  <style>
+    body {
+      background-repeat: no-repeat;
+      background-position: right 10% top 100px;
+      background-size: 10%;
+      background-color: white;
+    }
+
+    divSidebarLeft {
+      float: left;
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid red;
+      width: 120px;
+      height: 600px;
+    }
+  </style>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var sEmblemImg = $('#divDataEmblem').data('name');
+      document.getElementById("divEmblem").style.backgroundImage = 'url("' + sEmblemImg + '")';
+      document.getElementById("divEmblem").style.backgroundRepeat = 'no-repeat';
+      document.getElementById("divEmblem").style.backgroundSize = '100%';
+    });
+  </script>
 </head>
 <body>
   <div class="navbar navbar-inverse navbar-fixed-top">
@@ -29,8 +90,16 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           @{
-            if (Request.IsAuthenticated) {
-              int iMails = CornerkickWebMvc.Controllers.MemberController.countNewMails();
+            if (Request.IsAuthenticated && usr != null) {
+              int iMails = 0;
+              if (usr.ltNews != null) {
+                foreach (CornerkickManager.Main.News news in usr.ltNews) {
+                  if (news.iType == 99 && !news.bRead) {
+                    iMails++;
+                  }
+                }
+              }
+
               string sMails = "";
               if (iMails > 0) {
                 sMails = " (" + iMails.ToString() + ")";
@@ -68,8 +137,9 @@
                 <ul class="dropdown-menu">
                   <li>@Html.ActionLink("Postfach" + @sMails, "Mail", "Member")</li>
                   <li>@Html.ActionLink("Transferliste", "Transfer", "Member")</li>
+                  <li>@Html.ActionLink("Statistik", "Statistic", "Member")</li>
                   <li>@Html.ActionLink("Livespiel", "ViewGame", "ViewGame")</li>
-                  <li>@Html.ActionLink("Konsole", "Console", "Member")</li>
+                  @*<li>@Html.ActionLink("Konsole", "Console", "Member")</li>*@
                 </ul>
               </li>
             }
@@ -79,41 +149,52 @@
       </div>
 
       @{
-        if (Request.IsAuthenticated) {
-          CornerkickCore.Core.User usr = CornerkickWebMvc.Controllers.AccountController.ckUser();
-          var sEmblem = "/Content/Uploads/0.png";
+        if (Request.IsAuthenticated && MvcApplication.ckcore != null) {
           <div class="" style="position: relative; width: 100%; margin-top: 2px; height: 0px">
+            <div id="divSidebarLeft" style="position: absolute; width: 120px; height: 600px; top: 100px; left: -200px">
+              <iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=29&l=ez&f=ifr&linkID=c4a136973d3f4339112f667dda767f3b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="120" height="600" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>
+            </div>
+
             <div style="position: relative; width: 100%; height: 20px; background-color: white; border: 1px solid black">
               <div style="position: absolute; height: 0px; margin-left: 1%; width: 49%; left:  0%; text-align: left">
-                @Html.ActionLink(MvcApplication.ckcore.sWochentag[(int)MvcApplication.ckcore.dtDatum.DayOfWeek] + ", " + MvcApplication.ckcore.dtDatum.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser), "Calendar", "Member")
+                @{
+                  string sCkTime = MvcApplication.ckcore.dtDatum.ToString("ddd", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("d", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", ci);
+                  if (!MvcApplication.timerCkCalender.Enabled) {
+                    sCkTime += " (Pause)";
+                  }
+                  @Html.ActionLink(sCkTime, "Calendar", "Member");
+                }
               </div>
               <div style="position: absolute; height: 0px; width: 49%; left: 50%; text-align: right">
                 @{
-                  CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub();
-                  int iCash = clb.iBalance;
                   string sCash = "0";
-                  if (iCash != 0) { sCash = iCash.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser); }
+                  if (clb != null) {
+                    int iCash = clb.iBalance;
+                    if (iCash != 0) { sCash = iCash.ToString("#,#", ci); }
+                  }
                 }
                 @Html.ActionLink(sCash + " €", "Finance", "Member")
               </div>
             </div>
 
             @{
-              if (usr.game != null) {
+              if (usr != null && usr.game != null) {
                 if (!usr.game.data.bFinished) {
                   <div class="" style="position: relative; width: 100%; margin-top: 2px; height: 0px">
                     <div style="position: absolute; width: 100%; height: 20px; background-color: white">
                       <div style="position: absolute; height: 0px; margin-left: 1%; width: 98%; left:  0%; text-align: center">
-                        @Html.ActionLink("Livespiel: " + MvcApplication.ckcore.game.tl.sSpielmin(usr.game.tsSpielminute, false) + usr.game.data.team[0].sTeam + " vs. " + usr.game.data.team[1].sTeam + " - " + usr.game.data.team[0].iGoals.ToString() + ":" + usr.game.data.team[1].iGoals.ToString(), "ViewGame", "ViewGame", null, new { @style = "font-weight:bold; color:red" })
+                        @Html.ActionLink("Livespiel: " + MvcApplication.ckcore.ui.getMinuteString(usr.game.tsMinute, false) + usr.game.data.team[0].sTeam + " vs. " + usr.game.data.team[1].sTeam + " - " + usr.game.data.team[0].iGoals.ToString() + ":" + usr.game.data.team[1].iGoals.ToString(), "ViewGame", "ViewGame", null, new { @style = "font-weight:bold; color:red" })
                       </div>
                     </div>
                   </div>
                 }
               }
             }
-            <div style="position: relative; width: 15%; height: 160px; top: 20px; left: 85%; text-align: right; z-index: 0">
-              <img id="imgEmblem" style="position: absolute; right: 10%; height: 100%" src=@sEmblem alt="" />
-            </div>
+            @*
+              <div style="position: relative; width: 15%; height: 160px; top: 20px; left: 85%; text-align: right; z-index: 0">
+                <img id="imgEmblem" style="position: absolute; right: 10%; height: 100%" src=@sEmblem alt="" />
+              </div>
+            *@
           </div>
         }
       }
@@ -121,6 +202,8 @@
   </div>
 
   <div id="box_top" style="position: relative; width: 100%; height: 50px; background-color: white"></div>
+
+  <div id="divEmblem" style="position: absolute; width: 10%; height: 100%; top: 100px; right: 10%; text-align: right"></div>
 
   <div class="container body-content">
     @RenderBody()

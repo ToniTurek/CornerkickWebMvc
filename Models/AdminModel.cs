@@ -10,10 +10,12 @@ namespace CornerkickWebMvc.Models
   public class AdminModel
   {
     public bool bCk { get; set; }
-    public double fCalenderInterval { get; set; }
+    public double fCalendarInterval { get; set; }
     public bool bTimer { get; set; }
+    public bool bTimerSave { get; set; }
     public string sStartHour { get; set; }
-    public string sLog { get; set; }
+    public List<string> ltLog { get; set; }
+    public List<string> ltErr { get; set; }
     public int nClubs { get; set; }
     public int nUser { get; set; }
     public int nPlayer { get; set; }
@@ -21,26 +23,46 @@ namespace CornerkickWebMvc.Models
 
     public bool bLogExist { get; set; }
     public bool bAutosaveExist { get; set; }
+    public bool bSaveDirExist { get; set; }
 
     public string sSelectedAutosaveFile { get; set; }
-    public int iAutosaveFile { get; set; }
     public List<SelectListItem> ddlAutosaveFiles { get; set; }
+
+    // CPU Clubs to be selected by admin
+    public List<SelectListItem> ddlClubsAdmin { get; set; }
+    public int iSelectedClubAdmin { get; set; }
 
     public AdminModel()
     {
       ddlAutosaveFiles = new List<SelectListItem>();
+      DirectoryInfo d = new DirectoryInfo(Path.Combine(MvcApplication.getHomeDir(), "save"));
+      if (d.Exists) {
+        FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
+        int i = 0;
+        foreach (FileInfo ckx in ltCkxFiles) {
+          ddlAutosaveFiles.Add(
+            new SelectListItem {
+              Text  = ckx.Name,
+              Value = ckx.Name
+            }
+          );
+        }
+      }
 
-      DirectoryInfo d = new DirectoryInfo(MvcApplication.getHomeDir() + "/save");
-      FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
-      int i = 0;
-      foreach (FileInfo ckx in ltCkxFiles) {
-        ddlAutosaveFiles.Add(
-          new SelectListItem {
-            Text = ckx.Name,
-            Value = ckx.Name
-          }
-        );
+      ddlClubsAdmin = new List<SelectListItem>();
+      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
+        CornerkickManager.Club clbCPU = MvcApplication.ckcore.ltClubs[iC];
+
+        if (clbCPU.iUser < 0) {
+          ddlClubsAdmin.Add(
+            new SelectListItem {
+              Text  = clbCPU.sName,
+              Value = iC.ToString()
+            }
+          );
+        }
       }
     }
+
   }
 }

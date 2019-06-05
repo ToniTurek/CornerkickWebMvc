@@ -3,15 +3,16 @@
   var textteamaverage = $("#average");
   var divTacticOrientation    = document.getElementById("divTacticOrientation");
   var divTacticIndOrientation = document.getElementById("divTacticIndOrientation");
-  var fStrength = 0.0;
-  var fStrengthAve = 0.0;
+
+  var fWindowWidth = $(window).width();
+  var bMobile = fWindowWidth < 960;
 
   // respond to the change event in here
   $.ajax({
     cache: false,
     url: "/Member/CkAufstellungFormation",
     type: "GET",
-    data: { iF: iFormation - 1, iSP: iSelectedPlayer - 1 },
+    data: { iF: iFormation - 1, iSP: iSelectedPlayer - 1, bMobile: bMobile },
     success: function (teamData) {
       if (teamData) {  // check if data is defined
         var result = "";
@@ -28,19 +29,21 @@
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
-            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i]);
+            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
 
             i = i + 1;
-            return (i !== 11);
+            return i !== 11;
           });
 
-          // opponent player
-          $.each(teamData.ltPlayerOpp, function (iFormation, player) {
-            result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1);
+          if (teamData.ltPlayerOpp) {
+            // opponent player
+            $.each(teamData.ltPlayerOpp, function (iFormation, player) {
+              result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, teamData.ltPlayerOppPos[i], bMobile);
 
-            i = i + 1;
-            return (i !== 11);
-          });
+              i = i + 1;
+              return i !== 11;
+            });
+          }
 
           // hide orientation slider on start
           divTacticOrientation   .style.display = 'none';
@@ -92,24 +95,39 @@
   });
 }
 
-function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos) {
+function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
+  if (!player) {
+    return "";
+  }
+
   if (!iPos) {
     iPos = 0;
   }
 
-  var iTop  = 100 - (((100 * player.ptPosDefault.X) / 122));
+  if (!fScale) {
+    fScale = 1.0;
+  }
+
+  var fHeightTot = 122 * fScale;
+  var fHeightBox = 3.5 / fScale;
+
+  var iTop  = 100 - ((100 * player.ptPosDefault.X) / fHeightTot);
   var iLeft = (100 * (player.ptPosDefault.Y + 25)) / 50;
   if (bOpponentTeam) {
     iTop  = 100 - iTop;
     iLeft = 100 - iLeft;
   }
 
-  iTop  = iTop  -  1.75;
+  iTop  = iTop  - (fHeightBox / 2.0);
   iLeft = iLeft - 13.00;
 
   var sName = player.sName;
   var sNameSplit = sName.split(' ');
-  if (sNameSplit.length > 1) sName = sNameSplit[0][0] + ". " + sNameSplit[sNameSplit.length - 1];
+  var sSurname = sName;
+  if (sNameSplit.length > 1) {
+    sSurname = sNameSplit[sNameSplit.length - 1];
+    sName = sNameSplit[0][0] + ". " + sSurname;
+  }
   if (sName.length > 11) sName = sName.substring(0, 11);
   var sPos = ["", "TW", "IV", "LV", "RV", "DM", "LM", "RM", "OM", "LA", "RA", "ST", "LIB", "OLV", "ORV", "ZM", "", "", "", "", "", "HS"];
 
@@ -117,6 +135,9 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   var color2 = "black";
   if (bOpponentTeam) {
     color = "lightgray";
+  } else if (bSuspended) {
+    color  = "rgba(255, 30, 0, .3)";
+    color2 = "rgba(0, 0, 0, .5)";
   } else if (player.bYellowCard) {
     color = "yellow";
   } else if (iSelectedPlayer >= 0 && i !== iSelectedPlayer) {
@@ -127,38 +148,67 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   var sSelectPlayer = "";
   var sZIndex = "";
   if (!bOpponentTeam) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\" ontouchstart=\"selectPlayer(" + i.toString() + ")\"";
     if (i === iSelectedPlayer) {
-      sZIndex = ";z-index:99";
+      sZIndex = "; z-index: 98";
     }
   } else if (iSelectedPlayer >= 0) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayerOpp(" + i.toString() + ")\" ontouchstart=\"selectPlayerOpp(" + i.toString() + ")\"";
+  }
+
+  var fWidth = 26;
+  var iTextSize = 150;
+  if (bMobile) {
+    iTextSize = 100;
+    sName = sSurname;
   }
 
   var sBox = "";
+
   sBox +=
-  '<div' + sSelectPlayer + ' style="position: absolute; width: 26%; height: 3.5%; top: ' + iTop + '%; left: ' + iLeft + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
-    '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
-      '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 240%; color: white">' + player.iNr + '</h2>' +
-    '</div>' +
-    '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black">' +
-      '<div style="position: absolute; width: 100%; height: 65%; top: 0%; left: 0%; background-color: ' + color + '; word-break: break-word">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 150%; color: black">' + sName + '</h2>' +
+    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
+      '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
+        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + player.iNr + '</h2>' +
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 0%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sPos[iPos] + '</h2>' +
+      '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black; background-color: ' + color + '">' +
+        '<div style="position: absolute; width: 100%; height: 65%; top: 0px; left: 0px; background-color: ' + color + '; word-break: break-word; vertical-align: middle">';
+  if (sNat) {
+    sBox +=
+      getNatIcon(sNat, "position: absolute; width: 16px; top: 0px; right: 1px");
+  }
+  if (bCaptain) {
+    sBox +=
+      '<img src="/Content/Icons/captain.png" title="Kapitän" style="position: absolute; width: 16px; top: 2px; left: 2px"/>';
+  }
+  sBox +=
+          '<h2 style="position: absolute; text-align: center; width: 100%; margin: 0; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</h2>' +
+        '</div>' +
+        '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 0%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sPos[iPos] + '</h2>' +
+        '</div>' +
+        '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 25%; background-color: ' + color + '">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sStrength + '</h2>' +
+        '</div>' +
+        '<div style="position: absolute; width: 50%; height: 35%; min-height: 8px; bottom: 0px; left: 50%; background-color: ' + color + '">';
+  if (sAge) {
+    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</h2>';
+  } else {
+    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + player.ptPosDefault.Y.toString() + '/' + player.ptPosDefault.X.toString() + '</h2>';
+  }
+  sBox +=
+        '</div>';
+  if (sTeamname) {
+    sBox +=
+        '<div style="position: absolute; width: 100%; height: 35%; min-height: 8px; bottom: -35%; left: 0px">' +
+          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: white">' + sTeamname + '</h2>' +
+        '</div>';
+  }
+
+  sBox +=
       '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 25%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">' + sStrength + '</h2>' +
-      '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 50%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">X: ' + player.ptPosDefault.Y + '</h2>' +
-      '</div>' +
-      '<div style="position: absolute; width: 25%; height: 35%; top: 65%; left: 75%; background-color: ' + color + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 80%; color: black">Y: ' + player.ptPosDefault.X + '</h2>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
+    '</div>';
+
+    //sBox += '</a>';
 
   return sBox;
 }
@@ -172,22 +222,22 @@ function getBoxMovePlayer(player) {
   var sBox = "";
 
   sBox +=
-    '<div style="position: absolute; width: 10%; min-width: 60px; top: ' + (iTop - 3) + '%; left: ' + (iLeft + 0 - 5) + '%">' +
+    '<div style="position: absolute; width: 10%; min-width: 60px; top: ' + (iTop - 3) + '%; left: ' + (iLeft + 0 - 5) + '%; z-index: 99">' +
       '<img id="img_arrow_1" onclick="javascript:movePlayer(1)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_up.png"/>' +
     '</div>';
 
   sBox +=
-    '<div style="position: absolute; width:  4%; min-width: 24px; top: ' + (iTop - 1.5) + '%; left: ' + (iLeft + 13 + 1) + '%">' +
+    '<div style="position: absolute; width:  4%; min-width: 24px; top: ' + (iTop - 1.5) + '%; left: ' + (iLeft + 13 + 1) + '%; z-index: 99">' +
       '<img id="img_arrow_2" onclick="javascript:movePlayer(2)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_right.png"/>' +
     '</div>';
 
   sBox +=
-    '<div style="position: absolute; width: 10%; min-width: 60px; top: ' + (iTop + 4) + '%; left: ' + (iLeft + 0 - 5) + '%">' +
+    '<div style="position: absolute; width: 10%; min-width: 60px; top: ' + (iTop + 4) + '%; left: ' + (iLeft + 0 - 5) + '%; z-index: 99">' +
       '<img id="img_arrow_3" onclick="javascript:movePlayer(3)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_down.png"/>' +
     '</div>';
 
   sBox +=
-    '<div style="position: absolute; width:  4%; min-width: 24px; top: ' + (iTop - 1.5) + '%; right: ' + (iRight + 13 + 1) + '%">' +
+    '<div style="position: absolute; width:  4%; min-width: 24px; top: ' + (iTop - 1.5) + '%; right: ' + (iRight + 13 + 1) + '%; z-index: 99">' +
       '<img id="img_arrow_4" onclick="javascript:movePlayer(4)" style="position: relative; width: 100%; cursor: pointer" src="/Content/Images/arrow_left.png"/>' +
     '</div>';
 

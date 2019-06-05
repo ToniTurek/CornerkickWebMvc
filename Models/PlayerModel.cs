@@ -15,6 +15,12 @@ namespace CornerkickWebMvc.Models
     public int iPlIdPrev { get; set; }
     public int iPlIdNext { get; set; }
 
+    public bool bOwnPlayer { get; set; }
+    public bool bJouth { get; set; }
+
+    // Emblem
+    public string sEmblem { get; set; }
+
     // Contract
     [Display(Name = "zusätzl. Laufzeit [a]:")]
     public int iContractYears { get; set; }
@@ -23,7 +29,12 @@ namespace CornerkickWebMvc.Models
 
     [Display(Name = "Neue Rückennr.:")]
     public int iNo { get; set; }
-
     public List<SelectListItem> ltDdlNo { get; set; }
+
+    public bool bCaptain  { get; set; }
+    public bool bCaptain2 { get; set; }
+
+    public int iDp { get; set; }
+    public List<SelectListItem> ddlDoping { get; set; }
   }
 }

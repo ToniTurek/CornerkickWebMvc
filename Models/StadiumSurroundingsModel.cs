@@ -16,19 +16,9 @@ namespace CornerkickWebMvc.Models
 
     public int iVereinsheim { get; set; }
     public int iVereinsmuseum { get; set; }
-    public int iParkp { get; set; }
-    public int iParkpNeu { get; set; }
-    public int iTicketschalter { get; set; }
-
-    public StadiumSurroundingsModel()
-    {
-      CornerkickCore.Core.Club clb = Controllers.AccountController.ckClub();
-
-      ddlTrainingsgel = new List<SelectListItem>();
-      for (int i = clb.iTrainingsgel  [1] + 1; i < MvcApplication.ckcore.sTrainingsgel.Length; i++) ddlTrainingsgel .Add(new SelectListItem { Text = MvcApplication.ckcore.sTrainingsgel[i], Value = i.ToString() });
-
-      ddlJouthInternat = new List<SelectListItem>();
-      for (int i = clb.iJugendinternat[1] + 1; i < MvcApplication.ckcore.sTrainingsgel.Length; i++) ddlJouthInternat.Add(new SelectListItem { Text = MvcApplication.ckcore.sJouthInternat[i], Value = i.ToString() });
-    }
+    public int iCarpark { get; set; }
+    public int iCarparkNew { get; set; }
+    public int iCounter { get; set; }
+    public int iCounterNew { get; set; }
   }
 }

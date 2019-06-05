@@ -9,6 +9,8 @@ namespace CornerkickWebMvc.Models
 {
   public class TaktikModel
   {
+    public CornerkickGame.Tactic tactic { get; set; }
+
     [Display(Name = "Ausrichtung")]
     public float fAusrichtung { get; set; }
 

@@ -3,9 +3,10 @@
 <head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
-  <script src="~/Scripts/jquery-2.0.0.min.js"></script>
-  <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
-  <script src="~/Scripts/Player.js" type="text/javascript"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
 </head>
 
 @{
@@ -59,8 +60,29 @@
       }
     });
   }
+  
+  function setDopingDesc() {
+    var iDp = $('#ddlDoping').val();
+
+    $.ajax({
+      url: '/Member/PlayerDetailsGetDopingDesc',
+      type: "GET",
+      dataType: "JSON",
+      data: { iDp: iDp },
+      success: function (sDopDesc) {
+        $("#txtDialogDoping").html(sDopDesc);
+      }
+    });
+  }
 
   $(document).ready(function () {
+    document.getElementById("divEmblem").style.backgroundImage = '';
+    var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
+    $("#divEmblemClub").html(sEmblemImg);
+
+    plotCFM();
+    plotPlayerDevelopment();
+
     setSalary(@player.contract.iLength + 1);
 
     $("#iContractYears").keyup(function () {
@@ -69,7 +91,7 @@
 
     function setSalary(iYears) {
       $.when(getSalary(@Model.iPlayer, iYears, 0)).done(function (contract) {
-        $("#txtContractMoney").html(contract.iSalary + " €");
+        $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
       });
     }
 
@@ -185,6 +207,41 @@
         }
       }
     });
+
+    $("#bnDoping").click(function () {
+      setDopingDesc();
+      $("#dialogDoping").dialog("open");
+    });
+
+    $(function () {
+      $("#dialogDoping").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            var iDp = $('#ddlDoping').val();
+
+            $.ajax({
+              url: "/Member/PlayerDetailsDoDoping",
+              type: 'POST',
+              traditional: true,
+              data: { iPlayerId: @Model.iPlayer, iDp: iDp },
+              dataType: "json",
+              success: function () {
+                plotCFM();
+              },
+              error: function (xhr) {
+                alert(xhr.error);
+              }
+            });
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+    });
   }); // $(document).ready(function () {
 
   function getCaptainIdAjax(iC) {
@@ -219,579 +276,755 @@
       }
     });
   }
+
+  function plotCFM() {
+    $.ajax({
+      type: 'post',
+      url: '/Member/PlayerDetailsGetCFM',
+      dataType: "json",
+      data: { iPlId: @Model.iPlayer },
+      success: function (dataCFM) {
+        CanvasJS.addColorSet("customColorSet1",
+          [
+            "lightblue",
+            "blue",
+            "green",
+            "red",
+          ]);
+
+        var chartCFM = new CanvasJS.Chart("divChartCFM", {
+          colorSet: "customColorSet1",
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            gridThickness: 1,
+            interval: 1
+          },
+          axisY: {
+            valueFormatString: "0.0%",
+            includeZero: true
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "column",
+              indexLabel: "{y}",
+              indexLabelFontColor: "black",
+              indexLabelPlacement: "outside",
+              yValueFormatString: "0.0%",
+              dataPoints: [
+                { label: "Kondition", x: 0, y: dataCFM[0].y },
+                { label: "",          x: 0, y: dataCFM[1].y },
+                { label: "Frische",   x: 1, y: dataCFM[2].y },
+                { label: "Moral",     x: 2, y: dataCFM[3].y }
+              ]
+            }
+          ]
+        });
+
+        chartCFM.render();
+      }
+    });
+  }
+
+  function plotPlayerDevelopment() {
+    $.ajax({
+      type: 'post',
+      url: '/Member/PlayerDetailsGetDevelopmentData',
+      dataType: "json",
+      data: { iPlId: @Model.iPlayer },
+      success: function (dataDev) {
+        var chartDev = new CanvasJS.Chart("divChartDevelopment", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            gridThickness: 1,
+            interval: 12,
+            valueFormatString: "DD MMM",
+            labelAngle: -20
+          },
+          axisY: {
+            title: "Stärke",
+            includeZero: false
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              xValueType: "dateTime",
+              yValueFormatString: "0.00",
+              dataPoints: dataDev
+            }
+          ]
+        });
+
+        chartDev.render();
+      }
+    });
+  }
 </script>
 
-@{
-  CornerkickCore.Core.Club clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
-  bool bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(clubUser, player);
+<div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
+  <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; border: 1px solid black"></div>
 
-  string sTalent = (player.iTalent + 1).ToString();
-  string sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
+  @{
+    string sTalent = (player.iTalent + 1).ToString();
+    string sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
 
-  <div style="position: relative; width: 100%; height: 30px">
-    @{
-      string sPlPrevName = "";
-      if (Model.iPlIdPrev >= 0) {
-        sPlPrevName = MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].sName;
-        <div style="position: absolute; left:  0%; width: 49%; height: 30px">
-          @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
-        </div>
+    <div style="position: relative; width: 100%; height: 30px">
+      @{
+        string sPlPrevName = "";
+        if (Model.iPlIdPrev >= 0) {
+          sPlPrevName = MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].sName;
+          <div style="position: absolute; left:  0%; width: 49%; height: 30px">
+            @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
+          </div>
+        }
+
+        string sPlNextName = "";
+        if (Model.iPlIdNext >= 0) {
+          sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].sName;
+
+          <div style="position: absolute; left: 50%; width: 49%; height: 30px">
+            @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
+          </div>
+        }
       }
+    </div>
 
-      string sPlNextName = "";
-      if (Model.iPlIdNext >= 0) {
-        sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].sName;
-
-        <div style="position: absolute; left: 50%; width: 49%; height: 30px">
-          @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
-        </div>
+    <div style="position: relative; width: 100%; height: auto; margin-top: 1%">
+      @{
+        if ((Model.bOwnPlayer && MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) || Model.bJouth) {
+          <div class="form-group">
+            @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
+          </div>
+        } else {
+          string sPlName = player.sName + " - " + player.iNr.ToString();
+          <h2>@sPlName</h2>
+        }
       }
-    }
-  </div>
+    </div>
 
-  <div style="position: relative; width: 100%; height: auto; margin-top: 1%">
-    @{
-      if ((bOwnPlayer && MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date) && MvcApplication.ckcore.iSaisonCount == 0) || clubUser.ltJugendspielerID.IndexOf(Model.iPlayer) >= 0) {
-        <div class="form-group">
-          @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
+    if (Model.bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1))) {
+      <div class="form-group">
+        @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+          @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @class = "form-control", @onchange = "setNo()", id = "iDdlINo", @style = "width:70px" })
         </div>
-      } else {
-        <h2>@player.sName</h2>
-      }
-    }
-  </div>
-
-  if (bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date) && MvcApplication.ckcore.iSaisonCount == 0))) {
-    <div class="form-group">
-      @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
-      <div class="col-md-10">
-        @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @class = "form-control", @onchange = "setNo()", id = "iDdlINo", @style = "width:70px" })
       </div>
-    </div>
-  }
-}
-
-<div style="position: relative; width: 50%; height: auto; float: left">
-  <table cellpadding="1" style="width: auto">
-    <tbody>
-      <tr>
-        <td align="right">Verein:</td>
-        <td align="right">@sClub</td>
-      </tr>
-      <tr>
-        <td align="right">Rückennummer:</td>
-        <td align="right">@player.iNr.ToString()</td>
-      </tr>
-      <tr>
-        <td align="right">Geburtsdatum:</td>
-        <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser) (@MvcApplication.ckcore.game.tl.getPlayerAge(player, MvcApplication.ckcore.dtDatum))</td>
-      </tr>
-      <tr>
-        <td align="right">Körpergröße/-gewicht:</td>
-        <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
-      </tr>
-      <tr>
-        <td align="right">Positionen:</td>
-        <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
-      </tr>
-      <tr>
-        <td align="right">Stärke (bereinigt):</td>
-        <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
-      </tr>
-      <tr>
-        <td align="right">Talent:</td>
-        <td align="right">@sTalent</td>
-      </tr>
-      <tr>
-        <td align="right">Fuß (links/rechts):</td>
-        @{
-          if (player.fFootL > 0.99 && player.fFootR > 0.99) {
-            <td align="right">beidfüßig</td>
-          } else {
-            <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
-          }
-        }
-      </tr>
-      <tr>
-        @{
-          string sVerletzung = "keine";
-          if (player.fVerletzung[0] > 0.0) {
-            sVerletzung = player.fVerletzung[0].ToString("0.0") + " Tage (" + (player.fVerletzung[0] / player.fVerletzung[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fVerletzung[2]];
-          }
-        }
-        <td align="right">Verletzung:</td>
-        <td align="right">@sVerletzung</td>
-      </tr>
-      <tr>
-        <td align="right">Gehalt:</td>
-        <td align="right">@player.contract.iSalary.ToString("#,# €", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-      </tr>
-      <tr>
-        @{
-          string sDauer = player.contract.iLength.ToString() + " Jahre";
-          if (MvcApplication.ckcore.ltClubs[player.iClubId].ltJugendspielerID.IndexOf(player.iId) >= 0) {
-            sDauer = "Jugendspieler";
-          } else if (player.contract.iLength < 2) {
-            sDauer = "Saisonende";
-          }
-        }
-        <td align="right">Laufzeit:</td>
-        <td align="right">@sDauer</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div style="position: relative; width: 50%; height: auto; float: left">
-  <table cellpadding="1" style="width: auto">
-    <tbody>
-      <tr>
-        <td align="right">Führungspersönlichkeit:</td>
-        <td align="right">@player.character.fLeader.ToString("0.0%")</td>
-      </tr>
-      <tr>
-        <td align="right">Schußhäufigkeit:</td>
-        <td align="right">@player.character.fShoot.ToString("0.0%")</td>
-      </tr>
-      <tr>
-        <td align="right">Teamplayer:</td>
-        <td align="right">@player.character.fPass.ToString("0.0%")</td>
-      </tr>
-      <tr>
-        <td align="right">Dribbler:</td>
-        <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-@{
-  string sExtendContract = "Vertrag verlängern";
-  if (clubUser.ltJugendspielerID.IndexOf(player.iId) >= 0) {
-    sExtendContract = "Profivertrag aushandeln";
+    }
   }
 
-  if (bOwnPlayer) {
-    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 1%">
-      @* Extend player contract *@
-      <button type="submit" id="bnContract" class="btn btn-default" style="width: 30%; min-width: 300px">@sExtendContract</button>
+      <div style="position: relative; width: 100%; height: auto">
+        <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
+          <table cellpadding="1" style="width: 100%">
+            <tbody>
+              <tr>
+                <td align="right">Verein:</td>
+                <td align="right">@sClub</td>
+              </tr>
+              <tr>
+                <td align="right">Geburtsdatum:</td>
+                <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
+              </tr>
+              <tr>
+                <td align="right">Körpergröße/-gewicht:</td>
+                <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
+              </tr>
+              <tr>
+                <td align="right">Positionen:</td>
+                <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
+              </tr>
+              <tr>
+                <td align="right">Stärke (bereinigt):</td>
+                <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
+              </tr>
+              <tr>
+                <td align="right">Talent:</td>
+                <td align="right">@sTalent</td>
+              </tr>
+              <tr>
+                <td align="right">Fuß (links/rechts):</td>
+                @{
+                  if (player.fFootL > 0.99 && player.fFootR > 0.99) {
+                    <td align="right">beidfüßig</td>
+                  } else {
+                    <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+                  }
+                }
+              </tr>
+              <tr>
+                @{
+                  string sVerletzung = "keine";
+                  if (player.fInjury[0] > 0.0) {
+                    sVerletzung = player.fInjury[0].ToString("0.0") + " Tage (" + (player.fInjury[0] / player.fInjury[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fInjury[2]];
+                  }
+                }
+                <td align="right">Verletzung:</td>
+                <td align="right">@sVerletzung</td>
+              </tr>
+              <tr>
+                <td align="right">Gehalt:</td>
+                <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+              </tr>
+              <tr>
+                @{
+                  string sDauer = player.contract.iLength.ToString() + " Jahre";
+                  if (MvcApplication.ckcore.ltClubs[player.iClubId].ltJugendspielerID.IndexOf(player.iId) >= 0) {
+                    sDauer = "Jugendspieler";
+                  } else if (player.contract.iLength < 2) {
+                    sDauer = "Saisonende";
+                  }
+                }
+                <td align="right">Laufzeit:</td>
+                <td align="right">@sDauer</td>
+              </tr>
+              <tr>
+                @{
+                  string sVal = (MvcApplication.ckcore.plr.getValue(player, 100) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";
+                }
+                <td align="right">Marktwert:</td>
+                <td align="right">@sVal</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      @* Put on / take from transferlist *@
-      @if (MvcApplication.ckcore.plr.onTransferlist(player)) {
-        <button type="submit" id="bnTakeFromTransfer" class="btn btn-default" style="width: 30%; min-width: 300px">Von Transferliste nehmen</button>
-      } else {
-        <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 30%; min-width: 300px">Auf Transferliste setzen</button>
-      }
-    </div>
+        <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+          <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
+            <tbody>
+              <tr>
+                <td align="right">Führungspersönlichkeit:</td>
+                <td align="right">@player.character.fLeader.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Schußhäufigkeit:</td>
+                <td align="right">@player.character.fShoot.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Teamplayer:</td>
+                <td align="right">@player.character.fPass.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Dribbler:</td>
+                <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Flexibilität:</td>
+                <td align="right">@player.character.fFlexibel.ToString("0.0%")</td>
+              </tr>
+            </tbody>
+          </table>
 
-    <div style="position: relative; width: 100%; height: 100%; float: left; margin-top: 1%">
-      @if (clubUser.iCaptainId[0] != player.iId) {
-        <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Kapitän machen</button>
-      }
+          <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
+            <tbody>
+              <tr>
+                <td align="right"><ins>Sperren:</ins></td>
+              </tr>
+              @{
+                if (player.iSuspension[0] + player.iSuspension[1] + player.iSuspension[4] == 0) {
+                  <tr>
+                    <td align="right">keine</td>
+                  </tr>
+                } else {
+                  if (player.iSuspension[0] > 0) {
+                    string sSp = "Liga: " + player.iSuspension[0].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[1] > 0) {
+                    string sSp = "Pokal: " + player.iSuspension[1].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[4] > 0) {
+                    string sSp = "Testspiele: " + player.iSuspension[4].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
 
-      @if (clubUser.iCaptainId[1] != player.iId) {
-        <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 30%; min-width: 300px">Zum Vize-Kapitän machen</button>
-      }
-    </div>
-  }
-}
+        <div style="position: relative; width: 40px; height: auto; float: left; text-align: right">
+          @if (Model.bCaptain) {
+            <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+          } else if (Model.bCaptain2) {
+            <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+          }
 
-<div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 1%">
-  <div style="position: relative; width: auto; height: auto; float: left; margin-right: 2%">
-    <table border="1" cellpadding="4" style="width: auto">
-      <thead>
-        <tr>
-          <th style="text-align:center">Fähigkeit</th>
-          <th>Wert</th>
           @{
-            if (bOwnPlayer) {
-              <th>Training</th>
-              <th>Ind.</th>
-              <th>Bonus</th>
+            string sNat = MvcApplication.ckcore.sLandShort[player.iNat1];
+
+            if (string.IsNullOrEmpty(sNat)) {
+              <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
+            } else {
+              string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+              <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
             }
           }
-        </tr>
-      </thead>
-      <tbody>
-        @for (int i = 0; i < player.iSkill.Length; i++) {
-          var fTraining = player.fFTraining[i] + 1.0;
+        </div>
+
+        <div id="divChartCFM" style="position: relative; height: 250px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
+      </div>
+
+  @{
+    string sExtendContract = "Vertrag verlängern";
+    if (Model.bJouth) {
+      sExtendContract = "Profivertrag aushandeln";
+    }
+
+    if (Model.bOwnPlayer) {
+      <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px; text-align: center">
+        @* Extend player contract *@
+        <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
+
+        @* Put on / take from transferlist *@
+        @if (MvcApplication.ckcore.plr.onTransferlist(player)) {
+          <button type="submit" id="bnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
+        } else {
+          <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
+        }
+
+        @if (!Model.bJouth) {
+          if (!Model.bCaptain) {
+            <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Kapitän machen</button>
+          }
+
+          if (!Model.bCaptain2) {
+            <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Vize-Kapitän machen</button>
+          }
+
+          <button type="submit" id="bnDoping" class="btn btn-default" style="width: 100%; margin-top: 4px">Spieler dopen</button>
+        }
+      </div>
+    }
+  }
+
+  <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
+
+  <div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 10px">
+    <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
+      <table border="1" cellpadding="4" style="width: auto">
+        <thead>
           <tr>
-            <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
-            <td align="center">@player.iSkill[i]</td>
+            <th style="text-align:center">Fähigkeit</th>
+            <th>Wert</th>
             @{
-              if (bOwnPlayer) {
-                <td align="right">@fTraining.ToString("0.0%")</td>
-                <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+              if (Model.bOwnPlayer) {
+                <th>Training</th>
+                <th>Ind.</th>
+                <th>Bonus</th>
               }
             }
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (int i = 0; i < player.iSkill.Length; i++) {
+            var fTraining = player.fSkillTraining[i] + 1.0;
+            <tr>
+              <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
+              <td align="center">@player.iSkill[i]</td>
+              @{
+                if (Model.bOwnPlayer) {
+                  <td align="right">@fTraining.ToString("0.0%")</td>
+                  <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                  <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-  <div style="position: relative; width: auto; height: auto; float: left; margin-right: 2%">
-    <table border="1" cellpadding="4" style="width: auto">
-      <thead>
-        <tr>
-          <th style="text-align:center">Position</th>
-          <th style="text-align:center">Wert</th>
-          <th style="text-align:center">Stärke</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (byte i = 0; i < player.fPosSkill.Length; i++) {
-          byte j = i;
-          j++;
+    <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
+      <table border="1" cellpadding="4" style="width: auto">
+        <thead>
           <tr>
-            <td align="center">@MvcApplication.ckcore.sPosition[i + 1]</td>
-            <td align="right">@player.fPosSkill[i].ToString("0.0%")</td>
-            <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(player, j, true).ToString("0.0")</td>
+            <th style="text-align:center">Position</th>
+            <th style="text-align:center">Wert</th>
+            <th style="text-align:center">Stärke</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (byte i = 0; i < player.fExperiencePos.Length; i++) {
+            byte j = (byte)(i + 1);
 
-  <div style="position: relative; width: auto; height: auto; float: left">
-    <table border="1" cellpadding="4" style="width: auto">
-      <thead>
-        <tr>
-          <th align="center"></th>
-          <th align="center">Liga</th>
-          @{
-            if (MvcApplication.ckcore.iSaisonCount > 1) {
-              <th align="center">Liga ges.</th>
+            string sColor = "";
+            string sBold = "";
+            if (player.fExperiencePos[i] > 0.99) {
+              sBold = "style=font-weight:bold";
+            } else if (player.fExperiencePos[i] > 0.8) {
+              sColor = "style=color:blue";
             }
+            <tr @sBold>
+              <td align="center">@MvcApplication.ckcore.sPosition[i + 1]</td>
+              <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
+              <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(player, j, true).ToString("0.0")</td>
+            </tr>
           }
-          <th align="center">Pokal</th>
-          @{
-            if (MvcApplication.ckcore.iSaisonCount > 1) {
-              <th align="center">Pokal ges.</th>
-            }
-          }
-        </tr>
-      </thead>
-      <tbody>
-        @{
-          int nStat = 1;
-          if (MvcApplication.ckcore.iSaisonCount > 1) {
-            nStat = 2;
-          }
+        </tbody>
+      </table>
+    </div>
 
-          CornerkickGame.Player.Statistic[] plStatSeason = new CornerkickGame.Player.Statistic[2] { MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 1, true), MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 2, true) };
-          CornerkickGame.Player.Statistic[] plStatTotal = new CornerkickGame.Player.Statistic[2] { MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 1, false), MvcApplication.ckcore.game.tl.getPlayerStatistic(player, 2, false) };
-        }
-        <tr>
-          <td align="right">Spiele</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[0]</td>
+    <div style="position: relative; width: auto; height: auto; float: left">
+      <table border="1" cellpadding="4" style="width: auto">
+        <thead>
+          <tr>
+            <th align="center"></th>
+            <th align="center">Liga</th>
+            @{
+              if (MvcApplication.ckcore.iSaisonCount > 1) {
+                <th align="center">Liga ges.</th>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Tore</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              int iToreGes = iStat[1] + iStat[2] + iStat[3] + iStat[4] + iStat[6];
-              <td align="center">@iToreGes</td>
+            <th align="center">Pokal</th>
+            @{
+              if (MvcApplication.ckcore.iSaisonCount > 1) {
+                <th align="center">Pokal ges.</th>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">mit rechts</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[1]</td>
+          </tr>
+        </thead>
+        <tbody>
+          @{
+            int nStat = 1;
+            if (MvcApplication.ckcore.iSaisonCount > 1) {
+              nStat = 2;
             }
+
+            CornerkickGame.Player.Statistic[] plStatSeason = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, true),  player.getStatistic(2, true)  };
+            CornerkickGame.Player.Statistic[] plStatTotal  = new CornerkickGame.Player.Statistic[2] { player.getStatistic(1, false), player.getStatistic(2, false) };
           }
-        </tr>
-        <tr>
-          <td align="right">mit links</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[2]</td>
+          <tr>
+            <td align="right">Spiele</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[0]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">per Kopf</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[3]</td>
+          </tr>
+          <tr>
+            <td align="right">Tore</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                int iToreGes = iStat[1] + iStat[2] + iStat[3] + iStat[4] + iStat[6];
+                <td align="center">@iToreGes</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Tore pro Spiel</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              int iToreGes = iStat[1] + iStat[2] + iStat[3];
-              string s = "-";
-              if (iStat[0] > 0) { s = (iToreGes / (float)iStat[0]).ToString("0.00"); }
-              <td align="center">@s</td>
+          </tr>
+          <tr>
+            <td align="right">mit rechts</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[1]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">11m +</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[4]</td>
+          </tr>
+          <tr>
+            <td align="right">mit links</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[2]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">11m -</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[5]</td>
+          </tr>
+          <tr>
+            <td align="right">per Kopf</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[3]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">11m Quote</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              string s11m = "-";
-              if (iStat[4] + iStat[5] > 0) { s11m = (iStat[4] / (float)(iStat[4] + iStat[5])).ToString("0.0%"); }
-              <td align="center">@s11m</td>
+          </tr>
+          <tr>
+            <td align="right">Tore pro Spiel</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                int iToreGes = player.getGoalsTotal(i + 1, true);
+                if (j > 0) {
+                  iStat = plStatTotal[i].iStat;
+                  iToreGes = player.getGoalsTotal(i + 1, false);
+                }
+                string s = "-";
+                if (iStat[0] > 0) { s = (iToreGes / (float)iStat[0]).ToString("0.00"); }
+                <td align="center">@s</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Freistoß +</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[6]</td>
+          </tr>
+          <tr>
+            <td align="right">11m +</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[4]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Freistoß -</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[7]</td>
+          </tr>
+          <tr>
+            <td align="right">11m -</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[5]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Freistoßquote</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              string s = "-";
-              if (iStat[6] + iStat[7] > 0) { s = (iStat[6] / (float)(iStat[6] + iStat[7])).ToString("0.0%"); }
-              <td align="center">@s</td>
+          </tr>
+          <tr>
+            <td align="right">11m Quote</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                string s11m = "-";
+                if (iStat[4] + iStat[5] > 0) { s11m = (iStat[4] / (float)(iStat[4] + iStat[5])).ToString("0.0%"); }
+                <td align="center">@s11m</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Vorlagen</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[8]</td>
+          </tr>
+          <tr>
+            <td align="right">Freistoß +</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[6]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Torschüsse</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[9]</td>
+          </tr>
+          <tr>
+            <td align="right">Freistoß -</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[7]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Torschüsse pro Tor</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              int iToreGes = iStat[1] + iStat[2] + iStat[3];
-              string s = "-";
-              if (iToreGes > 0) { s = (iStat[9] / (float)iToreGes).ToString("0.00"); }
-              <td align="center">@s</td>
+          </tr>
+          <tr>
+            <td align="right">Freistoßquote</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                string s = "-";
+                if (iStat[6] + iStat[7] > 0) { s = (iStat[6] / (float)(iStat[6] + iStat[7])).ToString("0.0%"); }
+                <td align="center">@s</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Schüsse aufs Tor</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[10]</td>
+          </tr>
+          <tr>
+            <td align="right">Vorlagen</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[8]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Abspiel +</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[15]</td>
+          </tr>
+          <tr>
+            <td align="right">Torschüsse</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[9]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Abspiel -</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[16]</td>
+          </tr>
+          <tr>
+            <td align="right">Torschüsse pro Tor</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                int iToreGes = iStat[1] + iStat[2] + iStat[3];
+                string s = "-";
+                if (iToreGes > 0) { s = (iStat[9] / (float)iToreGes).ToString("0.00"); }
+                <td align="center">@s</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Abspielquote</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              string s = "-";
-              if (iStat[15] + iStat[16] > 0) { s = (iStat[15] / (float)(iStat[15] + iStat[16])).ToString("0.0%"); }
-              <td align="center">@s</td>
+          </tr>
+          <tr>
+            <td align="right">Schüsse aufs Tor</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[10]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Zweikampf def. +</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[17]</td>
+          </tr>
+          <tr>
+            <td align="right">Abspiel +</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[15]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Zweikampf def. -</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[18]</td>
+          </tr>
+          <tr>
+            <td align="right">Abspiel -</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[16]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Zweikampf def. Quote</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              string s = "-";
-              if (iStat[17] + iStat[18] > 0) { s = (iStat[17] / (float)(iStat[17] + iStat[18])).ToString("0.0%"); }
-              <td align="center">@s</td>
+          </tr>
+          <tr>
+            <td align="right">Abspielquote</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                string s = "-";
+                if (iStat[15] + iStat[16] > 0) { s = (iStat[15] / (float)(iStat[15] + iStat[16])).ToString("0.0%"); }
+                <td align="center">@s</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Zweikampf off. +</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[19]</td>
+          </tr>
+          <tr>
+            <td align="right">Zweikampf def. +</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[17]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Zweikampf off. -</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[20]</td>
+          </tr>
+          <tr>
+            <td align="right">Zweikampf def. -</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[18]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Zweikampf off. Quote</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              string s = "-";
-              if (iStat[19] + iStat[20] > 0) { s = (iStat[19] / (float)(iStat[19] + iStat[20])).ToString("0.0%"); }
-              <td align="center">@s</td>
+          </tr>
+          <tr>
+            <td align="right">Zweikampf def. Quote</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                string s = "-";
+                if (iStat[17] + iStat[18] > 0) { s = (iStat[17] / (float)(iStat[17] + iStat[18])).ToString("0.0%"); }
+                <td align="center">@s</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Fouls</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[21]</td>
+          </tr>
+          <tr>
+            <td align="right">Zweikampf off. +</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[19]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Gelbe Karten</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[22]</td>
+          </tr>
+          <tr>
+            <td align="right">Zweikampf off. -</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[20]</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Gelb-Rote Karten</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[23]</td>
+          </tr>
+          <tr>
+            <td align="right">Zweikampf off. Quote</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                string s = "-";
+                if (iStat[19] + iStat[20] > 0) { s = (iStat[19] / (float)(iStat[19] + iStat[20])).ToString("0.0%"); }
+                <td align="center">@s</td>
+              }
             }
-          }
-        </tr>
-        <tr>
-          <td align="right">Rote Karten</td>
-          @for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < nStat; j++) {
-              int[] iStat = plStatSeason[i].iStat;
-              if (j > 0) { iStat = plStatTotal[i].iStat; }
-              <td align="center">@iStat[24]</td>
+          </tr>
+          <tr>
+            <td align="right">Fouls</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[21]</td>
+              }
             }
-          }
-        </tr>
-      </tbody>
-    </table>
+          </tr>
+          <tr>
+            <td align="right">Gelbe Karten</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[22]</td>
+              }
+            }
+          </tr>
+          <tr>
+            <td align="right">Gelb-Rote Karten</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[23]</td>
+              }
+            }
+          </tr>
+          <tr>
+            <td align="right">Rote Karten</td>
+            @for (int i = 0; i < 2; i++) {
+              for (int j = 0; j < nStat; j++) {
+                int[] iStat = plStatSeason[i].iStat;
+                if (j > 0) { iStat = plStatTotal[i].iStat; }
+                <td align="center">@iStat[24]</td>
+              }
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -812,4 +1045,19 @@
 
 <div id="dialogCaptain" title="Bitte bestätigen...">
   <p id="txtCaptain"></p>
+</div>
+
+<div id="dialogDoping" title="Spieler dopen">
+  <div style="position: relative; width: 100%; height: 40px" class="form-group">
+    <div style="position: absolute; width: 35%; height: auto; top: 10px" class="form-group">
+      <b class="left">Dopingmittel:</b>
+    </div>
+    <div style="position: absolute; width: 65%; left: 35%" class="col-md-10">
+      @Html.DropDownListFor(m => m.iDp, new SelectList(Model.ddlDoping, "Value", "Text", Model.iDp), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setDopingDesc()", id = "ddlDoping", style = "width: 100%" })
+    </div>
+  </div>
+  <div style="position: relative" class="form-group">
+    <b>Eigenschaften:</b>
+    <p id="txtDialogDoping"></p>
+  </div>
 </div>

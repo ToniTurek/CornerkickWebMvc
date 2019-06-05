@@ -5,7 +5,6 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <head>
   <meta charset="UTF-8">
   <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -17,6 +16,15 @@
 
   <script type="text/javascript">
     var bMobile = false;
+
+    var sponsorBoards = [];
+    sponsorBoards.push('<img src="/Content/Images/sponsors/0.png" style="position: relative; width: 320px; height: 50px"/>');
+    //var iB = 1;
+    while (sponsorBoards.length < 10) {
+      sponsorBoards.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=288&l=ez&f=ifr&linkID=304dbf1425f3596b252609b0812b5e4b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="320" height="50" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
+      //sponsorBoards.push('<img src="/Content/Images/sponsors/' + iB.toString() + '.png" style="position: relative; width: 320px; height: 50px" />');
+      //iB++;
+    }
 
     function getLtSponsorBoardIds() {
       return $.ajax({
@@ -30,8 +38,11 @@
     }
 
     function loadImageMain(iSponsorID) {
-      if (iSponsorID >= 0) {
-        document.getElementById("imgSponsorMain").src = "/Content/Images/sponsors/" + iSponsorID.toString() + ".png";
+      divSponsorMain = document.getElementById("divSponsorMain");
+      if (iSponsorID > 0) {
+        divSponsorMain.innerHTML = '<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=12&l=ez&f=ifr&linkID=af710bb1d1484bd029e76eeada862979&t=cornerkick03-21&tracking_id=cornerkick03-21" width="300" height="250" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>';
+      } else {
+        divSponsorMain.innerHTML = '<img src="/Content/Images/sponsors/0.png" style="position: relative; width: 100%"/>';
       }
     }
 
@@ -43,12 +54,17 @@
         }
 
         for (i = 0; i < ltSponsorTmp.length; i++) {
-          document.getElementById("imgSponsorBoard_" + i.toString()).src = "/Content/Images/sponsors/" + ltSponsorTmp[i].toString() + ".png";
+          divBoard = document.getElementById("divSponsorBoard_" + i.toString());
+          divBoard.innerHTML = sponsorBoards[ltSponsorTmp[i]];
         }
       }
     }
 
     $(document).ready(function () {
+      bnTakeMain = document.getElementById("bnTake");
+      if (bnTakeMain != null) {
+        bnTakeMain.disabled = true;
+      }
       bnTakeBoard = document.getElementById("bnTakeBoard");
       bnTakeBoard.disabled = true;
 
@@ -77,8 +93,13 @@
       });
 
       $('#tableSponsors tbody').on('click', 'tr', function () {
+        if (bnTakeMain != null) {
+          bnTakeMain.disabled = true;
+        }
+
         if ($(this).hasClass('selected')) {
           $(this).removeClass('selected');
+          loadImageMain(0);
         } else {
           jTable.$('tr.selected').removeClass('selected');
           $(this).addClass('selected');
@@ -86,6 +107,9 @@
           var data = jTable.row('.selected').data();
           if (data) {
             loadImageMain(data[1]);
+            if (bnTakeMain != null) {
+              bnTakeMain.disabled = false;
+            }
           } else {
             loadImageMain(iSponsorID);
           }
@@ -199,10 +223,8 @@
 
 <h2>Hauptsponsor</h2>
 
-<div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
-  <img id="imgSponsorMain" src="" style="position: relative; width: 100%; border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px" />
+<div class="image" style="position: relative; width: 100%; margin-bottom: 2%" align="center">
+  <div id="divSponsorMain" style="position: relative; width: 312px; height: 262px; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
 </div>
 
 @{
@@ -230,23 +252,23 @@
           <td>0</td>
           <td>@Model.sponsorMain.iId</td>
           <td>@MvcApplication.ckcore.fz.ltSponsoren[Model.sponsorMain.iId].sName</td>
-          <td>@Model.sponsorMain.iGeldJahr.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-          <td>@Model.sponsorMain.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-          <td>@Model.sponsorMain.iGeldMeister.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+          <td>@Model.sponsorMain.iGeldJahr.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          <td>@Model.sponsorMain.iMoneyVicHome.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          <td>@Model.sponsorMain.iGeldMeister.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
           <td>@Model.sponsorMain.iYears</td>
         </tr>
       }
 
       int iSp = 0;
-      foreach (CornerkickCore.Finance.Sponsor spon in Model.ltSponsorOffers) {
+      foreach (CornerkickManager.Finance.Sponsor spon in Model.ltSponsorOffers) {
         if (spon.bMain && spon.iId > 0 && spon.iId < MvcApplication.ckcore.fz.ltSponsoren.Count) {
           <tr>
             <td>@iSp</td>
             <td>@spon.iId</td>
             <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName</td>
-            <td>@spon.iGeldJahr.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-            <td>@spon.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-            <td>@spon.iGeldMeister.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
+            <td>@spon.iGeldJahr.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+            <td>@spon.iMoneyVicHome.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+            <td>@spon.iGeldMeister.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
             <td>@spon.iYears</td>
           </tr>
         }
@@ -258,7 +280,7 @@
 
 @{
   if (Model.sponsorMain.iId <= 0) {
-    <button type="submit" id="bnTake" class="btn btn-default" style="width: 100%">Sponsor wählen</button>
+    <button type="submit" id="bnTake" class="btn btn-default" style="width: 100%; margin-top: 6px">Sponsor wählen</button>
   }
 }
 
@@ -278,54 +300,19 @@
     </tr>
   </thead>
   <tbody>
-    @*
-    @{
-      foreach (CornerkickCore.Finance.Sponsor spon in Model.ltSponsorBoards) {
-        if (!spon.bHaupt) {
-          <tr style="font-weight:bold">
-            <td>-1</td>
-            <td>@spon.iId</td>
-            <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName</td>
-            <td>@spon.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-            <td>@spon.nBoards.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-            <td>@spon.iYears</td>
-          </tr>
-        }
-      }
-
-      int iSpB = 0;
-      foreach (CornerkickCore.Finance.Sponsor spon in Model.ltSponsorOffers) {
-        if (!spon.bHaupt) {
-          <tr>
-            <td>@iSpB</td>
-            <td>@spon.iId</td>
-            <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName</td>
-            <td>@spon.iMoneyVicHome.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-            <td>@spon.nBoards.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR"))</td>
-            <td>@spon.iYears</td>
-          </tr>
-        }
-        iSpB++;
-      }
-    }
-    *@
   </tbody>
 </table>
 
-<button type="submit" id="bnTakeBoard" class="btn btn-default" style="width: 100%">Sponsor wählen</button>
+<button type="submit" id="bnTakeBoard" class="btn btn-default" style="width: 100%; margin-top: 6px">Sponsor wählen</button>
 
 @{
   for (int iB = 0; iB < 12; iB++) {
     if (iB < Model.ltSponsorBoards.Count) {
-      CornerkickCore.Finance.Sponsor spon = Model.ltSponsorBoards[iB];
+      CornerkickManager.Finance.Sponsor spon = Model.ltSponsorBoards[iB];
     }
-    string sImgId = "imgSponsorBoard_" + iB.ToString();
+    string sImgId = "divSponsorBoard_" + iB.ToString();
     <div class="image" style="position: relative; width: 100%; margin-top: 2%">
-      <div style="position: relative; float: left; width: 48%; margin-right: 2%; margin-bottom: 2%; height: auto; border: 0px solid green">
-        <img id=@sImgId src="" style="position: relative; width: 100%; border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px" />
-      </div>
+      <div id=@sImgId style="position: relative; float: left; width: 48%; min-width: 330px; margin-right: 2%; margin-bottom: 2%; height: auto; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
     </div>
   }
 }

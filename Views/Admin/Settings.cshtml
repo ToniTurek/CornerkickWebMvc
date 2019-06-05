@@ -5,76 +5,194 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<script type="text/javascript">
+  var sDir = "";
+  $(document).ready(function () {
+    setFileExplorer();
+
+    $("#bnSetWeeks1").click(function () {
+      setCalInterval(1);
+    });
+
+    $("#bnSetWeeks2").click(function () {
+      setCalInterval(2);
+    });
+
+    $('#iSelectedClubAdmin').change(function () {
+      $.ajax({
+        url: '/Admin/SetAdminClub',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        data: { iClubIx: $(this).val() }
+      });
+    });
+  });
+
+  function setCalInterval(iWeeks) {
+    // Capital letters = Real-time
+    //              MIN * S  * H   /   weeks * qu  * h  * d
+    var fInterval = (60 * 60 * 24) / (iWeeks * 4.0 * 24 * 7);
+    document.getElementById('fCalendarInterval').value = fInterval;
+  }
+
+  function changeDir() {
+    sDir = document.getElementById('itCd').value;
+    setFileExplorer();
+  }
+
+  function setFileExplorer() {
+    $.ajax({
+      url: '/Admin/getFilesInDirectory',
+      type: "GET",
+      dataType: "JSON",
+      data: { sDir: sDir },
+      success: function (sContent) {
+        document.getElementById('itCurDir').value = sDir;
+
+        $("#divFileExplorer").html(setFileExplorerTable(sContent)).show();
+      }
+    });
+  }
+
+
+  function setFileExplorerTable(sContent) {
+    var sBox = '';
+    sBox += '<table id="tableFileExplorer" style="width: 100%; background-color: black; color: white">';
+
+    sNsplit = sContent.split('\n');
+    for (var i = 0; i < sNsplit.length; i++) {
+      sN = sNsplit[i];
+
+      sN = sN.replace("<", "&lt;");
+      sN = sN.replace(">", "&gt;");
+
+      sBox += '<tr>';
+      sBox += '<td>' + sN + '</td>';
+      sBox += '</tr>';
+    }
+
+    sBox += '</table>';
+
+    return sBox;
+  }
+
+</script>
+
+@Html.ActionLink("Log", "Log", "Admin")
+
 <h2>Settings</h2>
 @{
   string sDtNow = DateTime.Now.ToString();
-}
-
-@using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
-  @Html.TextBoxFor(m => m.fCalenderInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 30%" })
-  @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 30%" })
-  @Html.TextBoxFor(m => m.iGameSpeed, new { autocomplete = "off", style = "width: 30%" })
-
-  <button type="submit">Start</button>
-}
-
-@using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
-  <button type="submit">Stop</button>
-}
-
-<text>System time: @sDtNow<br></text>
-
-@{
   bool bCk = true;
   bool bTimer = false;
+  bool bTimerSave = false;
   string sInterval = "";
   string sHour = "";
   if (Model != null) {
     bCk = Model.bCk;
     bTimer = Model.bTimer;
-    sInterval = Model.fCalenderInterval.ToString() + " s";
+    bTimerSave = Model.bTimerSave;
+    sInterval = Model.fCalendarInterval.ToString() + " s";
     sHour = Model.sStartHour;
   }
 }
+
+<div style="position: relative; width: 50%; min-width: 300px; height: 70px">
+  @using (Html.BeginForm("StartCalendar", "Admin", FormMethod.Post)) {
+    @Html.TextBoxFor(m => m.fCalendarInterval, new { autocomplete = "off", autofocus = "autofocus", style = "width: 33%" })
+    @Html.TextBoxFor(m => m.sStartHour, new { autocomplete = "off", style = "width: 33%" })
+    @Html.TextBoxFor(m => m.iGameSpeed, new { autocomplete = "off", style = "width: 33%" })
+
+    <p></p>
+    if (bTimer) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px">Update</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px">Start</button>
+    }
+  }
+
+  @using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
+    <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px; left: 184px">Stop</button>
+  }
+</div>
+
+<button type="submit" id="bnSetWeeks1" class="btn btn-default" style="position: relative; width: 180px">1 Day -> 1 Week</button>
+<button type="submit" id="bnSetWeeks2" class="btn btn-default" style="position: relative; width: 180px">1 Day -> 2 Weeks</button>
+
+<p></p>
+<text>System time: @sDtNow<br></text>
 <text>running: @bCk.ToString()<br></text>
 <text>timer: @bTimer.ToString()<br></text>
 <text>interval: @sInterval<br></text>
 <text>hour: @sHour<br></text>
+<text>save timer: @bTimerSave.ToString()<br></text>
 <text>No. of Teams: @Model.nClubs<br></text>
 <text>No. of User: @Model.nUser<br></text>
 <text>No. of Player: @Model.nPlayer<br></text>
 
 @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {
-  <button type="submit">Restart Cornerkick</button>
+  <button type="submit" class="btn btn-default" style="position: relative; width: 180px">Restart Cornerkick</button>
 }
 
-@using (Html.BeginForm("DeleteLog", "Admin", FormMethod.Post)) {
-  if (Model.bLogExist) {
-    <button type="submit">delete Log</button>
-  } else {
-    <button type="submit" disabled>delete Log</button>
+<div style="position: relative; width: 50%; min-width: 300px; height: 75px; margin-top: 10px">
+  @using (Html.BeginForm("DeleteLog", "Admin", FormMethod.Post)) {
+    if (Model.bLogExist) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px">delete Log</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px" disabled>delete Log</button>
+    }
   }
-}
 
-@using (Html.BeginForm("SaveAutosave", "Admin", FormMethod.Post)) {
-  <button type="submit">save autosave</button>
-}
-
-@using (Html.BeginForm("DeleteAutosave", "Admin", FormMethod.Post)) {
-  if (Model.bAutosaveExist) {
-    <button type="submit">delete autosave</button>
-  } else {
-    <button type="submit" disabled>delete autosave</button>
+  @using (Html.BeginForm("DeleteSaveFolder", "Admin", FormMethod.Post)) {
+    if (Model.bSaveDirExist) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px">delete save folder</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px" disabled>delete save folder</button>
+    }
   }
-}
+</div>
 
-@using (Html.BeginForm("LoadAutosave", "Admin", FormMethod.Post)) {
-  <label for="files">autosave files:</label>
-  @Html.DropDownListFor(m => m.sSelectedAutosaveFile, Model.ddlAutosaveFiles, new { @class = "form-control" })
-
-  if (Model.bAutosaveExist) {
-    <button type="submit">load autosave</button>
-  } else {
-    <button type="submit" disabled>load autosave</button>
+<div style="position: relative; width: 50%; min-width: 300px; height: 40px">
+  @using (Html.BeginForm("SaveAutosave", "Admin", FormMethod.Post)) {
+    <button type="submit" class="btn btn-default" style="position: absolute; width: 180px">save autosave</button>
   }
+
+  @using (Html.BeginForm("DeleteAutosave", "Admin", FormMethod.Post)) {
+    if (Model.bAutosaveExist) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px">delete autosave</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px" disabled>delete autosave</button>
+    }
+  }
+</div>
+
+<div style="position: relative; width: 50%; min-width: 300px; height: 40px">
+  @using (Html.BeginForm("LoadAutosave", "Admin", FormMethod.Post)) {
+    @Html.DropDownListFor(m => m.sSelectedAutosaveFile, Model.ddlAutosaveFiles, new { @class = "form-control", style = "position: absolute; width: 180px" })
+
+    if (Model.bAutosaveExist) {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px">load autosave</button>
+    } else {
+      <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; left: 184px" disabled>load autosave</button>
+    }
+  }
+</div>
+
+<div style="position: relative; width: 50%; min-width: 300px; height: 40px">
+  @Html.DropDownListFor(m => m.iSelectedClubAdmin, Model.ddlClubsAdmin, new { @class = "form-control", style = "position: absolute; width: 180px" })
+</div>
+
+@{
+  string sMapPath = Server.MapPath("~");
 }
+<h3>File Explorer</h3>
+<text>Home Dir: @sMapPath<br></text>
+<text id="txtCurDir">Current Dir: </text>
+<input id="itCurDir" style="width: 30%" type="text" readonly>
+
+<p></p>
+<input id="itCd" style="width: 30%" type="text" autocomplete="off">
+<button id="bnCd" type="submit" class="btn btn-default" onclick="changeDir();">Change Dir</button>
+<div id="divFileExplorer"></div>

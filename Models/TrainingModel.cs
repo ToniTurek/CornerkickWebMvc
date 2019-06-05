@@ -10,6 +10,7 @@ namespace CornerkickWebMvc.Models
 {
   public class TrainingModel
   {
+    public CornerkickManager.Main.Training training { get; set; }
     public string sTraining { get; set; }
     public List<SelectListItem> ltDdlTraining { get; set; }
 
@@ -32,21 +33,24 @@ namespace CornerkickWebMvc.Models
   [DataContract]
   public class DataPointGeneral
   {
-    public DataPointGeneral(long x, double y)
+    public DataPointGeneral(long x, double y, string z = "")
     {
       this.x = x;
       this.y = y;
+      this.z = z;
     }
 
-    //Explicitly setting the name to be used while serializing to JSON.
+    // Explicitly setting the name to be used while serializing to JSON.
     [DataMember(Name = "x")]
     public Nullable<long> x = null;
-    //[DataMember(Name = "x")]
-    //public Nullable<DateTime> X = null;
 
-    //Explicitly setting the name to be used while serializing to JSON.
+    // Explicitly setting the name to be used while serializing to JSON.
     [DataMember(Name = "y")]
     public Nullable<double> y = null;
+
+    // Explicitly setting the name to be used while serializing to JSON.
+    [DataMember(Name = "z")]
+    public string z;
   }
 
   [DataContract]

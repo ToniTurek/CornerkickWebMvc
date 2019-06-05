@@ -4,23 +4,36 @@
   ViewBag.Title = "Aufstellung";
   Layout = "~/Views/Shared/_Layout.cshtml";
 
-  var clubUser = CornerkickWebMvc.Controllers.AccountController.ckClub();
-  var plSelected = MvcApplication.ckcore.ltPlayer[clubUser.ltPlayerId[0]];
-  var tactic = clubUser.taktik;
+  var clubUser = Model.club;
+  CornerkickGame.Player plSelected;
+  CornerkickGame.Tactic tactic = new CornerkickGame.Tactic();
+
+  if (clubUser != null) {
+    plSelected = MvcApplication.ckcore.ltPlayer[clubUser.ltPlayerId[0]];
+    tactic = clubUser.tactic;
+  }
 }
 
 <!DOCTYPE html>
-<script type="text/javascript" src="~/Scripts/draw.js"></script>
-<script type="text/javascript" src="~/Scripts/Formation.js"></script>
 <head>
   <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
   <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
   <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
-  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/draw.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
+  <script type="text/javascript" src="~/Scripts/Formation.js"></script>
+
+  <style>
+    .disabledDiv {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  </style>
 
   <script type="text/javascript">
     var iFormation = 0;
@@ -149,7 +162,7 @@
           {
             "data": "sName",
             "render": function (data, type, row) {
-              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "_blank" })'.replace("name", data).replace("id", row.sID);
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "" })'.replace("name", data).replace("id", row.sID);
             }
           },
           { "data": "sPosition" },
@@ -159,14 +172,25 @@
           { "data": "sMoral" },
           { "data": "sStaerkeIdeal" },
           { "data": "sErf" },
-          { "data": "sForm" },
+          {
+            "data": "sForm",
+            "render": function (sForm, type, row) {
+              return getFormIcon(sForm);
+            }
+          },
           { "data": "sAlter" },
           { "data": "sTalent" },
           { "data": "fLeader" },
+          { "data": "sCaptain" },
           { "data": "sMarktwert" },
           { "data": "sGehalt" },
           { "data": "sLz" },
-          { "data": "sNat" },
+          {
+            "data": "sNat",
+            "render": function (sNat, type, row) {
+              return getNatIcon(sNat);
+            }
+          },
           { "data": "iSuspended" }
         ],
         rowReorder: {
@@ -179,12 +203,12 @@
         "searching": false,
         columnDefs: [
           {
-            targets: [1, 2, 20],
+            targets: [1, 2, 21],
             "orderable": false,
             "visible": false,
             "searchable": false
           },
-          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "className": "dt-center" }
+          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "className": "dt-center" }
         ],
         select: true,
         select: {
@@ -231,7 +255,7 @@
       bnSaveFormation.disabled = true;
       bnDeleteFormation = document.getElementById("bnDeleteFormation");
 
-      var fWidth = $(document).width();
+      //var fWidth = $(document).width();
       // end declarations
 
       // Formation
@@ -294,41 +318,32 @@
           drawAufstellung(iFormation, iSelectedPlayer, true);
           oTable.rows('.selected').nodes().to$().removeClass('selected'); // if no data --> remove all selected classes
         } else if (data.length == 1) {
-          if (data[0].iSuspended < 1) {
-            $(this).toggleClass('selected'); // add selected class to row
+          $(this).toggleClass('selected'); // add selected class to row
 
-            iSelectedPlayer = data[0].iIndex;
-            drawAufstellung(iFormation, iSelectedPlayer, true);
-          } else {
-            // suspended
-            oTable.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp'); // remove all selected_tmp classes
-          }
+          iSelectedPlayer = data[0].iIndex;
+          drawAufstellung(iFormation, iSelectedPlayer, true);
         } else if (data.length == 2) {
-          if (data[0].iSuspended < 1 && data[1].iSuspended < 1) {
-            $(this).toggleClass('selected'); // add selected class to row
+          $(this).toggleClass('selected'); // add selected class to row
 
-            var i1 = data[0].sID;
-            var i2 = data[1].sID;
+          var i1 = data[0].sID;
+          var i2 = data[1].sID;
 
-            $.ajax({
-              url: '/Member/SwitchPlayerByID',
-              type: "GET",
-              dataType: "JSON",
-              data: { iID1: i1, iID2: i2 },
-              success: function (ltPlayer) {
-                //console.log(ltPlayer);
-                if (ltPlayer) {
-                  iSelectedPlayer = 0;
-                  drawAufstellung(iFormation, iSelectedPlayer, true);
-                  oTable.ajax.reload();
+          $.ajax({
+            url: '/Member/SwitchPlayerByID',
+            type: "GET",
+            dataType: "JSON",
+            data: { iID1: i1, iID2: i2 },
+            success: function (ltPlayer) {
+              //console.log(ltPlayer);
+              if (ltPlayer) {
+                iSelectedPlayer = 0;
+                drawAufstellung(iFormation, iSelectedPlayer, true);
+                oTable.ajax.reload();
 
-                  getSubstitutionList();
-                }
+                getSubstitutionList();
               }
-            });
-          } else {
-            oTable.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp'); // remove all selected_tmp classes
-          }
+            }
+          });
         }
       });
 
@@ -392,6 +407,8 @@
       });
 
       function doAutoFormation(iType) {
+        $("#divFieldContainer").addClass("disabledDiv");
+
         $.ajax({
           type: "post",
           url: '/Member/doFormationKI',
@@ -400,6 +417,7 @@
           success: function () {
             drawAufstellung(iFormation, -1, true);
             oTable.ajax.reload();
+            $("#divFieldContainer").removeClass("disabledDiv");
           }
         });
       }
@@ -456,27 +474,6 @@
         }
       });
     });
-
-    /*
-    function format(d) {
-      alert(d);
-      // `d` is the original data object for the row
-      return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
-        '<tr>' +
-        '<td>Full name:</td>' +
-        '<td>' + d.name + '</td>' +
-        '</tr>' +
-        '<tr>' +
-        '<td>Extension number:</td>' +
-        '<td>' + d.extn + '</td>' +
-        '</tr>' +
-        '<tr>' +
-        '<td>Extra info:</td>' +
-        '<td>And any further details here (images etc)...</td>' +
-        '</tr>' +
-        '</table>';
-    }
-    */
   </script>
 </head>
 
@@ -528,7 +525,7 @@
 
 @{
   if (true) { // is admin
-    <div class="image" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 1%">
+    <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 1%">
       <img style="position: relative; width: 100%; transform:rotate(180deg)" src="~/Content/Images/stadium/field.png" />
       <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
       <div style="position: absolute; float: left; margin-left: 5%; width: 90%; height: 94%; top: 3%; left: 0%">
@@ -554,10 +551,14 @@
         <div style="position: relative; width: 300px; height: 30px; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
           <form>
             <fieldset>
-              <input type="radio" id="rbDefence" name="rbDefOff" value="0" checked>
-              <label for="rbDefence" style="font-size:140%; color: black; margin-right: 4%"> Formation</label>
-              <input type="radio" id="rbOffence" name="rbDefOff" value="1">
-              <label for="rbOffense" style="font-size:140%; color: black"> Offensive</label>
+              <label style="font-size:140%; color: black; margin-right: 4%">
+                <input type="radio" id="rbDefence" name="rbDefOff" value="0" checked>
+                Formation
+              </label>
+              <label style="font-size:140%; color: black">
+                <input type="radio" id="rbOffence" name="rbDefOff" value="1">
+                Offensive
+              </label>
             </fieldset>
           </form>
         </div>
@@ -566,8 +567,8 @@
       <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
     </div>
 
-    <div class="form-group" style="position: relative; float: left; width: 100%; height: auto; background-color: white">
-      <div class="form-group" style="position: relative; float: left; width: 60%; min-width: 340px; height: 30px">
+    <div class="form-group" style="position: relative; float: left; width: 70%; height: auto; background-color: white">
+      <div class="form-group" style="position: relative; float: left; width: 50%; min-width: 340px; height: 30px">
         <div style="position: absolute; width: 120px; height: auto">
           @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlFormation", @class = "form-control" })
         </div>
@@ -577,13 +578,13 @@
       </div>
       @{
         if (!Model.bGame) {
-          <div style="position: relative; float: left; width: 40%; min-width: 340px; height: 30px">
+          <div style="position: relative; float: left; width: 50%; min-width: 340px; height: 30px">
             <div style="position: absolute; width: 49%">
               <button type="submit" id="bnAutoFormation" class="btn btn-default" style="position: relative; width: 100%">Co-Trainer</button>
             </div>
 
             <div style="position: absolute; width: 49%; left: 51%">
-              @Html.DropDownListFor(m => m.sAutoFormationType, Model.ltDdlAutoFormationType, new { @class = "form-control", id = "ddlAutoFormationType" })
+              @Html.DropDownListFor(m => m.sAutoFormationType, Model.ltDdlAutoFormationType, new { @class = "form-control", id = "ddlAutoFormationType", @style = "width: 100%" })
             </div>
           </div>
         }
@@ -593,14 +594,20 @@
     // Substitutions
     if (Model.bGame) {
       if (CornerkickWebMvc.Models.TeamModels.ltsSubstitution != null) {
-        <h4>Geplante Spielerwechsel</h4>
-        <div id="drawSubstitutions" style="position: relative"></div>
-        using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
-          <input type="submit" value="bestätigen" style="position: relative; width: 20%; min-width: 100px; height: 100%" />
-        }
-        using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
-          <input type="submit" value="zurücksetzen" style="position: relative; width: 20%; min-width: 100px; height: 100%" />
-        }
+        <div style="position: relative; float: left; width: 70%; min-width: 320px; height: auto; min-height: 85px; border: 1px solid black">
+          <div style="position: relative; left: 2%; width: 96%">
+            <h4>Geplante Spielerwechsel</h4>
+            <div id="drawSubstitutions" style="position: relative; width: 50%; margin-bottom: 4px"></div>
+            <div style="position: absolute; left: 50%; top: 0px; width: 50%; height: 75px; text-align: right">
+              @using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
+                <input type="submit" style="width: 100%" class="btn btn-default" value="bestätigen" />
+              }
+              @using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
+                <input type="submit" value="zurücksetzen" class="btn btn-default" style="width: 100%" />
+              }
+            </div>
+          </div>
+        </div>
       }
     }
   }
@@ -627,6 +634,7 @@
           <th>Alter</th>
           <th>Talent</th>
           <th>FP</th>
+          <th>C</th>
           <th>Marktwert [€]</th>
           <th>Gehalt [€/a]</th>
           <th>Lz [a]</th>

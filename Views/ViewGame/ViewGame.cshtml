@@ -6,22 +6,22 @@
   var sA = "";
   var sGoalsH = "";
   var sGoalsA = "";
-  var sEmblemH = "/Content/Uploads/0.png";
-  var sEmblemA = "/Content/Uploads/0.png";
+  var sEmblemH = "/Content/Uploads/emblems/0.png";
+  var sEmblemA = "/Content/Uploads/emblems/0.png";
   if (Model.game != null) {
     sHeader = Model.game.data.team[0].sTeam + " - " + Model.game.data.team[1].sTeam;
     sH = Model.game.data.team[0].sTeam;
     sA = Model.game.data.team[1].sTeam;
     sGoalsH = Model.game.data.team[0].iGoals.ToString();
     sGoalsA = Model.game.data.team[1].iGoals.ToString();
-    sEmblemH = "/Content/Uploads/" + Model.sEmblemH;
-    sEmblemA = "/Content/Uploads/" + Model.sEmblemA;
+    sEmblemH = "/Content/Uploads/emblems/" + Model.sEmblemH;
+    sEmblemA = "/Content/Uploads/emblems/" + Model.sEmblemA;
   }
 
   var sStadion = "";
   if (Model.game != null) {
     sStadion = Model.game.data.stadium.sName;
-    sStadion += " (" + (Model.game.data.iSpectators[0] + Model.game.data.iSpectators[1] + Model.game.data.iSpectators[2]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + " / " + MvcApplication.ckcore.st.getStadiumSeats(Model.game.data.stadium).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser) + ")";
+    sStadion += " (" + (Model.game.data.iSpectators[0] + Model.game.data.iSpectators[1] + Model.game.data.iSpectators[2]).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / " + Model.game.data.stadium.getSeats().ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
   }
 
   ViewBag.Title = sHeader;
@@ -60,7 +60,7 @@
 
   <script type="text/javascript">
     var bStopPlay = false;
-    var bAdminStopPlay = false;
+    var bAdminStop = true;
 
     var ltF = [];
     var ltM = [];
@@ -82,7 +82,7 @@
   <script type="text/javascript" src="~/Scripts/flot/jquery.flot.min.js"></script>
   <script type="text/javascript" src="~/Scripts/flot/jquery.flot.stack.js"></script>
   <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/js/flot/excanvas.min.js"></script><![endif]-->
-  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
 
   <script type="text/javascript">
     $(window).resize(function () {
@@ -100,11 +100,22 @@
       bnAdminPlay = document.getElementById("bnAdminPlay");
       bnAdminNext = document.getElementById("bnAdminNext");
 
-      var ddlHeatmap = $('#ddlHeatmap');
+      var ddlPositions = $('#ddlPositions');
+      var ddlHeatmap   = $('#ddlHeatmap');
+      var ddlShoots    = $('#ddlShoots');
+      var ddlDuels     = $('#ddlDuels');
+      var ddlPasses    = $('#ddlPasses');
+
+      $("a#aOptions").click(function (e) {
+        e.preventDefault();
+        $("#dialogOptions").dialog("open");
+      });
 
       setView();
 
-      drawGame(-1);
+      var iGameSpeed = @Html.Raw(Json.Encode(Model.iGameSpeed));
+
+      drawGame(-3, iGameSpeed);
 
       pMainSlider = $('#slider-Minute');
 
@@ -172,23 +183,42 @@
       });
 
       $("#bnAdminPlay").click(function () {
-        if (bAdminStopPlay) {
-          bAdminStopPlay = false;
+        if (bAdminStop) {
+          bAdminStop = false;
           bnAdminPlay.innerText = "◼";
 
           playAdmin();
         } else {
-          bAdminStopPlay = true;
+          bAdminStop = true;
           bnAdminPlay.innerText = '►';
         }
       });
 
       $("#bnAdminNext").click(function () {
-        bAdminStopPlay = true;
+        bAdminStop = true;
         bnAdminPlay.innerText = '►';
+
+        var iNextAction = document.getElementById("ddlAdminNextAction").value;
+        var iX = document.getElementById("inputAdminSetPosX").value;
+        var iY = document.getElementById("inputAdminSetPosY").value;
 
         $.ajax({
           url: '/ViewGame/AdminNext',
+          type: "GET",
+          dataType: "JSON",
+          data: { iNextAction: iNextAction, iX: iX, iY: iY },
+          success: function () {
+            drawGame(-2);
+          }
+        });
+      });
+
+      $("#bnAdminNew").click(function () {
+        bAdminStop = true;
+        bnAdminPlay.innerText = '►';
+
+        $.ajax({
+          url: '/ViewGame/AdminNew',
           type: "GET",
           dataType: "JSON",
           success: function () {
@@ -197,14 +227,16 @@
         });
       });
 
-      $("#bnAdminNew").click(function () {
-        bAdminStopPlay = true;
-        bnAdminPlay.innerText = '►';
-
+      $("#bnAdminSetPos").click(function () {
+        var iHA = document.getElementById("ddlAdminSetPosHA").value;
+        var iPl = document.getElementById("ddlAdminSetPosPl").value;
+        var iX = document.getElementById("inputAdminSetPosX").value;
+        var iY = document.getElementById("inputAdminSetPosY").value;
         $.ajax({
-          url: '/ViewGame/AdminNew',
+          url: '/ViewGame/AdminSetPos',
           type: "GET",
           dataType: "JSON",
+          data: { iHA: iHA, iPl: iPl, iX: iX, iY: iY },
           success: function () {
             drawGame(-2);
           }
@@ -255,6 +287,7 @@
           showInLegend: true,
           type: "line",
           name: "1",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[0]
         },
         {
@@ -262,6 +295,7 @@
           showInLegend: true,
           type: "line",
           name: "2",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[1]
         },
         {
@@ -269,6 +303,7 @@
           showInLegend: true,
           type: "line",
           name: "3",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[2]
         },
         {
@@ -276,6 +311,7 @@
           showInLegend: true,
           type: "line",
           name: "4",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[3]
         },
         {
@@ -283,6 +319,7 @@
           showInLegend: true,
           type: "line",
           name: "5",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[4]
         },
         {
@@ -290,6 +327,7 @@
           showInLegend: true,
           type: "line",
           name: "6",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[5]
         },
         {
@@ -297,6 +335,7 @@
           showInLegend: true,
           type: "line",
           name: "7",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[6]
         },
         {
@@ -304,6 +343,7 @@
           showInLegend: true,
           type: "line",
           name: "8",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[7]
         },
         {
@@ -311,6 +351,7 @@
           showInLegend: true,
           type: "line",
           name: "9",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[8]
         },
         {
@@ -318,6 +359,7 @@
           showInLegend: true,
           type: "line",
           name: "10",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[9]
         },
         {
@@ -325,6 +367,7 @@
           showInLegend: true,
           type: "line",
           name: "11",
+          yValueFormatString: "0.0%",
           dataPoints: ltF[10]
         }]
       });
@@ -360,6 +403,7 @@
           showInLegend: true,
           type: "line",
           name: "1",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[0]
         },
         {
@@ -367,6 +411,7 @@
           showInLegend: true,
           type: "line",
           name: "2",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[1]
         },
         {
@@ -374,6 +419,7 @@
           showInLegend: true,
           type: "line",
           name: "3",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[2]
         },
         {
@@ -381,6 +427,7 @@
           showInLegend: true,
           type: "line",
           name: "4",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[3]
         },
         {
@@ -388,6 +435,7 @@
           showInLegend: true,
           type: "line",
           name: "5",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[4]
         },
         {
@@ -395,6 +443,7 @@
           showInLegend: true,
           type: "line",
           name: "6",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[5]
         },
         {
@@ -402,6 +451,7 @@
           showInLegend: true,
           type: "line",
           name: "7",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[6]
         },
         {
@@ -409,6 +459,7 @@
           showInLegend: true,
           type: "line",
           name: "8",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[7]
         },
         {
@@ -416,6 +467,7 @@
           showInLegend: true,
           type: "line",
           name: "9",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[8]
         },
         {
@@ -423,6 +475,7 @@
           showInLegend: true,
           type: "line",
           name: "10",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[9]
         },
         {
@@ -430,21 +483,59 @@
           showInLegend: true,
           type: "line",
           name: "11",
+          yValueFormatString: "0.0%",
           dataPoints: ltM[10]
         }]
+      });
+
+      // Dialogs
+      $("#dialogOptions").dialog({
+          autoOpen: false,
+          height: 288,
+          width: 260
+      });
+
+      $("#dialogPlAction").dialog({
+        autoOpen: false,
+        height: 202,
+        width: 170
       });
 
       ddlHeatmap.change(function () {
         plotStatistics(pMainSlider.slider("value"));
       });
 
+      ddlShoots.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
+      ddlDuels.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
+      ddlPasses.change(function () {
+        plotStatistics(pMainSlider.slider("value"));
+      });
+
       ddlPositions.change(function () {
         drawGame(pMainSlider.slider("value"));
+      });
+
+      $('#sSelectedGame').change(function () {
+        $.ajax({
+          url: '/ViewGame/loadGame',
+          type: "GET",
+          dataType: "JSON",
+          data: { sFilename: $(this).val() },
+          success: function () {
+            drawGame(-1);
+          }
+        });
       });
     }); // $(document).ready(function () {});
 
     function playAdmin() {
-      if (bAdminStopPlay === true) return;
+      if (bAdminStop === true) return;
 
       var iAdminGameSpeed = document.getElementById("inputAdminGameSpeed").value;
 
@@ -453,6 +544,7 @@
           url: '/ViewGame/AdminNext',
           type: "GET",
           dataType: "JSON",
+          data: { iNextAction: -1 },
           success: function () {
             $.when(drawGame(-2)).done(function () {
               setTimeout(function () { playAdmin() }, iAdminGameSpeed);
@@ -462,23 +554,9 @@
       }
     }
 
-    /*
-    function requestFullScreen(element) {
-      alert(element);
-      // Supports most browsers and their versions.
-      var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
-
-      alert(requestMethod);
-      if (requestMethod) { // Native full screen.
-        requestMethod.call(element);
-      } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
-        var wscript = new ActiveXObject("WScript.Shell");
-        if (wscript !== null) {
-          wscript.SendKeys("{F11}");
-        }
-      }
+    function openDialogChances() {
+      $("#dialogPlAction").dialog("open");
     }
-    */
 
     function setView() {
       var divDrawGameContainer = document.getElementById("divDrawGameContainer");
@@ -486,10 +564,15 @@
       var divDrawGame = document.getElementById("divDrawGame");
       var divHeader = document.getElementById("divHeader");
       var divTimeline = document.getElementById("divTimeline");
+
+      var divOptions = document.getElementById("divOptions");
+
       var divPlotStatistics = document.getElementById("divPlotStatistics");
       var divStat1 = document.getElementById("divStat1");
       var divStat2 = document.getElementById("divStat2");
-      var tbKommentar = document.getElementById("tbKommentar");
+      var divComments = document.getElementById("divComments");
+      var divChartContainerF = document.getElementById("chartContainerF");
+      var divChartContainerM = document.getElementById("chartContainerM");
 
       var fWidth = $(window).width();
       if (fWidth < 960 && $(window).height() < fWidth) {
@@ -497,49 +580,87 @@
         divHeader.style.display = 'none';
         //divStat1.style.display = 'none';
         divStat2.style.display = 'none';
-        //tbKommentar.style.display = 'none';
+        //divComments.style.display = 'none';
         divDrawGameContainer.style.position = "absolute";
-        divDrawGameContainer.style.top = "0px";
+        divDrawGameContainer.style.top  = "0px";
         divDrawGameContainer.style.left = "0px";
         divDrawGameContainer.style.height = "90%";
         imgGame.style.height = "100%";
         imgGame.style.width = "auto";
         divDrawGameContainer.style.width = imgGame.offsetWidth.toString() + "px";
         divDrawGame.style.width = "90%";
-        tbKommentar.style.position = "absolute";
-        tbKommentar.style.left = "0px";
-        tbKommentar.style.top = "90%";
+
+        divComments.style.position = "absolute";
+        divComments.style.left = "0px";
+        divComments.style.top  = "90%";
 
         var fInfoLeft = divDrawGameContainer.offsetWidth + 6;
         var fInfoWidth = fWidth - fInfoLeft - 6;
 
         divTimeline.style.position = "absolute";
         divTimeline.style.top = "0px";
-        divTimeline.style.left = fInfoLeft.toString() + "px";
+        divTimeline.style.left  = fInfoLeft .toString() + "px";
         divTimeline.style.width = fInfoWidth.toString() + "px";
 
+        divOptions.style.display = 'none';
+        /*
+        divOptions.style.position = "absolute";
+        divOptions.style.bottom = "50px";
+        divOptions.style.left = fInfoLeft.toString() + "px";
+        divOptions.style.width = fInfoWidth.toString() + "px";
+        divOptions.style.height = "100px";
+
+        txtOptionsHeatmap.innerHTML = "HM:";
+        txtOptionsHeatmap.style.left = "0px";
+        divOptionsHeatmap.style.left = "30px";
+        divOptionsHeatmap.style.top = "0px";
+
+        txtOptionsPos.innerHTML = "Pos:";
+        txtOptionsPos.style.top = "44px";
+        txtOptionsPos.style.left = "0px";
+        divOptionsPos.style.left = "30px";
+        divOptionsPos.style.top = "40px";
+        */
+
         divStat1.style.position = "absolute";
+        divStat1.style.top   = "50px";
         divStat1.style.left  = fInfoLeft .toString() + "px";
         divStat1.style.width = fInfoWidth.toString() + "px";
         divStat1.style.minWidth = "0px";
 
-        var fCommY = tbKommentar.offsetTop + tbKommentar.offsetHeight;
-
+        var fCommY = divComments.offsetTop + divComments.offsetHeight;
         divPlotStatistics.style.position = "absolute";
         divPlotStatistics.style.left = "0px";
         divPlotStatistics.style.top = fCommY.toString() + "px";
+
+        var fStatY = divPlotStatistics.offsetTop + divPlotStatistics.offsetHeight;
+        divChartContainerF.style.left = "0px";
+        divChartContainerF.style.position = "absolute";
+        divChartContainerF.style.top = fStatY.toString() + "px";
+
+        var fFY = divChartContainerF.offsetTop + divChartContainerF.offsetHeight;
+        divChartContainerM.style.left = "0px";
+        divChartContainerM.style.position = "absolute";
+        divChartContainerM.style.top = fFY.toString() + "px";
       }
       else {
         divHeader.style.display = 'block';
+
+        divTimeline.style.position = "relative";
+        divTimeline.style.left  = "0px";
+        divTimeline.style.width = "100%";
+
+        divOptions.style.display = 'block';
+
         //divStat1.style.display = 'block';
         divStat2.style.display = 'block';
-        //tbKommentar.style.display = 'block';
+        //divComments.style.display = 'block';
         divDrawGameContainer.style.position = "relative";
         divDrawGameContainer.style.width = "100%";
         divDrawGameContainer.style.height = "auto";
         imgGame.style.width = "100%";
         imgGame.style.height = "auto";
-        tbKommentar.style.position = "relative";
+        divComments.style.position = "relative";
 
         divStat1.style.position = "relative";
         divStat1.style.left = "0%";
@@ -559,10 +680,10 @@
     <div style="position: absolute; width: 30px; height: 30px; left:  1%; margin-top: 12px">
       <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid blue; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
     </div>
-    <div style="position: absolute; width: 28%; height: 100%; left: 5%; top: 30%; text-align: right">
+    <div style="position: absolute; width: 30%; height: 100%; left: 5%; top: 30%; text-align: right">
       <font size="4">@sH</font>
     </div>
-    <div style="position: absolute; width: 6%; height: 100%; left: 34%">
+    <div style="position: absolute; width: 4%; height: 60%; top: 20%; left: 36%">
       <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@sEmblemH alt="" />
     </div>
 
@@ -573,47 +694,75 @@
       <div style="position: absolute; width: 100%; height: 100%; left: 0px; text-align: center">
         <font size="8">-</font>
       </div>
-      <div style="position: absolute; width: 100%; height: auto; bottom: 0%; left: 0%; text-align: center">
-        <font size="2">@sStadion</font>
-      </div>
       <div style="position: absolute; width: 35%; height: 100%; right: 0%; text-align: left">
         <font id="lbGoalsA" size="8">@sGoalsA</font>
       </div>
     </div>
 
-    <div style="position: absolute; width: 6%; height: 100%; right: 34%">
+    <div style="position: absolute; width: 4%; height: 60%; top: 20%; right: 36%">
       <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@sEmblemA alt="" />
     </div>
-    <div style="position: absolute; width: 28%; height: 100%; right: 5%; top: 30%; text-align: left">
+    <div style="position: absolute; width: 30%; height: 100%; right: 5%; top: 30%; text-align: left">
       <font size="4">@sA</font>
     </div>
     <div style="position: absolute; width: 30px; height: 30px; right: 1%; margin-top: 12px">
       <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid red; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
     </div>
+
+    <div style="position: absolute; width: 100%; height: auto; bottom: 0px; left: 0px; text-align: center">
+      <font size="2">@sStadion</font>
+    </div>
   </div>
 
-  <div style="position: relative; left: 0px; width: 100%; height: 40px">
-    <div style="position: relative; float: left; width: 75%; min-width: 420px; height: 40px">
-      <b style="position: absolute; top: 6px">Heatmap:</b>
-      <div style="position: absolute; left: 70px; width: 110px; height: auto">
-        @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
-      </div>
-      <b style="position: absolute; top: 6px; left: 200px">Positionen:</b>
-      <div style="position: absolute; left: 280px; width: 120px; height: auto">
-        @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
-      </div>
-    </div>
+  <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: auto">
     @if (Model.game != null) {
       if (Model.bAdmin) {
-        <div style="position: relative; float: left; width: 25%; min-width: 160px; height: 40px">
+        <div style="position: relative; float: left; width: 25%; min-width: 200px; height: 40px">
           <input id="cbTargetPos" name="cbTargetPos" type="checkbox" value="0" style="position: absolute; left: 0px" class="checkbox">
           <input id="inputAdminGameSpeed" style="position: absolute; left: 22%; width: 18%" type="text" value="250" data-val-required='Das Feld "inputAdminGameSpeed" ist erforderlich.' data-val-number='Das Feld "inputAdminGameSpeed" muss eine Zahl sein.' data-val="true" autocomplete="off">
           <button type="submit" id="bnAdminPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
           <button type="submit" id="bnAdminNext" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
           <button type="submit" id="bnAdminNew" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">new</button>
         </div>
+        <div style="position: relative; float: left; width: 25%; min-width: 200px; height: 40px; margin-left: 6px">
+          <label>
+            Aktion:
+            <select id="ddlAdminNextAction">
+              <option value="-1">AI</option>
+              <option value="0">Schuss</option>
+              <option value="1">Pass</option>
+              <option value="2">Solo</option>
+              <option value="3">Warten</option>
+              <option value="4">BS</option>
+            </select>
+          </label>
+        </div>
+        <div style="position: relative; float: left; width: 240px; height: 40px; margin-left: 6px; border: 1px solid black">
+          <select id="ddlAdminSetPosHA">
+            <option value="0">H</option>
+            <option value="1">A</option>
+          </select>
+          <select id="ddlAdminSetPosPl">
+            <option value="-1">Ball</option>
+            <option value="0">1</option>
+            <option value="1">2</option>
+            <option value="2">3</option>
+            <option value="3">4</option>
+            <option value="4">5</option>
+            <option value="5">6</option>
+            <option value="6">7</option>
+            <option value="7">8</option>
+            <option value="8">9</option>
+            <option value="9">10</option>
+            <option value="10">11</option>
+          </select>
+          <input id="inputAdminSetPosX" style="width: 40px" type="text" value="61" data-val="true" autocomplete="off">
+          <input id="inputAdminSetPosY" style="width: 40px" type="text" value="0" data-val="true" autocomplete="off">
+          <button type="submit" id="bnAdminSetPos" style="width: 40px; height: auto">set</button>
+        </div>
       } else if (Model.game.data.bFinished) {
-        <div style="position: relative; float: left; width: 25%; min-width: 160px; height: 40px">
+        @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 160px" })
+        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
           <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
           <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
           <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
@@ -624,37 +773,58 @@
     }
   </div>
 
-  <div id="divTimeline" style="position: relative; width: 100%; height: 64px">
+  <div id="divTimeline" style="position: relative; float: left; width: 100%; height: 64px">
     <div id="divTimelineIcons" style="position: absolute; width: 100%; height: 100%"></div>
     <div id="slider-Minute" style="position: absolute; width: 100%; top: 20px">
       <div id="divMinute" style="position: absolute; width: 100%"></div>
     </div>
   </div>
 
-  <div id="divDrawGameContainer" style="position: relative; float: left; width: auto; margin-bottom: 2%">
+  <div id="divDrawGameContainer" style="position: relative; float: left; width: auto; margin-bottom: 4px">
     <img id="imgGame" style="position: relative; width: 100%" src="~/Content/Images/stadium/field_full.png" alt="" />
     <div id="drawHeatmap" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
     <div id="divDrawGame" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
-    <div id="divLinks" style="position: absolute; margin-left: 5%; top: 0px; width: 45%">
+    <div id="divLinkTeam" style="position: absolute; top: 0px; left: 5%; width: 30%">
       @Html.ActionLink("Aufstellung", "Team", "Member", null, new { @style = "color:#000aaa;" })
     </div>
-    <div id="divLinks" style="position: absolute; margin-right: 5%; top: 0px; left: 45%; width: 50%; text-align: right">
+    <div id="divLinkTactic" style="position: absolute; top: 20px; left: 5%; width: 30%">
       @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
     </div>
+    <div id="divLinkHome" style="position: absolute; top: 0px; left: 35%; width: 30%; text-align: center">
+      @Html.ActionLink("Home", "Desk", "Member", null, new { @style = "color:#000aaa;" })
+    </div>
+    <div id="divLinkTactic" style="position: absolute; top: 0px; right: 5%; width: 30%; text-align: right">
+      <a href="#" id="aOptions" style="color:#000aaa">Optionen</a>
+    </div>
+    <div style="position: absolute; width: 175px; left: 5%; bottom: 0px; height: 40px; text-align: left">
+      <text id="txtReferee"></text>
+    </div>
+    @if (Model.game != null) {
+      if (!Model.game.data.bFinished) {
+        <div id="divCbUpdate" style="position: absolute; bottom: 20px; right: 0px; width: 200px; text-align: right">
+          <label style="position: absolute; top: 0px; right: 4px">
+            <input type="checkbox" id="cbUpdateStatistic" name="cbUpdateStatistic" value="0" checked>
+            Update Statistik
+          </label>
+        </div>
+      }
+
+      if (Model.bAdmin) {
+        <div style="position: absolute; width: 30%; left: 35%; bottom: 0px; height: 60px; text-align: center">
+          <text id="txtAdminChanceShootOnGoal"></text>
+          <text id="txtAdminChanceGoal"></text>
+        </div>
+      }
+    }
   </div>
 
-  @if (Model.game != null) {
-    if (Model.bAdmin) {
-      <div style="position: relative; float: left; width: 100%; height: 60px; margin-top: -2%">
-        <text id="txtAdminChanceShootOnGoal"></text>
-        <text id="txtAdminChanceGoal"></text>
-      </div>
-    }
-  }
+  <div id="divComments" style="width: 100%; height: auto; float: left">
+    <table id="tblComments" style="width: 100%; height: auto">
+      <tbody style="display: block; border: 1px solid black; height: 132px; overflow-y: scroll"></tbody>
+    </table>
+  </div>
 
-  <textarea id="tbKommentar" readonly rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
-
-  <div id="divPlotStatistics" style="width: 100%; height: 250px"></div>
+  <div id="divPlotStatistics" style="width: 100%; height: 300px; float: left"></div>
 
   <div id="divStat1" style="position: relative; float: left; width: 50%; min-width: 300px; display: block; word-break: break-word">
     <text id="statistikGoals">Tore:</text>
@@ -665,7 +835,57 @@
     <text id="playerAction"></text>
   </div>
 
-  <div id="chartContainerF" style="position: relative; float: left; height: 350px; width: 100%"></div>
-  <div id="chartContainerM" style="position: relative; float: left; height: 350px; width: 100%"></div>
+  <div id="chartContainerF" style="position: relative; float: left; height: 300px; width: 100%; margin-top: 10px"></div>
+  <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
+
+  <div id="dialogOptions" title="Optionen">
+    <b id="txtOptionsHeatmap" style="position: absolute; top: 10px">Heatmap:</b>
+    <div id="divOptionsHeatmap" style="position: absolute; top: 4px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
+    </div>
+    <b id="txtOptionsShoots" style="position: absolute; top: 50px">Schüsse:</b>
+    <div id="divOptionsShoots" style="position: absolute; top: 44px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iShoots, Model.ddlShoots, new { @Id = "ddlShoots", @class = "form-control" })
+    </div>
+    <b id="txtOptionsDuels" style="position: absolute; top: 90px">Zweikämpfe:</b>
+    <div id="divOptionsDuels" style="position: absolute; top: 84px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iDuels, Model.ddlDuels, new { @Id = "ddlDuels", @class = "form-control" })
+    </div>
+    <b id="txtOptionsPasses" style="position: absolute; top: 130px">Pässe:</b>
+    <div id="divOptionsPasses" style="position: absolute; top: 124px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iPasses, Model.ddlPasses, new { @Id = "ddlPasses", @class = "form-control" })
+    </div>
+    <b id="txtOptionsPos" style="position: absolute; top: 170px">Positionen:</b>
+    <div id="divOptionsPos" style="position: absolute; top: 164px; left: 100px; width: 140px; height: auto">
+      @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
+    </div>
+    <label style="position: absolute; top: 210px">
+        Chancen:
+        <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="if (this.checked) { openDialogChances() }" value="0">
+    </label>
+  </div>
+
+  <div id="dialogPlAction" title="Chancen" style="text-align: right">
+    <p>
+      Schuss:
+      <txt id="txtPlActionShoot"></txt>
+    </p>
+    <p>
+      Pass:
+      <txt id="txtPlActionPass"></txt>
+    </p>
+    <p>
+      Dribbling:
+      <txt id="txtPlActionGo"></txt>
+    </p>
+    <p>
+      Warten:
+      <txt id="txtPlActionWait"></txt>
+    </p>
+    <p>
+      Entscheidung:
+      <txt id="txtPlActionRnd"></txt>
+    </p>
+  </div>
 </body>
 </html>

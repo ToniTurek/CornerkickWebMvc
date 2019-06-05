@@ -12,18 +12,16 @@
 <head>
   <meta name="viewport" content="width=device-width" />
   <title>Index</title>
-  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-  <script src="~/Scripts/autoNumeric/autoNumeric-min.js" type="text/javascript"></script>
-  <script src="~/Scripts/Numbers.js" type="text/javascript"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
 </head>
 
 <body>
-  <div id="chartContainer" style="height: 300px; width: 100%"></div>
-
   <script type="text/javascript">
     function setBudget() {
-      var iBudgetIn  = [];
+      var iBudgetIn = [];
       $('.tbBudgetIn').each(function () {
         iBudgetIn.push(getIntFromString($(this).val()));
       });
@@ -53,10 +51,10 @@
             sTotal[3] = sTotal[3].fontcolor("green");
           }
 
-          document.getElementById('tdTotalInPlan' ).innerHTML = sTotal[0];
+          document.getElementById('tdTotalInPlan').innerHTML = sTotal[0];
           document.getElementById('tdTotalPayPlan').innerHTML = sTotal[1];
-          document.getElementById('tdSumPlan'     ).innerHTML = sTotal[2];
-          document.getElementById('tdSumCurr'     ).innerHTML = sTotal[3];
+          document.getElementById('tdSumPlan').innerHTML = sTotal[2];
+          document.getElementById('tdSumCurr').innerHTML = sTotal[3];
 
           document.getElementById('tdSumPlan').style.fontWeight = "bold"
           document.getElementById('tdSumCurr').style.fontWeight = "bold"
@@ -102,12 +100,38 @@
 
         $.ajax({
           type: 'post',
-          url: '/Member/EintrittChange',
+          url: '/Member/FinanceSetAdmissionPrice',
           dataType: "json",
           data: { iEintritt: eintritt },
           success: function (sIncomeSpecExpected) {
             //alert("Eintrittspreise geändert");
             $("#lbInSpec").text("Einnahmen Liga bei 100% Auslastung: " + sIncomeSpecExpected);
+          }
+        });
+
+        var iSeasonalTicketsTotal = @Model.iSeasonalTickets[0] + @Model.iSeasonalTickets[1] + @Model.iSeasonalTickets[2];
+        $("#txtSeasonalTickets").text("Verkaufte Dauerkarten: " + iSeasonalTicketsTotal.toString() + " (" + @Model.iSeasonalTickets[0].ToString() + "/" + @Model.iSeasonalTickets[1].ToString() + "/" + @Model.iSeasonalTickets[2].ToString() + ")");
+      }
+
+      $('.tbPriceSeason').each(function () {
+        $(this).on('keyup', function (ev) {
+          setAdmissionPriceSeasonal();
+        });
+      });
+
+      function setAdmissionPriceSeasonal() {
+        var price = [];
+        $('.tbPriceSeason').each(function () {
+          price.push($(this).val());
+        });
+
+        $.ajax({
+          type: 'post',
+          url: '/Member/FinanceSetAdmissionPriceSeasonal',
+          dataType: "json",
+          data: { iPrice: price },
+          success: function () {
+            //alert("Eintrittspreise geändert");
           }
         });
       }
@@ -125,13 +149,10 @@
         });
       });
 
-      $.get("/Member/GetFinanceDevelopmentData/", function (dataCash) {
+      $.get("/Member/FinanceGetDevelopmentData/", function (dataCash) {
         var chart = new CanvasJS.Chart("chartContainer", {
           animationEnabled: true,
           theme: "theme2",//theme1
-          title: {
-            text: "Entwicklung Kontostand"
-          },
           axisX: {
             gridThickness: 1,
             interval: 7,
@@ -160,206 +181,272 @@
 
         chart.render();
       });
+
+      $.get("/Member/FinanceGetSpec/", function (dataSpec) {
+        var chartSpec = new CanvasJS.Chart("divChartSpec", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            interval: 1,
+            labelFontColor: "white",
+            gridThickness: 1,
+            maximum: -0.9
+          },
+          axisY: {
+            title: "Zuschauer"
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          toolTip: {
+            content: "{z}"
+          },
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              dataPoints: dataSpec[0]
+            },
+            {
+              type: "line",
+              color: "red",
+              lineDashType: "dash",
+              markerType: "none",
+              lineThickness: 1,
+              dataPoints: dataSpec[1]
+            }
+          ]
+        });
+
+        chartSpec.render();
+      });
     });
   </script>
-</body>
-</html>
 
-@{ CornerkickCore.Core.Club clb = CornerkickWebMvc.Controllers.AccountController.ckClub(); }
+  <div id="chartContainer" style="height: 300px; width: 100%"></div>
 
-<h4>Eintrittspreise</h4>
-@Html.LabelFor(m => m.iEintritt1, new { @class = "col-md-2 control-label" })
-@Html.TextBoxFor(m => m.iEintritt1, new { @class = "form-control tbEintritt", autocomplete = "off", style = "width: 5%; min-width: 55px; text-align: right", type = "number" })
+  <h4 style="margin-top: 40px">Eintrittspreise</h4>
+  <div style="position: relative; width: 100%; height: auto; float: left">
+    <div style="position: relative; width: 230px; height: 120px; margin-top: 20px; float: left">
+      @Html.LabelFor(m => m.iEintritt1, new { @class = "col-md-2 control-label", style = "position: absolute; top:  4px" })
+      @Html.TextBoxFor(m => m.iEintritt1, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top:  0px; left: 42%; width: 6%; min-width: 60px; text-align: right", type = "number" })
+      @Html.TextBoxFor(m => m.iPriceSeason1, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top:  0px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
 
-@Html.LabelFor(m => m.iEintritt2, new { @class = "col-md-2 control-label" })
-@Html.TextBoxFor(m => m.iEintritt2, new { @class = "form-control tbEintritt", autocomplete = "off", style = "width: 5%; min-width: 55px; text-align: right", type = "number" })
+      @Html.LabelFor(m => m.iEintritt2, new { @class = "col-md-2 control-label", style = "position: absolute; top: 39px" })
+      @Html.TextBoxFor(m => m.iEintritt2, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 35px; left: 42%; width: 6%; min-width: 60px; text-align: right", type = "number" })
+      @Html.TextBoxFor(m => m.iPriceSeason2, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 35px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
 
-@Html.LabelFor(m => m.iEintritt3, new { @class = "col-md-2 control-label" })
-@Html.TextBoxFor(m => m.iEintritt3, new { @class = "form-control tbEintritt", autocomplete = "off", style = "width: 5%; min-width: 55px; text-align: right", type = "number" })
+      @Html.LabelFor(m => m.iEintritt3, new { @class = "col-md-2 control-label", style = "position: absolute; top: 74px" })
+      @Html.TextBoxFor(m => m.iEintritt3, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 70px; left: 42%; width: 6%; min-width: 60px; text-align: right", type = "number" })
+      @Html.TextBoxFor(m => m.iPriceSeason3, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 70px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
+    </div>
 
-<p id="lbInSpec"></p>
+    <div id="divChartSpec" style="position: relative; float: right; height: 220px; width: 75%; min-width: 320px"></div>
 
-<h4>Finanzplanung</h4>
-<div style="position: relative; width: 100%; top: 5%; border: 0px solid red">
-  <div style="position: relative; float: left; width: 49%; min-width: 400px; margin-right: 2%; margin-bottom: 2%; height: auto; border: 0px solid green">
-    <table id="tableBudgetIn" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
-      <thead>
-        <tr>
-          <th style="text-align:center" colspan="3">Einnahmen</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td align="center" width="15%">Typ</td>
-          <td align="center">Geplant [€]</td>
-          <td align="center">Tatsächlich [€]</td>
-        </tr>
-        <tr>
-          <td align="right">Zuschauer</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInSpec, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Sponsoren</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInBonusSponsor, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iInBonusSponsor.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iInBonusSponsor.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Transfer</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInTransfer, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iInTransfer.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iInTransfer.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Gesamt</td>
-          <td id="tdTotalInPlan" style="width:20%" align="right">0</td>
-          <td style="width:20%" align="right">@MvcApplication.ckcore.fz.getBudgetInTotal(Model.budgetReal).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="position: relative; width: 250px; float: left">
+      <p id="lbInSpec" style="position: relative; width: 100%"></p>
+      <text id="txtSeasonalTickets" style="position: relative; width: 100%"></text>
+    </div>
   </div>
 
-  <div style="position: relative; float: left; width: 49%; min-width: 400px; border: 0px solid blue">
-    <table id="tableBudgetPay" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
-      <thead>
-        <tr>
-          <th style="text-align:center" colspan="3">Ausgaben</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td align="center" width="15%">Typ</td>
-          <td align="center">Geplant [€]</td>
-          <td align="center">Tatsächlich [€]</td>
-        </tr>
-        <tr>
-          <td align="right">Spielergehälter</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPaySalary, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iPaySalary.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iPaySalary.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Personalkosten</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayStaff, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iPayStaff.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iPayStaff.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Transfer</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayTransfer, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iPayTransfer.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iPayTransfer.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Stadion</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayStadium, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iPayStadium.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iPayStadium.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Zinsen</td>
-          @{
-            if (Model.bEditable) {
-              <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayInterest, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-            } else {
-              <td style="width:20%" align="right">@Model.budgetPlan.iPayInterest.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-            }
-          }
-          <td style="width:20%" align="right">@Model.budgetReal.iPayInterest.ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-        <tr>
-          <td align="right">Gesamt</td>
-          <td id="tdTotalPayPlan" style="width:20%" align="right">0</td>
-          <td style="width:20%" align="right">@MvcApplication.ckcore.fz.getBudgetPayTotal(Model.budgetReal).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <p style="position: relative; width: 100%; height: 40px; float: left"></p>
 
-  <div style="position: relative; float: left; width: 100%; margin-top: 2%">
-    <table border="1" cellpadding="4" style="width: 100%">
-      <thead>
-        <tr>
-          <th style="text-align:center">Geplantes Ergebnis [€]</th>
-          <th style="text-align:center">Tatsächliches Ergebnis [€]</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td id="tdSumPlan" align="right" font-weight:bold">0</td>
-          <td id="tdSumCurr" align="right" font-weight:bold">0</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-@{
-  if (clb.ltAccount.Count > 0) {
-    <h4>Kontoauszug</h4>
-    <div style="position: relative; width: 100%; height: auto; top: 5%">
-      <table border="1" cellpadding="4" style="width: auto">
+  <h4>Finanzplanung</h4>
+  <div style="position: relative; width: 100%; top: 5%; float: left; margin-bottom: 40px">
+    <div style="position: relative; float: left; width: 49%; min-width: 400px; margin-right: 2%; margin-bottom: 2%; height: auto">
+      <table id="tableBudgetIn" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
         <thead>
           <tr>
-            <th align="center">Datum</th>
-            <th align="center">Betreff</th>
-            <th align="center">Umsatz €</th>
-            <th align="center">Kontostand €</th>
+            <th style="text-align:center" colspan="3">Einnahmen</th>
           </tr>
         </thead>
         <tbody>
-          @for (int i = clb.ltAccount.Count - 1; i >= 0; i--) {
-            CornerkickCore.Finance.Account kto = clb.ltAccount[i];
-            string sUmsatz = "0";
-            if (kto.iValue != 0) { sUmsatz = kto.iValue.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR")); }
-            string sKontostand = "0";
-            if (kto.iBalance != 0) { sKontostand = kto.iBalance.ToString("#,#", System.Globalization.CultureInfo.CreateSpecificCulture("el-GR")); }
-            <tr>
-              <td align="center">@kto.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)</td>
-              <td align="center">@kto.sSubject</td>
-              <td align="right">@sUmsatz</td>
-              <td align="right">@sKontostand</td>
-            </tr>
-          }
+          <tr>
+            <td align="center" width="15%">Typ</td>
+            <td align="center">Geplant [€]</td>
+            <td align="center">Tatsächlich [€]</td>
+          </tr>
+          <tr>
+            <td align="right">Zuschauer</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInSpec, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Prämien</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInBonusCup, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iInBonusCup.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iInBonusCup.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Sponsoren</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInBonusSponsor, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iInBonusSponsor.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iInBonusSponsor.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Transfer</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInTransfer, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iInTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iInTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Gesamt</td>
+            <td id="tdTotalInPlan" style="width:20%" align="right">0</td>
+            <td style="width:20%" align="right">@MvcApplication.ckcore.fz.getBudgetInTotal(Model.budgetReal).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
         </tbody>
       </table>
     </div>
+
+    <div style="position: relative; float: left; width: 49%; min-width: 400px">
+      <table id="tableBudgetPay" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th style="text-align:center" colspan="3">Ausgaben</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center" width="15%">Typ</td>
+            <td align="center">Geplant [€]</td>
+            <td align="center">Tatsächlich [€]</td>
+          </tr>
+          <tr>
+            <td align="right">Spielergehälter</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPaySalary, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iPaySalary.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iPaySalary.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Personalkosten</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayStaff, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iPayStaff.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iPayStaff.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Transfer</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayTransfer, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iPayTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iPayTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Stadion</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayStadium, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iPayStadium.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iPayStadium.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Zinsen</td>
+            @{
+              if (Model.bEditable) {
+                <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayInterest, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
+              } else {
+                <td style="width:20%" align="right">@Model.budgetPlan.iPayInterest.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              }
+            }
+            <td style="width:20%" align="right">@Model.budgetReal.iPayInterest.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+          <tr>
+            <td align="right">Gesamt</td>
+            <td id="tdTotalPayPlan" style="width:20%" align="right">0</td>
+            <td style="width:20%" align="right">@MvcApplication.ckcore.fz.getBudgetPayTotal(Model.budgetReal).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="position: relative; float: left; width: 100%; margin-top: 2%">
+      <table border="1" cellpadding="4" style="width: 100%">
+        <thead>
+          <tr>
+            <th style="text-align:center">Geplantes Ergebnis [€]</th>
+            <th style="text-align:center">Tatsächliches Ergebnis [€]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="tdSumPlan" align="right" font-weight:bold">0</td>
+            <td id="tdSumCurr" align="right" font-weight:bold">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @{
+    if (Model.ltAccount.Count > 0) {
+      <h4>Kontoauszug</h4>
+      <div style="position: relative; width: 100%; height: auto; top: 5%">
+        <table border="1" cellpadding="4" style="width: auto">
+          <thead>
+            <tr>
+              <th align="center">Datum</th>
+              <th align="center">Betreff</th>
+              <th align="center">Umsatz €</th>
+              <th align="center">Kontostand €</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (int i = Model.ltAccount.Count - 1; i >= 0; i--) {
+              CornerkickManager.Finance.Account kto = Model.ltAccount[i];
+              string sUmsatz = "0";
+              if (kto.iValue != 0) { sUmsatz = kto.iValue.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)); }
+              string sKontostand = "0";
+              if (kto.iBalance != 0) { sKontostand = kto.iBalance.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)); }
+              <tr>
+                <td align="center">@kto.dt.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+                <td align="center">@kto.sSubject</td>
+                <td align="right">@sUmsatz</td>
+                <td align="right">@sKontostand</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   }
-}
+</body>
+</html>

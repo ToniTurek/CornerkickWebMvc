@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 
 namespace CornerkickWebMvc.Controllers
@@ -35,12 +36,34 @@ namespace CornerkickWebMvc.Controllers
       return View();
     }
 
+    private CornerkickManager.User ckUser()
+    {
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
+      }
+
+      return null;
+    }
+
+    private CornerkickManager.Club ckClub()
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return null;
+
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+        return MvcApplication.ckcore.ltClubs[usr.iTeam];
+      }
+
+      return null;
+    }
+
     public ContentResult UmGetStadiumCost()
     {
-      CornerkickCore.Core.Club club = AccountController.ckClub();
+      CornerkickManager.Club club = ckClub();
 
-      CornerkickCore.Core.User user = MvcApplication.ckcore.ini.newUser();
-      user.sNachname = "manual";
+      CornerkickManager.User user = new CornerkickManager.User();
+      user.sSurname = "manual";
       user.iLevel = 1;
 
       List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
@@ -51,21 +74,21 @@ namespace CornerkickWebMvc.Controllers
       int[] iCostDays;
 
       for (int iDp = 0; iDp < 3; iDp++) {
-        CornerkickGame.Stadium stDatum = MvcApplication.ckcore.ini.newStadium();
+        CornerkickGame.Stadium stDatum = new CornerkickGame.Stadium();
         stDatum.blocks[0].iSeats = iDp * 1000;
 
-        CornerkickGame.Stadium stNew = MvcApplication.ckcore.ini.newStadium();
+        CornerkickGame.Stadium stNew = new CornerkickGame.Stadium();
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats +  500;
-        iCostDays = MvcApplication.ckcore.st.iCostDaysContructStadium(stNew, stDatum, user);
+        iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);
         dataPoints[iDp].Add(new Models.DataPointGeneral( 500, iCostDays[0]));
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats + 1000;
-        iCostDays = MvcApplication.ckcore.st.iCostDaysContructStadium(stNew, stDatum, user);
+        iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);
         dataPoints[iDp].Add(new Models.DataPointGeneral(1000, iCostDays[0]));
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats + 2000;
-        iCostDays = MvcApplication.ckcore.st.iCostDaysContructStadium(stNew, stDatum, user);
+        iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);
         dataPoints[iDp].Add(new Models.DataPointGeneral(2000, iCostDays[0]));
       }
 

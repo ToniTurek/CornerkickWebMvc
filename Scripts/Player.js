@@ -26,7 +26,6 @@
               alert(response);
             },
             error: function (xhr) {
-              debugger;
               alert(xhr);
             }
           });
@@ -84,4 +83,53 @@ function createTableTransferDetails() {
   sReturn += '</table>';
 
   return sReturn;
+}
+
+function getNatIcon(sNat, sStyle) {
+  var sIcon = '<img src="/Content/Icons/flags/';
+
+  if (sNat) {
+    sIcon += sNat + '.png" title="' + sNat;
+  } else {
+    sIcon += '0.png" title="unknown';
+  }
+
+  sIcon += '" style="';
+
+  if (sStyle) {
+    sIcon += sStyle;
+  } else {
+    sIcon += 'width: 16px';
+  }
+
+  sIcon += '"/>';
+
+  return sIcon;
+}
+
+function getFormIcon(sForm) {
+  if (!sForm) return 'o';
+
+  sForm = sForm.trim();
+
+  var sIcon = '<img src="/Content/Icons/';
+  if        (sForm === '---') {
+    sIcon += 'form0';
+  } else if (sForm ===  '-')  {
+    sIcon += 'form1';
+  } else if (sForm ===  'o')  {
+    sIcon += 'form2';
+  } else if (sForm ===  '+')  {
+    sIcon += 'form3';
+  } else if (sForm === '+++') {
+    sIcon += 'form4';
+  } else if (sForm === 'verl') {
+    sIcon += 'ambulance';
+  } else if (sForm === 'ang.') {
+    sIcon += 'ambulance2';
+  }
+
+  sIcon += '.png" title="' + sForm + '" style="width: 16px"/>';
+
+  return sIcon;
 }

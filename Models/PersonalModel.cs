@@ -9,6 +9,7 @@ namespace CornerkickWebMvc.Models
 {
   public class PersonalModel
   {
+    public CornerkickManager.Main.Personal personal { get; set; }
     public string sPersonal { get; set; }
     public List<SelectListItem> ltDdlPersonal { get; set; }
 
@@ -16,10 +17,11 @@ namespace CornerkickWebMvc.Models
     {
       ltDdlPersonal = new List<SelectListItem>();
 
-      for (byte i = 0; i < 8; i++) {
+      ltDdlPersonal.Add(new SelectListItem { Text = "-", Value = "0" });
+      for (byte i = 1; i < 8; i++) {
         ltDdlPersonal.Add(
           new SelectListItem {
-            Text = "Level: " + (i + 1).ToString(),
+            Text = "Level: " + i.ToString(),
             Value = i.ToString()
           }
         );

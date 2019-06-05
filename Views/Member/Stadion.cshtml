@@ -8,6 +8,26 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <style>
+    .ui-widget-header {
+      background: lime;
+    }
+
+    .ui-progressbar {
+      position: relative;
+      height: 14px;
+      display: none;
+    }
+
+    .progress-label {
+      position: absolute;
+      left: 50%;
+      top: -4px;
+      text-shadow: 1px 1px 0 #fff;
+    }
+  </style>
+
   <script type="text/javascript">
     function setName() {
       var sNewName = $("#sName").val();
@@ -35,6 +55,8 @@
 
       getStadion();
       getVideo();
+      getSnackbar();
+      getToilets();
 
       $('.tbSeats').each(function () {
         $(this).on('keyup', function (ev) {
@@ -54,6 +76,14 @@
 
       $("#bnBuildVideo").click(function () {
         buildVideo();
+      });
+
+      $("#bnBuildSnackbar").click(function () {
+        buildSnackbar();
+      });
+
+      $("#bnBuildToilets").click(function () {
+        buildToilets();
       });
 
       $("#bnRenewPitch").click(function () {
@@ -140,6 +170,25 @@
           }
         }
       });
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetBlockProgress',
+        dataType: "json",
+        success: function (ltfPg) {
+          var iB = 0;
+          for (iB = 0; iB < ltfPg.length; iB++) {
+            if (ltfPg[iB] >= 0.0) {
+              // Create progress bars
+              var pbBlock = $("#pbBlock_" + iB.toString());
+              pbBlock.progressbar({
+                value: ltfPg[iB] * 100
+              });
+              pbBlock.css("display", "block");
+            }
+          }
+        }
+      });
     }
 
     function setStadion() {
@@ -167,6 +216,7 @@
       });
     }
 
+    // Video-wall
     function getVideo() {
       bnBuildVideo = document.getElementById("bnBuildVideo");
       bnBuildVideo.disabled = true;
@@ -176,7 +226,7 @@
         type: 'post',
         url: '/Member/StadiumGetCostVideo',
         dataType: "json",
-        data: { iVideo: iVideo },
+        data: { iLevel: iVideo },
         success: function (sCostDaysDispo) {
           $("#bnBuildVideo").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
           if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
@@ -194,7 +244,79 @@
         type: 'post',
         url: '/Member/StadiumBuildVideo',
         dataType: "json",
-        data: { iVideo: iVideo },
+        data: { iLevel: iVideo },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    // Snackbars
+    function getSnackbar() {
+      bnBuildSnackbar = document.getElementById("bnBuildSnackbar");
+      bnBuildSnackbar.disabled = true;
+
+      var iSnackbar = $('#itSnackbar').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSnackbar',
+        dataType: "json",
+        data: { iCount: iSnackbar },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildSnackbar").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildSnackbar.disabled = true;
+          } else {
+            bnBuildSnackbar.disabled = false;
+          }
+        }
+      });
+    }
+
+    function buildSnackbar() {
+      var iSnackbar = $('#itSnackbar').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildSnackbar',
+        dataType: "json",
+        data: { iCount: iSnackbar },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    // Toilets
+    function getToilets() {
+      bnBuildToilets = document.getElementById("bnBuildToilets");
+      bnBuildToilets.disabled = true;
+
+      var iToilets = $('#itToilets').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostToilets',
+        dataType: "json",
+        data: { iCount: iToilets },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildToilets").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildToilets.disabled = true;
+          } else {
+            bnBuildToilets.disabled = false;
+          }
+        }
+      });
+    }
+
+    function buildToilets() {
+      var iToilets = $('#itToilets').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildToilets',
+        dataType: "json",
+        data: { iCount: iToilets },
         success: function (sMessage) {
           alert(sMessage);
           window.location.reload(true);
@@ -211,11 +333,16 @@
     if (Model != null) {
       if (!string.IsNullOrEmpty(Model.sName)) {
         sName = Model.sName;
-        sStadion = MvcApplication.ckcore.st.getStadiumSeats(Model.stadion).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
+        sStadion = Model.stadion.getSeats().ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+        sStadion += " (";
+        sStadion += Model.stadion.getSeats(0).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / ";
+        sStadion += Model.stadion.getSeats(1).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / ";
+        sStadion += Model.stadion.getSeats(2).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+        sStadion += ")";
       }
     }
 
-    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSaisonstart.Date) && MvcApplication.ckcore.iSaisonCount == 0) {
+    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) {
       <div class="form-group">
         @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
       </div>
@@ -287,12 +414,15 @@
               { "onchange", "getStadion()" }
             };
 
-            if (Model.iSeatsBuild[iB] > 0) { htmlAttributesDropDownListFor.Add("disabled", "disabled"); }
+            if (Model.iSeatsBuild[iB] > 0) {
+              htmlAttributesDropDownListFor.Add("disabled", "disabled");
+            }
 
             string sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; left: " + (sLoc[iB, 0] - 0.03).ToString("0%");
             if (iB == 8 || iB == 9) {
               sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; right: " + (1.0 - sLoc[iB, 0] - 0.03).ToString("0%");
             }
+
             <div style="@sStyle">
               <div style="position: relative">
                 @Html.EditorFor(Model => Model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
@@ -303,6 +433,12 @@
               } else {
                 @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right" })
               }
+
+              @if (Model.iSeatsBuild[iB] > 0) {
+                // Progress bar
+                string sPbId = "pbBlock_" + iB.ToString();
+                <div id="@sPbId" style="position: absolute; width: 100%; top: 28px"></div>
+              }
             </div>
             //@Html.DropDownListFor(m => m.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { htmlAttributes = htmlAttributesDropDownListFor })
           }
@@ -312,7 +448,10 @@
       @* Pitch quality *@
       <div style="position: absolute; left: 35%; width: 30%; min-width: 150px; height: auto; top: 40%">
         @{
-          string sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
+          string sPitchQuality = "100%";
+          if (Model.stadion != null) {
+            sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
+          }
         }
         <p style="text-align: center; font-weight:bold">Akt. Rasenqualität: @sPitchQuality</p>
         <button type="submit" id="bnRenewPitch" class="btn btn-default" style="width: 100%">Rasen +10%, Kosten: 0</button>
@@ -320,57 +459,130 @@
     </div>
   </div>
 
-  <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%">Kosten: 0</button>
+  <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
   @{
-    if (!Model.stadion.bTopring) {
+    if (Model.stadion != null && !Model.stadion.bTopring) {
       <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
     }
   }
 </body>
 </html>
 
-<legend style="position: relative; margin-top: 2%">Stadionextras</legend>
-<p><b>Anzeigetafel:</b></p>
-@Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 200px; margin-right: 2%" })
-<button type="submit" id="bnBuildVideo" class="btn btn-default" style="float: left; width: 400px">Kosten: 0</button>
+@{
+  if (Model.stadion != null && !Model.stadion.bTopring) {
+    <h3 style="position: relative; margin-top: 10px">Stadionextras</h3>
+    <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 10px">
+      <h4>Anzeigetafel</h4>
+      @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "iDdlVideo", @style = "float: left; width: 260px; margin-right: 2%" })
+      <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+    </div>
 
-<div style="float: left; position: relative; height: 60px"></div>
-<legend>Stadionausbau</legend>
-<table class="tStat" style="width: auto" border="1" cellpadding="3" summary="Stadionausbau">
-  <tr>
-    <th>Name</th>
-    <th>Art</th>
-    <th>Dauer</th>
-  </tr>
+    <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 10px">
+      <h4>Imbissbuden</h4>
+      <text id="txtSnackbar" style="position: relative; width: 100%; min-width: 260px; float: left">Aktuell: @Model.stadion.iSnackbar.ToString() (max: 100)</text>
+      <div style="position: relative; float: left; width: 260px; margin-right: 24px">
+        <text style="position: relative; top: 6px; width: 15%; float: left">Neu:</text>
+        <input id="itSnackbar" class="form-control" style="position: relative; width: 85%; float: left; text-align: right" type="tel" min="0" max="100" onkeyup="getSnackbar()" value="@Model.stadion.iSnackbarNew.ToString()">
+      </div>
+      <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+    </div>
 
-  @{
+    <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 30px">
+      <h4>Toiletten</h4>
+      <text id="txtToilets" style="position: relative; width: 100%; min-width: 260px; float: left">Aktuell: @Model.stadion.iToilets.ToString() (max: 100)</text>
+      <div style="position: relative; float: left; width: 260px; margin-right: 24px">
+        <text style="position: relative; top: 6px; width: 15%; float: left">Neu:</text>
+        <input id="itToilets" class="form-control" style="position: relative; width: 85%; float: left; text-align: right" type="tel" min="0" max="100" onkeyup="getToilets()" value="@Model.stadion.iToiletsNew.ToString()">
+      </div>
+      <button type="submit" id="bnBuildToilets" class="btn btn-default" style="width: 49%; min-width: 260px">Kosten: 0</button>
+    </div>
+
+    bool bShow = false;
     for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
       if (Model.iSeatsBuild[iB] > 0) {
-        //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
-        <tr>
-          <td align="center">Block @Model.stadion.blocks[iB].sName</td>
-          <td align="center">@Model.iSeatType[iB]</td>
-          <td align="center">@Model.iSeatsBuild[iB] d</td>
-        </tr>
+        bShow = true;
+        break;
       }
     }
-
-    if (Model.stadion.iDaysConstructTopring > 0) {
-      //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
-      <tr>
-        <td align="center">Oberring</td>
-        <td align="center">N/A</td>
-        <td align="center">@Model.stadion.iDaysConstructTopring d</td>
-      </tr>
+    if (Model.stadion.iTopringDaysConstruct > 0) {
+      bShow = true;
+    }
+    if (Model.stadion.iVideoDaysConstruct > 0) {
+      bShow = true;
+    }
+    if (Model.stadion.iSnackbarDaysConstruct > 0) {
+      bShow = true;
+    }
+    if (Model.stadion.iToiletsDaysConstruct > 0) {
+      bShow = true;
     }
 
-    if (Model.stadion.iDaysConstructVideo > 0) {
-      //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.AccountController.ciUser);
-      <tr>
-        <td align="center">Anzeigetafel</td>
-        <td align="center">@MvcApplication.ckcore.st.sVideo[Model.iVideo]</td>
-        <td align="center">@Model.stadion.iDaysConstructVideo d</td>
-      </tr>
+    if (bShow) {
+      <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 20px">
+        <h3 style="position: relative">Stadionausbau</h3>
+        <table class="tStat" style="position: relative; width: auto" border="1" cellpadding="3" summary="Stadionausbau">
+          <tr>
+            <th style="text-align:center">Name</th>
+            <th style="text-align:center">Art</th>
+            <th style="text-align:center">Menge</th>
+            <th style="text-align:center">Dauer</th>
+          </tr>
+
+          @{
+            for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
+              if (Model.iSeatsBuild[iB] > 0) {
+                //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+                <tr>
+                  <td align="center">Block @Model.stadion.blocks[iB].sName</td>
+                  <td align="center">@CornerkickManager.csStadion.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
+                  <td align="center">@Model.stadion.blocks[iB].iSeats</td>
+                  <td align="center">@Model.iSeatsBuild[iB] d</td>
+                </tr>
+              }
+            }
+
+            if (Model.stadion.iTopringDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+              <tr>
+                <td align="center">Oberring</td>
+                <td align="center">-</td>
+                <td align="center">1</td>
+                <td align="center">@Model.stadion.iTopringDaysConstruct d</td>
+              </tr>
+            }
+
+            if (Model.stadion.iVideoDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+              <tr>
+                <td align="center">Anzeigetafel</td>
+                <td align="center">@CornerkickManager.csStadion.sVideo[Model.stadion.iVideoNew]</td>
+                <td align="center">1</td>
+                <td align="center">@Model.stadion.iVideoDaysConstruct.ToString() d</td>
+              </tr>
+            }
+
+            if (Model.stadion.iSnackbarDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+              <tr>
+                <td align="center">Imbissbuden</td>
+                <td align="center">-</td>
+                <td align="center">@Model.stadion.iSnackbarNew.ToString()</td>
+                <td align="center">@Model.stadion.iSnackbarDaysConstruct.ToString() d</td>
+              </tr>
+            }
+
+            if (Model.stadion.iToiletsDaysConstruct > 0) {
+              //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
+              <tr>
+                <td align="center">Toiletten</td>
+                <td align="center">-</td>
+                <td align="center">@Model.stadion.iToiletsNew.ToString()</td>
+                <td align="center">@Model.stadion.iToiletsDaysConstruct.ToString() d</td>
+              </tr>
+            }
+          }
+        </table>
+      </div>
     }
   }
-</table>
+}

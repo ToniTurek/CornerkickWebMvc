@@ -134,7 +134,12 @@
           { "data": "age", "className": "dt-center" },
           { "data": "talent", "className": "dt-center" },
           { "data": "mw", "className": "dt-right" },
-          { "data": "nat", "className": "dt-center" }
+          {
+            "data": "nat",
+            "render": function (nat, type, row) {
+              return getNatIcon(nat);
+            }
+          }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
           if (aData.iOffer > 0) { // already offered or own player
@@ -238,12 +243,13 @@
           var iYears = $("#iContractYears").val();
 
           $.when(getSalary(iIdPl, iYears, 0)).done(function (contract) {
-            if (contract.fPlayerMood < 0) {
+            if (contract.fMood < 0) {
               alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
             } else {
-              $("#txtContractMoney").html(contract.iSalary + " €");
-              $("#txtContractMood") .html((contract.fPlayerMood * 100).toFixed(0) + "%");
-              $("#tbContractSalaryOffer").val(contract.iSalary);
+              $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
+              setMoodText(contract.fMood);
+              $("#tbContractSalaryOffer").val(contract.iSalary.toLocaleString());
+              $("#iContractYears").val(contract.iLength.toString());
 
               $("#dialogContract").dialog("open");
             }
@@ -253,14 +259,25 @@
 
       // Player contract
       $("#iContractYears").keyup(function () {
+        var tbContractYears = document.getElementById("iContractYears");
+        var bnNegotiate = document.getElementById("bnNegotiate");
+
+        if ($(this).val() > 10) {
+          tbContractYears.style.backgroundColor = "red";
+          bnNegotiate.disabled = true;
+        } else {
+          tbContractYears.style.backgroundColor = "";
+          bnNegotiate.disabled = false;
+        }
+
         var data = jTable.rows('.selected').data();
         if (data) {
           var iIdPl = data[0].playerId;
 
           $.when(getSalary(iIdPl, $(this).val(), 0)).done(function (contract) {
-            $("#txtContractMoney").html(contract.iSalary + " €");
-            $("#txtContractMood" ).html((contract.fPlayerMood * 100).toFixed(0) + "%");
-            $("#tbContractSalaryOffer").val(contract.iSalary);
+            $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
+            setMoodText(contract.fMood);
+            $("#tbContractSalaryOffer").val(contract.iSalary.toLocaleString());
           });
         }
       });
@@ -270,18 +287,17 @@
         if (data) {
           var iIdPl        = data[0].playerId;
           var iYears       = $("#iContractYears").val();
-          //var iSalaryOffer = $("#iContractSalaryOffer").val();
           var iSalaryOffer = getIntFromString($("#tbContractSalaryOffer").val());
 
           $.when(getSalary(iIdPl, iYears, iSalaryOffer)).done(function (contract) {
-            if (contract.fPlayerMood < 0) {
+            if (contract.fMood < 0) {
               alert("Der Spieler hat die Vertragsverhandlungen abgebrochen!");
               jTable.ajax.reload();
 
               $("#dialogContract").dialog("close");
             } else {
-              $("#txtContractMoney").html(contract.iSalary + " €");
-              $("#txtContractMood") .html((contract.fPlayerMood * 100).toFixed(0) + "%");
+              $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
+              setMoodText(contract.fMood);
             }
           });
         }
@@ -290,6 +306,20 @@
       $("#bnCancelOffer").click(function () {
         cancelTransferOffer();
       });
+
+      function setMoodText(fMood) {
+        var txtContractMood = document.getElementById("txtContractMood");
+        var fMoodAdj = (fMood - 0.1) / 0.9;
+
+        txtContractMood.innerText = (fMoodAdj * 100).toFixed(0) + "%";
+        if (fMoodAdj > 0.5) {
+          txtContractMood.style.color = "green";
+        } else if (fMoodAdj > 0.25) {
+          txtContractMood.style.color = "orange";
+        } else {
+          txtContractMood.style.color = "red";
+        }
+      }
 
       function cancelTransferOffer() {
         var data = jTable.rows('.selected').data();
@@ -339,8 +369,7 @@
                   $("#dialogTransferFee").dialog("open");
                 },
                 error: function (xhr) {
-                  debugger;
-                  alert(xhr);
+                  alert(xhr.responseText);
                 }
               });
             }
@@ -432,10 +461,14 @@
   <div style="position: relative; width: 150px; height: auto; float: left; margin-top: 2%; margin-left: 2%">
     <form>
       <fieldset>
-        <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
-        <label for="lbProfi" style="font-size:100%; color: black; margin-right: 4%"> Profis</label>
-        <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
-        <label for="lbJouth" style="font-size:100%; color: black"> Jugend</label>
+        <label style="font-size:100%; color: black; margin-right: 4%">
+          <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+          Profis
+        </label>
+        <label style="font-size:100%; color: black">
+          <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+          Jugend
+        </label>
       </fieldset>
     </form>
   </div>
@@ -465,9 +498,9 @@
   </tbody>
 </table>
 
-<button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%">Spieler verpflichten</button>
-<button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%">Angebot annehmen</button>
-<button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%">Angebot zurückziehen</button>
+<button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%; margin-top: 6px">Spieler verpflichten</button>
+<button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot annehmen</button>
+<button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot zurückziehen</button>
 
 <div id="dialogContract" title="Vertragsverhandlung">
   <div style="position: relative; width: 100%; height: 40px" class="form-group">

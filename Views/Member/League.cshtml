@@ -5,150 +5,128 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script src="~/Scripts/League.js" type="text/javascript"></script>
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
+  <script type="text/javascript" src="~/Scripts/League.js"></script>
 
-<script>
-  $(document).ready(function () {
-    setLeague2();
+  <script>
+    $(document).ready(function () {
+      changeLand(1, 0);
 
-    var iLigaMax = 8.1;
+      var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
+      fLigaMax = fLigaMax + 0.1;
 
-    $.get("/Member/GetLeaguePlaceHistory/", function (ltPlace) {
-      var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
-        animationEnabled: true,
-        theme: "theme2",//theme1
-        axisX: {
-          labelFontSize: 16,
-          lineThickness: 0,
-          gridThickness: 1,
-          interval: 1,
-          minimum: 0.9
-        },
-        axisY: {
-          labelFontSize: 16,
-          interval: 1,
-          minimum: 0.9,
-          maximum: iLigaMax,
-          reversed: true
-        },
-        /*legend: {
-          horizontalAlign: "center", // left, center ,right
-          verticalAlign: "bottom",  // top, center, bottom
-          dockInsidePlotArea: true
-        },*/
-        data: [
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            type: "line",
-            showInLegend: false,
-            legendText: "Tabellenplatz",
-            dataPoints: ltPlace
-          }
-        ]
+      // Radio-buttons league
+      $("#rbTableTotal").on('change', function (ev) {
+        setLeague2(1, 0);
       });
 
-      chart.render();
+      $("#rbTableH").on('change', function (ev) {
+        setLeague2(1, 0);
+      });
+
+      $("#rbTableA").on('change', function (ev) {
+        setLeague2(1, 0);
+      });
+
+      $.get("/Member/GetLeaguePlaceHistory/", function (ltPlace) {
+        var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            labelFontSize: 16,
+            lineThickness: 0,
+            gridThickness: 1,
+            interval: 1,
+            minimum: 0.9
+          },
+          axisY: {
+            labelFontSize: 16,
+            interval: 1,
+            minimum: 0.9,
+            maximum: fLigaMax,
+            reversed: true
+          },
+          /*legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },*/
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              showInLegend: false,
+              legendText: "Tabellenplatz",
+              dataPoints: ltPlace
+            }
+          ]
+        });
+
+        chart.render();
+      });
     });
-  });
-</script>
+  </script>
+</head>
 
-@{
-  var sLand = (Model.iLand + 1).ToString();
-  var sLiga = (Model.iSpKl + 1).ToString();
-}
-<h2>Land @sLand, Liga @sLiga</h2>
-
-<h4>Begegnungen</h4>
-<div style="position: relative">
-  @Html.LabelFor(m => m.iSpTg, new { @class = "col-md-2 control-label" })
-  @Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setLeague2()", id = "ddlSpieltag" })
-  @*@Html.DropDownListFor(m => m.sSpTg, Model.ltDdlSpTg, new { @class = "form-control", @onchange = "setLeague2()", id = "ddlSpieltag" })*@
-</div>
-
-@{
-  var ltBeg = new List<int[]>();
-  var dt = new DateTime();
-  if (Model.iSpTg >= 0 && Model.iSpTg < Model.ltErg.Count) {
-    if (Model.iLand >= 0) {
-      if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
-        if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand].Count > Model.iSpKl) {
-          if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl].Count > Model.iSpTg) {
-            dt = MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl][Model.iSpTg];
-          }
-        }
-      }
-    }
-  }
-
-  string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
-  int i = 0;
-  foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
-    string sId = "idClubNames" + i++.ToString();
-    <div id="@sId" data-name="@club.sName"></div>
-  }
-
-  if (Model.iLand >= 0) {
-    if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
-      if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand].Count > Model.iSpKl) {
-        if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl].Count > Model.iSpTg) {
-          int j = 0;
-          foreach (DateTime dtTmp in MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand][Model.iSpKl]) {
-            string sIdDay = "idDtDay" + j.ToString();
-            <div id="@sIdDay" data-name="@dtTmp.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-            string sIdHour = "idDtHour" + j.ToString();
-            <div id="@sIdHour" data-name="@dtTmp.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-            j++;
-          }
-        }
-      }
-    }
-  }
-}
-<div id="dtDayId" data-name="@dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-<div id="dtHourId" data-name="@dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-<div id="idClubUser" data-name="@CornerkickWebMvc.Controllers.AccountController.ckClub().iId"></div>
-
-<div id="tableDivTeams" style="position: relative; border: 0px solid black"></div>
-
-<h4>Tabelle</h4>
-<div id="tableDivLeague" style="margin-bottom: 4%"></div>
-
-<h4>Tabellenplatzentwicklung</h4>
-<div id="chartContainerPlaceHist" style="height: 300px; width: 100%; margin-bottom: 4%"></div>
-
-<h4>Torschützen</h4>
-<table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
-  <tr>
-    <th colspan="2">Pl.</th>
-    <th>Spieler</th>
-    <th>Verein</th>
-    <th style="text-align:right">Tore</th>
-    <th style="text-align:right">Vorl.</th>
-    <th style="text-align:right">Scor.</th>
-  </tr>
-
-  @{ int iPlatz = 0; }
+<body style="height: 100%; min-height: 100%">
   @{
-    foreach (CornerkickCore.UI.Scorer sc in Model.ltScorer) {
-      iPlatz++;
-      string sStyle2 = "";
-      if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == CornerkickWebMvc.Controllers.AccountController.ckClub().iId) {
-        sStyle2 = "font-weight:bold";
-      }
-      int iScorer = sc.iGoals + sc.iAssists;
-
-      <tr style=@sStyle2 class=" ">
-        <td class="first">@iPlatz</td>
-        <td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>
-        <td>@sc.sName</td>
-        <td>@sc.sTeam</td>
-        <td align="right">@sc.iGoals</td>
-        <td align="right">@sc.iAssists</td>
-        <td align="right">@iScorer</td>
-      </tr>
+    var sLand = "";
+    if (Model.iLand >= 0 && Model.iLand < MvcApplication.ckcore.sLand.Length) {
+      sLand = MvcApplication.ckcore.sLand[Model.iLand];
     }
+    var sLiga = (Model.iSpKl + 1).ToString();
   }
-</table>
+
+  <div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
+    <label>
+      Land:
+      @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLand" })
+    </label>
+
+    <label style="margin-left: 10px">
+      Spieltag:
+      <select id="ddlMatchday" onchange="setLeague2(1, 0)"></select>
+    </label>
+
+    <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">
+      <div style="position: relative; width: 47%; min-width: 350px; margin-right: 6%; margin-bottom: 20px; float: left">
+        <h4>Begegnungen</h4>
+        <div id="tableDivTeams" style="position: relative"></div>
+      </div>
+
+      <div style="position: relative; width: 47%; min-width: 350px; float: left">
+        <h4>Tabelle</h4>
+        <div style="position: absolute; width: 250px; top: 10px; right: 0px; text-align: right">
+          <form>
+            <fieldset>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbTableTotal" name="rbTableHA" value="0" checked>
+                Gesamt
+              </label>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbTableH" name="rbTableHA" value="1">
+                Heim
+              </label>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbTableA" name="rbTableHA" value="2">
+                Auswärts
+              </label>
+            </fieldset>
+          </form>
+        </div>
+        <div id="tableDivLeague" style="position: relative; width: 100%"></div>
+      </div>
+    </div>
+
+    <div style="height: auto; width: 54%; min-width: 350px; margin-top: 20px; float: right">
+      <h4>Tabellenplatzentwicklung</h4>
+      <div id="chartContainerPlaceHist" style="height: 400px; width: 100%"></div>
+    </div>
+
+    <div id="divLeagueScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+  </div>
+</body>
+</html>

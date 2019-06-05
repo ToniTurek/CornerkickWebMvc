@@ -1,8 +1,7 @@
-﻿function drawGame(iState) {
+﻿function drawGame(iState, iGameSpeed) {
   //alert("drawGame: " + iState);
 
   var drawGameDiv = $("#divDrawGame");
-  var playerAction = $("#playerAction");
   var bFinished = false;
   var iPositionsValue = $('#ddlPositions').val();
   var bAverage = iPositionsValue > 0;
@@ -14,10 +13,12 @@
     dataType: "JSON",
     data: { iState: iState, bAverage: bAverage },
     success: function (gLoc) {
-      data = getPlayer(gLoc);
-
       drawGameDiv.html('');
-      drawGameDiv.html(data);
+
+      if (iPositionsValue >= 0) {
+        data = getPlayer(gLoc, iPositionsValue == 0);
+        drawGameDiv.html(data);
+      }
 
       bFinished = gLoc.bFinished;
 
@@ -25,22 +26,32 @@
         iState = -2;
       }
 
-      plotStatistics(iState);
+      var bUpdate = true;
+      if (iState === -1) {
+        bUpdate = document.getElementById("cbUpdateStatistic").checked;
+      }
+      if (bUpdate === true) {
+        plotStatistics(iState);
+      }
     },
     error: function () {
       //alert("ERROR");
       return false;
     },
     complete: function (jqXHR, textStatus) {
+      if (!iGameSpeed) {
+        iGameSpeed = 300;
+      }
+
       // Schedule the next request when the current one's complete
-      if (iState === -1 && !bFinished && textStatus !== "error" && !bStopPlay && !bAdminStopPlay) {
-        setTimeout(function () { drawGame(-1) }, 250);
+      if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && bAdminStop) {
+        setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
       }
     }
   });
 }
 
-function getPlayer(gLoc) {
+function getPlayer(gLoc, bShowLookAt = true) {
   var sBox = "";
 
   if (gLoc.ltPlayer.length < 1) return sBox;
@@ -76,7 +87,12 @@ function getPlayer(gLoc) {
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
                   '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: black; z-index:22">' + gLoc.ltPlayer[iP +  0].iNo.toString() + '</h2>' + 
                 '</div>';
-      sBox   += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+
+      // draw look-at circle
+      if (bShowLookAt) {
+        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+      }
+
       sBox += '</div>';
     }
 
@@ -102,7 +118,12 @@ function getPlayer(gLoc) {
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
                   '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: black; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</h2>' + 
                 '</div>';
-      sBox   += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+
+      // draw look-at circle
+      if (bShowLookAt) {
+        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+      }
+
       sBox += '</div>';
 
       if (cbTargetPos) {
@@ -140,15 +161,18 @@ function getPlayer(gLoc) {
 
 function plotStatistics(jState = -1) {
   //alert(jState);
-  iState = jState;
+  var iState = jState;
 
   var iHeatmapValue = $('#ddlHeatmap').val();
+  var iShootsValue  = $('#ddlShoots').val();
+  var iDuelsValue   = $('#ddlDuels').val();
+  var iPassesValue  = $('#ddlPasses').val();
 
   $.ajax({
     url: '/ViewGame/ViewGameGetDataStatisticObject',
     type: "GET",
     dataType: "JSON",
-    data: { iState: iState, iHeatmap: iHeatmapValue },
+    data: { iState: iState, iHeatmap: iHeatmapValue, iAllShoots: iShootsValue, iAllDuels: iDuelsValue, iAllPasses: iPassesValue },
     cache: false,
     contentType: "application/json; charset=utf-8",
     error: function (xhr) {
@@ -193,6 +217,8 @@ function plotStatistics(jState = -1) {
 
       $("#divTimelineIcons").html(gD.sTimelineIcons);
 
+      $("#drawHeatmap").html('');
+
       // draw shoot lines
       if (gD.ltDrawLineShoot) {
         gD.ltDrawLineShoot.forEach(function (drawLineShoot) {
@@ -204,30 +230,51 @@ function plotStatistics(jState = -1) {
           iY0 = ((drawLineShoot.Y0 + 25) * iDivHeightPix) /  50;
           iX1 = ( drawLineShoot.X1       * iDivWidthPix ) / 122;
           iY1 = ((drawLineShoot.Y1 + 25) * iDivHeightPix) /  50;
-          //alert(iX0 + ", " + iY0 + ", " + iX1 + ", " + iY1);
 
-          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, 1, 20)).appendTo('#divDrawGame');
+          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, 1, 20)).appendTo('#drawHeatmap');
+        });
+      }
+
+      // draw pass lines
+      if (gD.ltDrawLinePass) {
+        gD.ltDrawLinePass.forEach(function (drawLinePass) {
+          var divGame = document.getElementById("divDrawGame");
+          iDivWidthPix  = divGame.offsetWidth.toString();
+          iDivHeightPix = divGame.offsetHeight.toString();
+
+          iX0 = (drawLinePass.X0 * iDivWidthPix) / 122;
+          iY0 = ((drawLinePass.Y0 + 25) * iDivHeightPix) / 50;
+          iX1 = (drawLinePass.X1 * iDivWidthPix) / 122;
+          iY1 = ((drawLinePass.Y1 + 25) * iDivHeightPix) / 50;
+
+          $(drawLine(iX0, iY0, iX1, iY1, drawLinePass.sColor, 2, 20, "dashed")).appendTo('#drawHeatmap');
         });
       }
 
       if (gD.sCard) {
-        $(gD.sCard).appendTo('#divDrawGame');
+        $(gD.sCard).appendTo('#drawHeatmap');
       }
 
       // Bar statistics
       var dataH = gD.fDataH;
       var dataA = gD.fDataA;
 
-      var iGoalsH  = dataH[0][0];
-      var iGoalsA  = dataA[0][0];
-      var iShootsH = dataH[1][0];
-      var iShootsA = dataA[1][0];
+      var iGoalsH        = dataH[0][0];
+      var iGoalsA        = dataA[0][0];
+      var iShootsH       = dataH[1][0];
+      var iShootsA       = dataA[1][0];
       var iShootsOnGoalH = dataH[2][0];
       var iShootsOnGoalA = dataA[2][0];
-      var iCornerkickH = dataH[5][0];
-      var iCornerkickA = dataA[5][0];
-      var iOffsiteH = dataH[6][0];
-      var iOffsiteA = dataA[6][0];
+      var iDuelsH        = dataH[4][0];
+      var iDuelsA        = dataA[4][0];
+      var iFoulsH        = dataH[5][0];
+      var iFoulsA        = dataA[5][0];
+      var iCornerkickH   = dataH[6][0];
+      var iCornerkickA   = dataA[6][0];
+      var iOffsiteH      = dataH[7][0];
+      var iOffsiteA      = dataA[7][0];
+      var fPassGoodH     = dataH[8][0];
+      var fPassGoodA     = dataA[8][0];
       if (iGoalsH + iGoalsA > 0) {
         dataH[0][0] = 100 * iGoalsH / (iGoalsH + iGoalsA);
         dataA[0][0] = 100 - dataH[0][0];
@@ -240,13 +287,25 @@ function plotStatistics(jState = -1) {
         dataH[2][0] = 100 * iShootsOnGoalH / (iShootsOnGoalH + iShootsOnGoalA);
         dataA[2][0] = 100 - dataH[2][0];
       }
-      if (iCornerkickH + iCornerkickA > 0) {
-        dataH[5][0] = 100 * iCornerkickH / (iCornerkickH + iCornerkickA);
+      if (iDuelsH + iDuelsA > 0) {
+        dataH[4][0] = 100 * iDuelsH / (iDuelsH + iDuelsA);
+        dataA[4][0] = 100 - dataH[4][0];
+      }
+      if (iFoulsH + iFoulsA > 0) {
+        dataH[5][0] = 100 * iFoulsH / (iFoulsH + iFoulsA);
         dataA[5][0] = 100 - dataH[5][0];
       }
-      if (iOffsiteH + iOffsiteA > 0) {
-        dataH[6][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
+      if (iCornerkickH + iCornerkickA > 0) {
+        dataH[6][0] = 100 * iCornerkickH / (iCornerkickH + iCornerkickA);
         dataA[6][0] = 100 - dataH[6][0];
+      }
+      if (iOffsiteH + iOffsiteA > 0) {
+        dataH[7][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
+        dataA[7][0] = 100 - dataH[7][0];
+      }
+      if (fPassGoodH + fPassGoodA > 0) {
+        dataH[8][0] = 100 * fPassGoodH / (fPassGoodH + fPassGoodA);
+        dataA[8][0] = 100 - dataH[8][0];
       }
 
       // Statistic bars
@@ -256,7 +315,7 @@ function plotStatistics(jState = -1) {
       ];
 
       var ticks = [
-        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Ecken"], [-6, "Abseits"]
+        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"], [-8, "Passquote"]
       ];
 
       var flotOptions = {
@@ -283,7 +342,7 @@ function plotStatistics(jState = -1) {
         },
         yaxis: {
           show: true,
-          min: -6.6,
+          min: -8.6,
           max: 0.6,
           ticks: ticks
         },
@@ -309,9 +368,13 @@ function plotStatistics(jState = -1) {
           } else if (ii === 2) {
             s = iShootsOnGoalH.toString();
           } else if (ii === 5) {
-            s = iCornerkickH.toString();
+            s = iFoulsH.toString();
           } else if (ii === 6) {
+            s = iCornerkickH.toString();
+          } else if (ii === 7) {
             s = iOffsiteH.toString();
+          } else if (ii === 8) {
+            s = fPassGoodH.toFixed(1) + '%';
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({
@@ -337,9 +400,13 @@ function plotStatistics(jState = -1) {
           } else if (ii === 2) {
             s = iShootsOnGoalA.toString();
           } else if (ii === 5) {
-            s = iCornerkickA.toString();
+            s = iFoulsA.toString();
           } else if (ii === 6) {
+            s = iCornerkickA.toString();
+          } else if (ii === 7) {
             s = iOffsiteA.toString();
+          } else if (ii === 8) {
+            s = fPassGoodA.toFixed(1) + '%';
           }
 
           $('<div class="data-point-label">' + s + '</div>').css({
@@ -354,24 +421,45 @@ function plotStatistics(jState = -1) {
         ii = ii + 1;
       });
 
+      $("#txtReferee").html("Schiedsrichter: " + gD.sRefereeQuality + "<br/>Fehlentscheidungen: " + gD.sRefereeDecisions);
+
       // Comment box
-      var tbKomm = document.getElementById("tbKommentar");
-      tbKomm.value = gD.sComment;
+      var tblComments = document.getElementById('tblComments');
+      if (jState !== -1) {
+        $("#tblComments tr").remove();
+      }
+
+      var sLastComment = [];
+      var colLast = tblComments.getElementsByTagName("tbody")[0];
+      if (colLast.getElementsByTagName('td').length > 1) {
+        sLastComment[0] = colLast.getElementsByTagName('td')[0].innerHTML;
+        sLastComment[1] = colLast.getElementsByTagName('td')[1].innerHTML;
+      }
+
+      var iC = 0;
+      for (iC = 0; iC < gD.ltComments.length; ++iC) {
+        if (sLastComment[0] === gD.ltComments[iC][0] && sLastComment[1] === gD.ltComments[iC][1]) {
+          continue;
+        }
+
+        var rowComments = tblComments.insertRow(0);
+        var cellComments0 = rowComments.insertCell(0);
+        var cellComments1 = rowComments.insertCell(1);
+        cellComments0.innerHTML = gD.ltComments[iC][0];
+        cellComments1.innerHTML = gD.ltComments[iC][1];
+      }
 
       $("#statistikGoals").html(gD.sStatGoals);
       $("#statistikCards").html(gD.sStatCards);
       $("#statistikSubs") .html(gD.sStatSubs);
 
       // Heatmap
-      if (iHeatmapValue >= 0) {
-        $("#drawHeatmap").html(gD.sDivHeatmap);
-      }
+      $(gD.sDivHeatmap).appendTo('#drawHeatmap');
 
       $("#txtAdminChanceShootOnGoal").html(gD.sAdminChanceShootOnGoal);
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);
 
-      //alert(iState);
-      //alert(ltF[0].length);
+      //alert(jState);
       var i = 0;
       var j = 0;
       for (i = 0; i < gD.ltF.length; ++i) {
@@ -385,7 +473,6 @@ function plotStatistics(jState = -1) {
         if (gD.ltF[i]) {
           if (gD.ltF[i].length > 0) {
             if (jState === -1) {
-              //alert(gD.ltF[i][gD.ltF[i].length - 1]);
               ltF[i].push(gD.ltF[i][0]);
             } else {
               ltF[i].length = 0;
@@ -420,110 +507,17 @@ function plotStatistics(jState = -1) {
         }
       }
 
-      //alert(ltF[0].length);
-      /*
-      var chartF = new CanvasJS.Chart("chartContainerF", {
-        animationEnabled: false,
-        theme: "theme2",//theme1
-        title: {
-          text: "Frische"
-        },
-        axisX: {
-          gridThickness: 1
-        },
-        axisY: {
-          valueFormatString: "0.0%",
-          includeZero: false
-        },
-        legend: {
-          horizontalAlign: "center", // left, center, right
-          verticalAlign: "bottom",  // top, center, bottom
-          dockInsidePlotArea: true
-        },
-        data: [
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "1",
-            dataPoints: gD.ltF[0]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "2",
-            dataPoints: gD.ltF[1]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "3",
-            dataPoints: gD.ltF[2]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "4",
-            dataPoints: gD.ltF[3]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "5",
-            dataPoints: gD.ltF[4]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "6",
-            dataPoints: gD.ltF[5]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "7",
-            dataPoints: gD.ltF[6]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "8",
-            dataPoints: gD.ltF[7]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "9",
-            dataPoints: gD.ltF[8]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "10",
-            dataPoints: gD.ltF[9]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "11",
-            dataPoints: gD.ltF[10]
-          }
-        ]
-      });
-      */
-
       chartF.render();
       chartM.render();
+
+      //if (document.getElementById("myCheck").checked) {
+      if ($('#dialogPlAction').dialog('isOpen')) {
+        $("#txtPlActionShoot").html((gD.fPlAction[0] * 100).toFixed(1) + '%');
+        $("#txtPlActionPass" ).html((gD.fPlAction[1] * 100).toFixed(1) + '%');
+        $("#txtPlActionGo"   ).html((gD.fPlAction[2] * 100).toFixed(1) + '%');
+        $("#txtPlActionWait" ).html((gD.fPlAction[3] * 100).toFixed(1) + '%');
+        $("#txtPlActionRnd"  ).html((gD.fPlActionRnd * 100).toFixed(1) + '%');
+      }
     } // success function
   }); // ajax
 }

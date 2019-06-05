@@ -9,6 +9,8 @@ namespace CornerkickWebMvc.Models
 {
   public class TeamModels
   {
+    public CornerkickManager.Club club { get; set; }
+
     public bool bAdmin { get; set; }
 
     public static List<CalendarModels> ltCalendar = new List<CalendarModels>();
@@ -38,15 +40,29 @@ namespace CornerkickWebMvc.Models
 
     public struct TeamData
     {
+      // Player details
       public List<CornerkickGame.Player> ltPlayer { get; set; }
       public List<byte> ltPlayerPos { get; set; }
       public List<string> ltPlayerAveSkill { get; set; }
+      public List<string> ltPlayerTeamname { get; set; }
+      public List<string> ltPlayerAge      { get; set; }
+      public List<string> ltPlayerNat      { get; set; }
+      public List<bool>   ltPlayerSusp     { get; set; } // List of suspended player
+
+      // Opponent player details
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
+      public List<byte> ltPlayerOppPos { get; set; }
+      public List<string> ltPlayerOppAveSkill { get; set; }
+
       public CornerkickGame.Player plSelected { get; set; }
+      public byte iCaptainIx { get; set; }
       public string sDivPlayer { get; set; }
       public string sDivRoa { get; set; }
       public float   fIndOrientation       { get; set; }
       public float[] fIndOrientationMinMax { get; set; }
+
+      public float fTeamAveStrength { get; set; }
+      public float fTeamAveAge { get; set; }
     }
 
     public TeamModels()

@@ -5,6 +5,44 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Log</h2>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script>
+    $(document).ready(function () {
+      // Fill Log table
+      var ltLog = @Html.Raw(Json.Encode(Model.ltLog));
+      var tblLog = document.getElementById('tblLog');
+      var iL = 0;
+      for (iL = 0; iL < ltLog.length; ++iL) {
+        var rowComments = tblLog.insertRow(0);
+        var cellComments = rowComments.insertCell(0);
+        cellComments.innerHTML = ltLog[iL];
+      }
 
-@Html.TextAreaFor(x => x.sLog, 50, 1000, htmlAttributes: new { style = "width: 100%; max-width: 100%" })
+      // Fill Error table
+      var ltErr = @Html.Raw(Json.Encode(Model.ltErr));
+      var tblErr = document.getElementById('tblErr');
+      var iE = 0;
+      for (iE = 0; iE < ltErr.length; ++iE) {
+        var rowComments = tblErr.insertRow(0);
+        var cellComments = rowComments.insertCell(0);
+        cellComments.innerHTML = ltErr[iE];
+      }
+    });
+  </script>
+</head>
+
+<body style="height: 100%; min-height: 100%">
+  @Html.ActionLink("Settings", "Settings", "Admin")
+
+  <h3>Log</h3>
+  <table id="tblLog" style="width: 100%; height: auto">
+    <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+  </table>
+
+  <h3>Error</h3>
+  <table id="tblErr" style="width: 100%; height: auto">
+    <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+  </table>
+</body>
+</html>

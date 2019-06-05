@@ -140,7 +140,7 @@
   <tbody>
     @{
       int iIndex = 0;
-      foreach (CornerkickCore.Core.News news in Model.ltUserMail) {
+      foreach (CornerkickManager.Main.News news in Model.ltUserMail) {
         int iFrom = news.iFrom;
         string sFrom = "-";
         string sFirstLine = news.sText.Split('\n')[0];
@@ -149,8 +149,8 @@
         if (iFrom < 0) {
           sFrom = "Admin";
         } else {
-          CornerkickCore.Core.User user = MvcApplication.ckcore.ltUser[iFrom];
-          sFrom = user.sVorname + " " + user.sNachname;
+          CornerkickManager.User user = MvcApplication.ckcore.ltUser[iFrom];
+          sFrom = user.sFirstname + " " + user.sSurname;
           sFrom += " (" + MvcApplication.ckcore.ltClubs[user.iTeam].sName + ")";
         }
 

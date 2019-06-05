@@ -94,12 +94,12 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Vereinsname")]
     public string Verein { get; set; }
 
-    [Required]
+    //[Required]
     [DataType(DataType.Text)]
     [Display(Name = "Land")]
     public int Land { get; set; }
 
-    [Required]
+    //[Required]
     [DataType(DataType.Text)]
     [Display(Name = "Liga")]
     public int Liga { get; set; }

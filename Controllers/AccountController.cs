@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if !DEBUG
+#define _EMAIL_CONFIRMATION
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -17,6 +21,12 @@ namespace CornerkickWebMvc.Controllers
   [Authorize]
   public class AccountController : Controller
   {
+    public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+    {
+      UserManager = userManager;
+      SignInManager = signInManager;
+    }
+
 #if _CONSOLE
     public static CornerkickConsole.CUI ckconsole;
 #endif
@@ -26,7 +36,90 @@ namespace CornerkickWebMvc.Controllers
     private ApplicationSignInManager _signInManager;
     private ApplicationUserManager _userManager;
     public static CultureInfo ciUser;
-    string[] sCultureInfo = new string[3] { "de-DE", "en-GB", "fr-FR"};
+    readonly string[] sCultureInfo = new string[82] {
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "en-GB",
+      "",
+      "",
+      "",
+      "fr-FR",
+      "",
+      "",
+      "de-DE",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    };
 
     public AccountController()
     {
@@ -52,16 +145,17 @@ namespace CornerkickWebMvc.Controllers
       //ckconsole = new CornerkickConsole.CUI(MvcApplication.ckcore);
 #endif
 
-      CornerkickCore.Core.User usr = ckUser();
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return;
       if (usr.iTeam >= MvcApplication.ckcore.ltClubs.Count) return;
 
-      CornerkickCore.Core.Club clb = ckClub();
+      CornerkickManager.Club clb = ckClub();
       int iLandUser = clb.iLand;
       if (iLandUser >= 0 && iLandUser < sCultureInfo.Length) ciUser = new CultureInfo(sCultureInfo[iLandUser]);
 
       if (usr.ltNews != null) {
         for (int iN = 0; iN < usr.ltNews.Count; iN++) {
-          CornerkickCore.Core.News news = usr.ltNews[iN];
+          CornerkickManager.Main.News news = usr.ltNews[iN];
           if (news.bRead2) news.bRead = true;
 
           news.bRead2 = true;
@@ -71,20 +165,17 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    public static CornerkickCore.Core.User ckUser()
+    public CornerkickManager.User ckUser()
     {
-      if (appUser != null) {
-        foreach (CornerkickCore.Core.User usr in MvcApplication.ckcore.ltUser) {
-          if (usr.id.Equals(appUser.Id)) {
-            return usr;
-          }
-        }
+      string sUserId = User.Identity.GetUserId();
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(sUserId)) return usr;
       }
 
-      return new CornerkickCore.Core.User();
+      return null;
     }
 
-    public static int getiUser(CornerkickCore.Core.User usr)
+    public static int getiUser(CornerkickManager.User usr)
     {
       for (int iU = 0; iU < MvcApplication.ckcore.ltUser.Count; iU++) {
         if (MvcApplication.ckcore.ltUser[iU].id.Equals(usr.id)) {
@@ -95,22 +186,16 @@ namespace CornerkickWebMvc.Controllers
       return -1;
     }
 
-    public static void setCkUser(CornerkickCore.Core.User usr)
+    public CornerkickManager.Club ckClub()
     {
-      int iU = getiUser(usr);
-      if (iU >= 0 && iU < MvcApplication.ckcore.ltUser.Count) {
-        MvcApplication.ckcore.ltUser[iU] = usr;
-      }
-    }
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return null;
 
-    public static CornerkickCore.Core.Club ckClub()
-    {
-      CornerkickCore.Core.User usr = ckUser();
-      if (usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
         return MvcApplication.ckcore.ltClubs[usr.iTeam];
       }
 
-      return new CornerkickCore.Core.Club();
+      return null;
     }
 
 #if DEBUG
@@ -119,22 +204,22 @@ namespace CornerkickWebMvc.Controllers
     private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false)
 #endif
     {
-      int  iLand = 0;
-      byte iLiga = 0;
+      int iLand = 0;
+      int iLiga = 0;
 
       MvcApplication.ckcore.tl.writeLog("  add User to Ck: " + applicationUser.Vorname + " " + applicationUser.Nachname);
 
       if (bAdmin) {
-        MvcApplication.ckcore.ltClubs.Add(MvcApplication.ckcore.ini.newClub());
-        CornerkickCore.Core.User usrAdmin = createUser(applicationUser);
+        MvcApplication.ckcore.ltClubs.Add(new CornerkickManager.Club());
+        CornerkickManager.User usrAdmin = createUser(applicationUser);
         MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
         return;
       }
 
       if (registerViewModel != null) {
-        iLand = registerViewModel.Land - 1;
-        iLiga = (byte)(registerViewModel.Liga - 1);
+        iLand = registerViewModel.Land;
+        iLiga = (byte)(registerViewModel.Liga);
       }
 
       if (iLand < 0) return;
@@ -143,8 +228,8 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       for (byte iU = 0; iU < 8; iU++) {
 #endif
-      CornerkickCore.Core.User usr = createUser(applicationUser);
-      CornerkickCore.Core.Club clb = createClub(applicationUser, iLand, iLiga);
+      CornerkickManager.User usr = createUser(applicationUser);
+      CornerkickManager.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iLiga);
       usr.iLevel = 1;
       usr.iTeam = clb.iId;
       usr.nextGame.iGameSpeed = 250;
@@ -169,18 +254,19 @@ namespace CornerkickWebMvc.Controllers
 #endif
       MvcApplication.ckcore.ltClubs.Add(clb);
 
-      if (MvcApplication.ckcore.ltLiga[iLand] == null) MvcApplication.ckcore.ltLiga[iLand] = new List<List<int>>();
-      while (MvcApplication.ckcore.ltLiga[iLand].Count <= iLiga) MvcApplication.ckcore.ltLiga[iLand].Add(new List<int>());
-      MvcApplication.ckcore.ltLiga[iLand][iLiga].Add(clb.iId);
+      
+      // Do initial formation
+      MvcApplication.ckcore.doFormation(clb.iId);
 
-      // do initial formation
-      MvcApplication.ckcore.doFormationKI(clb.iId, true);
+      // Add club to league/cup
+      MvcApplication.ckcore.ltCups[0].ltClubs[0].Add(clb); // nat. cup
+      MvcApplication.ckcore.ltCups[1].ltClubs[0].Add(clb); // league
 
 #if DEBUG
       if (iU == 0) {
 #endif
-      MvcApplication.ckcore.Info(clb.iUser, usr.sVorname + " " + usr.sNachname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
-      MvcApplication.ckcore.Info(clb.iUser, usr.sVorname + " " + usr.sNachname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
+      MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
+      MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
 #if DEBUG
       }
 #endif
@@ -189,19 +275,22 @@ namespace CornerkickWebMvc.Controllers
       }
 #endif
 
-      if (!MvcApplication.timerCkCalender.Enabled) MvcApplication.ckcore.calcSpieltage();
+      if (!MvcApplication.timerCkCalender.Enabled) {
+        MvcApplication.ckcore.calcMatchdays();
+        MvcApplication.ckcore.drawCup(MvcApplication.ckcore.ltCups[1]);
+      }
     }
 
-    private CornerkickCore.Core.User createUser(ApplicationUser applicationUser)
+    private CornerkickManager.User createUser(ApplicationUser applicationUser)
     {
-      CornerkickCore.Core.User usr = MvcApplication.ckcore.ini.newUser();
+      CornerkickManager.User usr = new CornerkickManager.User();
 
       if (applicationUser == null) return usr;
 
       usr.id = applicationUser.Id;
 
-      usr.sVorname  = applicationUser.Vorname;
-      usr.sNachname = applicationUser.Nachname;
+      usr.sFirstname = applicationUser.Vorname;
+      usr.sSurname   = applicationUser.Nachname;
       
       return usr;
     }
@@ -229,19 +318,18 @@ namespace CornerkickWebMvc.Controllers
       return checkUserIsAdmin(regModel.Email, regModel.Password);
     }
 
-    private CornerkickCore.Core.Club createClub(ApplicationUser applicationUser, int iLand, byte iLiga)
+    internal CornerkickManager.Club createClub(string sTeamname, byte iLand, byte iLiga)
     {
-      CornerkickCore.Core.Club clb = MvcApplication.ckcore.ini.newClub();
-      clb.sName = applicationUser.Vereinsname;
+      CornerkickManager.Club clb = new CornerkickManager.Club();
+
+      clb.sName = sTeamname;
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
       clb.iId = MvcApplication.ckcore.ltClubs.Count;
-      clb.stadium.sName = clb.sName +  " Stadion";
 
       clb.iLand = iLand;
       clb.iDivision = iLiga;
-      clb.iPokalrunde = 0;
 
-      MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[12]);
+      MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[7]);
 
 #if DEBUG
       clb.training.iTraining[1] = 2;
@@ -260,18 +348,26 @@ namespace CornerkickWebMvc.Controllers
 
       clb.ltSponsorOffers.Add(createDefaultSponsor());
 
-      clb.iEintrittspreise[0] =  10;
-      clb.iEintrittspreise[1] =  30;
-      clb.iEintrittspreise[2] = 100;
+      // Stadium
+      clb.stadium.sName = clb.sName + " Stadion";
+      clb.stadium.iTicketcounter = 1;
+
+      clb.iAdmissionPrice[0] =  10;
+      clb.iAdmissionPrice[1] =  30;
+      clb.iAdmissionPrice[2] = 100;
+
+      clb.iAdmissionPriceSeasonal[0] =  200;
+      clb.iAdmissionPriceSeasonal[1] =  600;
+      clb.iAdmissionPriceSeasonal[2] = 2000;
 
       addPlayerToClub(ref clb);
 
       return clb;
     }
 
-    private CornerkickCore.Finance.Sponsor createDefaultSponsor()
+    private CornerkickManager.Finance.Sponsor createDefaultSponsor()
     {
-      CornerkickCore.Finance.Sponsor sponUser = MvcApplication.ckcore.fz.newSponsor();
+      CornerkickManager.Finance.Sponsor sponUser = MvcApplication.ckcore.fz.newSponsor();
 
       sponUser.bMain = true;
       sponUser.iId = 1;
@@ -283,7 +379,7 @@ namespace CornerkickWebMvc.Controllers
       return sponUser;
     }
 
-    private void addPlayerToClub(ref CornerkickCore.Core.Club club)
+    private void addPlayerToClub(ref CornerkickManager.Club club)
     {
       int   iSpeed  = 0;
       int   iTalent = 0;
@@ -292,23 +388,23 @@ namespace CornerkickWebMvc.Controllers
 
       for (byte iPos = 1; iPos < 12; iPos++) {
         for (byte iPl = 0; iPl < 2; iPl++) {
-          CornerkickGame.Player sp = MvcApplication.ckcore.plr.newPlayer(club, iPos);
+          CornerkickGame.Player pl = MvcApplication.ckcore.plr.newPlayer(club, iPos);
 #if DEBUG
-          sp.fFrische = 1f;
+          pl.fFresh = 1f;
 #endif
-          sp.contract.iLength = (byte)rnd.Next(1, 4);
-          sp.contract.iSalary = MvcApplication.ckcore.plr.getSalary(sp, sp.contract.iLength, 0);
+          pl.contract.iLength = (byte)rnd.Next(1, 4);
+          pl.contract.iSalary = MvcApplication.ckcore.plr.getSalary(pl, pl.contract.iLength, 0);
 
-          sp.iNr = (byte)(iPos + (11 * iPl));
+          pl.iNr = (byte)(iPos + (11 * iPl));
 
           // Count speed
-          iSpeed  += sp.iSkill[0];
+          iSpeed  += pl.iSkill[0];
 
           // Count talent
-          iTalent += sp.iTalent;
+          iTalent += pl.iTalent;
 
           // Count age
-          float fAge = MvcApplication.ckcore.game.tl.getPlayerAgeFloat(sp, MvcApplication.ckcore.dtDatum);
+          float fAge = pl.getAge(MvcApplication.ckcore.dtDatum);
           fAlter += fAge;
         }
       }
@@ -339,10 +435,10 @@ namespace CornerkickWebMvc.Controllers
       /*
       while (iSpeed < 6 * club.ltPlayerId.Count) {
         for (byte iPl = 0; iPl < club.ltPlayerId.Count; iPl++) {
-          CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
-          if (sp.iF[0] < 6) {
-            sp.iF[0]++;
-            MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = sp;
+          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
+          if (pl.iF[0] < 6) {
+            pl.iF[0]++;
+            MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = pl;
 
             iSpeed++;
             break;
@@ -352,10 +448,10 @@ namespace CornerkickWebMvc.Controllers
 
       while (iSpeed > 6 * club.ltPlayerId.Count) {
         for (byte iPl = 0; iPl < club.ltPlayerId.Count; iPl++) {
-          CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
-          if (sp.iF[0] > 6) {
-            sp.iF[0]--;
-            MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = sp;
+          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
+          if (pl.iF[0] > 6) {
+            pl.iF[0]--;
+            MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = pl;
 
             iSpeed++;
             break;
@@ -367,9 +463,9 @@ namespace CornerkickWebMvc.Controllers
       // Equalize player talent
       while (iTalent > 4.51 * club.ltPlayerId.Count) {
         int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[iPlId];
-        if (sp.iTalent > 2) {
-          sp.iTalent--;
+        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+        if (pl.iTalent > 2) {
+          pl.iTalent--;
 
           iTalent--;
         }
@@ -377,9 +473,9 @@ namespace CornerkickWebMvc.Controllers
 
       while (iTalent < 4.49 * club.ltPlayerId.Count) {
         int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[iPlId];
-        if (sp.iTalent < 7) {
-          sp.iTalent++;
+        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+        if (pl.iTalent < 7) {
+          pl.iTalent++;
 
           iTalent++;
         }
@@ -388,11 +484,11 @@ namespace CornerkickWebMvc.Controllers
       // Equalize player age
       while (fAlter > 25.5f * club.ltPlayerId.Count) {
         int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[iPlId];
+        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
 
-        if (MvcApplication.ckcore.game.tl.getPlayerAgeFloat(sp, MvcApplication.ckcore.dtDatum) > 22) {
+        if (pl.getAge(MvcApplication.ckcore.dtDatum) > 22) {
           try {
-            sp.dtBirthday = new DateTime(sp.dtBirthday.Year + 1, sp.dtBirthday.Month, sp.dtBirthday.Day); // make younger
+            pl.dtBirthday = new DateTime(pl.dtBirthday.Year + 1, pl.dtBirthday.Month, pl.dtBirthday.Day); // make younger
           } catch {
             continue;
           }
@@ -403,11 +499,11 @@ namespace CornerkickWebMvc.Controllers
 
       while (fAlter < 25.5f * club.ltPlayerId.Count) {
         int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[iPlId];
+        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
 
-        if (MvcApplication.ckcore.game.tl.getPlayerAgeFloat(sp, MvcApplication.ckcore.dtDatum) < 30) {
+        if (pl.getAge(MvcApplication.ckcore.dtDatum) < 30) {
           try {
-            sp.dtBirthday = new DateTime(sp.dtBirthday.Year - 1, sp.dtBirthday.Month, sp.dtBirthday.Day); // make older
+            pl.dtBirthday = new DateTime(pl.dtBirthday.Year - 1, pl.dtBirthday.Month, pl.dtBirthday.Day); // make older
           } catch {
             continue;
           }
@@ -437,8 +533,8 @@ namespace CornerkickWebMvc.Controllers
           pl2.iTalent += iDeltaTalent;
 
           fAgeTalent = getAgeTalent(club);
-        } else if (MvcApplication.ckcore.game.tl.getPlayerAgeFloat(pl1, MvcApplication.ckcore.dtDatum) > 22 &&
-                   MvcApplication.ckcore.game.tl.getPlayerAgeFloat(pl2, MvcApplication.ckcore.dtDatum) < 30) {
+        } else if (pl1.getAge(MvcApplication.ckcore.dtDatum) > 22 &&
+                   pl2.getAge(MvcApplication.ckcore.dtDatum) < 30) {
           try {
             pl1.dtBirthday = new DateTime(pl1.dtBirthday.Year + 1, pl1.dtBirthday.Month, pl1.dtBirthday.Day); // make younger
           } catch {
@@ -461,7 +557,7 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    private float getAgeTalent(CornerkickCore.Core.Club club)
+    private float getAgeTalent(CornerkickManager.Club club)
     {
       float fAgeTalent = 0f;
 
@@ -469,7 +565,7 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
 
         // Count age
-        fAgeTalent += (MvcApplication.ckcore.game.tl.getPlayerAgeFloat(pl, MvcApplication.ckcore.dtDatum) - 10f) * pl.iTalent;
+        fAgeTalent += (pl.getAge(MvcApplication.ckcore.dtDatum) - 10f) * pl.iTalent;
       }
 
       return fAgeTalent / club.ltPlayerId.Count;
@@ -478,23 +574,23 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public bool uploadFile(HttpPostedFileBase file, int iClub)
     {
+#if DEBUG
+      return false;
+#endif
+
       try {
         if (file.ContentLength > 0) {
-          //string _FileName = Path.GetFileName(file.FileName);
-          string _path = Path.Combine(Server.MapPath("~/Content/Uploads"), iClub.ToString() + ".png");
-          file.SaveAs(_path);
+          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir(), "../Content/Uploads", iClub.ToString() + ".png");
+          file.SaveAs(sFilenameLocal);
+
+          AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+          as3.uploadFile(sFilenameLocal, "emblems/" + iClub.ToString() + ".png", "image/custom");
         }
 
         return true;
       } catch {
         return false;
       }
-    }
-
-    public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
-    {
-      UserManager = userManager;
-      SignInManager = signInManager;
     }
 
     public ApplicationSignInManager SignInManager
@@ -539,10 +635,18 @@ namespace CornerkickWebMvc.Controllers
     {
       MvcApplication.ckcore.tl.writeLog("Login of user: " + model.Email);
 
-      if (!ModelState.IsValid)
-      {
-        return View(model);
+      if (!ModelState.IsValid) return View(model);
+
+#if _EMAIL_CONFIRMATION
+      // Require the user to have a confirmed email before they can log on.
+      var user = await UserManager.FindByNameAsync(model.Email);
+      if (user != null) {
+        if (!await UserManager.IsEmailConfirmedAsync(user.Id)) {
+          ViewBag.errorMessage = "Um Dich einloggen zu können, musst Du deine e-mail bestätigen! Bitte überprüfe Deinen e-mail Account.";
+          return View("Error");
+        }
       }
+#endif
 
       // Anmeldefehler werden bezüglich einer Kontosperre nicht gezählt.
       // Wenn Sie aktivieren möchten, dass Kennwortfehler eine Sperre auslösen, ändern Sie in "shouldLockout: true".
@@ -553,7 +657,7 @@ namespace CornerkickWebMvc.Controllers
       {
         case SignInStatus.Success:
           //appUser = new ApplicationUser { UserName = model.Email, Email = model.Email };
-          appUser = await UserManager.FindByNameAsync(model.Email);
+          ApplicationUser appUser = await UserManager.FindByNameAsync(model.Email);
           if (appUser == null/* || !(await UserManager.IsEmailConfirmedAsync(appUser.Id))*/) {
             // Don't reveal that the user does not exist or is not confirmed
 
@@ -578,66 +682,64 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-      //
-      // GET: /Account/VerifyCode
-      [AllowAnonymous]
-      public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
-      {
-          // Verlangen, dass sich der Benutzer bereits mit seinem Benutzernamen/Kennwort oder einer externen Anmeldung angemeldet hat.
-          if (!await SignInManager.HasBeenVerifiedAsync())
-          {
-              return View("Error");
-          }
-          return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
-      }
+    //
+    // GET: /Account/VerifyCode
+    [AllowAnonymous]
+    public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
+    {
+      // Verlangen, dass sich der Benutzer bereits mit seinem Benutzernamen/Kennwort oder einer externen Anmeldung angemeldet hat.
+      if (!await SignInManager.HasBeenVerifiedAsync()) return View("Error");
 
-      //
-      // POST: /Account/VerifyCode
-      [HttpPost]
-      [AllowAnonymous]
-      [ValidateAntiForgeryToken]
-      public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
-      {
-          if (!ModelState.IsValid)
-          {
-              return View(model);
-          }
+      return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+    }
 
-          // Der folgende Code schützt vor Brute-Force-Angriffen der zweistufigen Codes. 
-          // Wenn ein Benutzer in einem angegebenen Zeitraum falsche Codes eingibt, wird das Benutzerkonto 
-          // für einen bestimmten Zeitraum gesperrt. 
-          // Sie können die Einstellungen für Kontosperren in "IdentityConfig" konfigurieren.
-          var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
-          switch (result)
-          {
-              case SignInStatus.Success:
-                  return RedirectToLocal(model.ReturnUrl);
-              case SignInStatus.LockedOut:
-                  return View("Lockout");
-              case SignInStatus.Failure:
-              default:
-                  ModelState.AddModelError("", "Ungültiger Code.");
-                  return View(model);
-          }
-      }
+    //
+    // POST: /Account/VerifyCode
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
+    {
+      if (!ModelState.IsValid) return View(model);
 
-      //
-      // GET: /Account/Register
-      [AllowAnonymous]
-      public ActionResult Register()
+      // Der folgende Code schützt vor Brute-Force-Angriffen der zweistufigen Codes. 
+      // Wenn ein Benutzer in einem angegebenen Zeitraum falsche Codes eingibt, wird das Benutzerkonto 
+      // für einen bestimmten Zeitraum gesperrt. 
+      // Sie können die Einstellungen für Kontosperren in "IdentityConfig" konfigurieren.
+      var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+      switch (result)
       {
-          return View();
+        case SignInStatus.Success:
+          return RedirectToLocal(model.ReturnUrl);
+        case SignInStatus.LockedOut:
+          return View("Lockout");
+        case SignInStatus.Failure:
+        default:
+          ModelState.AddModelError("", "Ungültiger Code.");
+          return View(model);
       }
+    }
+
+    //
+    // GET: /Account/Register
+    [AllowAnonymous]
+    public ActionResult Register()
+    {
+      return View();
+    }
 
     //
     // POST: /Account/Register
-    public static ApplicationUser appUser;
     private RegisterViewModel rvmDEBUG;
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase file)
     {
+      // Set land hard-coded. Can be removed when disabled is removed from DropDownListFor in Register.cshtml
+      model.Land = 36; // GER
+
+      // Check emblem
       if (file != null) {
         List<string> sImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
         if (!sImageExtensions.Contains(Path.GetExtension(file.FileName).ToUpperInvariant())) {
@@ -648,37 +750,43 @@ namespace CornerkickWebMvc.Controllers
 
       DebugInfo("Register");
 
+      bool bAdminFirst = false;
+#if !DEBUG
+      // first user must be admin
+      if (MvcApplication.ckcore.ltUser.Count == 0) {
+        if (!checkUserIsAdmin(model)) return View(model);
+      }
+
+      // Set admin details
+      if (MvcApplication.ckcore.ltUser.Count == 0) {
+        model.Vorname = "Admin";
+        model.Nachname = "Admin";
+        model.Verein = "Computer";
+      }
+
+      bAdminFirst = true;
+#endif
+
       MvcApplication.ckcore.tl.writeLog("Register new user: " + model.Vorname + " " + model.Nachname + ", Team: " + model.Verein);
 
       if (ModelState.IsValid) {
         //appUser = new ApplicationUser { UserName = model.Vorname + " " + model.Nachname, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
-        appUser = new ApplicationUser { UserName = model.Email, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
-
-        // first user must be admin
-        if (MvcApplication.ckcore.ltUser.Count == 0) {
-          if (!checkUserIsAdmin(model)) return View(model);
-        }
+        ApplicationUser appUser = new ApplicationUser { UserName = model.Email, Email = model.Email, Vorname = model.Vorname, Nachname = model.Nachname, Vereinsname = model.Verein };
 
         var result = await UserManager.CreateAsync(appUser, model.Password);
         MvcApplication.ckcore.tl.writeLog("  Register succeeded: " + result.Succeeded.ToString());
 
         if (result.Succeeded) {
-          await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
-
-          // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
-          // E-Mail-Nachricht mit diesem Link senden
-          // string code = await UserManager.GenerateEmailConfirmationTokenAsync(usr.Id);
-          // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = usr.Id, code = code }, protocol: Request.Url.Scheme);
-          // await UserManager.SendEmailAsync(usr.Id, "Konto bestätigen", "Bitte bestätigen Sie Ihr Konto. Klicken Sie dazu <a href=\"" + callbackUrl + "\">hier</a>");
-
           rvmDEBUG = model;
 
-          if (MvcApplication.ckcore.ltUser.Count == 0/* && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
-            CornerkickCore.Core.User usrAdmin = createUser(appUser);
+          if (MvcApplication.ckcore.ltUser.Count == 0/* && bAdminFirst && MvcApplication.ckcore.ltClubs.Count == 0*/) { // admin user
+            await SignInManager.SignInAsync(appUser, isPersistent:false, rememberBrowser:false);
+
+            CornerkickManager.User usrAdmin = createUser(appUser);
             MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
             // Initialize dummy club
-            CornerkickCore.Core.Club club0 = MvcApplication.ckcore.ini.newClub();
+            CornerkickManager.Club club0 = new CornerkickManager.Club();
             club0.iId = 0;
             club0.sName = "Computer";
 
@@ -692,26 +800,36 @@ namespace CornerkickWebMvc.Controllers
             MvcApplication.ckcore.ltClubs.Add(club0);
             // END Initialize dummy club
           } else { // no admin
+#if _EMAIL_CONFIRMATION
+            // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
+            // E-Mail-Nachricht mit diesem Link senden
+            string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
+            MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
+            await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+
+            // Uncomment to debug locally 
+            // TempData["ViewBagLink"] = callbackUrl;
+
+            ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-Konto zu bestätigen!";
+#else
+            await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
+#endif
+
+            // Create club
             addUserToCk(appUser, model);
-            uploadFile(file, ckClub().iId);
+            CornerkickManager.Club clb = ckClub();
+            if (clb != null) uploadFile(file, ckClub().iId);
             iniCk();
           }
 
-          MvcApplication.save();
-          /*
-#if DEBUG
-          MvcApplication.ckcore.io.save("C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\save\\.autosave.ck");
-#else
-          var path = Server.MapPath("~/save");
-          if (!System.IO.Directory.Exists(path)) {
-            System.IO.Directory.CreateDirectory(path);
-          }
-          MvcApplication.ckcore.io.save(System.Web.HttpContext.Current.Server.MapPath("~/save/.autosave.ck"));
+          MvcApplication.save(MvcApplication.timerCkCalender);
+
+#if _EMAIL_CONFIRMATION
+          return View("Info");
 #endif
-          */
 
           return RedirectToAction("Desk", "Member");
-          //return RedirectToAction("Index", "Home");
         }
 
         AddErrors(result);
@@ -725,7 +843,7 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public ActionResult CheckExistingTeamName(string Verein)
     {
-      foreach (CornerkickCore.Core.Club clubExist in MvcApplication.ckcore.ltClubs) {
+      foreach (CornerkickManager.Club clubExist in MvcApplication.ckcore.ltClubs) {
         if (clubExist.sName.Equals(Verein)) return Json(false, JsonRequestBehavior.AllowGet);
       }
       return Json(true, JsonRequestBehavior.AllowGet);
@@ -739,15 +857,14 @@ namespace CornerkickWebMvc.Controllers
     //
     // GET: /Account/ConfirmEmail
     [AllowAnonymous]
-      public async Task<ActionResult> ConfirmEmail(string userId, string code)
-      {
-          if (userId == null || code == null)
-          {
-              return View("Error");
-          }
-          var result = await UserManager.ConfirmEmailAsync(userId, code);
-          return View(result.Succeeded ? "ConfirmEmail" : "Error");
-      }
+    public async Task<ActionResult> ConfirmEmail(string userId, string code)
+    {
+      if (userId == null || code == null) return View("Error");
+
+      var result = await UserManager.ConfirmEmailAsync(userId, code);
+
+      return View(result.Succeeded ? "ConfirmEmail" : "Error");
+    }
 
       //
       // GET: /Account/ForgotPassword

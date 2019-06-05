@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define _USE_BLOB
+#define _DEPLOY_ON_APPHB
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,25 +24,39 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult Settings(Models.AdminModel modelAdmin)
     {
-      modelAdmin.bCk = MvcApplication.ckcore != null;
-      modelAdmin.bTimer = MvcApplication.timerCkCalender.Enabled;
-      modelAdmin.fCalenderInterval = MvcApplication.timerCkCalender.Interval / 1000;
+      if (MvcApplication.ckcore == null) {
+        modelAdmin.bCk = false;
+        return View(modelAdmin);
+      }
+      modelAdmin.bCk = true;
+
+      if (MvcApplication.timerCkCalender != null) {
+        modelAdmin.bTimer            = MvcApplication.timerCkCalender.Enabled;
+        modelAdmin.fCalendarInterval = MvcApplication.timerCkCalender.Interval / 1000;
+      }
+
+      if (MvcApplication.timerSave != null) {
+        modelAdmin.bTimerSave = MvcApplication.timerSave.Enabled;
+      }
 
       modelAdmin.sStartHour = "";
       if (MvcApplication.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.iStartHour.ToString();
 
-      if (MvcApplication.ckcore.ltUser.Count > 0) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
 
       modelAdmin.nClubs  = MvcApplication.ckcore.ltClubs .Count;
       modelAdmin.nUser   = MvcApplication.ckcore.ltUser  .Count;
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
       string sHomeDir = getHomeDir();
-      modelAdmin.bLogExist      = System.IO.File.Exists(sHomeDir + "log/ck.log");
+      modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "/log/ck.log");
 
       //DirectoryInfo d = new DirectoryInfo(sHomeDir + "save");
       //FileInfo[] ltCkxFiles = d.GetFiles("*.ckx");
-      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "save/.autosave.ckx");
+      modelAdmin.bAutosaveExist = System.IO.File.Exists(sHomeDir + "/save/.autosave.ckx");
+      modelAdmin.bSaveDirExist  = System.IO.Directory.Exists(sHomeDir + "/save");
+
+      if (MvcApplication.clubAdmin != null) modelAdmin.iSelectedClubAdmin = MvcApplication.clubAdmin.iId;
 
       return View(modelAdmin);
     }
@@ -57,30 +74,82 @@ namespace CornerkickWebMvc.Controllers
         int.TryParse(modelAdmin.sStartHour, out MvcApplication.iStartHour);
       }
 
-      if (modelAdmin.fCalenderInterval < 1E-6) {
+      if (modelAdmin.fCalendarInterval < 1E-6) {
         MvcApplication.timerCkCalender.Enabled = false;
         return View(modelAdmin);
       }
 
-      for (int iU = 0; iU < MvcApplication.ckcore.ltUser.Count; iU++) {
-        CornerkickCore.Core.User user = MvcApplication.ckcore.ltUser[iU];
-        user.nextGame.iGameSpeed = modelAdmin.iGameSpeed;
-        MvcApplication.ckcore.ltUser[iU] = user;
+      // If first step: Add CPU teams
+      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
+        Controllers.AccountController accountController = new Controllers.AccountController();
+
+        foreach (int iLand in MvcApplication.iNations) {
+          CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
+          if (cup == null) {
+            // Create nat. cup
+            cup = new CornerkickManager.Cup(bKo: true);
+            cup.iId = 2;
+            cup.iId2 = iLand;
+            MvcApplication.ckcore.ltCups.Add(cup);
+          }
+
+          // Create league
+          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand);
+          if (league == null) {
+            league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
+            league.iId = 1;
+            league.iId2 = iLand;
+            MvcApplication.ckcore.ltCups.Add(league);
+          }
+
+          // Only GER (remove to use full iNations)
+          //break;
+
+          int iC = 0;
+          while (league.ltClubs[0].Count < 16) {
+            CornerkickManager.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[iLand] + "_" + (iC + 1).ToString(), (byte)iLand, 0);
+            MvcApplication.ckcore.ltClubs.Add(clb);
+
+            cup   .ltClubs[0].Add(clb);
+            league.ltClubs[0].Add(clb);
+
+            iC++;
+          }
+
+          MvcApplication.ckcore.calcMatchdays();
+          MvcApplication.ckcore.drawCup(league);
+        }
       }
+
+      setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
 
       // Do one step now
       MvcApplication.ckcore.next(true);
 
       // Start the timer
-      MvcApplication.timerCkCalender.Interval = modelAdmin.fCalenderInterval * 1000;
+      MvcApplication.timerCkCalender.Interval = modelAdmin.fCalendarInterval * 1000;
       MvcApplication.timerCkCalender.Enabled = true;
 
+      // Save last state
+      MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
+
       return RedirectToAction("Settings");
+    }
+
+    internal void setGameSpeedToAllUsers(int iGameSpeed)
+    {
+      foreach (CornerkickManager.User user in MvcApplication.ckcore.ltUser) {
+        if (user.nextGame != null) user.nextGame.iGameSpeed = iGameSpeed;
+      }
     }
 
     public ActionResult StopCalendar(Models.AdminModel modelAdmin)
     {
       MvcApplication.timerCkCalender.Enabled = false;
+      MvcApplication.timerSave.Enabled = true;
+
+      // Save last state
+      MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
 
       return RedirectToAction("Settings");
       //return View("Settings", "");
@@ -98,9 +167,24 @@ namespace CornerkickWebMvc.Controllers
       //return View(modelAdmin);
     }
 
+    public ActionResult SaveAutosave()
+    {
+      MvcApplication.save(MvcApplication.timerCkCalender, true);
+
+      return RedirectToAction("Settings");
+    }
+
     public ActionResult DeleteAutosave()
     {
-      if (System.IO.File.Exists(getHomeDir() + "save/.autosave.ckx")) System.IO.File.Delete(getHomeDir() + "save/.autosave.ckx");
+      if (System.IO.File.Exists(getHomeDir() + "/save/.autosave.ckx")) System.IO.File.Delete(getHomeDir() + "/save/.autosave.ckx");
+
+      return RedirectToAction("Settings");
+    }
+
+    public ActionResult DeleteSaveFolder()
+    {
+      if (System.IO.Directory.Exists(getHomeDir() + "/save"))          System.IO.Directory.Delete(getHomeDir() + "/save", true);
+      if (System.IO.File     .Exists(getHomeDir() + "/laststate.txt")) System.IO.File     .Delete(getHomeDir() + "/laststate.txt");
 
       return RedirectToAction("Settings");
     }
@@ -108,12 +192,12 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public ActionResult LoadAutosave(Models.AdminModel modelAdmin)
     {
-      if (System.IO.File.Exists(getHomeDir() + "save/" + modelAdmin.sSelectedAutosaveFile)) {
+      if (System.IO.File.Exists(getHomeDir() + "/save/" + modelAdmin.sSelectedAutosaveFile)) {
         MvcApplication.timerCkCalender.Enabled = false;
 
         MvcApplication.newCk();
 
-        MvcApplication.ckcore.io.load(getHomeDir() + "save/" + modelAdmin.sSelectedAutosaveFile);
+        MvcApplication.ckcore.io.load(getHomeDir() + "/save/" + modelAdmin.sSelectedAutosaveFile);
       }
 
       return RedirectToAction("Settings");
@@ -121,7 +205,8 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult Log(Models.AdminModel modelAdmin)
     {
-      modelAdmin.sLog = "";
+      modelAdmin.ltLog = new List<string>();
+      modelAdmin.ltErr = new List<string>();
 
       /*
       if (MvcApplication.ckcore != null) {
@@ -137,15 +222,34 @@ namespace CornerkickWebMvc.Controllers
       foreach (string s in MvcApplication.ltLog) modelAdmin.sLog += s + '\n';
       */
 
+      // Log
       try {
         // Create an instance of StreamReader to read from a file.
         // The using statement also closes the StreamReader.
-        using (StreamReader sr = new StreamReader(getHomeDir() + "ck.log")) {
+        using (StreamReader sr = new StreamReader(getHomeDir() + "/log/ck.log")) {
           string sLine;
           // Read and display lines from the file until the end of 
           // the file is reached.
           while ((sLine = sr.ReadLine()) != null) {
-            modelAdmin.sLog += sLine + '\n';
+            modelAdmin.ltLog.Add(sLine);
+          }
+        }
+      } catch (Exception e) {
+        // Let the user know what went wrong.
+        Console.WriteLine("The file could not be read:");
+        Console.WriteLine(e.Message);
+      }
+
+      // Error
+      try {
+        // Create an instance of StreamReader to read from a file.
+        // The using statement also closes the StreamReader.
+        using (StreamReader sr = new StreamReader(getHomeDir() + "/log/error.log")) {
+          string sLine;
+          // Read and display lines from the file until the end of 
+          // the file is reached.
+          while ((sLine = sr.ReadLine()) != null) {
+            modelAdmin.ltErr.Add(sLine);
           }
         }
       } catch (Exception e) {
@@ -159,15 +263,48 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult DeleteLog(Models.AdminModel modelAdmin)
     {
-      MvcApplication.ckcore.log.Clear();
-
-      var diLog = new DirectoryInfo(getHomeDir() + "log");
+      var diLog = new DirectoryInfo(getHomeDir() + "/log");
       foreach (var file in diLog.EnumerateFiles("*.log")) {
         file.Delete();
       }
-      if (System.IO.File.Exists(getHomeDir() + "log.zip")) System.IO.File.Delete(getHomeDir() + "log.zip");
+      if (System.IO.File.Exists(getHomeDir() + "/log.zip")) System.IO.File.Delete(getHomeDir() + "/log.zip");
 
       return RedirectToAction("Settings");
+    }
+
+    public ActionResult getFilesInDirectory(string sDir = "")
+    {
+      //if (string.IsNullOrEmpty(sDir) || sDir.Equals(".")) sDir = Server.MapPath("~");
+      sDir = Path.Combine(Server.MapPath("~"), sDir);
+
+      DirectoryInfo d = new DirectoryInfo(sDir);
+      if (!d.Exists) {
+        //Response.StatusCode = 1;
+        return Json(new string[] { "Directory does not exist!" }, JsonRequestBehavior.AllowGet);
+      }
+
+      string sContent = ".." + '\n';
+
+      // First get directories
+      foreach (string sSubDir in Directory.GetDirectories(sDir)) {
+        sContent += "<DIR> " + Path.GetFileName(sSubDir) + '\n';
+      }
+
+      // then get files
+      //return Json(d.GetFiles("*").ToArray(), JsonRequestBehavior.AllowGet);
+      foreach (FileInfo fi in d.GetFiles("*")) {
+        sContent += fi.Name + '\n';
+      }
+
+      return Json(sContent, JsonRequestBehavior.AllowGet);
+    }
+
+    public void SetAdminClub(int iClubIx)
+    {
+      if (iClubIx <                                    0) return;
+      if (iClubIx >= MvcApplication.ckcore.ltClubs.Count) return;
+
+      MvcApplication.clubAdmin = MvcApplication.ckcore.ltClubs[iClubIx];
     }
 
     public string getHomeDir()
@@ -175,16 +312,14 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #endif
-      return System.Web.HttpContext.Current.Server.MapPath("~/");
+#if _DEPLOY_ON_APPHB
+      return Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "App_Data");
+#endif
+
+      return System.Web.HttpContext.Current.Server.MapPath("~");
     }
 
-    public ActionResult SaveAutosave()
-    {
-      MvcApplication.save(true);
-
-      return RedirectToAction("Settings");
-    }
-
+#if _USE_BLOB
     public ActionResult CreateBlobContainer()
     {
       CloudBlobContainer container = MvcApplication.GetCloudBlobContainer();
@@ -194,5 +329,6 @@ namespace CornerkickWebMvc.Controllers
       return View();
     }
 
+#endif
   }
 }

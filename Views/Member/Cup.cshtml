@@ -5,94 +5,42 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script src="~/Scripts/Cup.js" type="text/javascript"></script>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
+  <script type="text/javascript" src="~/Scripts/Cup.js"></script>
 
-<script>
-  $(document).ready(function () {
-    setCup();
-  });
+  <script>
+    $(document).ready(function () {
+      changeLand(1);
+    });
 
-  function setCup() {
-    var iSpTg = $('#ddlCupSpieltag').val();
-    setCup2(iSpTg);
-  }
-</script>
-
-@{
-  string sLand = MvcApplication.ckcore.sLand[MvcApplication.ckcore.iNatUmrechnung[Model.iLand + 1]];
-}
-<h2>Land @sLand</h2>
-
-<h4>Begegnungen</h4>
-
-@Html.LabelFor(m => m.iSpTg, new { @class = "col-md-2 control-label" })
-@Html.DropDownListFor(m => m.iSpTg, Model.ltDdlSpTg, new { @class = "form-horizontal", @onchange = "setCup()", id = "ddlCupSpieltag" })
-
-@{
-  var dt = new DateTime();
-  CornerkickCore.Core.Cup cup = MvcApplication.ckcore.tl.getCup(Model.iLand, 2);
-  if (Model.iSpTg < Model.ltErg.Count) {
-    if (cup.ltMatchdays != null) { dt = cup.ltMatchdays[Model.iSpTg].dt; }
-  }
-
-  string[] sClubNames = new string[MvcApplication.ckcore.ltClubs.Count];
-  int i = 0;
-  foreach (CornerkickCore.Core.Club club in MvcApplication.ckcore.ltClubs) {
-    string sId = "idClubNames" + i++.ToString();
-    <div id="@sId" data-name="@club.sName"></div>
-  }
-
-  if (Model.iLand >= 0) {
-    if (MvcApplication.ckcore.ltDtSpieltagLiga[Model.iLand] != null) {
-      int j = 0;
-      foreach (CornerkickCore.Core.Matchday gd in cup.ltMatchdays) {
-        string sIdDay = "idDtDay" + j.ToString();
-        <div id="@sIdDay" data-name="@gd.dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-        string sIdHour = "idDtHour" + j.ToString();
-        <div id="@sIdHour" data-name="@gd.dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-
-        j++;
-      }
+    function setCup() {
+      setCup2(1);
     }
-  }
-}
-<div id="dtDayId" data-name="@dt.ToString("d", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-<div id="dtHourId" data-name="@dt.ToString("t", CornerkickWebMvc.Controllers.AccountController.ciUser)"></div>
-<div id="idClubUser" data-name="@CornerkickWebMvc.Controllers.AccountController.ckClub().iId"></div>
+  </script>
+</head>
 
-<div id="tableDivCupTeams"></div>
-
-<h4>Torschützen</h4>
-<table class="tStat" style="width: auto" border="0" cellpadding="2" summary="Torschuetzen">
-  <tr>
-    <th colspan="2">Pl.</th>
-    <th>Spieler</th>
-    <th>Verein</th>
-    <th style="text-align:right">Tore</th>
-    <th style="text-align:right">Vorl.</th>
-    <th style="text-align:right">Scor.</th>
-  </tr>
-
-  @{ int iPlatz = 0; }
+<body style="height: 100%; min-height: 100%">
   @{
-    foreach (CornerkickCore.UI.Scorer sc in Model.ltScorer) {
-      iPlatz++;
-      string sStyle2 = "";
-      if (MvcApplication.ckcore.ltPlayer[sc.iId].iClubId == CornerkickWebMvc.Controllers.AccountController.ckClub().iId) {
-        sStyle2 = "font-weight:bold";
-      }
-      int iScorer = sc.iGoals + sc.iAssists;
-
-      <tr style=@sStyle2 class=" ">
-        <td class="first">@iPlatz</td>
-        <td><img src="http://mediadb.kicker.de/library/images/tendenz-hold.png" alt="" /></td>
-        <td>@sc.sName</td>
-        <td>@sc.sTeam</td>
-        <td align="right">@sc.iGoals</td>
-        <td align="right">@sc.iAssists</td>
-        <td align="right">@iScorer</td>
-      </tr>
+    string sLand = "";
+    if (Model.iLand >= 0 && Model.iLand < MvcApplication.ckcore.sLand.Length) {
+      sLand = MvcApplication.ckcore.sLand[Model.iLand];
     }
   }
-</table>
+  <label>
+    Land:
+    @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(1, 0)", id = "ddlLandCup" })
+  </label>
+
+  <label style="margin-left: 10px">
+    Spieltag:
+    <select id="ddlMatchdayCup" onchange="setCup()"></select>
+  </label>
+
+  <h4>Begegnungen</h4>
+  <div id="tableDivCupTeams"></div>
+
+  <div id="divCupScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+</body>
+</html>

@@ -15,7 +15,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CornerkickWebMvc</RootNamespace>
     <AssemblyName>CornerkickWebMvc</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
@@ -27,6 +27,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <WebGreaseLibPath>packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,21 +56,28 @@
       <HintPath>packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CornerkickCore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\CornerkickCore.dll</HintPath>
+    <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>packages\AWSSDK.Core.3.3.31.12\lib\net45\AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>packages\AWSSDK.S3.3.3.31.20\lib\net45\AWSSDK.S3.dll</HintPath>
     </Reference>
     <Reference Include="CornerkickGame, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\CornerkickGame.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
-      <HintPath>packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="CornerkickManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\CornerkickManager.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.5.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Protobuf.3.5.1\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept">
       <HintPath>packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
@@ -164,23 +172,40 @@
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=9.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\WindowsAzure.Storage.9.1.0\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>packages\MySql.Data.Entity.6.9.12\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Nupload, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nupload.1.0.1\lib\Nupload.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
       <HintPath>packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SendGrid, Version=9.10.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
+      <HintPath>packages\Sendgrid.9.10.0\lib\net452\SendGrid.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Cors">
       <HintPath>packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
       <Private>True</Private>
@@ -189,8 +214,7 @@
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers">
       <HintPath>packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
       <Private>True</Private>
@@ -231,9 +255,7 @@
       <HintPath>packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
@@ -244,12 +266,14 @@
     </Reference>
     <Reference Include="System.Net.Http.WebRequest">
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease">
       <HintPath>packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmazonS3FileTransfer.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
@@ -295,6 +319,7 @@
     <Compile Include="Models\SponsorModel.cs" />
     <Compile Include="Models\StadionModel.cs" />
     <Compile Include="Models\StadiumSurroundingsModel.cs" />
+    <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="Models\TaktikModel.cs" />
     <Compile Include="Models\TeamModels.cs" />
     <Compile Include="Models\TrainingModel.cs" />
@@ -302,6 +327,9 @@
     <Compile Include="Models\UserManualModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\ViewGameModel.cs" />
+    <Compile Include="MySqlConfiguration.cs" />
+    <Compile Include="MySqlHistoryContext.cs" />
+    <Compile Include="MySqlInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -476,26 +504,106 @@
     <Content Include="Content\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar.print.css" />
     <Content Include="Content\fullcalendar.print.min.css" />
-    <Content Include="Content\Icons\ambulance.ico" />
-    <Content Include="Content\Icons\ambulance2.ico" />
-    <Content Include="Content\Icons\arrow_down.ico" />
-    <Content Include="Content\Icons\arrow_downleft.ico" />
-    <Content Include="Content\Icons\arrow_left.ico" />
-    <Content Include="Content\Icons\arrow_up.ico" />
-    <Content Include="Content\Icons\arrow_upleft.ico" />
+    <Content Include="Content\Icons\ambulance.png" />
+    <Content Include="Content\Icons\ambulance2.png" />
     <Content Include="Content\Icons\ball_cyan.png" />
+    <Content Include="Content\Icons\ball_cyan_penalty.png" />
     <Content Include="Content\Icons\ball_white.png" />
+    <Content Include="Content\Icons\ball_white_penalty.png" />
     <Content Include="Content\Icons\ball_yellow.png" />
+    <Content Include="Content\Icons\ball_yellow_penalty.png" />
+    <Content Include="Content\Icons\captain.png" />
+    <Content Include="Content\Icons\captain2.png" />
+    <Content Include="Content\Icons\duel_def_0.png" />
+    <Content Include="Content\Icons\duel_def_1.png" />
+    <Content Include="Content\Icons\duel_off_0.png" />
+    <Content Include="Content\Icons\duel_off_1.png" />
+    <Content Include="Content\Icons\flags\0.png" />
+    <Content Include="Content\Icons\flags\ALB.png" />
+    <Content Include="Content\Icons\flags\ARG.png" />
+    <Content Include="Content\Icons\flags\AUS.png" />
+    <Content Include="Content\Icons\flags\AUT.png" />
+    <Content Include="Content\Icons\flags\BEL.png" />
+    <Content Include="Content\Icons\flags\BFA.png" />
+    <Content Include="Content\Icons\flags\BIH.png" />
+    <Content Include="Content\Icons\flags\BOL.png" />
+    <Content Include="Content\Icons\flags\BRA.png" />
+    <Content Include="Content\Icons\flags\BUL.png" />
+    <Content Include="Content\Icons\flags\CAN.png" />
+    <Content Include="Content\Icons\flags\CH.png" />
+    <Content Include="Content\Icons\flags\CHI.png" />
+    <Content Include="Content\Icons\flags\CHN.png" />
+    <Content Include="Content\Icons\flags\CIV.png" />
+    <Content Include="Content\Icons\flags\CMR.png" />
+    <Content Include="Content\Icons\flags\COD.png" />
+    <Content Include="Content\Icons\flags\COG.png" />
+    <Content Include="Content\Icons\flags\COL.png" />
+    <Content Include="Content\Icons\flags\CRC.png" />
+    <Content Include="Content\Icons\flags\CRO.png" />
+    <Content Include="Content\Icons\flags\DEN.png" />
+    <Content Include="Content\Icons\flags\ECU.png" />
+    <Content Include="Content\Icons\flags\EGY.png" />
+    <Content Include="Content\Icons\flags\ENG.png" />
+    <Content Include="Content\Icons\flags\ESP.png" />
+    <Content Include="Content\Icons\flags\FIN.png" />
+    <Content Include="Content\Icons\flags\FRA.png" />
+    <Content Include="Content\Icons\flags\GEO.png" />
+    <Content Include="Content\Icons\flags\GER.png" />
+    <Content Include="Content\Icons\flags\GHA.png" />
+    <Content Include="Content\Icons\flags\GRE.png" />
+    <Content Include="Content\Icons\flags\HON.png" />
+    <Content Include="Content\Icons\flags\ISL.png" />
+    <Content Include="Content\Icons\flags\ITA.png" />
+    <Content Include="Content\Icons\flags\JAM.png" />
+    <Content Include="Content\Icons\flags\JPN.png" />
+    <Content Include="Content\Icons\flags\KOL.png" />
+    <Content Include="Content\Icons\flags\MAR.png" />
+    <Content Include="Content\Icons\flags\MEX.png" />
+    <Content Include="Content\Icons\flags\MKD.png" />
+    <Content Include="Content\Icons\flags\MNE.png" />
+    <Content Include="Content\Icons\flags\NED.png" />
+    <Content Include="Content\Icons\flags\NGA.png" />
+    <Content Include="Content\Icons\flags\NIR.png" />
+    <Content Include="Content\Icons\flags\NOR.png" />
+    <Content Include="Content\Icons\flags\PAR.png" />
+    <Content Include="Content\Icons\flags\PER.png" />
+    <Content Include="Content\Icons\flags\POL.png" />
+    <Content Include="Content\Icons\flags\POR.png" />
+    <Content Include="Content\Icons\flags\PRK.png" />
+    <Content Include="Content\Icons\flags\ROU.png" />
+    <Content Include="Content\Icons\flags\RUS.png" />
+    <Content Include="Content\Icons\flags\SCO.png" />
+    <Content Include="Content\Icons\flags\SEN.png" />
+    <Content Include="Content\Icons\flags\SLE.png" />
+    <Content Include="Content\Icons\flags\SRB.png" />
+    <Content Include="Content\Icons\flags\SVK.png" />
+    <Content Include="Content\Icons\flags\SVN.png" />
+    <Content Include="Content\Icons\flags\SWE.png" />
+    <Content Include="Content\Icons\flags\TGO.png" />
+    <Content Include="Content\Icons\flags\TUN.png" />
+    <Content Include="Content\Icons\flags\TUR.png" />
+    <Content Include="Content\Icons\flags\UKR.png" />
+    <Content Include="Content\Icons\flags\URU.png" />
+    <Content Include="Content\Icons\flags\USA.png" />
+    <Content Include="Content\Icons\flags\VEN.png" />
+    <Content Include="Content\Icons\flags\WAL.png" />
+    <Content Include="Content\Icons\flags\ZAF.png" />
+    <Content Include="Content\Icons\form0.png" />
+    <Content Include="Content\Icons\form1.png" />
+    <Content Include="Content\Icons\form2.png" />
+    <Content Include="Content\Icons\form3.png" />
+    <Content Include="Content\Icons\form4.png" />
     <Content Include="Content\Icons\minus.png" />
     <Content Include="Content\Icons\plus.png" />
-    <Content Include="Content\Icons\RCard.bmp" />
+    <Content Include="Content\Icons\rCard.png" />
     <Content Include="Content\Icons\sub.png" />
     <Content Include="Content\Icons\weather\0.gif" />
     <Content Include="Content\Icons\weather\1.gif" />
     <Content Include="Content\Icons\weather\2.gif" />
     <Content Include="Content\Icons\weather\3.gif" />
-    <Content Include="Content\Icons\YCard.bmp" />
-    <Content Include="Content\Icons\YRCard.bmp" />
+    <Content Include="Content\Icons\whistle.png" />
+    <Content Include="Content\Icons\yCard.png" />
+    <Content Include="Content\Icons\yrCard.png" />
     <Content Include="Content\Images\10.jpg" />
     <Content Include="Content\Images\arrow_down.png" />
     <Content Include="Content\Images\arrow_left.png" />
@@ -504,292 +612,6 @@
     <Content Include="Content\Images\ball_red.png" />
     <Content Include="Content\Images\ball_white.png" />
     <Content Include="Content\Images\ball_yellow.png" />
-    <Content Include="Content\Images\flags\0.png" />
-    <Content Include="Content\Images\flags\1.png" />
-    <Content Include="Content\Images\flags\10.png" />
-    <Content Include="Content\Images\flags\101.png" />
-    <Content Include="Content\Images\flags\103.png" />
-    <Content Include="Content\Images\flags\107.png" />
-    <Content Include="Content\Images\flags\108.png" />
-    <Content Include="Content\Images\flags\110.png" />
-    <Content Include="Content\Images\flags\111.png" />
-    <Content Include="Content\Images\flags\115.png" />
-    <Content Include="Content\Images\flags\117.png" />
-    <Content Include="Content\Images\flags\12.png" />
-    <Content Include="Content\Images\flags\126.png" />
-    <Content Include="Content\Images\flags\129.png" />
-    <Content Include="Content\Images\flags\13.png" />
-    <Content Include="Content\Images\flags\133.png" />
-    <Content Include="Content\Images\flags\136.png" />
-    <Content Include="Content\Images\flags\138.png" />
-    <Content Include="Content\Images\flags\14.png" />
-    <Content Include="Content\Images\flags\140.png" />
-    <Content Include="Content\Images\flags\144.png" />
-    <Content Include="Content\Images\flags\145.png" />
-    <Content Include="Content\Images\flags\15.png" />
-    <Content Include="Content\Images\flags\166.png" />
-    <Content Include="Content\Images\flags\17.png" />
-    <Content Include="Content\Images\flags\19.png" />
-    <Content Include="Content\Images\flags\2.png" />
-    <Content Include="Content\Images\flags\20.png" />
-    <Content Include="Content\Images\flags\206.png" />
-    <Content Include="Content\Images\flags\23.png" />
-    <Content Include="Content\Images\flags\24.png" />
-    <Content Include="Content\Images\flags\26.png" />
-    <Content Include="Content\Images\flags\27.png" />
-    <Content Include="Content\Images\flags\3.png" />
-    <Content Include="Content\Images\flags\35.png" />
-    <Content Include="Content\Images\flags\36.png" />
-    <Content Include="Content\Images\flags\37.png" />
-    <Content Include="Content\Images\flags\38.png" />
-    <Content Include="Content\Images\flags\39.png" />
-    <Content Include="Content\Images\flags\4.png" />
-    <Content Include="Content\Images\flags\40.png" />
-    <Content Include="Content\Images\flags\42.png" />
-    <Content Include="Content\Images\flags\43.png" />
-    <Content Include="Content\Images\flags\44.png" />
-    <Content Include="Content\Images\flags\45.png" />
-    <Content Include="Content\Images\flags\46.png" />
-    <Content Include="Content\Images\flags\47.png" />
-    <Content Include="Content\Images\flags\48.png" />
-    <Content Include="Content\Images\flags\49.png" />
-    <Content Include="Content\Images\flags\50.png" />
-    <Content Include="Content\Images\flags\51.png" />
-    <Content Include="Content\Images\flags\52.png" />
-    <Content Include="Content\Images\flags\53.png" />
-    <Content Include="Content\Images\flags\54.png" />
-    <Content Include="Content\Images\flags\55.png" />
-    <Content Include="Content\Images\flags\56.png" />
-    <Content Include="Content\Images\flags\57.png" />
-    <Content Include="Content\Images\flags\58.png" />
-    <Content Include="Content\Images\flags\59.png" />
-    <Content Include="Content\Images\flags\6.png" />
-    <Content Include="Content\Images\flags\60.png" />
-    <Content Include="Content\Images\flags\61.png" />
-    <Content Include="Content\Images\flags\70.png" />
-    <Content Include="Content\Images\flags\72.png" />
-    <Content Include="Content\Images\flags\8.png" />
-    <Content Include="Content\Images\flags\81.png" />
-    <Content Include="Content\Images\flags\82.png" />
-    <Content Include="Content\Images\flags\83.png" />
-    <Content Include="Content\Images\flags\9.png" />
-    <Content Include="Content\Images\flags\95.png" />
-    <Content Include="Content\Images\flags\97.png" />
-    <Content Include="Content\Images\flags\99.png" />
-    <Content Include="Content\Images\flags\Afghanistan.png" />
-    <Content Include="Content\Images\flags\African Union.png" />
-    <Content Include="Content\Images\flags\Aland.png" />
-    <Content Include="Content\Images\flags\Alderney.png" />
-    <Content Include="Content\Images\flags\American Samoa.png" />
-    <Content Include="Content\Images\flags\Angola.png" />
-    <Content Include="Content\Images\flags\Anguilla.png" />
-    <Content Include="Content\Images\flags\Antarctica.png" />
-    <Content Include="Content\Images\flags\Antigua &amp; Barbuda.png" />
-    <Content Include="Content\Images\flags\Arab League.png" />
-    <Content Include="Content\Images\flags\Armenia.png" />
-    <Content Include="Content\Images\flags\Aruba.png" />
-    <Content Include="Content\Images\flags\ASEAN.png" />
-    <Content Include="Content\Images\flags\Australia.png" />
-    <Content Include="Content\Images\flags\Azerbaijan.png" />
-    <Content Include="Content\Images\flags\Bahamas.png" />
-    <Content Include="Content\Images\flags\Bahrain.png" />
-    <Content Include="Content\Images\flags\Bangladesh.png" />
-    <Content Include="Content\Images\flags\Barbados.png" />
-    <Content Include="Content\Images\flags\Basque Country.png" />
-    <Content Include="Content\Images\flags\Belgium.png" />
-    <Content Include="Content\Images\flags\Belize.png" />
-    <Content Include="Content\Images\flags\Bermuda.png" />
-    <Content Include="Content\Images\flags\Bhutan.png" />
-    <Content Include="Content\Images\flags\Botswana.png" />
-    <Content Include="Content\Images\flags\Bouvet.png" />
-    <Content Include="Content\Images\flags\British Indian Ocean Territory.png" />
-    <Content Include="Content\Images\flags\Brunei.png" />
-    <Content Include="Content\Images\flags\Burundi.png" />
-    <Content Include="Content\Images\flags\Cambodja.png" />
-    <Content Include="Content\Images\flags\Cape Verde.png" />
-    <Content Include="Content\Images\flags\CARICOM.png" />
-    <Content Include="Content\Images\flags\Catalonia.png" />
-    <Content Include="Content\Images\flags\Cayman Islands.png" />
-    <Content Include="Content\Images\flags\Central African Republic.png" />
-    <Content Include="Content\Images\flags\Chad.png" />
-    <Content Include="Content\Images\flags\China.png" />
-    <Content Include="Content\Images\flags\Christmas.png" />
-    <Content Include="Content\Images\flags\CIS.png" />
-    <Content Include="Content\Images\flags\Cocos %28Keeling%29.png" />
-    <Content Include="Content\Images\flags\Commonwealth.png" />
-    <Content Include="Content\Images\flags\Comoros.png" />
-    <Content Include="Content\Images\flags\Cook Islands.png" />
-    <Content Include="Content\Images\flags\Cuba.png" />
-    <Content Include="Content\Images\flags\Curacao.png" />
-    <Content Include="Content\Images\flags\Cyprus.png" />
-    <Content Include="Content\Images\flags\Djibouti.png" />
-    <Content Include="Content\Images\flags\Dominica.png" />
-    <Content Include="Content\Images\flags\Dominican Republic.png" />
-    <Content Include="Content\Images\flags\El Salvador.png" />
-    <Content Include="Content\Images\flags\Equatorial Guinea.png" />
-    <Content Include="Content\Images\flags\Eritrea.png" />
-    <Content Include="Content\Images\flags\Ethiopia.png" />
-    <Content Include="Content\Images\flags\European Union.png" />
-    <Content Include="Content\Images\flags\Falkland %28Malvinas%29.png" />
-    <Content Include="Content\Images\flags\FAO.png" />
-    <Content Include="Content\Images\flags\Faroes.png" />
-    <Content Include="Content\Images\flags\Fiji.png" />
-    <Content Include="Content\Images\flags\France.png" />
-    <Content Include="Content\Images\flags\French Southern and Antarctic Lands.png" />
-    <Content Include="Content\Images\flags\French-Guiana.png" />
-    <Content Include="Content\Images\flags\Gabon.png" />
-    <Content Include="Content\Images\flags\Galicia.png" />
-    <Content Include="Content\Images\flags\Gambia.png" />
-    <Content Include="Content\Images\flags\Germany.png" />
-    <Content Include="Content\Images\flags\Gibraltar.png" />
-    <Content Include="Content\Images\flags\Greece.png" />
-    <Content Include="Content\Images\flags\Greenland.png" />
-    <Content Include="Content\Images\flags\Grenada.png" />
-    <Content Include="Content\Images\flags\Guadeloupe.png" />
-    <Content Include="Content\Images\flags\Guademala.png" />
-    <Content Include="Content\Images\flags\Guam.png" />
-    <Content Include="Content\Images\flags\Guernsey.png" />
-    <Content Include="Content\Images\flags\Guinea-Bissau.png" />
-    <Content Include="Content\Images\flags\Guinea.png" />
-    <Content Include="Content\Images\flags\Guyana.png" />
-    <Content Include="Content\Images\flags\Haiti.png" />
-    <Content Include="Content\Images\flags\Heard Island and McDonald.png" />
-    <Content Include="Content\Images\flags\Hong Kong.png" />
-    <Content Include="Content\Images\flags\IAEA.png" />
-    <Content Include="Content\Images\flags\IHO.png" />
-    <Content Include="Content\Images\flags\India.png" />
-    <Content Include="Content\Images\flags\Indonesia.png" />
-    <Content Include="Content\Images\flags\Iran.png" />
-    <Content Include="Content\Images\flags\Iraq.png" />
-    <Content Include="Content\Images\flags\Ireland.png" />
-    <Content Include="Content\Images\flags\Islamic Conference.png" />
-    <Content Include="Content\Images\flags\Isle of Man.png" />
-    <Content Include="Content\Images\flags\Japan.png" />
-    <Content Include="Content\Images\flags\Jersey.png" />
-    <Content Include="Content\Images\flags\Jordan.png" />
-    <Content Include="Content\Images\flags\Kazakhstan.png" />
-    <Content Include="Content\Images\flags\Kenya.png" />
-    <Content Include="Content\Images\flags\Kiribati.png" />
-    <Content Include="Content\Images\flags\Kosovo.png" />
-    <Content Include="Content\Images\flags\Kuwait.png" />
-    <Content Include="Content\Images\flags\Kyrgyzstan.png" />
-    <Content Include="Content\Images\flags\Laos.png" />
-    <Content Include="Content\Images\flags\Latvia.png" />
-    <Content Include="Content\Images\flags\Lebanon.png" />
-    <Content Include="Content\Images\flags\Lesotho.png" />
-    <Content Include="Content\Images\flags\Liberia.png" />
-    <Content Include="Content\Images\flags\Libya.png" />
-    <Content Include="Content\Images\flags\Liechtenstein.png" />
-    <Content Include="Content\Images\flags\Lithuania.png" />
-    <Content Include="Content\Images\flags\Luxembourg.png" />
-    <Content Include="Content\Images\flags\Macao.png" />
-    <Content Include="Content\Images\flags\Madagascar.png" />
-    <Content Include="Content\Images\flags\Malawi.png" />
-    <Content Include="Content\Images\flags\Malaysia.png" />
-    <Content Include="Content\Images\flags\Maldives.png" />
-    <Content Include="Content\Images\flags\Malta.png" />
-    <Content Include="Content\Images\flags\Marshall Islands.png" />
-    <Content Include="Content\Images\flags\Martinique.png" />
-    <Content Include="Content\Images\flags\Mauritania.png" />
-    <Content Include="Content\Images\flags\Mauritius.png" />
-    <Content Include="Content\Images\flags\Mayotte.png" />
-    <Content Include="Content\Images\flags\Micronesia.png" />
-    <Content Include="Content\Images\flags\Moldova.png" />
-    <Content Include="Content\Images\flags\Monaco.png" />
-    <Content Include="Content\Images\flags\Mongolia.png" />
-    <Content Include="Content\Images\flags\Montserrat.png" />
-    <Content Include="Content\Images\flags\Mozambique.png" />
-    <Content Include="Content\Images\flags\Myanmar%28Burma%29.png" />
-    <Content Include="Content\Images\flags\Namibia.png" />
-    <Content Include="Content\Images\flags\NATO.png" />
-    <Content Include="Content\Images\flags\Nauru.png" />
-    <Content Include="Content\Images\flags\Nepal.png" />
-    <Content Include="Content\Images\flags\Netherlands Antilles.png" />
-    <Content Include="Content\Images\flags\Netherlands.png" />
-    <Content Include="Content\Images\flags\New Caledonia.png" />
-    <Content Include="Content\Images\flags\New Zealand.png" />
-    <Content Include="Content\Images\flags\Nicaragua.png" />
-    <Content Include="Content\Images\flags\Niger.png" />
-    <Content Include="Content\Images\flags\Niue.png" />
-    <Content Include="Content\Images\flags\Norfolk.png" />
-    <Content Include="Content\Images\flags\Northern Cyprus.png" />
-    <Content Include="Content\Images\flags\Northern Mariana.png" />
-    <Content Include="Content\Images\flags\OAS.png" />
-    <Content Include="Content\Images\flags\OECD.png" />
-    <Content Include="Content\Images\flags\Olimpic Movement.png" />
-    <Content Include="Content\Images\flags\Oman.png" />
-    <Content Include="Content\Images\flags\OPEC.png" />
-    <Content Include="Content\Images\flags\Pakistan.png" />
-    <Content Include="Content\Images\flags\Palau.png" />
-    <Content Include="Content\Images\flags\Palestine.png" />
-    <Content Include="Content\Images\flags\Panama.png" />
-    <Content Include="Content\Images\flags\Papua New Guinea.png" />
-    <Content Include="Content\Images\flags\Philippines.png" />
-    <Content Include="Content\Images\flags\Pitcairn.png" />
-    <Content Include="Content\Images\flags\Puerto Rico.png" />
-    <Content Include="Content\Images\flags\Qatar.png" />
-    <Content Include="Content\Images\flags\Red Cross.png" />
-    <Content Include="Content\Images\flags\Reunion.png" />
-    <Content Include="Content\Images\flags\Romania.png" />
-    <Content Include="Content\Images\flags\Rwanda.png" />
-    <Content Include="Content\Images\flags\Saint Barthelemy.png" />
-    <Content Include="Content\Images\flags\Saint Helena.png" />
-    <Content Include="Content\Images\flags\Saint Lucia.png" />
-    <Content Include="Content\Images\flags\Saint Martin %28French%29.png" />
-    <Content Include="Content\Images\flags\Saint Pierre and Miquelon.png" />
-    <Content Include="Content\Images\flags\Samoa.png" />
-    <Content Include="Content\Images\flags\San Marino.png" />
-    <Content Include="Content\Images\flags\Sao Tome &amp; Principe.png" />
-    <Content Include="Content\Images\flags\Saudi Arabia.png" />
-    <Content Include="Content\Images\flags\Seyshelles.png" />
-    <Content Include="Content\Images\flags\Singapore.png" />
-    <Content Include="Content\Images\flags\Sint-Maarten.png" />
-    <Content Include="Content\Images\flags\Solomon Islands.png" />
-    <Content Include="Content\Images\flags\Somalia.png" />
-    <Content Include="Content\Images\flags\Somaliland.png" />
-    <Content Include="Content\Images\flags\South Georgia and South Sandwich.png" />
-    <Content Include="Content\Images\flags\South Korea.png" />
-    <Content Include="Content\Images\flags\Southern-Sudan.png" />
-    <Content Include="Content\Images\flags\Sri Lanka.png" />
-    <Content Include="Content\Images\flags\St Kitts &amp; Nevis.png" />
-    <Content Include="Content\Images\flags\St Vincent &amp; the Grenadines.png" />
-    <Content Include="Content\Images\flags\Sudan.png" />
-    <Content Include="Content\Images\flags\Suriname.png" />
-    <Content Include="Content\Images\flags\Svalbard and Jan Mayen.png" />
-    <Content Include="Content\Images\flags\Swaziland.png" />
-    <Content Include="Content\Images\flags\Syria.png" />
-    <Content Include="Content\Images\flags\Tahiti%28French Polinesia%29.png" />
-    <Content Include="Content\Images\flags\Taiwan.png" />
-    <Content Include="Content\Images\flags\Tajikistan.png" />
-    <Content Include="Content\Images\flags\Tanzania.png" />
-    <Content Include="Content\Images\flags\Thailand.png" />
-    <Content Include="Content\Images\flags\Timor-Leste.png" />
-    <Content Include="Content\Images\flags\Tokelau.png" />
-    <Content Include="Content\Images\flags\Tonga.png" />
-    <Content Include="Content\Images\flags\Trinidad &amp; Tobago.png" />
-    <Content Include="Content\Images\flags\Tristan-da-Cunha.png" />
-    <Content Include="Content\Images\flags\Turkmenistan.png" />
-    <Content Include="Content\Images\flags\Turks and Caicos Islands.png" />
-    <Content Include="Content\Images\flags\Tuvalu.png" />
-    <Content Include="Content\Images\flags\Uganda.png" />
-    <Content Include="Content\Images\flags\UNESCO.png" />
-    <Content Include="Content\Images\flags\UNICEF.png" />
-    <Content Include="Content\Images\flags\United Arab Emirates.png" />
-    <Content Include="Content\Images\flags\United Kingdom%28Great Britain%29.png" />
-    <Content Include="Content\Images\flags\United States Minor Outlying.png" />
-    <Content Include="Content\Images\flags\Uzbekistan.png" />
-    <Content Include="Content\Images\flags\Vanutau.png" />
-    <Content Include="Content\Images\flags\Vatican City.png" />
-    <Content Include="Content\Images\flags\Viet Nam.png" />
-    <Content Include="Content\Images\flags\Virgin Islands British.png" />
-    <Content Include="Content\Images\flags\Virgin Islands US.png" />
-    <Content Include="Content\Images\flags\Wallis and Futuna.png" />
-    <Content Include="Content\Images\flags\Western Sahara.png" />
-    <Content Include="Content\Images\flags\WHO.png" />
-    <Content Include="Content\Images\flags\WTO.png" />
-    <Content Include="Content\Images\flags\Yemen.png" />
-    <Content Include="Content\Images\flags\Zambia.png" />
-    <Content Include="Content\Images\flags\Zimbabwe.png" />
     <Content Include="Content\Images\sponsors\0.png" />
     <Content Include="Content\Images\sponsors\1.png" />
     <Content Include="Content\Images\sponsors\2.png" />
@@ -846,6 +668,7 @@
     <Content Include="Content\themes\base\tabs.css" />
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="Content\Uploads\emblems\0.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -863,6 +686,7 @@
     <Content Include="Content\DataTables\css\semanticui.scss" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\common.scss" />
+    <Content Include="Scripts\canvasjs.min.js" />
     <Content Include="Scripts\Cup.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -1054,6 +878,7 @@
     <Content Include="Connected Services\ckstoredAzureStorage\ConnectedService.json" />
     <Content Include="Scripts\Numbers.js" />
     <Content Include="Scripts\Player.js" />
+    <Content Include="Scripts\Scorer.js" />
     <Content Include="Views\Shared\_Layout_plain.cshtml" />
     <Content Include="Views\Member\Transfer.cshtml" />
     <Content Include="Views\Home\UserManual.cshtml" />
@@ -1061,6 +886,8 @@
     <Content Include="Views\Member\ClubDetails.cshtml" />
     <Content Include="Views\Member\Mail.cshtml" />
     <Content Include="Views\ViewGame\ViewGame.cshtml" />
+    <Content Include="Views\Shared\Info.cshtml" />
+    <Content Include="Views\Member\Statistic.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1146,9 +973,7 @@
     <Content Include="Views\Blobs\ListBlobs.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Content\Uploads\" />
-    <Folder Include="save\" />
+    <Folder Include="App_Data\save\games\" />
     <Folder Include="Views\MemberPages\" />
   </ItemGroup>
   <ItemGroup>
@@ -1172,9 +997,15 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="packages\AWSSDK.S3.3.3.31.20\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

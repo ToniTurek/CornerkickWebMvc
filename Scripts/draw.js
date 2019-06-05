@@ -1,4 +1,4 @@
-﻿function drawLine(ax, ay, bx, by, sColor, iWidth, izIndex) {
+﻿function drawLine(ax, ay, bx, by, sColor, iWidth, izIndex, sBorderStyle) {
   //alert(ax + ", " + ay + ", " + bx + ", " + by + ", " + sColor);
 
   if (!sColor) {
@@ -18,19 +18,19 @@
     by = by - ay;
   }
 
-  var angle = Math.atan((ay - by) / (bx - ax));
-
-  angle = (angle * 180 / Math.PI);
-  angle = -angle;
+  var angle = -Math.atan((ay - by) / (bx - ax)) * (180.0 / Math.PI);
 
   var length = Math.sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
+
+  if (length === 0) {
+    return "";
+  }
 
   var style = "";
   style += "left:" + ax.toString() + "px;";
   style += "top:" + ay.toString() + "px;";
   style += "width:" + length.toString() + "px;";
-  style += "height:" + iWidth.toString() + "px;";
-  style += "background-color:" + sColor + ";";
+  style += "height:0px;";
   style += "position:absolute;";
   style += "transform:rotate(" + angle.toString() + "deg);";
   style += "-ms-transform:rotate(" + angle.toString() + "deg);";
@@ -44,11 +44,15 @@
   style += "-webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .1);";
   style += "box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .1)";
 
+  if (!sBorderStyle) {
+    sBorderStyle = "solid";
+  }
+  style += ";border:" + iWidth.toString() + "px " + sBorderStyle + " " + sColor;
+
   if (izIndex) {
     style += ";z-index:" + izIndex.toString();
   }
 
-  //$("<div style='" + style + "'></div>").appendTo('#divDrawGame');
   return "<div style='" + style + "'></div>";
 }
 

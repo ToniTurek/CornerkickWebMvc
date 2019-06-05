@@ -23,6 +23,8 @@ namespace CornerkickWebMvc.Models
 
     public List<SelectListItem> ltDdlVideo { get; set; }
     public byte iVideo { get; set; }
+    public byte iSnackbar { get; set; }
+    public byte iToilets { get; set; }
 
     public StadionModel()
     {
@@ -32,7 +34,7 @@ namespace CornerkickWebMvc.Models
       ltDdlStadionSeatType.Add(new SelectListItem { Text = "VIP",  Value = "2" });
 
       ltDdlVideo = new List<SelectListItem>();
-      for (byte iV = 0; iV < MvcApplication.ckcore.st.sVideo.Length; iV++) ltDdlVideo.Add(new SelectListItem { Text = MvcApplication.ckcore.st.sVideo[iV], Value = iV.ToString() });
+      for (byte iV = 0; iV < CornerkickManager.csStadion.sVideo.Length; iV++) ltDdlVideo.Add(new SelectListItem { Text = CornerkickManager.csStadion.sVideo[iV], Value = iV.ToString() });
     }
   }
 }

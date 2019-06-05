@@ -9,23 +9,29 @@ namespace CornerkickWebMvc.Models
 {
   public class FinanceModel
   {
+    public List<CornerkickManager.Finance.Account> ltAccount { get; set; }
+
     public string sKonto { get; set; }
-    public List<CornerkickCore.Finance.Account[]> ltKonto { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "Stehplätze:")]
     public int iEintritt1 { get; set; }
+    public int iPriceSeason1 { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "Sitzplätze:")]
     public int iEintritt2 { get; set; }
+    public int iPriceSeason2 { get; set; }
 
     [DataType(DataType.Currency)]
     [Display(Name = "V.I.P.:")]
     public int iEintritt3 { get; set; }
+    public int iPriceSeason3 { get; set; }
 
-    public CornerkickCore.Finance.Budget budgetPlan { get; set; }
-    public CornerkickCore.Finance.Budget budgetReal { get; set; }
+    public int[] iSeasonalTickets { get; set; }
+
+    public CornerkickManager.Finance.Budget budgetPlan { get; set; }
+    public CornerkickManager.Finance.Budget budgetReal { get; set; }
     public bool bEditable { get; set; }
   }
 
