@@ -103,6 +103,12 @@ namespace CornerkickWebMvc
       }
       timerSave.Enabled = false;
 
+      // Create stopwatch
+      System.Diagnostics.Stopwatch swLoad = new System.Diagnostics.Stopwatch();
+
+      // Start stopwatch
+      swLoad.Start();
+
       // Load autosave
       if (!load()) {
         // New game
@@ -128,6 +134,13 @@ namespace CornerkickWebMvc
         ckcore.calcMatchdays();
         ckcore.dtDatum = ckcore.dtSeasonStart;
       }
+
+      // Stop stopwatch
+      swLoad.Stop();
+      TimeSpan tsLoad = swLoad.Elapsed;
+
+      // Write elapsed time to log
+      ckcore.tl.writeLog("Elapsed time during load: " + tsLoad.TotalSeconds.ToString("0.000") + "s");
 
       // If no calendar timer --> enable save timer to save every 15 min.
       timerSave.Enabled = !timerCkCalender.Enabled;
@@ -454,7 +467,7 @@ namespace CornerkickWebMvc
 
       // Load ck state
       if (ckcore.io.load(sFileLoad)) {
-        ckcore.tl.writeLog("File " + sFileLoad + " loaded");
+        ckcore.tl.writeLog("File " + sFileLoad + " loaded. Elapsed time: ");
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].iUser = -1;
