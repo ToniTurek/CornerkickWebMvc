@@ -593,6 +593,10 @@ namespace CornerkickWebMvc.Controllers
         getStatisticHAPlayerIx(iHeatmap, user.game.data.nPlStart, out iHA, out iPlIx);
         gD.sDivHeatmap = getDivHeatmap(iHA, iState, iPlIx);
       }
+
+      // Player action chances
+      gD.fPlAction    = state.fPlAction;
+      gD.fPlActionRnd = state.fPlActionRandom;
     }
 
     private void getStatisticHAPlayerIx(int i, byte nPlStart, out byte iHA, out int iPl)

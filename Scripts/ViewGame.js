@@ -504,110 +504,17 @@ function plotStatistics(jState = -1) {
         }
       }
 
-      //alert(ltF[0][0].x + ", " + ltF[0][ltF[0].length - 1].x);
-      /*
-      var chartF = new CanvasJS.Chart("chartContainerF", {
-        animationEnabled: false,
-        theme: "theme2",//theme1
-        title: {
-          text: "Frische"
-        },
-        axisX: {
-          gridThickness: 1
-        },
-        axisY: {
-          valueFormatString: "0.0%",
-          includeZero: false
-        },
-        legend: {
-          horizontalAlign: "center", // left, center, right
-          verticalAlign: "bottom",  // top, center, bottom
-          dockInsidePlotArea: true
-        },
-        data: [
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "1",
-            dataPoints: gD.ltF[0]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "2",
-            dataPoints: gD.ltF[1]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "3",
-            dataPoints: gD.ltF[2]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "4",
-            dataPoints: gD.ltF[3]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "5",
-            dataPoints: gD.ltF[4]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "6",
-            dataPoints: gD.ltF[5]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "7",
-            dataPoints: gD.ltF[6]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "8",
-            dataPoints: gD.ltF[7]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "9",
-            dataPoints: gD.ltF[8]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "10",
-            dataPoints: gD.ltF[9]
-          },
-          {
-            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-            showInLegend: true,
-            type: "line",
-            legendText: "11",
-            dataPoints: gD.ltF[10]
-          }
-        ]
-      });
-      */
-
       chartF.render();
       chartM.render();
+
+      //if (document.getElementById("myCheck").checked) {
+      if ($('#dialogPlAction').dialog('isOpen')) {
+        $("#txtPlActionShoot").html((gD.fPlAction[0] * 100).toFixed(1) + '%');
+        $("#txtPlActionPass" ).html((gD.fPlAction[1] * 100).toFixed(1) + '%');
+        $("#txtPlActionGo"   ).html((gD.fPlAction[2] * 100).toFixed(1) + '%');
+        $("#txtPlActionWait" ).html((gD.fPlAction[3] * 100).toFixed(1) + '%');
+        $("#txtPlActionRnd"  ).html((gD.fPlActionRnd * 100).toFixed(1) + '%');
+      }
     } // success function
   }); // ajax
 }

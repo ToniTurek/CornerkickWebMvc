@@ -489,12 +489,16 @@
       });
 
       // Dialogs
-      $(function () {
-        $("#dialogOptions").dialog({
+      $("#dialogOptions").dialog({
           autoOpen: false,
-          height: 260,
+          height: 288,
           width: 260
-        });
+      });
+
+      $("#dialogPlAction").dialog({
+        autoOpen: false,
+        height: 202,
+        width: 170
       });
 
       ddlHeatmap.change(function () {
@@ -550,23 +554,9 @@
       }
     }
 
-    /*
-    function requestFullScreen(element) {
-      alert(element);
-      // Supports most browsers and their versions.
-      var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
-
-      alert(requestMethod);
-      if (requestMethod) { // Native full screen.
-        requestMethod.call(element);
-      } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
-        var wscript = new ActiveXObject("WScript.Shell");
-        if (wscript !== null) {
-          wscript.SendKeys("{F11}");
-        }
-      }
+    function openDialogChances() {
+      $("#dialogPlAction").dialog("open");
     }
-    */
 
     function setView() {
       var divDrawGameContainer = document.getElementById("divDrawGameContainer");
@@ -576,8 +566,6 @@
       var divTimeline = document.getElementById("divTimeline");
 
       var divOptions = document.getElementById("divOptions");
-      //var txtOptionsHeatmap = document.getElementById("txtOptionsHeatmap");
-      //var divOptionsHeatmap = document.getElementById("divOptionsHeatmap");
 
       var divPlotStatistics = document.getElementById("divPlotStatistics");
       var divStat1 = document.getElementById("divStat1");
@@ -851,7 +839,7 @@
   <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
 
   <div id="dialogOptions" title="Optionen">
-    <b id="txtOptionsHeatmap" style="position: absolute; top: 6px">Heatmap:</b>
+    <b id="txtOptionsHeatmap" style="position: absolute; top: 10px">Heatmap:</b>
     <div id="divOptionsHeatmap" style="position: absolute; top: 4px; left: 100px; width: 140px; height: auto">
       @Html.DropDownListFor(m => m.iHeatmap, Model.ddlHeatmap, new { @Id = "ddlHeatmap", @class = "form-control" })
     </div>
@@ -871,6 +859,33 @@
     <div id="divOptionsPos" style="position: absolute; top: 164px; left: 100px; width: 140px; height: auto">
       @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
     </div>
+    <label style="position: absolute; top: 210px">
+        Chancen:
+        <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="if (this.checked) { openDialogChances() }" value="0">
+    </label>
+  </div>
+
+  <div id="dialogPlAction" title="Chancen" style="text-align: right">
+    <p>
+      Schuss:
+      <txt id="txtPlActionShoot"></txt>
+    </p>
+    <p>
+      Pass:
+      <txt id="txtPlActionPass"></txt>
+    </p>
+    <p>
+      Dribbling:
+      <txt id="txtPlActionGo"></txt>
+    </p>
+    <p>
+      Warten:
+      <txt id="txtPlActionWait"></txt>
+    </p>
+    <p>
+      Entscheidung:
+      <txt id="txtPlActionRnd"></txt>
+    </p>
   </div>
 </body>
 </html>

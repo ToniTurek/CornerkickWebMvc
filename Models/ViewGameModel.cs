@@ -101,6 +101,10 @@ namespace CornerkickWebMvc.Models
 
       public List<string[]> ltComments { get; set; }
 
+      // Chances
+      public float[] fPlAction    { get; set; }
+      public float   fPlActionRnd { get; set; }
+
       public string sAdminChanceShootOnGoal { get; set; }
       public string sAdminChanceGoal { get; set; }
 
