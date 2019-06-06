@@ -3776,12 +3776,17 @@ namespace CornerkickWebMvc.Controllers
         if (gd.team[0].iTeamId == clb.iId) {
           i--;
 
-          string sInfo0 = gd.dt.ToShortDateString() + "</br>" +
+          string sCupName = "";
+          if      (gd.iGameType == 1) sCupName = " - Liga";
+          else if (gd.iGameType == 2) sCupName = " - Pokal";
+          else if (gd.iGameType == 5) sCupName = " - Testspiel";
+
+          string sInfo0 = gd.dt.ToString("d", getCi()) + sCupName + "</br>" +
                           (gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]).ToString() + " (" + gd.iSpectators[0].ToString() + "/" + gd.iSpectators[1].ToString() + "/" + gd.iSpectators[2].ToString() + ")" + "</br>" +
                           gd.team[1].sTeam;
           dataPoints[0].Add(new Models.DataPointGeneral(i, gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2], sInfo0));
 
-          string sInfo1 = gd.dt.ToShortDateString() + "</br>" +
+          string sInfo1 = gd.dt.ToString("d", getCi()) + "</br>" +
                           gd.stadium.getSeats().ToString() + " (" + gd.stadium.getSeats(0).ToString() + "/" + gd.stadium.getSeats(1).ToString() + "/" + gd.stadium.getSeats(2).ToString() + ")" + "</br>" +
                           gd.team[1].sTeam;
           dataPoints[1].Add(new Models.DataPointGeneral(i, gd.stadium.getSeats(), sInfo1));
