@@ -124,7 +124,7 @@ namespace CornerkickWebMvc.Controllers
       setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
 
       // Do one step now
-      MvcApplication.ckcore.next(true);
+      //MvcApplication.ckcore.next(true);
 
       // Start the timer
       MvcApplication.timerCkCalender.Interval = modelAdmin.fCalendarInterval * 1000;
