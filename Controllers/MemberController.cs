@@ -2217,13 +2217,15 @@ namespace CornerkickWebMvc.Controllers
         string sSelectedO = "";
         string sSelectedI = "";
         if (iAS < clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count) {
-          if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0]) sSelectedO = " selected=\"selected\"";
-          if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1]) sSelectedI = " selected=\"selected\"";
+          if (clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1] > clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0]) {
+            if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0]) sSelectedO = " selected=\"selected\"";
+            if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1]) sSelectedI = " selected=\"selected\"";
+          }
         }
 
         string sPos = "";
         if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
-        else                                           sPos = MvcApplication.ckcore.plr.getStrPos(pl);
+        else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
         string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl).ToString(" (0.0)");
 
         if (bOut) sBox[0] += "<option" + sSelectedO + " value=\"" + iPl.ToString() + "\">" + pl.sName + " - " + sPos + sStrength + "</option>";
