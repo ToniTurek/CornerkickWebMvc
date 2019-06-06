@@ -2646,8 +2646,10 @@ namespace CornerkickWebMvc.Controllers
       for (int i = clb.iTrainingsgel  [1] + 1; i < MvcApplication.ckcore.st.sTrainingsgel.Length; i++) mdStadionSurr.ddlTrainingsgel .Add(new SelectListItem { Text = MvcApplication.ckcore.st.sTrainingsgel [i], Value = i.ToString() });
       for (int i = clb.iJugendinternat[1] + 1; i < MvcApplication.ckcore.st.sTrainingsgel.Length; i++) mdStadionSurr.ddlJouthInternat.Add(new SelectListItem { Text = MvcApplication.ckcore.st.sJouthInternat[i], Value = i.ToString() });
 
-      mdStadionSurr.iTrainingsgel  = clb.iTrainingsgel  [0];
-      mdStadionSurr.iJouthInternat = clb.iJugendinternat[0];
+      mdStadionSurr.iTrainingsgel     = clb.iTrainingsgel  [0];
+      mdStadionSurr.iTrainingNew      = clb.iTrainingsgel  [2];
+      mdStadionSurr.iJouthInternat    = clb.iJugendinternat[0];
+      mdStadionSurr.iJouthInternatNew = clb.iJugendinternat[2];
       mdStadionSurr.iCarpark       = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
       mdStadionSurr.iCarparkNew    = clb.stadium.iCarparkNew;
       mdStadionSurr.iCounter       = Math.Max(clb.stadium.iTicketcounter, clb.stadium.iTicketcounterNew);

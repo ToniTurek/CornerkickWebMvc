@@ -14,6 +14,9 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ddlJouthInternat { get; set; }
     public int iJouthInternat { get; set; }
 
+    public int iTrainingNew { get; set; }
+    public int iJouthInternatNew { get; set; }
+
     public int iVereinsheim { get; set; }
     public int iVereinsmuseum { get; set; }
     public int iCarpark { get; set; }
