@@ -28,94 +28,105 @@
 <h2>Personal</h2>
 
 <div class="form-group">
-  @if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1) {
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerKondi),   /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iMasseur),        /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerMental),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iArzt),           /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendTrainer),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendScouting), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6" })
-      </div>
-    </div>
-  } else {
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerCo),      /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0", @disabled = "disabled" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerKondi),   /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1", @disabled = "disabled" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iMasseur),        /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2", @disabled = "disabled" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerMental),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3", @disabled = "disabled" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iArzt),           /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4", @disabled = "disabled" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendTrainer),  /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5", @disabled = "disabled" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendScouting), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6", @disabled = "disabled" })
-      </div>
-    </div>
+  @{
+
   }
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iTrainerCo < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerCo), new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0" });
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerCo), new { @class = "form-control", @onchange = "setPersonal(0)", id = "iDdlId0", @disabled = "disabled" });
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iTrainerKondi < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerKondi), new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerKondi), new { @class = "form-control", @onchange = "setPersonal(1)", id = "iDdlId1", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iMasseur < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iMasseur), new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iMasseur), new { @class = "form-control", @onchange = "setPersonal(2)", id = "iDdlId2", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iTrainerMental < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerMental), new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iTrainerMental), new { @class = "form-control", @onchange = "setPersonal(3)", id = "iDdlId3", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iArzt < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iArzt), new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iArzt), new { @class = "form-control", @onchange = "setPersonal(4)", id = "iDdlId4", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iJugendTrainer < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendTrainer), new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendTrainer), new { @class = "form-control", @onchange = "setPersonal(5)", id = "iDdlId5", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iJugendScouting < 1) {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendScouting), new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonal, new SelectList(Model.ltDdlPersonal, "Value", "Text", Model.personal.iJugendScouting), new { @class = "form-control", @onchange = "setPersonal(6)", id = "iDdlId6", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
+  <div style="position: relative; height: 40px">
+    <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Spielbeobachter</label>
+    <div style="position: absolute; height: 30px; left: 190px">
+      @{
+        if (true || MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) || MvcApplication.ckcore.dtDatum.Day == 1 || Model.personal.iKibitzer < 1) {
+          @Html.DropDownListFor(m => m.sPersonalKibitzer, new SelectList(Model.ltDdlPersonalKibitzer, "Value", "Text", Model.personal.iKibitzer), new { @class = "form-control", @onchange = "setPersonal(7)", id = "iDdlId7" })
+        } else {
+          @Html.DropDownListFor(m => m.sPersonalKibitzer, new SelectList(Model.ltDdlPersonalKibitzer, "Value", "Text", Model.personal.iKibitzer), new { @class = "form-control", @onchange = "setPersonal(7)", id = "iDdlId7", @disabled = "disabled" })
+        }
+      }
+    </div>
+  </div>
 </div>
 
 <p id="lbPersonalkosten"></p>
-

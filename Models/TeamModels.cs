@@ -50,6 +50,7 @@ namespace CornerkickWebMvc.Models
       public List<bool>   ltPlayerSusp     { get; set; } // List of suspended player
 
       // Opponent player details
+      public byte iKibitzer { get; set; }
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
       public List<byte> ltPlayerOppPos { get; set; }
       public List<string> ltPlayerOppAveSkill { get; set; }

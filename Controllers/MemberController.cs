@@ -1079,6 +1079,8 @@ namespace CornerkickWebMvc.Controllers
       tD.iCaptainIx = MvcApplication.ckcore.plr.getCaptainIx(club);
 
       if (club.nextGame != null) {
+        tD.iKibitzer = club.personal.iKibitzer;
+
         int iClubOpp = club.nextGame.team[1].iTeamId;
         if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
 
@@ -2808,13 +2810,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if      (iPersonal == 0) clb.personal.iTrainerCo =      (byte)iLevel;
-      else if (iPersonal == 1) clb.personal.iTrainerKondi =   (byte)iLevel;
-      else if (iPersonal == 2) clb.personal.iMasseur =        (byte)iLevel;
-      else if (iPersonal == 3) clb.personal.iTrainerMental =  (byte)iLevel;
-      else if (iPersonal == 4) clb.personal.iArzt =           (byte)iLevel;
-      else if (iPersonal == 5) clb.personal.iJugendTrainer =  (byte)iLevel;
+      if      (iPersonal == 0) clb.personal.iTrainerCo      = (byte)iLevel;
+      else if (iPersonal == 1) clb.personal.iTrainerKondi   = (byte)iLevel;
+      else if (iPersonal == 2) clb.personal.iMasseur        = (byte)iLevel;
+      else if (iPersonal == 3) clb.personal.iTrainerMental  = (byte)iLevel;
+      else if (iPersonal == 4) clb.personal.iArzt           = (byte)iLevel;
+      else if (iPersonal == 5) clb.personal.iJugendTrainer  = (byte)iLevel;
       else if (iPersonal == 6) clb.personal.iJugendScouting = (byte)iLevel;
+      else if (iPersonal == 7) clb.personal.iKibitzer       = (byte)iLevel;
 
       int iKosten = (int)(MvcApplication.ckcore.tl.getStuffSalary(clb) / 12f);
       string sKosten = "0";

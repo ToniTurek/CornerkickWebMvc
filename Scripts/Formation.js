@@ -29,18 +29,31 @@
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
-            result += getBoxFormation(player, i, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
+            result += getBoxFormation(player, i, player.sName, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
 
             i = i + 1;
             return i !== 11;
           });
 
-          if (teamData.ltPlayerOpp) {
+          if (teamData.iKibitzer > 0 && teamData.ltPlayerOpp) {
             // opponent player
-            $.each(teamData.ltPlayerOpp, function (iFormation, player) {
-              result += getBoxFormation(player, i, "", true, iSelectedPlayer - 1, teamData.ltPlayerOppPos[i], bMobile);
+            var j = 0;
+            $.each(teamData.ltPlayerOpp, function (iFormation, playerOpp) {
+              var sPlayerOppName = "";
+              var sPlayerOppAveSkill = "";
+              var sPlayerOppPos = "";
+              if (teamData.iKibitzer > 1) {
+                sPlayerOppName = playerOpp.sName;
+
+                if (teamData.iKibitzer > 2) {
+                  sPlayerOppAveSkill = teamData.ltPlayerOppAveSkill[j];
+                  sPlayerOppPos      = teamData.ltPlayerOppPos     [j];
+                }
+              }
+              result += getBoxFormation(playerOpp, i, sPlayerOppName, sPlayerOppAveSkill, true, -1, sPlayerOppPos, bMobile);
 
               i = i + 1;
+              j = j + 1;
               return i !== 11;
             });
           }
@@ -95,7 +108,7 @@
   });
 }
 
-function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
+function getBoxFormation(player, i, sName, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
   if (!player) {
     return "";
   }
@@ -121,7 +134,6 @@ function getBoxFormation(player, i, sStrength, bOpponentTeam, iSelectedPlayer, i
   iTop  = iTop  - (fHeightBox / 2.0);
   iLeft = iLeft - 13.00;
 
-  var sName = player.sName;
   var sNameSplit = sName.split(' ');
   var sSurname = sName;
   if (sNameSplit.length > 1) {
