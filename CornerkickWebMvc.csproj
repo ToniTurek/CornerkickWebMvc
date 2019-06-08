@@ -520,6 +520,8 @@
     <Content Include="Content\Icons\duel_off_1.png" />
     <Content Include="Content\Icons\flags\0.png" />
     <Content Include="Content\Icons\flags\ALB.png" />
+    <Content Include="Content\Icons\flags\ALG.png" />
+    <Content Include="Content\Icons\flags\AND.png" />
     <Content Include="Content\Icons\flags\ARG.png" />
     <Content Include="Content\Icons\flags\AUS.png" />
     <Content Include="Content\Icons\flags\AUT.png" />
