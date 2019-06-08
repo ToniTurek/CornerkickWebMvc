@@ -19,8 +19,8 @@ namespace CornerkickWebMvc
         // if MigrationHistory table is not there (which is the case first time we run) - create it
         //if (migrationHistoryTableExists.FirstOrDefault() == 0) {
         if (MvcApplication.ckcore.ltUser.Count == 0) {
-          context.Database.Delete();
-          context.Database.Create();
+          //context.Database.Delete();
+          //context.Database.Create();
         }
       }
     }
