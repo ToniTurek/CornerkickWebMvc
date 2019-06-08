@@ -194,8 +194,8 @@
             title: "Zuschauer"
           },
           legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
+            horizontalAlign: "right", // left, center, right
+            verticalAlign: "top",  // top, center, bottom
             dockInsidePlotArea: true
           },
           toolTip: {
@@ -205,6 +205,8 @@
             {
               // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
               type: "line",
+              showInLegend: true,
+              legendText: "Zuschauer",
               dataPoints: dataSpec[0]
             },
             {
@@ -213,6 +215,8 @@
               lineDashType: "dash",
               markerType: "none",
               lineThickness: 1,
+              showInLegend: true,
+              legendText: "Stadionkapazität",
               dataPoints: dataSpec[1]
             }
           ]
