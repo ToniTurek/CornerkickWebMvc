@@ -253,7 +253,6 @@ namespace CornerkickWebMvc.Controllers
       }
 #endif
       MvcApplication.ckcore.ltClubs.Add(clb);
-
       
       // Do initial formation
       MvcApplication.ckcore.doFormation(clb.iId);
