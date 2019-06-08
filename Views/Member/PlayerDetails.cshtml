@@ -213,34 +213,35 @@
       $("#dialogDoping").dialog("open");
     });
 
-    $(function () {
-      $("#dialogDoping").dialog({
-        autoOpen: false,
-        buttons: {
-          "Bestätigen": function () {
-            var iDp = $('#ddlDoping').val();
+    $("#dialogDoping").dialog({
+      autoOpen: false,
+      buttons: {
+        "Bestätigen": function () {
+          var iDp = $('#ddlDoping').val();
 
-            $.ajax({
-              url: "/Member/PlayerDetailsDoDoping",
-              type: 'POST',
-              traditional: true,
-              data: { iPlayerId: @Model.iPlayer, iDp: iDp },
-              dataType: "json",
-              success: function () {
+          $.ajax({
+            url: "/Member/PlayerDetailsDoDoping",
+            type: 'POST',
+            traditional: true,
+            data: { iPlayerId: @Model.iPlayer, iDp: iDp },
+            dataType: "json",
+            success: function (bOk) {
+              if (bOk) {
                 plotCFM();
-              },
-              error: function (xhr) {
-                alert(xhr.error);
+                $("#dialogDoping").dialog("close");
+              } else {
+                alert("Der Inhalt Ihrer Schwarzen Kasse reicht leider nicht aus...");
               }
-            });
-
-            $(this).dialog("close");
-          },
-          Cancel: function () {
-            $(this).dialog("close");
-          }
+            },
+            error: function (xhr) {
+              alert(xhr.error);
+            }
+          });
+        },
+        Cancel: function () {
+          $(this).dialog("close");
         }
-      });
+      }
     });
   }); // $(document).ready(function () {
 

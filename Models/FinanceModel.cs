@@ -33,6 +33,9 @@ namespace CornerkickWebMvc.Models
     public CornerkickManager.Finance.Budget budgetPlan { get; set; }
     public CornerkickManager.Finance.Budget budgetReal { get; set; }
     public bool bEditable { get; set; }
+
+    public float  fBalanceSecretFracAdmissionPrice { get; set; }
+    public string sBalanceSecret { get; set; }
   }
 
   public class DiaryFinanceEvent
@@ -40,7 +43,6 @@ namespace CornerkickWebMvc.Models
     public int iID;
     public string sTitle;
     public string sDescription;
-    public int SomeImportantKeyID;
     public string sStartDate;
     public string sEndDate;
     public string StatusString;

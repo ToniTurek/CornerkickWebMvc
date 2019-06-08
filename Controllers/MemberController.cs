@@ -1486,9 +1486,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
 
-      MvcApplication.ckcore.plr.doDoping(pl, MvcApplication.ckcore.ltDoping[iDp]);
-
-      return Json("", JsonRequestBehavior.AllowGet);
+      return Json(MvcApplication.ckcore.plr.doDoping(pl, MvcApplication.ckcore.ltDoping[iDp]), JsonRequestBehavior.AllowGet);
     }
 
     public ActionResult PlayerDetailsGetDopingDesc(byte iDp)
@@ -3743,6 +3741,10 @@ namespace CornerkickWebMvc.Controllers
         financeModel.budgetPlan = bg;
       }
 
+      // Secret Balance
+      financeModel.fBalanceSecretFracAdmissionPrice = clb.fBalanceSecretFracAdmissionPrice * 100f;
+      financeModel.sBalanceSecret                   = clb.iBalanceSecret.ToString("N0", getCi()) + " €";
+
       return View(financeModel);
     }
 
@@ -3889,6 +3891,17 @@ namespace CornerkickWebMvc.Controllers
       };
 
       return Json(sTotal, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult FinanceSetBalanceSecret(float fBalanceSecretFracAdmissionPrice)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.fBalanceSecretFracAdmissionPrice = fBalanceSecretFracAdmissionPrice / 100f;
+
+      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
