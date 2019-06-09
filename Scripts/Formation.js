@@ -35,7 +35,9 @@
             return i !== 11;
           });
 
-          if (teamData.iKibitzer > 0 && teamData.ltPlayerOpp) {
+          if (teamData.iKibitzer === 0) {
+            result += '<div style="position: absolute; width: 90%; height: 50%; left: 5%; text-align: center"><p style="position: absolute; top: 40%; color: white; font-size: 150%">Stellen Sie einen <a style="color: white" href="/Member/Personal">Spielbeobachter</a> ein, wenn Sie mehr über Ihren nächsten Gegner erfahren wollen!</p></div>';
+          } else if (teamData.ltPlayerOpp) {
             // opponent player
             var j = 0;
             $.each(teamData.ltPlayerOpp, function (iFormation, playerOpp) {
@@ -56,6 +58,12 @@
               j = j + 1;
               return i !== 11;
             });
+
+            if (teamData.iKibitzer > 2) {
+              var divTeamOppAve = $("#divTeamOppAve");
+              sTeamOppAve = '<p style="position: absolute; margin: 4px; background-color: rgb(31, 158, 69); color: white; font-size: 100%">' + teamData.sTeamOppAveSkill + ' (' + teamData.sTeamOppAveAge + ')</p>';
+              divTeamOppAve.html(sTeamOppAve).fadeIn('slow');
+            }
           }
 
           // hide orientation slider on start
@@ -89,21 +97,13 @@
           }
         }
 
+        // Team averages
+        textteamaverage.html("Durchschnittsstärke (-alter): " + teamData.sTeamAveSkill + " (" + teamData.sTeamAveAge + ")");
+
         drawFormation/*.hide()*/.html(result).fadeIn('slow')/*.show()*/;
       } else {
         alert("data hasn't worked!");
       }
-    }
-  });
-
-  $.ajax({
-    cache: false,
-    url: "/Member/GetPlayerStrengthAgeAve",
-    type: "GET",
-    data: { },
-    success: function (fStrengthAgeAve) {
-      textteamaverage.html('');
-      textteamaverage.html("Durchschnittsstärke (-alter): " + fStrengthAgeAve[0].toFixed(2) + " (" + fStrengthAgeAve[1].toFixed(1) + ")");
     }
   });
 }

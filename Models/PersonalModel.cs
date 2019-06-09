@@ -36,6 +36,7 @@ namespace CornerkickWebMvc.Models
       ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 1", Value = "1" });
       ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 2", Value = "2" });
       ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 3", Value = "3" });
+      ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 4", Value = "4" });
     }
   }
 }

@@ -1078,6 +1078,11 @@ namespace CornerkickWebMvc.Controllers
 
       tD.iCaptainIx = MvcApplication.ckcore.plr.getCaptainIx(club);
 
+      // Team averages
+      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(club, 11);
+      tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
+      tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
+
       if (club.nextGame != null) {
         tD.iKibitzer = club.personal.iKibitzer;
 
@@ -1088,15 +1093,25 @@ namespace CornerkickWebMvc.Controllers
         tD.ltPlayerOppPos = new List<byte>();
         tD.ltPlayerOppAveSkill = new List<string>();
 
-        if (iClubOpp > 0) {
-          for (byte iPl = 0; iPl < 11; iPl++) {
-            int iPlId = MvcApplication.ckcore.ltClubs[iClubOpp].ltPlayerId[iPl];
+        if (iClubOpp >= 0) {
+          CornerkickManager.Club clubOpp = MvcApplication.ckcore.ltClubs[iClubOpp];
+
+          for (byte iPl = 0; iPl < club.nextGame.nPlStart; iPl++) {
+            int iPlId = clubOpp.ltPlayerId[iPl];
             CornerkickGame.Player plOpp = MvcApplication.ckcore.ltPlayer[iPlId];
 
             tD.ltPlayerOpp.Add(plOpp);
             tD.ltPlayerOppPos.Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(plOpp)));
-            tD.ltPlayerOppAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(plOpp, 99).ToString("0.0"));
+
+            float fPlOppAveSkill = MvcApplication.ckcore.game.tl.getAveSkill(plOpp, 99);
+            if (tD.iKibitzer == 3) fPlOppAveSkill = (float)Math.Round(fPlOppAveSkill * 2f) / 2f;
+            tD.ltPlayerOppAveSkill.Add(fPlOppAveSkill.ToString("0.0"));
           }
+
+          // Opp. team averages
+          float[] fTeamOppAve11 = MvcApplication.ckcore.tl.getTeamAve(clubOpp, club.nextGame.nPlStart);
+          tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
+          tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
         }
       }
 
@@ -1164,20 +1179,6 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
       double fStrength = MvcApplication.ckcore.game.tl.getAveSkill(player, 99);
       return Json(fStrength, JsonRequestBehavior.AllowGet);
-    }
-
-    public JsonResult GetPlayerStrengthAgeAve()
-    {
-      CornerkickManager.Club club = ckClub();
-      if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
-
-      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(club, 11);
-
-      float[] f = new float[2];
-      f[0] = fTeamAve11[3];
-      f[1] = fTeamAve11[4];
-
-      return Json(f, JsonRequestBehavior.AllowGet);
     }
 
     private string TeamGetPlayerOffence(List<CornerkickGame.Player> ltPlayer, CornerkickManager.Club club, bool bMobile = false)

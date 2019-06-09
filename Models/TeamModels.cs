@@ -48,12 +48,16 @@ namespace CornerkickWebMvc.Models
       public List<string> ltPlayerAge      { get; set; }
       public List<string> ltPlayerNat      { get; set; }
       public List<bool>   ltPlayerSusp     { get; set; } // List of suspended player
+      public string sTeamAveSkill { get; set; }
+      public string sTeamAveAge { get; set; }
 
       // Opponent player details
       public byte iKibitzer { get; set; }
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
       public List<byte> ltPlayerOppPos { get; set; }
       public List<string> ltPlayerOppAveSkill { get; set; }
+      public string sTeamOppAveSkill { get; set; }
+      public string sTeamOppAveAge { get; set; }
 
       public CornerkickGame.Player plSelected { get; set; }
       public byte iCaptainIx { get; set; }
