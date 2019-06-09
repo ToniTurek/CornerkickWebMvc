@@ -133,18 +133,22 @@
                 success: function (ltDays) {
                   ddlTrainingscampDays.innerHTML = "";
 
-                  for (var i = 1; i < ltDays.length; i++) {
-                    var sDay = ltDays[i];
+                  if (ltDays.length > 1) {
+                    for (var i = 1; i < ltDays.length; i++) {
+                      var sDay = ltDays[i];
 
-                    var el = document.createElement("option");
-                    el.textContent = sDay;
-                    el.value = (i + 1).toString();
-                    ddlTrainingscampDays.appendChild(el);
+                      var el = document.createElement("option");
+                      el.textContent = sDay;
+                      el.value = (i + 1).toString();
+                      ddlTrainingscampDays.appendChild(el);
+                    }
+
+                    setSelectedCamp();
+
+                    $("#dialogTrainingscamp").dialog("open");
+                  } else {
+                    alert("Die Zeit bis zum nächsten Pflichtspiel reicht für ein Trainingslager leider nicht aus.");
                   }
-
-                  setSelectedCamp();
-
-                  $("#dialogTrainingscamp").dialog("open");
                 },
                 error: function (xhr) {
                   debugger;
@@ -360,10 +364,14 @@
 <button type="submit" id="bnDeclineTestgame" class="btn btn-default" style="width: 49%">Anfrage ablehnen</button>
 
 <div id="dialogOptions" title="Was wollen Sie machen?">
-  <input type="radio" name="rbOptions" id="rbTestgame" checked="checked" value="1">
-  <text for="1"> Testspiel vereinbaren</text><br>
-  <input type="radio" name="rbOptions" id="rbTrainingscamp" value="2">
-  <text for="2"> Trainingslager planen</text><br>
+  <label>
+    <input type="radio" name="rbOptions" id="rbTestgame" value="1" checked="checked">
+    Testspiel vereinbaren
+  </label>
+  <label>
+    <input type="radio" name="rbOptions" id="rbTrainingscamp" value="2">
+    Trainingslager planen
+  </label>
 </div>
 
 <div id="dialogTestgame" title="Testspielanfrage">
