@@ -121,7 +121,7 @@ namespace CornerkickWebMvc.Controllers
           int iTeamIdA = -1;
           if (string.IsNullOrEmpty(getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA))) continue;
 
-          if (iTeamIdH == clubUser.iId || iTeamIdA == clubUser.iId) fiGames.Add(ckg);
+          if (iTeamIdH == clubUser.iId || iTeamIdA == clubUser.iId || AccountController.checkUserIsAdmin(User)) fiGames.Add(ckg);
         }
       }
 
