@@ -56,6 +56,10 @@
     #slider-Minute .ui-slider-handle {
       border-color: orange;
     }
+
+    .disabledDiv {
+      pointer-events: none;
+    }
   </style>
 
   <script type="text/javascript">
@@ -522,6 +526,9 @@
       });
 
       $('#sSelectedGame').change(function () {
+        $("body").css("cursor", "wait");
+        $("#divDrawGameContainer").addClass("disabledDiv");
+
         $.ajax({
           url: '/ViewGame/loadGame',
           type: "GET",
@@ -529,6 +536,8 @@
           data: { sFilename: $(this).val() },
           success: function () {
             drawGame(-1);
+            $("body").css("cursor", "default");
+            $("#divDrawGameContainer").removeClass("disabledDiv");
           }
         });
       });
