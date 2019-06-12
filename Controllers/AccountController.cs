@@ -304,17 +304,19 @@ namespace CornerkickWebMvc.Controllers
 
       return true;
     }
-
     internal static bool checkUserIsAdmin(ApplicationUser appUserAdmin)
     {
       if (appUserAdmin == null) return false;
 
       return checkUserIsAdmin(appUserAdmin.Email);
     }
-
     internal static bool checkUserIsAdmin(RegisterViewModel regModel)
     {
       return checkUserIsAdmin(regModel.Email, regModel.Password);
+    }
+    internal static bool checkUserIsAdmin(System.Security.Principal.IPrincipal user)
+    {
+      return checkUserIsAdmin(user.Identity.Name);
     }
 
     internal CornerkickManager.Club createClub(string sTeamname, byte iLand, byte iLiga)
