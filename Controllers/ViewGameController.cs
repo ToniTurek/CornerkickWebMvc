@@ -209,6 +209,8 @@ namespace CornerkickWebMvc.Controllers
         return Json(Models.ViewGameModel.ltLoc, JsonRequestBehavior.AllowGet);
       }
 
+      bool bAdmin = AccountController.checkUserIsAdmin(User);
+
       if (MvcApplication.ckcore.ltUser.Count > 0) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
 
       CornerkickGame.Game.State state = user.game.newState();
@@ -231,6 +233,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Game.PointBall pbBall = new CornerkickGame.Game.PointBall();
       pbBall = ball.Pos;
+
       if (bAverage) {
         System.Drawing.Point ptAve = MvcApplication.ckcore.ui.getAveragePos(user.game, -1, -1, iState);
         pbBall.X = ptAve.X;
@@ -268,6 +271,31 @@ namespace CornerkickWebMvc.Controllers
 
           gLoc.ltPlayer.Add(gPlayer);
           //Models.ViewGameModel.ltLoc.Add(new float[5] { iPosX, iPosY, pl.iLookAt, pl.iNr, fCard });
+
+          if (bAdmin && iState >= 0) {
+            user.game.player[iHA][iP].iHA     = pl.iHA;
+            user.game.player[iHA][iP].iIndex  = pl.iIndex;
+            user.game.player[iHA][iP].ptPos.X = pl.ptPos.X;
+            user.game.player[iHA][iP].ptPos.Y = pl.ptPos.Y;
+            user.game.player[iHA][iP].iLookAt = pl.iLookAt;
+            user.game.player[iHA][iP].fSteps = 6f;
+          }
+        }
+      }
+
+      if (bAdmin && iState >= 0) {
+        user.game.ball = ball;
+        user.game.tsMinute = state.tsMinute;
+
+        if (user.game.ball.iPassStep == 0) {
+          for (byte iHA = 0; iHA < 2; iHA++) {
+            for (int iP = 0; iP < MvcApplication.ckcore.game.data.nPlStart; iP++) {
+              if (ball.ptPos == user.game.player[iHA][iP].ptPos) {
+                user.game.ball.plAtBall = user.game.player[iHA][iP];
+                break;
+              }
+            }
+          }
         }
       }
 
