@@ -14,7 +14,10 @@
   }
 
   if (usr != null) {
-    clb = MvcApplication.ckcore.ltClubs[usr.iTeam];
+    if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count)
+    {
+      clb = MvcApplication.ckcore.ltClubs[usr.iTeam];
+    }
   }
 
   string sEmblem = @"/Content/Uploads/";
