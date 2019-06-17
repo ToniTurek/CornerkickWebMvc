@@ -52,7 +52,7 @@
                   sPlayerOppPos      = teamData.ltPlayerOppPos     [j];
                 }
               }
-              result += getBoxFormation(playerOpp, i, sPlayerOppName, sPlayerOppAveSkill, true, -1, sPlayerOppPos, bMobile);
+              result += getBoxFormation(playerOpp, i, sPlayerOppName, sPlayerOppAveSkill, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
 
               i = i + 1;
               j = j + 1;
