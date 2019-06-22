@@ -2801,28 +2801,119 @@ namespace CornerkickWebMvc.Controllers
 
       personal.personal = clb.personal;
 
+      personal.ltDdlPersonalCoachCo      = new List<SelectListItem>();
+      personal.ltDdlPersonalCoachCondi   = new List<SelectListItem>();
+      personal.ltDdlPersonalMasseur       = new List<SelectListItem>();
+      personal.ltDdlPersonalMental        = new List<SelectListItem>();
+      personal.ltDdlPersonalMed           = new List<SelectListItem>();
+      personal.ltDdlPersonalJouthCoach    = new List<SelectListItem>();
+      personal.ltDdlPersonalJouthScouting = new List<SelectListItem>();
+      personal.ltDdlPersonalKibitzer      = new List<SelectListItem>();
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalCoachCo.Add(new SelectListItem{ Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostCoachCo[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalCoachCo.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalCoachCondi.Add(new SelectListItem { Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostCoachCondi[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalCoachCondi.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalMasseur.Add(new SelectListItem { Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostMasseur[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalMasseur.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalMental.Add(new SelectListItem { Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostMental[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalMental.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalMed.Add(new SelectListItem { Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostMed[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalMed.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalJouthCoach.Add(new SelectListItem { Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostJouthCoach[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalJouthCoach.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      for (byte i = 7; i > 0; i--) personal.ltDdlPersonalJouthScouting.Add(new SelectListItem { Text = "Level: " + i.ToString() + " - " + CornerkickManager.Finance.iCostJouthScouting[i].ToString("N0", getCi()) + " €/Monat", Value = i.ToString() });
+      personal.ltDdlPersonalJouthScouting.Add(new SelectListItem { Text = "-", Value = "0" });
+
+      personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 4 - " + CornerkickManager.Finance.iCostKibitzer[4].ToString("N0", getCi()) + " €/Monat", Value = "4" });
+      personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 3 - " + CornerkickManager.Finance.iCostKibitzer[3].ToString("N0", getCi()) + " €/Monat", Value = "3" });
+      personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 2 - " + CornerkickManager.Finance.iCostKibitzer[2].ToString("N0", getCi()) + " €/Monat", Value = "2" });
+      personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 1 - " + CornerkickManager.Finance.iCostKibitzer[1].ToString("N0", getCi()) + " €/Monat", Value = "1" });
+      personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "-", Value = "0" });
+
       return View(personal);
     }
 
-    public ActionResult setPersonal(int iPersonal, int iLevel)
+    [HttpPost]
+    public JsonResult PersonalCheckCost(int[] iLevel)
+    {
+      CornerkickManager.Club clb = new CornerkickManager.Club();
+
+      clb.personal.iTrainerCo      = (byte)iLevel[0];
+      clb.personal.iTrainerKondi   = (byte)iLevel[1];
+      clb.personal.iMasseur        = (byte)iLevel[2];
+      clb.personal.iTrainerMental  = (byte)iLevel[3];
+      clb.personal.iArzt           = (byte)iLevel[4];
+      clb.personal.iJugendTrainer  = (byte)iLevel[5];
+      clb.personal.iJugendScouting = (byte)iLevel[6];
+      clb.personal.iKibitzer       = (byte)iLevel[7];
+
+      int iKosten = (int)(MvcApplication.ckcore.tl.getStuffSalary(clb) / 12f);
+      string sKosten = iKosten.ToString("N0", getCi());
+
+      sKosten = "Kosten: " + sKosten + " €/Monat";
+
+      // Add personal pay-off costs
+      int iPayOff = getPersonalPayOff(iLevel);
+      if (iPayOff > 0) sKosten += ", Abfindungen: " + iPayOff.ToString("N0", getCi()) + " €";
+
+      return Json(sKosten, JsonRequestBehavior.AllowGet);
+    }
+
+    private int getPersonalPayOff(int[] iLevelNew)
+    {
+      int iPayOff = 0;
+      for (byte iP = 0; iP < 8; iP++) iPayOff += getPersonalPayOff(iP, iLevelNew[iP]);
+
+      return iPayOff;
+    }
+
+    private int getPersonalPayOff(int iPersonal, int iLevelNew)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return 0;
+
+      int iMoney = 0;
+      int iMonthDiff = (MvcApplication.ckcore.dtSeasonEnd.Month - MvcApplication.ckcore.dtDatum.Month) + (12 * (MvcApplication.ckcore.dtSeasonEnd.Year - MvcApplication.ckcore.dtDatum.Year));
+      if      (iPersonal == 0 && iLevelNew != clb.personal.iTrainerCo)      iMoney = iMonthDiff * (CornerkickManager.Finance.iCostCoachCo      [clb.personal.iTrainerCo]      / 2);
+      else if (iPersonal == 1 && iLevelNew != clb.personal.iTrainerKondi)   iMoney = iMonthDiff * (CornerkickManager.Finance.iCostCoachCondi   [clb.personal.iTrainerKondi]   / 2);
+      else if (iPersonal == 2 && iLevelNew != clb.personal.iMasseur)        iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMasseur      [clb.personal.iMasseur]        / 2);
+      else if (iPersonal == 3 && iLevelNew != clb.personal.iTrainerMental)  iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMental       [clb.personal.iTrainerMental]  / 2);
+      else if (iPersonal == 4 && iLevelNew != clb.personal.iArzt)           iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMed          [clb.personal.iArzt]           / 2);
+      else if (iPersonal == 5 && iLevelNew != clb.personal.iJugendTrainer)  iMoney = iMonthDiff * (CornerkickManager.Finance.iCostJouthCoach   [clb.personal.iJugendTrainer]  / 2);
+      else if (iPersonal == 6 && iLevelNew != clb.personal.iJugendScouting) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostJouthScouting[clb.personal.iJugendScouting] / 2);
+      else if (iPersonal == 7 && iLevelNew != clb.personal.iKibitzer)       iMoney = iMonthDiff * (CornerkickManager.Finance.iCostKibitzer     [clb.personal.iKibitzer]       / 2);
+
+      return iMoney;
+    }
+
+    [HttpPost]
+    public JsonResult PersonalHire(int[] iLevel)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if      (iPersonal == 0) clb.personal.iTrainerCo      = (byte)iLevel;
-      else if (iPersonal == 1) clb.personal.iTrainerKondi   = (byte)iLevel;
-      else if (iPersonal == 2) clb.personal.iMasseur        = (byte)iLevel;
-      else if (iPersonal == 3) clb.personal.iTrainerMental  = (byte)iLevel;
-      else if (iPersonal == 4) clb.personal.iArzt           = (byte)iLevel;
-      else if (iPersonal == 5) clb.personal.iJugendTrainer  = (byte)iLevel;
-      else if (iPersonal == 6) clb.personal.iJugendScouting = (byte)iLevel;
-      else if (iPersonal == 7) clb.personal.iKibitzer       = (byte)iLevel;
+      // First: Pay personal pay-off costs
+      int iPayOff = getPersonalPayOff(iLevel);
+      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
 
-      int iKosten = (int)(MvcApplication.ckcore.tl.getStuffSalary(clb) / 12f);
-      string sKosten = "0";
-      if (iKosten != 0) sKosten = iKosten.ToString("N0", getCi());
+      // Then, hire new personal
+      clb.personal.iTrainerCo      = (byte)iLevel[0];
+      clb.personal.iTrainerKondi   = (byte)iLevel[1];
+      clb.personal.iMasseur        = (byte)iLevel[2];
+      clb.personal.iTrainerMental  = (byte)iLevel[3];
+      clb.personal.iArzt           = (byte)iLevel[4];
+      clb.personal.iJugendTrainer  = (byte)iLevel[5];
+      clb.personal.iJugendScouting = (byte)iLevel[6];
+      clb.personal.iKibitzer       = (byte)iLevel[7];
 
-      return Json(sKosten, JsonRequestBehavior.AllowGet);
+      return Json("Neues Personal eingestellt!", JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////

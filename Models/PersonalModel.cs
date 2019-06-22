@@ -11,32 +11,28 @@ namespace CornerkickWebMvc.Models
   {
     public CornerkickManager.Main.Personal personal { get; set; }
 
-    public List<SelectListItem> ltDdlPersonal { get; set; }
-    public string sPersonal { get; set; }
+    public List<SelectListItem> ltDdlPersonalCoachCo { get; set; }
+    public string sPersonalCoachCo { get; set; }
+
+    public List<SelectListItem> ltDdlPersonalCoachCondi { get; set; }
+    public string sPersonalCoachCondi { get; set; }
+
+    public List<SelectListItem> ltDdlPersonalMasseur { get; set; }
+    public string sPersonalMasseur { get; set; }
+
+    public List<SelectListItem> ltDdlPersonalMental { get; set; }
+    public string sPersonalMental { get; set; }
+
+    public List<SelectListItem> ltDdlPersonalMed { get; set; }
+    public string sPersonalMed { get; set; }
+
+    public List<SelectListItem> ltDdlPersonalJouthCoach { get; set; }
+    public string sPersonalJouthCoach { get; set; }
+
+    public List<SelectListItem> ltDdlPersonalJouthScouting { get; set; }
+    public string sPersonalJouthScouting { get; set; }
 
     public List<SelectListItem> ltDdlPersonalKibitzer { get; set; }
     public string sPersonalKibitzer { get; set; }
-
-    public PersonalModel()
-    {
-      ltDdlPersonal = new List<SelectListItem>();
-      ltDdlPersonalKibitzer = new List<SelectListItem>();
-
-      ltDdlPersonal.Add(new SelectListItem { Text = "-", Value = "0" });
-      for (byte i = 1; i < 8; i++) {
-        ltDdlPersonal.Add(
-          new SelectListItem {
-            Text = "Level: " + i.ToString(),
-            Value = i.ToString()
-          }
-        );
-      }
-
-      ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "-",        Value = "0" });
-      ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 1", Value = "1" });
-      ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 2", Value = "2" });
-      ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 3", Value = "3" });
-      ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 4", Value = "4" });
-    }
   }
 }
