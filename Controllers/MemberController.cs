@@ -2426,7 +2426,7 @@ namespace CornerkickWebMvc.Controllers
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
 
-      string[] sKostenDauer = new string[] { iKostenDauer[0].ToString("N0", getCi()), iKostenDauer[1].ToString(), iDispoOk.ToString() };
+      string[] sKostenDauer = new string[] { (iKostenDauer[0] / 1000000).ToString("N0", getCi()) + " mio. €", iKostenDauer[1].ToString(), iDispoOk.ToString() };
 
       return Json(sKostenDauer, JsonRequestBehavior.AllowGet);
     }
