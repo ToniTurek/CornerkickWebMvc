@@ -1,0 +1,52 @@
+﻿@model CornerkickWebMvc.Models.PreviewGameModel
+
+@{
+  ViewBag.Title = "PreviewGame";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+    $(document).ready(function () {
+      $("#sGames").change(function () {
+        alert("Changed");
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <div style="position: relative; width: 100%">
+    <h2>Spielvorschau</h2>
+
+    @Html.DropDownListFor(m => m.sGames, Model.ddlGames, new { @class = "form-control" })
+
+    <div style="position: relative; width: 100%; text-align: center">
+      <text>@Model.sCupName</text>
+    </div>
+    <div style="position: relative; width: 100%; text-align: center">
+      <text>@Model.sMd</text>
+    </div>
+    <div style="position: relative; width: 100%; height: 30px; font-size: 150%">
+      <div style="position: absolute; width: 47%; text-align: right">
+        <text>@Model.sTeamH</text>
+      </div>
+      <div style="position: absolute; width: 6%; left: 47%; text-align: center">
+        <text>vs.</text>
+      </div>
+      <div style="position: absolute; width: 47%; left: 53%; text-align: left">
+        <text>@Model.sTeamA</text>
+      </div>
+    </div>
+    <div style="position: relative; width: 100%; text-align: center">
+      <text>@Model.sStadium</text>
+    </div>
+    <div style="position: relative; width: 100%; text-align: center">
+      <text>Schiedsrichter:</text>
+      <text>@Model.sReferee</text>
+    </div>
+  </div>
+</body>
+</html>

@@ -459,6 +459,38 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
+    public ActionResult PreviewGame(int i)
+    {
+      Models.PreviewGameModel mdPreview = new Models.PreviewGameModel();
+      if (i < 0) return View(mdPreview);
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(mdPreview);
+
+      List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clb, MvcApplication.ckcore.dtDatum);
+      for (byte j = 0; j < ltGdNextGames.Count; j++) {
+        CornerkickGame.Game.Data gd = ltGdNextGames[j];
+        mdPreview.ddlGames.Add(new SelectListItem { Text = gd.dt.ToString("d", getCi()), Value = j.ToString() });
+      }
+      if (i >= ltGdNextGames.Count) return View(mdPreview);
+
+      CornerkickGame.Game.Data gdNext = ltGdNextGames[i];
+      mdPreview.sTeamH = gdNext.team[0].sTeam;
+      mdPreview.sTeamA = gdNext.team[1].sTeam;
+
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(gdNext);
+      if (cup != null) {
+        mdPreview.sCupName = cup.sName;
+        mdPreview.sMd = (MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum) + 1).ToString() + ". Spieltag";
+      }
+
+      mdPreview.sStadium = gdNext.stadium.sName;
+
+      mdPreview.sReferee = "Qualität: " + gdNext.referee.fQuality.ToString("0.0%") + ", Härte: " + gdNext.referee.fStrict.ToString("0.0%");
+
+      return View(mdPreview);
+    }
+
     public ContentResult GetTeamDevelopmentData(bool bExpected = false)
     {
       CornerkickManager.Club clb = ckClub();

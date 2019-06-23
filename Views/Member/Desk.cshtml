@@ -144,13 +144,14 @@
       }
 
       if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
-        if (clb.personal.iTrainerCo == 0 &&
-            clb.personal.iTrainerKondi == 0 &&
-            clb.personal.iMasseur == 0 &&
-            clb.personal.iTrainerMental == 0 &&
-            clb.personal.iArzt == 0 &&
+        if (clb.personal.iTrainerCo      == 0 &&
+            clb.personal.iTrainerKondi   == 0 &&
+            clb.personal.iMasseur        == 0 &&
+            clb.personal.iTrainerMental  == 0 &&
+            clb.personal.iArzt           == 0 &&
             clb.personal.iJugendScouting == 0 &&
-            clb.personal.iJugendTrainer == 0) {
+            clb.personal.iJugendTrainer  == 0 &&
+            clb.personal.iKibitzer       == 0) {
           <div style="position: relative; width: 100%; text-align: center">
             @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
           </div>
@@ -208,7 +209,8 @@
           }
         }
       }
-      <text>@sDt</text>
+
+      @Html.ActionLink(@sDt, "PreviewGame", "Member", new { i = "0" }, new { target = "" })
     }
   }
 
