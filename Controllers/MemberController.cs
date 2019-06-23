@@ -1852,6 +1852,8 @@ namespace CornerkickWebMvc.Controllers
 
                 MvcApplication.ckcore.ltTransfer[iT] = transfer;
 
+                MvcApplication.ckcore.tr.informUser(transfer, offer);
+
                 int iClubPlayer = MvcApplication.ckcore.ltPlayer[iPlayerId].iClubId;
                 if (iClubPlayer >= 0) {
                   int iUserPlayer = MvcApplication.ckcore.ltClubs[iClubPlayer].iUser;
@@ -1862,7 +1864,6 @@ namespace CornerkickWebMvc.Controllers
 
                 CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
                 player.character.fMoney += 0.05f;
-                MvcApplication.ckcore.ltPlayer[iPlayerId] = player;
 
                 sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " erfolgreich abgegeben.";
                 break;
