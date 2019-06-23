@@ -346,14 +346,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Game.State state = gameData.ltState[gameData.ltState.Count - 1];
       if (iState >= 0 && iState < gameData.ltState.Count) state = gameData.ltState[iState];
 
-      for (int iC = 0; iC < state.ltCommend.Count; iC++) {
-        CornerkickGame.Game.Kommentar k = state.ltCommend[iC];
+      for (int iC = 0; iC < state.ltComment.Count; iC++) {
+        CornerkickGame.Game.Comment k = state.ltComment[iC];
 
-        if (string.IsNullOrEmpty(k.sKommentar)) continue;
+        if (string.IsNullOrEmpty(k.sText)) continue;
 
         string[] sCommentarNew = new string[2];
         sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + ": ";
-        sCommentarNew[1] = k.sKommentar;
+        sCommentarNew[1] = k.sText;
         gD.ltComments.Add(sCommentarNew);
       }
 
@@ -377,7 +377,7 @@ namespace CornerkickWebMvc.Controllers
         // Shoots
         CornerkickGame.Game.Shoot shoot = state.shoot;
         if (shoot.plShoot != null && shoot.iHA == iHA) {
-          float fDist = MvcApplication.ckcore.game.tl.getDistanceToGoal(shoot.plShoot)[0];
+          float fDist = CornerkickGame.Tool.getDistanceToGoal(shoot.plShoot, MvcApplication.ckcore.game.ptPitch.X, MvcApplication.ckcore.game.fConvertDist2Meter)[0];
 
           string sShootDesc = MvcApplication.ckcore.ui.getMinuteString(shoot.tsMinute, false) + " Min.: " +
                               shoot.iGoalsH.ToString() + ":" + shoot.iGoalsA.ToString();
