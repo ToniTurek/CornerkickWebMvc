@@ -219,8 +219,60 @@ namespace CornerkickWebMvc
         ckcore.setNewSeason();
       }
 
+      // Do next step
       int iRetCk = ckcore.next(true);
-      if (iRetCk == 99) return; // Saisonende
+
+      // End of season
+      if (iRetCk == 99) {
+        timerCkCalender.Enabled = false;
+
+        CornerkickManager.Cup cupGold   = MvcApplication.ckcore.tl.getCup(3);
+        CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+        if (ckcore.iSaisonCount == 1) {
+          // Create gold cup
+          cupGold = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
+          cupGold.iId = 3;
+          cupGold.sName = "Gold Cup";
+          cupGold.settings.iNeutral = 2;
+          cupGold.settings.iBonusCupWin = 30000000; // 30 mio.
+          cupGold.settings.bBonusReleaseCupWinInKo = true;
+          cupGold.settings.iDayOfWeek = 3;
+          MvcApplication.ckcore.ltCups.Add(cupGold);
+
+          // Create silver cup
+          cupSilver = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
+          cupSilver.iId = 4;
+          cupSilver.sName = "Silver Cup";
+          cupSilver.settings.iNeutral = 2;
+          cupSilver.settings.iBonusCupWin = 15000000; // 15 mio.
+          cupSilver.settings.bBonusReleaseCupWinInKo = true;
+          cupSilver.settings.iDayOfWeek = 4;
+          MvcApplication.ckcore.ltCups.Add(cupSilver);
+        }
+
+        for (byte iG = 0; iG < cupGold  .ltClubs.Length; iG++) cupGold  .ltClubs[iG].Clear();
+        for (byte iG = 0; iG < cupSilver.ltClubs.Length; iG++) cupSilver.ltClubs[iG].Clear();
+
+        int iGroup = 0;
+        foreach (int iN in iNations) {
+          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+          if (league == null) continue;
+
+          List<CornerkickManager.Tool.TableItem> ltTbl = MvcApplication.ckcore.tl.getLeagueTable(league);
+          for (byte jL = 0; jL < 4; jL++) {
+            if (iGroup >= cupGold.ltClubs.Length) iGroup = 0;
+            cupGold.ltClubs[iGroup].Add(ltTbl[jL].club);
+            iGroup++;
+          }
+        }
+
+        MvcApplication.ckcore.calcMatchdays();
+
+        MvcApplication.ckcore.drawCup(cupGold);
+        MvcApplication.ckcore.drawCup(cupSilver);
+
+        return;
+      }
 
       // Remove testgame requests if in past
       List<CornerkickManager.Cup> ltCupsTmp = new List<CornerkickManager.Cup>(ckcore.ltCups);
