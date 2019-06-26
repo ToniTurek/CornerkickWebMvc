@@ -316,6 +316,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\PersonalModel.cs" />
     <Compile Include="Models\PlayerModel.cs" />
+    <Compile Include="Models\PreviewGameModel.cs" />
     <Compile Include="Models\SponsorModel.cs" />
     <Compile Include="Models\StadionModel.cs" />
     <Compile Include="Models\StadiumSurroundingsModel.cs" />
@@ -891,6 +892,7 @@
     <Content Include="Views\ViewGame\ViewGame.cshtml" />
     <Content Include="Views\Shared\Info.cshtml" />
     <Content Include="Views\Member\Statistic.cshtml" />
+    <Content Include="Views\Member\PreviewGame.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
