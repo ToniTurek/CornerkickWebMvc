@@ -3361,6 +3361,24 @@ namespace CornerkickWebMvc.Controllers
       return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
+    [Authorize]
+    public ActionResult CupGold(Models.CupGoldModel cupGoldModel)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(cupGoldModel);
+
+      return View(cupGoldModel);
+    }
+
+    [Authorize]
+    public ActionResult CupSilver(Models.CupSilverModel cupSilverModel)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(cupSilverModel);
+
+      return View(cupSilverModel);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// Calendar

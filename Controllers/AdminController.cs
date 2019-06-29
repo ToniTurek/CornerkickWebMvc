@@ -80,13 +80,13 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // If first step: Add CPU teams
-      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
+      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount == 0) {
         Controllers.AccountController accountController = new Controllers.AccountController();
 
         foreach (int iLand in MvcApplication.iNations) {
+          // Create nat. cup
           CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
           if (cup == null) {
-            // Create nat. cup
             cup = new CornerkickManager.Cup(bKo: true);
             cup.iId = 2;
             cup.iId2 = iLand;
