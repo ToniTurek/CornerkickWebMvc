@@ -153,9 +153,7 @@ namespace CornerkickWebMvc
 
       if (timerCkCalender.Interval < 1000) timerCkCalender.Enabled = false;
 
-      performCalendarStep();
-
-      timerCkCalender.Enabled = true;
+      timerCkCalender.Enabled = performCalendarStep();
     }
 
     private static void timerSave_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -163,16 +161,15 @@ namespace CornerkickWebMvc
       save(timerCkCalender, true);
     }
 
-    private static void performCalendarStep(bool bSave = true)
+    private static bool performCalendarStep(bool bSave = true)
     {
-      if (ckcore.ltUser.Count == 0) return;
+      if (ckcore.ltUser.Count == 0) return true;
 
       if (iStartHour >= 0 && iStartHour <= 24) {
         if (DateTime.Now.Hour != iStartHour && DateTime.Now.Hour > 13) {
           if (ckcore.dtDatum.Equals(ckcore.dtSeasonStart) ||
              ((int)ckcore.dtDatum.DayOfWeek == 1 && ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0)) {
-            timerCkCalender.Enabled = true;
-            return;
+            return true;
           }
         }
       }
@@ -224,8 +221,6 @@ namespace CornerkickWebMvc
 
       // End of season
       if (iRetCk == 99) {
-        timerCkCalender.Enabled = false;
-
         CornerkickManager.Cup cupGold   = MvcApplication.ckcore.tl.getCup(3);
         CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
         if (ckcore.iSaisonCount == 1) {
@@ -271,7 +266,7 @@ namespace CornerkickWebMvc
         MvcApplication.ckcore.drawCup(cupGold);
         MvcApplication.ckcore.drawCup(cupSilver);
 
-        return;
+        return false;
       }
 
       // Remove testgame requests if in past
@@ -287,6 +282,8 @@ namespace CornerkickWebMvc
           }
         }
       }
+
+      return true;
     }
 
     private static int countCpuPlayerOnTransferlist()
