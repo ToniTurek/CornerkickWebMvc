@@ -106,7 +106,7 @@ function actionDrawTeams(sTeams) {
 function drawTeams(sTeams) {
   var sBox = '';
 
-  sBox += '<table id="tableLeagueTeams" border="0" cellpadding="2" style="width: 100%">';
+  sBox += '<table id="tableTeams" border="0" cellpadding="2" style="width: 100%">';
   sBox += '<tr>';
   sBox += '  <th colspan="1">Anstoß</th>';
   sBox += '  <th style="text-align:right">Heim</th>';
