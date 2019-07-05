@@ -182,14 +182,14 @@ namespace CornerkickWebMvc
         ckcore.ui.putPlayerOnTransferlist(plNew.iId, 0);
 
         // Player jouth
-        foreach (int iPlJouthId in club0.ltJugendspielerID) {
-          ckcore.ui.putPlayerOnTransferlist(iPlJouthId, 0);
+        foreach (CornerkickGame.Player plJ in club0.ltPlayerJouth) {
+          ckcore.ui.putPlayerOnTransferlist(plJ, 0);
         }
 
         if (countCpuPlayerOnTransferlist() > 200) {
           for (int iT = 0; iT < ckcore.ltTransfer.Count; iT++) {
             CornerkickManager.csTransfer.Transfer transfer = ckcore.ltTransfer[iT];
-            if (club0.ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) {
+            if (club0.ltPlayer.IndexOf(ckcore.ltPlayer[transfer.iPlayerId]) >= 0) {
               ckcore.tr.removePlayerFromTransferlist(ckcore.ltPlayer[transfer.iPlayerId]);
               break;
             }
@@ -197,8 +197,8 @@ namespace CornerkickWebMvc
         }
 
         // retire cpu player
-        if (club0.ltPlayerId.Count > 500) {
-          ckcore.plr.retirePlayer(ckcore.ltPlayer[club0.ltPlayerId[0]]);
+        if (club0.ltPlayer.Count > 500) {
+          ckcore.plr.retirePlayer(club0.ltPlayer[0]);
         }
 
         //checkCpuJouth();
@@ -302,7 +302,7 @@ namespace CornerkickWebMvc
     {
       int nPl = 0;
       foreach (CornerkickManager.csTransfer.Transfer transfer in ckcore.ltTransfer) {
-        if (ckcore.ltClubs[0].ltPlayerId.IndexOf(transfer.iPlayerId) >= 0) nPl++;
+        if (ckcore.ltClubs[0].ltPlayer.IndexOf(ckcore.ltPlayer[transfer.iPlayerId]) >= 0) nPl++;
       }
 
       return nPl;
