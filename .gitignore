@@ -4,3 +4,8 @@
 CornerkickAll.sln
 *.ckx
 Content/Uploads/*
+bin
+save
+obj
+*Credentials*
+.vs
