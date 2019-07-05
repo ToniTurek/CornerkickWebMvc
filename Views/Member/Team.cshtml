@@ -9,7 +9,7 @@
   CornerkickGame.Tactic tactic = new CornerkickGame.Tactic();
 
   if (clubUser != null) {
-    plSelected = MvcApplication.ckcore.ltPlayer[clubUser.ltPlayerId[0]];
+    plSelected = clubUser.ltPlayer[0];
     tactic = clubUser.tactic;
   }
 }

@@ -525,7 +525,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Create temp. player
         List<CornerkickGame.Player> ltPlayerTmp = new List<CornerkickGame.Player>();
-        foreach (int iPlId in clb.ltPlayerId) ltPlayerTmp.Add(MvcApplication.ckcore.ltPlayer[iPlId].Clone());
+        foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTmp.Add(pl.Clone());
 
         // For the next 7 days ...
         for (byte iD = 0; iD < 7; iD++) {
@@ -568,9 +568,7 @@ namespace CornerkickWebMvc.Controllers
 
       double[] fFAve = new double[7];
       int nPlKeeper = 0;
-      foreach (int iPlId in clb.ltPlayerId) {
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
-
+      foreach (CornerkickGame.Player pl in clb.ltPlayer) {
         fFAve[0] +=  pl.fSkillTraining[ 0];
         fFAve[1] += (pl.fSkillTraining[ 1] + pl.fSkillTraining[ 2])                                                / 2f; // Technik + Dribbling
         fFAve[2] +=  pl.fSkillTraining[ 3];                                                                              // Zweikampf
@@ -583,7 +581,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       for (int iF = 0; iF < fFAve.Length; iF++) {
-        if (iF < fFAve.Length - 1) dataPoints[iF] = new Models.DataPointGeneral(iF, fFAve[iF] / clb.ltPlayerId.Count);
+        if (iF < fFAve.Length - 1) dataPoints[iF] = new Models.DataPointGeneral(iF, fFAve[iF] / clb.ltPlayer.Count);
         else if (nPlKeeper > 0)    dataPoints[iF] = new Models.DataPointGeneral(iF, fFAve[iF] / nPlKeeper);
       }
 
@@ -606,6 +604,10 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult Team(Models.TeamModels team)
     {
+      // Formationen
+      team.ltsFormations    = new List<SelectListItem>();
+      team.ltsFormationsOwn = new List<SelectListItem>();
+
       CornerkickManager.User user = ckUser();
       CornerkickManager.Club club = ckClub();
       team.club = club;
@@ -617,10 +619,6 @@ namespace CornerkickWebMvc.Controllers
       if (user != null && user.game != null) team.bGame = !user.game.data.bFinished;
 
       setModelLtPlayer(user);
-
-      // Formationen
-      team.ltsFormations    = new List<SelectListItem>();
-      team.ltsFormationsOwn = new List<SelectListItem>();
 
       team.ltsFormations.Add(new SelectListItem { Text = "0 - Eigene", Value = "0" });
       for (int i = 0; i < MvcApplication.ckcore.ltFormationen.Count; i++) {
@@ -651,8 +649,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return;
 
-      foreach (int iPl in club.ltPlayerId) {
-        Models.TeamModels.ltPlayer.Add(MvcApplication.ckcore.ltPlayer[iPl]);
+      foreach (CornerkickGame.Player pl in club.ltPlayer) {
+        Models.TeamModels.ltPlayer.Add(pl);
       }
 
       if (user.game != null) {
@@ -680,10 +678,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User user = ckUser();
       int iC = user.iTeam;
 
-      int iPlayerID = MvcApplication.ckcore.ltClubs[iC].ltPlayerId[fromPosition - 1];
-      if (!MvcApplication.ckcore.ltPlayer[iPlayerID].bPlayed) {
-        MvcApplication.ckcore.ltClubs[iC].ltPlayerId.RemoveAt(fromPosition - 1);
-        MvcApplication.ckcore.ltClubs[iC].ltPlayerId.Insert(toPosition - 1, iPlayerID);
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltClubs[iC].ltPlayer[fromPosition - 1];
+      if (!pl.bPlayed) {
+        MvcApplication.ckcore.ltClubs[iC].ltPlayer.RemoveAt(fromPosition - 1);
+        MvcApplication.ckcore.ltClubs[iC].ltPlayer.Insert(toPosition - 1, pl);
 
         setModelLtPlayer(user);
 
@@ -700,8 +698,8 @@ namespace CornerkickWebMvc.Controllers
       int jPosMin = Math.Min(iIndex1, iIndex2);
       int jPosMax = Math.Max(iIndex1, iIndex2);
 
-      int iPlayerID1 = club.ltPlayerId[jPosMin];
-      int iPlayerID2 = club.ltPlayerId[jPosMax];
+      CornerkickGame.Player pl1 = club.ltPlayer[jPosMin];
+      CornerkickGame.Player pl2 = club.ltPlayer[jPosMax];
 
       if (user.game != null) {
         if (!user.game.data.bFinished) {
@@ -728,14 +726,11 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (jPosMin < 11) {
-        CornerkickGame.Player sp1 = MvcApplication.ckcore.ltPlayer[iPlayerID1];
-        CornerkickGame.Player sp2 = MvcApplication.ckcore.ltPlayer[iPlayerID2];
-
-        System.Drawing.Point pt2Tmp = sp2.ptPosDefault;
-        sp2.ptPosDefault = sp1.ptPosDefault;
+        System.Drawing.Point pt2Tmp = pl2.ptPosDefault;
+        pl2.ptPosDefault = pl1.ptPosDefault;
 
         if (jPosMax < 11) {
-          sp1.ptPosDefault = pt2Tmp;
+          pl1.ptPosDefault = pt2Tmp;
         }
 
         //MvcApplication.ckcore.ltPlayer[iPlayerID1] = sp1;
@@ -743,11 +738,11 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // Switch player in club list
-      club.ltPlayerId.Remove(iPlayerID1);
-      club.ltPlayerId.Remove(iPlayerID2);
+      club.ltPlayer.Remove(pl1);
+      club.ltPlayer.Remove(pl2);
 
-      club.ltPlayerId.Insert(jPosMin, iPlayerID2);
-      club.ltPlayerId.Insert(jPosMax, iPlayerID1);
+      club.ltPlayer.Insert(jPosMin, pl2);
+      club.ltPlayer.Insert(jPosMax, pl1);
 
       //MvcApplication.ckcore.ltClubs[iC] = club;
       setModelLtPlayer(user);
@@ -755,12 +750,12 @@ namespace CornerkickWebMvc.Controllers
       return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult SwitchPlayerByID(int iID1, int iID2)
+    public JsonResult SwitchPlayer(CornerkickGame.Player pl1, CornerkickGame.Player pl2)
     {
       CornerkickManager.Club clb = ckClub();
 
-      int iIndex1 = clb.ltPlayerId.IndexOf(iID1);
-      int iIndex2 = clb.ltPlayerId.IndexOf(iID2);
+      int iIndex1 = clb.ltPlayer.IndexOf(pl1);
+      int iIndex2 = clb.ltPlayer.IndexOf(pl2);
 
       return Json(SwitchPlayerByIndex(iIndex1, iIndex2), JsonRequestBehavior.AllowGet);
     }
@@ -796,7 +791,7 @@ namespace CornerkickWebMvc.Controllers
     {
       /*
       List<CornerkickGame.Player> ltSpieler = new List<CornerkickGame.Player>();
-      foreach (int iSp in AccountController.ckClub.ltPlayerId) {
+      foreach (int iSp in AccountController.ckClub.ltPlayer) {
         ltSpieler.Add(MvcApplication.ckcore.ltPlayer[iSp]);
       }
       */
@@ -897,9 +892,8 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIndexPlayer]];
+      CornerkickGame.Player pl = club.ltPlayer[iIndexPlayer];
       pl.ptPosDefault = club.formation.ptPos[iIndexPlayer];
-      MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIndexPlayer]] = pl;
       club.formation.iId = 0;
 
       //if (iIndexPlayer >= Models.TeamModels.ltPlayer.Count) setModelLtPlayer(usr);
@@ -917,14 +911,12 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIndexPlayer]];
+      CornerkickGame.Player pl = club.ltPlayer[iIndexPlayer];
 
       if      (iDirection == 1) pl.fRadOfAction[0] += 0.2f;
       else if (iDirection == 2) pl.fRadOfAction[0] -= 0.2f;
       else if (iDirection == 3) pl.fRadOfAction[1] += 0.2f;
       else if (iDirection == 4) pl.fRadOfAction[1] -= 0.2f;
-
-      MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIndexPlayer]] = pl;
 
       //if (iIndex >= Models.TeamModels.ltPlayer.Count) setModelLtPlayer(usr);
       Models.TeamModels.ltPlayer[iIndexPlayer] = pl;
@@ -941,11 +933,11 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIndexPlayer]];
+      CornerkickGame.Player pl = club.ltPlayer[iIndexPlayer];
 
       pl.fIndOrientation = fIndOrientation;
 
-      //MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIndexPlayer]] = pl;
+      //MvcApplication.ckcore.ltPlayer[club.ltPlayer[iIndexPlayer]] = pl;
       Models.TeamModels.ltPlayer[iIndexPlayer] = pl;
 
       updatePlayerOfGame(ckUser().game, club);
@@ -960,7 +952,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iIxPlayer]];
+      CornerkickGame.Player pl = club.ltPlayer[iIxPlayer];
 
       if (pl.iIxManMarking == iIxPlayerOpp) pl.iIxManMarking = -1;
       else                                  pl.iIxManMarking = iIxPlayerOpp;
@@ -1010,17 +1002,17 @@ namespace CornerkickWebMvc.Controllers
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
           // Create list of temp player
-          List<int> ltiSpErsatz = new List<int>();
-          for (int i = 18; i < club.ltPlayerId.Count; i++) ltiSpErsatz.Add(club.ltPlayerId[i]);
+          List<CornerkickGame.Player> ltPlRes = new List<CornerkickGame.Player>();
+          for (int i = user.game.data.nPlStart + user.game.data.nPlRes; i < club.ltPlayer.Count; i++) ltPlRes.Add(club.ltPlayer[i].Clone());
 
           // Clear current list of players
-          club.ltPlayerId.Clear();
+          club.ltPlayer.Clear();
 
           // Add player from current game
-          foreach (CornerkickGame.Player sp in user.game.player[iHA]) club.ltPlayerId.Add(sp.iId);
+          foreach (CornerkickGame.Player pl in user.game.player[iHA]) club.ltPlayer.Add(pl);
 
           // Add temp player
-          foreach (int iSp in ltiSpErsatz) club.ltPlayerId.Add(iSp);
+          foreach (CornerkickGame.Player plRes in ltPlRes) club.ltPlayer.Add(plRes);
 
           return RedirectToAction("Team");
         }
@@ -1129,8 +1121,7 @@ namespace CornerkickWebMvc.Controllers
           CornerkickManager.Club clubOpp = MvcApplication.ckcore.ltClubs[iClubOpp];
 
           for (byte iPl = 0; iPl < club.nextGame.nPlStart; iPl++) {
-            int iPlId = clubOpp.ltPlayerId[iPl];
-            CornerkickGame.Player plOpp = MvcApplication.ckcore.ltPlayer[iPlId];
+            CornerkickGame.Player plOpp = clubOpp.ltPlayer[iPl];
 
             tD.ltPlayerOpp.Add(plOpp);
             tD.ltPlayerOppPos.Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(plOpp)));
@@ -1160,9 +1151,9 @@ namespace CornerkickWebMvc.Controllers
       if (game.data.team[1].iTeamId == club.iId) iHA = 1;
 
       for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
-        foreach (int iPlId in club.ltPlayerId) {
-          if (iPlId == game.player[iHA][iPl].iId) {
-            game.player[iHA][iPl] = MvcApplication.ckcore.ltPlayer[iPlId];
+        foreach (CornerkickGame.Player pl in club.ltPlayer) {
+          if (pl.iId == game.player[iHA][iPl].iId) {
+            game.player[iHA][iPl] = pl;
             break;
           }
         }
@@ -1268,9 +1259,9 @@ namespace CornerkickWebMvc.Controllers
     {
       string sDiv = "";
 
-      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.data.nPlStart || iPlayerIndex >= club.ltPlayerId.Count) return "";
+      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.data.nPlStart || iPlayerIndex >= club.ltPlayer.Count) return "";
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPlayerIndex]];
+      CornerkickGame.Player pl = club.ltPlayer[iPlayerIndex];
 
       int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.tactic.fOrientation);
 
@@ -1354,9 +1345,9 @@ namespace CornerkickWebMvc.Controllers
     {
       float[] fIndOrientationMinMax = new float[2];
 
-      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.data.nPlStart || iPlayerIndex >= club.ltPlayerId.Count) return fIndOrientationMinMax;
+      if (iPlayerIndex < 0 || iPlayerIndex >= MvcApplication.ckcore.game.data.nPlStart || iPlayerIndex >= club.ltPlayer.Count) return fIndOrientationMinMax;
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPlayerIndex]];
+      CornerkickGame.Player pl = club.ltPlayer[iPlayerIndex];
 
       fIndOrientationMinMax[0] = MvcApplication.ckcore.game.tl.getXPosOffence(pl.ptPosDefault.X, club.tactic.fOrientation, -1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
       fIndOrientationMinMax[1] = MvcApplication.ckcore.game.tl.getXPosOffence(pl.ptPosDefault.X, club.tactic.fOrientation, +1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
@@ -1376,7 +1367,7 @@ namespace CornerkickWebMvc.Controllers
       plModel.iPlayerIndTr = plDetails.iIndTraining;
 
       plModel.bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(club, plDetails);
-      plModel.bJouth = club.ltJugendspielerID.IndexOf(i) >= 0;
+      plModel.bJouth = club.ltPlayerJouth.IndexOf(plDetails) >= 0;
 
       plModel.iContractYears = 1;
 
@@ -1388,8 +1379,8 @@ namespace CornerkickWebMvc.Controllers
       plModel.sEmblem = getClubEmblem(plDetails.iClubId, "height: 100%; width: 100%; object-fit: contain");
 
       List<int> ltNoExist = new List<int>();
-      foreach (int iPlId in club.ltPlayerId) {
-        ltNoExist.Add(MvcApplication.ckcore.ltPlayer[iPlId].iNr);
+      foreach (CornerkickGame.Player pl in club.ltPlayer) {
+        ltNoExist.Add(pl.iNr);
       }
 
       if (plDetails.iNr == 0) {
@@ -1432,11 +1423,11 @@ namespace CornerkickWebMvc.Controllers
       plModel.iPlIdPrev = -1;
       plModel.iPlIdNext = -1;
 
-      int iIndex = club.ltPlayerId.IndexOf(plDetails.iId);
+      int iIndex = club.ltPlayer.IndexOf(plDetails);
 
       if (iIndex >= 0) {
-        if (iIndex >                         0) plModel.iPlIdPrev = club.ltPlayerId[iIndex - 1];
-        if (iIndex < club.ltPlayerId.Count - 1) plModel.iPlIdNext = club.ltPlayerId[iIndex + 1];
+        if (iIndex >                       0) plModel.iPlIdPrev = club.ltPlayer[iIndex - 1].iId;
+        if (iIndex < club.ltPlayer.Count - 1) plModel.iPlIdNext = club.ltPlayer[iIndex + 1].iId;
       }
 
       return View(plModel);
@@ -1747,9 +1738,7 @@ namespace CornerkickWebMvc.Controllers
       Models.JouthModel.ltPlayerJouth = new List<CornerkickGame.Player>();
 
       if (MvcApplication.ckcore.ltClubs.Count > iC) {
-        foreach (int iSp in MvcApplication.ckcore.ltClubs[iC].ltJugendspielerID) {
-          CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[iSp];
-
+        foreach (CornerkickGame.Player plJ in MvcApplication.ckcore.ltClubs[iC].ltPlayerJouth) {
           /*
           // Change Birthday if too young
           if (MvcApplication.ckcore.game.tl.getPlayerAgeFloat(sp, MvcApplication.ckcore.dtDatum) < 15) {
@@ -1758,7 +1747,7 @@ namespace CornerkickWebMvc.Controllers
           }
           */
 
-          Models.JouthModel.ltPlayerJouth.Add(sp);
+          Models.JouthModel.ltPlayerJouth.Add(plJ);
         }
       }
 
@@ -1773,15 +1762,12 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.ltJugendspielerID.Remove(iJouthID);
-      clb.ltPlayerId.Add(iJouthID);
+      CornerkickGame.Player plJ = MvcApplication.ckcore.ltPlayer[iJouthID];
+      clb.ltPlayerJouth.Remove(plJ);
+      clb.ltPlayer     .Add   (plJ);
 
-      CornerkickGame.Player sp = MvcApplication.ckcore.ltPlayer[iJouthID];
-
-      sp.contract.iLength = 2;
-      sp.contract.iSalary = MvcApplication.ckcore.plr.getSalary(sp, sp.contract.iLength, MvcApplication.ckcore.fz.iMoneyTotal());
-
-      MvcApplication.ckcore.ltPlayer[iJouthID] = sp;
+      plJ.contract.iLength = 2;
+      plJ.contract.iSalary = MvcApplication.ckcore.plr.getSalary(plJ, plJ.contract.iLength, MvcApplication.ckcore.fz.iMoneyTotal());
 
       return Json("", JsonRequestBehavior.AllowGet);
     }
@@ -1896,13 +1882,13 @@ namespace CornerkickWebMvc.Controllers
               if (offer.iClubId == iClubId) {
                 CornerkickManager.Club clubUser = ckClub();
                 clubUser.iKontostand += offer.iMoney;
-                clubUser.ltPlayerId.Remove(iPlayerId);
+                clubUser.ltPlayer.Remove(iPlayerId);
                 MvcApplication.ckcore.fz.setKonto(ref clubUser, MvcApplication.ckcore.dtDatum, +offer.iMoney, "Spielertransfer");
                 AccountController.setCkClub(clubUser);
 
                 CornerkickManager.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
                 clubTake.iKontostand -= offer.iMoney;
-                clubTake.ltPlayerId.Add(iPlayerId);
+                clubTake.ltPlayer.Add(iPlayerId);
                 MvcApplication.ckcore.fz.setKonto(ref clubTake, MvcApplication.ckcore.dtDatum, -offer.iMoney, "Spielertransfer");
                 MvcApplication.ckcore.Info("Ihr Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " von " + offer.iMoney.ToString("N0", getCi()) + " wurde angenommen!", clubTake.iUser, 3, 0, clubTake.iUser);
                 MvcApplication.ckcore.ltClubs[iClubId] = clubTake;
@@ -2074,9 +2060,9 @@ namespace CornerkickWebMvc.Controllers
         tactic.ltDdlStandards[iS] = new List<SelectListItem>();
         tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = "auto (" + sStandards[iS] + ")", Value = "-1" });
         for (byte iPl = 0; iPl < MvcApplication.ckcore.game.data.nPlStart; iPl++) {
-          if (clb.ltPlayerId.Count <= iPl) break;
+          if (clb.ltPlayer.Count <= iPl) break;
 
-          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
+          CornerkickGame.Player pl = clb.ltPlayer[iPl];
           tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = pl.sName, Value = iPl.ToString(), Selected = iPl == clb.tactic.iStandards[iS] });
         }
       }
@@ -2175,8 +2161,8 @@ namespace CornerkickWebMvc.Controllers
         tactic.ddlAutoSubsOut[iAS].Add(new SelectListItem { Text = "aus", Value = "-1" });
         tactic.ddlAutoSubsIn [iAS].Add(new SelectListItem { Text = "aus", Value = "-1" });
 
-        for (byte iPl = 0; iPl < clb.ltPlayerId.Count; iPl++) {
-          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
+        for (byte iPl = 0; iPl < clb.ltPlayer.Count; iPl++) {
+          CornerkickGame.Player pl = clb.ltPlayer[iPl];
 
           bool bSelected = false;
           if (iAS < clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count) {
@@ -2235,7 +2221,7 @@ namespace CornerkickWebMvc.Controllers
 
       // foreach player
       for (int iPl = 0; iPl < MvcApplication.ckcore.game.data.nPlStart + MvcApplication.ckcore.game.data.nPlRes; iPl++) {
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
+        CornerkickGame.Player pl = clb.ltPlayer[iPl];
 
         bool bOut = iPl < MvcApplication.ckcore.game.data.nPlStart;
 

@@ -413,15 +413,13 @@ namespace CornerkickWebMvc.Controllers
       // Equalize player speed
       byte iCount7 = 0;
       byte iCount5 = 0;
-      for (int iPl = 0; iPl < club.ltPlayerId.Count; iPl++) {
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
+      for (int iPl = 0; iPl < club.ltPlayer.Count; iPl++) {
+        CornerkickGame.Player pl = club.ltPlayer[iPl];
         pl.iSkill[0] = 6;
-        MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = pl;
       }
 
       while (iCount7 < 2 || iCount5 < 1) {
-        int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (!MvcApplication.ckcore.game.tl.bPlayerMainPos(pl, 1)) { // if not keeper
           if (iCount7 < 2) {
@@ -434,12 +432,12 @@ namespace CornerkickWebMvc.Controllers
         }
       }
       /*
-      while (iSpeed < 6 * club.ltPlayerId.Count) {
-        for (byte iPl = 0; iPl < club.ltPlayerId.Count; iPl++) {
-          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
+      while (iSpeed < 6 * club.ltPlayer.Count) {
+        for (byte iPl = 0; iPl < club.ltPlayer.Count; iPl++) {
+          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayer[iPl]];
           if (pl.iF[0] < 6) {
             pl.iF[0]++;
-            MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = pl;
+            MvcApplication.ckcore.ltPlayer[club.ltPlayer[iPl]] = pl;
 
             iSpeed++;
             break;
@@ -447,12 +445,12 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      while (iSpeed > 6 * club.ltPlayerId.Count) {
-        for (byte iPl = 0; iPl < club.ltPlayerId.Count; iPl++) {
-          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]];
+      while (iSpeed > 6 * club.ltPlayer.Count) {
+        for (byte iPl = 0; iPl < club.ltPlayer.Count; iPl++) {
+          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[club.ltPlayer[iPl]];
           if (pl.iF[0] > 6) {
             pl.iF[0]--;
-            MvcApplication.ckcore.ltPlayer[club.ltPlayerId[iPl]] = pl;
+            MvcApplication.ckcore.ltPlayer[club.ltPlayer[iPl]] = pl;
 
             iSpeed++;
             break;
@@ -462,9 +460,8 @@ namespace CornerkickWebMvc.Controllers
       */
 
       // Equalize player talent
-      while (iTalent > 4.51 * club.ltPlayerId.Count) {
-        int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+      while (iTalent > 4.51 * club.ltPlayer.Count) {
+        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
         if (pl.iTalent > 2) {
           pl.iTalent--;
 
@@ -472,9 +469,8 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      while (iTalent < 4.49 * club.ltPlayerId.Count) {
-        int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+      while (iTalent < 4.49 * club.ltPlayer.Count) {
+        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
         if (pl.iTalent < 7) {
           pl.iTalent++;
 
@@ -483,9 +479,8 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // Equalize player age
-      while (fAlter > 25.5f * club.ltPlayerId.Count) {
-        int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+      while (fAlter > 25.5f * club.ltPlayer.Count) {
+        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (pl.getAge(MvcApplication.ckcore.dtDatum) > 22) {
           try {
@@ -498,9 +493,8 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      while (fAlter < 25.5f * club.ltPlayerId.Count) {
-        int iPlId = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+      while (fAlter < 25.5f * club.ltPlayer.Count) {
+        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (pl.getAge(MvcApplication.ckcore.dtDatum) < 30) {
           try {
@@ -518,11 +512,8 @@ namespace CornerkickWebMvc.Controllers
       int iBreak = 0;
       float fAgeTalent = getAgeTalent(club);
       while (fAgeTalent > 70.75 || fAgeTalent < 68.75) {
-        int iPlId1 = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl1 = MvcApplication.ckcore.ltPlayer[iPlId1];
-
-        int iPlId2 = club.ltPlayerId[random.Next(club.ltPlayerId.Count)];
-        CornerkickGame.Player pl2 = MvcApplication.ckcore.ltPlayer[iPlId2];
+        CornerkickGame.Player pl1 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickGame.Player pl2 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (pl1.iTalent > 2 && pl1.iTalent < 7 &&
             pl2.iTalent > 2 && pl2.iTalent < 7) {
@@ -562,14 +553,12 @@ namespace CornerkickWebMvc.Controllers
     {
       float fAgeTalent = 0f;
 
-      foreach (int iPlId in club.ltPlayerId) {
-        CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
-
-        // Count age
+      // Count age
+      foreach (CornerkickGame.Player pl in club.ltPlayer) {
         fAgeTalent += (pl.getAge(MvcApplication.ckcore.dtDatum) - 10f) * pl.iTalent;
       }
 
-      return fAgeTalent / club.ltPlayerId.Count;
+      return fAgeTalent / club.ltPlayer.Count;
     }
 
     [HttpPost]

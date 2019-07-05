@@ -102,18 +102,18 @@
     CornerkickManager.Club clb = Model.club;
 
     if (clb != null) {
-      if (clb.ltPlayerId != null) {
-        for (int iPl = 0; iPl < clb.ltPlayerId.Count; iPl++, nPl++) {
-          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltPlayerId[iPl]];
+      if (clb.ltPlayer != null) {
+        for (int iPl = 0; iPl < clb.ltPlayer.Count; iPl++, nPl++) {
+          CornerkickGame.Player pl = clb.ltPlayer[iPl];
           string sId = "idPlayerNames" + iPl.ToString();
-          <div id="@sId" data-name="@pl.sName,@clb.ltPlayerId[iPl]"></div>
+          <div id="@sId" data-name="@pl.sName,@clb.ltPlayer[iPl]"></div>
         }
       }
-      if (clb.ltJugendspielerID != null) {
-        for (int iPl = 0; iPl < clb.ltJugendspielerID.Count; iPl++, nPl++) {
-          CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[clb.ltJugendspielerID[iPl]];
-          string sId = "idPlayerNames" + (iPl + clb.ltPlayerId.Count).ToString();
-          <div id="@sId" data-name="@pl.sName,@clb.ltJugendspielerID[iPl]"></div>
+      if (clb.ltPlayerJouth != null) {
+        for (int iPl = 0; iPl < clb.ltPlayerJouth.Count; iPl++, nPl++) {
+          CornerkickGame.Player pl = clb.ltPlayerJouth[iPl];
+          string sId = "idPlayerNames" + (iPl + clb.ltPlayer.Count).ToString();
+          <div id="@sId" data-name="@pl.sName,@clb.ltPlayerJouth[iPl]"></div>
         }
       }
 
