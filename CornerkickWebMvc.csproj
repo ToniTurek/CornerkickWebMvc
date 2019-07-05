@@ -307,7 +307,9 @@
     <Compile Include="Models\CalendarModels.cs" />
     <Compile Include="Models\ClubModel.cs" />
     <Compile Include="Models\ConsoleModels.cs" />
+    <Compile Include="Models\CupGoldModel.cs" />
     <Compile Include="Models\CupModel.cs" />
+    <Compile Include="Models\CupSilverModel.cs" />
     <Compile Include="Models\DeskModel.cs" />
     <Compile Include="Models\FinanceModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -692,6 +694,8 @@
     <Content Include="Content\DataTables\css\common.scss" />
     <Content Include="Scripts\canvasjs.min.js" />
     <Content Include="Scripts\Cup.js" />
+    <Content Include="Scripts\CupGold.js" />
+    <Content Include="Scripts\CupSilver.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap4.js" />
@@ -893,6 +897,8 @@
     <Content Include="Views\Shared\Info.cshtml" />
     <Content Include="Views\Member\Statistic.cshtml" />
     <Content Include="Views\Member\PreviewGame.cshtml" />
+    <Content Include="Views\Member\CupGold.cshtml" />
+    <Content Include="Views\Member\CupSilver.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
