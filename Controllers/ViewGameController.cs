@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define _AI2
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
@@ -605,7 +607,11 @@ namespace CornerkickWebMvc.Controllers
 
       if (AccountController.checkUserIsAdmin(User.Identity.GetUserName())) {
         if (user.game.ball.plAtBall != null) {
+#if _AI2
+          float fShootOnGoal = user.game.ai.getChanceShootOnGoal(user.game.ball.plAtBall, 0);
+#else
           float fShootOnGoal = user.game.ai.getChanceShootOnGoal    (user.game.ball.plAtBall);
+#endif
           float fKeeperSave  = user.game.ai.getChanceShootKeeperSave(user.game.ball.plAtBall);
 
           gD.sAdminChanceShootOnGoal = "<br/><u>Change Schuss aufs Tor:</u> " + fShootOnGoal.ToString("0.0%");
