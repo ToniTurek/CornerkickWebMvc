@@ -1,9 +1,36 @@
 ﻿@model CornerkickWebMvc.Models.CupGoldModel
 
 @{
-    ViewBag.Title = "Gold Cup";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Gold Cup";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Gold Cup</h2>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
+  <script type="text/javascript" src="~/Scripts/League.js"></script>
+  <script type="text/javascript" src="~/Scripts/CupGold.js"></script>
 
+  <script>
+    $(document).ready(function () {
+      setMatchday(0);
+
+      $("#ddlMatchday").change(function () {
+        setMatchday($(this).val());
+      });
+    });
+  </script>
+</head>
+
+<body style="height: 100%; min-height: 100%">
+  <label style="margin-left: 10px">
+    Spieltag:
+    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchday" })
+  </label>
+
+  <h4>Begegnungen</h4>
+  <div id="tableDivCupGoldTeams"></div>
+
+  <div id="divCupGoldScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+</body>
+</html>

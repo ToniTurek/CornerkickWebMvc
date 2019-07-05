@@ -221,6 +221,8 @@ namespace CornerkickWebMvc
 
       // End of season
       if (iRetCk == 99) {
+        return false;
+      } else if (iRetCk == 4) {
         CornerkickManager.Cup cupGold   = MvcApplication.ckcore.tl.getCup(3);
         CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
         if (ckcore.iSaisonCount == 1) {
@@ -248,16 +250,28 @@ namespace CornerkickWebMvc
         for (byte iG = 0; iG < cupGold  .ltClubs.Length; iG++) cupGold  .ltClubs[iG].Clear();
         for (byte iG = 0; iG < cupSilver.ltClubs.Length; iG++) cupSilver.ltClubs[iG].Clear();
 
-        int iGroup = 0;
+        // Add clubs ...
+        int iGroupGold   = 0;
+        int iGroupSilver = 0;
         foreach (int iN in iNations) {
+          // ... of league iN ...
           CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iN, 0);
           if (league == null) continue;
 
           List<CornerkickManager.Tool.TableItem> ltTbl = MvcApplication.ckcore.tl.getLeagueTable(league);
+
+          // ... to Gold Cup
           for (byte jL = 0; jL < 4; jL++) {
-            if (iGroup >= cupGold.ltClubs.Length) iGroup = 0;
-            cupGold.ltClubs[iGroup].Add(ltTbl[jL].club);
-            iGroup++;
+            if (iGroupGold >= cupGold.ltClubs.Length) iGroupGold = 0;
+            cupGold.ltClubs[iGroupGold].Add(ltTbl[jL].club);
+            iGroupGold++;
+          }
+
+          // ... to Silver Cup
+          for (byte jL = 4; jL < 8; jL++) {
+            if (iGroupSilver >= cupSilver.ltClubs.Length) iGroupSilver = 0;
+            cupSilver.ltClubs[iGroupSilver].Add(ltTbl[jL].club);
+            iGroupSilver++;
           }
         }
 
@@ -265,8 +279,6 @@ namespace CornerkickWebMvc
 
         MvcApplication.ckcore.drawCup(cupGold);
         MvcApplication.ckcore.drawCup(cupSilver);
-
-        return false;
       }
 
       // Remove testgame requests if in past

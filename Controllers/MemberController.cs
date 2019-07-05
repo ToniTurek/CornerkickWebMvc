@@ -3376,6 +3376,13 @@ namespace CornerkickWebMvc.Controllers
       return View(cupGoldModel);
     }
 
+    public JsonResult setCupGold(int iMatchday)
+    {
+      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
+
+      return Json(getCupTeams(cupGold, iMatchday), JsonRequestBehavior.AllowGet);
+    }
+
     [Authorize]
     public ActionResult CupSilver(Models.CupSilverModel cupSilverModel)
     {
@@ -3383,6 +3390,13 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return View(cupSilverModel);
 
       return View(cupSilverModel);
+    }
+
+    public JsonResult setCupSilver(int iMatchday)
+    {
+      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+
+      return Json(getCupTeams(cupSilver, iMatchday), JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
