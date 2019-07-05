@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
@@ -26,7 +27,7 @@ namespace CornerkickWebMvc
     // Use NuGet to install SendGrid (Basic C# client lib) 
     private async Task configSendGridasync(IdentityMessage message)
     {
-      var apiKey = "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";
+      var apiKey = ConfigurationManager.AppSettings["ckSendGridApiKey"];
       var client = new SendGridClient(apiKey);
 
       var from = new EmailAddress("contact@cornerkick.net", "Cornerkick");

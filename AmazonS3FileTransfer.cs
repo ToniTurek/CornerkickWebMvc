@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -17,7 +18,12 @@ namespace CornerkickWebMvc
     private const string sBucketName = "ckamazonbucket";
     private RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
     const string sAccessKey = "AKIAJKOOKK445KJRPY7Q";
-    const string sSecretAccessKey = "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";
+    string sSecretAccessKey = "";
+
+    public AmazonS3FileTransfer()
+    {
+      sSecretAccessKey = ConfigurationManager.AppSettings["ckAwsKey"];
+    }
 
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
     {
