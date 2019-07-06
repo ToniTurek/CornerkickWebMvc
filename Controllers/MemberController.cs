@@ -3430,6 +3430,9 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Club club = ckClub();
 
+      DateTime dtStartWeek = MvcApplication.ckcore.dtDatum;
+      while ((int)(dtStartWeek.DayOfWeek) != 0) dtStartWeek = dtStartWeek.AddDays(-1);
+
       //DateTime dt = new DateTime(MvcApplication.ckcore.dtDatum.Year, MvcApplication.ckcore.dtDatum.Month, MvcApplication.ckcore.dtDatum.Day);
       DateTime dt = MvcApplication.ckcore.dtSeasonStart.Date;
       while (dt.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
@@ -3491,7 +3494,10 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Training
-        if (club.training.iTraining[(int)dt.DayOfWeek] > 0 && !bCampTravelDay) {
+        if ((dt - dtStartWeek).TotalDays >= 0 &&
+            (dt - dtStartWeek).TotalDays <  7 &&
+            club.training.iTraining[(int)dt.DayOfWeek] > 0 &&
+            !bCampTravelDay) {
           DateTime dtTmp = new DateTime(dt.Year, dt.Month, dt.Day, 10, 00, 00);
 
           ltEvents.Add(new Models.DiaryEvent {
@@ -3517,7 +3523,8 @@ namespace CornerkickWebMvc.Controllers
                 int iIdH = gd.team[0].iTeamId;
                 int iIdA = gd.team[1].iTeamId;
                 if (iIdH == club.iId ||
-                    iIdA == club.iId) {
+                    iIdA == club.iId ||
+                    cup.iId == 7) {
                   string sH = "";
                   string sA = "";
                   if (iIdH >= 0 && iIdH < MvcApplication.ckcore.ltClubs.Count) sH = MvcApplication.ckcore.ltClubs[iIdH].sName;
@@ -3578,6 +3585,7 @@ namespace CornerkickWebMvc.Controllers
                 bAllDay = false
               });
             }
+
             iSpTg++;
           }
         }
