@@ -17,12 +17,13 @@ namespace CornerkickWebMvc
   {
     private const string sBucketName = "ckamazonbucket";
     private RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
-    const string sAccessKey = "AKIAJKOOKK445KJRPY7Q";
-    string sSecretAccessKey = "";
+    string sAwsKeyId     = "";
+    string sAwsSecretKey = "";
 
     public AmazonS3FileTransfer()
     {
-      sSecretAccessKey = ConfigurationManager.AppSettings["ckAwsKey"];
+      sAwsKeyId     = ConfigurationManager.AppSettings["ckAwsKeyId"];
+      sAwsSecretKey = ConfigurationManager.AppSettings["ckAwsSecretKey"];
     }
 
     public void uploadFile(string sFile, string sKey = null, string sContentType = "text/plain")
@@ -37,7 +38,7 @@ namespace CornerkickWebMvc
       //string accessKey = System.Configuration.ConfigurationManager.AppSettings["AWSAccessKey"];
       //string secretAccessKey = System.Configuration.ConfigurationManager.AppSettings["AWSSecretKey"];
 
-      IAmazonS3 client = new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion);
+      IAmazonS3 client = new AmazonS3Client(sAwsKeyId, sAwsSecretKey, bucketRegion);
 
       if (string.IsNullOrEmpty(sKey)) sKey = sFile;
 
@@ -98,7 +99,7 @@ namespace CornerkickWebMvc
       //IAmazonS3 client = new AmazonS3Client(bucketRegion);
       //ReadObjectDataAsync(client, sKey).Wait();
       try {
-        TransferUtility fileTransferUtility = new TransferUtility(new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion));
+        TransferUtility fileTransferUtility = new TransferUtility(new AmazonS3Client(sAwsKeyId, sAwsSecretKey, bucketRegion));
 
         // 2. Specify object key name explicitly.
         try {
@@ -118,7 +119,7 @@ namespace CornerkickWebMvc
 
     public void downloadAllFiles(string sS3SubDir, string sTargetPath = "./", string sStartsWith = null, string sEndsWith = null, bool bForce = false)
     {
-      IAmazonS3 client = new AmazonS3Client(sAccessKey, sSecretAccessKey, bucketRegion);
+      IAmazonS3 client = new AmazonS3Client(sAwsKeyId, sAwsSecretKey, bucketRegion);
 
       ListObjectsRequest request = new ListObjectsRequest();
       request.BucketName = sBucketName;
