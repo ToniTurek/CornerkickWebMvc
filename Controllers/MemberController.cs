@@ -3006,21 +3006,20 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="league"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-    [Authorize]
+    //[Authorize]
     public ActionResult League(Models.LeagueModels mlLeague)
     {
       CornerkickManager.Club clb = ckClub();
-      if (clb == null) View(mlLeague);
+      if (clb != null) {
+        mlLeague.iClubId = clb.iId;
+        mlLeague.iLand   = clb.iLand;
+        mlLeague.iSpKl   = clb.iDivision;
+      }
 
-      mlLeague.iClubId = clb.iId;
-
-      mlLeague.iLand = clb.iLand;
-      mlLeague.iSpKl = clb.iDivision;
-
-      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, clb.iLand, clb.iDivision);
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, mlLeague.iLand, mlLeague.iSpKl);
       if (league == null) return View(mlLeague);
 
-      int iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
+      int iMd = MvcApplication.ckcore.tl.getMatchday(league, MvcApplication.ckcore.dtDatum);
       mlLeague.league = league;
       mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, iMd - 1, 0);
       mlLeague.iLeagueSize = MvcApplication.ckcore.tl.getCupParticipants(league, iMd).Count;
@@ -3033,7 +3032,7 @@ namespace CornerkickWebMvc.Controllers
       return View(mlLeague);
     }
 
-    public JsonResult getDdlMatchdays(ushort iSaison, int iLand, byte iDivision)
+    public JsonResult getDdlMatchdays(int iSaison, int iLand, byte iDivision)
     {
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
 
@@ -3046,17 +3045,17 @@ namespace CornerkickWebMvc.Controllers
       return Json(ltMd, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult LeagueGetMatchday()
+    public JsonResult LeagueGetMatchday(int iSaison, int iLand, byte iDivision)
     {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(1, JsonRequestBehavior.AllowGet);
-
       // Get current matchday
-      int iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 1);
+      int iMd = MvcApplication.ckcore.tl.getMatchday(iLand, iDivision, MvcApplication.ckcore.dtDatum, 1);
 
       // Increment matchday match is if today or tomorrow
-      CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 1);
-      if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+      CornerkickManager.Club clb = ckClub();
+      if (clb != null) {
+        CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 1);
+        if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+      }
 
       // Limit to 1
       iMd = Math.Max(iMd, 1);
@@ -3064,7 +3063,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult setLeague(Models.LeagueModels mlLeague, ushort iSaison, int iLand, byte iDivision, int iMatchday, byte iHA)
+    public JsonResult setLeague(Models.LeagueModels mlLeague, int iSaison, int iLand, byte iDivision, int iMatchday, byte iHA)
     {
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
       CornerkickManager.Club clb = ckClub();
@@ -3126,7 +3125,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult setLeagueTeams(ushort iSaison, int iLand, byte iDivision, int iMatchday)
+    public JsonResult setLeagueTeams(int iSaison, int iLand, byte iDivision, int iMatchday)
     {
       if (iMatchday < 1) return Json("", JsonRequestBehavior.AllowGet);
 
@@ -3212,17 +3211,16 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
-    [Authorize]
+    //[Authorize]
     public ActionResult Cup(Models.CupModel cupModel)
     {
       cupModel.ltErg = new List<List<CornerkickGame.Game.Data>>();
 
       CornerkickManager.Club clb = ckClub();
-      if (clb == null) return View(cupModel);
-
-      cupModel.iClubId = clb.iId;
-
-      cupModel.iLand = clb.iLand;
+      if (clb != null) {
+        cupModel.iClubId = clb.iId;
+        cupModel.iLand = clb.iLand;
+      }
 
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, cupModel.iLand);
 
@@ -3238,11 +3236,8 @@ namespace CornerkickWebMvc.Controllers
       return View(cupModel);
     }
 
-    public JsonResult CupGetDdlMatchdays(ushort iSaison, int iLand)
+    public JsonResult CupGetDdlMatchdays(int iSaison, int iLand)
     {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
-
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
       if (cup == null) return Json(null, JsonRequestBehavior.AllowGet);
 
@@ -3285,7 +3280,7 @@ namespace CornerkickWebMvc.Controllers
           if (iGroup >= 0 && iGroup < cup.ltClubs.Length && cup.ltClubs[iGroup].IndexOf(clb) < 0) continue;
 
           var sStyle = "";
-          if (clb == clbUser) sStyle = "font-weight:bold";
+          if (clbUser != null && clb == clbUser) sStyle = "font-weight:bold";
 
           sBox += "<p><a style=" + sStyle + " href=\"/Member/ClubDetails?iClub=" + clb.iId.ToString() + "\" target=\"_blank\">" + clb.sName + "</a></p>";
         }
@@ -3327,17 +3322,19 @@ namespace CornerkickWebMvc.Controllers
       return sBox;
     }
 
-    public JsonResult CupGetMatchday()
+    public JsonResult CupGetMatchday(int iSaison, int iLand)
     {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(1, JsonRequestBehavior.AllowGet);
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand, -1);
 
       // Get current matchday
-      int iMd = MvcApplication.ckcore.tl.getMatchday(clb, MvcApplication.ckcore.dtDatum, 2);
+      int iMd = MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum);
 
-      // Increment matchday match is if today or tomorrow
-      CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 2);
-      if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+      CornerkickManager.Club clb = ckClub();
+      if (clb != null) {
+        // Increment matchday match is if today or tomorrow
+        CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 2);
+        if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+      }
 
       // Limit to 1
       iMd = Math.Max(iMd, 1);
@@ -3352,12 +3349,9 @@ namespace CornerkickWebMvc.Controllers
       return Json(getCupTeams(cup, iMatchday - 1), JsonRequestBehavior.AllowGet);
     }
 
-    [Authorize]
+    //[Authorize]
     public ActionResult CupGold(Models.CupGoldModel cupGoldModel)
     {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return View(cupGoldModel);
-
       return View(cupGoldModel);
     }
 
@@ -3368,12 +3362,9 @@ namespace CornerkickWebMvc.Controllers
       return Json(getCupTeams(cupGold, iMatchday), JsonRequestBehavior.AllowGet);
     }
 
-    [Authorize]
+    //[Authorize]
     public ActionResult CupSilver(Models.CupSilverModel cupSilverModel)
     {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return View(cupSilverModel);
-
       return View(cupSilverModel);
     }
 
@@ -3384,12 +3375,9 @@ namespace CornerkickWebMvc.Controllers
       return Json(getCupTeams(cupSilver, iMatchday), JsonRequestBehavior.AllowGet);
     }
 
-    [Authorize]
+    //[Authorize]
     public ActionResult CupWc(Models.CupWcModel cupWcModel)
     {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return View(cupWcModel);
-
       return View(cupWcModel);
     }
 

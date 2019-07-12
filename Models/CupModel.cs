@@ -20,6 +20,7 @@ namespace CornerkickWebMvc.Models
     public CupModel()
     {
       ddlLand = new List<SelectListItem>();
+      if (MvcApplication.iNations.Length > 0) iLand = MvcApplication.iNations[0];
     }
   }
 }

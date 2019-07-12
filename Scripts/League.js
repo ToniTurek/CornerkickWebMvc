@@ -16,6 +16,7 @@
         url: '/Member/LeagueGetMatchday',
         type: "GET",
         dataType: "JSON",
+        data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision },
         success: function (iMd) {
           document.getElementById("ddlMatchday").value = iMd;
           setLeague2(iSaison, iDivision);

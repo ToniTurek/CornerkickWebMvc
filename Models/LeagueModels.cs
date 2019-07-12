@@ -30,7 +30,8 @@ namespace CornerkickWebMvc.Models
 
     public LeagueModels()
     {
-      ddlLand   = new List<SelectListItem>();
+      ddlLand = new List<SelectListItem>();
+      if (MvcApplication.iNations.Length > 0) iLand = MvcApplication.iNations[0];
     }
 
   }

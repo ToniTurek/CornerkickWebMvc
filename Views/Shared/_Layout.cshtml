@@ -91,6 +91,30 @@
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
+          <li>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Saison</a>
+            <ul class="dropdown-menu">
+              @{
+                if (Request.IsAuthenticated && usr != null) {
+                  <li>@Html.ActionLink("Kalender", "Calendar", "Member")</li>
+                }
+              }
+              <li>@Html.ActionLink("Liga", "League", "Member")</li>
+              <li>@Html.ActionLink("Pokal", "Cup", "Member")</li>
+              @{
+                CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
+                if (cupGold != null) {
+                  <li>@Html.ActionLink("Gold Cup", "CupGold", "Member")</li>
+                }
+                CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+                if (cupSilver != null) {
+                  <li>@Html.ActionLink("Silver Cup", "CupSilver", "Member")</li>
+                }
+              }
+              <li>@Html.ActionLink("WM", "CupWc", "Member")</li>
+            </ul>
+          </li>
+
           @{
             if (Request.IsAuthenticated && usr != null) {
               int iMails = 0;
@@ -106,26 +130,6 @@
               if (iMails > 0) {
                 sMails = " (" + iMails.ToString() + ")";
               }
-              //@Html.ActionLink("Schreibtisch", "Desk", "Member", new { area = "" }, new { @class = "dropdown-toggle" })
-              <li>
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Saison</a>
-                <ul class="dropdown-menu">
-                  <li>@Html.ActionLink("Kalender", "Calendar", "Member")</li>
-                  <li>@Html.ActionLink("Liga", "League", "Member")</li>
-                  <li>@Html.ActionLink("Pokal", "Cup", "Member")</li>
-                  @{
-                    CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-                    if (cupGold != null) {
-                      <li>@Html.ActionLink("Gold Cup", "CupGold", "Member")</li>
-                    }
-                    CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-                    if (cupSilver != null) {
-                      <li>@Html.ActionLink("Silver Cup", "CupSilver", "Member")</li>
-                    }
-                  }
-                  <li>@Html.ActionLink("WM", "CupWc", "Member")</li>
-                </ul>
-              </li>
               <li>
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mannschaft</a>
                 <ul class="dropdown-menu">

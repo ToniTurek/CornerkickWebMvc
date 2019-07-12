@@ -17,6 +17,7 @@
         url: '/Member/CupGetMatchday',
         type: "GET",
         dataType: "JSON",
+        data: { iSaison: iSaison, iLand: iLand },
         success: function (iMd) {
           document.getElementById("ddlMatchdayCup").value = iMd;
           setCup2(iSaison);
