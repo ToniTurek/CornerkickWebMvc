@@ -110,7 +110,21 @@ namespace CornerkickWebMvc
       swLoad.Start();
 
       // Load autosave
-      if (!load()) {
+      if (load()) {
+        // Add clubs to ddl in register view (need to be relocated if multiple leagues are available)
+        Models.RegisterViewModel.ltClubs.Clear();
+
+        for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clb = ckcore.ltClubs[iC];
+
+          if (clb.bNation) continue;
+          if (clb.iUser >= 0) continue;
+
+          if (clb.iLand != iNations[0]) continue; // Remove if all leagues are available
+
+          Models.RegisterViewModel.ltClubs.Add(new SelectListItem { Text = clb.sName, Value = iC.ToString() });
+        }
+      } else {
         // New game
         DateTime dtLeagueStart;
         DateTime dtLeagueEnd;

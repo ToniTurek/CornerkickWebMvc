@@ -64,8 +64,9 @@ namespace CornerkickWebMvc.Models
 
   public class RegisterViewModel
   {
-    public static List<System.Web.Mvc.SelectListItem> ltLand = new List<System.Web.Mvc.SelectListItem>();
-    public static List<System.Web.Mvc.SelectListItem> ltSpKl = new List<System.Web.Mvc.SelectListItem>();
+    public static List<System.Web.Mvc.SelectListItem> ltLand  = new List<System.Web.Mvc.SelectListItem>();
+    public static List<System.Web.Mvc.SelectListItem> ltSpKl  = new List<System.Web.Mvc.SelectListItem>();
+    public static List<System.Web.Mvc.SelectListItem> ltClubs = new List<System.Web.Mvc.SelectListItem>();
 
     [Required]
     [EmailAddress]
@@ -104,6 +105,11 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Liga")]
     public int Liga { get; set; }
 
+    //[Required]
+    [DataType(DataType.Text)]
+    [Display(Name = "Verein")]
+    public int iClubIx { get; set; }
+
 #if !DEBUG
     [Required]
     [StringLength(100, ErrorMessage = "\"{0}\" muss mindestens {2} Zeichen lang sein.", MinimumLength = 4)]
@@ -116,34 +122,39 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Kennwort bestätigen")]
     [Compare("Password", ErrorMessage = "Das Kennwort entspricht nicht dem Bestätigungskennwort.")]
     public string ConfirmPassword { get; set; }
+
+    public RegisterViewModel()
+    {
+      iClubIx = -1;
+    }
   }
 
   public class ResetPasswordViewModel
-    {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "E-Mail")]
-        public string Email { get; set; }
+  {
+    [Required]
+    [EmailAddress]
+    [Display(Name = "E-Mail")]
+    public string Email { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "\"{0}\" muss mindestens {2} Zeichen lang sein.", MinimumLength = 4)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Kennwort")]
-        public string Password { get; set; }
+    [Required]
+    [StringLength(100, ErrorMessage = "\"{0}\" muss mindestens {2} Zeichen lang sein.", MinimumLength = 4)]
+    [DataType(DataType.Password)]
+    [Display(Name = "Kennwort")]
+    public string Password { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Kennwort bestätigen")]
-        [Compare("Password", ErrorMessage = "Das Kennwort stimmt nicht mit dem Bestätigungskennwort überein.")]
-        public string ConfirmPassword { get; set; }
+    [DataType(DataType.Password)]
+    [Display(Name = "Kennwort bestätigen")]
+    [Compare("Password", ErrorMessage = "Das Kennwort stimmt nicht mit dem Bestätigungskennwort überein.")]
+    public string ConfirmPassword { get; set; }
 
-        public string Code { get; set; }
-    }
+    public string Code { get; set; }
+  }
 
-    public class ForgotPasswordViewModel
-    {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "E-Mail")]
-        public string Email { get; set; }
-    }
+  public class ForgotPasswordViewModel
+  {
+    [Required]
+    [EmailAddress]
+    [Display(Name = "E-Mail")]
+    public string Email { get; set; }
+  }
 }

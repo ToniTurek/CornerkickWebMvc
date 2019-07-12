@@ -199,11 +199,14 @@ namespace CornerkickWebMvc.Controllers
     }
 
 #if DEBUG
-    public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false)
+    public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1)
 #else
     private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false)
 #endif
     {
+      CornerkickManager.Club clubExist = null;
+      if (iClubExist >= 0 && iClubExist < MvcApplication.ckcore.ltClubs.Count) clubExist = MvcApplication.ckcore.ltClubs[iClubExist];
+
       int iLand     = 0;
       int iDivision = 0;
 
@@ -229,53 +232,59 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cup    = MvcApplication.ckcore.tl.getCup(2, iLand, iDivision);
 
 #if DEBUG
-      for (byte iU = 0; iU < 8; iU++) {
+      int nUser = 8;
+      if (clubExist != null) nUser = 1;
+      for (byte iU = 0; iU < nUser; iU++) {
 #endif
-      // Remove CPU club from league and nat. cup
-      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
-        CornerkickManager.Club clubCpu = MvcApplication.ckcore.ltClubs[iC];
-        if (clubCpu == null) continue;
-        if (clubCpu.iUser >= 0) continue;
+      CornerkickManager.Club clb = null;
+      if (clubExist == null) {
+        // Remove CPU club from league and nat. cup
+        for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clubCpu = MvcApplication.ckcore.ltClubs[iC];
+          if (clubCpu == null) continue;
+          if (clubCpu.iUser >= 0) continue;
 
-        if (cup   .ltClubs[0].IndexOf(clubCpu) >= 0) cup.ltClubs[0].Remove(clubCpu);
-        if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
-          league.ltClubs[0].Remove(clubCpu);
-          break;
+          if (cup   .ltClubs[0].IndexOf(clubCpu) >= 0) cup.ltClubs[0].Remove(clubCpu);
+          if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
+            league.ltClubs[0].Remove(clubCpu);
+            break;
+          }
         }
+
+        clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision);
+      } else {
+        clb = clubExist;
       }
 
       CornerkickManager.User usr = createUser(applicationUser);
-      CornerkickManager.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision);
       usr.iLevel = 1;
       usr.iTeam = clb.iId;
       usr.nextGame.iGameSpeed = 250;
+      
 #if DEBUG
       if (iU == 0) {
 #endif
       clb.iUser = MvcApplication.ckcore.ltUser.Count;
-#if DEBUG
-      }
-#endif
-
-#if DEBUG
-        clb.sName += "_" + clb.iId.ToString();
-#endif
-
-#if DEBUG
-      if (iU == 0) {
-#endif
       MvcApplication.ckcore.ltUser.Add(usr);
 #if DEBUG
       }
-#endif
-      MvcApplication.ckcore.ltClubs.Add(clb);
-      
-      // Do initial formation
-      MvcApplication.ckcore.doFormation(clb.iId);
 
-      // Add club to league/cup
-      cup   .ltClubs[0].Add(clb); // nat. cup
-      league.ltClubs[0].Add(clb); // league
+      clb.sName += "_" + clb.iId.ToString();
+#endif
+      
+      if (clubExist == null) {
+        // Add club to mng
+        MvcApplication.ckcore.ltClubs.Add(clb);
+      
+        // Do initial formation
+        MvcApplication.ckcore.doFormation(clb.iId);
+
+        // Add club to league/cup
+        cup   .ltClubs[0].Add(clb); // nat. cup
+        league.ltClubs[0].Add(clb); // league
+      } else {
+        clb.sName = applicationUser.Vereinsname;
+      }
 
 #if DEBUG
       if (iU == 0) {
@@ -284,9 +293,6 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
 #if DEBUG
       }
-#endif
-
-#if DEBUG
       }
 #endif
 
@@ -823,7 +829,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
             // Create club
-            addUserToCk(appUser, model);
+            addUserToCk(appUser, model, false, model.iClubIx);
             CornerkickManager.Club clb = ckClub();
             if (clb != null) uploadFile(file, ckClub().iId);
             iniCk();
