@@ -531,7 +531,7 @@ async function play(iState) {
 
   drawGame(iState);
 
-  setTimeout(function () { play(iState) }, 250);
+  setTimeout(function () { play(iState); }, 250);
 }
 
 async function stop() {
