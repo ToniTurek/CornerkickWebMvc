@@ -11,9 +11,6 @@ using Newtonsoft.Json;
 
 namespace CornerkickWebMvc.Controllers
 {
-#if !DEBUG
-  [Authorize]
-#endif
   public class MemberController : Controller
   {
     public readonly static string[] sCultureInfo = new string[82] {
@@ -103,7 +100,7 @@ namespace CornerkickWebMvc.Controllers
 
     public MemberController()
     {
-      #if _CONSOLE
+#if _CONSOLE
       ConsoleNews();
 #endif
     }
@@ -278,6 +275,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="desk"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult Desk(Models.DeskModel desk, Models.LeagueModels mlLeague)
     {
       desk.sNews = "";
@@ -459,6 +457,7 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
+    [Authorize]
     public ActionResult PreviewGame(int i)
     {
       Models.PreviewGameModel mdPreview = new Models.PreviewGameModel();
@@ -601,7 +600,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="team"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-    //[Authorize]
+    [Authorize]
     public ActionResult Team(Models.TeamModels team)
     {
       // Formationen
@@ -1355,6 +1354,7 @@ namespace CornerkickWebMvc.Controllers
       return fIndOrientationMinMax;
     }
 
+    [Authorize]
     public ActionResult PlayerDetails(int i)
     {
       Models.PlayerModel plModel = new Models.PlayerModel();
@@ -1730,7 +1730,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Jouth"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-    //[Authorize]
+    [Authorize]
     public ActionResult Jouth(Models.JouthModel jouth)
     {
       int iC = ckUser().iTeam;
@@ -1779,6 +1779,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Transfer"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult Transfer(Models.TransferModel transfer)
     {
       transfer.iContractYears = 1;
@@ -2045,8 +2046,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Taktik"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-
-    //[Authorize]
+    [Authorize]
     public ActionResult Taktik(Models.TaktikModel tactic)
     {
       CornerkickManager.Club clb = ckClub();
@@ -2299,6 +2299,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Training"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult Training(Models.TrainingModel mdTraining)
     {
       CornerkickManager.Club clb = ckClub();
@@ -2325,6 +2326,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Stadion"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult Stadion(Models.StadionModel stadionModel)
     {
       CornerkickManager.Club clb = ckClub();
@@ -2655,6 +2657,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Stadion"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult StadiumSurroundings(Models.StadiumSurroundingsModel mdStadionSurr)
     {
       CornerkickManager.Club clb = ckClub();
@@ -2813,6 +2816,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Personal"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult Personal(Models.PersonalModel personal)
     {
       CornerkickManager.Club clb = ckClub();
