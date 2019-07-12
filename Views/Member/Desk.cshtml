@@ -192,7 +192,7 @@
 
       <h3>Nächstes Spiel</h3>
 
-      string sDt = "?";
+      string sDt = Model.sDtNextGame;
       if (clb.nextGame != null) {
         sDt = Model.sDtNextGame + " - ";
 
@@ -208,9 +208,11 @@
             sDt += " (Testspiel)";
           }
         }
-      }
 
-      @Html.ActionLink(@sDt, "PreviewGame", "Member", new { i = "0" }, new { target = "" })
+        @Html.ActionLink(@sDt, "PreviewGame", "Member", new { i = "0" }, new { target = "" })
+      } else {
+        <p>@sDt</p>
+      }
     }
   }
 

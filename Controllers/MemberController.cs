@@ -334,6 +334,8 @@ namespace CornerkickWebMvc.Controllers
 
         // Weather
         desk.iWeather = club.nextGame.iWeather;
+      } else {
+        desk.sDtNextGame = "Saisonende: " + MvcApplication.ckcore.dtSeasonEnd.ToString("d", getCi()) + " (" + (MvcApplication.ckcore.dtSeasonEnd.Date - MvcApplication.ckcore.dtDatum.Date).TotalDays.ToString("0") + "d)";
       }
 
       // Get Table
