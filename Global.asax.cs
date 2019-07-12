@@ -690,6 +690,11 @@ namespace CornerkickWebMvc
 
               ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
             }
+
+            if (sStateFileContent.Length > 5) {
+              bool.TryParse(sStateFileContent[4], out settings.bEmailCertification);
+              bool.TryParse(sStateFileContent[5], out settings.bRegisterDuringGame);
+            }
           }
         } else {
           ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
