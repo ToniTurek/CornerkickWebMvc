@@ -3216,7 +3216,7 @@ namespace CornerkickWebMvc.Controllers
       List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
 
       for (int iSpT = 1; iSpT < league.getMatchdaysTotal(); iSpT++) {
-        int iPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, club, iSpT);
+        int iPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, club, MvcApplication.ckcore.dtDatum, iSpT);
         if (iPlace > 0) dataPoints.Add(new Models.DataPointGeneral(iSpT, iPlace));
       }
 
