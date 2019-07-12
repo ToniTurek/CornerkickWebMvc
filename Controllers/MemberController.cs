@@ -3269,7 +3269,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(ltMd, JsonRequestBehavior.AllowGet);
     }
 
-    private string getCupTeams(CornerkickManager.Cup cup, int iMatchday)
+    private string getCupTeams(CornerkickManager.Cup cup, int iMatchday, int iGroup = -1)
     {
       if (cup == null) return "";
       if (cup.ltMatchdays == null) return "";
@@ -3282,18 +3282,12 @@ namespace CornerkickWebMvc.Controllers
         List<CornerkickManager.Club> ltClubs = MvcApplication.ckcore.tl.getCupParticipants(cup, iMatchday);
 
         foreach (CornerkickManager.Club clb in ltClubs) {
+          if (iGroup >= 0 && iGroup < cup.ltClubs.Length && cup.ltClubs[iGroup].IndexOf(clb) < 0) continue;
+
           var sStyle = "";
           if (clb == clbUser) sStyle = "font-weight:bold";
 
-          sBox += "<tr style=" + sStyle + ">";
-          sBox += "<td></td>";
-
-          sBox += "<td align=\"right\"><a href=\"/Member/ClubDetails?iClub=" + clb.iId.ToString() + "\" target=\"_blank\">" + clb.sName + "</a></td></td>";
-          sBox += "<td align=\"center\"></td>";
-          sBox += "<td align=\"left\"></td>)</td>";
-          sBox += "<td align=\"center\"></td>";
-
-          sBox += "</tr>";
+          sBox += "<p><a style=" + sStyle + " href=\"/Member/ClubDetails?iClub=" + clb.iId.ToString() + "\" target=\"_blank\">" + clb.sName + "</a></p>";
         }
 
         return sBox;
@@ -3304,8 +3298,13 @@ namespace CornerkickWebMvc.Controllers
         string sClubNameA = "freilos";
         int iIdH = gd.team[0].iTeamId;
         int iIdA = gd.team[1].iTeamId;
+
         if (gd.team[0].iTeamId >= 0) sClubNameH = MvcApplication.ckcore.ltClubs[iIdH].sName;
         if (gd.team[1].iTeamId >= 0) sClubNameA = MvcApplication.ckcore.ltClubs[iIdA].sName;
+
+        if (iGroup >= 0 && iGroup < cup.ltClubs.Length) {
+          if (cup.ltClubs[iGroup].IndexOf(MvcApplication.ckcore.ltClubs[iIdH]) < 0 || cup.ltClubs[iGroup].IndexOf(MvcApplication.ckcore.ltClubs[iIdA]) < 0) continue;
+        }
 
         var sStyle = "";
         if (clbUser != null && (iIdH == clbUser.iId || iIdA == clbUser.iId)) sStyle = "font-weight:bold";
@@ -3383,6 +3382,22 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
 
       return Json(getCupTeams(cupSilver, iMatchday), JsonRequestBehavior.AllowGet);
+    }
+
+    [Authorize]
+    public ActionResult CupWc(Models.CupWcModel cupWcModel)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(cupWcModel);
+
+      return View(cupWcModel);
+    }
+
+    public JsonResult setCupWc(int iMatchday, int iGroup)
+    {
+      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
+
+      return Json(getCupTeams(cupWc, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -3534,17 +3549,19 @@ namespace CornerkickWebMvc.Controllers
 
                   string sTitle = " " + cup.sName;
                   string sColor = "rgb(200, 0, 200)";
-                  if (cup.iId == 1) {
+                  if (cup.iId == 1) { // Nat. league
                     sTitle = " Liga, " + (iSpTg + 1).ToString().PadLeft(2) + ". Spieltag";
                     sColor = "rgb(0, 175, 100)";
-                  } else if (cup.iId == 2) {
+                  } else if (cup.iId == 2) { // Nat. Cup
                     string sPokalrunde = "";
                     sPokalrunde = MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count)];
                     sTitle += ", " + sPokalrunde;
 
                     sColor = "rgb(100, 100, 255)";
-                  } else if (cup.iId == -5) {
+                  } else if (cup.iId == -5) { // Testgame requests
                     sColor = "rgb(255, 200, 255)";
+                  } else if (cup.iId == 7) { // World cup
+                    sColor = "rgb( 91, 146, 229)";
                   }
                   sTitle += ": " + sH + " vs. " + sA;
                   if (!string.IsNullOrEmpty(sRes)) sTitle += ", " + sRes;

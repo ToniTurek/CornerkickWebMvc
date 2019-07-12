@@ -310,6 +310,7 @@
     <Compile Include="Models\CupGoldModel.cs" />
     <Compile Include="Models\CupModel.cs" />
     <Compile Include="Models\CupSilverModel.cs" />
+    <Compile Include="Models\CupWcModel.cs" />
     <Compile Include="Models\DeskModel.cs" />
     <Compile Include="Models\FinanceModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -696,6 +697,7 @@
     <Content Include="Scripts\Cup.js" />
     <Content Include="Scripts\CupGold.js" />
     <Content Include="Scripts\CupSilver.js" />
+    <Content Include="Scripts\CupWc.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap4.js" />
@@ -899,6 +901,7 @@
     <Content Include="Views\Member\PreviewGame.cshtml" />
     <Content Include="Views\Member\CupGold.cshtml" />
     <Content Include="Views\Member\CupSilver.cshtml" />
+    <Content Include="Views\Member\CupWc.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

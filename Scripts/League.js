@@ -106,17 +106,25 @@ function actionDrawTeams(sTeams) {
 function drawTeams(sTeams) {
   var sBox = '';
 
-  sBox += '<table id="tableTeams" border="0" cellpadding="2" style="width: 100%">';
-  sBox += '<tr>';
-  sBox += '  <th colspan="1">Anstoß</th>';
-  sBox += '  <th style="text-align:right">Heim</th>';
-  sBox += '  <th style="text-align:center">&nbsp;</th>';
-  sBox += '  <th style="text-align:left">Auswärts</th>';
-  sBox += '  <th style="text-align:center">Erg.</th>';
-  sBox += sTeams;
-  sBox += '</tr>';
+  if (!sTeams) {
+    return sBox;
+  } else if (sTeams.includes('<td>')) {
+    sBox += '<h4>Begegnungen</h4>';
+    sBox += '<table id="tableTeams" border="0" cellpadding="2" style="width: 100%">';
+    sBox += '<tr>';
+    sBox += '  <th colspan="1">Anstoß</th>';
+    sBox += '  <th style="text-align:right">Heim</th>';
+    sBox += '  <th style="text-align:center">&nbsp;</th>';
+    sBox += '  <th style="text-align:left">Auswärts</th>';
+    sBox += '  <th style="text-align:center">Erg.</th>';
+    sBox += sTeams;
+    sBox += '</tr>';
 
-  sBox += '</table>';
+    sBox += '</table>';
+  } else {
+    sBox += '<h4>Teilnehmer</h4>';
+    sBox += sTeams;
+  }
 
   return sBox;
 }
