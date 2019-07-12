@@ -10,16 +10,20 @@ namespace CornerkickWebMvc.Models
   public class AdminModel
   {
     public bool bCk { get; set; }
-    public double fCalendarInterval { get; set; }
     public bool bTimer { get; set; }
     public bool bTimerSave { get; set; }
-    public string sStartHour { get; set; }
     public List<string> ltLog { get; set; }
     public List<string> ltErr { get; set; }
     public int nClubs { get; set; }
     public int nUser { get; set; }
     public int nPlayer { get; set; }
+
+    // Settings
+    public double fCalendarInterval { get; set; }
+    public string sStartHour { get; set; }
     public int iGameSpeed { get; set; }
+    public bool bEmailCertification { get; set; }
+    public bool bRegisterDuringGame { get; set; }
 
     public bool bLogExist { get; set; }
     public bool bAutosaveExist { get; set; }

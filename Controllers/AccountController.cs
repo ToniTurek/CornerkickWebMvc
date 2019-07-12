@@ -1,8 +1,4 @@
-﻿#if !DEBUG
-#define _EMAIL_CONFIRMATION
-#endif
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -23,7 +19,7 @@ namespace CornerkickWebMvc.Controllers
   {
     public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
     {
-      UserManager = userManager;
+      UserManager   = userManager;
       SignInManager = signInManager;
     }
 
@@ -649,16 +645,16 @@ namespace CornerkickWebMvc.Controllers
 
       if (!ModelState.IsValid) return View(model);
 
-#if _EMAIL_CONFIRMATION
-      // Require the user to have a confirmed email before they can log on.
-      var user = await UserManager.FindByNameAsync(model.Email);
-      if (user != null) {
-        if (!await UserManager.IsEmailConfirmedAsync(user.Id)) {
-          ViewBag.errorMessage = "Um Dich einloggen zu können, musst Du deine e-mail bestätigen! Bitte überprüfe Deinen e-mail Account.";
-          return View("Error");
+      if (MvcApplication.settings.bEmailCertification) {
+        // Require the user to have a confirmed email before they can log on.
+        var user = await UserManager.FindByNameAsync(model.Email);
+        if (user != null) {
+          if (!await UserManager.IsEmailConfirmedAsync(user.Id)) {
+            ViewBag.errorMessage = "Um Dich einloggen zu können, musst Du deine e-mail bestätigen! Bitte überprüfe Deinen e-mail Account.";
+            return View("Error");
+          }
         }
       }
-#endif
 
       // Anmeldefehler werden bezüglich einer Kontosperre nicht gezählt.
       // Wenn Sie aktivieren möchten, dass Kennwortfehler eine Sperre auslösen, ändern Sie in "shouldLockout: true".
@@ -812,21 +808,21 @@ namespace CornerkickWebMvc.Controllers
             MvcApplication.ckcore.ltClubs.Add(club0);
             // END Initialize dummy club
           } else { // no admin
-#if _EMAIL_CONFIRMATION
-            // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
-            // E-Mail-Nachricht mit diesem Link senden
-            string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
-            MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
-            await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+            if (MvcApplication.settings.bEmailCertification) {
+              // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
+              // E-Mail-Nachricht mit diesem Link senden
+              string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
+              var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
+              MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
+              await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
 
-            // Uncomment to debug locally 
-            // TempData["ViewBagLink"] = callbackUrl;
+              // Uncomment to debug locally
+              // TempData["ViewBagLink"] = callbackUrl;
 
-            ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-Konto zu bestätigen!";
-#else
-            await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
-#endif
+              ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-Konto zu bestätigen!";
+            } else {
+              await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
+            }
 
             // Create club
             addUserToCk(appUser, model, false, model.iClubIx);
@@ -837,9 +833,9 @@ namespace CornerkickWebMvc.Controllers
 
           MvcApplication.save(MvcApplication.timerCkCalender);
 
-#if _EMAIL_CONFIRMATION
-          return View("Info");
-#endif
+          if (MvcApplication.settings.bEmailCertification) {
+            return View("Info");
+          }
 
           return RedirectToAction("Desk", "Member");
         }

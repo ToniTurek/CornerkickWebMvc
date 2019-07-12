@@ -30,6 +30,7 @@ namespace CornerkickWebMvc.Controllers
       }
       modelAdmin.bCk = true;
 
+      // Timer
       if (MvcApplication.timerCkCalender != null) {
         modelAdmin.bTimer            = MvcApplication.timerCkCalender.Enabled;
         modelAdmin.fCalendarInterval = MvcApplication.timerCkCalender.Interval / 1000;
@@ -39,15 +40,19 @@ namespace CornerkickWebMvc.Controllers
         modelAdmin.bTimerSave = MvcApplication.timerSave.Enabled;
       }
 
+      // Settings
       modelAdmin.sStartHour = "";
-      if (MvcApplication.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.iStartHour.ToString();
-
+      if (MvcApplication.settings.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.settings.iStartHour.ToString();
       if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      modelAdmin.bEmailCertification = MvcApplication.settings.bEmailCertification;
+      modelAdmin.bRegisterDuringGame = MvcApplication.settings.bRegisterDuringGame;
 
+      // Statistics
       modelAdmin.nClubs  = MvcApplication.ckcore.ltClubs .Count;
       modelAdmin.nUser   = MvcApplication.ckcore.ltUser  .Count;
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
+      // Files
       string sHomeDir = getHomeDir();
       modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "/log/ck.log");
 
@@ -69,9 +74,9 @@ namespace CornerkickWebMvc.Controllers
         MvcApplication.ckcore.setNeueSaison();
       }
       */
-      MvcApplication.iStartHour = -1;
+      MvcApplication.settings.iStartHour = -1;
       if (!string.IsNullOrEmpty(modelAdmin.sStartHour)) {
-        int.TryParse(modelAdmin.sStartHour, out MvcApplication.iStartHour);
+        int.TryParse(modelAdmin.sStartHour, out MvcApplication.settings.iStartHour);
       }
 
       if (modelAdmin.fCalendarInterval < 1E-6) {
@@ -165,6 +170,12 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return RedirectToAction("Settings");
+    }
+
+    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame)
+    {
+      MvcApplication.settings.bEmailCertification = bEmailCertification;
+      MvcApplication.settings.bRegisterDuringGame = bRegisterDuringGame;
     }
 
     public ActionResult Log(Models.AdminModel modelAdmin)

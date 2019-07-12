@@ -28,7 +28,29 @@
         data: { iClubIx: $(this).val() }
       });
     });
+
+    $("#bEmailCertification").change(function () {
+      setSettings();
+    });
+
+    $("#bRegisterDuringGame").change(function () {
+      setSettings();
+    });
   });
+
+  function setSettings() {
+    var bEmailCertification = document.getElementById("bEmailCertification").checked;
+    var bRegisterDuringGame = document.getElementById("bRegisterDuringGame").checked;
+
+    $.ajax({
+      url: '/Admin/setSettings',
+      type: "GET",
+      dataType: "JSON",
+      cache: false,
+      contentType: "application/json; charset=utf-8",
+      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame }
+    });
+  }
 
   function setCalInterval(iWeeks) {
     // Capital letters = Real-time
@@ -131,6 +153,16 @@
 <text>No. of Teams: @Model.nClubs<br></text>
 <text>No. of User: @Model.nUser<br></text>
 <text>No. of Player: @Model.nPlayer<br></text>
+
+<label>
+  @Html.CheckBoxFor(m => m.bEmailCertification)
+  Email Certification
+</label>
+
+<label>
+  @Html.CheckBoxFor(m => m.bRegisterDuringGame)
+  Register during game
+</label>
 
 @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {
   <button type="submit" class="btn btn-default" style="position: relative; width: 180px">Restart Cornerkick</button>

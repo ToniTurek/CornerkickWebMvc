@@ -29,11 +29,26 @@ namespace CornerkickWebMvc
     public static System.Timers.Timer timerCkCalender = null;
     public static System.Timers.Timer timerSave = null;
     public static List<string> ltLog = new List<string>();
-    public static int iStartHour = -1;
     private static Random random = new Random();
+    public static Settings settings = new Settings();
+
+    public class Settings
+    {
+      public int  iStartHour;
+      public bool bEmailCertification;
+      public bool bRegisterDuringGame;
+
+      public Settings()
+      {
+        iStartHour = -1;
+        bEmailCertification = true;
+        bRegisterDuringGame = true;
+      }
+    }
 
     //const string sSaveZip = "ckSave.zip";
-    const string sFilenameSave = ".autosave.ckx";
+    const string sFilenameSave     = ".autosave.ckx";
+    const string sFilenameSettings = "laststate.txt";
 
     internal static byte[] iNations = new byte[8] {
       36, // GER
@@ -275,8 +290,8 @@ namespace CornerkickWebMvc
     {
       if (ckcore.ltUser.Count == 0) return true;
 
-      if (iStartHour >= 0 && iStartHour <= 24) {
-        if (DateTime.Now.Hour != iStartHour && DateTime.Now.Hour > 13) {
+      if (settings.iStartHour >= 0 && settings.iStartHour <= 24) {
+        if (DateTime.Now.Hour != settings.iStartHour && DateTime.Now.Hour > 13) {
           if (ckcore.dtDatum.Equals(ckcore.dtSeasonStart) ||
              ((int)ckcore.dtDatum.DayOfWeek == 1 && ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0)) {
             return true;
@@ -546,22 +561,26 @@ namespace CornerkickWebMvc
 
     internal static void saveLaststate(string sTargetDir)
     {
-      string sFileLastState = Path.Combine(sTargetDir, "laststate.txt");
-      using (System.IO.StreamWriter fileLastState = new System.IO.StreamWriter(sFileLastState)) {
-        fileLastState.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", CultureInfo.InvariantCulture));
-        fileLastState.WriteLine(timerCkCalender.Enabled.ToString());
-        fileLastState.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
+      string sFileSettings = Path.Combine(sTargetDir, sFilenameSettings);
+
+      using (System.IO.StreamWriter fileSettings = new System.IO.StreamWriter(sFileSettings)) {
+        fileSettings.WriteLine((timerCkCalender.Interval / 1000.0).ToString("g", CultureInfo.InvariantCulture));
+        fileSettings.WriteLine(timerCkCalender.Enabled.ToString());
+        fileSettings.WriteLine(DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
 
         int iGameSpeed = 0;
         if (ckcore.ltUser.Count > 0 && ckcore.ltUser[0].nextGame != null) iGameSpeed = ckcore.ltUser[0].nextGame.iGameSpeed;
-        fileLastState.WriteLine(iGameSpeed.ToString());
+        fileSettings.WriteLine(iGameSpeed.ToString());
 
-        fileLastState.Close();
+        fileSettings.WriteLine(settings.bEmailCertification.ToString());
+        fileSettings.WriteLine(settings.bRegisterDuringGame.ToString());
+
+        fileSettings.Close();
       }
 
 #if _USE_AMAZON_S3
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-      as3.uploadFile(sFileLastState, "laststate");
+      as3.uploadFile(sFileSettings, "laststate");
 #endif
     }
 
@@ -626,7 +645,7 @@ namespace CornerkickWebMvc
 
         dtLoadCk = ckcore.dtDatum;
 
-        string sFileLastState = Path.Combine(sHomeDir, "laststate.txt");
+        string sFileLastState = Path.Combine(sHomeDir, sFilenameSettings);
 #if !DEBUG
 #if _USE_AMAZON_S3
         if (!System.IO.File.Exists(sFileLastState)) as3.downloadFile("laststate", sFileLastState);

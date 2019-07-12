@@ -52,7 +52,7 @@
         @Html.DropDownListFor(m => m.Liga, CornerkickWebMvc.Models.RegisterViewModel.ltSpKl, new { @class = "form-control", @disabled = "disabled" })
       </div>
     </div>
-    if (MvcApplication.ckcore.dtDatum.CompareTo(MvcApplication.ckcore.dtSeasonStart) > 0) {
+    if (MvcApplication.settings.bRegisterDuringGame && MvcApplication.ckcore.dtDatum.CompareTo(MvcApplication.ckcore.dtSeasonStart) > 0) {
       <div class="form-group">
         @Html.LabelFor(m => m.iClubIx, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
@@ -74,7 +74,15 @@
     </div>
     <div class="form-group">
       <div class="col-md-offset-2 col-md-10">
-        <input type="submit" class="btn btn-default" value="Registrieren" />
+        @{
+          if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) ||
+              MvcApplication.ckcore.dtSeasonStart.Year < 1000 ||
+              MvcApplication.settings.bRegisterDuringGame) {
+            <input type="submit" class="btn btn-default" value="Registrieren" />
+          } else {
+            <input type="submit" class="btn btn-default" disabled="disabled" value="Registrieren" />
+          }
+        }
       </div>
     </div>
 }
