@@ -749,6 +749,16 @@ namespace CornerkickWebMvc.Controllers
       return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
     }
 
+    public JsonResult SwitchPlayerByID(int iID1, int iID2)
+    {
+      if (iID1 < 0) return null;
+      if (iID2 < 0) return null;
+      if (iID1 >= MvcApplication.ckcore.ltPlayer.Count) return null;
+      if (iID2 >= MvcApplication.ckcore.ltPlayer.Count) return null;
+
+      return Json(SwitchPlayer(MvcApplication.ckcore.ltPlayer[iID1], MvcApplication.ckcore.ltPlayer[iID2]), JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult SwitchPlayer(CornerkickGame.Player pl1, CornerkickGame.Player pl2)
     {
       CornerkickManager.Club clb = ckClub();
