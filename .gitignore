@@ -9,3 +9,6 @@ save
 obj
 *Credentials*
 .vs
+*.user
+*.vspx
+*.psess
