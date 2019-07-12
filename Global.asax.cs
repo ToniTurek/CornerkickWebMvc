@@ -130,6 +130,7 @@ namespace CornerkickWebMvc
           CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
           league.iId = 1;
           league.iId2 = iLand;
+          league.iId3 = 0;
           league.sName = "Liga " + ckcore.sLand[iLand];
           ckcore.ltCups.Add(league);
 
