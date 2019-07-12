@@ -69,29 +69,52 @@
 </html>
 
 <h2>Erste Schritte</h2>
-Einige Einstellungen können nur zu bestimmten Zeitpunkten (zu Beginn einer Saison oder am ersten Tag jeden Monats) vorgenommen werden.
-
-<h4>Erster Tag des Spiels</h4>
-Nur am ersten Tag des Spiels können:
+Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 <ul>
-  <li>die Namen und die Rückennummern der Spieler</li>
-  <li>der Name des Stadions</li>
-</ul>
-geändert werden.
-
-<h4>Erster Tag der Saison</h4>
-Am ersten Tag jeder Saison kann:
-<ul>
-  <li>die Finanzplanung durchgeführt werden.</li>
-  <li>das Personal geändert werden. Dies ist auch am ersten Tag jeden Monats möglich.</li>
+  <li>
+    <u>Machen Sie sich mit Ihrer <a href="#h3Team">Mannschaft</a> vertraut</u><br />
+    Dazu klicken Sie im oberen Reiter auf <i>Mannschaft->Aufstellung</i> (oder auf <i>Durchschnittsstärke (Startelf): X,XX (Y,YY)</i> im Hauptmenü). Durch klicken auf einen Spieler in der Aufstellungstabelle erhalten Sie detailliertere Informationen zu diesem Spieler.
+  </li>
+  <li>
+    <u>Wählen Sie für jeden Ihrer Spieler sein individuelles Training</u><br />
+    Im Spielermenü (s. O.) können Sie diejenige Eigenschaft festlegen, an welcher der Spieler arbeiten soll. Hier können Sie auch die Namen und Rückennummern der Spieler ändern. Jedoch nur am ersten Tag des Spiels!
+  </li>
+  <li>
+    <u>Wählen Sie Ihren Kapitän und Vize-Kapitän</u><br />
+    Ebenfalls im Spielermenü können Sie einen Spieler zum (Vize-)Kapitän ernennen.
+  </li>
+  <li>
+    <u>Stellen Sie <a href="#h3Team">Personal</a> ein</u><br />
+    Über das Menü <i>Verein->Personal</i> können Sie Personal einstellen. Beachten Sie, dass Sie das Personal immer für eine Saison einstellen. Wollen Sie Ihr Personal später ändern, fallen Abfindungen in Höhe von 50% des restlichen Gehalts an.
+  </li>
+  <li>
+    <u>Legen Sie das Mannschaftstraining fest</u><br />
+    Über das Menü <i>Mannschaft->Training</i> (oder durch klick auf <i>K: X%, F: Y%, M: Z%</i> im Hauptmenü) können Sie das Mannschaftstraining festlegen. Am Beginn einer Saison sollten Sie vermehrt auf die Kondition achten. Während der Saison, dass die Spieler vor dem nächsten Spiel frisch sind.
+  </li>
+  <li>
+    <u>Schauen Sie sich auf dem Transfermarkt um</u><br />
+    Über das Menü <i>Büro->Transfermarkt</i> können Sie nach Spielern schauen um Ihre Mannschaft zu verstärken.
+  </li>
+  <li>
+    <u>Planen Sie Testspiele</u><br />
+    Über das Menü <i>Saison->Kalender</i> (oder durch klick auf das Datum) kommen Sie in die Kalenderübersicht. Durch klick auf ein Datum haben Sie die Wahl zwischen der Anfrage eines Testspiels und der Buchung eines Trainingslagers.
+  </li>
+  <li>
+    <u>Machen Sie Ihre Finanzplanung</u><br />
+    Über das Menü <i>Verein->Finanzen</i> (oder durch klick auf den Kontostand) können Sie die Finanzplanung für die kommende Saison durchführen. Hier können Sie auch die Eintrittspreise festlegen. Die Finanzplanung kann nur am ersten Tag jeder Saison festgelegt werden!
+  </li>
+  <li>
+    <u>Geben Sie Ihrem Stadion einen Namen</u><br />
+    Über das Menü <i>Verein->Stadion</i> gelangen Sie zu Ihrem Stadion. Hier können Sie den Namen des Stadions ändern. Jedoch nur am ersten Tag des Spiels!
+  </li>
 </ul>
 
 <h2>Mannschaft</h2>
-<h3>Aufstellung</h3>
+<h3 id="h3Team">Aufstellung</h3>
 tbd
-<h3>Taktik</h3>
+<h3 id="h3Tactic">Taktik</h3>
 tbd
-<h3>Mannschaftstraining</h3>
+<h3 id="h3Training">Mannschaftstraining</h3>
 <table style="width: auto" border="1" cellpadding="3">
   <tr>
     <th style="text-align:center">Art</th>
@@ -252,9 +275,9 @@ Je mehr Plätze gebaut werden und je mehr Plätze bereits vorhanden sind, desto 
 <h4>Stadionausstattung</h4>
 @{
   string sSnackbar = (400f / CornerkickManager.csStadion.iFeatureSpecReqSnackbar).ToString("0.0");
-  string sToilets  = (400f / CornerkickManager.csStadion.iFeatureSpecReqToilets).ToString("0.0");
-  string sCounter  = (400f / CornerkickManager.csStadion.iFeatureSpecReqTicketcounter).ToString("0.0");
-  string sCarpark  = (400f / CornerkickManager.csStadion.iFeatureSpecReqCarpark).ToString("0.0");
+  string sToilets = (400f / CornerkickManager.csStadion.iFeatureSpecReqToilets).ToString("0.0");
+  string sCounter = (400f / CornerkickManager.csStadion.iFeatureSpecReqTicketcounter).ToString("0.0");
+  string sCarpark = (400f / CornerkickManager.csStadion.iFeatureSpecReqCarpark).ToString("0.0");
 }
 Folgende Stadionausstattungen stehen zur Verfügung, welche die (potentiellen) Zuschauerzahlen um bis zu 25% reduzieren, wenn sie nicht genügend vorhanden sind. Die Zahlen in Klammern geben an, welche Anzahl der jeweiligen Ausstattungen für 10.000 Stehplatz-, 8.000 Sitzplatz- und 400 VIP Zuschauer (mindestens) vorhanden sein muss, um eine Zuschauerreduktion zu vermeiden.
 <ul>
