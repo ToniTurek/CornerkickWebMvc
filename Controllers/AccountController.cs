@@ -204,8 +204,8 @@ namespace CornerkickWebMvc.Controllers
     private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false)
 #endif
     {
-      int iLand = 0;
-      int iLiga = 0;
+      int iLand     = 0;
+      int iDivision = 0;
 
       MvcApplication.ckcore.tl.writeLog("  add User to Ck: " + applicationUser.Vorname + " " + applicationUser.Nachname);
 
@@ -218,18 +218,34 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (registerViewModel != null) {
-        iLand = registerViewModel.Land;
-        iLiga = (byte)(registerViewModel.Liga);
+        iLand     = registerViewModel.Land;
+        iDivision = registerViewModel.Liga;
       }
 
-      if (iLand < 0) return;
-      if (iLiga < 0) return;
+      if (iLand     < 0) return;
+      if (iDivision < 0) return;
+
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
+      CornerkickManager.Cup cup    = MvcApplication.ckcore.tl.getCup(2, iLand, iDivision);
 
 #if DEBUG
       for (byte iU = 0; iU < 8; iU++) {
 #endif
+      // Remove CPU club from league and nat. cup
+      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
+        CornerkickManager.Club clubCpu = MvcApplication.ckcore.ltClubs[iC];
+        if (clubCpu == null) continue;
+        if (clubCpu.iUser >= 0) continue;
+
+        if (cup   .ltClubs[0].IndexOf(clubCpu) >= 0) cup.ltClubs[0].Remove(clubCpu);
+        if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
+          league.ltClubs[0].Remove(clubCpu);
+          break;
+        }
+      }
+
       CornerkickManager.User usr = createUser(applicationUser);
-      CornerkickManager.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iLiga);
+      CornerkickManager.Club clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision);
       usr.iLevel = 1;
       usr.iTeam = clb.iId;
       usr.nextGame.iGameSpeed = 250;
@@ -248,7 +264,7 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       if (iU == 0) {
 #endif
-      MvcApplication.ckcore.ltUser .Add(usr);
+      MvcApplication.ckcore.ltUser.Add(usr);
 #if DEBUG
       }
 #endif
@@ -258,8 +274,8 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.doFormation(clb.iId);
 
       // Add club to league/cup
-      MvcApplication.ckcore.ltCups[0].ltClubs[0].Add(clb); // nat. cup
-      MvcApplication.ckcore.ltCups[1].ltClubs[0].Add(clb); // league
+      cup   .ltClubs[0].Add(clb); // nat. cup
+      league.ltClubs[0].Add(clb); // league
 
 #if DEBUG
       if (iU == 0) {

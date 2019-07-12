@@ -79,47 +79,11 @@ namespace CornerkickWebMvc.Controllers
         return View(modelAdmin);
       }
 
+      /*
       // If first step: Add CPU teams
       if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount == 0) {
-        Controllers.AccountController accountController = new Controllers.AccountController();
-
-        foreach (int iLand in MvcApplication.iNations) {
-          // Create nat. cup
-          CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, iLand);
-          if (cup == null) {
-            cup = new CornerkickManager.Cup(bKo: true);
-            cup.iId = 2;
-            cup.iId2 = iLand;
-            MvcApplication.ckcore.ltCups.Add(cup);
-          }
-
-          // Create league
-          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand);
-          if (league == null) {
-            league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
-            league.iId = 1;
-            league.iId2 = iLand;
-            MvcApplication.ckcore.ltCups.Add(league);
-          }
-
-          // Only GER (remove to use full iNations)
-          //break;
-
-          int iC = 0;
-          while (league.ltClubs[0].Count < 16) {
-            CornerkickManager.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[iLand] + "_" + (iC + 1).ToString(), (byte)iLand, 0);
-            MvcApplication.ckcore.ltClubs.Add(clb);
-
-            cup   .ltClubs[0].Add(clb);
-            league.ltClubs[0].Add(clb);
-
-            iC++;
-          }
-
-          MvcApplication.ckcore.calcMatchdays();
-          MvcApplication.ckcore.drawCup(league);
-        }
       }
+      */
 
       setGameSpeedToAllUsers(modelAdmin.iGameSpeed);
 

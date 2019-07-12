@@ -112,6 +112,12 @@ namespace CornerkickWebMvc
       // Load autosave
       if (!load()) {
         // New game
+        DateTime dtLeagueStart;
+        DateTime dtLeagueEnd;
+        MvcApplication.ckcore.setSeasonStartEndDates(out dtLeagueStart, out dtLeagueEnd);
+
+        /////////////////////////////////////////////////////////////////////
+        // Create nat. Cups and Leagues
         foreach (int iLand in iNations) {
           // Create nat. cup
           CornerkickManager.Cup cup = new CornerkickManager.Cup(bKo: true);
@@ -124,14 +130,21 @@ namespace CornerkickWebMvc
           CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
           league.iId = 1;
           league.iId2 = iLand;
-          cup.sName = "Liga " + ckcore.sLand[iLand];
+          league.sName = "Liga " + ckcore.sLand[iLand];
           ckcore.ltCups.Add(league);
 
-          // Only GER (remove to use full iNations)
-          break;
+          fillLeaguesWithCpuClubc(league, cup);
         }
 
+        /////////////////////////////////////////////////////////////////////
+        // Create Internat. cups
+        createCupGold();
+        createCupSilver();
+        createCupWc(dtLeagueEnd);
+
         ckcore.calcMatchdays();
+        MvcApplication.ckcore.drawCup(MvcApplication.ckcore.tl.getCup(7));
+
         ckcore.dtDatum = ckcore.dtSeasonStart;
       }
 
@@ -144,6 +157,88 @@ namespace CornerkickWebMvc
 
       // If no calendar timer --> enable save timer to save every 15 min.
       timerSave.Enabled = !timerCkCalender.Enabled;
+    }
+
+    private static void fillLeaguesWithCpuClubc(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
+    {
+      Controllers.AccountController accountController = new Controllers.AccountController();
+
+      int iC = 0;
+      while (league.ltClubs[0].Count < nLeagueSize) {
+        CornerkickManager.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[league.iId2] + "_" + (iC + 1).ToString(), (byte)league.iId2, 0);
+        MvcApplication.ckcore.ltClubs.Add(clb);
+
+        cup   .ltClubs[0].Add(clb);
+        league.ltClubs[0].Add(clb);
+
+        iC++;
+      }
+    }
+
+    private static void createCupGold()
+    {
+      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
+
+      if (cupGold == null) {
+        // Create Gold Cup
+        cupGold = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
+        cupGold.iId = 3;
+        cupGold.sName = "Gold Cup";
+        cupGold.settings.iNeutral = 2;
+        cupGold.settings.iBonusCupWin = 30000000; // 30 mio.
+        cupGold.settings.bBonusReleaseCupWinInKo = true;
+        cupGold.settings.iDayOfWeek = 3;
+        MvcApplication.ckcore.ltCups.Add(cupGold);
+      }
+    }
+
+    private static void createCupSilver()
+    {
+      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+
+      if (cupSilver == null) {
+        // Create Silver Cup
+        cupSilver = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
+        cupSilver.iId = 4;
+        cupSilver.sName = "Silver Cup";
+        cupSilver.settings.iNeutral = 2;
+        cupSilver.settings.iBonusCupWin = 15000000; // 15 mio.
+        cupSilver.settings.bBonusReleaseCupWinInKo = true;
+        cupSilver.settings.iDayOfWeek = 4;
+        MvcApplication.ckcore.ltCups.Add(cupSilver);
+      }
+    }
+
+    private static void createCupWc(DateTime dtLeagueEnd)
+    {
+      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
+
+      if (cupWc == null) {
+        cupWc = new CornerkickManager.Cup(bKo: true, bKoTwoGames: false, nGroups: 2, bGroupsTwoGames: false, nQualifierKo: 2);
+        cupWc.iId = 7;
+        cupWc.sName = "World Cup";
+        cupWc.settings.iNeutral = 1;
+        cupWc.settings.dtStart = dtLeagueEnd.Date + new TimeSpan(20, 30, 00);
+        cupWc.settings.dtEnd = MvcApplication.ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
+        MvcApplication.ckcore.ltCups.Add(cupWc);
+
+        int iGroup = 0;
+        foreach (byte iN in MvcApplication.iNations) {
+          CornerkickManager.Club clbNat = new CornerkickManager.Club();
+          clbNat.bNation = true;
+          clbNat.iId = MvcApplication.ckcore.ltClubs.Count;
+          clbNat.sName = MvcApplication.ckcore.sLand[iN];
+          clbNat.iLand = iN;
+          clbNat.formation = MvcApplication.ckcore.ltFormationen[8];
+
+          MvcApplication.ckcore.ltClubs.Add(clbNat);
+
+          MvcApplication.ckcore.doFormation(clbNat.iId);
+
+          cupWc.ltClubs[iGroup / 4].Add(clbNat);
+          iGroup++;
+        }
+      }
     }
 
     private static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -221,31 +316,8 @@ namespace CornerkickWebMvc
 
       // End of season
       if (iRetCk == 99) {
-        return false;
-      } else if (iRetCk == 4) {
-        CornerkickManager.Cup cupGold   = MvcApplication.ckcore.tl.getCup(3);
-        CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-        if (ckcore.iSaisonCount == 1) {
-          // Create gold cup
-          cupGold = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
-          cupGold.iId = 3;
-          cupGold.sName = "Gold Cup";
-          cupGold.settings.iNeutral = 2;
-          cupGold.settings.iBonusCupWin = 30000000; // 30 mio.
-          cupGold.settings.bBonusReleaseCupWinInKo = true;
-          cupGold.settings.iDayOfWeek = 3;
-          MvcApplication.ckcore.ltCups.Add(cupGold);
-
-          // Create silver cup
-          cupSilver = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
-          cupSilver.iId = 4;
-          cupSilver.sName = "Silver Cup";
-          cupSilver.settings.iNeutral = 2;
-          cupSilver.settings.iBonusCupWin = 15000000; // 15 mio.
-          cupSilver.settings.bBonusReleaseCupWinInKo = true;
-          cupSilver.settings.iDayOfWeek = 4;
-          MvcApplication.ckcore.ltCups.Add(cupSilver);
-        }
+        CornerkickManager.Cup cupGold   = ckcore.tl.getCup(3);
+        CornerkickManager.Cup cupSilver = ckcore.tl.getCup(4);
 
         for (byte iG = 0; iG < cupGold  .ltClubs.Length; iG++) cupGold  .ltClubs[iG].Clear();
         for (byte iG = 0; iG < cupSilver.ltClubs.Length; iG++) cupSilver.ltClubs[iG].Clear();
