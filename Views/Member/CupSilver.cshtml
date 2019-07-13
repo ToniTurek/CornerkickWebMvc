@@ -1,9 +1,35 @@
 ﻿@model CornerkickWebMvc.Models.CupSilverModel
 
 @{
-    ViewBag.Title = "Silver Cup";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Silver Cup";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Silver Cup</h2>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
+  <script type="text/javascript" src="~/Scripts/League.js"></script>
+  <script type="text/javascript" src="~/Scripts/CupSilver.js"></script>
 
+  <script>
+    $(document).ready(function () {
+      setMatchday(0);
+
+      $("#ddlMatchday").change(function () {
+        setMatchday($(this).val());
+      });
+    });
+  </script>
+</head>
+
+<body style="height: 100%; min-height: 100%">
+  <label style="margin-left: 10px">
+    Spieltag:
+    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchday" })
+  </label>
+
+  <div id="tableDivCupSilverTeams"></div>
+
+  <div id="divCupSilverScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+</body>
+</html>
