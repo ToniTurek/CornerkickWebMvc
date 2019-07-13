@@ -381,6 +381,8 @@ namespace CornerkickWebMvc
 
         MvcApplication.ckcore.drawCup(cupGold);
         MvcApplication.ckcore.drawCup(cupSilver);
+
+        return false;
       }
 
       // Remove testgame requests if in past
