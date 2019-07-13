@@ -48,28 +48,7 @@ function setLeague2(iSaison, iDivision) {
     dataType: "JSON",
     data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd, iHA: iHA },
     success: function (sTable) {
-      var sBox = '';
-
-      sBox += "<table id=\"tableLeague\" style=\"width: 100%\">";
-      sBox += "<tr>";
-      sBox += "<th colspan=\"2\">Pl.</th>";
-      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-      sBox += "<th>Verein</th>";
-      sBox += "<th style=\"text-align:right; width: 3%\">&nbsp;</th>";
-      sBox += "<th style=\"text-align:right\">Sp.</th>";
-      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-      sBox += "<th style=\"text-align:right\">g.</th>";
-      sBox += "<th style=\"text-align:right\">u.</th>";
-      sBox += "<th style=\"text-align:right\">v.</th>";
-      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-      sBox += "<th style=\"text-align:center\">Tore</th>";
-      sBox += "<th style=\"text-align:right\">Diff.</th>";
-      sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-      sBox += "<th style=\"text-align:right\"> Pkte.</th>";
-      sBox += "</tr>";
-      sBox += sTable;
-      sBox += "</table>";
-
+      var sBox = drawTable(sTable);
       divDrawTable.html(sBox).show();
     }
   });
@@ -126,6 +105,32 @@ function drawTeams(sTeams) {
     sBox += '<h4>Teilnehmer</h4>';
     sBox += sTeams;
   }
+
+  return sBox;
+}
+
+function drawTable(sTable) {
+  var sBox = '';
+
+  sBox += "<table id=\"tableLeague\" style=\"width: 100%\">";
+  sBox += "<tr>";
+  sBox += "<th colspan=\"2\">Pl.</th>";
+  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+  sBox += "<th>Verein</th>";
+  sBox += "<th style=\"text-align:right; width: 3%\">&nbsp;</th>";
+  sBox += "<th style=\"text-align:right\">Sp.</th>";
+  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+  sBox += "<th style=\"text-align:right\">g.</th>";
+  sBox += "<th style=\"text-align:right\">u.</th>";
+  sBox += "<th style=\"text-align:right\">v.</th>";
+  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+  sBox += "<th style=\"text-align:center\">Tore</th>";
+  sBox += "<th style=\"text-align:right\">Diff.</th>";
+  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
+  sBox += "<th style=\"text-align:right\"> Pkte.</th>";
+  sBox += "</tr>";
+  sBox += sTable;
+  sBox += "</table>";
 
   return sBox;
 }

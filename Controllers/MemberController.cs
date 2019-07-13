@@ -3084,8 +3084,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
       CornerkickManager.Club clb = ckClub();
 
-      List<CornerkickManager.Tool.TableItem> ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday - 1, iHA);
-      List<CornerkickManager.Tool.TableItem> ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(league, iMatchday,     iHA);
+      string sBox = getTable(league, iMatchday, -1, iHA, clb, 1, 4, 8, -1);
+
+      return Json(sBox, JsonRequestBehavior.AllowGet);
+    }
+
+    private string getTable(CornerkickManager.Cup cup, int iMatchday, sbyte iGroup = -1, byte iHA = 0, CornerkickManager.Club clubUser = null, int iColor1 = 0, int iColor2 = 0, int iColor3 = 0, int iColor4 = 0)
+    {
+      List<CornerkickManager.Tool.TableItem> ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(cup, iMatchday - 1, iHA, iGroup);
+      List<CornerkickManager.Tool.TableItem> ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(cup, iMatchday,     iHA, iGroup);
 
       string sBox = "";
       for (var i = 0; i < ltTbl.Count; i++) {
@@ -3094,13 +3101,17 @@ namespace CornerkickWebMvc.Controllers
         int iDiff = tbpl.iGoals - tbpl.iGoalsOpp;
 
         string sStyle = "";
-        if (clb != null && tbpl.iId == clb.iId) sStyle = "style=\"font-weight:bold\" ";
+        if (clubUser != null && tbpl.iId == clubUser.iId) sStyle = "style=\"font-weight:bold\" ";
 
         string sBgColor = "white";
-        if      (i == 0) sBgColor = "#ffffcc";
-        else if (i <  4) sBgColor = "#ccffcc";
-        else if (i <  8) sBgColor = "#cce5ff";
-        else if (i == ltTbl.Count - 1) sBgColor = "#ffcccc";
+        if      (iColor1 > 0 && i <  iColor1) sBgColor = "#ffffcc";
+        else if (iColor2 > 0 && i <  iColor2) sBgColor = "#ccffcc";
+        else if (iColor3 > 0 && i <  iColor3) sBgColor = "#cce5ff";
+        else if (iColor4 > 0 && i <  iColor4) sBgColor = "#ffcccc";
+        else if (iColor1 < 0 && i >= ltTbl.Count + iColor1) sBgColor = "#ffffcc";
+        else if (iColor2 < 0 && i >= ltTbl.Count + iColor2) sBgColor = "#ccffcc";
+        else if (iColor3 < 0 && i >= ltTbl.Count + iColor3) sBgColor = "#cce5ff";
+        else if (iColor4 < 0 && i >= ltTbl.Count + iColor4) sBgColor = "#ffcccc";
 
         var k = i + 1;
 
@@ -3111,7 +3122,7 @@ namespace CornerkickWebMvc.Controllers
             if (i != iLast) {
               sPlaceLast = (iLast + 1).ToString();
               if (i > iLast) sColor = "red";
-              else           sColor = "green";
+              else sColor = "green";
             }
             break;
           }
@@ -3138,7 +3149,7 @@ namespace CornerkickWebMvc.Controllers
         sBox += "</tr>";
       }
 
-      return Json(sBox, JsonRequestBehavior.AllowGet);
+      return sBox;
     }
 
     public JsonResult setLeagueTeams(int iSaison, int iLand, byte iDivision, int iMatchday)
@@ -3402,6 +3413,18 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
 
       return Json(getCupTeams(cupWc, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult CupWcGetLeague(int iSaison, int iMatchday, sbyte iGroup)
+    {
+      string sBox = "";
+
+      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
+      if (cupWc.checkCupGroupPhase(iMatchday)) {
+        sBox = getTable(cupWc, iMatchday + 1, iGroup, iColor1: 2);
+      }
+
+      return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////

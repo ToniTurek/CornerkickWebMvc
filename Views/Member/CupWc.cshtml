@@ -19,7 +19,7 @@
         setMatchday($("#ddlMatchday").val(), $(this).val());
       });
 
-      $("#ddlMatchday").change(function () {
+      $("#ddlMatchdayCupWc").change(function () {
         setMatchday($(this).val(), $("#iGroup").val());
       });
     });
@@ -34,10 +34,11 @@
 
   <label style="margin-left: 10px">
     Spieltag:
-    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchday" })
+    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupWc" })
   </label>
 
-  <div id="tableDivCupWcTeams"></div>
+  <div id="divCupWcTeams"></div>
+  <div id="divCupWcTable" style="position: relative; width: 100%"></div>
 
   <div id="divCupWcScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
 </body>
