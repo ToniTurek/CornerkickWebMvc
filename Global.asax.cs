@@ -399,6 +399,33 @@ namespace CornerkickWebMvc
         }
       }
 
+      // Inform user if transfer offer too low
+      if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(12, 00, 00))) {
+        // For each transfer
+        foreach (CornerkickManager.csTransfer.Transfer transfer in ckcore.ltTransfer) {
+          CornerkickGame.Player plTrf = ckcore.ltPlayer[transfer.iPlayerId];
+          if (plTrf.iClubId <                     0) continue;
+          if (plTrf.iClubId >= ckcore.ltClubs.Count) continue;
+
+          CornerkickManager.Club clbCpu = ckcore.ltClubs[plTrf.iClubId];
+          if (clbCpu.iUser > 0) continue; // If human user (0 = main CPU user)
+
+          // Get max offer
+          int iOfferMax = 0;
+          foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
+            iOfferMax = Math.Max(iOfferMax, offer.iFee);
+          }
+
+          // Inform users
+          foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
+            CornerkickManager.Club clbOffer = ckcore.ltClubs[offer.iClubId];
+            if (clbOffer.iUser > 0 && offer.iFee < iOfferMax) {
+              ckcore.Info(clbOffer.iUser, "Ihr Transferangebot für den Spieler " + plTrf.sName + " ist leider (nicht mehr) hoch genug.");
+            }
+          }
+        }
+      }
+
       return true;
     }
 
