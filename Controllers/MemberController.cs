@@ -2993,12 +2993,20 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"" + clb.sName + "\"/>";
 
 #if DEBUG
-      string sEmblemFile = MvcApplication.getHomeDir() + "/Content/Uploads/" + clb.iId.ToString() + ".png";
+      string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
+      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", MvcApplication.ckcore.sLandShort[clb.iLand] + ".png");
 #else
       string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
+      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", MvcApplication.ckcore.sLandShort[clb.iLand] + ".png");
 #endif
-      if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
-      else                                    sEmblem += "0";
+      if (clb.bNation) {
+        sEmblem = "<img src=\"/Content/Icons/flags/";
+        if (System.IO.File.Exists(sEmblemFile)) sEmblem += MvcApplication.ckcore.sLandShort[clb.iLand];
+        else                                    sEmblem += "0";
+      } else {
+        if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
+        else                                    sEmblem += "0";
+      }
 
       if (!string.IsNullOrEmpty(sStyle)) sStyle = " style=\"" + sStyle + "\"";
       sEmblem += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + clb.sName + "\"/>";
