@@ -26,14 +26,25 @@
       sUser = MvcApplication.ckcore.ltUser[iUser].sFirstname + " " + MvcApplication.ckcore.ltUser[iUser].sSurname;
     }
 
-    string sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
-    CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
-    string sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club, MvcApplication.ckcore.dtDatum).ToString();
+    string sDivision = "-";
+    if (!Model.club.bNation) {
+      sDivision = (Model.club.iDivision + 1).ToString() + ". Liga";
+    }
+
+    string sPlace = "-";
+    if (!Model.club.bNation) {
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
+      sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club, MvcApplication.ckcore.dtDatum).ToString();
+    }
+
     float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
     string sAveStrength = fAve[3].ToString("0.0");
     string sAveAge = fAve[4].ToString("0.0");
 
-    string sStadium = Model.club.stadium.sName + " (" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
+    string sStadium = "-";
+    if (!Model.club.bNation) {
+      sStadium = Model.club.stadium.sName + " (" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
+    }
   }
 
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
@@ -54,26 +65,28 @@
             <td></td>
             <td></td>
           </tr>
-          <tr>
-            <td align="right">Land:</td>
-            <td align="left">@MvcApplication.ckcore.sLand[@Model.club.iLand]</td>
-          </tr>
-          <tr>
-            <td align="right">Liga:</td>
-            <td align="left">@sDivision</td>
-          </tr>
-          <tr>
-            <td align="right">akt. Tabellenplatz:</td>
-            <td align="left">@sPlace</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-          </tr>
+          @if (!Model.club.bNation) {
+            <tr>
+              <td align="right">Land:</td>
+              <td align="left">@MvcApplication.ckcore.sLand[@Model.club.iLand]</td>
+            </tr>
+            <tr>
+              <td align="right">Liga:</td>
+              <td align="left">@sDivision</td>
+            </tr>
+            <tr>
+              <td align="right">akt. Tabellenplatz:</td>
+              <td align="left">@sPlace</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+            </tr>
+          }
           <tr>
             <td align="right">Anzahl Spieler:</td>
             <td align="left">@Model.club.ltPlayer.Count</td>
@@ -86,18 +99,20 @@
             <td align="right">Durchschnittsalter:</td>
             <td align="left">@sAveAge</td>
           </tr>
-          <tr>
-            <td align="right">Anzahl Jugendspieler:</td>
-            <td align="left">@Model.club.ltPlayerJouth.Count</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td align="right">Stadion:</td>
-            <td align="left">@sStadium</td>
-          </tr>
+          @if (!Model.club.bNation) {
+            <tr>
+              <td align="right">Anzahl Jugendspieler:</td>
+              <td align="left">@Model.club.ltPlayerJouth.Count</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td align="right">Stadion:</td>
+              <td align="left">@sStadium</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
@@ -106,49 +121,84 @@
     <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
       <table cellpadding="1" style="width: auto">
         <tbody>
-          <tr>
-            <td align="right">Höchster Heimsieg Liga:</td>
-            <td align="left">@Model.sRecordLWinH</td>
-          </tr>
-          <tr>
-            <td align="right">Höchster Auswärtssieg Liga:</td>
-            <td align="left">@Model.sRecordLWinA</td>
-          </tr>
-          <tr>
-            <td align="right">Höchste Heimniederlage Liga:</td>
-            <td align="left">@Model.sRecordLDefH</td>
-          </tr>
-          <tr>
-            <td align="right">Höchste Auswärtsniederlage Liga:</td>
-            <td align="left">@Model.sRecordLDefA</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td align="right">Höchster Heimsieg Pokal:</td>
-            <td align="left">@Model.sRecordCWinH</td>
-          </tr>
-          <tr>
-            <td align="right">Höchster Auswärtssieg Pokal:</td>
-            <td align="left">@Model.sRecordCWinA</td>
-          </tr>
-          <tr>
-            <td align="right">Höchste Heimniederlage Pokal:</td>
-            <td align="left">@Model.sRecordCDefH</td>
-          </tr>
-          <tr>
-            <td align="right">Höchste Auswärtsniederlage Pokal:</td>
-            <td align="left">@Model.sRecordCDefA</td>
-          </tr>
+          @if (Model.club.bNation) {
+            <tr>
+              <td align="right">Höchster Heimsieg:</td>
+              <td align="left">@Model.sRecordLWinH</td>
+            </tr>
+            <tr>
+              <td align="right">Höchster Auswärtssieg:</td>
+              <td align="left">@Model.sRecordLWinA</td>
+            </tr>
+            <tr>
+              <td align="right">Höchste Heimniederlage:</td>
+              <td align="left">@Model.sRecordLDefH</td>
+            </tr>
+            <tr>
+              <td align="right">Höchste Auswärtsniederlage:</td>
+              <td align="left">@Model.sRecordLDefA</td>
+            </tr>
+          } else {
+            <tr>
+              <td align="right">Höchster Heimsieg Liga:</td>
+              <td align="left">@Model.sRecordLWinH</td>
+            </tr>
+            <tr>
+              <td align="right">Höchster Auswärtssieg Liga:</td>
+              <td align="left">@Model.sRecordLWinA</td>
+            </tr>
+            <tr>
+              <td align="right">Höchste Heimniederlage Liga:</td>
+              <td align="left">@Model.sRecordLDefH</td>
+            </tr>
+            <tr>
+              <td align="right">Höchste Auswärtsniederlage Liga:</td>
+              <td align="left">@Model.sRecordLDefA</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td align="right">Höchster Heimsieg Pokal:</td>
+              <td align="left">@Model.sRecordCWinH</td>
+            </tr>
+            <tr>
+              <td align="right">Höchster Auswärtssieg Pokal:</td>
+              <td align="left">@Model.sRecordCWinA</td>
+            </tr>
+            <tr>
+              <td align="right">Höchste Heimniederlage Pokal:</td>
+              <td align="left">@Model.sRecordCDefH</td>
+            </tr>
+            <tr>
+              <td align="right">Höchste Auswärtsniederlage Pokal:</td>
+              <td align="left">@Model.sRecordCDefA</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
+
+    @if (Model.club.bNation) {
+      <h4>Aktueller Kader</h4>
+      <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
+        <table cellpadding="3" style="width: auto">
+          <tbody>
+            @foreach (CornerkickGame.Player pl in Model.club.ltPlayer) {
+              <tr>
+                <td align="right">@pl.sName</td>
+                <td align="left">@MvcApplication.ckcore.ltClubs[pl.iClubId].sName</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   </div>
 </body>
 </html>
