@@ -3324,7 +3324,7 @@ namespace CornerkickWebMvc.Controllers
         if (gd.team[0].iTeamId >= 0) sClubNameH = MvcApplication.ckcore.ltClubs[iIdH].sName;
         if (gd.team[1].iTeamId >= 0) sClubNameA = MvcApplication.ckcore.ltClubs[iIdA].sName;
 
-        if (iGroup >= 0 && iGroup < cup.ltClubs.Length) {
+        if (cup.checkCupGroupPhase(iMatchday) && iGroup >= 0 && iGroup < cup.ltClubs.Length) {
           if (cup.ltClubs[iGroup].IndexOf(MvcApplication.ckcore.ltClubs[iIdH]) < 0 || cup.ltClubs[iGroup].IndexOf(MvcApplication.ckcore.ltClubs[iIdA]) < 0) continue;
         }
 
