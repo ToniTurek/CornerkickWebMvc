@@ -88,7 +88,9 @@ function drawTeams(sTeams) {
 
   if (!sTeams) {
     return sBox;
-  } else if (sTeams.includes('<td>')) {
+  }
+
+  if (sTeams.includes('<td>')) {
     sBox += '<h4>Begegnungen</h4>';
     sBox += '<table id="tableTeams" border="0" cellpadding="2" style="width: 100%">';
     sBox += '<tr>';
@@ -111,6 +113,10 @@ function drawTeams(sTeams) {
 
 function drawTable(sTable) {
   var sBox = '';
+
+  if (!sTable) {
+    return sBox;
+  }
 
   sBox += "<table id=\"tableLeague\" style=\"width: 100%\">";
   sBox += "<tr>";
