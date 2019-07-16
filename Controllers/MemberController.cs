@@ -3431,6 +3431,7 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupWc(Models.CupWcModel cupWcModel)
     {
+      cupWcModel.iMatchday = MvcApplication.ckcore.tl.getMatchday(MvcApplication.ckcore.tl.getCup(7), MvcApplication.ckcore.dtDatum);
       return View(cupWcModel);
     }
 
