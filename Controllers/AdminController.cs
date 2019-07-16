@@ -127,7 +127,7 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult RestartCk(Models.AdminModel modelAdmin)
     {
-      MvcApplication.timerCkCalender.Enabled = false;
+      if (MvcApplication.timerCkCalender != null) MvcApplication.timerCkCalender.Enabled = false;
 
       MvcApplication.newCk();
 
