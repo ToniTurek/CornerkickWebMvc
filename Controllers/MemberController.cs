@@ -1132,6 +1132,8 @@ namespace CornerkickWebMvc.Controllers
           CornerkickManager.Club clubOpp = MvcApplication.ckcore.ltClubs[iClubOpp];
 
           for (byte iPl = 0; iPl < club.nextGame.nPlStart; iPl++) {
+            if (iPl >= clubOpp.ltPlayer.Count) break;
+
             CornerkickGame.Player plOpp = clubOpp.ltPlayer[iPl];
 
             tD.ltPlayerOpp.Add(plOpp);
