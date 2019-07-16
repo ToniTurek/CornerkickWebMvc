@@ -150,6 +150,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
+      // National team
+      if (usr.iNat >= 0 && usr.iNat < MvcApplication.ckcore.ltClubs.Count) {
+        foreach (CornerkickManager.Club nat in MvcApplication.ckcore.ltClubs) {
+          if (!nat.bNation) continue;
+          if ( nat.iLand == usr.iNat) return nat;
+        }
+      }
+
+      // Club
       if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
         return MvcApplication.ckcore.ltClubs[usr.iTeam];
       }
@@ -1119,7 +1128,8 @@ namespace CornerkickWebMvc.Controllers
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
 
       if (club.nextGame != null) {
-        tD.iKibitzer = club.personal.iKibitzer;
+        if (club.bNation) tD.iKibitzer = 3;
+        else              tD.iKibitzer = club.personal.iKibitzer;
 
         int iClubOpp = club.nextGame.team[1].iTeamId;
         if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;

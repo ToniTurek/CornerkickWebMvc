@@ -420,13 +420,63 @@ namespace CornerkickWebMvc
           foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
             CornerkickManager.Club clbOffer = ckcore.ltClubs[offer.iClubId];
             if (clbOffer.iUser > 0 && offer.iFee < iOfferMax) {
-              ckcore.Info(clbOffer.iUser, "Ihr Transferangebot für den Spieler " + plTrf.sName + " ist leider (nicht mehr) hoch genug.");
+              ckcore.Info(clbOffer.iUser, "Ihr Transferangebot für den Spieler " + plTrf.sName + " ist leider nicht (mehr) hoch genug.");
             }
           }
         }
       }
 
-      return true;
+      // Reduce player for WC
+      const int nPlayerNat = 22;
+      CornerkickManager.Cup cupWc = ckcore.tl.getCup(7);
+      DateTime dtWcSelectPlayerFinish = new DateTime();
+      if (cupWc != null) {
+        if (cupWc.ltMatchdays != null) {
+          if (cupWc.ltMatchdays.Count > 0) {
+            dtWcSelectPlayerFinish = cupWc.ltMatchdays[0].dt.Date.AddDays(-6);
+            if (ckcore.dtDatum.Equals(dtWcSelectPlayerFinish)) {
+              // For each national team
+              foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
+                if (!nat.bNation) continue;
+
+                while (nat.ltPlayer.Count > nPlayerNat) nat.ltPlayer.RemoveAt(nPlayerNat);
+                for (int iP = 0; iP < nat.ltPlayer.Count; iP++) nat.ltPlayer[iP].iNrNat = (byte)(iP + 1);
+              }
+            }
+          }
+        }
+      }
+
+      // Nominate user for WC
+      bool bReturn = true;
+      foreach (CornerkickManager.Cup league in ckcore.ltCups) {
+        if (league.iId  != 1) continue;
+        if (league.iId3 >  0) continue;
+
+        if (ckcore.dtDatum.Equals(league.ltMatchdays[league.ltMatchdays.Count - 1].dt.AddDays(1))) {
+          List<CornerkickManager.Tool.TableItem> tbl = ckcore.tl.getLeagueTable(league);
+          foreach (CornerkickManager.Tool.TableItem item in tbl) {
+            if (item.club.iUser > 0) {
+              ckcore.ltUser[item.club.iUser].iNat = league.iId2;
+
+              // Add all player of that nation
+              CornerkickManager.Club nat = ckcore.tl.getNation(league.iId2);
+              nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
+              nat.iUser = item.club.iUser;
+
+              // Inform user
+              string sWcInfo = "Herzlichen Glückwunsch! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.";
+              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) sWcInfo += " Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.";
+              ckcore.Info(item.club.iUser, sWcInfo);
+
+              bReturn = false;
+              break;
+            }
+          }
+        }
+      }
+
+      return bReturn;
     }
 
     private static int countCpuPlayerOnTransferlist()
