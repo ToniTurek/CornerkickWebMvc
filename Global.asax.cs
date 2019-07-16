@@ -440,6 +440,8 @@ namespace CornerkickWebMvc
                 if (!nat.bNation) continue;
 
                 while (nat.ltPlayer.Count > nPlayerNat) nat.ltPlayer.RemoveAt(nPlayerNat);
+
+                // Set player no.
                 for (int iP = 0; iP < nat.ltPlayer.Count; iP++) nat.ltPlayer[iP].iNrNat = (byte)(iP + 1);
               }
             }
@@ -719,7 +721,6 @@ namespace CornerkickWebMvc
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].iUser = -1;
 
         // TMP section
-        ckcore.fz.fGlobalCreditInterest = 0.05f;
         // END TMP section
 
         dtLoadCk = ckcore.dtDatum;
