@@ -106,14 +106,14 @@
         for (int iPl = 0; iPl < clb.ltPlayer.Count; iPl++, nPl++) {
           CornerkickGame.Player pl = clb.ltPlayer[iPl];
           string sId = "idPlayerNames" + iPl.ToString();
-          <div id="@sId" data-name="@pl.sName,@clb.ltPlayer[iPl]"></div>
+          <div id="@sId" data-name="@pl.sName,@clb.ltPlayer[iPl].iId"></div>
         }
       }
       if (clb.ltPlayerJouth != null) {
         for (int iPl = 0; iPl < clb.ltPlayerJouth.Count; iPl++, nPl++) {
           CornerkickGame.Player pl = clb.ltPlayerJouth[iPl];
           string sId = "idPlayerNames" + (iPl + clb.ltPlayer.Count).ToString();
-          <div id="@sId" data-name="@pl.sName,@clb.ltPlayerJouth[iPl]"></div>
+          <div id="@sId" data-name="@pl.sName,@clb.ltPlayerJouth[iPl].iId"></div>
         }
       }
 
