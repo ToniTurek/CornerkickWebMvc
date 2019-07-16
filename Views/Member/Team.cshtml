@@ -9,7 +9,10 @@
   CornerkickGame.Tactic tactic = new CornerkickGame.Tactic();
 
   if (clubUser != null) {
-    plSelected = clubUser.ltPlayer[0];
+    if (clubUser.ltPlayer.Count > 0) {
+      plSelected = clubUser.ltPlayer[0];
+    }
+
     tactic = clubUser.tactic;
   }
 }
