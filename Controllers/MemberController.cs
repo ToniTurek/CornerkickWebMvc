@@ -176,6 +176,12 @@ namespace CornerkickWebMvc.Controllers
 
       return CultureInfo.CurrentCulture;
     }
+    public static CultureInfo getCiStatic(int iLand)
+    {
+      if (iLand >= 0 && iLand < sCultureInfo.Length) return new CultureInfo(sCultureInfo[iLand]);
+
+      return CultureInfo.CurrentCulture;
+    }
 
     public CultureInfo getCi()
     {
