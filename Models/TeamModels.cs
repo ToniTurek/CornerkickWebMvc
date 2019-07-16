@@ -68,6 +68,8 @@ namespace CornerkickWebMvc.Models
 
       public float fTeamAveStrength { get; set; }
       public float fTeamAveAge { get; set; }
+
+      public bool bNation { get; set; }
     }
 
     public TeamModels()

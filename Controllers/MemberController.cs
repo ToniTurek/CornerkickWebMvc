@@ -1133,6 +1133,8 @@ namespace CornerkickWebMvc.Controllers
       tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
 
+      tD.bNation = club.bNation;
+
       if (club.nextGame != null) {
         if (club.bNation) tD.iKibitzer = 3;
         else              tD.iKibitzer = club.personal.iKibitzer;

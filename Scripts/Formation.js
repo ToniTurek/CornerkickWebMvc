@@ -29,7 +29,12 @@
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
-            result += getBoxFormation(player, i, player.sName, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
+            var sNo = player.iNr.toString();
+            if (teamData.bNation) {
+              sNo = player.iNrNat.toString();
+            }
+
+            result += getBoxFormation(player, i, player.sName, sNo, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
 
             i = i + 1;
             return i !== 11;
@@ -52,7 +57,13 @@
                   sPlayerOppPos      = teamData.ltPlayerOppPos     [j];
                 }
               }
-              result += getBoxFormation(playerOpp, i, sPlayerOppName, sPlayerOppAveSkill, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
+
+              var sOppNo = playerOpp.iNr.toString();
+              if (teamData.bNation) {
+                sOppNo = playerOpp.iNrNat.toString();
+              }
+
+              result += getBoxFormation(playerOpp, i, sPlayerOppName, sOppNo, sPlayerOppAveSkill, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
 
               i = i + 1;
               j = j + 1;
@@ -108,7 +119,7 @@
   });
 }
 
-function getBoxFormation(player, i, sName, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
+function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
   if (!player) {
     return "";
   }
@@ -180,7 +191,7 @@ function getBoxFormation(player, i, sName, sStrength, bOpponentTeam, iSelectedPl
   sBox +=
     '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
       '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + player.iNr + '</h2>' +
+        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + sNo + '</h2>' +
       '</div>' +
       '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black; background-color: ' + color + '">' +
         '<div style="position: absolute; width: 100%; height: 65%; top: 0px; left: 0px; background-color: ' + color + '; word-break: break-word; vertical-align: middle">';

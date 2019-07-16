@@ -59,7 +59,7 @@
             var drawFormation = $("#drawFormation");
 
             $.each(teamData.ltPlayer, function (j, player) {
-              result += getBoxFormation(player, i, player.sName, teamData.ltPlayerAveSkill[i], false, -1, teamData.ltPlayerPos[i], bMobile, 0.5, teamData.ltPlayerTeamname[i], teamData.ltPlayerAge[i], teamData.ltPlayerNat[i]);
+              result += getBoxFormation(player, i, player.sName, player.iNr.toString(), teamData.ltPlayerAveSkill[i], false, -1, teamData.ltPlayerPos[i], bMobile, 0.5, teamData.ltPlayerTeamname[i], teamData.ltPlayerAge[i], teamData.ltPlayerNat[i]);
 
               i = i + 1;
               return i !== 11;
