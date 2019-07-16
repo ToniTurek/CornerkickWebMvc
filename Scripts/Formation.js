@@ -22,7 +22,7 @@
 
         if (document.getElementById("rbDefence").checked) {
           $.each(teamData.ltPlayer, function (iFormation, player) {
-            if (player.iIxManMarking >= 0) {
+            if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
               plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
 
               var iPos = convertPosToPix(player.ptPosDefault.Y, 122 - player.ptPosDefault.X, -plOpp.ptPosDefault.Y, plOpp.ptPosDefault.X, document.getElementById("drawFormation"), false);
