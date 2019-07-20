@@ -3891,7 +3891,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return nDays;
 
-      foreach (CornerkickGame.Game.Data data in MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false)) {
+      List<CornerkickGame.Game.Data> ltGdNext = MvcApplication.ckcore.tl.getNextGames(club, dtStart, false);
+      foreach (CornerkickGame.Game.Data data in ltGdNext) {
         if (data.iGameType == iIgnoreGameType) continue;
 
         nDays = Math.Min(nDays, (int)(data.dt - dtStart).TotalDays);
