@@ -122,6 +122,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUserStatic(User);
       if (usr == null) return null;
 
+      // National team
+      if (usr.iNat >= 0 && usr.iNat < MvcApplication.ckcore.ltClubs.Count) {
+        foreach (CornerkickManager.Club nat in MvcApplication.ckcore.ltClubs) {
+          if (!nat.bNation) continue;
+          if (nat.iLand == usr.iNat) return nat;
+        }
+      }
+
+      // Club
       if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
         return MvcApplication.ckcore.ltClubs[usr.iTeam];
       }
