@@ -481,7 +481,7 @@
               <tr>
                 @{
                   string sDauer = player.contract.iLength.ToString() + " Jahre";
-                  if (MvcApplication.ckcore.ltClubs[player.iClubId].ltPlayerJouth.IndexOf(player) >= 0) {
+                  if (Model.bJouth) {
                     sDauer = "Jugendspieler";
                   } else if (player.contract.iLength < 2) {
                     sDauer = "Saisonende";
