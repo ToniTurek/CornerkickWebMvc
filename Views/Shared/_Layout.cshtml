@@ -16,18 +16,17 @@
       }
     }
 
-    if (usr != null) {
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count)
-      {
-        clb = MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-    }
-
-    sEmblem = @"/Content/Uploads/emblems/";
+    clb = CornerkickWebMvc.Controllers.MemberController.ckClubStatic(User);
 
     if (Request.IsAuthenticated) {
+      sEmblem = @"/Content/Uploads/emblems/";
+
       if (clb != null) {
-        sEmblem += clb.iId.ToString() + ".png";
+        if (clb.bNation) {
+          sEmblem = @"/Content/Icons/flags/" + MvcApplication.ckcore.sLandShort[clb.iLand] + ".png";
+        } else {
+          sEmblem += clb.iId.ToString() + ".png";
+        }
 
         int iLandUser = clb.iLand;
         if (iLandUser >= 0 && iLandUser < CornerkickWebMvc.Controllers.MemberController.sCultureInfo.Length) {
