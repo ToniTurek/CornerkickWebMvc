@@ -4,35 +4,38 @@
 @{
   CornerkickManager.User usr = null;
   CornerkickManager.Club clb = null;
-
-  string sUserId = User.Identity.GetUserId();
-  foreach (CornerkickManager.User usrTmp in MvcApplication.ckcore.ltUser) {
-    if (usrTmp.id.Equals(sUserId)) {
-      usr = usrTmp;
-      break;
-    }
-  }
-
-  if (usr != null) {
-    if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count)
-    {
-      clb = MvcApplication.ckcore.ltClubs[usr.iTeam];
-    }
-  }
-
-  string sEmblem = @"/Content/Uploads/";
+  string sEmblem = "";
   System.Globalization.CultureInfo ci = System.Globalization.CultureInfo.CurrentCulture;
 
-  if (Request.IsAuthenticated) {
-    if (clb != null) {
-      sEmblem += clb.iId.ToString() + ".png";
-
-      int iLandUser = clb.iLand;
-      if (iLandUser >= 0 && iLandUser < CornerkickWebMvc.Controllers.MemberController.sCultureInfo.Length) {
-        ci = new System.Globalization.CultureInfo(CornerkickWebMvc.Controllers.MemberController.sCultureInfo[iLandUser]);
+  if (MvcApplication.ckcore != null) {
+    string sUserId = User.Identity.GetUserId();
+    foreach (CornerkickManager.User usrTmp in MvcApplication.ckcore.ltUser) {
+      if (usrTmp.id.Equals(sUserId)) {
+        usr = usrTmp;
+        break;
       }
-    } else {
-      sEmblem += "0.png";
+    }
+
+    if (usr != null) {
+      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count)
+      {
+        clb = MvcApplication.ckcore.ltClubs[usr.iTeam];
+      }
+    }
+
+    sEmblem = @"/Content/Uploads/";
+
+    if (Request.IsAuthenticated) {
+      if (clb != null) {
+        sEmblem += clb.iId.ToString() + ".png";
+
+        int iLandUser = clb.iLand;
+        if (iLandUser >= 0 && iLandUser < CornerkickWebMvc.Controllers.MemberController.sCultureInfo.Length) {
+          ci = new System.Globalization.CultureInfo(CornerkickWebMvc.Controllers.MemberController.sCultureInfo[iLandUser]);
+        }
+      } else {
+        sEmblem += "0.png";
+      }
     }
   }
 }
