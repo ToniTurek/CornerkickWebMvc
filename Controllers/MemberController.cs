@@ -1605,6 +1605,274 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
+    public JsonResult PlayerDetailsGetStatistic(int iPlayer, bool bSeason = true)
+    {
+      CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
+
+      const byte nStatLength = 4;
+
+      // Create EP statistic
+      CornerkickGame.Player.Statistic plStat3 = player.getStatistic(3, bSeason);
+      CornerkickGame.Player.Statistic plStat4 = player.getStatistic(4, bSeason);
+      CornerkickGame.Player.Statistic plStatEP = new CornerkickGame.Player.Statistic();
+      for (int iS = 0; iS < plStat3.iStat.Length; iS++) {
+        plStatEP.iStat[iS] = plStat3.iStat[iS] + plStat4.iStat[iS];
+      }
+
+      CornerkickGame.Player.Statistic[] plStat = new CornerkickGame.Player.Statistic[nStatLength] { player.getStatistic(1, bSeason), player.getStatistic(2, bSeason), plStatEP, player.getStatistic(7, bSeason) };
+
+      int[] iGoalsTotal = new int[nStatLength] { player.getGoalsTotal(1, bSeason), player.getGoalsTotal(2, bSeason), player.getGoalsTotal(3, bSeason) + player.getGoalsTotal(4, bSeason), player.getGoalsTotal(7, bSeason) };
+
+      string sBox = "";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Spiele</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[0] + "</td>";
+      }
+      sBox += "</tr>";
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Tore</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iGoalsTotal[i].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">mit rechts</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[1].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">mit links</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[2].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">per Kopf</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[3].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Tore pro Spiel</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s = "-";
+        if (iStat[0] > 0) s = (iGoalsTotal[i] / (float)iStat[0]).ToString("0.00");
+        sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">11m +</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[4].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">11m -</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[5].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">11m Quote</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s11m = "-";
+        if (iStat[4] + iStat[5] > 0) s11m = (iStat[4] / (float)(iStat[4] + iStat[5])).ToString("0.0%");
+        sBox += "<td align=\"center\">" + s11m + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Freistoß +</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[6].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Freistoß -</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[7].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Freistoßquote</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s = "-";
+        if (iStat[6] + iStat[7] > 0) s = (iStat[6] / (float)(iStat[6] + iStat[7])).ToString("0.0%");
+        sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Vorlagen</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[8].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Torschüsse</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[9].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Tors. pro Tor</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s = "-";
+        if (iGoalsTotal[i] > 0) s = (iStat[9] / (float)iGoalsTotal[i]).ToString("0.00");
+        sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Schüsse aufs Tor</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[10].ToString() + "</td>";
+        }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Abspiel +</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[15].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Abspiel -</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[16].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Abspiel</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s = "-";
+        if (iStat[15] + iStat[16] > 0) s = (iStat[15] / (float)(iStat[15] + iStat[16])).ToString("0.0%");
+        sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Zweikampf def. +</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[17].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Zweikampf def. -</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[18].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Zweikampf def.</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s = "-";
+        if (iStat[17] + iStat[18] > 0) s = (iStat[17] / (float)(iStat[17] + iStat[18])).ToString("0.0%");
+        sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Zweikampf off. +</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[19].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Zweikampf off. -</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[20].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Zweikampf off.</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string s = "-";
+        if (iStat[19] + iStat[20] > 0) s = (iStat[19] / (float)(iStat[19] + iStat[20])).ToString("0.0%");
+        sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Fouls</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[21].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Gelbe Karten</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[22].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Gelb-Rote Karten</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[23].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Rote Karten</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[24].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      return Json(sBox, JsonRequestBehavior.AllowGet);
+    }
+
     [HttpPost]
     public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0)
     {
