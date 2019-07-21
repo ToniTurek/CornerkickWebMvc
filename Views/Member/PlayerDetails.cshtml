@@ -416,7 +416,7 @@
       }
     </div>
 
-    if (Model.bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1))) {
+    if (Model.bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1)) && !Model.bJouth) {
       <div class="form-group">
         @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
