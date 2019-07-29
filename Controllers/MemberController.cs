@@ -1571,6 +1571,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Player.Doping dp = MvcApplication.ckcore.ltDoping[iDp];
 
       string sDesc = "Steigerung max. Kondition: " + dp.fEffectMax    .ToString("0.0%") + "<br>" +
+                     " Einmaliger Frischegewinn: " + dp.fFreshGain    .ToString("0.0%") + "<br>" +
                      "       Reduktionsrate / d: " + dp.fReductionRate.ToString("0.0%") + "<br>" +
                      "    Max. Detektionsrisiko: " + dp.fDetectable   .ToString("0.0%") + "<br>" +
                      "                   Kosten: " + dp.iCost.ToString("N0", getCi()) + " €";
