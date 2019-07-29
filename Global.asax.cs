@@ -451,9 +451,11 @@ namespace CornerkickWebMvc
 
       // Nominate user for WC
       bool bReturn = true;
-      foreach (CornerkickManager.Cup league in ckcore.ltCups) {
+      foreach (CornerkickManager.Cup league in ckcore.ltCups) { // For each 1st division league
         if (league.iId  != 1) continue;
         if (league.iId3 >  0) continue;
+        if (league.ltMatchdays == null) continue;
+        if (league.ltMatchdays.Count < 2) continue;
 
         if (ckcore.dtDatum.Equals(league.ltMatchdays[league.ltMatchdays.Count - 1].dt.AddDays(1))) {
           List<CornerkickManager.Tool.TableItem> tbl = ckcore.tl.getLeagueTable(league);
