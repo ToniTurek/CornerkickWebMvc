@@ -516,7 +516,7 @@ namespace CornerkickWebMvc.Controllers
       return View(mdPreview);
     }
 
-    public ContentResult GetTeamDevelopmentData(bool bExpected = false)
+    public ContentResult GetTeamDevelopmentData(bool bExpected = false, int iTrainingsCamp = 0)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Content("", "application/json");
@@ -552,6 +552,16 @@ namespace CornerkickWebMvc.Controllers
         List<CornerkickGame.Player> ltPlayerTmp = new List<CornerkickGame.Player>();
         foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTmp.Add(pl.Clone());
 
+        CornerkickManager.csTrainingCamp.Booking camp = new CornerkickManager.csTrainingCamp.Booking();
+        foreach (CornerkickManager.csTrainingCamp.Camp cp in MvcApplication.ckcore.tcp.ltCamps) {
+          if (cp.iId == iTrainingsCamp) {
+            camp.camp = cp;
+            camp.dtArrival   = MvcApplication.ckcore.dtDatum.AddDays(-1);
+            camp.dtDeparture = MvcApplication.ckcore.dtDatum.AddDays(+8);
+            break;
+          }
+        }
+
         // For the next 7 days ...
         for (byte iD = 0; iD < 7; iD++) {
           DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iD);
@@ -562,7 +572,7 @@ namespace CornerkickWebMvc.Controllers
             // ... do training for each player
             for (int iP = 0; iP < ltPlayerTmp.Count; iP++) {
               CornerkickGame.Player plTmp = ltPlayerTmp[iP];
-              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp, false, true);
+              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp, camp, false, true);
             }
           }
 

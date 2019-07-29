@@ -85,11 +85,18 @@
     function plotTrainingDevelopment(bAnimate) {
       var bExpected = document.getElementById("cbPlotExpected").checked;
 
+      var selectCamp = document.getElementById("selectCamp");
+      if (bExpected) {
+        selectCamp.style.visibility = "visible";
+      } else {
+        selectCamp.style.visibility = "hidden";
+      }
+
       $.ajax({
         type: 'post',
         url: '/Member/GetTeamDevelopmentData',
         dataType: "json",
-        data: { bExpected: bExpected },
+        data: { bExpected: bExpected, iTrainingsCamp: $("#selectCamp").val() },
         success: function (dataKFM) {
           var chart = new CanvasJS.Chart("chartContainer", {
             animationEnabled: bAnimate,
@@ -201,9 +208,17 @@
     <div id="chartContainer" style="height: 400px; width: 100%"></div>
 
     <label style="position: absolute; top: 0px; right: 0px; background-color: white">
-      <input type="checkbox" id="cbPlotExpected" name="cbPlotExpected" value="0" onclick="plotTrainingDevelopment(true);" style="margin-left: 4px">
+      <input type="checkbox" id="cbPlotExpected" name="cbPlotExpected" value="0" onclick="plotTrainingDevelopment(true)" style="margin-left: 4px">
       Vorschau
     </label>
+    <select name="Camp" id="selectCamp" onchange="plotTrainingDevelopment(false)" style="position: absolute; top: 20px; right: 0px; width: 80px; background-color: white">
+      <option value="0">aus</option>
+      @{
+        foreach (CornerkickManager.csTrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
+          <option value="@camp.iId.ToString()">@camp.sName</option>
+        }
+      }
+    </select>
   </div>
 
   <div id="chartContainerFAve" style="height: 400px; width: 100%; margin-top: 60px"></div>
