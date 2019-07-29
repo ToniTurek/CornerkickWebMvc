@@ -138,19 +138,25 @@
                   <li>@Html.ActionLink("Aufstellung", "Team", "Member")</li>
                   <li>@Html.ActionLink("Taktik", "Taktik", "Member")</li>
                   <li>@Html.ActionLink("Mannschaftstraining", "Training", "Member")</li>
-                  <li>@Html.ActionLink("Jugendspieler", "Jouth", "Member")</li>
+                  @{
+                    if (!clb.bNation) {
+                      <li>@Html.ActionLink("Jugendspieler", "Jouth", "Member")</li>
+                    }
+                  }
                 </ul>
               </li>
-              <li>
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Verein</a>
-                <ul class="dropdown-menu">
-                  <li>@Html.ActionLink("Finanzen", "Finance", "Member")</li>
-                  <li>@Html.ActionLink("Sponsoren", "Sponsor", "Member")</li>
-                  <li>@Html.ActionLink("Personal", "Personal", "Member")</li>
-                  <li>@Html.ActionLink("Stadion", "Stadion", "Member")</li>
-                  <li>@Html.ActionLink("Vereinsgelände", "StadiumSurroundings", "Member")</li>
-                </ul>
-              </li>
+              if (!clb.bNation) {
+                <li>
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Verein</a>
+                  <ul class="dropdown-menu">
+                    <li>@Html.ActionLink("Finanzen", "Finance", "Member")</li>
+                    <li>@Html.ActionLink("Sponsoren", "Sponsor", "Member")</li>
+                    <li>@Html.ActionLink("Personal", "Personal", "Member")</li>
+                    <li>@Html.ActionLink("Stadion", "Stadion", "Member")</li>
+                    <li>@Html.ActionLink("Vereinsgelände", "StadiumSurroundings", "Member")</li>
+                  </ul>
+                </li>
+              }
               <li>
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Büro @sMails</a>
                 <ul class="dropdown-menu">
@@ -186,16 +192,20 @@
                   @Html.ActionLink(sCkTime, "Calendar", "Member");
                 }
               </div>
-              <div style="position: absolute; height: 0px; width: 50%; left: 50%; text-align: right">
-                @{
-                  string sCash = "0";
-                  if (clb != null) {
-                    int iCash = clb.iBalance;
-                    if (iCash != 0) { sCash = iCash.ToString("#,#", ci); }
-                  }
+              @{
+                if (!clb.bNation) {
+                  <div style="position: absolute; height: 0px; width: 50%; left: 50%; text-align: right">
+                    @{
+                      string sCash = "0";
+                      if (clb != null) {
+                        int iCash = clb.iBalance;
+                        if (iCash != 0) { sCash = iCash.ToString("#,#", ci); }
+                      }
+                    }
+                    @Html.ActionLink(sCash + " €", "Finance", "Member")
+                  </div>
                 }
-                @Html.ActionLink(sCash + " €", "Finance", "Member")
-              </div>
+              }
             </div>
 
             @{
