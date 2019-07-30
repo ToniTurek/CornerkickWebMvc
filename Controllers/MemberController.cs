@@ -1419,6 +1419,7 @@ namespace CornerkickWebMvc.Controllers
 
       plModel.bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(club, plDetails);
       plModel.bJouth = club.ltPlayerJouth.IndexOf(plDetails) >= 0;
+      plModel.bNation = club.bNation;
 
       plModel.iContractYears = 1;
 
@@ -1702,7 +1703,7 @@ namespace CornerkickWebMvc.Controllers
       sBox += "</tr>";
 
       sBox += "<tr>";
-      sBox += "<td align=\"right\">11m Quote</td>";
+      sBox += "<td align=\"right\">11m</td>";
       for (int i = 0; i < nStatLength; i++) {
         int[] iStat = plStat[i].iStat;
         string s11m = "-";
@@ -1728,7 +1729,7 @@ namespace CornerkickWebMvc.Controllers
       sBox += "</tr>";
 
       sBox += "<tr>";
-      sBox += "<td align=\"right\">Freistoßquote</td>";
+      sBox += "<td align=\"right\">Freistoß</td>";
       for (int i = 0; i < nStatLength; i++) {
         int[] iStat = plStat[i].iStat;
         string s = "-";

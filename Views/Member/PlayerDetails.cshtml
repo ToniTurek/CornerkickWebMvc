@@ -565,8 +565,20 @@
                   <td align="right">@sSp</td>
                 </tr>
               }
+              if (player.iSuspension[2] + player.iSuspension[3] > 0) {
+                string sSp = "Int: " + (player.iSuspension[2] + player.iSuspension[3]).ToString() + " Spiele";
+                <tr>
+                  <td align="right">@sSp</td>
+                </tr>
+              }
               if (player.iSuspension[4] > 0) {
                 string sSp = "Testspiele: " + player.iSuspension[4].ToString() + " Spiele";
+                <tr>
+                  <td align="right">@sSp</td>
+                </tr>
+              }
+              if (player.iSuspension[6] > 0) {
+                string sSp = "Nat: " + player.iSuspension[6].ToString() + " Spiele";
                 <tr>
                   <td align="right">@sSp</td>
                 </tr>
@@ -600,12 +612,12 @@
   </div>
 
   @{
-    string sExtendContract = "Vertrag verlängern";
-    if (Model.bJouth) {
-      sExtendContract = "Profivertrag aushandeln";
-    }
+    if (Model.bOwnPlayer && !Model.bNation) {
+      string sExtendContract = "Vertrag verlängern";
+      if (Model.bJouth) {
+        sExtendContract = "Profivertrag aushandeln";
+      }
 
-    if (Model.bOwnPlayer) {
       <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px; text-align: center">
         @* Extend player contract *@
         <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
@@ -715,7 +727,7 @@
             </th>
             <th align="center">Liga</th>
             <th align="center">Pokal</th>
-            <th align="center">EP</th>
+            <th align="center">Int.</th>
             <th align="center">Nat.</th>
           </tr>
         </thead>
