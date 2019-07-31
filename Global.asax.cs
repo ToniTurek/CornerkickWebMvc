@@ -426,14 +426,16 @@ namespace CornerkickWebMvc
         }
       }
 
-      // Reduce player for WC
+      // Reduce player for WC / Remove national coaches
       const int nPlayerNat = 22;
       CornerkickManager.Cup cupWc = ckcore.tl.getCup(7);
       DateTime dtWcSelectPlayerFinish = new DateTime();
       if (cupWc != null) {
         if (cupWc.ltMatchdays != null) {
           if (cupWc.ltMatchdays.Count > 0) {
+            // Reduce player for WC
             dtWcSelectPlayerFinish = cupWc.ltMatchdays[0].dt.Date.AddDays(-6);
+
             if (ckcore.dtDatum.Equals(dtWcSelectPlayerFinish)) {
               // For each national team
               foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
@@ -443,6 +445,15 @@ namespace CornerkickWebMvc
 
                 // Set player no.
                 for (int iP = 0; iP < nat.ltPlayer.Count; iP++) nat.ltPlayer[iP].iNrNat = (byte)(iP + 1);
+              }
+            }
+
+            // Remove national coaches
+            CornerkickManager.Cup.Matchday mdWcFinal = cupWc.ltMatchdays[cupWc.ltMatchdays.Count - 1];
+            if (mdWcFinal.ltGameData.Count == 1 && ckcore.dtDatum.Equals(mdWcFinal.dt.AddDays(1))) { // Final game
+              foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.iNat = -1;
+              foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
+                if (nat.bNation) nat.iUser = -1;
               }
             }
           }
