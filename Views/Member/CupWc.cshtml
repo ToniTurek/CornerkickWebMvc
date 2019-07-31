@@ -13,7 +13,7 @@
 
   <script>
     $(document).ready(function () {
-      setMatchday(0, 0);
+      setMatchday(@Model.iMatchday, 0);
 
       $("#iGroup").change(function () {
         setMatchday($("#ddlMatchdayCupWc").val(), $(this).val());
