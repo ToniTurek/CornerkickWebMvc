@@ -480,9 +480,8 @@ namespace CornerkickWebMvc
               nat.iUser = item.club.iUser;
 
               // Inform user
-              string sWcInfo = "Herzlichen Glückwunsch! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.";
-              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) sWcInfo += " Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.";
-              ckcore.Info(item.club.iUser, sWcInfo);
+              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.Info(item.club.iUser, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
+              ckcore.Info(item.club.iUser, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
 
               bReturn = false;
               break;
