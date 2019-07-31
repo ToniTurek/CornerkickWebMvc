@@ -193,7 +193,7 @@
                 }
               </div>
               @{
-                if (!clb.bNation) {
+                if (clb != null && !clb.bNation) {
                   <div style="position: absolute; height: 0px; width: 50%; left: 50%; text-align: right">
                     @{
                       string sCash = "0";
