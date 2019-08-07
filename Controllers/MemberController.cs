@@ -484,10 +484,9 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [Authorize]
-    public ActionResult PreviewGame(int i)
+    public ActionResult PreviewGame()
     {
       Models.PreviewGameModel mdPreview = new Models.PreviewGameModel();
-      if (i < 0) return View(mdPreview);
 
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdPreview);
@@ -497,23 +496,80 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Game.Data gd = ltGdNextGames[j];
         mdPreview.ddlGames.Add(new SelectListItem { Text = gd.dt.ToString("d", getCi()), Value = j.ToString() });
       }
-      if (i >= ltGdNextGames.Count) return View(mdPreview);
 
-      CornerkickGame.Game.Data gdNext = ltGdNextGames[i];
-      mdPreview.sTeamH = gdNext.team[0].sTeam;
-      mdPreview.sTeamA = gdNext.team[1].sTeam;
+      return View(mdPreview);
+    }
+
+    public JsonResult PreviewGameDrawGame(int iGame)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clb, MvcApplication.ckcore.dtDatum);
+      if (iGame >= ltGdNextGames.Count) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Game.Data gdNext = ltGdNextGames[iGame];
+
+      string sBox = "";
 
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(gdNext);
       if (cup != null) {
-        mdPreview.sCupName = cup.sName;
-        mdPreview.sMd = (MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum) + 1).ToString() + ". Spieltag";
+        sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
+        sBox += "<text>" + cup.sName + "</text>";
+        sBox += "</div>";
+        sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
+        sBox += "<text>" + (MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum) + 1).ToString() + ". Spieltag</text>";
+        sBox += "</div>";
       }
 
-      mdPreview.sStadium = gdNext.stadium.sName;
+      sBox += "<div style=\"position: relative; width: 100%; height: 30px; font-size: 150% \">";
+      sBox += "<div style=\"position: absolute; width: 47%; text-align: right\" > ";
+      sBox += "<text>" + gdNext.team[0].sTeam + "</text>";
+      sBox += "</div>";
+      sBox += "<div style=\"position: absolute; width: 6%; left: 47%; text-align: center\">";
+      sBox += "<text>vs.</text>";
+      sBox += "</div>";
+      sBox += "<div style=\"position: absolute; width: 47%; left: 53%; text-align: left\">";
+      sBox += "<text>" + gdNext.team[1].sTeam + "</text>";
+      sBox += "</div>";
+      sBox += "</div>";
+      sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
+      sBox += "<text>" + gdNext.stadium.sName + " (" + gdNext.stadium.getSeats().ToString("N0", getCi()) + ")</text>";
+      sBox += "</div>";
 
-      mdPreview.sReferee = "Qualität: " + gdNext.referee.fQuality.ToString("0.0%") + ", Härte: " + gdNext.referee.fStrict.ToString("0.0%");
+      // Referee box
+      sBox += "<div style=\"position: relative; width: 220px; height: 106px; float: right; text-align: left; padding: 8px; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px\">";
+      sBox += "<u>Schiedsrichter:<br></u>";
+      sBox += "<text>Qualität: " + gdNext.referee.fQuality.ToString("0.0%") + "<br></text>";
+      sBox += "<text>Härte: "    + gdNext.referee.fStrict .ToString("0.0%") + "</text>";
+      if (iGame == 0) {
+        sBox += "<input id=\"tbCorruptReferee\" class=\"form-control\" type=\"text\" value=\"0\" style=\"position: absolute; top: 8px; right: 8px; width: 100px; text-align: right\">";
+        //sBox += "<input class=\"\" id=\"tbCorruptReferee\" style=\"position: absolute; top: 8px; right: 8px; width: 100px; height: 40px\"></input>";
+        sBox += "<button type=\"submit\" id=\"bnCorruptReferee\" class=\"btn btn-default\" style=\"position: absolute; top: 48px; right: 8px; width: 100px; height: 50px; text-align: center\" onclick=\"corruptReferee()\">Schiri<br>bestechen</button>";
+      }
+      sBox += "</div>";
 
-      return View(mdPreview);
+      return Json(sBox, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult PreviewGameCorruptReferee(int iMoney)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      if (clb.iBalanceSecret < iMoney) return Json("Leider haben Sie nicht mehr genug Kleingeld in der schwarzen Kasse...", JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum);
+
+      for (byte iHA = 0; iHA < 2; iHA++) {
+        if (clb.iId == gdNext.team[iHA].iTeamId) {
+          gdNext.team[iHA].fRefereeCorrupt = Math.Min(iMoney / (float)500000, 0.2f); // Max 20% corruption with 100.000€
+          clb.iBalanceSecret -= iMoney;
+          break;
+        }
+      }
+
+      return Json("Der Schiedsrichter steckt das Geld ein und zieht pfeifend von dannen...", JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult GetTeamDevelopmentData(bool bExpected = false, int iTrainingsCamp = 0)

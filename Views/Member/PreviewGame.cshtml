@@ -1,52 +1,66 @@
 ﻿@model CornerkickWebMvc.Models.PreviewGameModel
 
 @{
-  ViewBag.Title = "PreviewGame";
+  ViewBag.Title = "Spielvorschau";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!doctype html>
 <html lang="en">
 <head>
+  <script src="~/Scripts/Numbers.js"></script>
+
   <script>
     $(document).ready(function () {
+      drawPreview(0);
+
       $("#sGames").change(function () {
-        alert("Changed");
+        drawPreview($(this).val());
+      });
+
+      $("#tbCorruptReferee").autoNumeric('init', {
+        aSep: '.',
+        aDec: ',',
+        mDec: '0'
       });
     });
+
+    function drawPreview(iGame) {
+      $.ajax({
+        type: 'post',
+        url: '/Member/PreviewGameDrawGame',
+        dataType: "json",
+        data: { iGame: iGame },
+        success: function (sText) {
+          $("#divPreview").html(sText).show();
+        }
+      });
+    }
+
+    function corruptReferee() {
+      var iMoney = getIntFromString($("#tbCorruptReferee").val());
+      if (iMoney > 0) {
+        $.ajax({
+          type: 'post',
+          url: '/Member/PreviewGameCorruptReferee',
+          dataType: "json",
+          data: { iMoney: iMoney },
+          success: function (sMsg) {
+            alert(sMsg);
+          }
+        });
+      }
+    }
   </script>
 </head>
 
 <body>
-  <div style="position: relative; width: 100%">
+  <div style="position: relative; width: 100%; height: 500px">
     <h2>Spielvorschau</h2>
 
-    @Html.DropDownListFor(m => m.sGames, Model.ddlGames, new { @class = "form-control" })
+    @Html.DropDownListFor(m => m.sGames, Model.ddlGames, new { @class = "form-control", @style = "position: absolute; top: 0px; right: 0px; width: 120px" })
 
-    <div style="position: relative; width: 100%; text-align: center">
-      <text>@Model.sCupName</text>
-    </div>
-    <div style="position: relative; width: 100%; text-align: center">
-      <text>@Model.sMd</text>
-    </div>
-    <div style="position: relative; width: 100%; height: 30px; font-size: 150%">
-      <div style="position: absolute; width: 47%; text-align: right">
-        <text>@Model.sTeamH</text>
-      </div>
-      <div style="position: absolute; width: 6%; left: 47%; text-align: center">
-        <text>vs.</text>
-      </div>
-      <div style="position: absolute; width: 47%; left: 53%; text-align: left">
-        <text>@Model.sTeamA</text>
-      </div>
-    </div>
-    <div style="position: relative; width: 100%; text-align: center">
-      <text>@Model.sStadium</text>
-    </div>
-    <div style="position: relative; width: 100%; text-align: center">
-      <text>Schiedsrichter:</text>
-      <text>@Model.sReferee</text>
-    </div>
+    <div id="divPreview" style="position: relative; width: 100%"></div>
   </div>
 </body>
 </html>
