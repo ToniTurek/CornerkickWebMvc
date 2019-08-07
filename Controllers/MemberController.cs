@@ -4204,6 +4204,8 @@ namespace CornerkickWebMvc.Controllers
         nDays = Math.Min(nDays, (int)(data.dt - dtStart).TotalDays);
       }
 
+      nDays = Math.Min(nDays, (int)(MvcApplication.ckcore.dtSeasonEnd - dtStart).TotalDays);
+
       return nDays;
     }
 
