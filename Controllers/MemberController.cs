@@ -3616,7 +3616,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clbUser = ckClub();
 
       string sBox = "";
+
+      iMatchday = Math.Min(iMatchday, cup.ltMatchdays.Count - 1);
       CornerkickManager.Cup.Matchday md = cup.ltMatchdays[iMatchday];
+
       if (md.ltGameData == null || md.ltGameData.Count == 0) {
         List<CornerkickManager.Club> ltClubs = MvcApplication.ckcore.tl.getCupParticipants(cup, iMatchday);
 
@@ -3722,7 +3725,9 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupWc(Models.CupWcModel cupWcModel)
     {
-      cupWcModel.iMatchday = MvcApplication.ckcore.tl.getMatchday(MvcApplication.ckcore.tl.getCup(7), MvcApplication.ckcore.dtDatum);
+      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
+      cupWcModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupWc, MvcApplication.ckcore.dtDatum), cupWc.ltMatchdays.Count - 1);
+
       return View(cupWcModel);
     }
 
