@@ -344,6 +344,15 @@ namespace CornerkickWebMvc
       // Do next step
       int iRetCk = ckcore.next(true);
 
+      // Beginn of new season
+      if (iRetCk == 4) {
+        foreach (int iN in iNations) {
+          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+          if (league == null) continue;
+          MvcApplication.ckcore.drawCup(league);
+        }
+      }
+
       // End of season
       if (iRetCk == 99) {
         CornerkickManager.Cup cupGold   = ckcore.tl.getCup(3);
