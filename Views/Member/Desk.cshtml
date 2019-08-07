@@ -44,6 +44,9 @@
       if (sN.includes("Stadions")) {
         sN = sN.replace("Stadions", '@Html.ActionLink("Stadions", "Stadion", "Member")');
       }
+      if (sN.includes("Stadionumgebung")) {
+        sN = sN.replace("Stadionumgebung", '@Html.ActionLink("Stadionumgebung", "StadiumSurroundings", "Member")');
+      }
       if (sN.includes("Jugendmannschaft")) {
         sN = sN.replace("Jugendmannschaft", '@Html.ActionLink("Jugendmannschaft", "Jouth", "Member")');
       }
