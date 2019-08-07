@@ -17,6 +17,7 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Ablöse [mio. €]:")]
     [DisplayFormat(DataFormatString = "{0:0,0}")]
     public int iTransferFee { get; set; }
+    public int iTransferFeeSecretBalance { get; set; }
 
     public int iOfferClubId { get; set; }
 

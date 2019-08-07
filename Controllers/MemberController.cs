@@ -1903,7 +1903,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Transfer.Offer offer = MvcApplication.ckcore.tr.getOffer(iPlayerId, club.iId);
 
       // get already negotiated contract (salary)
-      if (offer.contract.iLength > 0) {
+      if (offer != null) {
         if (offer.contract.iLength == iYears) {
           iSalary = offer.contract.iSalary;
         } else {
@@ -1913,6 +1913,7 @@ namespace CornerkickWebMvc.Controllers
 
         fMood = offer.contract.fMood;
       } else { // new offer
+        offer = new CornerkickManager.Transfer.Offer();
         offer.club = club;
         offer.dt = MvcApplication.ckcore.dtDatum;
         offer.contract.iLength = iYears;
@@ -2139,7 +2140,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult MakeTransferOffer(int iPlayerId, int iTransferFee)
+    public JsonResult MakeTransferOffer(int iPlayerId, int iTransferFee, int iTransferFeeSecret)
     {
       if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
       if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
@@ -2164,8 +2165,15 @@ namespace CornerkickWebMvc.Controllers
                   return Json("Ihr Kreditrahmen ist leider nicht hoch genug", JsonRequestBehavior.AllowGet);
                 }
 
+                if (iTransferFeeSecret > club.iBalanceSecret) {
+                  transfer.ltOffers.Remove(offer);
+                  return Json("Sie haben nicht genug Schwarzgeld...", JsonRequestBehavior.AllowGet);
+                }
+
                 offer.dt = MvcApplication.ckcore.dtDatum;
-                offer.iFee = iTransferFee;
+
+                offer.iFee       = iTransferFee;
+                offer.iFeeSecret = iTransferFeeSecret;
 
                 transfer.ltOffers[iO] = offer;
 

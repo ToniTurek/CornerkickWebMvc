@@ -74,6 +74,12 @@
         mDec: '0'
       });
 
+      $("#tbTransferFeeSecret").autoNumeric('init', {
+        aSep: '.',
+        aDec: ',',
+        mDec: '0'
+      });
+
       $("#tbContractSalaryOffer").autoNumeric('init', {
         aSep: '.',
         aDec: ',',
@@ -389,13 +395,14 @@
           "Bestätigen": function () {
             var data = jTable.rows('.selected').data();
             var iId = data[0].playerId;
-            var iFee = getIntFromString($("#tbTransferFee").val());
+            var iFee    = getIntFromString($("#tbTransferFee")      .val());
+            var iFeeSec = getIntFromString($("#tbTransferFeeSecret").val());
 
             $.ajax({
               url: "/Member/MakeTransferOffer",
               type: 'POST',
               traditional: true,
-              data: { iPlayerId: iId, iTransferFee: iFee },
+              data: { iPlayerId: iId, iTransferFee: iFee, iTransferFeeSecret: iFeeSec },
               dataType: "json",
               success: function (response) {
                 alert(response);
@@ -533,12 +540,21 @@
 </div>
 
 <div id="dialogTransferFee" title="Ablöseverhandlungen">
-  <div style="position: relative; width: 100%; height: 40px" class="form-group">
-    <div style="position: absolute; width: 50%; height: auto; top: 10px" class="form-group">
-      <b class="left">Ablöse [€]:</b>
+  <div style="position: relative; width: 100%; height: 30px" class="form-group">
+    <div style="position: absolute; width: 50%; height: auto; top: 10px; left: 6px" class="form-group">
+      <b>Ablöse [€]:</b>
     </div>
     <div style="position: absolute; width: 50%; left: 50%" class="col-md-10">
       @Html.TextBoxFor(m => m.iTransferFee, new { @id = "tbTransferFee", @class = "form-control tbTransferFee", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
+    </div>
+  </div>
+
+  <div style="position: relative; width: 100%; height: 50px; background-color: black; -webkit-border-radius: 10px; -moz-border-radius: 10px" class="form-group">
+    <div style="position: absolute; width: 50%; height: auto; top: 18px; left: 6px" class="form-group">
+      <b style="color: white">Handgeld [€]:</b>
+    </div>
+    <div style="position: absolute; width: 50%; left: 50%; top: 8px" class="col-md-10">
+      @Html.TextBoxFor(m => m.iTransferFeeSecretBalance, new { @id = "tbTransferFeeSecret", @class = "form-control tbTransferFeeSecret", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
     </div>
   </div>
 </div>
