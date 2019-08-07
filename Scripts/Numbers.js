@@ -10,3 +10,7 @@ function getIntFromString(s) {
 
   return parseInt(s);
 }
+
+function addThousandSepToNumberInt(i) {
+  return i.toLocaleString('de-DE');
+}
