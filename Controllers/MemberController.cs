@@ -544,8 +544,7 @@ namespace CornerkickWebMvc.Controllers
       sBox += "<text>Härte: "    + gdNext.referee.fStrict .ToString("0.0%") + "</text>";
       if (iGame == 0) {
         sBox += "<input id=\"tbCorruptReferee\" class=\"form-control\" type=\"text\" value=\"0\" style=\"position: absolute; top: 8px; right: 8px; width: 100px; text-align: right\">";
-        //sBox += "<input class=\"\" id=\"tbCorruptReferee\" style=\"position: absolute; top: 8px; right: 8px; width: 100px; height: 40px\"></input>";
-        sBox += "<button type=\"submit\" id=\"bnCorruptReferee\" class=\"btn btn-default\" style=\"position: absolute; top: 48px; right: 8px; width: 100px; height: 50px; text-align: center\" onclick=\"corruptReferee()\">Schiri<br>bestechen</button>";
+        sBox += "<button type=\"submit\" id=\"bnCorruptReferee\" class=\"btn btn-default\" style=\"position: absolute; top: 46px; right: 8px; width: 100px; height: 52px; text-align: center\" onclick=\"corruptReferee()\">Schiri<br>bestechen</button>";
       }
       sBox += "</div>";
 
