@@ -21,9 +21,8 @@
 
   @{
     string sUser = "Computer";
-    int iUser = Model.club.iUser;
-    if (iUser >= 0) {
-      sUser = MvcApplication.ckcore.ltUser[iUser].sFirstname + " " + MvcApplication.ckcore.ltUser[iUser].sSurname;
+    if (Model.club.user != null) {
+      sUser = Model.club.user.sFirstname + " " + Model.club.user.sSurname;
     }
 
     string sDivision = "-";

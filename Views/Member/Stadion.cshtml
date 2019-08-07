@@ -342,7 +342,7 @@
       }
     }
 
-    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSaisonCount <= 1) {
+    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSeason <= 1) {
       <div class="form-group">
         @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
       </div>
@@ -534,7 +534,7 @@
                 //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
                 <tr>
                   <td align="center">Block @Model.stadion.blocks[iB].sName</td>
-                  <td align="center">@CornerkickManager.csStadion.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
+                  <td align="center">@CornerkickManager.Stadium.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
                   <td align="center">@Model.stadion.blocks[iB].iSeats</td>
                   <td align="center">@Model.iSeatsBuild[iB] d</td>
                 </tr>
@@ -555,7 +555,7 @@
               //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
               <tr>
                 <td align="center">Anzeigetafel</td>
-                <td align="center">@CornerkickManager.csStadion.sVideo[Model.stadion.iVideoNew]</td>
+                <td align="center">@CornerkickManager.Stadium.sVideo[Model.stadion.iVideoNew]</td>
                 <td align="center">1</td>
                 <td align="center">@Model.stadion.iVideoDaysConstruct.ToString() d</td>
               </tr>

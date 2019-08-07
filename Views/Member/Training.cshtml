@@ -214,7 +214,7 @@
     <select name="Camp" id="selectCamp" onchange="plotTrainingDevelopment(false)" style="position: absolute; top: 20px; right: 0px; width: 80px; background-color: white">
       <option value="0">aus</option>
       @{
-        foreach (CornerkickManager.csTrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
+        foreach (CornerkickManager.TrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
           <option value="@camp.iId.ToString()">@camp.sName</option>
         }
       }

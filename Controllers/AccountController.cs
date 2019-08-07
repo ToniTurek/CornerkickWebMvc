@@ -237,8 +237,8 @@ namespace CornerkickWebMvc.Controllers
         // Remove CPU club from league and nat. cup
         for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
           CornerkickManager.Club clubCpu = MvcApplication.ckcore.ltClubs[iC];
-          if (clubCpu == null) continue;
-          if (clubCpu.iUser >= 0) continue;
+          if (clubCpu      == null) continue;
+          if (clubCpu.user == null) continue;
 
           if (cup   .ltClubs[0].IndexOf(clubCpu) >= 0) cup.ltClubs[0].Remove(clubCpu);
           if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
@@ -260,7 +260,7 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       if (iU == 0) {
 #endif
-      clb.iUser = MvcApplication.ckcore.ltUser.Count;
+      clb.user = usr;
       MvcApplication.ckcore.ltUser.Add(usr);
 #if DEBUG
       }
@@ -285,8 +285,8 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       if (iU == 0) {
 #endif
-      MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
-      MvcApplication.ckcore.Info(clb.iUser, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
+      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
+      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
 #if DEBUG
       }
       }

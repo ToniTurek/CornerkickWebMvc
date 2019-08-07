@@ -133,7 +133,7 @@ namespace CornerkickWebMvc
           CornerkickManager.Club clb = ckcore.ltClubs[iC];
 
           if (clb.bNation) continue;
-          if (clb.iUser >= 0) continue;
+          if (clb.user != null) continue;
 
           if (clb.iLand != iNations[0]) continue; // Remove if all leagues are available
 
@@ -313,9 +313,9 @@ namespace CornerkickWebMvc
 
         if (countCpuPlayerOnTransferlist() > 200) {
           for (int iT = 0; iT < ckcore.ltTransfer.Count; iT++) {
-            CornerkickManager.csTransfer.Transfer transfer = ckcore.ltTransfer[iT];
-            if (club0.ltPlayer.IndexOf(ckcore.ltPlayer[transfer.iPlayerId]) >= 0) {
-              ckcore.tr.removePlayerFromTransferlist(ckcore.ltPlayer[transfer.iPlayerId]);
+            CornerkickManager.Transfer.Item transfer = ckcore.ltTransfer[iT];
+            if (club0.ltPlayer.IndexOf(transfer.player) >= 0) {
+              ckcore.tr.removePlayerFromTransferlist(transfer.player);
               break;
             }
           }
@@ -336,7 +336,7 @@ namespace CornerkickWebMvc
 
       if ((ckcore.dtDatum.Equals(ckcore.dtSeasonStart) ||
           ckcore.dtDatum.Year < 1900) &&
-          ckcore.iSaisonCount == 0) {
+          ckcore.iSeason == 0) {
         ltLog.Clear();
         ckcore.setNewSeason();
       }
@@ -402,25 +402,24 @@ namespace CornerkickWebMvc
       // Inform user if transfer offer too low
       if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(12, 00, 00))) {
         // For each transfer
-        foreach (CornerkickManager.csTransfer.Transfer transfer in ckcore.ltTransfer) {
-          CornerkickGame.Player plTrf = ckcore.ltPlayer[transfer.iPlayerId];
-          if (plTrf.iClubId <                     0) continue;
-          if (plTrf.iClubId >= ckcore.ltClubs.Count) continue;
+        foreach (CornerkickManager.Transfer.Item transfer in ckcore.ltTransfer) {
+          if (transfer.player.iClubId <                     0) continue;
+          if (transfer.player.iClubId >= ckcore.ltClubs.Count) continue;
 
-          CornerkickManager.Club clbCpu = ckcore.ltClubs[plTrf.iClubId];
-          if (clbCpu.iUser > 0) continue; // If human user (0 = main CPU user)
+          CornerkickManager.Club clbCpu = ckcore.ltClubs[transfer.player.iClubId];
+          if (clbCpu.user != null) continue; // If human user
+          if (MvcApplication.ckcore.ltUser.IndexOf(clbCpu.user) == 0) continue; // If main CPU user
 
           // Get max offer
           int iOfferMax = 0;
-          foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
+          foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
             iOfferMax = Math.Max(iOfferMax, offer.iFee);
           }
 
           // Inform users
-          foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
-            CornerkickManager.Club clbOffer = ckcore.ltClubs[offer.iClubId];
-            if (clbOffer.iUser > 0 && offer.iFee < iOfferMax) {
-              ckcore.Info(clbOffer.iUser, "Ihr Transferangebot für den Spieler " + plTrf.sName + " ist leider nicht (mehr) hoch genug.");
+          foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
+            if (offer.iFee < iOfferMax) {
+              ckcore.Info(offer.club.user, "Ihr Transferangebot für den Spieler " + transfer.player.sName + " ist leider nicht (mehr) hoch genug.");
             }
           }
         }
@@ -453,7 +452,7 @@ namespace CornerkickWebMvc
             if (mdWcFinal.ltGameData.Count == 1 && ckcore.dtDatum.Equals(mdWcFinal.dt.AddDays(1))) { // Final game
               foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.iNat = -1;
               foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
-                if (nat.bNation) nat.iUser = -1;
+                if (nat.bNation) nat.user = null;
               }
             }
           }
@@ -471,17 +470,19 @@ namespace CornerkickWebMvc
         if (ckcore.dtDatum.Equals(league.ltMatchdays[league.ltMatchdays.Count - 1].dt.AddDays(1))) {
           List<CornerkickManager.Tool.TableItem> tbl = ckcore.tl.getLeagueTable(league);
           foreach (CornerkickManager.Tool.TableItem item in tbl) {
-            if (item.club.iUser > 0) {
-              ckcore.ltUser[item.club.iUser].iNat = league.iId2;
+            if (item.club.user != null) {
+              if (MvcApplication.ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
+
+              item.club.user.iNat = league.iId2;
 
               // Add all player of that nation
               CornerkickManager.Club nat = ckcore.tl.getNation(league.iId2);
               nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
-              nat.iUser = item.club.iUser;
+              nat.user = item.club.user;
 
               // Inform user
-              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.Info(item.club.iUser, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
-              ckcore.Info(item.club.iUser, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
+              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.Info(item.club.user, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
+              ckcore.Info(item.club.user, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
 
               bReturn = false;
               break;
@@ -496,8 +497,8 @@ namespace CornerkickWebMvc
     private static int countCpuPlayerOnTransferlist()
     {
       int nPl = 0;
-      foreach (CornerkickManager.csTransfer.Transfer transfer in ckcore.ltTransfer) {
-        if (ckcore.ltClubs[0].ltPlayer.IndexOf(ckcore.ltPlayer[transfer.iPlayerId]) >= 0) nPl++;
+      foreach (CornerkickManager.Transfer.Item transfer in ckcore.ltTransfer) {
+        if (ckcore.ltClubs[0].ltPlayer.IndexOf(transfer.player) >= 0) nPl++;
       }
 
       return nPl;
@@ -550,7 +551,7 @@ namespace CornerkickWebMvc
 
       // Clear CPU clubs before saving
       foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
-        if (clb.iUser < 0) {
+        if (clb.user == null) {
           clb.ltAccount      .Clear();
           clb.ltTrainingHist .Clear();
           clb.ltSponsorOffers.Clear();
@@ -730,7 +731,7 @@ namespace CornerkickWebMvc
         ckcore.tl.writeLog("File " + sFileLoad + " loaded. Elapsed time: ");
 
         // Set admin user to CPU
-        if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].iUser = -1;
+        if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
 
         // TMP section
         // END TMP section

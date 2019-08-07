@@ -32,7 +32,7 @@ namespace CornerkickWebMvc.Models
 
     public List<Testgame> ltTestgames { get; set; }
 
-    public CornerkickManager.csTrainingCamp.Camp camp { get; set; }
+    public CornerkickManager.TrainingCamp.Camp camp { get; set; }
   }
 
   public class DiaryEvent

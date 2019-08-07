@@ -552,8 +552,8 @@ namespace CornerkickWebMvc.Controllers
         List<CornerkickGame.Player> ltPlayerTmp = new List<CornerkickGame.Player>();
         foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTmp.Add(pl.Clone());
 
-        CornerkickManager.csTrainingCamp.Booking camp = new CornerkickManager.csTrainingCamp.Booking();
-        foreach (CornerkickManager.csTrainingCamp.Camp cp in MvcApplication.ckcore.tcp.ltCamps) {
+        CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
+        foreach (CornerkickManager.TrainingCamp.Camp cp in MvcApplication.ckcore.tcp.ltCamps) {
           if (cp.iId == iTrainingsCamp) {
             camp.camp = cp;
             camp.dtArrival   = MvcApplication.ckcore.dtDatum.AddDays(-1);
@@ -1418,7 +1418,10 @@ namespace CornerkickWebMvc.Controllers
       plModel.iPlayerIndTr = plDetails.iIndTraining;
 
       plModel.bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(club, plDetails);
-      plModel.bJouth = club.ltPlayerJouth.IndexOf(plDetails) >= 0;
+      if (plDetails.iClubId >= 0 && plDetails.iClubId < MvcApplication.ckcore.ltClubs.Count) {
+        plModel.bJouth = MvcApplication.ckcore.ltClubs[plDetails.iClubId].ltPlayerJouth.IndexOf(plDetails) >= 0;
+      }
+
       plModel.bNation = club.bNation;
 
       plModel.iContractYears = 1;
@@ -1897,7 +1900,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickManager.csTransfer.TransferOffer offer = MvcApplication.ckcore.tr.getOffer(iPlayerId, club.iId);
+      CornerkickManager.Transfer.Offer offer = MvcApplication.ckcore.tr.getOffer(iPlayerId, club.iId);
 
       // get already negotiated contract (salary)
       if (offer.contract.iLength > 0) {
@@ -1910,16 +1913,16 @@ namespace CornerkickWebMvc.Controllers
 
         fMood = offer.contract.fMood;
       } else { // new offer
-        offer.iClubId = club.iId;
+        offer.club = club;
         offer.dt = MvcApplication.ckcore.dtDatum;
         offer.contract.iLength = iYears;
       }
       /*
-      foreach (CornerkickManager.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
+      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ltTransfer) {
         if (transfer.iPlayerId == iPlayerId) {
           if (transfer.ltOffers == null) break;
 
-          foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
+          foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
             if (offer.iClubId == club.iId) {
               iSalary = offer.contract.iSalary;
               fMood   = offer.contract.fPlayerMood;
@@ -1996,13 +1999,13 @@ namespace CornerkickWebMvc.Controllers
         if (iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
 
         // create new offer
-        CornerkickManager.csTransfer.TransferOffer offer = new CornerkickManager.csTransfer.TransferOffer();
+        CornerkickManager.Transfer.Offer offer = new CornerkickManager.Transfer.Offer();
         CornerkickGame.Player.Contract contract = new CornerkickGame.Player.Contract();
         contract.iLength = (byte)iYears;
         contract.iSalary = iSalary;
         contract.fMood = fPlayerMood;
         offer.contract = contract;
-        offer.iClubId = ckClub().iId;
+        offer.club = ckClub();
 
         MvcApplication.ckcore.tr.addChangeOffer(iId, offer);
         sReturn = "Sie haben sich mit dem Spieler " + MvcApplication.ckcore.ltPlayer[iId].sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
@@ -2118,36 +2121,44 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public JsonResult TakeFromTransferList(int iPlayerId)
     {
-      for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-        CornerkickManager.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+      if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
 
-        if (transfer.iPlayerId == iPlayerId) {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
+        CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
+
+        if (transfer.player == pl) {
           MvcApplication.ckcore.ltTransfer.RemoveAt(iT);
           break;
         }
       }
 
-      return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
+      return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
     public JsonResult MakeTransferOffer(int iPlayerId, int iTransferFee)
     {
+      if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
       string sReturn = "Error";
 
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      int iClub = club.iId;
-
       for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-        CornerkickManager.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+        CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
 
-        if (transfer.iPlayerId == iPlayerId) {
+        if (transfer.player == pl) {
           if (transfer.ltOffers != null) {
             for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
-              CornerkickManager.csTransfer.TransferOffer offer = transfer.ltOffers[iO];
-              if (offer.iClubId == iClub) {
+              CornerkickManager.Transfer.Offer offer = transfer.ltOffers[iO];
+              if (offer.club == club) {
                 if (!MvcApplication.ckcore.fz.checkDispoLimit(iTransferFee, club)) {
                   transfer.ltOffers.Remove(offer);
                   return Json("Ihr Kreditrahmen ist leider nicht hoch genug", JsonRequestBehavior.AllowGet);
@@ -2162,18 +2173,14 @@ namespace CornerkickWebMvc.Controllers
 
                 MvcApplication.ckcore.tr.informUser(transfer, offer);
 
-                int iClubPlayer = MvcApplication.ckcore.ltPlayer[iPlayerId].iClubId;
+                int iClubPlayer = pl.iClubId;
                 if (iClubPlayer >= 0) {
-                  int iUserPlayer = MvcApplication.ckcore.ltClubs[iClubPlayer].iUser;
-                  if (iUserPlayer >= 0) {
-                    MvcApplication.ckcore.Info(iUserPlayer, "Sie haben ein neues Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " erhalten!", 1, iPlayerId, 0);
-                  }
+                  MvcApplication.ckcore.Info(MvcApplication.ckcore.ltClubs[iClubPlayer].user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId, 0);
                 }
 
-                CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
-                player.character.fMoney += 0.05f;
+                pl.character.fMoney += 0.05f;
 
-                sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " erfolgreich abgegeben.";
+                sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.sName + " erfolgreich abgegeben.";
                 break;
               }
             }
@@ -2195,12 +2202,12 @@ namespace CornerkickWebMvc.Controllers
       }
       /*
       for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-        CornerkickManager.csTransfer.Transfer transfer = MvcApplication.ckcore.ltTransfer[iT];
+        CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
 
         if (transfer.iPlayerId == iPlayerId) {
           if (transfer.ltOffers != null) {
             for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
-              CornerkickManager.csTransfer.TransferOffer offer = transfer.ltOffers[iO];
+              CornerkickManager.Transfer.Offer offer = transfer.ltOffers[iO];
               if (offer.iClubId == iClubId) {
                 CornerkickManager.Club clubUser = ckClub();
                 clubUser.iKontostand += offer.iMoney;
@@ -2251,39 +2258,37 @@ namespace CornerkickWebMvc.Controllers
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
 
       int iTr = 0;
-      foreach (CornerkickManager.csTransfer.Transfer transfer in MvcApplication.ckcore.ui.filterTransferlist("", -1, iPos, -1f, 0, iFType, iFValue, bJouth)) {
-        CornerkickGame.Player plTr = MvcApplication.ckcore.ltPlayer[transfer.iPlayerId];
-
-        CornerkickManager.Club club = MvcApplication.ckcore.ltClubs[plTr.iClubId];
+      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist("", -1, iPos, -1f, 0, iFType, iFValue, bJouth)) {
+        CornerkickManager.Club club = MvcApplication.ckcore.ltClubs[transfer.player.iClubId];
 
         string sClub = "vereinslos";
-        if (plTr.iClubId >= 0) {
+        if (transfer.player.iClubId >= 0) {
           sClub = club.sName;
         }
 
         int iOffer = 0;
         CornerkickManager.Club clubUser = ckClub();
         if (clubUser.iId > 0) {
-          if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, plTr)) iOffer = -1;
-          else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, plTr)) iOffer = +1;
-          else if (MvcApplication.ckcore.plr.ownPlayer           (clubUser, plTr)) iOffer = +2;
+          if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
+          else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
+          else if (MvcApplication.ckcore.plr.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
         }
 
         ltDeTransfer.Add(new Models.DatatableEntryTransfer {
-          playerId = transfer.iPlayerId,
+          playerId = transfer.player.iId,
           empty = "",
           iOffer = iOffer,
           index = (iTr + 1).ToString(),
           datum = transfer.dt.ToString("d", getCi()),
-          name = plTr.sName,
-          position = MvcApplication.ckcore.plr.getStrPos(plTr),
-          strength = MvcApplication.ckcore.game.tl.getAveSkill(plTr, 0, true).ToString("0.0"),
-          strengthIdeal = MvcApplication.ckcore.game.tl.getAveSkill(plTr, 0, false).ToString("0.0"),
-          age = plTr.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
-          talent = (plTr.iTalent + 1).ToString(),
-          mw = (MvcApplication.ckcore.plr.getValue(plTr) * 1000).ToString("N0", getCi()),
+          name = transfer.player.sName,
+          position = MvcApplication.ckcore.plr.getStrPos(transfer.player),
+          strength = MvcApplication.ckcore.game.tl.getAveSkill(transfer.player, 0, true).ToString("0.0"),
+          strengthIdeal = MvcApplication.ckcore.game.tl.getAveSkill(transfer.player, 0, false).ToString("0.0"),
+          age = transfer.player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
+          talent = (transfer.player.iTalent + 1).ToString(),
+          mw = (MvcApplication.ckcore.plr.getValue(transfer.player) * 1000).ToString("N0", getCi()),
           club = sClub,
-          nat = MvcApplication.ckcore.sLandShort[plTr.iNat1]
+          nat = MvcApplication.ckcore.sLandShort[transfer.player.iNat1]
         });
 
         iTr++;
@@ -2295,7 +2300,12 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public ActionResult getTableTransferDetails2(int iPlayerId)
     {
+      if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
+
       string sTable = "";
+
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
 
       CornerkickManager.Club clubUser = ckClub();
 
@@ -2312,24 +2322,24 @@ namespace CornerkickWebMvc.Controllers
       sTable += "<tbody>";
 
       int iTr = 0;
-      foreach (CornerkickManager.csTransfer.Transfer transfer in MvcApplication.ckcore.ltTransfer) {
-        if (transfer.iPlayerId == iPlayerId) {
+      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ltTransfer) {
+        if (transfer.player == pl) {
           if (transfer.ltOffers == null) break;
 
           bool bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(clubUser, MvcApplication.ckcore.ltPlayer[iPlayerId]);
 
-          foreach (CornerkickManager.csTransfer.TransferOffer offer in transfer.ltOffers) {
+          foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
             if (bOwnPlayer || // If own player
-                clubUser.iId == offer.iClubId) {
+                clubUser == offer.club) {
               string sClub = "vereinslos";
-              if (offer.iClubId >= 0) {
-                sClub = MvcApplication.ckcore.ltClubs[offer.iClubId].sName;
+              if (offer.club != null) {
+                sClub = offer.club.sName;
               }
 
               string sStyle = "";
-              if (offer.iClubId == clubUser.iId) sStyle = "font-weight:bold";
+              if (offer.club == clubUser) sStyle = "font-weight:bold";
 
-              sTable += "<tr id=\"rowTransferDetail_" + offer.iClubId.ToString() + "\" style=" + sStyle + ">";
+              sTable += "<tr id=\"rowTransferDetail_" + offer.club.iId.ToString() + "\" style=" + sStyle + ">";
               sTable += "<td>" + (iTr + 1).ToString() + "</td>";
               sTable += "<td align=\"center\">" + offer.dt.ToString("d", getCi()) + "</td>";
               sTable += "<td align=\"center\">" + sClub + "</td>";
@@ -2338,7 +2348,7 @@ namespace CornerkickWebMvc.Controllers
               if (bOwnPlayer) {
                 string sChecked = "";
                 //if (iTr == 0) sChecked = " checked";
-                sTable += "<td><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.iClubId.ToString() + "\"" + sChecked + "></td>";
+                sTable += "<td><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.club.iId.ToString() + "\"" + sChecked + "></td>";
               }
 
               sTable += "</tr>";
@@ -2827,10 +2837,10 @@ namespace CornerkickWebMvc.Controllers
 
       if (clb.stadium.iVideoNew != iLevel) {
         int iDispoOk = 0;
-        if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickManager.csStadion.iVideoCost[iLevel], clb)) iDispoOk = 1;
+        if (MvcApplication.ckcore.fz.checkDispoLimit(CornerkickManager.Stadium.iVideoCost[iLevel], clb)) iDispoOk = 1;
 
-        sCostDaysDispo[0] = CornerkickManager.csStadion.iVideoCost[iLevel].ToString("N0", getCi());
-        sCostDaysDispo[1] = CornerkickManager.csStadion.iVideoDaysConstruct[iLevel].ToString();
+        sCostDaysDispo[0] = CornerkickManager.Stadium.iVideoCost[iLevel].ToString("N0", getCi());
+        sCostDaysDispo[1] = CornerkickManager.Stadium.iVideoDaysConstruct[iLevel].ToString();
         sCostDaysDispo[2] = iDispoOk.ToString();
       }
 
@@ -2957,8 +2967,6 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       MvcApplication.ckcore.ui.renewStadiumPitch(ref clb, 0.1f);
-
-      if (clb.iUser >= 0) MvcApplication.ckcore.ltClubs[MvcApplication.ckcore.ltUser[clb.iUser].iTeam] = clb;
 
       return Json("Der Stadionrasen wurde erneuert", JsonRequestBehavior.AllowGet);
     }
@@ -3816,7 +3824,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Trainingscamp
         bool bCampTravelDay = false;
-        CornerkickManager.csTrainingCamp.Booking booking = MvcApplication.ckcore.tcp.getCurrentCamp(club, dt, true);
+        CornerkickManager.TrainingCamp.Booking booking = MvcApplication.ckcore.tcp.getCurrentCamp(club, dt, true);
         if (booking.camp.iId > 0) {
           if (dt.Date.Equals(booking.dtArrival.Date)) {
             ltEvents.Add(new Models.DiaryEvent {
@@ -4009,7 +4017,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Inform user
         CornerkickManager.Club clubRequest = MvcApplication.ckcore.ltClubs[iTeamId];
-        if (clubRequest.iUser < 0) {
+        if (clubRequest.user == null) {
           createTestgame(md);
 
           sReturn = "Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + clubRequest.sName + " vereinbart";
@@ -4024,7 +4032,7 @@ namespace CornerkickWebMvc.Controllers
 
           sReturn = "Anfrage für Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
 
-          MvcApplication.ckcore.Info(clubRequest.iUser, "Sie haben eine neue Anfrage für ein Testspiel erhalten.", 2, iTeamId);
+          MvcApplication.ckcore.Info(clubRequest.user, "Sie haben eine neue Anfrage für ein Testspiel erhalten.", 2, iTeamId);
         }
       }
 
@@ -4060,9 +4068,7 @@ namespace CornerkickWebMvc.Controllers
                   CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId];
                   clubH.nextGame = MvcApplication.ckcore.tl.getNextGame(clubH, MvcApplication.ckcore.dtDatum);
 
-                  if (clubH.iUser >= 0) {
-                    MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", getCi()) + " um " + dt.ToString("t", getCi()) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
-                  }
+                  MvcApplication.ckcore.Info(clubH.user, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", getCi()) + " um " + dt.ToString("t", getCi()) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
 
                   return Json("", JsonRequestBehavior.AllowGet);
                 }
@@ -4114,9 +4120,7 @@ namespace CornerkickWebMvc.Controllers
                   MvcApplication.ckcore.ltCups.RemoveAt(iC);
 
                   CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId];
-                  if (clubH.iUser >= 0) {
-                    MvcApplication.ckcore.Info(clubH.iUser, "Ihre Anfrage an " + clb.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde abgelehnt!", 2, gd.team[0].iTeamId);
-                  }
+                  MvcApplication.ckcore.Info(clubH.user, "Ihre Anfrage an " + clb.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde abgelehnt!", 2, gd.team[0].iTeamId);
 
                   return Json("", JsonRequestBehavior.AllowGet);
                 }
@@ -4156,7 +4160,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      CornerkickManager.csTrainingCamp.Camp camp = MvcApplication.ckcore.tcp.ltCamps[iIx];
+      CornerkickManager.TrainingCamp.Camp camp = MvcApplication.ckcore.tcp.ltCamps[iIx];
 
       MvcApplication.ckcore.tcp.bookCamp(ref club, camp, dtStart, dtEnd);
 
