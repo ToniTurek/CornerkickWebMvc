@@ -3326,7 +3326,7 @@ namespace CornerkickWebMvc.Controllers
     private string getStringRecordGame(CornerkickGame.Game.Data gdRecord)
     {
       if (gdRecord != null) {
-        return gdRecord.team[0].iGoals.ToString() + ":" + gdRecord.team[1].iGoals.ToString() + " - " + gdRecord.team[0].sTeam + " vs. " + gdRecord.team[1].sTeam + ", " + gdRecord.dt.ToLongDateString();
+        return gdRecord.team[0].iGoals.ToString() + ":" + gdRecord.team[1].iGoals.ToString() + " - " + gdRecord.team[0].sTeam + " vs. " + gdRecord.team[1].sTeam + ", " + gdRecord.dt.ToString("d", getCi());
       }
 
       return "-";
