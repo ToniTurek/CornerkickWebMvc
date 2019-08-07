@@ -553,6 +553,7 @@
     <Content Include="Content\Icons\flags\ESP.png" />
     <Content Include="Content\Icons\flags\FIN.png" />
     <Content Include="Content\Icons\flags\FRA.png" />
+    <Content Include="Content\Icons\flags\GAB.png" />
     <Content Include="Content\Icons\flags\GEO.png" />
     <Content Include="Content\Icons\flags\GER.png" />
     <Content Include="Content\Icons\flags\GHA.png" />
