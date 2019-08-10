@@ -885,9 +885,10 @@ namespace CornerkickWebMvc.Controllers
       public string sNat { get; set; }
       public int iSuspended { get; set; }
       public string sCaptain { get; set; }
+      public string sGrade { get; set; }
     }
 
-    public ActionResult getTableTeam()
+    public ActionResult getTableTeam(int iPlayerMax)
     {
       /*
       List<CornerkickGame.Player> ltSpieler = new List<CornerkickGame.Player>();
@@ -909,7 +910,7 @@ namespace CornerkickWebMvc.Controllers
         if (bGame) iGameType = user.game.data.iGameType;
       }
 
-      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(Models.TeamModels.ltPlayer, bGame, iGameType);
+      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(club.ltPlayer, bGame, iGameType, iPlayerMax);
 
       //The table or entity I'm querying
       DatatableEntryTeam[] query = new DatatableEntryTeam[ltLV.Count];
@@ -928,7 +929,7 @@ namespace CornerkickWebMvc.Controllers
         string sNat = MvcApplication.ckcore.sLandShort[iNat];
 
         //Hard coded data here that I want to replace with query results
-        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20] };
+        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21] };
       }
 
       return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);

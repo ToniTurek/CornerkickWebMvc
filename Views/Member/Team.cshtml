@@ -156,7 +156,18 @@
 
     function datatableTeam() {
       datatableTeamGlobal = $('#tableTeam').DataTable({
-        "ajax": '@Url.Action("getTableTeam", "Member")',
+        "ajax": {
+          "url": '@Url.Action("getTableTeam", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8",
+          "data": function (d) {
+            return $.extend({}, d, {
+              "iPlayerMax": 0,
+            });
+          }
+        },
         "columns": [
           { "data": "iIndex" },
           { "data": "sID" },
@@ -173,7 +184,6 @@
           { "data": "sKondi" },
           { "data": "sFrische" },
           { "data": "sMoral" },
-          { "data": "sStaerkeIdeal" },
           { "data": "sErf" },
           {
             "data": "sForm",
@@ -181,9 +191,11 @@
               return getFormIcon(sForm);
             }
           },
+          { "data": "sLeader" },
+          { "data": "sGrade" },
           { "data": "sAlter" },
           { "data": "sTalent" },
-          { "data": "sLeader" },
+          { "data": "sStaerkeIdeal" },
           { "data": "sCaptain" },
           { "data": "sMarktwert" },
           { "data": "sGehalt" },
@@ -206,12 +218,12 @@
         "searching": false,
         columnDefs: [
           {
-            targets: [1, 2, 21],
+            targets: [1, 2, 13, 22], // sID, bSubstituted, sGrade, iSuspended
             "orderable": false,
             "visible": false,
             "searchable": false
           },
-          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "className": "dt-center" }
+          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], "className": "dt-center" }
         ],
         select: true,
         select: {
@@ -636,17 +648,19 @@
           <th>Kondi.</th>
           <th>Frische</th>
           <th>Moral</th>
-          <th>St. ber.</th>
           <th>Erf.</th>
           <th>Form</th>
-          <th>Alter</th>
-          <th>Talent</th>
           <th>FP</th>
+          <th>Note</th>
+          <th>Alter</th>
+          <th>Tal.</th>
+          <th>St. ber.</th>
           <th>C</th>
           <th>Marktwert [€]</th>
           <th>Gehalt [€/a]</th>
           <th>Lz [a]</th>
           <th>Nat.</th>
+          <th>susp</th>
         </tr>
       </thead>
       <tbody>
