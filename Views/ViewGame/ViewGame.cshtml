@@ -78,14 +78,17 @@
     }
   </script>
 
-  <script type="text/javascript" src="~/Scripts/draw.js"></script>
-  <script type="text/javascript" src="~/Scripts/ViewGame.js"></script>
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
 
+  <script type="text/javascript" src="~/Scripts/draw.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
+  <script type="text/javascript" src="~/Scripts/ViewGame.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
   <script type="text/javascript" src="~/Scripts/flot/jquery.flot.min.js"></script>
   <script type="text/javascript" src="~/Scripts/flot/jquery.flot.stack.js"></script>
   <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/js/flot/excanvas.min.js"></script><![endif]-->
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
 
   <script type="text/javascript">
@@ -252,6 +255,99 @@
         });
       });
 
+      // List team
+      oTable = $('#tableTeamViewGame').DataTable({
+        "ajax": {
+          "url": '@Url.Action("getTableTeam", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8",
+          "data": function (d) {
+            return $.extend({}, d, {
+              "iPlayerMax": 11,
+            });
+          }
+        },
+        "columns": [
+          { "data": "iIndex" },
+          { "data": "sID" },
+          { "data": "bSubstituted" },
+          { "data": "sNr" },
+          { "data": "sName" },
+          { "data": "sPosition" },
+          { "data": "sStaerke" },
+          { "data": "sKondi" },
+          { "data": "sFrische" },
+          { "data": "sMoral" },
+          { "data": "sErf" },
+          {
+            "data": "sForm",
+            "render": function (sForm, type, row) {
+              return getFormIcon(sForm);
+            }
+          },
+          { "data": "sLeader" },
+          { "data": "sGrade" },
+          { "data": "sAlter" },
+          { "data": "sTalent" },
+          { "data": "sStaerkeIdeal" },
+          { "data": "sCaptain" },
+          { "data": "sMarktwert" },
+          { "data": "sGehalt" },
+          { "data": "sLz" },
+          {
+            "data": "sNat",
+            "render": function (sNat, type, row) {
+              return getNatIcon(sNat);
+            }
+          },
+          { "data": "iSuspended" }
+        ],
+        rowReorder: {
+          dataSrc: 'iIndex'
+        },
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "responsive": true,
+        "searching": false,
+        columnDefs: [
+          {
+            targets: [1, 2, 18, 19, 20, 22], // sID, bSubstituted, sGrade, iSuspended
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], "className": "dt-center" }
+        ],
+        select: true,
+        select: {
+          selector: 'tr',
+          style: 'os'
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.iIndex < 12) {
+            if (aData.iIndex % 2 == 0) {
+              $('td', nRow).css('background-color', "rgb(235,255,235)");
+            } else {
+              $('td', nRow).css('background-color', "rgb(245,255,245)");
+            }
+            $('td', nRow).eq(0).css('background-color', "rgb(210,230,188)");
+          } else if (aData.iIndex < 19) {
+            if (aData.iIndex % 2 == 0) {
+              $('td', nRow).css('background-color', "rgb(230,240,255)");
+            } else {
+              $('td', nRow).css('background-color', "rgb(240,250,255)");
+            }
+            $('td', nRow).eq(0).css('background-color', "rgb(192,204,224)");
+            //          } else if (aData.iIndex > 22) {
+            //            $('td', nRow).eq(0).css('background-color', "rgb(220,140,0)");
+          }
+        }
+      });
+
+      // Fresh/Moral chart
       CanvasJS.addColorSet("csF", [
         "rgba(0,0,130,1.0)",
         "rgba(0,0,155,1.0)",
@@ -818,6 +914,41 @@
   <div id="divStat2" style="position: relative; float: left; width: 50%; min-width: 300px">
     <text id="statistikCards"></text>
     <text id="playerAction"></text>
+  </div>
+
+  <div id="divTableViewGame" style="position: relative; float: left; width: 100%; margin-top: 10px; margin-bottom: 10px">
+    <table id="tableTeamViewGame" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>subst</th>
+          <th>Nr</th>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Stärke</th>
+          <th>Kondi.</th>
+          <th>Frische</th>
+          <th>Moral</th>
+          <th>Erf.</th>
+          <th>Form</th>
+          <th>FP</th>
+          <th>Note</th>
+          <th>Alter</th>
+          <th>Tal.</th>
+          <th>St. ber.</th>
+          <th>C</th>
+          <th>Marktwert [€]</th>
+          <th>Gehalt [€/a]</th>
+          <th>Lz [a]</th>
+          <th>Nat.</th>
+          <th>susp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+    </table>
   </div>
 
   <div id="chartContainerF" style="position: relative; float: left; height: 300px; width: 100%; margin-top: 10px"></div>
