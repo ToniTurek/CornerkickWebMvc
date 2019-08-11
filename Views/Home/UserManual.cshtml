@@ -84,7 +84,7 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
     Ebenfalls im Spielermenü können Sie einen Spieler zum (Vize-)Kapitän ernennen.
   </li>
   <li>
-    <u>Stellen Sie <a href="#h3Team">Personal</a> ein</u><br />
+    <u>Stellen Sie <a href="#h3Stuff">Personal</a> ein</u><br />
     Über das Menü <i>Verein->Personal</i> können Sie Personal einstellen. Beachten Sie, dass Sie das Personal immer für eine Saison einstellen. Wollen Sie Ihr Personal später ändern, fallen Abfindungen in Höhe von 50% des restlichen Gehalts an.
   </li>
   <li>
@@ -111,6 +111,13 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 
 <h2>Mannschaft</h2>
 <h3 id="h3Team">Aufstellung</h3>
+text
+<div style="position: relative; width: 100%">
+  <img id="imgTeam1" style="position: relative; width:  500px; margin: 6px; border: 1px solid black" src="~/Content/Images/user_manual/Team1.PNG" />
+  <img id="imgTeam2" style="position: relative; width:  500px; margin: 6px; border: 1px solid black" src="~/Content/Images/user_manual/Team1a.PNG" />
+  <img id="imgTeam3" style="position: relative; width: 1016px; margin: 6px; border: 1px solid black" src="~/Content/Images/user_manual/Team2.PNG" />
+  <img id="imgTeam4" style="position: relative; width: 1016px; margin: 6px; border: 1px solid black" src="~/Content/Images/user_manual/Team2a.PNG" />
+</div>
 tbd
 <h3 id="h3Tactic">Taktik</h3>
 tbd
@@ -227,7 +234,7 @@ Die Fähigkeiten des Spielers werden beeinflußt durch seine Frische, seine Mora
 </ul>
 
 <h2>Verein</h2>
-<h3>Personal</h3>
+<h3 id="h3Stuff">Personal</h3>
 <ul>
   <li>
     <u>Co-Trainer</u><br />
@@ -275,9 +282,9 @@ Je mehr Plätze gebaut werden und je mehr Plätze bereits vorhanden sind, desto 
 <h4>Stadionausstattung</h4>
 @{
   string sSnackbar = (400f / CornerkickManager.Stadium.iFeatureSpecReqSnackbar).ToString("0.0");
-  string sToilets  = (400f / CornerkickManager.Stadium.iFeatureSpecReqToilets).ToString("0.0");
-  string sCounter  = (400f / CornerkickManager.Stadium.iFeatureSpecReqTicketcounter).ToString("0.0");
-  string sCarpark  = (400f / CornerkickManager.Stadium.iFeatureSpecReqCarpark).ToString("0.0");
+  string sToilets = (400f / CornerkickManager.Stadium.iFeatureSpecReqToilets).ToString("0.0");
+  string sCounter = (400f / CornerkickManager.Stadium.iFeatureSpecReqTicketcounter).ToString("0.0");
+  string sCarpark = (400f / CornerkickManager.Stadium.iFeatureSpecReqCarpark).ToString("0.0");
 }
 Folgende Stadionausstattungen stehen zur Verfügung, welche die (potentiellen) Zuschauerzahlen um bis zu 25% reduzieren, wenn sie nicht genügend vorhanden sind. Die Zahlen in Klammern geben an, welche Anzahl der jeweiligen Ausstattungen für 10.000 Stehplatz-, 8.000 Sitzplatz- und 400 VIP Zuschauer (mindestens) vorhanden sein muss, um eine Zuschauerreduktion zu vermeiden.
 <ul>
