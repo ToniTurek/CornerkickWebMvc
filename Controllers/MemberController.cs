@@ -515,12 +515,17 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(gdNext);
       if (cup != null) {
         sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
-        sBox += "<text>" + cup.sName + "</text>";
-        sBox += "</div>";
-        sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
-        sBox += "<text>" + (MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum) + 1).ToString() + ". Spieltag</text>";
+        sBox += "<text>" + cup.sName + " - ";
+        int iMd = MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum);
+        if (cup.checkCupGroupPhase(iMd, 0)) sBox += (iMd + 1).ToString() + ". Spieltag";
+        else                                sBox += MvcApplication.ckcore.sCupRound[cup.getMatchdaysTotal() - iMd - 1];
+        sBox += "</text>";
         sBox += "</div>";
       }
+
+      sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
+      sBox += "<text>Anstoß: " + gdNext.dt.ToString("d", getCi()) + ", " + gdNext.dt.ToString("t", getCi()) + " Uhr</text>";
+      sBox += "</div>";
 
       sBox += "<div style=\"position: relative; width: 100%; height: 30px; font-size: 150% \">";
       sBox += "<div style=\"position: absolute; width: 47%; text-align: right\" > ";
@@ -533,18 +538,22 @@ namespace CornerkickWebMvc.Controllers
       sBox += "<text>" + gdNext.team[1].sTeam + "</text>";
       sBox += "</div>";
       sBox += "</div>";
-      sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
-      sBox += "<text>" + gdNext.stadium.sName + " (" + gdNext.stadium.getSeats().ToString("N0", getCi()) + ")</text>";
-      sBox += "</div>";
+      if (gdNext.stadium != null && !string.IsNullOrEmpty(gdNext.stadium.sName) && gdNext.stadium.getSeats() > 0) {
+        sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
+        sBox += "<text>" + gdNext.stadium.sName + " (" + gdNext.stadium.getSeats().ToString("N0", getCi()) + ")</text>";
+        sBox += "</div>";
+      }
 
       // Referee box
-      sBox += "<div style=\"position: relative; width: 220px; height: 106px; float: right; text-align: left; padding: 8px; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px\">";
+      byte iRefereeBoxHeight = 80;
+      if (iGame == 0) iRefereeBoxHeight = 160;
+      sBox += "<div style=\"position: relative; width: 116px; height: " + iRefereeBoxHeight.ToString() + "px; float: right; margin-top: 10px; text-align: left; padding: 8px; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px\">";
       sBox += "<u>Schiedsrichter:<br></u>";
       sBox += "<text>Qualität: " + gdNext.referee.fQuality.ToString("0.0%") + "<br></text>";
       sBox += "<text>Härte: "    + gdNext.referee.fStrict .ToString("0.0%") + "</text>";
       if (iGame == 0) {
-        sBox += "<input id=\"tbCorruptReferee\" class=\"form-control\" type=\"text\" value=\"0\" style=\"position: absolute; top: 8px; right: 8px; width: 100px; text-align: right\">";
-        sBox += "<button type=\"submit\" id=\"bnCorruptReferee\" class=\"btn btn-default\" style=\"position: absolute; top: 46px; right: 8px; width: 100px; height: 52px; text-align: center\" onclick=\"corruptReferee()\">Schiri<br>bestechen</button>";
+        sBox += "<input id=\"tbCorruptReferee\" class=\"form-control\" type=\"text\" value=\"0\" style=\"position: relative; width: 100px; text-align: right\">";
+        sBox += "<button type=\"submit\" id=\"bnCorruptReferee\" class=\"btn btn-default\" style=\"position: relative; width: 100px; height: 52px; text-align: center\" onclick=\"corruptReferee()\">Schiri<br>bestechen</button>";
       }
       sBox += "</div>";
 
