@@ -913,10 +913,20 @@ namespace CornerkickWebMvc.Controllers
       int iGameType = 0;
       if (club.nextGame != null) iGameType = club.nextGame.iGameType;
 
+      List<CornerkickGame.Player> ltPlayerTeam = club.ltPlayer;
       bool bGame = false;
       if (user.game != null) {
         bGame = !user.game.data.bFinished;
-        if (bGame) iGameType = user.game.data.iGameType;
+        if (bGame) {
+          iGameType = user.game.data.iGameType;
+
+          if (user.game.data.ltState.Count > 0) {
+            byte iHA = 0;
+            if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
+
+            ltPlayerTeam = user.game.data.ltState[user.game.data.ltState.Count - 1].player[iHA].ToList();
+          }
+        }
       }
 
       List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(club.ltPlayer, bGame, iGameType, iPlayerMax);

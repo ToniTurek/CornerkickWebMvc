@@ -353,7 +353,6 @@ function plotStatistics(jState = -1) {
         }
       };
 
-      //alert(flotDataset);
       p = $.plot($("#divPlotStatistics"), flotDataset, flotOptions);
 
       var ii = 0;
@@ -459,7 +458,10 @@ function plotStatistics(jState = -1) {
       $("#txtAdminChanceShootOnGoal").html(gD.sAdminChanceShootOnGoal);
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);
 
-      //alert(jState);
+      // Update team table
+      $('#tableTeamViewGame').DataTable().ajax.reload();
+
+      // Charts
       var i = 0;
       var j = 0;
       for (i = 0; i < gD.ltF.length; ++i) {
