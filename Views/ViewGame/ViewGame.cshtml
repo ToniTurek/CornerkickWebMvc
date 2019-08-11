@@ -6,16 +6,12 @@
   var sA = "";
   var sGoalsH = "";
   var sGoalsA = "";
-  var sEmblemH = "/Content/Uploads/emblems/0.png";
-  var sEmblemA = "/Content/Uploads/emblems/0.png";
   if (Model.game != null) {
     sHeader = Model.game.data.team[0].sTeam + " - " + Model.game.data.team[1].sTeam;
     sH = Model.game.data.team[0].sTeam;
     sA = Model.game.data.team[1].sTeam;
     sGoalsH = Model.game.data.team[0].iGoals.ToString();
     sGoalsA = Model.game.data.team[1].iGoals.ToString();
-    sEmblemH = "/Content/Uploads/emblems/" + Model.sEmblemH;
-    sEmblemA = "/Content/Uploads/emblems/" + Model.sEmblemA;
   }
 
   var sStadion = "";
@@ -804,7 +800,7 @@
       <font size="4">@sH</font>
     </div>
     <div style="position: absolute; width: 4%; height: 60%; top: 20%; left: 36%">
-      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@sEmblemH alt="" />
+      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@Model.sEmblemH alt="" />
     </div>
 
     <div style="position: absolute; width: 20%; height: 100%; left: 40%">
@@ -820,7 +816,7 @@
     </div>
 
     <div style="position: absolute; width: 4%; height: 60%; top: 20%; right: 36%">
-      <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@sEmblemA alt="" />
+      <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@Model.sEmblemA alt="" />
     </div>
     <div style="position: absolute; width: 30%; height: 100%; right: 5%; top: 30%; text-align: left">
       <font size="4">@sA</font>
