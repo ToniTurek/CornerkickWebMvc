@@ -51,11 +51,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
-        return MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-
-      return null;
+      return usr.club;
     }
 
     public ContentResult UmGetStadiumCost()

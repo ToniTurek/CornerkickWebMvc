@@ -123,19 +123,10 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       // National team
-      if (usr.iNat >= 0 && usr.iNat < MvcApplication.ckcore.ltClubs.Count) {
-        foreach (CornerkickManager.Club nat in MvcApplication.ckcore.ltClubs) {
-          if (!nat.bNation) continue;
-          if (nat.iLand == usr.iNat) return nat;
-        }
-      }
+      if (usr.nation != null) return usr.nation;
 
       // Club
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
-        return MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-
-      return null;
+      return usr.club;
     }
 
     public CornerkickManager.User ckUser()
@@ -160,19 +151,10 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       // National team
-      if (usr.iNat >= 0 && usr.iNat < MvcApplication.ckcore.ltClubs.Count) {
-        foreach (CornerkickManager.Club nat in MvcApplication.ckcore.ltClubs) {
-          if (!nat.bNation) continue;
-          if ( nat.iLand == usr.iNat) return nat;
-        }
-      }
+      if (usr.nation != null) return usr.nation;
 
       // Club
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
-        return MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-
-      return null;
+      return usr.club;
     }
 
     public static CultureInfo getCiStatic(System.Security.Principal.IPrincipal User)
@@ -774,17 +756,16 @@ namespace CornerkickWebMvc.Controllers
     {
       if (fromPosition < 1 || toPosition < 1) return;
 
-      CornerkickManager.User user = ckUser();
-      int iC = user.iTeam;
+      CornerkickManager.Club clb = ckClub();
 
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltClubs[iC].ltPlayer[fromPosition - 1];
+      CornerkickGame.Player pl = clb.ltPlayer[fromPosition - 1];
       if (!pl.bPlayed) {
-        MvcApplication.ckcore.ltClubs[iC].ltPlayer.RemoveAt(fromPosition - 1);
-        MvcApplication.ckcore.ltClubs[iC].ltPlayer.Insert(toPosition - 1, pl);
+        clb.ltPlayer.RemoveAt(fromPosition - 1);
+        clb.ltPlayer.Insert(toPosition - 1, pl);
 
-        setModelLtPlayer(user);
+        setModelLtPlayer(ckUser());
 
-        CkAufstellungFormation(MvcApplication.ckcore.ltClubs[iC].formation.iId);
+        CkAufstellungFormation(clb.formation.iId);
       }
     }
 
@@ -963,7 +944,7 @@ namespace CornerkickWebMvc.Controllers
         if (!user.game.data.bFinished) return RedirectToAction("Team");
       }
 
-      MvcApplication.ckcore.doFormation(user.iTeam);
+      MvcApplication.ckcore.doFormation(MvcApplication.ckcore.ltClubs.IndexOf(user.club));
 
       return RedirectToAction("Team");
     }
@@ -1231,7 +1212,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (club.nextGame != null) {
         if (club.bNation) tD.iKibitzer = 3;
-        else              tD.iKibitzer = club.personal.iKibitzer;
+        else              tD.iKibitzer = club.staff.iKibitzer;
 
         int iClubOpp = club.nextGame.team[1].iTeamId;
         if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
@@ -2133,12 +2114,12 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Jouth(Models.JouthModel jouth)
     {
-      int iC = ckUser().iTeam;
+      CornerkickManager.Club clb = ckClub();
 
       Models.JouthModel.ltPlayerJouth = new List<CornerkickGame.Player>();
 
-      if (MvcApplication.ckcore.ltClubs.Count > iC) {
-        foreach (CornerkickGame.Player plJ in MvcApplication.ckcore.ltClubs[iC].ltPlayerJouth) {
+      if (clb != null) {
+        foreach (CornerkickGame.Player plJ in clb.ltPlayerJouth) {
           /*
           // Change Birthday if too young
           if (MvcApplication.ckcore.game.tl.getPlayerAgeFloat(sp, MvcApplication.ckcore.dtDatum) < 15) {
@@ -2729,7 +2710,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.training.iTraining[iTag] = (byte)iTraining;
+      clb.training.iType[iTag] = (byte)iTraining;
       return Json(iTraining, JsonRequestBehavior.AllowGet);
     }
 
@@ -3234,10 +3215,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(personal);
 
-      personal.personal = clb.personal;
+      personal.staff = clb.staff;
 
-      personal.ltDdlPersonalCoachCo      = new List<SelectListItem>();
-      personal.ltDdlPersonalCoachCondi   = new List<SelectListItem>();
+      personal.ltDdlPersonalCoachCo       = new List<SelectListItem>();
+      personal.ltDdlPersonalCoachCondi    = new List<SelectListItem>();
       personal.ltDdlPersonalMasseur       = new List<SelectListItem>();
       personal.ltDdlPersonalMental        = new List<SelectListItem>();
       personal.ltDdlPersonalMed           = new List<SelectListItem>();
@@ -3280,14 +3261,14 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Club clb = new CornerkickManager.Club();
 
-      clb.personal.iTrainerCo      = (byte)iLevel[0];
-      clb.personal.iTrainerKondi   = (byte)iLevel[1];
-      clb.personal.iMasseur        = (byte)iLevel[2];
-      clb.personal.iTrainerMental  = (byte)iLevel[3];
-      clb.personal.iArzt           = (byte)iLevel[4];
-      clb.personal.iJugendTrainer  = (byte)iLevel[5];
-      clb.personal.iJugendScouting = (byte)iLevel[6];
-      clb.personal.iKibitzer       = (byte)iLevel[7];
+      clb.staff.iCoTrainer     = (byte)iLevel[0];
+      clb.staff.iCondiTrainer  = (byte)iLevel[1];
+      clb.staff.iPhysio        = (byte)iLevel[2];
+      clb.staff.iMentalTrainer = (byte)iLevel[3];
+      clb.staff.iDoctor        = (byte)iLevel[4];
+      clb.staff.iJouthTrainer  = (byte)iLevel[5];
+      clb.staff.iJouthScouting = (byte)iLevel[6];
+      clb.staff.iKibitzer      = (byte)iLevel[7];
 
       int iKosten = (int)(MvcApplication.ckcore.tl.getStuffSalary(clb) / 12f);
       string sKosten = iKosten.ToString("N0", getCi());
@@ -3316,14 +3297,14 @@ namespace CornerkickWebMvc.Controllers
 
       int iMoney = 0;
       int iMonthDiff = (MvcApplication.ckcore.dtSeasonEnd.Month - MvcApplication.ckcore.dtDatum.Month) + (12 * (MvcApplication.ckcore.dtSeasonEnd.Year - MvcApplication.ckcore.dtDatum.Year));
-      if      (iPersonal == 0 && iLevelNew != clb.personal.iTrainerCo)      iMoney = iMonthDiff * (CornerkickManager.Finance.iCostCoachCo      [clb.personal.iTrainerCo]      / 2);
-      else if (iPersonal == 1 && iLevelNew != clb.personal.iTrainerKondi)   iMoney = iMonthDiff * (CornerkickManager.Finance.iCostCoachCondi   [clb.personal.iTrainerKondi]   / 2);
-      else if (iPersonal == 2 && iLevelNew != clb.personal.iMasseur)        iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMasseur      [clb.personal.iMasseur]        / 2);
-      else if (iPersonal == 3 && iLevelNew != clb.personal.iTrainerMental)  iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMental       [clb.personal.iTrainerMental]  / 2);
-      else if (iPersonal == 4 && iLevelNew != clb.personal.iArzt)           iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMed          [clb.personal.iArzt]           / 2);
-      else if (iPersonal == 5 && iLevelNew != clb.personal.iJugendTrainer)  iMoney = iMonthDiff * (CornerkickManager.Finance.iCostJouthCoach   [clb.personal.iJugendTrainer]  / 2);
-      else if (iPersonal == 6 && iLevelNew != clb.personal.iJugendScouting) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostJouthScouting[clb.personal.iJugendScouting] / 2);
-      else if (iPersonal == 7 && iLevelNew != clb.personal.iKibitzer)       iMoney = iMonthDiff * (CornerkickManager.Finance.iCostKibitzer     [clb.personal.iKibitzer]       / 2);
+      if      (iPersonal == 0 && iLevelNew != clb.staff.iCoTrainer    ) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostCoachCo      [clb.staff.iCoTrainer    ] / 2);
+      else if (iPersonal == 1 && iLevelNew != clb.staff.iCondiTrainer ) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostCoachCondi   [clb.staff.iCondiTrainer ] / 2);
+      else if (iPersonal == 2 && iLevelNew != clb.staff.iPhysio       ) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMasseur      [clb.staff.iPhysio       ] / 2);
+      else if (iPersonal == 3 && iLevelNew != clb.staff.iMentalTrainer) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMental       [clb.staff.iMentalTrainer] / 2);
+      else if (iPersonal == 4 && iLevelNew != clb.staff.iDoctor       ) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostMed          [clb.staff.iDoctor       ] / 2);
+      else if (iPersonal == 5 && iLevelNew != clb.staff.iJouthTrainer ) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostJouthCoach   [clb.staff.iJouthTrainer ] / 2);
+      else if (iPersonal == 6 && iLevelNew != clb.staff.iJouthScouting) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostJouthScouting[clb.staff.iJouthScouting] / 2);
+      else if (iPersonal == 7 && iLevelNew != clb.staff.iKibitzer     ) iMoney = iMonthDiff * (CornerkickManager.Finance.iCostKibitzer     [clb.staff.iKibitzer     ] / 2);
 
       return iMoney;
     }
@@ -3339,14 +3320,14 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
 
       // Then, hire new personal
-      clb.personal.iTrainerCo      = (byte)iLevel[0];
-      clb.personal.iTrainerKondi   = (byte)iLevel[1];
-      clb.personal.iMasseur        = (byte)iLevel[2];
-      clb.personal.iTrainerMental  = (byte)iLevel[3];
-      clb.personal.iArzt           = (byte)iLevel[4];
-      clb.personal.iJugendTrainer  = (byte)iLevel[5];
-      clb.personal.iJugendScouting = (byte)iLevel[6];
-      clb.personal.iKibitzer       = (byte)iLevel[7];
+      clb.staff.iCoTrainer     = (byte)iLevel[0];
+      clb.staff.iCondiTrainer  = (byte)iLevel[1];
+      clb.staff.iPhysio        = (byte)iLevel[2];
+      clb.staff.iMentalTrainer = (byte)iLevel[3];
+      clb.staff.iDoctor        = (byte)iLevel[4];
+      clb.staff.iJouthTrainer  = (byte)iLevel[5];
+      clb.staff.iJouthScouting = (byte)iLevel[6];
+      clb.staff.iKibitzer      = (byte)iLevel[7];
 
       return Json("Neues Personal eingestellt!", JsonRequestBehavior.AllowGet);
     }
@@ -3952,14 +3933,14 @@ namespace CornerkickWebMvc.Controllers
         // Training
         if ((dt - dtStartWeek).TotalDays >= 0 &&
             (dt - dtStartWeek).TotalDays <  7 &&
-            club.training.iTraining[(int)dt.DayOfWeek] > 0 &&
+            club.training.iType[(int)dt.DayOfWeek] > 0 &&
             !bCampTravelDay) {
           DateTime dtTmp = new DateTime(dt.Year, dt.Month, dt.Day, 10, 00, 00);
 
           ltEvents.Add(new Models.DiaryEvent {
             iID = ltEvents.Count,
-            sTitle = " Training (" + MvcApplication.ckcore.sTraining[club.training.iTraining[(int)dt.DayOfWeek]] + ")",
-            sDescription = MvcApplication.ckcore.sTraining[club.training.iTraining[(int)dt.DayOfWeek]],
+            sTitle = " Training (" + MvcApplication.ckcore.sTraining[club.training.iType[(int)dt.DayOfWeek]] + ")",
+            sDescription = MvcApplication.ckcore.sTraining[club.training.iType[(int)dt.DayOfWeek]],
             sStartDate = dtTmp.ToString("yyyy-MM-ddTHH:mm:ss"),
             sEndDate = dtTmp.AddMinutes(120).ToString("yyyy-MM-ddTHH:mm:ss"),
             sColor = "rgb(255, 200, 0)",
@@ -4722,7 +4703,7 @@ namespace CornerkickWebMvc.Controllers
 
         string sName = userTmp.sFirstname + " " + userTmp.sSurname;
 
-        sName += " (" + MvcApplication.ckcore.ltClubs[userTmp.iTeam].sName + ")";
+        sName += " (" + userTmp.club.sName + ")";
 
         mdUser.ltDdlUser.Add(new SelectListItem { Text = sName, Value = iU.ToString() });
       }

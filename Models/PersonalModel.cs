@@ -9,7 +9,7 @@ namespace CornerkickWebMvc.Models
 {
   public class PersonalModel
   {
-    public CornerkickManager.Main.Personal personal { get; set; }
+    public CornerkickManager.Main.Staff staff { get; set; }
 
     public List<SelectListItem> ltDdlPersonalCoachCo { get; set; }
     public string sPersonalCoachCo { get; set; }

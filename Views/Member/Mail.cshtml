@@ -151,7 +151,7 @@
         } else {
           CornerkickManager.User user = MvcApplication.ckcore.ltUser[iFrom];
           sFrom = user.sFirstname + " " + user.sSurname;
-          sFrom += " (" + MvcApplication.ckcore.ltClubs[user.iTeam].sName + ")";
+          sFrom += " (" + user.club.sName + ")";
         }
 
         if (!news.bRead) {

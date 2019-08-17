@@ -32,11 +32,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
-        return MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-
-      return null;
+      return usr.club;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -174,8 +170,6 @@ namespace CornerkickWebMvc.Controllers
     {
       if (game != null) {
         gD = new Models.ViewGameModel.gameData();
-
-
 
         string sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems");
         string sEmblemDirHtml = "/Content/Uploads/emblems/";

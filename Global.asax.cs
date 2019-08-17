@@ -459,7 +459,7 @@ namespace CornerkickWebMvc
             // Remove national coaches
             CornerkickManager.Cup.Matchday mdWcFinal = cupWc.ltMatchdays[cupWc.ltMatchdays.Count - 1];
             if (mdWcFinal.ltGameData.Count == 1 && ckcore.dtDatum.Equals(mdWcFinal.dt.AddDays(1))) { // Final game
-              foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.iNat = -1;
+              foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.nation = null;
               foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
                 if (nat.bNation) nat.user = null;
               }
@@ -482,12 +482,13 @@ namespace CornerkickWebMvc
             if (item.club.user != null) {
               if (MvcApplication.ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
 
-              item.club.user.iNat = league.iId2;
+              CornerkickManager.Club nat = ckcore.tl.getNation(league.iId2);
+              if (nat == null) continue;
 
               // Add all player of that nation
-              CornerkickManager.Club nat = ckcore.tl.getNation(league.iId2);
               nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
               nat.user = item.club.user;
+              item.club.user.nation = nat;
 
               // Inform user
               if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.Info(item.club.user, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");

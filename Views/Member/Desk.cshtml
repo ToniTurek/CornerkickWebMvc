@@ -131,8 +131,8 @@
       *@
 
       bool bTraining = false;
-      if (clb.training.iTraining != null) {
-        foreach (byte iT in clb.training.iTraining) {
+      if (clb.training.iType != null) {
+        foreach (byte iT in clb.training.iType) {
           if (iT > 0) {
             bTraining = true;
             break;
@@ -147,14 +147,14 @@
       }
 
       if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
-        if (clb.personal.iTrainerCo      == 0 &&
-            clb.personal.iTrainerKondi   == 0 &&
-            clb.personal.iMasseur        == 0 &&
-            clb.personal.iTrainerMental  == 0 &&
-            clb.personal.iArzt           == 0 &&
-            clb.personal.iJugendScouting == 0 &&
-            clb.personal.iJugendTrainer  == 0 &&
-            clb.personal.iKibitzer       == 0) {
+        if (clb.staff.iCoTrainer     == 0 &&
+            clb.staff.iCondiTrainer  == 0 &&
+            clb.staff.iPhysio        == 0 &&
+            clb.staff.iMentalTrainer == 0 &&
+            clb.staff.iDoctor        == 0 &&
+            clb.staff.iJouthTrainer  == 0 &&
+            clb.staff.iJouthScouting == 0 &&
+            clb.staff.iKibitzer      == 0) {
           <div style="position: relative; width: 100%; text-align: center">
             @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
           </div>

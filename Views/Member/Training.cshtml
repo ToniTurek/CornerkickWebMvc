@@ -192,13 +192,13 @@
 
   @{
     string[] sDayOfWeek = new string[7] { "So.:", "Mo.:", "Di.:", "Mi.:", "Do.:", "Fr.:", "Sa.:" };
-    for (int i = 0; i < Model.training.iTraining.Length; i++) {
+    for (int i = 0; i < Model.training.iType.Length; i++) {
       <div style="position: relative; height: 40px">
         <label style="position: absolute; text-align: right; width: 60px; top: 4px">
           @sDayOfWeek[i]
         </label>
         <div style="position: absolute; height: 30px; left: 70px">
-          @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", Model.training.iTraining[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString(), style = "width: 180px" })
+          @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", Model.training.iType[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString(), style = "width: 180px" })
         </div>
       </div>
     }

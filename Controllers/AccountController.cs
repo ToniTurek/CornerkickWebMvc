@@ -142,11 +142,10 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       CornerkickManager.User usr = ckUser();
-      if (usr == null) return;
-      if (usr.iTeam >= MvcApplication.ckcore.ltClubs.Count) return;
+      if (usr      == null) return;
+      if (usr.club == null) return;
 
-      CornerkickManager.Club clb = ckClub();
-      int iLandUser = clb.iLand;
+      int iLandUser = usr.club.iLand;
       if (iLandUser >= 0 && iLandUser < sCultureInfo.Length) ciUser = new CultureInfo(sCultureInfo[iLandUser]);
 
       if (usr.ltNews != null) {
@@ -187,11 +186,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
-      if (usr.iTeam >= 0 && usr.iTeam < MvcApplication.ckcore.ltClubs.Count) {
-        return MvcApplication.ckcore.ltClubs[usr.iTeam];
-      }
-
-      return null;
+      return usr.club;
     }
 
 #if DEBUG
@@ -254,7 +249,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.User usr = createUser(applicationUser);
       usr.iLevel = 1;
-      usr.iTeam = clb.iId;
+      usr.club = clb;
       usr.nextGame.iGameSpeed = 250;
       
 #if DEBUG
@@ -285,8 +280,8 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       if (iU == 0) {
 #endif
-      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.iTeam, 1);
-      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.iTeam, 1, System.DateTime.Now, -1);
+      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.club.iId, 1);
+      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.club.iId, 1, System.DateTime.Now, -1);
 #if DEBUG
       }
       }
@@ -351,12 +346,12 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[7]);
 
 #if DEBUG
-      clb.training.iTraining[1] = 2;
-      clb.training.iTraining[2] = 3;
-      clb.training.iTraining[3] = 4;
-      clb.training.iTraining[4] = 6;
-      clb.training.iTraining[5] = 9;
-      clb.training.iTraining[6] = 1;
+      clb.training.iType[1] = 2;
+      clb.training.iType[2] = 3;
+      clb.training.iType[3] = 4;
+      clb.training.iType[4] = 6;
+      clb.training.iType[5] = 9;
+      clb.training.iType[6] = 1;
 #endif
 
       for (byte iB = 0; iB < 3; iB++) {
@@ -798,7 +793,7 @@ namespace CornerkickWebMvc.Controllers
             club0.iId = 0;
             club0.sName = "Computer";
 
-            club0.personal.iJugendScouting = 10;
+            club0.staff.iJouthScouting = 10;
 
             for (int iPl = 0; iPl < 100; iPl++) {
               CornerkickGame.Player sp = MvcApplication.ckcore.plr.newPlayer(club0);
