@@ -220,25 +220,38 @@ namespace CornerkickWebMvc.Controllers
       if (iDivision < 0) return;
 
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
-      CornerkickManager.Cup cup    = MvcApplication.ckcore.tl.getCup(2, iLand, iDivision);
+      CornerkickManager.Cup cup    = MvcApplication.ckcore.tl.getCup(2, iLand);
 
 #if DEBUG
-      int nUser = 8;
+      int nUser = 1;
       if (clubExist != null) nUser = 1;
       for (byte iU = 0; iU < nUser; iU++) {
 #endif
       CornerkickManager.Club clb = null;
+
+      int iClubExistIx = -1;
       if (clubExist == null) {
         // Remove CPU club from league and nat. cup
         for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
           CornerkickManager.Club clubCpu = MvcApplication.ckcore.ltClubs[iC];
           if (clubCpu      == null) continue;
-          if (clubCpu.user == null) continue;
+          if (clubCpu.user != null) continue;
 
-          if (cup   .ltClubs[0].IndexOf(clubCpu) >= 0) cup.ltClubs[0].Remove(clubCpu);
-          if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
-            league.ltClubs[0].Remove(clubCpu);
-            break;
+          if (league != null) {
+            if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
+              league.ltClubs[0].Remove(clubCpu);
+
+              if (cup != null) {
+                if (cup.ltClubs[0].IndexOf(clubCpu) >= 0) cup.ltClubs[0].Remove(clubCpu);
+              }
+
+              MvcApplication.ckcore.ltClubs.Remove(clubCpu);
+              foreach (CornerkickGame.Player plRemove in clubCpu.ltPlayer) MvcApplication.ckcore.ltPlayer.Remove(plRemove);
+              clubCpu = null;
+              iClubExistIx = iC;
+
+              break;
+            }
           }
         }
 
@@ -259,20 +272,27 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.ltUser.Add(usr);
 #if DEBUG
       }
-
-      clb.sName += "_" + clb.iId.ToString();
 #endif
       
       if (clubExist == null) {
         // Add club to mng
-        MvcApplication.ckcore.ltClubs.Add(clb);
+        if (iClubExistIx >= 0) {
+          clb.iId = iClubExistIx;
+          MvcApplication.ckcore.ltClubs.Insert(iClubExistIx, clb);
+        } else {
+          MvcApplication.ckcore.ltClubs.Add(clb);
+        }
       
         // Do initial formation
         MvcApplication.ckcore.doFormation(clb.iId);
 
         // Add club to league/cup
-        cup   .ltClubs[0].Add(clb); // nat. cup
-        league.ltClubs[0].Add(clb); // league
+        if (cup    != null) cup   .ltClubs[0].Add(clb); // nat. cup
+        if (league != null) league.ltClubs[0].Add(clb); // league
+
+#if DEBUG
+        clb.sName += "_" + clb.iId.ToString();
+#endif
       } else {
         clb.sName = applicationUser.Vereinsname;
       }

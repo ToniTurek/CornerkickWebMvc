@@ -43,6 +43,9 @@ namespace CornerkickWebMvc
         iStartHour = -1;
         bEmailCertification = true;
         bRegisterDuringGame = true;
+#if DEBUG
+        bEmailCertification = false;
+#endif
       }
     }
 
