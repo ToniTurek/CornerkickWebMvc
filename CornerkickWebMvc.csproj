@@ -905,6 +905,7 @@
     <Content Include="Views\Member\CupGold.cshtml" />
     <Content Include="Views\Member\CupSilver.cshtml" />
     <Content Include="Views\Member\CupWc.cshtml" />
+    <Content Include="Views\Member\UserView.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
