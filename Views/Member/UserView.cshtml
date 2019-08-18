@@ -1,0 +1,24 @@
+﻿@model CornerkickWebMvc.Models.UserModel
+
+@{
+  ViewBag.Title = "Persönliches";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+  if (Model.usr != null) {
+    string sName = Model.usr.sFirstname + " " + @Model.usr.sSurname;
+    <h3>@sName</h3>
+
+  <h4>Erfolge:</h4>
+  foreach (CornerkickManager.User.Success success in Model.usr.ltSuccess) {
+    string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
+    string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
+    if (success.cup == null) { continue; }
+
+    <b>@success.cup.sName</b>
+    <p>@sWDD</p>
+    <p>@sCupWin</p>
+    }
+  }
+}

@@ -4585,9 +4585,9 @@ namespace CornerkickWebMvc.Controllers
 
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
-    /// Transfer
+    /// Statistic
     /// </summary>
-    /// <param name="Transfer"></param>
+    /// <param name="Statistic"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
     public ActionResult Statistic(Models.StatisticModel statisticModel)
@@ -4770,6 +4770,20 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return iMails;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// User
+    /// </summary>
+    /// <param name="Statistic"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    public ActionResult UserView(Models.UserModel mdUser)
+    {
+      mdUser.usr = ckUser();
+
+      return View(mdUser);
     }
 
     public int compareDates(DateTime dt)
