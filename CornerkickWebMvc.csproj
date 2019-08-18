@@ -677,6 +677,8 @@
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="Content\Uploads\emblems\0.png" />
+    <Content Include="Content\Video\team_change_position.mp4" />
+    <Content Include="Content\Video\team_substitute.mp4" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
