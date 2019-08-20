@@ -114,7 +114,7 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 Auf der unteren Hälfte des Spielfeldes ist die aktuelle Aufstellung deiner Mannschaft zu sehen. Darunter sind in einer Tabelle alle deine Spieler aufgelistet.
 
 <h4>Position eines Spielers ändern</h4>
-Im folgenden Video ist zu sehen, wie die Position eines Spielers auf dem Spielfeld geändert werden kann (in diesem Beispiel Angelo Schmidt). Durch klicken auf einen Spieler im Spielfeld (oder in der Mannschaftstabelle) wird der Spielermodus aktiviert. Durch Klicks auf die Pfeiltasten kann die Position des Spielers geändert werden. Ein Klick ins leere Spielfeld beendet den Spielermodus.
+<p>Im folgenden Video ist zu sehen, wie die Position eines Spielers auf dem Spielfeld geändert werden kann (in diesem Beispiel Angelo Schmidt). Durch klicken auf einen Spieler im Spielfeld (oder in der Mannschaftstabelle) wird der Spielermodus aktiviert. Durch Klicks auf die Pfeiltasten kann die Position des Spielers geändert werden. Ein Klick ins leere Spielfeld beendet den Spielermodus.</p>
 <video width="500" height="406" controls="controls">
   <source src="/Content/Video/team_change_position.mp4" type="video/mp4">
   <source src="/Content/Video/team_change_position.ogg" type="video/ogg">
@@ -128,12 +128,17 @@ Im folgenden Video wird gezeigt, wie ein Spieler durch einen anderen ersetzt wir
   <source src="~/Content/Video/team_substitute.ogg" type="video/ogg">
   Your browser does not support the video tag.
 </video>
+<video width="500" height="764" controls="controls">
+  <source src="Content/Video/team_substitute.mp4" type="video/mp4">
+  <source src="Content/Video/team_substitute.ogg" type="video/ogg">
+  Your browser does not support the video tag.
+</video>
 tbd
 
 <h3 id="h3Tactic">Taktik</h3>
 tbd
 <h3 id="h3Training">Mannschaftstraining</h3>
-Durch das Mannschaftstraining kann die körperliche Fitness der Spieler gesteuert werden. Zudem werden die Eigenschaften der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.
+<p>Durch das Mannschaftstraining kann die körperliche Fitness der Spieler (Kondition und Moral) gesteuert werden. Zudem werden die Eigenschaften der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.</p>
 Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden.
 <table style="width: auto" border="1" cellpadding="3">
   <tr>
@@ -193,12 +198,12 @@ Zu Beginn eines jeden Spiels erhält der Kaptiän zusätzlich einen Moralbonus v
 <h3>Konstitution</h3>
 <ul>
   <li>
-    <u>Kondition</u><br />
+    <u id="uPlayerCondi">Kondition</u><br />
     Je besser die Kondition des Spielers, desto geringer fällt der Frischeverlust in Spiel und Training aus.<br />
     Der Konditionsbereich liegt zwischen 10 < Kondition < 100 (durch Spielerdoping kann die maximale Kondition erhöht werden).
   </li>
   <li>
-    <u>Frische</u><br />
+    <u id="uPlayerFresh">Frische</u><br />
     Je größer die Frische des Spielers, desto mehr Strecke kann er zurücklegen.<br />
     Der Frischebereich liegt zwischen 10 < Frische < 100.
   </li>
