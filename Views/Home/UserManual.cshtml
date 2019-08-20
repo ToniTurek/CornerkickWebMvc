@@ -63,7 +63,66 @@
 
         chart.render();
       });
+
+      plotPlayerTraining();
     });
+
+    function plotPlayerTraining() {
+      $.ajax({
+        type: 'post',
+        url: '/Home/UmGetPlayerTraining',
+        dataType: "json",
+        data: { iType: $("#selectPlayerTrainingType").val(), iTrainer: 5, iCamp: -1, iAge: 25 },
+        success: function (dataKFM) {
+          var chartPlayerTraining = new CanvasJS.Chart("divChartPlayerTraining", {
+            animationEnabled: false,
+            theme: "theme2",//theme1
+            axisX: {
+              gridThickness: 1,
+              interval: 1
+            },
+            axisY: {
+              valueFormatString: "0.0%",
+              includeZero: false
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                color: "blue",
+                showInLegend: true,
+                legendText: "Kondition",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[0]
+              },
+              {
+                type: "line",
+                color: "green",
+                showInLegend: true,
+                legendText: "Frische",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[1]
+              },
+              {
+                type: "line",
+                color: "red",
+                showInLegend: true,
+                legendText: "Moral",
+                yValueFormatString: "0.0%",
+                dataPoints: dataKFM[2]
+              }
+            ]
+          });
+
+          chartPlayerTraining.render();
+        }
+      });
+    }
   </script>
 </body>
 </html>
@@ -116,16 +175,16 @@ Auf der unteren Hälfte des Spielfeldes ist die aktuelle Aufstellung deiner Mann
 <h4>Position eines Spielers ändern</h4>
 <p>Im folgenden Video ist zu sehen, wie die Position eines Spielers auf dem Spielfeld geändert werden kann (in diesem Beispiel Angelo Schmidt). Durch klicken auf einen Spieler im Spielfeld (oder in der Mannschaftstabelle) wird der Spielermodus aktiviert. Durch Klicks auf die Pfeiltasten kann die Position des Spielers geändert werden. Ein Klick ins leere Spielfeld beendet den Spielermodus.</p>
 <video width="500" height="406" controls="controls">
-  <source src="~/App_Data/team_change_position.mp4" type="video/mp4">
-  <source src="~/App_Data/team_change_position.ogg" type="video/ogg">
+  <source src="~/Content/Video/team_change_position.mp4" type="video/mp4">
+  <source src="~/Content/Video/team_change_position.ogg" type="video/ogg">
   Your browser does not support the video tag.
 </video>
 
 <h4>Spieler austauschen</h4>
 Im folgenden Video wird gezeigt, wie ein Spieler durch einen anderen ersetzt wird (in diesem Beispiel Stanley Sommer durch Toni Kraus).
 <video width="500" height="764" controls="controls">
-  <source src="~/App_Data/team_substitute.mp4" type="video/mp4">
-  <source src="~/App_Data/team_substitute.ogg" type="video/ogg">
+  <source src="~/Content/Video/team_substitute.mp4" type="video/mp4">
+  <source src="~/Content/Video/team_substitute.ogg" type="video/ogg">
   Your browser does not support the video tag.
 </video>
 tbd
@@ -134,7 +193,7 @@ tbd
 tbd
 <h3 id="h3Training">Mannschaftstraining</h3>
 <p>Durch das Mannschaftstraining kann die körperliche Verfassung der Spieler (<a href="#uPlayerCondi">Kondition</a> und <a href="#uPlayerFresh">Frische</a>) gesteuert werden. Zudem werden die Eigenschaften der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.</p>
-Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden.
+Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:
 <table style="width: auto" border="1" cellpadding="3">
   <tr>
     <th style="text-align:center">Art</th>
@@ -184,6 +243,12 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spiel
 </table>
 
 Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leichter Kondition auf, ältere schwerer.
+<div style="position: relative; width: 100%">
+  <div style="position: relative; height: 30px; top: 0px; left: 0px; margin-bottom: 6px">
+    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ddlTraining, "Value", "Text", 0), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "selectPlayerTrainingType", style = "width: 170px" })
+  </div>
+  <div id="divChartPlayerTraining" style="position: relative; height: 300px; width: 100%"></div>
+</div>
 
 <h3>Kapitäne</h3>
 Nach Ernennung eines Spielers zum Kapitän gewinnt er 15% Moral (Vize-Kapitän: 5%). Wird durch die Ernennung ein anderer Spieler als Kapitän abgelöst, verliert dieser 20% Moral (Vize-Kapitän: 8%).
@@ -307,3 +372,4 @@ Folgende Stadionausstattungen stehen zur Verfügung, welche die (potentiellen) Z
   <li>Parkplätze (@sCarpark)</li>
 </ul>
 Mit anderen Worten: @sCarpark Parkplätze genügen für 10.000 Stehplatz-, 8.000 Sitzplatz- und 400 VIP Zuschauer. Sind keine vorhanden reduziert sich die Anzahl der potentiellen Zuschauer um 25%.
+
