@@ -94,21 +94,22 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
-    public ContentResult UmGetPlayerTraining(int iType, int iTrainer, int iCamp, int iAge)
+    public ContentResult UmGetPlayerTraining(int iType, int iTrainerCondi, int iTrainerPhysio, int iCamp, int iDoping, int iAge)
     {
       List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
 
       // Initialize dataPoints list
       for (byte j = 0; j < dataPoints.Length; j++) dataPoints[j] = new List<Models.DataPointGeneral>();
 
-      // Create temp. player
+      // Create temp. ck manager instance
       CornerkickManager.Main mnUm = new CornerkickManager.Main();
       mnUm.dtDatum = mnUm.dtDatum.AddDays(1);
 
+      // Create user
       CornerkickManager.User usr = new CornerkickManager.User();
       mnUm.ltUser.Add(usr);
 
-      // Create Club
+      // Create club
       CornerkickManager.Club clb = new CornerkickManager.Club();
       clb.iId = 0;
       clb.sName = "Team";
@@ -121,6 +122,7 @@ namespace CornerkickWebMvc.Controllers
 
       usr.club = clb;
 
+      // Create player
       CornerkickGame.Player pl = new CornerkickGame.Player();
       pl.fCondition = 0.6f;
       pl.fFresh = 0.8f;
@@ -129,25 +131,27 @@ namespace CornerkickWebMvc.Controllers
       pl.dtBirthday = mnUm.dtDatum.AddYears(-iAge);
       clb.ltPlayer.Add(pl);
 
-      clb.staff.iCondiTrainer = (byte)iTrainer;
-      //pl.doDoping(mn.ltDoping[1]);
+      // Trainer
+      clb.staff.iCondiTrainer = (byte)iTrainerCondi;
+      clb.staff.iPhysio       = (byte)iTrainerPhysio;
 
+      // Trainings camp
       CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
-      foreach (CornerkickManager.TrainingCamp.Camp cp in mnUm.tcp.ltCamps) {
-        if (cp.iId == iCamp) {
-          camp.camp = cp;
-          camp.dtArrival   = mnUm.dtDatum.AddDays(-1);
-          camp.dtDeparture = mnUm.dtDatum.AddDays(+8);
-          break;
-        }
+      if (iCamp >= 0 && iCamp < mnUm.tcp.ltCamps.Count) {
+        camp.camp = mnUm.tcp.ltCamps[iCamp];
+        camp.dtArrival   = mnUm.dtDatum.AddDays(-1);
+        camp.dtDeparture = mnUm.dtDatum.AddDays(+8);
       }
+
+      // Doping
+      if (iDoping >= 0 && iDoping < mnUm.ltDoping.Count) pl.doDoping(mnUm.ltDoping[iDoping]);
 
       // For the next 7 days ...
       for (byte iD = 0; iD < 7; iD++) {
         DateTime dtTmp = mnUm.dtDatum.AddDays(iD);
 
         if (iD > 0) {
-          if ((int)dtTmp.DayOfWeek == 0) break;
+          //if ((int)dtTmp.DayOfWeek == 0) break;
 
           // ... do training
           mnUm.plr.doTraining(ref pl, dtTmp, camp, false, true);
