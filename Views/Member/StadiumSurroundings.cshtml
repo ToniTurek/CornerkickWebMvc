@@ -135,7 +135,7 @@
 
           $("#txtCounter").text("Aktuell: " + sCurrent[3][0]);
           if (sCurrent[3][2] != "0") {
-            $("txtCounterNew").text("Ausbau zu: " + sCurrent[3][1] + " (noch " + sCurrent[3][2] + "d)");
+            $("#txtCounterNew").text("Ausbau zu: " + sCurrent[3][1] + " (noch " + sCurrent[3][2] + "d)");
             $("#pbCounter").progressbar("value", parseFloat(sCurrent[3][3].replace("%", "").replace(",", ".")));
             $("#pbCounter").css("display", "block");
           }
@@ -315,7 +315,7 @@
       }
     </div>
 
-    @{ 
+    @{
       var htmlAttributesEditorFor = new Dictionary<string, object>
       {
         { "type", "number" },
@@ -338,7 +338,7 @@
       }
     </div>
 
-    @{ 
+    @{
       var htmlAttributesEditorForCounter = new Dictionary<string, object>
       {
         { "type", "number" },
