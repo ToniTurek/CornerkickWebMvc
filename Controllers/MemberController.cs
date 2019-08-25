@@ -2754,6 +2754,9 @@ namespace CornerkickWebMvc.Controllers
 
       stadionModel.stadionNew = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);
 
+      stadionModel.iSnackbarNew = (byte)(clb.stadium.iSnackbarNew - clb.stadium.iSnackbar);
+      stadionModel.iToiletsNew  = (byte)(clb.stadium.iToiletsNew  - clb.stadium.iToilets);
+
       /*
       stModel.stadionNew = MvcApplication.ckcore.ini.newStadion();
       for (int i = 0; i < stModel.stadionNew.iPlaetze.Length; i++) {
@@ -2857,6 +2860,7 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult StadiumGetBlockProgress()
     {
       CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       int nBlocksMax = clb.stadium.blocks.Length;
       if (!clb.stadium.bTopring) nBlocksMax = 10;
@@ -2869,6 +2873,31 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(fPg, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult StadiumGetExtras()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.User usr = ckUser();
+
+      int nVideoDaysConstract    = CornerkickManager.Stadium.iVideoDaysConstruct[clb.stadium.iVideoNew];
+      int nSnackbarDaysConstract = MvcApplication.ckcore.st.getCostDaysContructSnackbar(clb.stadium.iSnackbarNew, clb.stadium.iSnackbar, usr)[1];
+      int nToiletsDaysConstract  = MvcApplication.ckcore.st.getCostDaysContructToilets (clb.stadium.iToiletsNew,  clb.stadium.iToilets,  usr)[1];
+      float fVideoDaysConstract    = 0f;
+      float fSnackbarDaysConstract = 0f;
+      float fToiletsDaysConstract  = 0f;
+      if (nVideoDaysConstract    > 0) fSnackbarDaysConstract = (nVideoDaysConstract    - clb.stadium.iVideoDaysConstruct  ) / (float)nVideoDaysConstract;
+      if (nSnackbarDaysConstract > 0) fSnackbarDaysConstract = (nSnackbarDaysConstract - clb.stadium.iSnackbarDaysConstruct) / (float)nSnackbarDaysConstract;
+      if (nToiletsDaysConstract  > 0) fToiletsDaysConstract  = (nToiletsDaysConstract  - clb.stadium.iToiletsDaysConstruct ) / (float)nToiletsDaysConstract;
+
+      return Json(new string[3][] {
+        new string [4] { CornerkickManager.Stadium.sVideo[clb.stadium.iVideo], CornerkickManager.Stadium.sVideo[clb.stadium.iVideoNew], clb.stadium.iVideoDaysConstruct   .ToString(), fVideoDaysConstract   .ToString("0.0%") },
+        new string [4] { clb.stadium.iSnackbar.ToString(),                     clb.stadium.iSnackbarNew.ToString(),                     clb.stadium.iSnackbarDaysConstruct.ToString(), fSnackbarDaysConstract.ToString("0.0%") },
+        new string [4] { clb.stadium.iToilets .ToString(),                     clb.stadium.iToiletsNew .ToString(),                     clb.stadium.iToiletsDaysConstruct .ToString(), fToiletsDaysConstract .ToString("0.0%") }
+      }, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -2921,7 +2950,7 @@ namespace CornerkickWebMvc.Controllers
 
     // Snackbars
     [HttpPost]
-    public JsonResult StadiumGetCostSnackbar(byte iCount)
+    public JsonResult StadiumGetCostSnackbar(int iBuildNew)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
 
@@ -2929,9 +2958,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if (clb.stadium.iSnackbarNew != iCount) {
+      if (iBuildNew != 0) {
         int iDispoOk = 0;
-        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(iCount, clb.stadium.iSnackbarNew, usr);
+        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(clb.stadium.iSnackbarNew + iBuildNew, clb.stadium.iSnackbarNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
         sCostDaysDispo[0] = iCostDays[0].ToString("N0", getCi());
@@ -2943,13 +2972,13 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult StadiumBuildSnackbar(byte iCount)
+    public JsonResult StadiumBuildSnackbar(int iBuildNew)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
-      stadion.iSnackbarNew = iCount;
+      stadion.iSnackbarNew = (byte)(stadion.iSnackbar + iBuildNew);
 
       MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
 
@@ -2958,7 +2987,7 @@ namespace CornerkickWebMvc.Controllers
 
     // Toilets
     [HttpPost]
-    public JsonResult StadiumGetCostToilets(byte iCount)
+    public JsonResult StadiumGetCostToilets(int iBuildNew)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
 
@@ -2966,9 +2995,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      if (clb.stadium.iToiletsNew != iCount) {
+      if (iBuildNew != 0) {
         int iDispoOk = 0;
-        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(iCount, clb.stadium.iToiletsNew, usr);
+        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(clb.stadium.iToiletsNew + iBuildNew, clb.stadium.iToiletsNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
         sCostDaysDispo[0] = iCostDays[0].ToString("N0", getCi());
@@ -2980,13 +3009,13 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult StadiumBuildToilets(byte iCount)
+    public JsonResult StadiumBuildToilets(int iBuildNew)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
-      stadion.iToiletsNew = iCount;
+      stadion.iToiletsNew = (byte)(clb.stadium.iToilets + iBuildNew);
 
       MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
 
