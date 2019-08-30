@@ -173,20 +173,31 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 
 <h2>Mannschaft</h2>
 <h3 id="h3Team">Aufstellung</h3>
-Auf der unteren Hälfte des Spielfeldes ist die aktuelle Aufstellung deiner Mannschaft zu sehen. Darunter sind in einer Tabelle alle deine Spieler aufgelistet.
-
-<h4>Position eines Spielers ändern</h4>
-<p>Im folgenden Video ist zu sehen, wie die Position eines Spielers auf dem Spielfeld geändert werden kann (in diesem Beispiel Angelo Schmidt). Durch klicken auf einen Spieler im Spielfeld (oder in der Mannschaftstabelle) wird der Spielermodus aktiviert. Durch Klicks auf die Pfeiltasten kann die Position des Spielers geändert werden. Ein Klick ins leere Spielfeld beendet den Spielermodus.</p>
-<video width="500" height="406" controls="controls">
-  <source src="~/Content/Video/team_change_position.mp4" type="video/mp4">
-  <source src="~/Content/Video/team_change_position.ogg" type="video/ogg">
-  Your browser does not support the video tag.
-</video>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/v3dclL2grbs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<iframe width="500" height="406" src="Content/Video/team_change_position.mp4" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<video controls="controls">
-  <source src="~/Content/Video/SampleVideo_1280x720_1mb.mp4" type="video/mp4" />
-</video>
+Die Aufstellungsseite unterteilt sich in ein Spielfeld, auf dem die Position deiner Spieler festgelegt werden kann und eine Liste aller deiner Spieler.
+Es gibt zwei Menüs um die Position deiner Spieler festzulegen: Die Formation und die offensive Positionierung.<br />
+<img width="208" height="24" src="~/Content/Images/user_manual/Team0.PNG" />
+<ul>
+  <li>
+    <u style="font-size: 18px">Formation</u><br />
+    Auf der unteren Hälfte des Spielfeldes ist die aktuelle Aufstellung deiner Mannschaft zu sehen. Steht der nächste Gegner fest und hast du einen <a href="#uKibitzer">Spielbeobachter</a> eingestellt, sind Informationen deines Gegners in der oberen Spielhälfte dargestellt.<br />
+    <u>Position eines Spielers ändern</u><br />
+    <p>Im folgenden Video ist zu sehen, wie die Position eines Spielers auf dem Spielfeld geändert werden kann (in diesem Beispiel Angelo Schmidt). Durch klicken auf einen Spieler im Spielfeld (oder in der Mannschaftstabelle) wird der Spielermodus aktiviert. Durch Klicks auf die Pfeiltasten kann die Position des Spielers geändert werden. Ein Klick ins leere Spielfeld beendet den Spielermodus.</p>
+    <video width="500" height="406" controls="controls">
+      <source src="~/Content/Video/team_change_position.mp4" type="video/mp4">
+      <source src="~/Content/Video/team_change_position.ogg" type="video/ogg">
+      Your browser does not support the video tag.
+    </video>
+  </li>
+  <li>
+    <u style="font-size: 18px">Offensive</u><br />
+    Im Menü Offensive kann die Position deiner Spieler bei eigenem Ballbesitz festgelegt werden. Basis hierfür ist die Positionierung in der defensiven Formation.<br />
+    <u>Offensive Ausrichtung</u><br />
+    Nach klicken auf ein Spielersymbol kann durch den links erscheinenden Regler die individuelle offensive Ausrichtung des Spielers angepasst werden.<br />
+    <u>Positionstreue</u><br />
+    Die gelben Rechtecke um den Spieler repräsentieren die Positionstreue des Spielers. Die jeweiligen Zahlen in der oberen linken Ecke der Rechtecke geben an, zu wieviel Prozent sich der Spieler bei Ballbesitz innerhalb dieser Rechtecke aufhält. Die Dimensionen der Rechtecke können über die horizontalen und vertikalen Pfeile geändert werden.<br />
+    <img width="500" src="~/Content/Images/user_manual/Team3a.PNG" />
+  </li>
+</ul>
 
 <h4>Spieler austauschen</h4>
 Im folgenden Video wird gezeigt, wie ein Spieler durch einen anderen ersetzt wird (in diesem Beispiel Stanley Sommer durch Toni Kraus).
@@ -195,7 +206,6 @@ Im folgenden Video wird gezeigt, wie ein Spieler durch einen anderen ersetzt wir
   <source src="~/Content/Video/team_substitute.ogg" type="video/ogg">
   Your browser does not support the video tag.
 </video>
-tbd
 
 <h3 id="h3Tactic">Taktik</h3>
 tbd
@@ -307,9 +317,9 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spiel
       </tr>
     }
   }
-  </table>
+</table>
 
-<h4>Kondition/Frische/Moral</h4>
+<h4 id="h4CFM">Kondition/Frische/Moral</h4>
 Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leichter Kondition auf, ältere schwerer. Ein besserer Konditionstrainer/Masseur sowie Trainingslager und Doping können das Training beeinflussen.
 <p>In der folgenden Graphik können diese Faktoren am Beispiel eines Spielers ausprobiert werden.</p>
 <div style="position: relative; width: 100%; margin-top: 10px; margin-bottom: 10px">
@@ -318,7 +328,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ddlTraining, "Value", "Text", 2), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "selectPlayerTrainingType", style = "width: 20%; min-width: 120px" })
     <label>Konditionstrainer:</label>
     @Html.DropDownListFor(m => m.sPlayerTrainingCoachCondi, new SelectList(Model.ddlPlayerTrainingCoachCondi, "Value", "Text", 5), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCoachCondi", @style = "width: 120px" })
-    <label>Physio:</label>
+    <label>Masseur:</label>
     @Html.DropDownListFor(m => m.sPlayerTrainingCoachPhysio, new SelectList(Model.ddlPlayerTrainingCoachPhysio, "Value", "Text", 5), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCoachPhysio", @style = "width: 120px" })
     <label>Trainingslager:</label>
     @Html.DropDownListFor(m => m.sPlayerTrainingCamp, new SelectList(Model.ddlPlayerTrainingCamp, "Value", "Text", -1), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCamp", @style = "width: 120px" })
@@ -458,11 +468,11 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       <u>Konditionstrainer</u><br />
-      Je besser der Konditionstrainer, desto effektiver ist das Konditionstraining.
+      Je besser der Konditionstrainer, desto effektiver ist das Konditionstraining (s. auch <a href="#h4CFM">Kondition/Frische/Moral</a>).
     </li>
     <li>
       <u>Masseur</u><br />
-      Je besser der Masseur, desto schneller regenerieren die Spieler.
+      Je besser der Masseur, desto schneller regenerieren die Spieler (s. auch <a href="#h4CFM">Kondition/Frische/Moral</a>).
     </li>
     <li>
       <u>Mentaltrainer</u><br />
@@ -479,6 +489,10 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     <li>
       <u>Jugendscout</u><br />
       Je besser der Jugendscout, desto wahrscheinlicher schließt sich ein neuer Jugendspieler dem Verein an.
+    </li>
+    <li>
+      <u id="uKibitzer">Spielbeobachter</u><br />
+      Je besser der Spielbeobachter, desto mehr Informationen erhältst du über deinen nächsten Gegner.
     </li>
   </ul>
 
