@@ -2821,7 +2821,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Stadium stadiumNew = getStadiumUpdate(clb.stadium, iSeats, iArt);
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadiumNew);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Ausbau des Stadions wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -2909,7 +2909,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.bTopring = !clb.stadium.bTopring;
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
 
       return Json("Der Bau des Oberrings wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -2943,7 +2943,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.iVideoNew = iLevel;
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
 
       return Json("Der Bau der Anzeigentafel wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -2980,7 +2980,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.iSnackbarNew = (byte)(stadion.iSnackbar + iBuildNew);
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
 
       return Json("Der Ausbau der Imbissbuden wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3017,7 +3017,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.iToiletsNew = (byte)(clb.stadium.iToilets + iBuildNew);
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
 
       return Json("Der Ausbau der Toiletten wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3092,16 +3092,16 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdStadionSurr);
 
-      mdStadionSurr.ddlTrainingsgel = new List<SelectListItem>();
+      mdStadionSurr.ddlTrainingsgel  = new List<SelectListItem>();
       mdStadionSurr.ddlJouthInternat = new List<SelectListItem>();
 
-      for (int i = clb.iTrainingsgel  [1] + 1; i < MvcApplication.ckcore.st.sTrainingsgel.Length; i++) mdStadionSurr.ddlTrainingsgel .Add(new SelectListItem { Text = MvcApplication.ckcore.st.sTrainingsgel [i], Value = i.ToString() });
-      for (int i = clb.iJugendinternat[1] + 1; i < MvcApplication.ckcore.st.sTrainingsgel.Length; i++) mdStadionSurr.ddlJouthInternat.Add(new SelectListItem { Text = MvcApplication.ckcore.st.sJouthInternat[i], Value = i.ToString() });
+      for (int i = clb.iTrainingCourts[1] + 1; i < CornerkickManager.Stadium.sTrainingCourts.Length; i++) mdStadionSurr.ddlTrainingsgel .Add(new SelectListItem { Text = CornerkickManager.Stadium.sTrainingCourts[i], Value = i.ToString() });
+      for (int i = clb.iJouthInternat [1] + 1; i < CornerkickManager.Stadium.sTrainingCourts.Length; i++) mdStadionSurr.ddlJouthInternat.Add(new SelectListItem { Text = CornerkickManager.Stadium.sJouthInternat [i], Value = i.ToString() });
 
-      mdStadionSurr.iTrainingsgel     = clb.iTrainingsgel  [0];
-      mdStadionSurr.iTrainingNew      = clb.iTrainingsgel  [2];
-      mdStadionSurr.iJouthInternat    = clb.iJugendinternat[0];
-      mdStadionSurr.iJouthInternatNew = clb.iJugendinternat[2];
+      mdStadionSurr.iTrainingsgel     = clb.iTrainingCourts[0];
+      mdStadionSurr.iTrainingNew      = clb.iTrainingCourts[2];
+      mdStadionSurr.iJouthInternat    = clb.iJouthInternat[0];
+      mdStadionSurr.iJouthInternatNew = clb.iJouthInternat[2];
       mdStadionSurr.iCarpark       = Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew);
       mdStadionSurr.iCarparkNew    = clb.stadium.iCarparkNew;
       mdStadionSurr.iCounter       = Math.Max(clb.stadium.iTicketcounter, clb.stadium.iTicketcounterNew);
@@ -3118,13 +3118,15 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.User usr = ckUser();
 
-      int nCarparkDaysConstract       = MvcApplication.ckcore.st.getCostDaysContructCarpark      (clb.stadium.iCarparkNew,       clb.stadium.iCarpark,       usr)[1];
-      int nTicketcounterDaysConstract = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(clb.stadium.iTicketcounterNew, clb.stadium.iTicketcounter, usr)[1];
+      int nTrainingCourtsDaysConstract = CornerkickManager.Stadium.getCostDaysBuildTrainingCourts(clb)[1];
+      int nJouthInternatDaysConstract  = CornerkickManager.Stadium.getCostDaysBuildJouthInternat (clb)[1];
+      int nCarparkDaysConstract        = MvcApplication.ckcore.st.getCostDaysContructCarpark      (clb.stadium.iCarparkNew,       clb.stadium.iCarpark,       usr)[1];
+      int nTicketcounterDaysConstract  = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(clb.stadium.iTicketcounterNew, clb.stadium.iTicketcounter, usr)[1];
       return Json(new string[4][] {
-        new string [4] { MvcApplication.ckcore.st.sTrainingsgel [clb.iTrainingsgel  [0]], MvcApplication.ckcore.st.sTrainingsgel [clb.iTrainingsgel  [1]], clb.iTrainingsgel  [2].ToString(), ((MvcApplication.ckcore.st.iTrainingsgelDaysConstruct [clb.iTrainingsgel  [1]] - clb.iTrainingsgel  [2]) / (float)MvcApplication.ckcore.st.iTrainingsgelDaysConstruct [clb.iTrainingsgel  [1]]).ToString("0.0%") },
-        new string [4] { MvcApplication.ckcore.st.sJouthInternat[clb.iJugendinternat[0]], MvcApplication.ckcore.st.sJouthInternat[clb.iJugendinternat[1]], clb.iJugendinternat[2].ToString(), ((MvcApplication.ckcore.st.iJouthInternatDaysConstruct[clb.iJugendinternat[1]] - clb.iJugendinternat[2]) / (float)MvcApplication.ckcore.st.iJouthInternatDaysConstruct[clb.iJugendinternat[1]]).ToString("0.0%") },
-        new string [4] { clb.stadium.iCarpark      .ToString(), clb.stadium.iCarparkNew      .ToString(), clb.stadium.iCarparkDaysConstruct      .ToString(), ((nCarparkDaysConstract       - clb.stadium.iCarparkDaysConstruct      ) / (float)nCarparkDaysConstract      ).ToString("0.0%") },
-        new string [4] { clb.stadium.iTicketcounter.ToString(), clb.stadium.iTicketcounterNew.ToString(), clb.stadium.iTicketcounterDaysConstruct.ToString(), ((nTicketcounterDaysConstract - clb.stadium.iTicketcounterDaysConstruct) / (float)nTicketcounterDaysConstract).ToString("0.0%") }
+        new string [4] { CornerkickManager.Stadium.sTrainingCourts[clb.iTrainingCourts[0]], CornerkickManager.Stadium.sTrainingCourts[clb.iTrainingCourts[1]], clb.iTrainingCourts[2].ToString(),                  ((CornerkickManager.Stadium.iTrainingCourtsDaysConstruct[clb.iTrainingCourts[1]] - clb.iTrainingCourts[2])                  / (float)nTrainingCourtsDaysConstract).ToString("0.0%") },
+        new string [4] { CornerkickManager.Stadium.sJouthInternat [clb.iJouthInternat [0]], CornerkickManager.Stadium.sJouthInternat [clb.iJouthInternat [1]], clb.iJouthInternat [2].ToString(),                  ((CornerkickManager.Stadium.iJouthInternatDaysConstruct [clb.iJouthInternat [1]] - clb.iJouthInternat [2])                  / (float)nJouthInternatDaysConstract ).ToString("0.0%") },
+        new string [4] { clb.stadium.iCarpark      .ToString(),                             clb.stadium.iCarparkNew      .ToString(),                          clb.stadium.iCarparkDaysConstruct      .ToString(), ((nCarparkDaysConstract                                                          - clb.stadium.iCarparkDaysConstruct      ) / (float)nCarparkDaysConstract       ).ToString("0.0%") },
+        new string [4] { clb.stadium.iTicketcounter.ToString(),                             clb.stadium.iTicketcounterNew.ToString(),                          clb.stadium.iTicketcounterDaysConstruct.ToString(), ((nTicketcounterDaysConstract                                                    - clb.stadium.iTicketcounterDaysConstruct) / (float)nTicketcounterDaysConstract ).ToString("0.0%") }
       }, JsonRequestBehavior.AllowGet);
     }
 
@@ -3138,21 +3140,25 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       if (iType == 0) {
-        if (clb.iTrainingsgel[0] != i) {
+        if (clb.iTrainingCourts[0] != i) {
           int iDispoOk = 0;
-          if (MvcApplication.ckcore.fz.checkDispoLimit(MvcApplication.ckcore.st.iTrainingsgelCost[i], clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = MvcApplication.ckcore.st.iTrainingsgelCost[i].ToString("N0", getCi());
-          sCostDaysDispo[1] = MvcApplication.ckcore.st.iTrainingsgelDaysConstruct[i].ToString();
+          int[] iCostDays = CornerkickManager.Stadium.getCostDaysBuildTrainingCourts(i, clb.iTrainingCourts[0]);
+          if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
+
+          sCostDaysDispo[0] = iCostDays[0].ToString("N0", getCi());
+          sCostDaysDispo[1] = iCostDays[1].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
       } else if (iType == 1) {
-        if (clb.iJugendinternat[0] != i) {
+        if (clb.iJouthInternat[0] != i) {
           int iDispoOk = 0;
-          if (MvcApplication.ckcore.fz.checkDispoLimit(MvcApplication.ckcore.st.iJouthInternatCost[i], clb)) iDispoOk = 1;
 
-          sCostDaysDispo[0] = MvcApplication.ckcore.st.iJouthInternatCost[i].ToString("N0", getCi());
-          sCostDaysDispo[1] = MvcApplication.ckcore.st.iJouthInternatDaysConstruct[i].ToString();
+          int[] iCostDays = CornerkickManager.Stadium.getCostDaysBuildJouthInternat(i, clb.iJouthInternat[0]);
+          if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
+
+          sCostDaysDispo[0] = iCostDays[0].ToString("N0", getCi());
+          sCostDaysDispo[1] = iCostDays[1].ToString();
           sCostDaysDispo[2] = iDispoOk.ToString();
         }
       } else if (iType == 2) {
@@ -3188,10 +3194,12 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.iTrainingsgel[1] = iTrGel;
-      clb.iTrainingsgel[2] = MvcApplication.ckcore.st.iTrainingsgelDaysConstruct[iTrGel];
+      int[] iCostDays = CornerkickManager.Stadium.getCostDaysBuildTrainingCourts(clb);
 
-      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -MvcApplication.ckcore.st.iTrainingsgelCost[iTrGel], "Bau Trainingsgelände", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+      clb.iTrainingCourts[1] = iTrGel;
+      clb.iTrainingCourts[2] = iCostDays[1];
+
+      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDays[0], "Bau Trainingsgelände", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
 
       return Json("Der Bau des Trainingsgeländes wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3202,10 +3210,12 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.iJugendinternat[1] = iInt;
-      clb.iJugendinternat[2] = MvcApplication.ckcore.st.iJouthInternatDaysConstruct[iInt];
+      int[] iCostDays = CornerkickManager.Stadium.getCostDaysBuildJouthInternat(clb);
 
-      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -MvcApplication.ckcore.st.iJouthInternatCost[iInt], "Bau Jugendinternat", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+      clb.iJouthInternat[1] = iInt;
+      clb.iJouthInternat[2] = iCostDays[1];
+
+      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDays[0], "Bau Jugendinternat", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
 
       return Json("Der Bau des Jugendinternats wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3219,7 +3229,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
       stadiumNew.iCarparkNew = iCount;
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadiumNew);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Bau der Parkplätze wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3233,7 +3243,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
       stadiumNew.iTicketcounterNew = iCount;
 
-      MvcApplication.ckcore.ui.buildStadion(ref clb, stadiumNew);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Bau der Ticketschalter wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
