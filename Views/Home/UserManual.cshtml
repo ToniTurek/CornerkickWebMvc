@@ -13,6 +13,20 @@
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
   <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
   <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <style>
+    .ckLink {
+      position: relative;
+      top: -42px;
+      width: 0px;
+      height: 0px;
+    }
+    .ckLinkLarge {
+      position: relative;
+      top: -68px;
+      width: 0px;
+      height: 0px;
+    }
+  </style>
 </head>
 <body>
   <script type="text/javascript">
@@ -146,7 +160,7 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
     Ebenfalls im Spielermenü können Sie einen Spieler zum (Vize-)Kapitän ernennen.
   </li>
   <li>
-    <u>Stellen Sie <a href="#h3Stuff">Personal</a> ein</u><br />
+    <u>Stellen Sie <a href="#h3Staff">Personal</a> ein</u><br />
     Über das Menü <i>Verein->Personal</i> können Sie Personal einstellen. Beachten Sie, dass Sie das Personal immer für eine Saison einstellen. Wollen Sie Ihr Personal später ändern, fallen Abfindungen in Höhe von 50% des restlichen Gehalts an.
   </li>
   <li>
@@ -172,7 +186,8 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 </ul>
 
 <h2>Mannschaft</h2>
-<h3 id="h3Team">Aufstellung</h3>
+<div id="h3Team" class="ckLink"></div>
+<h3>Aufstellung</h3>
 Die Aufstellungsseite unterteilt sich in ein Spielfeld, auf dem die Position deiner Spieler festgelegt werden kann und eine Liste aller deiner Spieler.
 Es gibt zwei Menüs um die Position deiner Spieler festzulegen: Die Formation und die offensive Positionierung.<br />
 <img width="208" height="24" src="~/Content/Images/user_manual/Team0.PNG" />
@@ -191,7 +206,8 @@ Es gibt zwei Menüs um die Position deiner Spieler festzulegen: Die Formation un
   <li>
     <u style="font-size: 18px">Offensive</u><br />
     Im Menü Offensive kann die Position deiner Spieler bei eigenem Ballbesitz festgelegt werden. Basis hierfür ist die Positionierung in der defensiven Formation.<br />
-    <u id="uTeamOrientation">Generelle offensive Ausrichtung</u><br />
+    <div id="uTeamOrientation" class="ckLink"></div>
+    <u>Generelle offensive Ausrichtung</u><br />
     Über den rechten Regler kann die Taktikeinstellung 'Ausrichtung' angepasst und deren Auswirkung auf die generelle offensive Positionierung der Spieler beobachtet werden.<br />
     <u>Individuelle offensive Ausrichtung</u><br />
     Nach klicken auf ein Spielersymbol kann durch den links erscheinenden Regler die individuelle offensive Ausrichtung des Spielers angepasst werden.<br />
@@ -209,15 +225,16 @@ Im folgenden Video wird gezeigt, wie ein Spieler durch einen anderen ersetzt wir
   Your browser does not support the video tag.
 </video>
 
-<h3 id="h3Tactic">Taktik</h3>
+<div id="h3Tactic" class="ckLink"></div>
+<h3>Taktik</h3>
 Folgende taktische Einstellungen stehen zur Verfügung:
 <ul>
   <li>
-    <u id="uTacticOrientation">Ausrichtung</u><br />
+    <u>Ausrichtung</u><div id="uTacticOrientation" class="ckLinkLarge"></div>
     Die Ausrichtung verändert die generelle Positionierung der Spieler bei Ballbesitz (s. auch <a href="#uTeamOrientation">Generelle offensive Ausrichtung</a>).
   </li>
   <li>
-    <u id="uTacticPower">Einsatz</u><br />
+    <u>Einsatz</u><div id="uTacticPower" class="ckLinkLarge"></div>
     Bei hohem Einsatz legen die Spieler mehr Schritte pro Runde zurück. Je mehr sich die Anzahl der zurück gelegten Schritte der maximal möglichen Schrittzahl annähert, desto mehr Frische wird verbraucht.
   </li>
   <li>
@@ -248,7 +265,8 @@ Folgende taktische Einstellungen stehen zur Verfügung:
   </li>
 </ul>
 
-<h3 id="h3Training">Mannschaftstraining</h3>
+<div id="h3Training" class="ckLink"></div>
+<h3>Mannschaftstraining</h3>
 <p>Durch das Mannschaftstraining kann zum einen die körperliche Verfassung der Spieler (<a href="#uPlayerCondi">Kondition</a> und <a href="#uPlayerFresh">Frische</a>) gesteuert werden, zum anderen werden die <a href="#h3PlayerSkills">individuellen Fähigkeiten</a> der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.</p>
 Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:
 <table style="width: auto" border="1" cellpadding="3">
@@ -303,36 +321,36 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spiel
       }
       string[] sTrInd = new string[13];
       if (iT == 3) { // Speed
-        sTrInd[ 0] = "++"; // Speed
+        sTrInd[0] = "++"; // Speed
       } else if (iT == 4) { // Duel
-        sTrInd[ 2] = "++"; // Duel off.
-        sTrInd[ 3] = "++"; // Duel def.
+        sTrInd[2] = "++"; // Duel off.
+        sTrInd[3] = "++"; // Duel def.
       } else if (iT == 5) { // 5 vs. 2
-        sTrInd[ 4] = "++"; // Low pass
-        sTrInd[ 1] = "++"; // Technic
+        sTrInd[4] = "++"; // Low pass
+        sTrInd[1] = "++"; // Technic
       } else if (iT == 6) { // Shoots
-        sTrInd[ 6] = "++"; // Shoots
+        sTrInd[6] = "++"; // Shoots
         sTrInd[10] = "++"; // Reaction
         sTrInd[11] = "++"; // Jump
       } else if (iT == 7) { // Flanken/Abschluss
-        sTrInd[ 5] = "+"; // High pass
-        sTrInd[ 7] = "+"; // Header
+        sTrInd[5] = "+"; // High pass
+        sTrInd[7] = "+"; // Header
         sTrInd[10] = "+"; // Reaction
         sTrInd[11] = "+"; // Jump
         sTrInd[12] = "+"; // Catch
       } else if (iT == 8) { // Standards
-        sTrInd[ 7] = "+"; // Header
-        sTrInd[ 8] = "+"; // Free-kick
-        sTrInd[ 9] = "+"; // Penalty
+        sTrInd[7] = "+"; // Header
+        sTrInd[8] = "+"; // Free-kick
+        sTrInd[9] = "+"; // Penalty
         sTrInd[10] = "+"; // Reaction
         sTrInd[11] = "+"; // Jump
         sTrInd[12] = "+"; // Catch
       } else if (iT == 9) { // Trainings game
-        sTrInd[ 1] = "+"; // Technic
-        sTrInd[ 2] = "+"; // Duel off.
-        sTrInd[ 3] = "+"; // Duel def.
-        sTrInd[ 4] = "+"; // Low pass
-        sTrInd[ 5] = "+"; // High pass
+        sTrInd[1] = "+"; // Technic
+        sTrInd[2] = "+"; // Duel off.
+        sTrInd[3] = "+"; // Duel def.
+        sTrInd[4] = "+"; // Low pass
+        sTrInd[5] = "+"; // High pass
       }
 
       <tr style="border: 1px solid black">
@@ -358,7 +376,8 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spiel
   }
 </table>
 
-<h4 id="h4CFM">Kondition/Frische/Moral</h4>
+<div id="h4CFM" class="ckLink"></div>
+<h4>Kondition/Frische/Moral</h4>
 Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leichter Kondition auf, ältere schwerer. Ein besserer Konditionstrainer/Masseur sowie Trainingslager und Doping können das Training beeinflussen.
 <p>In der folgenden Graphik können diese Faktoren am Beispiel eines Spielers ausprobiert werden.</p>
 <div style="position: relative; width: 100%; margin-top: 10px; margin-bottom: 10px">
@@ -380,7 +399,8 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
 </div>
 
 <div style="float: left">
-  <h3 id="h3Captains">Kapitäne</h3>
+  <div id="h3Captains" class="ckLink"></div>
+  <h3>Kapitäne</h3>
   Nach Ernennung eines Spielers zum Kapitän gewinnt er 15% Moral (Vize-Kapitän: 5%). Wird durch die Ernennung ein anderer Spieler als Kapitän abgelöst, verliert dieser 20% Moral (Vize-Kapitän: 8%).
   Zu Beginn eines jeden Spiels erhält der Kaptiän zusätzlich einen Moralbonus von 2%. Bei einem Gegentor wird der Einfluß der Führungspersönlichkeit des Kapitäns (FP) um 10% erhöht.
 
@@ -388,12 +408,12 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   <h3>Konstitution</h3>
   <ul>
     <li>
-      <u id="uPlayerCondi">Kondition</u><br />
+      <u>Kondition</u><div id="uPlayerCondi" class="ckLinkLarge"></div>
       Je besser die Kondition des Spielers, desto geringer fällt der Frischeverlust in Spiel und Training aus.<br />
       Der Konditionsbereich liegt zwischen 10 < Kondition < 100 (durch Spielerdoping kann die maximale Kondition erhöht werden).
     </li>
     <li>
-      <u id="uPlayerFresh">Frische</u><br />
+      <u>Frische</u><div id="uPlayerFresh" class="ckLinkLarge"></div>
       Je größer die Frische des Spielers, desto mehr Strecke kann er zurücklegen.<br />
       Der Frischebereich liegt zwischen 10 < Frische < 100.
     </li>
@@ -423,7 +443,8 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
   </ul>
 
-  <h3 id="h3PlayerSkills">Fähigkeiten</h3>
+  <div id="h3PlayerSkills" class="ckLink"></div>
+  <h3>Fähigkeiten</h3>
   Die Fähigkeiten des Spielers werden beeinflußt durch seine Frische, seine Moral, seine Tagesform und seine Position (wenn nicht auf Hauptposition eingesetzt).
   <ul>
     <li>
@@ -431,7 +452,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
       Der Wert der Schnelligkeit eines Spielers gibt die maximale Anzahl von Schritten pro Spielzug an. Der Wert wird im Spiel reduziert durch die aktuelle Frische des Spielers, die Taktikeinstellung <a href="#uTacticPower">Einsatz</a> sowie das Führen des Balles abhängig von der <a href="#uPlayerSkillsTechnic">Technik</a> des Spielers.
     </li>
     <li>
-      <u id="uPlayerSkillsTechnic">Technik</u><br />
+      <u>Technik</u><div id="uPlayerSkillsTechnic" class="ckLinkLarge"></div>
       Der Wert der Technik eines Spielers beeinflusst die Fähigkeit Pässe und Flanken anzunehmen, d.h. je höher die Technik eines Spielers desto geringer ist das Risiko, dass der Ball bei der Annahme eines Passes/einer Flanke verspringt.
       Zudem verringert eine höhere Technik den Malus auf die Schnelligkeit eines Spielers, wenn dieser den Ball führt.
     </li>
@@ -499,7 +520,8 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   </ul>
 
   <h2>Verein</h2>
-  <h3 id="h3Stuff">Personal</h3>
+  <div id="h3Staff" class="ckLink"></div>
+  <h3>Personal</h3>
   <ul>
     <li>
       <u>Co-Trainer</u><br />
@@ -548,7 +570,8 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     Die Baukosten der Blöcke des Oberrings erhöhen sich um 50%. Untere Blöcke können nur noch bis zur Kapazität (abhängig vom Blocktyp) des größen Blocks des Unterings ausgebaut werden.
   </div>
 
-  <h4 id="h4StadiumExtras">Stadionausstattung</h4>
+  <div id="h4StadiumExtras" class="ckLink"></div>
+  <h4>Stadionausstattung</h4>
   @{
     string sSnackbar = (400f / CornerkickManager.Stadium.iFeatureSpecReqSnackbar).ToString("0.0");
     string sToilets = (400f / CornerkickManager.Stadium.iFeatureSpecReqToilets).ToString("0.0");
