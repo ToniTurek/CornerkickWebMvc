@@ -635,6 +635,8 @@
     <Content Include="Content\Images\stadium\stadion_L.jpg" />
     <Content Include="Content\Images\stadium\stadion_S.jpg" />
     <Content Include="Content\Images\tactic.png" />
+    <Content Include="Content\Images\user_manual\Team0.PNG" />
+    <Content Include="Content\Images\user_manual\Team3a.PNG" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -677,7 +679,6 @@
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="Content\Uploads\emblems\0.png" />
-    <Content Include="Content\Video\SampleVideo_1280x720_1mb.mp4" />
     <Content Include="Content\Video\team_change_position.mp4" />
     <Content Include="Content\Video\team_change_position.ogg" />
     <Content Include="Content\Video\team_substitute.mp4" />
