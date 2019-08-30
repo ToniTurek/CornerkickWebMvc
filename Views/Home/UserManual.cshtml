@@ -191,10 +191,12 @@ Es gibt zwei Menüs um die Position deiner Spieler festzulegen: Die Formation un
   <li>
     <u style="font-size: 18px">Offensive</u><br />
     Im Menü Offensive kann die Position deiner Spieler bei eigenem Ballbesitz festgelegt werden. Basis hierfür ist die Positionierung in der defensiven Formation.<br />
-    <u>Offensive Ausrichtung</u><br />
+    <u id="uTeamOrientation">Generelle offensive Ausrichtung</u><br />
+    Über den rechten Regler kann die Taktikeinstellung 'Ausrichtung' angepasst und deren Auswirkung auf die generelle offensive Positionierung der Spieler beobachtet werden.<br />
+    <u>Individuelle offensive Ausrichtung</u><br />
     Nach klicken auf ein Spielersymbol kann durch den links erscheinenden Regler die individuelle offensive Ausrichtung des Spielers angepasst werden.<br />
     <u>Positionstreue</u><br />
-    Die gelben Rechtecke um den Spieler repräsentieren die Positionstreue des Spielers. Die jeweiligen Zahlen in der oberen linken Ecke der Rechtecke geben an, zu wieviel Prozent sich der Spieler bei Ballbesitz innerhalb dieser Rechtecke aufhält. Die Dimensionen der Rechtecke können über die horizontalen und vertikalen Pfeile geändert werden.<br />
+    Die gelben Rechtecke um den Spieler repräsentieren die Positionstreue des Spielers. Die Zahlen in der oberen linken Ecke der Rechtecke geben an, zu wieviel Prozent sich der Spieler bei Ballbesitz innerhalb des jeweiligen Rechtecks aufhalten wird. Die Dimensionen der Rechtecke können über die horizontalen und vertikalen Pfeile geändert werden.<br />
     <img width="500" src="~/Content/Images/user_manual/Team3a.PNG" />
   </li>
 </ul>
@@ -208,7 +210,44 @@ Im folgenden Video wird gezeigt, wie ein Spieler durch einen anderen ersetzt wir
 </video>
 
 <h3 id="h3Tactic">Taktik</h3>
-tbd
+Folgende taktische Einstellungen stehen zur Verfügung:
+<ul>
+  <li>
+    <u id="uTacticOrientation">Ausrichtung</u><br />
+    Die Ausrichtung verändert die generelle Positionierung der Spieler bei Ballbesitz (s. auch <a href="#uTeamOrientation">Generelle offensive Ausrichtung</a>).
+  </li>
+  <li>
+    <u id="uTacticPower">Einsatz</u><br />
+    Bei hohem Einsatz legen die Spieler mehr Schritte pro Runde zurück. Je mehr sich die Anzahl der zurück gelegten Schritte der maximal möglichen Schrittzahl annähert, desto mehr Frische wird verbraucht.
+  </li>
+  <li>
+    <u>Aggresivität</u><br />
+    Je höher die Aggresivität eingestellt ist, desto eher werden Zweikämpfe gewonnen. Gleichzeitig steigt aber auch das Risiko für Fouls und Karten.
+  </li>
+  <li>
+    <u>Schusshäufigkeit</u><br />
+    Je näher der Regler vom Tor weg gezogen wird, desto höher ist die Wahrscheinlichkeit eines Torschusses im Spiel.
+  </li>
+  <li>
+    <u>Passlänge</u><br />
+  </li>
+  <li>
+    <u>Passrisiko</u><br />
+    Je höher das Passrisiko, desto eher wird der Pass nach vorne gesucht und desto weiter wird der Ball in den Lauf des Spielers gespielt.
+  </li>
+  <li>
+    <u>Passhäufigkeit</u><br />
+  </li>
+  <li>
+    <u>Über links</u><br />
+    Je höher dieser Wert, desto eher entscheidet sich ein Spieler beim Abspiel für einen Pass ins linke Drittel des Spielfeldes.
+  </li>
+  <li>
+    <u>Über rechts</u><br />
+    Je höher dieser Wert, desto eher entscheidet sich ein Spieler beim Abspiel für einen Pass ins rechte Drittel des Spielfeldes.
+  </li>
+</ul>
+
 <h3 id="h3Training">Mannschaftstraining</h3>
 <p>Durch das Mannschaftstraining kann zum einen die körperliche Verfassung der Spieler (<a href="#uPlayerCondi">Kondition</a> und <a href="#uPlayerFresh">Frische</a>) gesteuert werden, zum anderen werden die <a href="#h3PlayerSkills">individuellen Fähigkeiten</a> der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.</p>
 Die folgende Tabelle gibt qualitativ an, wie die Fitness und die Moral der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:
@@ -389,10 +428,10 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   <ul>
     <li>
       <u>Schnelligkeit</u><br />
-      Der Wert der Schnelligkeit eines Spielers gibt die maximale Anzahl von Schritten pro Spielzug an. Der Wert wird im Spiel reduziert durch die aktuelle Frische des Spielers, die Taktikeinstellung Einsatz sowie das Führen des Balles abhängig von der Technik des Spielers.
+      Der Wert der Schnelligkeit eines Spielers gibt die maximale Anzahl von Schritten pro Spielzug an. Der Wert wird im Spiel reduziert durch die aktuelle Frische des Spielers, die Taktikeinstellung <a href="#uTacticPower">Einsatz</a> sowie das Führen des Balles abhängig von der <a href="#uPlayerSkillsTechnic">Technik</a> des Spielers.
     </li>
     <li>
-      <u>Technik</u><br />
+      <u id="uPlayerSkillsTechnic">Technik</u><br />
       Der Wert der Technik eines Spielers beeinflusst die Fähigkeit Pässe und Flanken anzunehmen, d.h. je höher die Technik eines Spielers desto geringer ist das Risiko, dass der Ball bei der Annahme eines Passes/einer Flanke verspringt.
       Zudem verringert eine höhere Technik den Malus auf die Schnelligkeit eines Spielers, wenn dieser den Ball führt.
     </li>
