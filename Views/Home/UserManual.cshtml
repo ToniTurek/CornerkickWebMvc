@@ -503,7 +503,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   <ul>
     <li>
       <u>Co-Trainer</u><br />
-      Je besser der Co-Trainer, desto wahrscheinlicher entwickeln sich die Fähigkeiten der Spieler.
+      Je besser der Co-Trainer, desto wahrscheinlicher entwickeln sich die <a href="#h3PlayerSkills">Fähigkeiten</a> der Spieler.
     </li>
     <li>
       <u>Konditionstrainer</u><br />
@@ -519,15 +519,15 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       <u>Teamarzt</u><br />
-      Je besser der Teamarzt, desto kürzer sind die Verletzungszeiten der Spieler.
+      Je besser der Teamarzt, desto kürzer sind die Verletzungszeiten deiner Spieler.
     </li>
     <li>
       <u>Jugendtrainer</u><br />
-      Je besser der Jugendtrainer, desto wahrscheinlicher entwickeln sich die Fähigkeiten der Jugendspieler.
+      Je besser der Jugendtrainer, desto wahrscheinlicher entwickeln sich die <a href="#h3PlayerSkills">Fähigkeiten</a> der Jugendspieler.
     </li>
     <li>
       <u>Jugendscout</u><br />
-      Je besser der Jugendscout, desto wahrscheinlicher schließt sich ein neuer Jugendspieler dem Verein an.
+      Je besser der Jugendscout, desto wahrscheinlicher schließt sich ein neuer Jugendspieler deinem Verein an.
     </li>
     <li>
       <u id="uKibitzer">Spielbeobachter</u><br />
@@ -548,7 +548,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     Die Baukosten der Blöcke des Oberrings erhöhen sich um 50%. Untere Blöcke können nur noch bis zur Kapazität (abhängig vom Blocktyp) des größen Blocks des Unterings ausgebaut werden.
   </div>
 
-  <h4>Stadionausstattung</h4>
+  <h4 id="h4StadiumExtras">Stadionausstattung</h4>
   @{
     string sSnackbar = (400f / CornerkickManager.Stadium.iFeatureSpecReqSnackbar).ToString("0.0");
     string sToilets = (400f / CornerkickManager.Stadium.iFeatureSpecReqToilets).ToString("0.0");
@@ -563,5 +563,25 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     <li>Parkplätze (@sCarpark)</li>
   </ul>
   Mit anderen Worten: @sCarpark Parkplätze genügen für 10.000 Stehplatz-, 8.000 Sitzplatz- und 400 VIP Zuschauer. Sind keine vorhanden reduziert sich die Anzahl der potentiellen Zuschauer um 25%.
-</div>
 
+  <h3>Vereinsgelände</h3>
+  Auf dem Vereinsgelände können verschiedene Gebäudetypen (aus-)gebaut werden:
+  <ul>
+    <li>
+      <u>Trainingsgelände</u><br />
+      Jedes zusätzliche Level des Trainingsgeländes erhöht die Wahrscheinlichkeit der Weiterentwicklung der <a href="#h3PlayerSkills">Spielerfähigkeiten</a> deiner Profispieler.
+    </li>
+    <li>
+      <u>Jugendinternat</u><br />
+      Jedes zusätzliche Level des Jugendinternats erhöht die Wahrscheinlichkeit der Weiterentwicklung der <a href="#h3PlayerSkills">Spielerfähigkeiten</a> deiner Jugendspieler.
+    </li>
+    <li>
+      <u>Parkplätze</u><br />
+      siehe <a href="#h4StadiumExtras">Stadionausstattung</a>
+    </li>
+    <li>
+      <u>Ticketschalter</u><br />
+      siehe <a href="#h4StadiumExtras">Stadionausstattung</a>
+    </li>
+  </ul>
+</div>
