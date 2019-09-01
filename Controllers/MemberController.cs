@@ -2517,6 +2517,24 @@ namespace CornerkickWebMvc.Controllers
       return Json(fRet, JsonRequestBehavior.AllowGet);
     }
 
+    public ActionResult TacticSetOffsite(bool bOffsite)
+    {
+      CornerkickManager.User usr = ckUser();
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.tactic.bOffsite = bOffsite;
+
+      if (usr.game != null) {
+        if (!usr.game.data.bFinished) {
+          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].tc = clb.tactic;
+          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].tc = clb.tactic;
+        }
+      }
+
+      return Json(null, JsonRequestBehavior.AllowGet);
+    }
+
     public ActionResult setStandards(int iStandard, int iIndexPlayer)
     {
       CornerkickManager.User usr = ckUser();

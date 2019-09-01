@@ -97,6 +97,14 @@
     #slider-Schussentf .ui-slider-handle {
       border-color: red;
     }
+
+    #slider-DistOffence .ui-slider-range {
+      background: blue;
+    }
+
+    #slider-DistOffence .ui-slider-handle {
+      border-color: blue;
+    }
   </style>
 
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
@@ -341,6 +349,15 @@
         }
       });
 
+      $('#cbTcOffsite').click(function () {
+        $.ajax({
+          url: '/Member/TacticSetOffsite',
+          type: "GET",
+          dataType: "JSON",
+          data: { bOffsite: $(this).is(':checked') }
+        });
+      });
+
       setInputs();
 
       createAutoSubs(0);
@@ -450,6 +467,7 @@
       var divTcPassLength         = document.getElementById("divTcPassLength");
       var divTcPassRisk           = document.getElementById("divTcPassRisk");
       var divTcPassFreq           = document.getElementById("divTcPassFreq");
+      var divTcOffsite            = document.getElementById("divTcOffsite");
       var divTcSubs               = document.getElementById("divTcSubs");
 
       var fWidth = $(window).width();
@@ -458,12 +476,15 @@
         divTcPassLeft.style.top = "10px";
         divTcPassRight.style.top = "10px";
         divTcPassMid.style.top = "10px";
+        divTcShootDist.style.left = "64%";
+        divTcShootDist.style.transform = "rotate(0deg)";
 
         divTcPower.style.top = "330px";
         divTcDuel.style.top = "372px";
         divTcPassLength.style.top = "414px";
         divTcPassRisk.style.top = "456px";
         divTcPassFreq.style.top = "498px";
+        divTcOffsite.style.top = "540px";
 
         divTcPower.style.left = "10px";
         divTcDuel.style.left = "10px";
@@ -471,13 +492,15 @@
         divTcPassRisk.style.left = "10px";
         divTcPassFreq.style.left = "10px";
 
-        divTcSubs.style.top = "560px";
+
+        divTcSubs.style.top = "600px";
         divTcSubs.style.left = "10px";
       }
       else {
         divTcOrientation.style.top = "12%";
         divTcOffsiteDistOffence.style.top = "20%";
-        divTcShootDist.style.top = "2%";
+        divTcShootDist.style.left = "58%";
+        divTcShootDist.style.transform = "rotate(-23deg)";
         divTcPassLeft.style.top = "12%";
         divTcPassRight.style.top = "12%";
         divTcPassMid.style.top = "12%";
@@ -493,6 +516,8 @@
         divTcPassLength.style.left = "55%";
         divTcPassRisk.style.left = "55%";
         divTcPassFreq.style.left = "55%";
+
+        divTcOffsite.style.top = "64%";
 
         divTcSubs.style.top = "73%";
         divTcSubs.style.left = "20%";
@@ -540,7 +565,7 @@
             <div id="slider-DistOffence" style="position: relative; float: left; height: 100%"></div>
           </div>
 
-          <div id="divTcShootDist" style="position: absolute; width: 0%; height: 25%; min-height: 300px; top: 2%; left: 65%">
+          <div id="divTcShootDist" style="position: absolute; width: 0%; height: 25%; min-height: 300px; top: 2%; left: 58%; transform:rotate(-23deg)">
             <p>
               <input type="text" id="inputSchussentf" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
             </p>
@@ -580,6 +605,13 @@
               <input type="text" id="inputZweikampf" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
             </p>
             <div id="slider-Zweikampf" style="position: relative; float: left"></div>
+          </div>
+
+          <div id="divTcOffsite" style="position: absolute; width: 40%; min-width: 300px; top: 64%; left: 5%; text-align: center">
+            <label style="width: 100%; background-color: white; font-size: 32px; color: blue; font-family: 'MV Boli'">
+              @Html.CheckBoxFor(m => m.tactic.bOffsite, new { id = "cbTcOffsite" })
+              Abseitsfalle
+            </label>
           </div>
 
           <div id="divTcPassLength" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 55%">
