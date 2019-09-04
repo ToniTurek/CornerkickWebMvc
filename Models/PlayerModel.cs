@@ -25,6 +25,8 @@ namespace CornerkickWebMvc.Models
     // Contract
     [Display(Name = "zusätzl. Laufzeit [a]:")]
     public int iContractYears { get; set; }
+    [Display(Name = "Gebotenes Gehalt:")]
+    public int iContractSalaryOffer { get; set; }
 
     public string sName { get; set; }
 

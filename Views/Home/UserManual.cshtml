@@ -11,8 +11,8 @@
   <meta name="viewport" content="width=device-width" />
   <title>Index</title>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
-  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
   <style>
     .ckLink {
       position: relative;
@@ -20,6 +20,7 @@
       width: 0px;
       height: 0px;
     }
+
     .ckLinkLarge {
       position: relative;
       top: -68px;
@@ -144,6 +145,11 @@
 </body>
 </html>
 
+<h2>Einleitung</h2>
+Cornerkick ist eine sequentiell ablaufende Fußballmanagersimulation. Mit jeder Sequenz schreitet die Zeit in Cornerkick 15 Minuten voran. Ein neuer Zeitschritt erfolgt dabei alle 2:08 Minuten in realer Zeit. Das bedeutet, dass die Zeit in Cornerkick 7 mal schneller abläuft als die reale Zeit. Somit entspricht eine Woche Cornerkick-Zeit exakt 24h realer Zeit. Ligaspiele, samstags um 15:30 finden somit stets Abends statt.<br />
+Zu Beginn des Spiels (Saisonstart) ist das Spiel pausiert. Du kannst dich somit in Ruhe in deinem Verein umsehen, deine Mannschaft kennen lernen, das Training festlegen usw. (s. <a href="#h2FirstSteps">Erste Schritte</a>)
+
+<div id="h2FirstSteps" class="ckLink"></div>
 <h2>Erste Schritte</h2>
 Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 <ul>
@@ -247,6 +253,7 @@ Folgende taktische Einstellungen stehen zur Verfügung:
   </li>
   <li>
     <u>Passlänge</u><br />
+    Je weiter die Passlänge eingestellt ist, desto eher wird ein entfernter Mitspieler angespielt und umgekehrt.
   </li>
   <li>
     <u>Passrisiko</u><br />
@@ -254,6 +261,7 @@ Folgende taktische Einstellungen stehen zur Verfügung:
   </li>
   <li>
     <u>Passhäufigkeit</u><br />
+    Je höher die Passhäufigkeit eingestellt ist, desto häufiger wird sich der Spieler für einen Pass und gegen ein Dribbling oder einen Torschuss entscheiden.
   </li>
   <li>
     <u>Über links</u><br />
@@ -520,6 +528,19 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   </ul>
 
   <h2>Verein</h2>
+  
+  <div id="h3Finance" class="ckLink"></div>
+  <h3>Finanzen</h3>
+  Zu Beginn einer Saison kannst du eine Finanzplanung aufstellen. Somit bekommst du einen Überblick, wieviel Geld dir während der Saison zur Verfügung steht um neue Spieler zu kaufen oder das Stadion auszubauen. Ebenso können hier die Stadioneintrittspreise festgelegt werden.
+  <div id="h4SecretMoney" class="ckLink"></div>
+  <h4>Schwarzgeld</h4>
+  Ein bestimmter Prozentsatz der Zuschauereinnahmen kann in deine schwarze Kasse umgeleitet werden. Mit dem Schwarzgeld kannst du anschließend deine Spieler dopen (s. <a href="#h4CFM">K/F/M</a>), den Schiedsrichter des nächsten Spiels <a href="#h2PreviewGame">bestechen</a> oder bei einem <a href="#h3Transfer">Transfer</a> ein Handgeld bezahlen.
+  
+  <div id="h3Sponsors" class="ckLink"></div>
+  <h3>Sponsoren</h3>
+  Spondoren sind eine wichtige Einnahmequelle. Es gibt zwei verschiedene Arten von Sponsoren: ein Hauptsponsor und Bandenwerbung. Hauptsponsor bieten dir einen einmaligen Sockelbetrag und erfolgsabhängige Leistungen an, während Bandenwerbungen bei jedem Heimspiel Geld generieren.<br />
+  Zu Beginn des Spiels hast du nur ein Angebot eines Hauptsponsors. Mit fortschreitender Spieldauer wirst du aber weitere Angebote bekommen, die (abhängig von deinem Tabellenplatz) durchaus lukrativer sein können. Es lohnt sich also, hier hin und wieder mal vorbei zu schauen.
+
   <div id="h3Staff" class="ckLink"></div>
   <h3>Personal</h3>
   <ul>
@@ -608,3 +629,13 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
   </ul>
 </div>
+
+<div id="h2PreviewGame" class="ckLink"></div>
+<h2>Spielvorschau</h2>
+Die Spielvorschau lässt sich vom Hauptmenü über den link unter "Nächstes Spiel" öffnen. Dort sind alle Details zum nächsten Spiel zusammengefasst.<br />
+Zudem kann hier der Schiedsrichter des nächsten Spiels mit <a href="#h4SecretMoney">Schwarzgeld</a> bestochen werden. Abhängig von der Summe die Sie ihm bezahlen (und der Summe die Ihr Gegner im bezahlt), wird er bis zu maximal 20% Fehlentscheidungen (bei einer Bestechungssumme von 100.000€) zu Ihren Gunsten treffen.
+
+<h2>Büro</h2>
+<div id="h3Transfer" class="ckLink"></div>
+<h3>Transfermarkt</h3>
+<h3>Live-Spiel</h3>
