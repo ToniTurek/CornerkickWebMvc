@@ -15,15 +15,13 @@
 
   <script type="text/javascript">
     $(document).ready(function () {
-      bnTakeJouth = document.getElementById("bnTakeJouth");
-      bnTakeJouth.disabled = true;
-
       var jTable = $('#tableJouth').DataTable({
         "pageLength": 50,
         "paging": false,
         "info": false,
         "responsive": true,
         "searching": false,
+        "order": [[5, "desc"]],
         columnDefs: [
           {
             targets: 0,
@@ -31,40 +29,6 @@
             "searchable": false
           }
         ]
-      });
-
-      $('#tableJouth tbody').on('click', 'tr', function () {
-        if ($(this).hasClass('selected')) {
-          $(this).removeClass('selected');
-          bnTakeJouth.disabled = true;
-        } else {
-          jTable.$('tr.selected').removeClass('selected');
-          $(this).addClass('selected');
-
-          var data = jTable.row('.selected').data();
-          if (data) {
-            if (data[6] > 16) {
-              bnTakeJouth.disabled = false;
-            }
-          }
-        }
-      });
-
-      $("#bnTakeJouth").click(function () {
-        var data = jTable.row('.selected').data();
-        if (data) {
-          var iId = data[0];
-          //table.row('.selected').remove().draw(false);
-          $.ajax({
-            type: 'post',
-            url: '/Member/TakeJouth',
-            dataType: "json",
-            data: { iJouthID: iId },
-            success: function () {
-              window.location.reload(true);
-            }
-          });
-        }
       });
     });
   </script>
@@ -80,8 +44,8 @@
       <th>Position</th>
       <th>Stärke</th>
       <th>Talent</th>
-      <th>Nat.</th>
       <th>Alter</th>
+      <th>Nat.</th>
     </tr>
   </thead>
   <tbody>
@@ -93,12 +57,10 @@
           <td align="center">@MvcApplication.ckcore.plr.getStrPos(plJouth)</td>
           <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(plJouth).ToString("0.0")</td>
           <td align="center">@(plJouth.iTalent + 1)</td>
+          <td align="center">@((int)plJouth.getAge(MvcApplication.ckcore.dtDatum))</td>
           <td align="center">@MvcApplication.ckcore.sLandShort[plJouth.iNat1]</td>
-          <td align="center">@plJouth.getAge(MvcApplication.ckcore.dtDatum).ToString("0")</td>
         </tr>
       }
     }
   </tbody>
 </table>
-
-<button type="submit" id="bnTakeJouth" class="btn btn-default" style="width: 100%; margin-top: 6px">zu Mannschaft hochziehen</button>

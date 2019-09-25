@@ -499,7 +499,7 @@
           </tr>
           <tr>
             <td align="right">Geburtsdatum:</td>
-            <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"))</td>
+            <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@((int)player.getAge(MvcApplication.ckcore.dtDatum)))</td>
           </tr>
           <tr>
             <td align="right">Körpergröße/-gewicht:</td>

@@ -1476,6 +1476,7 @@ namespace CornerkickWebMvc.Controllers
       plModel.bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(club, plDetails);
       if (plDetails.iClubId >= 0 && plDetails.iClubId < MvcApplication.ckcore.ltClubs.Count) {
         plModel.bJouth = MvcApplication.ckcore.ltClubs[plDetails.iClubId].ltPlayerJouth.IndexOf(plDetails) >= 0;
+        plModel.bJouthBelow16 = plDetails.getAge(MvcApplication.ckcore.dtDatum) < 16;
       }
 
       plModel.bNation = club.bNation;
