@@ -557,9 +557,11 @@
     <Content Include="Content\Icons\flags\GEO.png" />
     <Content Include="Content\Icons\flags\GER.png" />
     <Content Include="Content\Icons\flags\GHA.png" />
+    <Content Include="Content\Icons\flags\GIN.png" />
     <Content Include="Content\Icons\flags\GRE.png" />
     <Content Include="Content\Icons\flags\HON.png" />
     <Content Include="Content\Icons\flags\ISL.png" />
+    <Content Include="Content\Icons\flags\ISR.png" />
     <Content Include="Content\Icons\flags\ITA.png" />
     <Content Include="Content\Icons\flags\JAM.png" />
     <Content Include="Content\Icons\flags\JPN.png" />
