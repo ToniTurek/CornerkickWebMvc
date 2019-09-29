@@ -980,7 +980,6 @@
     <Content Include="Views\Member\ConsoleInput.cshtml" />
     <Content Include="Views\Member\League.cshtml" />
     <Content Include="Views\Member\Team.cshtml" />
-    <Content Include="Views\Member\_PartialViewTest.cshtml" />
     <Content Include="Views\Member\Calendar.cshtml" />
     <Content Include="Views\Member\PlayerDetails.cshtml" />
     <Content Include="Views\Member\Training.cshtml" />
