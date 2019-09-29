@@ -4689,6 +4689,8 @@ namespace CornerkickWebMvc.Controllers
       tD.ltPlayerAge      = new List<string>();
       tD.ltPlayerNat      = new List<string>();
 
+      tD.formation = MvcApplication.ckcore.ltFormationen[iF];
+
       for (byte iP = 0; iP < 11; iP++) {
         float fStrength = 0f;
         tD.ltPlayer        .Add(null);
@@ -4706,14 +4708,16 @@ namespace CornerkickWebMvc.Controllers
           if (iNat >= 0 && pl.iNat1 != iNat) continue;
 
           // Check if same player already in same role
-          bool bSame = false;
-          foreach (CornerkickGame.Player plSame in tD.ltPlayer) {
-            if (plSame != null && plSame.iId == pl.iId && plSame.fExperiencePos[iPos] > 0.999) {
-              bSame = true;
-              break;
+          if (iPos > 0) {
+            bool bSame = false;
+            foreach (CornerkickGame.Player plSame in tD.ltPlayer) {
+              if (plSame != null && plSame.iId == pl.iId && plSame.fExperiencePos[iPos - 1] > 0.999) {
+                bSame = true;
+                break;
+              }
             }
+            if (bSame) continue;
           }
-          if (bSame) continue;
 
           float fStrengthTmp = MvcApplication.ckcore.game.tl.getAveSkill(pl, iPos);
           if (fStrengthTmp > fStrength) {

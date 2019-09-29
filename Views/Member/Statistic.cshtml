@@ -55,13 +55,11 @@
           if (teamData) { // check if data is defined
             var bMobile = $(window).width() < 960;
             var result = "";
-            var i = 0;
             var drawFormation = $("#drawFormation");
 
-            $.each(teamData.ltPlayer, function (j, player) {
-              result += getBoxFormation(player, i, player.sName, player.iNr.toString(), teamData.ltPlayerAveSkill[i], false, -1, teamData.ltPlayerPos[i], bMobile, 0.5, teamData.ltPlayerTeamname[i], teamData.ltPlayerAge[i], teamData.ltPlayerNat[i]);
+            $.each(teamData.ltPlayer, function (i, player) {
+              result += getBoxFormation(i, teamData.formation.ptPos[i], player.sName, player.iNr.toString(), teamData.ltPlayerAveSkill[i], false, false, -1, teamData.ltPlayerPos[i], bMobile, 0.5, teamData.ltPlayerTeamname[i], teamData.ltPlayerAge[i], teamData.ltPlayerNat[i]);
 
-              i = i + 1;
               return i !== 11;
             });
 
