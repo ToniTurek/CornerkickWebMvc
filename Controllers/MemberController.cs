@@ -2453,7 +2453,7 @@ namespace CornerkickWebMvc.Controllers
           if (clb.ltPlayer.Count <= iPl) break;
 
           CornerkickGame.Player pl = clb.ltPlayer[iPl];
-          tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = pl.sName, Value = iPl.ToString(), Selected = iPl == clb.tactic.iStandards[iS] });
+          tactic.ltDdlStandards[iS].Add(new SelectListItem { Text = pl.sName, Value = iPl.ToString(), Selected = iPl == clb.iStandards[iS] });
         }
       }
 
@@ -2536,13 +2536,13 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.tactic.iStandards[iStandard] = iIndexPlayer;
+      clb.iStandards[iStandard] = iIndexPlayer;
 
       // Set tactic of current game
       if (usr.game != null) {
         if (!usr.game.data.bFinished) {
-          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].tc = clb.tactic;
-          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].tc = clb.tactic;
+          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].ltTactic[0] = clb.ltTactic[0];
+          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].ltTactic[0] = clb.ltTactic[0];
         }
       }
 
@@ -2573,8 +2573,8 @@ namespace CornerkickWebMvc.Controllers
           CornerkickGame.Player pl = clb.ltPlayer[iPl];
 
           bool bSelected = false;
-          if (iAS < clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count) {
-            if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0] || iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1]) bSelected = true;
+          if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) {
+            if (iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][0] || iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][1]) bSelected = true;
           }
 
           string sPos = "";
@@ -2594,7 +2594,7 @@ namespace CornerkickWebMvc.Controllers
         }
 
         tactic.iAutoSubsMin[iAS] = 60;
-        if (iAS < clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count) tactic.iAutoSubsMin[iAS] = clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][2];
+        if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) tactic.iAutoSubsMin[iAS] = clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][2];
       }
     }
 
@@ -2636,18 +2636,18 @@ namespace CornerkickWebMvc.Controllers
         bool bContinue = false;
         byte jAS = 0;
         while (jAS < iAS) {
-          if ( bOut && iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[jAS][0]) bContinue = true;
-          if (!bOut && iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[jAS][1]) bContinue = true;
+          if ( bOut && iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[jAS][0]) bContinue = true;
+          if (!bOut && iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[jAS][1]) bContinue = true;
           jAS++;
         }
         if (bContinue) continue;
 
         string sSelectedO = "";
         string sSelectedI = "";
-        if (iAS < clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count) {
-          if (clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1] > clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0]) {
-            if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0]) sSelectedO = " selected=\"selected\"";
-            if (iPl == clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1]) sSelectedI = " selected=\"selected\"";
+        if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) {
+          if (clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][1] > clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][0]) {
+            if (iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][0]) sSelectedO = " selected=\"selected\"";
+            if (iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][1]) sSelectedI = " selected=\"selected\"";
           }
         }
 
@@ -2676,23 +2676,23 @@ namespace CornerkickWebMvc.Controllers
       byte iHA = 0;
       if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
 
-      while (clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Count <= iAS) clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned.Add(new byte[3] { 0, 0, 0 });
+      while (clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count <= iAS) clb.nextGame.team[iHA].ltSubstitutionsPlanned.Add(new byte[3] { 0, 0, 0 });
 
       if (iIndexPlayerOut < 0 || iIndexPlayerIn < 0) {
         iIndexPlayerOut = 0;
         iIndexPlayerIn  = 0;
       }
-      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][0] = (byte)iIndexPlayerOut;
-      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][1] = (byte)iIndexPlayerIn;
-      clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[iAS][2] = iMin;
+      clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][0] = (byte)iIndexPlayerOut;
+      clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][1] = (byte)iIndexPlayerIn;
+      clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][2] = iMin;
 
       bool bValid = iIndexPlayerOut >= 0 && iIndexPlayerIn >= 0 && iIndexPlayerOut != iIndexPlayerIn && iMin >= 0;
 
       if (!bValid) {
         int jAS = iAS + 1;
         while (jAS < 3) {
-          clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[jAS][0] = 0;
-          clb.nextGame.team[iHA].tc.ltSubstitutionsPlanned[jAS][1] = 0;
+          clb.nextGame.team[iHA].ltSubstitutionsPlanned[jAS][0] = 0;
+          clb.nextGame.team[iHA].ltSubstitutionsPlanned[jAS][1] = 0;
           jAS++;
         }
       }
