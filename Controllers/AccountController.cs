@@ -363,7 +363,7 @@ namespace CornerkickWebMvc.Controllers
       clb.iLand = iLand;
       clb.iDivision = iLiga;
 
-      MvcApplication.ckcore.tl.setFormationToClub(ref clb, MvcApplication.ckcore.ltFormationen[7]);
+      clb.ltTactic[0].formation = MvcApplication.ckcore.ltFormationen[7];
 
 #if DEBUG
       clb.training.iType[1] = 2;

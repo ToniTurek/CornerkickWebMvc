@@ -262,7 +262,7 @@ namespace CornerkickWebMvc
           clbNat.iId = MvcApplication.ckcore.ltClubs.Count;
           clbNat.sName = MvcApplication.ckcore.sLand[iN];
           clbNat.iLand = iN;
-          clbNat.formation = MvcApplication.ckcore.ltFormationen[8];
+          clbNat.ltTactic[0].formation = MvcApplication.ckcore.ltFormationen[8];
 
           MvcApplication.ckcore.ltClubs.Add(clbNat);
 

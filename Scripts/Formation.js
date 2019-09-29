@@ -25,7 +25,7 @@
             if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
               plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
 
-              var iPos = convertPosToPix(player.ptPosDefault.Y, 122 - player.ptPosDefault.X, -plOpp.ptPosDefault.Y, plOpp.ptPosDefault.X, document.getElementById("drawFormation"), false);
+              var iPos = convertPosToPix(teamData.formation.ptPos[i].Y, 122 - teamData.formation.ptPos[i].X, -teamData.formationOpp.ptPos[player.iIxManMarking].Y, teamData.formationOpp.ptPos[player.iIxManMarking].X, document.getElementById("drawFormation"), false);
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
@@ -34,7 +34,7 @@
               sNo = player.iNrNat.toString();
             }
 
-            result += getBoxFormation(player, i, player.sName, sNo, teamData.ltPlayerAveSkill[i], false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
+            result += getBoxFormation(i, teamData.formation.ptPos[i], player.sName, sNo, teamData.ltPlayerAveSkill[i], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
 
             i = i + 1;
             return i !== 11;
@@ -63,7 +63,7 @@
                 sOppNo = playerOpp.iNrNat.toString();
               }
 
-              result += getBoxFormation(playerOpp, i, sPlayerOppName, sOppNo, sPlayerOppAveSkill, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
+              result += getBoxFormation(i, teamData.formationOpp.ptPos[j], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
 
               i = i + 1;
               j = j + 1;
@@ -104,7 +104,7 @@
 
         if (iSelectedPlayer > 0 && iSelectedPlayer < 12) {
           if (document.getElementById("rbDefence").checked) {
-            result += getBoxMovePlayer(teamData.ltPlayer[iSelectedPlayer - 1]);
+            result += getBoxMovePlayer(teamData.formation.ptPos[iSelectedPlayer - 1]);
           }
         }
 
@@ -119,11 +119,9 @@
   });
 }
 
-function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
-  if (!player) {
-    return "";
-  }
-
+//function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
+function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended)
+{
   if (!iPos) {
     iPos = 0;
   }
@@ -135,8 +133,8 @@ function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelec
   var fHeightTot = 122 * fScale;
   var fHeightBox = 3.5 / fScale;
 
-  var iTop  = 100 - ((100 * player.ptPosDefault.X) / fHeightTot);
-  var iLeft = (100 * (player.ptPosDefault.Y + 25)) / 50;
+  var iTop  = 100 - ((100 * ptPos.X) / fHeightTot);
+  var iLeft = (100 * (ptPos.Y + 25)) / 50;
   if (bOpponentTeam) {
     iTop  = 100 - iTop;
     iLeft = 100 - iLeft;
@@ -161,7 +159,7 @@ function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelec
   } else if (bSuspended) {
     color  = "rgba(255, 30, 0, .3)";
     color2 = "rgba(0, 0, 0, .5)";
-  } else if (player.bYellowCard) {
+  } else if (bYellowCard) {
     color = "yellow";
   } else if (iSelectedPlayer >= 0 && i !== iSelectedPlayer) {
     color  = "rgba(255, 255, 255, .5)";
@@ -216,7 +214,7 @@ function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelec
   if (sAge) {
     sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</h2>';
   } else {
-    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + player.ptPosDefault.Y.toString() + '/' + player.ptPosDefault.X.toString() + '</h2>';
+    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</h2>';
   }
   sBox +=
         '</div>';
@@ -236,11 +234,11 @@ function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelec
   return sBox;
 }
 
-function getBoxMovePlayer(player) {
+function getBoxMovePlayer(ptPos) {
   // Total box width: 18%
-  var iTop = (100 - ((100 * player.ptPosDefault.X) / 122)) - 1.75;
-  var iLeft  = (100 *       (player.ptPosDefault.Y + 25))  / 50;
-  var iRight = (100 * (50 - (player.ptPosDefault.Y + 25))) / 50;
+  var iTop = (100 - ((100 * ptPos.X) / 122)) - 1.75;
+  var iLeft  = (100 *       (ptPos.Y + 25))  / 50;
+  var iRight = (100 * (50 - (ptPos.Y + 25))) / 50;
 
   var sBox = "";
 

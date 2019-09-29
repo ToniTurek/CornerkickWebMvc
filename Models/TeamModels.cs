@@ -42,6 +42,7 @@ namespace CornerkickWebMvc.Models
     {
       // Player details
       public List<CornerkickGame.Player> ltPlayer { get; set; }
+      public CornerkickGame.Tactic.Formation formation { get; set; }
       public List<byte> ltPlayerPos { get; set; }
       public List<string> ltPlayerAveSkill { get; set; }
       public List<string> ltPlayerTeamname { get; set; }
@@ -54,6 +55,7 @@ namespace CornerkickWebMvc.Models
       // Opponent player details
       public byte iKibitzer { get; set; }
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
+      public CornerkickGame.Tactic.Formation formationOpp { get; set; }
       public List<byte> ltPlayerOppPos { get; set; }
       public List<string> ltPlayerOppAveSkill { get; set; }
       public string sTeamOppAveSkill { get; set; }
