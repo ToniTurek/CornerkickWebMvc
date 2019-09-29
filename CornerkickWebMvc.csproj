@@ -635,7 +635,7 @@
     <Content Include="Content\Images\stadium\field.png" />
     <Content Include="Content\Images\stadium\field_full.png" />
     <Content Include="Content\Images\stadium\stadion_L.jpg" />
-    <Content Include="Content\Images\stadium\stadion_S.jpg" />
+    <Content Include="Content\Images\stadium\stadion_S.png" />
     <Content Include="Content\Images\stadium\stadium_surrounding.png" />
     <Content Include="Content\Images\tactic.png" />
     <Content Include="Content\Images\user_manual\Team0.PNG" />
