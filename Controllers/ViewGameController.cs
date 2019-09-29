@@ -177,17 +177,17 @@ namespace CornerkickWebMvc.Controllers
         string sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
 
         if (game.data.team[0].iTeamId >= 0 && game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
-          int iNationH = MvcApplication.ckcore.ltClubs[game.data.team[0].iTeamId].iLand;
           sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
           sEmblemDirHtml = "/Content/Icons/flags/";
-          sEmblemH = MvcApplication.ckcore.sLandShort[iNationH] + ".png";
+          int iNationH = MvcApplication.ckcore.ltClubs[game.data.team[0].iTeamId].iLand;
+          if (iNationH >= 0 && iNationH < MvcApplication.ckcore.sLandShort.Length) sEmblemH = MvcApplication.ckcore.sLandShort[iNationH] + ".png";
         }
 
         if (game.data.team[1].iTeamId >= 0 && game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
-          int iNationA = MvcApplication.ckcore.ltClubs[game.data.team[1].iTeamId].iLand;
           sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
           sEmblemDirHtml = "/Content/Icons/flags/";
-          sEmblemA = MvcApplication.ckcore.sLandShort[iNationA] + ".png";
+          int iNationA = MvcApplication.ckcore.ltClubs[game.data.team[1].iTeamId].iLand;
+          if (iNationA >= 0 && iNationA < MvcApplication.ckcore.sLandShort.Length) sEmblemA = MvcApplication.ckcore.sLandShort[iNationA] + ".png";
         }
 
         if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemH))) sEmblemH = "0.png";
