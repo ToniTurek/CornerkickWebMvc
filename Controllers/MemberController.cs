@@ -1940,78 +1940,24 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0)
+    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0)
     {
       if (iPlayerId < 0) return Json("Invalid player",                    JsonRequestBehavior.AllowGet);
       if (iYears    < 1) return Json("Invalid number of contract length", JsonRequestBehavior.AllowGet);
 
-      int iSalary = MvcApplication.ckcore.plr.getSalary(MvcApplication.ckcore.ltPlayer[iPlayerId], iYears);
-      double fMood = 1.0;
-
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickManager.Transfer.Offer offer = MvcApplication.ckcore.tr.getOffer(iPlayerId, club.iId);
+      int iGamesPerSeason = MvcApplication.ckcore.tl.getMatchdays(MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision), club);
 
-      // get already negotiated contract (salary)
-      if (offer != null) {
-        if (offer.contract.iLength == iYears) {
-          iSalary = offer.contract.iSalary;
-        } else {
-          double fFactorNego = offer.contract.iSalary / (double)MvcApplication.ckcore.plr.getSalary(MvcApplication.ckcore.ltPlayer[iPlayerId], offer.contract.iLength);
-          iSalary = (int)(iSalary * fFactorNego);
-        }
+      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason);
 
-        fMood = offer.contract.fMood;
-      } else { // new offer
-        offer = new CornerkickManager.Transfer.Offer();
-        offer.club = club;
-        offer.dt = MvcApplication.ckcore.dtDatum;
-        offer.contract.iLength = iYears;
-      }
-      /*
-      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ltTransfer) {
-        if (transfer.iPlayerId == iPlayerId) {
-          if (transfer.ltOffers == null) break;
-
-          foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
-            if (offer.iClubId == club.iId) {
-              iSalary = offer.contract.iSalary;
-              fMood   = offer.contract.fPlayerMood;
-
-              break;
-            }
-          }
-
-          break;
-        }
-      }
-      */
-
-      // negotiate
-      if (iSalaryOffer > 0) {
-        if (offer.contractOffered.iSalary > 0 && iSalaryOffer < offer.contractOffered.iSalary) {
-          fMood = -1f;
-        } else {
-          offer.contractOffered.iLength = iYears;
-          offer.contractOffered.iSalary = iSalaryOffer;
-          MvcApplication.ckcore.tl.negotiate(ref fMood, ref iSalary, iSalaryOffer);
-        }
-      }
-
-      if (fMood < 0.1) fMood = -1f; // negotiation cancelled
-
-      offer.contract.fMood   = (float)fMood;
-      offer.contract.iSalary = iSalary;
-
-      if (iSalaryOffer > 0) MvcApplication.ckcore.tr.addChangeOffer(iPlayerId, offer);
-
-      return Json(offer.contract, JsonRequestBehavior.AllowGet);
+      return Json(contract, JsonRequestBehavior.AllowGet);
     }
 
     // iMode: 0 - Extention, 1 - new contract
     [HttpPost]
-    public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sPlayerMood, int iMode)
+    public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sBonusPlay, string sBonusGoal, string sFixTransferFee, string sPlayerMood, int iMode)
     {
       // Initialize status code with ERROR
       Response.StatusCode = 1;
@@ -2019,15 +1965,23 @@ namespace CornerkickWebMvc.Controllers
       if (iId    < 0) return Json("Error", JsonRequestBehavior.AllowGet);
       if (iYears < 1) return Json("0",     JsonRequestBehavior.AllowGet);
 
-      // convert salary to int
-      sSalary = sSalary.Replace("€", string.Empty);
-      sSalary = sSalary.Replace(".", string.Empty);
-      sSalary = sSalary.Trim();
+      // Convert salary to int
+      int iSalary = convertCurrencyToInt(sSalary);
+      if (iSalary < 0) return Json("Error", JsonRequestBehavior.AllowGet);
 
-      int iSalary = 0;
-      if (!int.TryParse(sSalary, out iSalary)) return Json("Error", JsonRequestBehavior.AllowGet);
+      // Convert salary to int
+      int iBonusPlay = convertCurrencyToInt(sBonusPlay);
+      if (iBonusPlay < 0) return Json("Error", JsonRequestBehavior.AllowGet);
 
-      // convert player mood to double
+      // Convert salary to int
+      int iBonusGoal = convertCurrencyToInt(sBonusGoal);
+      if (iBonusGoal < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      // Convert salary to int
+      int iFixTransferFee = convertCurrencyToInt(sFixTransferFee);
+      if (iFixTransferFee < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      // Convert player mood to double
       sPlayerMood = sPlayerMood.Replace("%", string.Empty);
       sPlayerMood = sPlayerMood.Replace(".", string.Empty);
       sPlayerMood = sPlayerMood.Trim();
@@ -2043,6 +1997,9 @@ namespace CornerkickWebMvc.Controllers
 
         player.contract.iLength += (byte)iYears;
         player.contract.iSalary = iSalary;
+        player.contract.iPlay = iBonusPlay;
+        player.contract.iGoal = iBonusGoal;
+        player.contract.iFixTransferFee = iFixTransferFee;
         player.contract.fMood = fPlayerMood;
         MvcApplication.ckcore.ltPlayer[iId] = player;
 
@@ -2055,6 +2012,9 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Player.Contract contract = new CornerkickGame.Player.Contract();
         contract.iLength = (byte)iYears;
         contract.iSalary = iSalary;
+        contract.iPlay = iBonusPlay;
+        contract.iGoal = iBonusGoal;
+        contract.iFixTransferFee = iFixTransferFee;
         contract.fMood = fPlayerMood;
         offer.contract = contract;
         offer.club = ckClub();
@@ -2067,6 +2027,18 @@ namespace CornerkickWebMvc.Controllers
       Response.StatusCode = 200;
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
+    }
+
+    private int convertCurrencyToInt(string s)
+    {
+      s = s.Replace("€", string.Empty);
+      s = s.Replace(".", string.Empty);
+      s = s.Trim();
+
+      int i = 0;
+      if (!int.TryParse(s, out i)) return -99999;
+
+      return i;
     }
 
     [HttpPost]

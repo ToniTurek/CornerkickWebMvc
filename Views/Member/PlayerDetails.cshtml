@@ -454,6 +454,18 @@
             <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
           </tr>
           <tr>
+            <td align="right">Auflaufprämie:</td>
+            <td align="right">@player.contract.iPlay.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+          </tr>
+          <tr>
+            <td align="right">Torprämie:</td>
+            <td align="right">@player.contract.iGoal.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+          </tr>
+          <tr>
+            <td align="right">Fixe Ablöse:</td>
+            <td align="right">@player.contract.iFixTransferFee.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+          </tr>
+          <tr>
             @{
               string sDauer = player.contract.iLength.ToString() + " Jahre";
               if (Model.bJouth) {
@@ -568,7 +580,7 @@
       }
     </div>
 
-    <div id="divChartCFM" style="position: relative; height: 250px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
+    <div id="divChartCFM" style="position: relative; height: 310px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
   </div>
 
   @{
