@@ -21,6 +21,7 @@
         drawFormation.html('');
 
         if (document.getElementById("rbDefence").checked) {
+          // Defence view
           $.each(teamData.ltPlayer, function (iFormation, player) {
             if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
               plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
@@ -80,7 +81,7 @@
           // hide orientation slider on start
           divTacticOrientation   .style.display = 'none';
           divTacticIndOrientation.style.display = 'none';
-        } else {
+        } else { // Offence view
           // print radius of action
           if (iSelectedPlayer > 0 && iSelectedPlayer < 12) {
             result += teamData.sDivRoa;

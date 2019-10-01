@@ -1316,17 +1316,20 @@ namespace CornerkickWebMvc.Controllers
         if (iPl >= ltPlayer.Count) break;
 
         CornerkickGame.Player pl = ltPlayer[iPl];
+        if (pl == null) continue;
 
-        if (!MvcApplication.ckcore.game.tl.checkPlayerIsKeeper(pl)) continue;
+        CornerkickGame.Tactic tc = club.ltTactic[iTactic];
+
+        if (MvcApplication.ckcore.game.tl.getPosRole(tc.formation.ptPos[iPl]) == 1) continue; // If keeper --> continue
 
         float fHeight = 0.05f;
         if (bMobile) fHeight = 0.07f;
 
         float fWidth  = fHeight * (3f / 2f);
 
-        int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.ltTactic[iTactic].fOrientation);
+        int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(tc.formation.ptPos[iPl].X, pl, tc.fOrientation);
         float fTop  = 1f - (iXOffence / (float)MvcApplication.ckcore.game.ptPitch.X);
-        float fLeft = (club.ltTactic[iTactic].formation.ptPos[iPl].Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
+        float fLeft = (tc.formation.ptPos[iPl].Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
 
         fTop  -= fHeight / 2f;
         fLeft -= fWidth  / 2f;
@@ -1363,14 +1366,16 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player pl = club.ltPlayer[iPlayerIndex];
 
-      int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(pl, club.ltTactic[iTactic].fOrientation);
+      CornerkickGame.Tactic tc = club.ltTactic[iTactic];
+
+      int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation);
 
       for (double fRoa = 0.5; fRoa < 1.01; fRoa += 0.1) {
-        System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(pl, club.ltTactic[iTactic].fOrientation, +1, -1, fRoa, fRoa);
-        System.Drawing.Point ptRoaBR = MvcApplication.ckcore.game.tl.getRndPos(pl, club.ltTactic[iTactic].fOrientation, -1, +1, fRoa, fRoa);
+        System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation, +1, -1, fRoa, fRoa);
+        System.Drawing.Point ptRoaBR = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation, -1, +1, fRoa, fRoa);
 
         float fTopRoa  = 1f - ((iXOffence + ptRoaTL.X) / (float)MvcApplication.ckcore.game.ptPitch.X);
-        float fLeftRoa = (club.ltTactic[iTactic].formation.ptPos[iPlayerIndex].Y + ptRoaTL.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
+        float fLeftRoa = (tc.formation.ptPos[iPlayerIndex].Y + ptRoaTL.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
         float fHeightRoa = Math.Abs(ptRoaBR.X - ptRoaTL.X) / (float)     MvcApplication.ckcore.game.ptPitch.X;
         float fWidthRoa  = Math.Abs(ptRoaBR.Y - ptRoaTL.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
 
