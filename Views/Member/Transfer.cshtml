@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
   <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
@@ -75,12 +77,6 @@
       });
 
       $("#tbTransferFeeSecret").autoNumeric('init', {
-        aSep: '.',
-        aDec: ',',
-        mDec: '0'
-      });
-
-      $("#tbContractSalaryOffer").autoNumeric('init', {
         aSep: '.',
         aDec: ',',
         mDec: '0'
@@ -246,86 +242,13 @@
         var data = jTable.rows('.selected').data();
         if (data) {
           var iIdPl = data[0].playerId;
-          var iYears = $("#iContractYears").val();
-
-          $.when(getSalary(iIdPl, iYears, 0)).done(function (contract) {
-            if (contract.fMood < 0) {
-              alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
-            } else {
-              $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
-              setMoodText(contract.fMood);
-              $("#tbContractSalaryOffer").val(contract.iSalary.toLocaleString());
-              $("#iContractYears").val(contract.iLength.toString());
-
-              $("#dialogContract").dialog("open");
-            }
-          });
-        }
-      });
-
-      // Player contract
-      $("#iContractYears").keyup(function () {
-        var tbContractYears = document.getElementById("iContractYears");
-        var bnNegotiate = document.getElementById("bnNegotiate");
-
-        if ($(this).val() > 10) {
-          tbContractYears.style.backgroundColor = "red";
-          bnNegotiate.disabled = true;
-        } else {
-          tbContractYears.style.backgroundColor = "";
-          bnNegotiate.disabled = false;
-        }
-
-        var data = jTable.rows('.selected').data();
-        if (data) {
-          var iIdPl = data[0].playerId;
-
-          $.when(getSalary(iIdPl, $(this).val(), 0)).done(function (contract) {
-            $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
-            setMoodText(contract.fMood);
-            $("#tbContractSalaryOffer").val(contract.iSalary.toLocaleString());
-          });
-        }
-      });
-
-      $("#bnNegotiate").click(function () {
-        var data = jTable.rows('.selected').data();
-        if (data) {
-          var iIdPl        = data[0].playerId;
-          var iYears       = $("#iContractYears").val();
-          var iSalaryOffer = getIntFromString($("#tbContractSalaryOffer").val());
-
-          $.when(getSalary(iIdPl, iYears, iSalaryOffer)).done(function (contract) {
-            if (contract.fMood < 0) {
-              alert("Der Spieler hat die Vertragsverhandlungen abgebrochen!");
-              jTable.ajax.reload();
-
-              $("#dialogContract").dialog("close");
-            } else {
-              $("#txtContractMoney").html(contract.iSalary.toLocaleString() + " €");
-              setMoodText(contract.fMood);
-            }
-          });
+          getContractDialog(document.body, iIdPl, true);
         }
       });
 
       $("#bnCancelOffer").click(function () {
         cancelTransferOffer();
       });
-
-      function setMoodText(fMood) {
-        var txtContractMood = document.getElementById("txtContractMood");
-        var fMoodAdj = (fMood - 0.1) / 0.9;
-
-        txtContractMood.innerText = (fMoodAdj * 100).toFixed(0) + "%";
-        if (fMoodAdj > 0.5) {
-          txtContractMood.style.color = "green";
-        } else if (fMoodAdj > 0.25) {
-          txtContractMood.style.color = "orange";
-        } else {
-          txtContractMood.style.color = "red";
-        }
-      }
 
       function cancelTransferOffer() {
         var data = jTable.rows('.selected').data();
@@ -349,44 +272,6 @@
           });
         }
       }
-
-      $("#dialogContract").dialog({
-        autoOpen: false,
-        width: 400,
-        height: 300,
-        buttons: {
-          "Bestätigen": function () {
-            var data = jTable.rows('.selected').data();
-            if (data) {
-              var iId = data[0].playerId;
-              var iYears  = $("#iContractYears").val();
-              var sSalary = $("#txtContractMoney").text();
-              var sPlayerMood = $("#txtContractMood").text();
-
-              $.ajax({
-                url: "/Member/NegotiatePlayerContract",
-                type: 'POST',
-                traditional: true,
-                data: { iId: iId, iYears: iYears, sSalary: sSalary, sPlayerMood: sPlayerMood, iMode: 1 },
-                dataType: "json",
-                success: function (response) {
-                  //window.location.reload(true);
-                  alert(response);
-                  $("#dialogTransferFee").dialog("open");
-                },
-                error: function (xhr) {
-                  alert(xhr.responseText);
-                }
-              });
-            }
-
-            $(this).dialog("close");
-          },
-          Cancel: function () {
-            $(this).dialog("close");
-          }
-        }
-      });
 
       // Transfer Fee
       $("#dialogTransferFee").dialog({
@@ -508,36 +393,6 @@
 <button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%; margin-top: 6px">Spieler verpflichten</button>
 <button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot annehmen</button>
 <button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot zurückziehen</button>
-
-<div id="dialogContract" title="Vertragsverhandlung">
-  <div style="position: relative; width: 100%; height: 40px" class="form-group">
-    <div style="position: absolute; width: 48%; height: auto; top: 10px" align="right">
-      <b class="left">Laufzeit [a]: </b>
-    </div>
-    <div style="position: absolute; width: 48%; left: 52%" align="left">
-      @Html.EditorFor(Model => Model.iContractYears, new { htmlAttributes = new { @class = "form-control tbContractYears", @type = "number", @min = "1", @max = "10", @step = "1", @value = "1", @style = "text-align: right; width:60px", @autocomplete = "off" } })
-    </div>
-  </div>
-  <div style="position: relative; height: 90px">
-    <div style="position: absolute; width: 45%" align="center">
-      <b>Gefordertes Gehalt:</b>
-      <p id="txtContractMoney"></p>
-    </div>
-    <div style="position: absolute; left: 55%; width: 45%" class="form-group">
-      <div style="position: absolute; width: 100%; height: auto; top: 0px" align="center">
-        <b class="left">Gebotenes Gehalt:</b>
-      </div>
-      <div style="position: absolute; width: 100%; top: 20px" align="right">
-        @Html.EditorFor(Model => Model.iContractSalaryOffer, new { htmlAttributes = new { @id = "tbContractSalaryOffer", @class = "form-control tbContractSalaryOffer", @type = "tel", @min = "0", @step = "1000", @value = "0", @style = "text-align: right; width:100%", @autocomplete = "off" } })
-      </div>
-    </div>
-    <div style="position: absolute; width: 45%; top: 40px" align="center">
-      <b>Stimmung:</b>
-      <p id="txtContractMood"></p>
-    </div>
-  </div>
-  <button type="submit" id="bnNegotiate" class="btn btn-default" style="width: 100%">verhandeln</button>
-</div>
 
 <div id="dialogTransferFee" title="Ablöseverhandlungen">
   <div style="position: relative; width: 100%; height: 30px" class="form-group">
