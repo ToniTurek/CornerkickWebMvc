@@ -683,29 +683,31 @@
       </table>
     </div>
 
-    <div style="position: relative; width: auto; height: auto; float: left">
-      <table id="tblStatistic" border="1" cellpadding="4" style="width: auto">
-        <thead>
-          <tr>
-            <th align="center">
-              <label>
-                Saison
-                <input name="rBStatistic" id="rBStatisticSeason" onchange="drawStatistic(0)" type="radio" checked="checked" value="0">
-              </label>
-              <label>
-                Total
-                <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
-              </label>
-            </th>
-            <th align="center">Liga</th>
-            <th align="center">Pokal</th>
-            <th align="center">Int.</th>
-            <th align="center">Nat.</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+   @if (!Model.bJouth) {
+      <div style="position: relative; width: auto; height: auto; float: left">
+        <table id="tblStatistic" border="1" cellpadding="4" style="width: auto">
+          <thead>
+            <tr>
+              <th align="center">
+                <label>
+                  Saison
+                  <input name="rBStatistic" id="rBStatisticSeason" onchange="drawStatistic(0)" type="radio" checked="checked" value="0">
+                </label>
+                <label>
+                  Total
+                  <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
+                </label>
+              </th>
+              <th align="center">Liga</th>
+              <th align="center">Pokal</th>
+              <th align="center">Int.</th>
+              <th align="center">Nat.</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    }
   </div>
 </div>
 
