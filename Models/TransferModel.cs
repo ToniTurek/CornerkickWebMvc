@@ -72,6 +72,7 @@ namespace CornerkickWebMvc.Models
     public string talent { get; set; }
     public string club { get; set; }
     public string mw { get; set; }
+    public string fixtransferfee { get; set; }
     public string nat { get; set; }
     public string age { get; set; }
   }

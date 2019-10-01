@@ -2311,13 +2311,13 @@ namespace CornerkickWebMvc.Controllers
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth = false)
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth = false, bool bAll = false, bool bFixTransferFee = false)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
 
       int iTr = 0;
-      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist("", -1, iPos, -1f, 0, iFType, iFValue, bJouth)) {
+      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist("", -1, iPos, -1f, 0, iFType, iFValue, bJouth, bAll, bFixTransferFee)) {
         CornerkickManager.Club club = MvcApplication.ckcore.ltClubs[transfer.player.iClubId];
 
         string sClub = "vereinslos";
@@ -2333,12 +2333,18 @@ namespace CornerkickWebMvc.Controllers
           else if (MvcApplication.ckcore.plr.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
         }
 
+        string sDatePutOnTl = "-";
+        if (transfer.dt.Year > 1) sDatePutOnTl = transfer.dt.ToString("d", getCi());
+
+        string sFixTransferFee = "-";
+        if (transfer.player.contract.iFixTransferFee > 0) sFixTransferFee = transfer.player.contract.iFixTransferFee.ToString("N0", getCi());
+
         ltDeTransfer.Add(new Models.DatatableEntryTransfer {
           playerId = transfer.player.iId,
           empty = "",
           iOffer = iOffer,
           index = (iTr + 1).ToString(),
-          datum = transfer.dt.ToString("d", getCi()),
+          datum = sDatePutOnTl,
           name = transfer.player.sName,
           position = MvcApplication.ckcore.plr.getStrPos(transfer.player),
           strength = MvcApplication.ckcore.game.tl.getAveSkill(transfer.player, 0, true).ToString("0.0"),
@@ -2346,6 +2352,7 @@ namespace CornerkickWebMvc.Controllers
           age = transfer.player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
           talent = (transfer.player.iTalent + 1).ToString(),
           mw = (MvcApplication.ckcore.plr.getValue(transfer.player) * 1000).ToString("N0", getCi()),
+          fixtransferfee = sFixTransferFee,
           club = sClub,
           nat = MvcApplication.ckcore.sLandShort[transfer.player.iNat1]
         });

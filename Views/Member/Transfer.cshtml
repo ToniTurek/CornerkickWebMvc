@@ -91,6 +91,8 @@
             d.iFType  = $('#ddlFilterFType').val();
             d.iFValue = $('#ddlFilterF').val();
             d.bJouth  = document.getElementById("rbJouth").checked;
+            d.bAll = document.getElementById("rbAll").checked;
+            d.bFixTransferFee = document.getElementById("cbFixTransferFee").checked;
           }
         },
         "info": false,
@@ -136,8 +138,10 @@
           { "data": "age", "className": "dt-center" },
           { "data": "talent", "className": "dt-center" },
           { "data": "mw", "className": "dt-right" },
+          { "data": "fixtransferfee", "className": "dt-right" },
           {
             "data": "nat",
+            "className": "dt-center",
             "render": function (nat, type, row) {
               return getNatIcon(nat);
             }
@@ -174,6 +178,18 @@
         jTable.ajax.reload();
       });
 
+      $("#rbTransferlist").on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      $("#rbAll").on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      $("#cbFixTransferFee").on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+      
       // Select row
       $('#tableTransfer tbody').on('click', 'tr', function () {
         if ($(this).hasClass('selected')) {
@@ -334,23 +350,23 @@
 </head>
 
 <h3>Transferliste</h3>
-<div class="form-group" style="position: relative; width: 100%; border: 0px solid black">
-  <div style="position: relative; width: auto; float: left; left: 0%; margin-bottom: 1%">
-    <b class="left">Position:</b>
-    @Html.DropDownListFor(m => m.sFilterPos, Model.ltDdlFilterPos, new { @class = "form-control", id = "ddlFilterPos", @style = "width:80px" })
+<div class="form-group" style="position: relative; width: 100%">
+  <div align="center" style="position: relative; width: 170px; height: auto; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+    <form>
+      <fieldset>
+        <label style="font-size:100%; color: black; margin-right: 4%">
+          <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
+          Transferliste
+        </label>
+        <label style="font-size:100%; color: black">
+          <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
+          Alle
+        </label>
+      </fieldset>
+    </form>
   </div>
 
-  <div style="position: relative; width: auto; float: left; margin-left: 2%; margin-bottom: 1%">
-    <b class="left">Fähigkeit:</b>
-    @Html.DropDownListFor(m => m.sFilterFType, Model.ltDdlFilterFType, new { @class = "form-control", id = "ddlFilterFType", @style = "width:160px" })
-  </div>
-
-  <div style="position: relative; width: auto; float: left; margin-left: 1%; margin-bottom: 1%">
-    <b class="left">Wert:</b>
-    @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
-  </div>
-
-  <div style="position: relative; width: 150px; height: auto; float: left; margin-top: 2%; margin-left: 2%">
+  <div align="center" style="position: relative; width: 150px; height: auto; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
     <form>
       <fieldset>
         <label style="font-size:100%; color: black; margin-right: 4%">
@@ -363,6 +379,28 @@
         </label>
       </fieldset>
     </form>
+  </div>
+
+  <div style="position: relative; width: auto; float: left; margin-bottom: 10px; margin-right: 10px">
+    <b class="left">Position:</b>
+    @Html.DropDownListFor(m => m.sFilterPos, Model.ltDdlFilterPos, new { @class = "form-control", id = "ddlFilterPos", @style = "width:80px" })
+  </div>
+
+  <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
+    <b class="left">Fähigkeit:</b>
+    @Html.DropDownListFor(m => m.sFilterFType, Model.ltDdlFilterFType, new { @class = "form-control", id = "ddlFilterFType", @style = "width:160px" })
+  </div>
+
+  <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
+    <b class="left">Wert:</b>
+    @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
+  </div>
+
+  <div style="position: relative; width: auto; float: left; margin-top: 20px; margin-right: 10px; margin-bottom: 20px">
+    <label style="width: 100%; background-color: white">
+      <input id="cbFixTransferFee" type="checkbox" value="false">
+      Fixe Ablöse
+    </label>
   </div>
 </div>
 
@@ -382,6 +420,7 @@
       <th>Alter</th>
       <th>Talent</th>
       <th>Marktwert [€]</th>
+      <th>Fixe Ablöse [€]</th>
       <th>Nat.</th>
     </tr>
   </thead>
