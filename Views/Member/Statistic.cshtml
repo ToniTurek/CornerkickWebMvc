@@ -10,6 +10,9 @@
 <head>
   <meta name="viewport" content="width=device-width" />
   <title>Statistik</title>
+
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Formation.js"></script>
 
@@ -35,6 +38,51 @@
       });
 
       drawBest11();
+
+      var dtTeams = $('#tblTeams').DataTable({
+        "ajax": {
+          "url": '@Url.Action("StatisticGetTableTeams", "Member")',
+          "type": 'POST',
+          "data": function (d) {
+            d.iLand = $('#ddlStatLeagues').val();
+          }
+        },
+        "info": true,
+        "searching": true,
+        "paging": false,
+        "pageLength": 20,
+        "order": [[3, "desc"]],
+        "columns": [
+          { "data": "iIx", "className": "dt-center" },
+          { "data": "iTeamId" },
+          {
+            "data": "sTeamName",
+            "render": function (data, type, row) {
+              return '@Html.ActionLink("name", "ClubDetails", "Member", new { iClub = "id" }, new { target = "" })'.replace("name", data).replace("id", row.iTeamId);
+            },
+            "className": "dt-center"
+          },
+          { "data": "sTeamAveSkill", "className": "dt-center" },
+          { "data": "sTeamAveAge", "className": "dt-center" },
+          { "data": "sTeamValueTotal", "className": "dt-right" },
+          { "data": "nPlayer", "className": "dt-center" },
+          { "data": "sTeamAveSkill11", "className": "dt-center" },
+          { "data": "sTeamAveAge11", "className": "dt-center" },
+          { "data": "sTeamValueTotal11", "className": "dt-right" },
+          { "data": "sLeague", "className": "dt-center" }
+        ],
+        columnDefs: [
+          {
+            targets: [0, 1],
+            "visible": false,
+            "searchable": false
+          }
+        ]
+      });
+
+      $('#ddlStatLeagues').change(function () {
+        dtTeams.ajax.reload();
+      });
     });
 
     function drawBest11() {
@@ -77,6 +125,7 @@
 </head>
 
 <body>
+  <h3>Beste Spieler</h3>
   <div style="position: relative; width: 160px; height: auto; margin-bottom: 6px">
     @Html.DropDownListFor(m => m.iNation, Model.ddlNations, new { @Id = "ddlStatNations", @class = "form-control" })
   </div>
@@ -110,5 +159,36 @@
     @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlStatFormation", @class = "form-control" })
   </div>
   <text id="txtStatAverage" style="position: relative; width: 100%"></text>
+
+  <h3 style="position: relative; margin-top: 30px">Mannschaftsübersicht</h3>
+  <div style="position: relative">
+    <div style="position: relative; width: 160px; height: auto; z-index: 99">
+      <b class="left">Liga:</b>
+      @Html.DropDownListFor(m => m.iLeague, Model.ddlLeagues, new { @Id = "ddlStatLeagues", @class = "form-control" })
+    </div>
+
+    <div style="position: relative; width: 100%; top: -30px">
+      <table id="tblTeams" cellspacing="0" style="width: 100%" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Team</th>
+            <th>&#8709;-Stärke</th>
+            <th>&#8709;-Alter</th>
+            <th>&#8709;-MW</th>
+            <th>Spieler</th>
+            <th>&#8709;-Stärke Startelf</th>
+            <th>&#8709;-Alter Startelf</th>
+            <th>&#8709;-MW Startelf</th>
+            <th>Liga</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
 </html>

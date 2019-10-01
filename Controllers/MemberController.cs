@@ -4655,6 +4655,30 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      statisticModel.ddlLeagues = new List<SelectListItem>();
+
+      statisticModel.ddlLeagues.Add(new SelectListItem {
+                                      Text = "alle",
+                                      Value = "-1"
+                                    }
+      );
+
+      CornerkickManager.Club clbUser = ckClub();
+
+      statisticModel.iLeague = clbUser.iLand;
+      for (int iC = 0; iC < MvcApplication.ckcore.ltCups.Count; iC++) {
+        CornerkickManager.Cup cup = MvcApplication.ckcore.ltCups[iC];
+
+        if (cup.iId != 1) continue; // If not league
+
+        statisticModel.ddlLeagues.Add(new SelectListItem {
+                                        Text = cup.sName,
+                                        Value = cup.iId2.ToString(),
+                                        Selected = clbUser.iLand == cup.iId2
+                                      }
+        );
+      }
+
       return View(statisticModel);
     }
 
@@ -4723,6 +4747,51 @@ namespace CornerkickWebMvc.Controllers
       tD.fTeamAveAge      = fTeamAve11[4];
 
       return Json(tD, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult StatisticGetTableTeams(int iLand = -1)
+    {
+      //The table or entity I'm querying
+      List<Models.DatatableEntryTeams> ltDeTeams = new List<Models.DatatableEntryTeams>();
+
+      int iC = 0;
+      foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
+        if (clb.iLand < 0) continue;
+        if (clb.bNation) continue;
+        if (iLand >= 0 && iLand != clb.iLand) continue;
+
+        float[] fAve = MvcApplication.ckcore.tl.getTeamAve(clb);
+        string sSkill = fAve[3].ToString("0.0");
+        string sAge   = fAve[4].ToString("0.0");
+        string sVal   = fAve[5].ToString("N0", getCi()) + " €";
+
+        float[] fAve11 = MvcApplication.ckcore.tl.getTeamAve(clb, 11);
+        string sSkill11 = fAve11[3].ToString("0.0");
+        string sAge11   = fAve11[4].ToString("0.0");
+        string sVal11   = fAve11[5].ToString("N0", getCi()) + " €";
+
+        CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, clb.iLand, clb.iDivision);
+        string sLeagueName = "-";
+        if (league != null) sLeagueName = league.sName;
+
+        ltDeTeams.Add(new Models.DatatableEntryTeams {
+          iIx = iC,
+          iTeamId = clb.iId,
+          sTeamName = clb.sName,
+          sTeamAveSkill = sSkill,
+          sTeamAveAge = sAge,
+          sTeamValueTotal = sVal,
+          nPlayer = clb.ltPlayer.Count,
+          sTeamAveSkill11 = sSkill11,
+          sTeamAveAge11 = sAge11,
+          sTeamValueTotal11 = sVal11,
+          sLeague = sLeagueName
+        });
+
+        iC++;
+      }
+
+      return Json(new { aaData = ltDeTeams.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
