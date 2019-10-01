@@ -147,7 +147,7 @@
 
 <h2>Einleitung</h2>
 Cornerkick ist eine sequentiell ablaufende Fußballmanagersimulation. Mit jeder Sequenz schreitet die Zeit in Cornerkick 15 Minuten voran. Ein neuer Zeitschritt erfolgt dabei alle 2:08 Minuten in realer Zeit. Das bedeutet, dass die Zeit in Cornerkick 7 mal schneller abläuft als die reale Zeit. Somit entspricht eine Woche Cornerkick-Zeit exakt 24h realer Zeit. Ligaspiele, samstags um 15:30 finden somit stets Abends statt.<br />
-Zu Beginn des Spiels (Saisonstart) ist das Spiel pausiert. Du kannst dich somit in Ruhe in deinem Verein umsehen, deine Mannschaft kennen lernen, das Training festlegen usw. (s. <a href="#h2FirstSteps">Erste Schritte</a>)
+Zu Beginn des Spiels (Saisonstart) ist das Spiel pausiert. Du kannst dich somit in Ruhe in deinem Verein umsehen, deine Mannschaft kennen lernen, das Training festlegen usw. (s. <a href="#h2FirstSteps">Erste Schritte</a>).
 
 <div id="h2FirstSteps" class="ckLink"></div>
 <h2>Erste Schritte</h2>
@@ -158,8 +158,8 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
     Dazu klicken Sie im oberen Reiter auf <i>Mannschaft->Aufstellung</i> (oder auf <i>Durchschnittsstärke (Startelf): X,XX (Y,YY)</i> im Hauptmenü). Durch klicken auf einen Spieler in der Aufstellungstabelle erhalten Sie detailliertere Informationen zu diesem Spieler.
   </li>
   <li>
-    <u>Wählen Sie für jeden Ihrer Spieler sein individuelles Training</u><br />
-    Im Spielermenü (s. O.) können Sie diejenige Eigenschaft festlegen, an welcher der Spieler arbeiten soll. Hier können Sie auch die Namen und Rückennummern der Spieler ändern. Jedoch nur am ersten Tag des Spiels!
+    <u>Wählen Sie für jeden Ihrer Spieler sein <a href="#h3PlayerSkills">individuelles Training</a></u><br />
+    Im Spielermenü (s. O.) können Sie diejenige Fähigkeit festlegen, an welcher der Spieler arbeiten soll. Hier können Sie auch die Namen und Rückennummern der Spieler ändern. Jedoch nur am ersten Tag des Spiels!
   </li>
   <li>
     <u>Wählen Sie Ihren <a href="#h3Captains">Kapitän und Vize-Kapitän</a></u><br />
@@ -435,13 +435,13 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
       Der Moralbereich liegt zwischen 10 < Moral < inf. Ist ein Spieler hoch motiviert (Moral > 100) ist es schwerer die Motivation zu steigern als wenn er schwach motiviert ist. Mit der Zeit nähert sich die Motivation dem Normwert von 100 an.
     </li>
     <li>
-      <u>Erfahrung</u><br />
+      <u>Erfahrung</u><br /><div id="uPlayerSkillsExperience" class="ckLinkLarge"></div>
       Je höher die Erfahrung des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
       Die Erfahrung steigt mit jeder gespielten Spielminute und sinkt im Lauf der Zeit kontinuierlich ab. Junge Spieler gewinnen schneller/verlieren langsamer Erfahrung als ältere.<br />
       Der Erfahrungbereich liegt zwischen 10 < Erfahrung < 100.
     </li>
     <li>
-      <u>Talent</u><br />
+      <u>Talent</u><br /><div id="uPlayerSkillsTalent" class="ckLinkLarge"></div>
       Das Talent ist für jeden Spieler konstant. Je größer das Talent des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
       Das Talent liegt üblicherweise zwischen 1 und 10. In Ausnahmefällen ist jedoch auch ein Talent größer 10 möglich.
     </li>
@@ -519,6 +519,37 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
   </ul>
 
+  <h4>Verbessern der Spielerfertigkeiten</h4>
+  Die Fähigkeiten der Spieler können durch Training verbessert werden. Die Wahrscheinlichkeit, dass sich ein Spieler in einer Fähigkeit verbessert ist von folgenden Faktoren abhängig:
+  <ul>
+    <li>
+      <u>Dem bereits erreichten Level der Fähigkeit</u><br />
+      Je höher eine Fähigkeit bereits ist, desto schwierigen ist es, den Spieler in dieser weiter zu verbessern.
+    </li>
+    <li>
+      <u>Dem Alter des Spielers</u><br />
+      Jüngere Spieler verbessern sich eher als alte.
+    </li>
+    <li>
+      <u>Dem <a href="#uPlayerSkillsTalent">Talent</a> des Spielers</u><br />
+    </li>
+    <li>
+      <u>Der aktuellen <a href="#uPlayerSkillsExperience">Erfahrung</a> des Spielers</u><br />
+    </li>
+    <li>
+      <u>Der aktuellen Stärke der Mitspieler</u><br />
+      Ist die Durchschnittsstärke der Mannschaft höher als die Stärke des einzelnen Spielers, erhöht sich die Wahrscheinlichkeit, dass dieser seine Fähigkeiten verbessert. Im Gegensatz dazu haben es gute Spieler schwerer, sich in einer schlechten Mannschaft zu verbessern.
+    </li>
+    <li>
+      <u>Trainer</u><br />
+      Je besser der <a href="#h3Staff">Co-Trainer/Jugendtrainer</a> ist, desto eher verbessern sich deine Spieler.
+    </li>
+    <li>
+      <u>Trainingslager</u><br />
+      Ein Trainingslager kann ebenfalls die Wahrscheinlichkeit erhöhen, dass sich ein Spieler in dieser Zeit verbessert.
+    </li>
+  </ul>
+
   <h3>Character</h3>
   <ul>
     <li>
@@ -528,14 +559,14 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   </ul>
 
   <h2>Verein</h2>
-  
+
   <div id="h3Finance" class="ckLink"></div>
   <h3>Finanzen</h3>
   Zu Beginn einer Saison kannst du eine Finanzplanung aufstellen. Somit bekommst du einen Überblick, wieviel Geld dir während der Saison zur Verfügung steht um neue Spieler zu kaufen oder das Stadion auszubauen. Ebenso können hier die Stadioneintrittspreise festgelegt werden.
   <div id="h4SecretMoney" class="ckLink"></div>
   <h4>Schwarzgeld</h4>
   Ein bestimmter Prozentsatz der Zuschauereinnahmen kann in deine schwarze Kasse umgeleitet werden. Mit dem Schwarzgeld kannst du anschließend deine Spieler dopen (s. <a href="#h4CFM">K/F/M</a>), den Schiedsrichter des nächsten Spiels <a href="#h2PreviewGame">bestechen</a> oder bei einem <a href="#h3Transfer">Transfer</a> ein Handgeld bezahlen.
-  
+
   <div id="h3Sponsors" class="ckLink"></div>
   <h3>Sponsoren</h3>
   Spondoren sind eine wichtige Einnahmequelle. Es gibt zwei verschiedene Arten von Sponsoren: ein Hauptsponsor und Bandenwerbung. Hauptsponsor bieten dir einen einmaligen Sockelbetrag und erfolgsabhängige Leistungen an, während Bandenwerbungen bei jedem Heimspiel Geld generieren.<br />
