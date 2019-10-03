@@ -1175,8 +1175,8 @@ namespace CornerkickWebMvc.Controllers
 
       int iP = 0;
       foreach (System.Drawing.Point ptPos in tD.formation.ptPos) {
-        tD.ltPlayerPos     .Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(ptPos)));
-        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(tD.ltPlayer[iP], MvcApplication.ckcore.game.tl.getPosRole(ptPos)).ToString("0.0"));
+        tD.ltPlayerPos     .Add(CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)));
+        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(tD.ltPlayer[iP], CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)).ToString("0.0"));
         iP++;
       }
 
@@ -1222,7 +1222,7 @@ namespace CornerkickWebMvc.Controllers
             CornerkickGame.Player plOpp = clubOpp.ltPlayer[iPl];
 
             tD.ltPlayerOpp.Add(plOpp);
-            tD.ltPlayerOppPos.Add(MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(plOpp)));
+            tD.ltPlayerOppPos.Add(CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(tD.formationOpp.ptPos[iPl], MvcApplication.ckcore.game.ptPitch)));
 
             float fPlOppAveSkill = MvcApplication.ckcore.game.tl.getAveSkill(plOpp, 99);
             if (tD.iKibitzer == 3) fPlOppAveSkill = (float)Math.Round(fPlOppAveSkill * 2f) / 2f;
@@ -1320,7 +1320,7 @@ namespace CornerkickWebMvc.Controllers
 
         CornerkickGame.Tactic tc = club.ltTactic[iTactic];
 
-        if (MvcApplication.ckcore.game.tl.getPosRole(tc.formation.ptPos[iPl]) == 1) continue; // If keeper --> continue
+        if (CornerkickGame.Tool.getPosRole(tc.formation.ptPos[iPl], MvcApplication.ckcore.game.ptPitch) == 1) continue; // If keeper --> continue
 
         float fHeight = 0.05f;
         if (bMobile) fHeight = 0.07f;
@@ -1371,8 +1371,8 @@ namespace CornerkickWebMvc.Controllers
       int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation);
 
       for (double fRoa = 0.5; fRoa < 1.01; fRoa += 0.1) {
-        System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation, +1, -1, fRoa, fRoa);
-        System.Drawing.Point ptRoaBR = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation, -1, +1, fRoa, fRoa);
+        System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.formation, tc.fOrientation, +1, -1, fRoa, fRoa);
+        System.Drawing.Point ptRoaBR = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.formation, tc.fOrientation, -1, +1, fRoa, fRoa);
 
         float fTopRoa  = 1f - ((iXOffence + ptRoaTL.X) / (float)MvcApplication.ckcore.game.ptPitch.X);
         float fLeftRoa = (tc.formation.ptPos[iPlayerIndex].Y + ptRoaTL.Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
@@ -2562,8 +2562,8 @@ namespace CornerkickWebMvc.Controllers
           }
 
           string sPos = "";
-          if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
-          else                                           sPos = MvcApplication.ckcore.plr.getStrPos(pl);
+          if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
+          else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
           string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl, 0, true).ToString(" (0.0)");
           SelectListItem sliAutoSub = new SelectListItem { Text = pl.sName + " - " + sPos + sStrength,
                                                            Value = iPl.ToString(),
@@ -2636,7 +2636,7 @@ namespace CornerkickWebMvc.Controllers
         }
 
         string sPos = "";
-        if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[MvcApplication.ckcore.game.tl.getBasisPos(MvcApplication.ckcore.game.tl.getPosRole(pl))];
+        if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
         else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
         string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl).ToString(" (0.0)");
 
@@ -4708,8 +4708,8 @@ namespace CornerkickWebMvc.Controllers
         tD.ltPlayerAge     .Add(null);
         tD.ltPlayerNat     .Add(null);
 
-        byte iPosExact = MvcApplication.ckcore.game.tl.getPosRole(MvcApplication.ckcore.ltFormationen[iF].ptPos[iP]);
-        byte iPos = MvcApplication.ckcore.game.tl.getBasisPos(iPosExact);
+        byte iPosExact = CornerkickGame.Tool.getPosRole(MvcApplication.ckcore.ltFormationen[iF].ptPos[iP], MvcApplication.ckcore.game.ptPitch);
+        byte iPos = CornerkickGame.Tool.getBasisPos(iPosExact);
 
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
           if (bJouth && pl.getAge(MvcApplication.ckcore.dtDatum) > 18f) continue;
