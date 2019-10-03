@@ -460,8 +460,8 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 0, fTaktik: ui.value / 100 },
-            success: function (fTaktik) {
+            data: { iTaktik: 0, fTaktik: ui.value / 100, iTactic: 0 },
+            success: function () {
               drawAufstellung(iFormation, iSelectedPlayer, true);
               //alert("Orientation set to " + fTaktik);
             }
