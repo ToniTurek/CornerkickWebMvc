@@ -54,6 +54,7 @@ namespace CornerkickWebMvc.Models
 
       // Opponent player details
       public byte iKibitzer { get; set; }
+      public bool bOppTeam { get; set; } // Opponent team exist
       public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
       public CornerkickGame.Tactic.Formation formationOpp { get; set; }
       public List<byte> ltPlayerOppPos { get; set; }

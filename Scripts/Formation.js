@@ -41,41 +41,45 @@
             return i !== 11;
           });
 
-          if (teamData.iKibitzer === 0) {
-            result += '<div style="position: absolute; width: 90%; height: 50%; left: 5%; text-align: center"><p style="position: absolute; top: 40%; color: white; font-size: 150%">Stellen Sie einen <a style="color: white" href="/Member/Personal">Spielbeobachter</a> ein, wenn Sie mehr über Ihren nächsten Gegner erfahren wollen!</p></div>';
-          } else if (teamData.ltPlayerOpp) {
-            // opponent player
-            var j = 0;
-            $.each(teamData.ltPlayerOpp, function (iFormation, playerOpp) {
-              var sPlayerOppName = "";
-              var sPlayerOppAveSkill = "";
-              var sPlayerOppPos = "";
-              if (teamData.iKibitzer > 1) {
-                sPlayerOppName = playerOpp.sName;
+          if (teamData.bOppTeam) {
+            if (teamData.iKibitzer === 0) {
+              result += '<div style="position: absolute; width: 90%; height: 50%; left: 5%; text-align: center"><p style="position: absolute; top: 40%; width: 100%; color: white; font-size: 150%">Stellen Sie einen <a style="color: white" href="/Member/Personal">Spielbeobachter</a> ein, wenn Sie mehr über Ihren nächsten Gegner erfahren wollen!</p></div>';
+            } else if (teamData.ltPlayerOpp) {
+              // opponent player
+              var j = 0;
+              $.each(teamData.ltPlayerOpp, function (iFormation, playerOpp) {
+                var sPlayerOppName = "";
+                var sPlayerOppAveSkill = "";
+                var sPlayerOppPos = "";
+                if (teamData.iKibitzer > 1) {
+                  sPlayerOppName = playerOpp.sName;
 
-                if (teamData.iKibitzer > 2) {
-                  sPlayerOppAveSkill = teamData.ltPlayerOppAveSkill[j];
-                  sPlayerOppPos      = teamData.ltPlayerOppPos     [j];
+                  if (teamData.iKibitzer > 2) {
+                    sPlayerOppAveSkill = teamData.ltPlayerOppAveSkill[j];
+                    sPlayerOppPos = teamData.ltPlayerOppPos[j];
+                  }
                 }
+
+                var sOppNo = playerOpp.iNr.toString();
+                if (teamData.bNation) {
+                  sOppNo = playerOpp.iNrNat.toString();
+                }
+
+                result += getBoxFormation(i, teamData.formationOpp.ptPos[j], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
+
+                i = i + 1;
+                j = j + 1;
+                return i !== 11;
+              });
+
+              if (teamData.iKibitzer > 2) {
+                var divTeamOppAve = $("#divTeamOppAve");
+                sTeamOppAve = '<p style="position: absolute; margin: 4px; background-color: rgb(31, 158, 69); color: white; font-size: 100%">' + teamData.sTeamOppAveSkill + ' (' + teamData.sTeamOppAveAge + ')</p>';
+                divTeamOppAve.html(sTeamOppAve).fadeIn('slow');
               }
-
-              var sOppNo = playerOpp.iNr.toString();
-              if (teamData.bNation) {
-                sOppNo = playerOpp.iNrNat.toString();
-              }
-
-              result += getBoxFormation(i, teamData.formationOpp.ptPos[j], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
-
-              i = i + 1;
-              j = j + 1;
-              return i !== 11;
-            });
-
-            if (teamData.iKibitzer > 2) {
-              var divTeamOppAve = $("#divTeamOppAve");
-              sTeamOppAve = '<p style="position: absolute; margin: 4px; background-color: rgb(31, 158, 69); color: white; font-size: 100%">' + teamData.sTeamOppAveSkill + ' (' + teamData.sTeamOppAveAge + ')</p>';
-              divTeamOppAve.html(sTeamOppAve).fadeIn('slow');
             }
+          } else {
+            result += '<div style="position: absolute; width: 90%; height: 50%; left: 5%; text-align: center"><p style="position: absolute; top: 40%; width: 100%; color: white; font-size: 150%">Kein Gegner</p></div>';
           }
 
           // hide orientation slider on start

@@ -1211,7 +1211,9 @@ namespace CornerkickWebMvc.Controllers
         tD.ltPlayerOppPos = new List<byte>();
         tD.ltPlayerOppAveSkill = new List<string>();
 
-        if (iClubOpp >= 0) {
+        tD.bOppTeam = iClubOpp >= 0;
+
+        if (tD.bOppTeam && tD.iKibitzer > 0) {
           CornerkickManager.Club clubOpp = MvcApplication.ckcore.ltClubs[iClubOpp];
 
           tD.formationOpp = clubOpp.ltTactic[0].formation;
