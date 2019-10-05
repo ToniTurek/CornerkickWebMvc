@@ -4767,12 +4767,12 @@ namespace CornerkickWebMvc.Controllers
         if (clb.bNation) continue;
         if (iLand >= 0 && iLand != clb.iLand) continue;
 
-        float[] fAve = MvcApplication.ckcore.tl.getTeamAve(clb);
+        float[] fAve = MvcApplication.ckcore.tl.getTeamAve(clb, bTeamValue: true);
         string sSkill = fAve[3].ToString("0.0");
         string sAge   = fAve[4].ToString("0.0");
         string sVal   = fAve[5].ToString("N0", getCi()) + " €";
 
-        float[] fAve11 = MvcApplication.ckcore.tl.getTeamAve(clb, 11);
+        float[] fAve11 = MvcApplication.ckcore.tl.getTeamAve(clb, 11, bTeamValue: true);
         string sSkill11 = fAve11[3].ToString("0.0");
         string sAge11   = fAve11[4].ToString("0.0");
         string sVal11   = fAve11[5].ToString("N0", getCi()) + " €";
