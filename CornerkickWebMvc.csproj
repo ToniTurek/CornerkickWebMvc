@@ -602,6 +602,7 @@
     <Content Include="Content\Icons\form2.png" />
     <Content Include="Content\Icons\form3.png" />
     <Content Include="Content\Icons\form4.png" />
+    <Content Include="Content\Icons\jersey.png" />
     <Content Include="Content\Icons\minus.png" />
     <Content Include="Content\Icons\plus.png" />
     <Content Include="Content\Icons\rCard.png" />
