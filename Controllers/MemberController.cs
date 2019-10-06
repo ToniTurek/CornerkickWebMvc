@@ -1491,6 +1491,11 @@ namespace CornerkickWebMvc.Controllers
 
       plModel.sEmblem = getClubEmblem(plDetails.iClubId, "height: 100%; width: 100%; object-fit: contain");
 
+      plModel.sColorJersey = "rgb(" + club.cl[0].R.ToString() + "," + club.cl[0].G.ToString() + "," + club.cl[0].B.ToString() + ")";
+      System.Drawing.Color clJerseyNo = System.Drawing.Color.Black;
+      if (club.cl[0].R + club.cl[0].G + club.cl[0].B < 200) clJerseyNo = System.Drawing.Color.White;
+      plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")"; 
+
       List<int> ltNoExist = new List<int>();
       foreach (CornerkickGame.Player pl in club.ltPlayer) {
         ltNoExist.Add(pl.iNr);

@@ -23,6 +23,9 @@ namespace CornerkickWebMvc.Models
     // Emblem
     public string sEmblem { get; set; }
 
+    public string sColorJersey { get; set; }
+    public string sColorJerseyNo { get; set; }
+
     // Contract
     [Display(Name = "zusätzl. Laufzeit [a]:")]
     public int iContractYears { get; set; }
