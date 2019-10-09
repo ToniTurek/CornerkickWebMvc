@@ -166,7 +166,7 @@ namespace CornerkickWebMvc
           league.sName = "Liga " + ckcore.sLand[iLand];
           ckcore.ltCups.Add(league);
 
-          fillLeaguesWithCpuClubc(league, cup);
+          fillLeaguesWithCpuClubs(league, cup);
         }
 
         /////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ namespace CornerkickWebMvc
       timerSave.Enabled = !timerCkCalender.Enabled;
     }
 
-    private static void fillLeaguesWithCpuClubc(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
+    private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
     {
       Controllers.AccountController accountController = new Controllers.AccountController();
 
