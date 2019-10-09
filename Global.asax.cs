@@ -146,7 +146,7 @@ namespace CornerkickWebMvc
         // New game
         DateTime dtLeagueStart;
         DateTime dtLeagueEnd;
-        MvcApplication.ckcore.setSeasonStartEndDates(out dtLeagueStart, out dtLeagueEnd);
+        ckcore.setSeasonStartEndDates(out dtLeagueStart, out dtLeagueEnd);
 
         /////////////////////////////////////////////////////////////////////
         // Create nat. Cups and Leagues
@@ -176,7 +176,7 @@ namespace CornerkickWebMvc
         createCupWc(dtLeagueEnd);
 
         ckcore.calcMatchdays();
-        MvcApplication.ckcore.drawCup(MvcApplication.ckcore.tl.getCup(7));
+        ckcore.drawCup(ckcore.tl.getCup(7));
 
         ckcore.dtDatum = ckcore.dtSeasonStart;
       }
@@ -198,8 +198,8 @@ namespace CornerkickWebMvc
 
       int iC = 0;
       while (league.ltClubs[0].Count < nLeagueSize) {
-        CornerkickManager.Club clb = accountController.createClub("Team_" + MvcApplication.ckcore.sLand[league.iId2] + "_" + (iC + 1).ToString(), (byte)league.iId2, 0);
-        MvcApplication.ckcore.ltClubs.Add(clb);
+        CornerkickManager.Club clb = accountController.createClub("Team_" + ckcore.sLand[league.iId2] + "_" + (iC + 1).ToString(), (byte)league.iId2, 0);
+        ckcore.ltClubs.Add(clb);
 
         cup   .ltClubs[0].Add(clb);
         league.ltClubs[0].Add(clb);
@@ -210,7 +210,7 @@ namespace CornerkickWebMvc
 
     private static void createCupGold()
     {
-      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
+      CornerkickManager.Cup cupGold = ckcore.tl.getCup(3);
 
       if (cupGold == null) {
         // Create Gold Cup
@@ -221,13 +221,13 @@ namespace CornerkickWebMvc
         cupGold.settings.iBonusCupWin = 30000000; // 30 mio.
         cupGold.settings.bBonusReleaseCupWinInKo = true;
         cupGold.settings.iDayOfWeek = 3;
-        MvcApplication.ckcore.ltCups.Add(cupGold);
+        ckcore.ltCups.Add(cupGold);
       }
     }
 
     private static void createCupSilver()
     {
-      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+      CornerkickManager.Cup cupSilver = ckcore.tl.getCup(4);
 
       if (cupSilver == null) {
         // Create Silver Cup
@@ -238,13 +238,13 @@ namespace CornerkickWebMvc
         cupSilver.settings.iBonusCupWin = 15000000; // 15 mio.
         cupSilver.settings.bBonusReleaseCupWinInKo = true;
         cupSilver.settings.iDayOfWeek = 4;
-        MvcApplication.ckcore.ltCups.Add(cupSilver);
+        ckcore.ltCups.Add(cupSilver);
       }
     }
 
     private static void createCupWc(DateTime dtLeagueEnd)
     {
-      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
+      CornerkickManager.Cup cupWc = ckcore.tl.getCup(7);
 
       if (cupWc == null) {
         cupWc = new CornerkickManager.Cup(bKo: true, bKoTwoGames: false, nGroups: 2, bGroupsTwoGames: false, nQualifierKo: 2);
@@ -252,21 +252,21 @@ namespace CornerkickWebMvc
         cupWc.sName = "World Cup";
         cupWc.settings.iNeutral = 1;
         cupWc.settings.dtStart = dtLeagueEnd.Date + new TimeSpan(20, 30, 00);
-        cupWc.settings.dtEnd = MvcApplication.ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
-        MvcApplication.ckcore.ltCups.Add(cupWc);
+        cupWc.settings.dtEnd = ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
+        ckcore.ltCups.Add(cupWc);
 
         int iGroup = 0;
-        foreach (byte iN in MvcApplication.iNations) {
+        foreach (byte iN in iNations) {
           CornerkickManager.Club clbNat = new CornerkickManager.Club();
           clbNat.bNation = true;
-          clbNat.iId = MvcApplication.ckcore.ltClubs.Count;
-          clbNat.sName = MvcApplication.ckcore.sLand[iN];
+          clbNat.iId = ckcore.ltClubs.Count;
+          clbNat.sName = ckcore.sLand[iN];
           clbNat.iLand = iN;
-          clbNat.ltTactic[0].formation = MvcApplication.ckcore.ltFormationen[8];
+          clbNat.ltTactic[0].formation = ckcore.ltFormationen[8];
 
-          MvcApplication.ckcore.ltClubs.Add(clbNat);
+          ckcore.ltClubs.Add(clbNat);
 
-          MvcApplication.ckcore.doFormation(clbNat.iId);
+          ckcore.doFormation(clbNat.iId);
 
           cupWc.ltClubs[iGroup / 4].Add(clbNat);
           iGroup++;
@@ -350,9 +350,9 @@ namespace CornerkickWebMvc
       // Beginn of new season
       if (iRetCk == 4) {
         foreach (int iN in iNations) {
-          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+          CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, 0);
           if (league == null) continue;
-          MvcApplication.ckcore.drawCup(league);
+          ckcore.drawCup(league);
         }
       }
 
@@ -369,10 +369,10 @@ namespace CornerkickWebMvc
         int iGroupSilver = 0;
         foreach (int iN in iNations) {
           // ... of league iN ...
-          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+          CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, 0);
           if (league == null) continue;
 
-          List<CornerkickManager.Tool.TableItem> ltTbl = MvcApplication.ckcore.tl.getLeagueTable(league);
+          List<CornerkickManager.Tool.TableItem> ltTbl = ckcore.tl.getLeagueTable(league);
 
           // ... to Gold Cup
           for (byte jL = 0; jL < 4; jL++) {
@@ -389,10 +389,10 @@ namespace CornerkickWebMvc
           }
         }
 
-        MvcApplication.ckcore.calcMatchdays();
+        ckcore.calcMatchdays();
 
-        MvcApplication.ckcore.drawCup(cupGold);
-        MvcApplication.ckcore.drawCup(cupSilver);
+        ckcore.drawCup(cupGold);
+        ckcore.drawCup(cupSilver);
 
         return false;
       }
@@ -420,7 +420,7 @@ namespace CornerkickWebMvc
 
           CornerkickManager.Club clbCpu = ckcore.ltClubs[transfer.player.iClubId];
           if (clbCpu.user != null) continue; // If human user
-          if (MvcApplication.ckcore.ltUser.IndexOf(clbCpu.user) == 0) continue; // If main CPU user
+          if (ckcore.ltUser.IndexOf(clbCpu.user) == 0) continue; // If main CPU user
 
           // Get max offer
           int iOfferMax = 0;
@@ -483,7 +483,7 @@ namespace CornerkickWebMvc
           List<CornerkickManager.Tool.TableItem> tbl = ckcore.tl.getLeagueTable(league);
           foreach (CornerkickManager.Tool.TableItem item in tbl) {
             if (item.club.user != null) {
-              if (MvcApplication.ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
+              if (ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
 
               CornerkickManager.Club nat = ckcore.tl.getNation(league.iId2);
               if (nat == null) continue;
