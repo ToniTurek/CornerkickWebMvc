@@ -625,7 +625,7 @@ namespace CornerkickWebMvc.Controllers
           // ... get training history data
           CornerkickManager.Main.TrainingHistory trHistExp = new CornerkickManager.Main.TrainingHistory();
           trHistExp.dt   = dtTmp;
-          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTmp);
+          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTmp, clb.ltTactic[0].formation);
 
           // ... add training history data to dataPoints
           for (byte j = 0; j < dataPoints[1].Length; j++) {
@@ -1176,7 +1176,7 @@ namespace CornerkickWebMvc.Controllers
       int iP = 0;
       foreach (System.Drawing.Point ptPos in tD.formation.ptPos) {
         tD.ltPlayerPos     .Add(CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)));
-        tD.ltPlayerAveSkill.Add(MvcApplication.ckcore.game.tl.getAveSkill(tD.ltPlayer[iP], CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)).ToString("0.0"));
+        tD.ltPlayerAveSkill.Add(CornerkickGame.Tool.getAveSkill(tD.ltPlayer[iP], CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)).ToString("0.0"));
         iP++;
       }
 
@@ -1226,7 +1226,7 @@ namespace CornerkickWebMvc.Controllers
             tD.ltPlayerOpp.Add(plOpp);
             tD.ltPlayerOppPos.Add(CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(tD.formationOpp.ptPos[iPl], MvcApplication.ckcore.game.ptPitch)));
 
-            float fPlOppAveSkill = MvcApplication.ckcore.game.tl.getAveSkill(plOpp, 99);
+            float fPlOppAveSkill = CornerkickGame.Tool.getAveSkill(plOpp, 99);
             if (tD.iKibitzer == 3) fPlOppAveSkill = (float)Math.Round(fPlOppAveSkill * 2f) / 2f;
             tD.ltPlayerOppAveSkill.Add(fPlOppAveSkill.ToString("0.0"));
           }
@@ -1302,7 +1302,7 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult GetPlayerStrength(int iPlayer)
     {
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
-      double fStrength = MvcApplication.ckcore.game.tl.getAveSkill(player, 99);
+      double fStrength = CornerkickGame.Tool.getAveSkill(player, 99);
       return Json(fStrength, JsonRequestBehavior.AllowGet);
     }
 
@@ -1676,7 +1676,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       long iDateCurrent = convertDateTimeToTimestamp(MvcApplication.ckcore.dtDatum);
-      dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, MvcApplication.ckcore.game.tl.getAveSkill(pl, 0, false)));
+      dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, CornerkickGame.Tool.getAveSkill(pl, 0, false)));
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
@@ -2331,8 +2331,8 @@ namespace CornerkickWebMvc.Controllers
           datum = sDatePutOnTl,
           name = transfer.player.sName,
           position = MvcApplication.ckcore.plr.getStrPos(transfer.player),
-          strength = MvcApplication.ckcore.game.tl.getAveSkill(transfer.player, 0, true).ToString("0.0"),
-          strengthIdeal = MvcApplication.ckcore.game.tl.getAveSkill(transfer.player, 0, false).ToString("0.0"),
+          strength      = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false).ToString("0.0"),
+          strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true) .ToString("0.0"),
           age = transfer.player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
           talent = (transfer.player.iTalent + 1).ToString(),
           mw = (MvcApplication.ckcore.plr.getValue(transfer.player) * 1000).ToString("N0", getCi()),
@@ -2571,7 +2571,7 @@ namespace CornerkickWebMvc.Controllers
           string sPos = "";
           if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
           else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
-          string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl, 0, true).ToString(" (0.0)");
+          string sStrength = CornerkickGame.Tool.getAveSkill(pl, bIdeal: false).ToString(" (0.0)");
           SelectListItem sliAutoSub = new SelectListItem { Text = pl.sName + " - " + sPos + sStrength,
                                                            Value = iPl.ToString(),
                                                            Selected = bSelected
@@ -2645,7 +2645,7 @@ namespace CornerkickWebMvc.Controllers
         string sPos = "";
         if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
         else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
-        string sStrength = MvcApplication.ckcore.game.tl.getAveSkill(pl).ToString(" (0.0)");
+        string sStrength = CornerkickGame.Tool.getAveSkill(pl).ToString(" (0.0)");
 
         if (bOut) sBox[0] += "<option" + sSelectedO + " value=\"" + iPl.ToString() + "\">" + pl.sName + " - " + sPos + sStrength + "</option>";
         else      sBox[1] += "<option" + sSelectedI + " value=\"" + iPl.ToString() + "\">" + pl.sName + " - " + sPos + sStrength + "</option>";
@@ -4734,7 +4734,7 @@ namespace CornerkickWebMvc.Controllers
             if (bSame) continue;
           }
 
-          float fStrengthTmp = MvcApplication.ckcore.game.tl.getAveSkill(pl, iPos);
+          float fStrengthTmp = CornerkickGame.Tool.getAveSkill(pl, iPos);
           if (fStrengthTmp > fStrength) {
             tD.ltPlayer[iP] = pl.Clone(true);
 
@@ -4754,7 +4754,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(tD.ltPlayer, 11);
+      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(tD.ltPlayer, tD.formation, 11);
       tD.fTeamAveStrength = fTeamAve11[3];
       tD.fTeamAveAge      = fTeamAve11[4];
 

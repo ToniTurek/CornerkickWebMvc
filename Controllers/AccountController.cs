@@ -454,7 +454,7 @@ namespace CornerkickWebMvc.Controllers
       while (iCount7 < 2 || iCount5 < 1) {
         CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
-        if (!MvcApplication.ckcore.game.tl.bPlayerMainPos(pl, 1)) { // if not keeper
+        if (!CornerkickGame.Tool.bPlayerMainPos(pl, 1)) { // if not keeper
           if (iCount7 < 2) {
             pl.iSkill[0] = 7;
             iCount7++;

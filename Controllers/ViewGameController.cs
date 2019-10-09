@@ -675,7 +675,7 @@ namespace CornerkickWebMvc.Controllers
       drawLine.X0 = plShoot.ptPos.X;
       drawLine.Y0 = plShoot.ptPos.Y;
       if (state.shoot.iResult == 3) { // keeper
-        CornerkickGame.Player plKeeper = game.tl.getKeeper(state.shoot.iHA == 1);
+        CornerkickGame.Player plKeeper = CornerkickGame.Tool.getKeeper(game.player[plShoot.iHA], game.iSuspensionIx, game.tc[plShoot.iHA].formation, game.ptPitch, game.data.nPlStart);
 
         drawLine.X1 = plKeeper.ptPos.X;
         drawLine.Y1 = plKeeper.ptPos.Y;
