@@ -51,10 +51,24 @@
   });
 }
 
-function getPlayer(gLoc, bShowLookAt = true) {
+function getPlayer(gLoc, bShowLookAt) {
   var sBox = "";
 
   if (gLoc.ltPlayer.length < 1) return sBox;
+
+  var sColorH0 = gLoc.sColorJerseyH[0];
+  var sColorH1 = gLoc.sColorJerseyH[1];
+  var sColorA0 = gLoc.sColorJerseyA[0];
+  var sColorA1 = gLoc.sColorJerseyA[1];
+
+  var sColorTextH = "black";
+  if (gLoc.bJerseyTextColorWhiteH) {
+    sColorTextH = "white";
+  }
+  var sColorTextA = "black";
+  if (gLoc.bJerseyTextColorWhiteA) {
+    sColorTextA = "white";
+  }
 
   var divGame = document.getElementById("divDrawGame");
   iDivWidthPix  = divGame.offsetWidth .toString();
@@ -70,9 +84,9 @@ function getPlayer(gLoc, bShowLookAt = true) {
       var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
       var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
 
-      var sCardH = "white";
+      var bCardH = false;
       if (gLoc.ltPlayer[iP +  0].iCard > 0) {
-        sCardH = "yellow";
+        bCardH = true;
       }
 
       var sXh = ((100 *  fXh       ) - 1.0).toString();
@@ -83,9 +97,13 @@ function getPlayer(gLoc, bShowLookAt = true) {
 
       var sLookAtXh = ((0.5 + (fLookAtAngleXh / 2) - (fLookAtSize / 2)) * 100).toString();
       var sLookAtYh = ((0.5 + (fLookAtAngleYh / 2) - (fLookAtSize / 2)) * 100).toString();
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sCardH + '; border: 2px solid blue; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
+
+      if (bCardH) {
+        sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
+      }
+      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sColorH0 + '; border: 2px solid ' + sColorH1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
-                  '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: black; z-index:22">' + gLoc.ltPlayer[iP +  0].iNo.toString() + '</h2>' + 
+                  '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextH + '; z-index:22">' + gLoc.ltPlayer[iP +  0].iNo.toString() + '</h2>' + 
                 '</div>';
 
       // draw look-at circle
@@ -101,9 +119,9 @@ function getPlayer(gLoc, bShowLookAt = true) {
       var fXa = gLoc.ltPlayer[iP + 11].ptPos.X / 122.0;
       var fYa = gLoc.ltPlayer[iP + 11].ptPos.Y /  50.0;
 
-      var sCardA = "white";
+      var bCardA = false;
       if (gLoc.ltPlayer[iP + 11].iCard > 0) {
-        sCardA = "yellow";
+        bCardA = true;
       }
 
       var sXa = ((100 *  fXa       ) - 1.0).toString();
@@ -114,9 +132,12 @@ function getPlayer(gLoc, bShowLookAt = true) {
 
       var sLookAtXa = ((0.5 + (fLookAtAngleXa / 2) - (fLookAtSize / 2)) * 100).toString();
       var sLookAtYa = ((0.5 + (fLookAtAngleYa / 2) - (fLookAtSize / 2)) * 100).toString();
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYa + '%; left: ' + sXa + '%; background-color: ' + sCardA + '; border: 2px solid red; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
+      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYa + '%; left: ' + sXa + '%; background-color: ' + sColorA0 + '; border: 2px solid ' + sColorA1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
+      if (bCardA) {
+        sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
+      }
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
-                  '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: black; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</h2>' + 
+                  '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextA + '; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</h2>' + 
                 '</div>';
 
       // draw look-at circle

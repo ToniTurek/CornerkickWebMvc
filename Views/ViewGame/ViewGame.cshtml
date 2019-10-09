@@ -792,9 +792,9 @@
 </head>
 
 <body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
-  <div id="divHeader" style="position: relative; width: 100%; height: 71px">
+  <div id="divHeader" style="position: relative; width: 100%; height: 71px; background-color: lightgrey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
     <div style="position: absolute; width: 30px; height: 30px; left:  1%; margin-top: 12px">
-      <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid blue; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
+      <div style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyH[0]; border: 2px solid @Model.sColorJerseyH[1]; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
     </div>
     <div style="position: absolute; width: 30%; height: 100%; left: 5%; top: 30%; text-align: right">
       <font size="4">@sH</font>
@@ -822,7 +822,7 @@
       <font size="4">@sA</font>
     </div>
     <div style="position: absolute; width: 30px; height: 30px; right: 1%; margin-top: 12px">
-      <div style="position: relative; width: 30px; height: 30px; background-color: white; border: 2px solid red; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
+      <div style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyA[0]; border: 2px solid @Model.sColorJerseyA[1]; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>
     </div>
 
     <div style="position: absolute; width: 100%; height: auto; bottom: 0px; left: 0px; text-align: center">

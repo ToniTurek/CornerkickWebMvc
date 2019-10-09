@@ -37,6 +37,9 @@ namespace CornerkickWebMvc.Models
     public string sEmblemH { get; set; }
     public string sEmblemA { get; set; }
 
+    public string[] sColorJerseyH { get; set; }
+    public string[] sColorJerseyA { get; set; }
+
     public int iGameSpeed { get; set; }
 
     public struct gameLoc
@@ -45,6 +48,11 @@ namespace CornerkickWebMvc.Models
       public int iInterval { get; set; }
       public List<gamePlayer> ltPlayer { get; set; }
       public gameBall gBall { get; set; }
+
+      public string[] sColorJerseyH { get; set; }
+      public bool bJerseyTextColorWhiteH { get; set; }
+      public string[] sColorJerseyA { get; set; }
+      public bool bJerseyTextColorWhiteA { get; set; }
     }
 
     public struct gamePlayer

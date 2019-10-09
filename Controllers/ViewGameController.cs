@@ -168,6 +168,9 @@ namespace CornerkickWebMvc.Controllers
 
     public void setGame(Models.ViewGameModel view, CornerkickGame.Game game)
     {
+      view.sColorJerseyH = new string[4] { "white", "blue", "blue", "white" };
+      view.sColorJerseyA = new string[4] { "white", "red",  "red",  "white" };
+
       if (game != null) {
         gD = new Models.ViewGameModel.gameData();
 
@@ -185,6 +188,8 @@ namespace CornerkickWebMvc.Controllers
             int iNationH = clubH.iLand;
             if (iNationH >= 0 && iNationH < MvcApplication.ckcore.sLandShort.Length) sEmblemH = MvcApplication.ckcore.sLandShort[iNationH] + ".png";
           }
+
+          for (byte iC = 0; iC < clubH.cl.Length; iC++) view.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
         }
 
         if (game.data.team[1].iTeamId >= 0 && game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
@@ -196,6 +201,8 @@ namespace CornerkickWebMvc.Controllers
             int iNationA = clubA.iLand;
             if (iNationA >= 0 && iNationA < MvcApplication.ckcore.sLandShort.Length) sEmblemA = MvcApplication.ckcore.sLandShort[iNationA] + ".png";
           }
+
+          for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
         }
 
         if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemH))) sEmblemH = "0.png";
@@ -235,6 +242,22 @@ namespace CornerkickWebMvc.Controllers
       }
 
       bool bAdmin = AccountController.checkUserIsAdmin(User);
+
+      // Colors home
+      gLoc.sColorJerseyH = new string[2] { "white", "blue" };
+      if (user.game.data.team[0].iTeamId >= 0 && user.game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
+        CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[user.game.data.team[0].iTeamId];
+        for (byte iC = 0; iC < gLoc.sColorJerseyH.Length; iC++) gLoc.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
+        gLoc.bJerseyTextColorWhiteH = clubH.cl[0].R + clubH.cl[0].G + clubH.cl[0].B < 300;
+      }
+
+      // Colors away
+      gLoc.sColorJerseyA = new string[2] { "white", "red" };
+      if (user.game.data.team[1].iTeamId >= 0 && user.game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
+        CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[user.game.data.team[1].iTeamId];
+        for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
+        gLoc.bJerseyTextColorWhiteA = clubA.cl[0].R + clubA.cl[0].G + clubA.cl[0].B < 300;
+      }
 
       if (MvcApplication.ckcore.ltUser.Count > 0) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
 
