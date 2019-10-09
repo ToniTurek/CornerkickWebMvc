@@ -1,10 +1,13 @@
-﻿function drawGame(iState, iGameSpeed) {
+﻿var gLocArray = []; // Array of gameLoc struct
+
+function drawGame(iState, iGameSpeed) {
   //alert("drawGame: " + iState);
 
   var drawGameDiv = $("#divDrawGame");
   var bFinished = false;
   var iPositionsValue = $('#ddlPositions').val();
   var bAverage = iPositionsValue > 0;
+  var sAjaxTextStatus = "";
 
   $.ajax({
     cache: false,
@@ -12,43 +15,56 @@
     type: "GET",
     dataType: "JSON",
     data: { iState: iState, bAverage: bAverage },
-    success: function (gLoc) {
-      drawGameDiv.html('');
-
-      if (iPositionsValue >= 0) {
-        data = getPlayer(gLoc, iPositionsValue == 0);
-        drawGameDiv.html(data);
-      }
-
-      bFinished = gLoc.bFinished;
-
-      if (iState < 0 && bFinished) {
-        iState = -2;
-      }
-
-      var bUpdate = true;
-      if (iState === -1) {
-        bUpdate = document.getElementById("cbUpdateStatistic").checked;
-      }
-      if (bUpdate === true) {
-        plotStatistics(iState);
-      }
+    success: function (gLoc2) {
+      // Add latest element to the array
+      gLocArray.push(gLoc2);
     },
     error: function () {
       //alert("ERROR");
       return false;
     },
     complete: function (jqXHR, textStatus) {
-      if (!iGameSpeed) {
-        iGameSpeed = 300;
-      }
-
-      // Schedule the next request when the current one's complete
-      if ((iState === -1 || iState === -3) && !bFinished && textStatus !== "error" && !bStopPlay && bAdminStop) {
-        setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
-      }
+      sAjaxTextStatus = textStatus;
     }
   });
+
+  // If array big enough, show results
+  if (gLocArray.length > 2) {
+    var gLoc = gLocArray[0];
+
+    // Remove first element from the array
+    gLocArray.splice(0, 1);
+
+    drawGameDiv.html('');
+
+    if (iPositionsValue >= 0) {
+      data = getPlayer(gLoc, iPositionsValue == 0);
+      drawGameDiv.html(data);
+    }
+
+    bFinished = gLoc.bFinished;
+
+    if (iState < 0 && bFinished) {
+      iState = -2;
+    }
+
+    var bUpdate = true;
+    if (iState === -1) {
+      bUpdate = document.getElementById("cbUpdateStatistic").checked;
+    }
+    if (bUpdate === true) {
+      plotStatistics(iState);
+    }
+  }
+
+  if (!iGameSpeed) {
+    iGameSpeed = 300;
+  }
+
+  // Schedule the next request when the current one's complete
+  if ((iState === -1 || iState === -3) && !bFinished && sAjaxTextStatus !== "error" && !bStopPlay && bAdminStop) {
+    setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
+  }
 }
 
 function getPlayer(gLoc, bShowLookAt) {
