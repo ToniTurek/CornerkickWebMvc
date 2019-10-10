@@ -430,7 +430,7 @@
           </tr>
           <tr>
             <td align="right">Stärke (bereinigt):</td>
-            <td align="right">@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, true).ToString("0.0") (@MvcApplication.ckcore.game.tl.getAveSkill(player, 0, false).ToString("0.0"))</td>
+            <td align="right">@CornerkickGame.Tool.getAveSkill(player, 0).ToString("0.0") (@CornerkickGame.Tool.getAveSkill(player, 0, true).ToString("0.0"))</td>
           </tr>
           <tr>
             <td align="right">Talent:</td>
@@ -687,7 +687,7 @@
             <tr @sBold>
               <td align="center">@MvcApplication.ckcore.sPosition[i + 1]</td>
               <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
-              <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(player, j, true).ToString("0.0")</td>
+              <td align="center">@CornerkickGame.Tool.getAveSkill(player, j).ToString("0.0")</td>
             </tr>
           }
         </tbody>
