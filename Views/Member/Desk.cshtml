@@ -290,20 +290,24 @@
     });
   </script>
 
-  <h3>News</h3>
-  <div style="position: relative; width: 100%">
-    <div style="position: absolute; top: -32px; right: 0px">
-      <label>
-        löschen nach:
-        @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-horizontal", @style = "width: 84px; text-align: right" })
-      </label>
-    </div>
+  @{
+    if (!Model.club.bNation) {
+      <h3>News</h3>
+      <div style="position: relative; width: 100%">
+        <div style="position: absolute; top: -32px; right: 0px">
+          <label>
+            löschen nach:
+            @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-horizontal", @style = "width: 84px; text-align: right" })
+          </label>
+        </div>
 
-    <div id="divNews" data-name="@Model.sNews"></div>
-    <div id="tableDivNews"></div>
+        <div id="divNews" data-name="@Model.sNews"></div>
+        <div id="tableDivNews"></div>
 
-    <div id="divNewsOld" data-name="@Model.sNewsOld"></div>
-    <div id="tableDivNewsOld" style="color:gray"></div>
-  </div>
+        <div id="divNewsOld" data-name="@Model.sNewsOld"></div>
+        <div id="tableDivNewsOld" style="color:gray"></div>
+      </div>
+    }
+  }
 </body>
 </html>
