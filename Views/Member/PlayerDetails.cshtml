@@ -637,7 +637,7 @@
             <th style="text-align:center">Fähigkeit</th>
             <th>Wert</th>
             @{
-              if (Model.bOwnPlayer) {
+              if (Model.bOwnPlayer && !Model.bNation) {
                 <th>Training</th>
                 <th>Ind.</th>
                 <th>Bonus</th>
@@ -652,7 +652,7 @@
               <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
               <td align="center">@player.iSkill[i]</td>
               @{
-                if (Model.bOwnPlayer) {
+                if (Model.bOwnPlayer && !Model.bNation) {
                   <td align="right">@fTraining.ToString("0.0%")</td>
                   <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
                   <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
