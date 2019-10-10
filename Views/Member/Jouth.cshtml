@@ -62,7 +62,7 @@
           <td align="center">@plJouth.iId</td>
           <td align="center">@Html.ActionLink(plJouth.sName, "PlayerDetails", "Member", new { i = plJouth.iId }, new { target = "" })</td>
           <td align="center">@MvcApplication.ckcore.plr.getStrPos(plJouth)</td>
-          <td align="center">@MvcApplication.ckcore.game.tl.getAveSkill(plJouth).ToString("0.0")</td>
+          <td align="center">@CornerkickGame.Tool.getAveSkill(plJouth).ToString("0.0")</td>
           <td align="center">@(plJouth.iTalent + 1)</td>
           <td align="center">@((int)plJouth.getAge(MvcApplication.ckcore.dtDatum))</td>
           <td align="center">@MvcApplication.ckcore.sLandShort[plJouth.iNat1]</td>
