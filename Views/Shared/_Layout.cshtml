@@ -72,6 +72,17 @@
       document.getElementById("divEmblem").style.backgroundRepeat = 'no-repeat';
       document.getElementById("divEmblem").style.backgroundSize = '100%';
     });
+
+    function switchClubNation() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/SwitchClubNation',
+        dataType: "json",
+        success: function (bShowNation) {
+          location.reload(true);
+        }
+      });
+    }
   </script>
 </head>
 <body>
@@ -237,7 +248,7 @@
 
   <div id="box_top" style="position: relative; width: 100%; height: 30px; background-color: white"></div>
 
-  <div id="divEmblem" style="position: absolute; width: 10%; height: 100%; top: 100px; right: 10%; text-align: right"></div>
+  <div id="divEmblem" style="position: absolute; width: 10%; height: 100%; top: 100px; right: 10%; text-align: right; cursor: pointer" onclick="switchClubNation()"></div>
 
   <div class="container body-content">
     @RenderBody()

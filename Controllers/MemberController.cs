@@ -98,6 +98,8 @@ namespace CornerkickWebMvc.Controllers
       ""
     };
 
+    private static bool bShowNation = true; // Flag if nation will be used if possible
+
     public MemberController()
     {
 #if _CONSOLE
@@ -123,7 +125,7 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       // National team
-      if (usr.nation != null) return usr.nation;
+      if (usr.nation != null && bShowNation) return usr.nation;
 
       // Club
       return usr.club;
@@ -151,7 +153,7 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       // National team
-      if (usr.nation != null) return usr.nation;
+      if (usr.nation != null && bShowNation) return usr.nation;
 
       // Club
       return usr.club;
@@ -199,6 +201,13 @@ namespace CornerkickWebMvc.Controllers
     public string Welcome(string name, int numTimes = 1)
     {
       return HttpUtility.HtmlEncode("Hello " + name + ", NumTimes is: " + numTimes);
+    }
+
+    public JsonResult SwitchClubNation()
+    {
+      bShowNation = !bShowNation;
+
+      return Json(bShowNation, JsonRequestBehavior.AllowGet);
     }
 
 #if _CONSOLE
