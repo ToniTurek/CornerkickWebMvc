@@ -1,13 +1,15 @@
 ﻿var gLocArray = []; // Array of gameLoc struct
+var bFinished = true;
 
+// iState: -3: initial call, -2: game finished, -1: running game, >=0: specific state
 function drawGame(iState, iGameSpeed) {
-  //alert("drawGame: " + iState);
-
-  var drawGameDiv = $("#divDrawGame");
-  var bFinished = false;
   var iPositionsValue = $('#ddlPositions').val();
   var bAverage = iPositionsValue > 0;
   var sAjaxTextStatus = "";
+
+  if (!iGameSpeed) {
+    iGameSpeed = 300;
+  }
 
   $.ajax({
     cache: false,
@@ -16,8 +18,17 @@ function drawGame(iState, iGameSpeed) {
     dataType: "JSON",
     data: { iState: iState, bAverage: bAverage },
     success: function (gLoc2) {
-      // Add latest element to the array
-      gLocArray.push(gLoc2);
+      if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
+        gLocArray = [];
+        drawGame2(gLoc2, iState);
+      } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
+        bFinished = gLoc2.bFinished;
+        if (!bFinished) {
+          setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
+        }
+      } else { // If running game --> Add latest element of locations to the array
+        gLocArray.push(gLoc2);
+      }
     },
     error: function () {
       //alert("ERROR");
@@ -29,41 +40,46 @@ function drawGame(iState, iGameSpeed) {
   });
 
   // If array big enough, show results
-  if (gLocArray.length > 2) {
+  if (gLocArray.length > 0) {
     var gLoc = gLocArray[0];
-
-    // Remove first element from the array
-    gLocArray.splice(0, 1);
-
-    drawGameDiv.html('');
-
-    if (iPositionsValue >= 0) {
-      data = getPlayer(gLoc, iPositionsValue == 0);
-      drawGameDiv.html(data);
-    }
 
     bFinished = gLoc.bFinished;
 
-    if (iState < 0 && bFinished) {
-      iState = -2;
-    }
+    if (gLocArray.length > 2 && iState === -1) {
+      drawGame2(gLoc, iState);
 
-    var bUpdate = true;
-    if (iState === -1) {
-      bUpdate = document.getElementById("cbUpdateStatistic").checked;
-    }
-    if (bUpdate === true) {
-      plotStatistics(iState);
+      // Remove first element from the array
+      gLocArray.splice(0, 1);
     }
   }
 
-  if (!iGameSpeed) {
-    iGameSpeed = 300;
-  }
-
-  // Schedule the next request when the current one's complete
-  if ((iState === -1 || iState === -3) && !bFinished && sAjaxTextStatus !== "error" && !bStopPlay && bAdminStop) {
+  // If running game and not finished --> recall function (loop)
+  if (iState === -1 && !bFinished && sAjaxTextStatus !== "error" && !bStopPlay && bAdminStop) {
     setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
+  }
+}
+
+function drawGame2(gLoc, iState) {
+  var drawGameDiv = $("#divDrawGame");
+  var iPositionsValue = $('#ddlPositions').val();
+
+  drawGameDiv.html('');
+
+  if (iPositionsValue >= 0) {
+    data = getPlayer(gLoc, iPositionsValue == 0);
+    drawGameDiv.html(data);
+  }
+
+  if (iState < 0 && gLoc.bFinished) {
+    iState = -2;
+  }
+
+  var bUpdate = true;
+  if (iState === -1) {
+    bUpdate = document.getElementById("cbUpdateStatistic").checked;
+  }
+  if (bUpdate === true) {
+    plotStatistics(iState);
   }
 }
 
@@ -197,7 +213,6 @@ function getPlayer(gLoc, bShowLookAt) {
 }
 
 function plotStatistics(jState = -1) {
-  //alert(jState);
   var iState = jState;
 
   var iHeatmapValue = $('#ddlHeatmap').val();
@@ -228,6 +243,7 @@ function plotStatistics(jState = -1) {
       document.getElementById("lbGoalsA").innerText = gD.iGoalsA.toString();
 
       pMainSlider = $('#slider-Minute');
+
       if (iState < 0) {
         iState = gD.nStates;
         //iState = pMainSlider.slider("value");
