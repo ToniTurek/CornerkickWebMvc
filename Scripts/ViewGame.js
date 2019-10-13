@@ -130,10 +130,10 @@ function getPlayer(gLoc, bShowLookAt) {
       var sLookAtXh = ((0.5 + (fLookAtAngleXh / 2) - (fLookAtSize / 2)) * 100).toString();
       var sLookAtYh = ((0.5 + (fLookAtAngleYh / 2) - (fLookAtSize / 2)) * 100).toString();
 
+      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sColorH0 + '; border: 2px solid ' + sColorH1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
       if (bCardH) {
         sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
       }
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sColorH0 + '; border: 2px solid ' + sColorH1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
       sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
                   '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextH + '; z-index:22">' + gLoc.ltPlayer[iP +  0].iNo.toString() + '</h2>' + 
                 '</div>';
