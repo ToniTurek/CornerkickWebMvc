@@ -188,8 +188,10 @@
       <text>Wetter:</text>
       <img src=@sWeatherIcon alt="Wetter" style="position: relative; top: 0px; left: 10px; width: 20px" title=@sWeatherTitle>
       <p></p>
-      <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
-      <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
+      if (!Model.club.bNation) {
+        <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
+        <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
+      }
       <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
       <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
 
