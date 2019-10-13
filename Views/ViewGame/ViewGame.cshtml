@@ -683,6 +683,7 @@
       var divStat1 = document.getElementById("divStat1");
       var divStat2 = document.getElementById("divStat2");
       var divComments = document.getElementById("divComments");
+      var divTableViewGame = document.getElementById("divTableViewGame");
       var divChartContainerF = document.getElementById("chartContainerF");
       var divChartContainerM = document.getElementById("chartContainerM");
 
@@ -748,9 +749,14 @@
         divPlotStatistics.style.top = fCommY.toString() + "px";
 
         var fStatY = divPlotStatistics.offsetTop + divPlotStatistics.offsetHeight;
+        divTableViewGame.style.left = "0px";
+        divTableViewGame.style.position = "absolute";
+        divTableViewGame.style.top = fStatY.toString() + "px";
+
+        var fTableY = divTableViewGame.offsetTop + divTableViewGame.offsetHeight;
         divChartContainerF.style.left = "0px";
         divChartContainerF.style.position = "absolute";
-        divChartContainerF.style.top = fStatY.toString() + "px";
+        divChartContainerF.style.top = fTableY.toString() + "px";
 
         var fFY = divChartContainerF.offsetTop + divChartContainerF.offsetHeight;
         divChartContainerM.style.left = "0px";
