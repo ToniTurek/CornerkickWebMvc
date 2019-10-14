@@ -2135,8 +2135,7 @@ namespace CornerkickWebMvc.Controllers
       clb.ltPlayerJouth.Remove(plJ);
       clb.ltPlayer     .Add   (plJ);
 
-      plJ.contract.iLength = 2;
-      plJ.contract.iSalary = MvcApplication.ckcore.plr.getSalary(plJ, plJ.contract.iLength, MvcApplication.ckcore.fz.iMoneyTotal());
+      plJ.contract = MvcApplication.ckcore.plr.getContract(plJ, 2, MvcApplication.ckcore.fz.iMoneyTotal());
 
       return Json("", JsonRequestBehavior.AllowGet);
     }

@@ -426,8 +426,7 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
           pl.fFresh = 1f;
 #endif
-          pl.contract.iLength = (byte)rnd.Next(1, 4);
-          pl.contract.iSalary = MvcApplication.ckcore.plr.getSalary(pl, pl.contract.iLength, 0);
+          pl.contract = MvcApplication.ckcore.plr.getContract(pl, (byte)rnd.Next(1, 4), 1000);
 
           pl.iNr = (byte)(iPos + (11 * iPl));
 
