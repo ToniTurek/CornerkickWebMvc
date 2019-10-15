@@ -158,7 +158,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 9, fTaktik: ui.value },
+            data: { iTaktik: 9, fTaktik: ui.value, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -179,7 +179,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 1, fTaktik: ui.value / 100 },
+            data: { iTaktik: 1, fTaktik: ui.value / 100, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -201,7 +201,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 2, fTaktik: (ui.value * -1) / 100 },
+            data: { iTaktik: 2, fTaktik: (ui.value * -1) / 100, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -222,7 +222,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 3, fTaktik: ui.value / 100 },
+            data: { iTaktik: 3, fTaktik: ui.value / 100, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -243,7 +243,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 4, fTaktik: ui.value / 100 },
+            data: { iTaktik: 4, fTaktik: ui.value / 100, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -264,7 +264,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 5, fTaktik: ui.value / 100 },
+            data: { iTaktik: 5, fTaktik: ui.value / 100, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -285,7 +285,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 6, fTaktik: ui.value / 100 },
+            data: { iTaktik: 6, fTaktik: ui.value / 100, iTactic: 0 },
             success: function (fTaktik) {
               //alert("Ausrichtung set to " + fTaktik);
             }
@@ -316,7 +316,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 7, fTaktik: (ui.value / 100) - 1 },
+            data: { iTaktik: 7, fTaktik: (ui.value / 100) - 1, iTactic: 0 },
             success: function (fTaktik) {
               sliderRight.slider("value", (fTaktik + 1) * 100);
               sliderMid.slider("value", 300 - (sliderLeft.slider("value") + sliderRight.slider("value")));
@@ -339,7 +339,7 @@
             url: '/Member/setTaktik',
             type: "GET",
             dataType: "JSON",
-            data: { iTaktik: 8, fTaktik: (ui.value / 100) - 1 },
+            data: { iTaktik: 8, fTaktik: (ui.value / 100) - 1, iTactic: 0 },
             success: function (fTaktik) {
               sliderLeft.slider("value", (fTaktik + 1) * 100);
               sliderMid.slider("value", 300 - (sliderLeft.slider("value") + sliderRight.slider("value")));
@@ -354,7 +354,7 @@
           url: '/Member/TacticSetOffsite',
           type: "GET",
           dataType: "JSON",
-          data: { bOffsite: $(this).is(':checked') }
+          data: { bOffsite: $(this).is(':checked'), iTactic: 0 }
         });
       });
 
