@@ -200,7 +200,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       div41.innerHTML = "<b>Gef. Torprämie:</b>";
       var p41 = document.createElement("p");
       p41.id = "txtContractBonusGoal";
-      p41.innerText = contract.iPlay.toLocaleString() + " €";
+      p41.innerText = contract.iGoal.toLocaleString() + " €";
       div41.appendChild(p41);
       div4.appendChild(div41);
       var div25 = document.createElement("div");
