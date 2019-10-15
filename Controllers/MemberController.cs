@@ -892,6 +892,14 @@ namespace CornerkickWebMvc.Controllers
       if (club.nextGame != null) iGameType = club.nextGame.iGameType;
 
       List<CornerkickGame.Player> ltPlayerTeam = club.ltPlayer;
+
+      // Update player numbers if nation
+      if (club.bNation) {
+        for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) {
+          if (ltPlayerTeam[iP].iNrNat == 0) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
+        }
+      }
+
       bool bGame = false;
       if (user.game != null) {
         bGame = !user.game.data.bFinished;
@@ -907,7 +915,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(club.ltPlayer, bGame, iGameType, iPlayerMax);
+      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, bGame, iGameType, iPlayerMax);
 
       //The table or entity I'm querying
       DatatableEntryTeam[] query = new DatatableEntryTeam[ltLV.Count];
