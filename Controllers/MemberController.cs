@@ -1961,7 +1961,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0)
+    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0)
     {
       if (iPlayerId < 0) return Json("Invalid player",                    JsonRequestBehavior.AllowGet);
       if (iYears    < 1) return Json("Invalid number of contract length", JsonRequestBehavior.AllowGet);
@@ -1971,7 +1971,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iGamesPerSeason = MvcApplication.ckcore.tl.getMatchdays(MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision), club);
 
-      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason);
+      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee);
 
       return Json(contract, JsonRequestBehavior.AllowGet);
     }

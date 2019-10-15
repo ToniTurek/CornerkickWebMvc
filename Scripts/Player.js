@@ -1,11 +1,11 @@
-﻿function getSalary(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer) {
+﻿function getSalary(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee) {
   //alert(iPlayerId + ", " + iYears + ", " + iSalaryOffer);
   return $.ajax({
     type: 'post',
     url: '/Member/GetPlayerSalary',
     dataType: "json",
     data: {
-      iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer
+      iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee
     },
     success: function (contract) {
     }
@@ -386,7 +386,7 @@ function input12Keyup(input12, iPlayerId) {
     bnNegotiate.disabled = false;
   }
 
-  $.when(getSalary(iPlayerId, input12.value, 0, 0, 0)).done(function (contract) {
+  $.when(getSalary(iPlayerId, input12.value, 0, 0, 0, 0)).done(function (contract) {
     $("#txtContractMoney2").text(contract.iSalary.toLocaleString() + " €");
     setMoodText(contract.fMood);
     $("#tbContractSalaryOffer2").val(contract.iSalary.toLocaleString());
@@ -398,8 +398,9 @@ function bnNegotiateClick(iPlayerId) {
   var iSalaryOffer    = getIntFromString($("#tbContractSalaryOffer2").val());
   var iBonusPlayOffer = getIntFromString($("#tbContractBonusPlayOffer").val());
   var iBonusGoalOffer = getIntFromString($("#tbContractBonusGoalOffer").val());
+  var iFixedFee = getIntFromString($("#tbContractFixTransferFeeOffer").val());
 
-  $.when(getSalary(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer)).done(function (contract) {
+  $.when(getSalary(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee)).done(function (contract) {
     if (contract.fMood < 0) {
       alert("Der Spieler hat die Vertragsverhandlungen abgebrochen!");
       jTable.ajax.reload();
