@@ -240,6 +240,7 @@ function printComments(gLoc) {
   }
 }
 
+var iStateLast = 0;
 function plotStatistics(jState = -1) {
   var iState = jState;
 
@@ -252,7 +253,7 @@ function plotStatistics(jState = -1) {
     url: '/ViewGame/ViewGameGetDataStatisticObject',
     type: "GET",
     dataType: "JSON",
-    data: { iState: iState, iHeatmap: iHeatmapValue, iAllShoots: iShootsValue, iAllDuels: iDuelsValue, iAllPasses: iPassesValue },
+    data: { iState: iState, iStateLast: iStateLast, iHeatmap: iHeatmapValue, iAllShoots: iShootsValue, iAllDuels: iDuelsValue, iAllPasses: iPassesValue },
     cache: false,
     contentType: "application/json; charset=utf-8",
     error: function (xhr) {
@@ -260,6 +261,7 @@ function plotStatistics(jState = -1) {
     },
     success: function (gD) {
       nStates = gD.nStates;
+      iStateLast = nStates;
 
       if (jState === -2) {
         iState = nStates;
@@ -530,7 +532,9 @@ function plotStatistics(jState = -1) {
         if (gD.ltF[i]) {
           if (gD.ltF[i].length > 0) {
             if (jState === -1) {
-              ltF[i].push(gD.ltF[i][0]);
+              for (k = 0; k < gD.ltF[i].length; ++k) {
+                ltF[i].push(gD.ltF[i][k]);
+              }
             } else {
               ltF[i].length = 0;
 
@@ -548,7 +552,9 @@ function plotStatistics(jState = -1) {
         if (gD.ltM[i]) {
           if (gD.ltM[i].length > 0) {
             if (jState === -1) {
-              ltM[i].push(gD.ltM[i][0]);
+              for (k = 0; k < gD.ltM[i].length; ++k) {
+                ltM[i].push(gD.ltM[i][k]);
+              }
             } else {
               ltM[i].length = 0;
 

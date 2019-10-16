@@ -376,12 +376,19 @@ namespace CornerkickWebMvc.Controllers
       return Json(gLoc, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iStateLast = 0, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       CornerkickManager.User user = ckUser();
       CornerkickManager.Club club = ckClub();
 
       CornerkickGame.Game.Data gameData = user.game.data;
+
+      // Clear chart arrays
+      gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
+      for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
+
+      gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
+      for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
 
       if (gD.nStates == 0) {
         gD = getAllGameData(view);
@@ -393,7 +400,8 @@ namespace CornerkickWebMvc.Controllers
           if (!gameData.ltState[gameData.ltState.Count - 1].bNewRound) return Json(null, JsonRequestBehavior.AllowGet);
         }
 
-        addGameData(ref gD, gameData, user, club, iState);
+        // Add game data to struct
+        for (int i = iStateLast; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, user, club, i);
       }
 
       setGameData(ref gD, gameData, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
@@ -510,15 +518,11 @@ namespace CornerkickWebMvc.Controllers
           for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
         }
 
-        if (gD.ltF[0].Count < state.i) {
-          for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
-            gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFresh));
-          }
+        for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
+          gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFresh));
         }
-        if (gD.ltM[0].Count < state.i) {
-          for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
-            gD.ltM[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fMoral));
-          }
+        for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) {
+          gD.ltM[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fMoral));
         }
       }
     }
