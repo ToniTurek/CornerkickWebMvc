@@ -256,7 +256,7 @@ function plotStatistics(jState = -1) {
     cache: false,
     contentType: "application/json; charset=utf-8",
     error: function (xhr) {
-      alert(xhr.responseText);
+      //alert(xhr.responseText);
     },
     success: function (gD) {
       nStates = gD.nStates;

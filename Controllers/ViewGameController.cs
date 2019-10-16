@@ -388,6 +388,11 @@ namespace CornerkickWebMvc.Controllers
       } else if (iState >= 0) {
         gD = getAllGameData(view, iState);
       } else if (iState <  0) {
+        // Return null if not new round
+        if (gameData.ltState.Count > 0) {
+          if (!gameData.ltState[gameData.ltState.Count - 1].bNewRound) return Json(null, JsonRequestBehavior.AllowGet);
+        }
+
         addGameData(ref gD, gameData, user, club, iState);
       }
 
