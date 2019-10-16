@@ -331,6 +331,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      // If admin: set finished to true to avoid recall of drawGame()
       if (bAdmin) gLoc.bFinished = true;
 
       if (bAdmin && iState >= 0) {
@@ -361,15 +362,17 @@ namespace CornerkickWebMvc.Controllers
 
       // Comments
       gLoc.ltComments = new List<string[]>();
-
       for (int iC = 0; iC < state.ltComment.Count; iC++) {
         CornerkickGame.Game.Comment k = state.ltComment[iC];
 
         if (string.IsNullOrEmpty(k.sText)) continue;
 
-        string[] sCommentarNew = new string[2];
+        string[] sCommentarNew = new string[3];
         sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + ": ";
         sCommentarNew[1] = k.sText;
+        if (state.shoot.plShoot != null && state.shoot.iResult == 1) {
+          sCommentarNew[2] = "bold";
+        }
         gLoc.ltComments.Add(sCommentarNew);
       }
 

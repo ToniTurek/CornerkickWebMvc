@@ -237,6 +237,10 @@ function printComments(gLoc) {
     var cellComments1 = rowComments.insertCell(1);
     cellComments0.innerHTML = gLoc.ltComments[iC][0];
     cellComments1.innerHTML = gLoc.ltComments[iC][1];
+    if (gLoc.ltComments[iC][2]) {
+      cellComments0.style.fontWeight = gLoc.ltComments[iC][2];
+      cellComments1.style.fontWeight = gLoc.ltComments[iC][2];
+    }
   }
 }
 
