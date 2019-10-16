@@ -262,7 +262,7 @@ namespace CornerkickWebMvc.Controllers
       if (MvcApplication.ckcore.ltUser.Count > 0) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
 
       CornerkickGame.Game.State state = user.game.newState();
-      if (user.game.data.ltState.Count > 0) state = user.game.data.ltState[0];
+      if (user.game.data.ltState.Count > 0) state = user.game.data.ltState[user.game.data.ltState.Count - 1];
 
       if (iState > 0 && iState < user.game.data.ltState.Count) state = user.game.data.ltState[iState];
       //if (fTime >= 0f) state = MvcApplication.ckcore.game.tl.getState(user.game.data, fTime);
@@ -330,6 +330,8 @@ namespace CornerkickWebMvc.Controllers
           }
         }
       }
+
+      if (bAdmin) gLoc.bFinished = true;
 
       if (bAdmin && iState >= 0) {
         user.game.ball = ball;
