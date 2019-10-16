@@ -53,6 +53,8 @@ namespace CornerkickWebMvc.Models
       public bool bJerseyTextColorWhiteH { get; set; }
       public string[] sColorJerseyA { get; set; }
       public bool bJerseyTextColorWhiteA { get; set; }
+
+      public List<string[]> ltComments { get; set; }
     }
 
     public struct gamePlayer
@@ -106,8 +108,6 @@ namespace CornerkickWebMvc.Models
       public string sRefereeDecisions { get; set; }
 
       public string sDivHeatmap { get; set; }
-
-      public List<string[]> ltComments { get; set; }
 
       // Chances
       public float[] fPlAction    { get; set; }

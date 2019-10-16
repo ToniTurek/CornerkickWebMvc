@@ -357,6 +357,20 @@ namespace CornerkickWebMvc.Controllers
 
       gLoc.gBall = gBall;
 
+      // Comments
+      gLoc.ltComments = new List<string[]>();
+
+      for (int iC = 0; iC < state.ltComment.Count; iC++) {
+        CornerkickGame.Game.Comment k = state.ltComment[iC];
+
+        if (string.IsNullOrEmpty(k.sText)) continue;
+
+        string[] sCommentarNew = new string[2];
+        sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + ": ";
+        sCommentarNew[1] = k.sText;
+        gLoc.ltComments.Add(sCommentarNew);
+      }
+
       return Json(gLoc, JsonRequestBehavior.AllowGet);
     }
 
@@ -372,7 +386,6 @@ namespace CornerkickWebMvc.Controllers
       } else if (iState >= 0) {
         gD = getAllGameData(view, iState);
       } else if (iState <  0) {
-        gD.ltComments.Clear();
         addGameData(ref gD, gameData, user, club, iState);
       }
 
@@ -393,17 +406,6 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Game.State state = gameData.ltState[gameData.ltState.Count - 1];
       if (iState >= 0 && iState < gameData.ltState.Count) state = gameData.ltState[iState];
-
-      for (int iC = 0; iC < state.ltComment.Count; iC++) {
-        CornerkickGame.Game.Comment k = state.ltComment[iC];
-
-        if (string.IsNullOrEmpty(k.sText)) continue;
-
-        string[] sCommentarNew = new string[2];
-        sCommentarNew[0] = MvcApplication.ckcore.ui.getMinuteString(k.tsMinute, true) + ": ";
-        sCommentarNew[1] = k.sText;
-        gD.ltComments.Add(sCommentarNew);
-      }
 
       float fLeft = ((state.tsMinute.Hours * 60f) + state.tsMinute.Minutes + (state.tsMinute.Seconds / 60f)) / 0.9f;
       if (gameData.bFinished) fLeft = (100.0f * state.i) / gameData.ltState.Count;
@@ -813,8 +815,6 @@ namespace CornerkickWebMvc.Controllers
       if (user.game == null) return gD;
 
       if (view.game == null) view.game = user.game;
-
-      gD.ltComments = new List<string[]>();
 
       // initialize chart values
       gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];

@@ -19,6 +19,8 @@ function drawGame(iState, iGameSpeed) {
     data: { iState: iState, bAverage: bAverage },
     success: function (gLoc2) {
       if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
+        $("#tblComments tr").remove();
+
         gLocArray = [];
         drawGame2(gLoc2, iState);
       } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
@@ -68,6 +70,7 @@ function drawGame2(gLoc, iState) {
   if (iPositionsValue >= 0) {
     data = getPlayer(gLoc, iPositionsValue == 0);
     drawGameDiv.html(data);
+    printComments(gLoc);
   }
 
   if (iState < 0 && gLoc.bFinished) {
@@ -210,6 +213,31 @@ function getPlayer(gLoc, bShowLookAt) {
   sBox += '<img src="/Content/Icons/ball_white.png\" alt=\"Ball\" style=\"position: absolute; width: ' + fSizeX.toString() + '%; height: ' + fSizeY.toString() + '%; top: ' + sYb + '%; left: ' + sXb + '%; z-index:23"/>';
 
   return sBox;
+}
+
+function printComments(gLoc) {
+  // Comment box
+  var tblComments = document.getElementById('tblComments');
+
+  var sLastComment = [];
+  var colLast = tblComments.getElementsByTagName("tbody")[0];
+  if (colLast.getElementsByTagName('td').length > 1) {
+    sLastComment[0] = colLast.getElementsByTagName('td')[0].innerHTML;
+    sLastComment[1] = colLast.getElementsByTagName('td')[1].innerHTML;
+  }
+
+  var iC = 0;
+  for (iC = 0; iC < gLoc.ltComments.length; ++iC) {
+    if (sLastComment[0] === gLoc.ltComments[iC][0] && sLastComment[1] === gLoc.ltComments[iC][1]) {
+      continue;
+    }
+
+    var rowComments = tblComments.insertRow(0);
+    var cellComments0 = rowComments.insertCell(0);
+    var cellComments1 = rowComments.insertCell(1);
+    cellComments0.innerHTML = gLoc.ltComments[iC][0];
+    cellComments1.innerHTML = gLoc.ltComments[iC][1];
+  }
 }
 
 function plotStatistics(jState = -1) {
@@ -474,32 +502,6 @@ function plotStatistics(jState = -1) {
       });
 
       $("#txtReferee").html("Schiedsrichter: " + gD.sRefereeQuality + "<br/>Fehlentscheidungen: " + gD.sRefereeDecisions);
-
-      // Comment box
-      var tblComments = document.getElementById('tblComments');
-      if (jState !== -1) {
-        $("#tblComments tr").remove();
-      }
-
-      var sLastComment = [];
-      var colLast = tblComments.getElementsByTagName("tbody")[0];
-      if (colLast.getElementsByTagName('td').length > 1) {
-        sLastComment[0] = colLast.getElementsByTagName('td')[0].innerHTML;
-        sLastComment[1] = colLast.getElementsByTagName('td')[1].innerHTML;
-      }
-
-      var iC = 0;
-      for (iC = 0; iC < gD.ltComments.length; ++iC) {
-        if (sLastComment[0] === gD.ltComments[iC][0] && sLastComment[1] === gD.ltComments[iC][1]) {
-          continue;
-        }
-
-        var rowComments = tblComments.insertRow(0);
-        var cellComments0 = rowComments.insertCell(0);
-        var cellComments1 = rowComments.insertCell(1);
-        cellComments0.innerHTML = gD.ltComments[iC][0];
-        cellComments1.innerHTML = gD.ltComments[iC][1];
-      }
 
       $("#statistikGoals").html(gD.sStatGoals);
       $("#statistikCards").html(gD.sStatCards);
