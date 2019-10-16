@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -772,7 +773,7 @@ namespace CornerkickWebMvc
       }
 
       try {
-        as3.downloadAllFiles("save/games/", sHomeDir, null, ".ckgx");
+        Task<bool> tkDownloadGames = Task.Run(async () => await downloadGamesAsync(as3, sHomeDir));
       } catch {
         ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
       }
@@ -859,6 +860,12 @@ namespace CornerkickWebMvc
       }
 
       return false;
+    }
+
+    private static async Task<bool> downloadGamesAsync(AmazonS3FileTransfer as3, string sHomeDir)
+    {
+      as3.downloadAllFiles("save/games/", sHomeDir, null, ".ckgx");
+      return true;
     }
 
 #if _USE_BLOB
