@@ -265,6 +265,13 @@ namespace CornerkickWebMvc
           clbNat.iLand = iN;
           clbNat.ltTactic[0].formation = ckcore.ltFormationen[8];
 
+          // Nat. staff
+          clbNat.staff.iCondiTrainer = 6;
+          clbNat.staff.iPhysio = 6;
+          clbNat.staff.iMentalTrainer = 6;
+          clbNat.staff.iDoctor = 6;
+          clbNat.staff.iKibitzer = 3;
+
           // Colors
           if (iN == 0) { // GER
             clbNat.cl[0] = System.Drawing.Color.White;
