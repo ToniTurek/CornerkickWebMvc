@@ -9,15 +9,11 @@
 <head>
   <script>
     $(document).ready(function () {
-      // Fill Log table
-      var ltLog = @Html.Raw(Json.Encode(Model.ltLog));
-      var tblLog = document.getElementById('tblLog');
-      var iL = 0;
-      for (iL = 0; iL < ltLog.length; ++iL) {
-        var rowComments = tblLog.insertRow(0);
-        var cellComments = rowComments.insertCell(0);
-        cellComments.innerHTML = ltLog[iL];
-      }
+      printLog(false);
+
+      $('#cbLog').click(function () {
+        printLog($(this).is(':checked'));
+      });
 
       // Fill Error table
       var ltErr = @Html.Raw(Json.Encode(Model.ltErr));
@@ -29,20 +25,47 @@
         cellComments.innerHTML = ltErr[iE];
       }
     });
+
+    function printLog(bUpDownloads) {
+      // Fill Log table
+      var ltLog = @Html.Raw(Json.Encode(Model.ltLog));
+
+      var tblLog = document.getElementById('tblLog');
+      $("#tblLog tr").remove();
+
+      var iL = 0;
+      for (iL = 0; iL < ltLog.length; ++iL) {
+        if (!bUpDownloads && ltLog[iL].includes("Succesfully downloaded file")) {
+          continue;
+        }
+
+        var rowComments = tblLog.insertRow(0);
+        var cellComments = rowComments.insertCell(0);
+        cellComments.innerHTML = ltLog[iL];
+      }
+    }
   </script>
 </head>
 
 <body style="height: 100%; min-height: 100%">
   @Html.ActionLink("Settings", "Settings", "Admin")
 
-  <h3>Log</h3>
-  <table id="tblLog" style="width: 100%; height: auto">
-    <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
-  </table>
+  <div style="position: relative; width: 100%">
+    <h3>Log</h3>
+    <div style="position: absolute; top: 0px; right: 0px">
+      <label>
+        <input id="cbLog" type="checkbox" value="false">
+        Down-/Upload logs
+      </label>
+    </div>
+    <table id="tblLog" style="width: 100%; height: auto">
+      <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+    </table>
 
-  <h3>Error</h3>
-  <table id="tblErr" style="width: 100%; height: auto">
-    <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
-  </table>
+    <h3>Error</h3>
+    <table id="tblErr" style="width: 100%; height: auto">
+      <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+    </table>
+  </div>
 </body>
 </html>
