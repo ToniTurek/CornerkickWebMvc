@@ -792,7 +792,7 @@ namespace CornerkickWebMvc
 
       // Load ck state
       if (ckcore.io.load(sFileLoad)) {
-        ckcore.tl.writeLog("File " + sFileLoad + " loaded. Elapsed time: ");
+        ckcore.tl.writeLog("File " + sFileLoad + " loaded.");
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
@@ -824,28 +824,16 @@ namespace CornerkickWebMvc
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
 
             if (fInterval > 10.0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
-              Controllers.AdminController adminController = new Controllers.AdminController();
-
-              adminController.setGameSpeedToAllUsers(0);
-
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (fInterval / 60f));
 
               ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
-              if (nSteps > 0) {
-                ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
-                for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
-              }
 
               int iGameSpeed = 0; // Calendar interval [s]
               int.TryParse(sStateFileContent[3], out iGameSpeed);
 
-              if (iGameSpeed > 0) adminController.setGameSpeedToAllUsers(iGameSpeed);
-
-              timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
-              timerCkCalender.Enabled  = bCalendarRunning;
-
-              ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
+              // Perform calendar steps in background
+              Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
             }
 
             if (sStateFileContent.Length > 5) {
@@ -872,6 +860,37 @@ namespace CornerkickWebMvc
     private static async Task<bool> downloadFilesAsync(AmazonS3FileTransfer as3, string sHomeDir, string sTargetPath, string sFiles)
     {
       as3.downloadAllFiles(sTargetPath, sHomeDir, null, sFiles);
+      return true;
+    }
+
+    private static async Task<bool> performCalendarStepsAsync(int nSteps, int iGameSpeed, double fInterval, bool bCalendarRunning)
+    {
+      // Create stopwatch
+      System.Diagnostics.Stopwatch swCalSteps = new System.Diagnostics.Stopwatch();
+
+      // Start stopwatch
+      swCalSteps.Start();
+
+      Controllers.AdminController.setGameSpeedToAllUsers(0);
+
+      if (nSteps > 0) {
+        ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
+        for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
+      }
+
+      if (iGameSpeed > 0) Controllers.AdminController.setGameSpeedToAllUsers(iGameSpeed);
+
+      timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
+      timerCkCalender.Enabled = bCalendarRunning;
+
+      ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
+
+      // Stop stopwatch
+      swCalSteps.Stop();
+
+      // Write elapsed time to log
+      ckcore.tl.writeLog("Elapsed time while performing calendar steps: " + swCalSteps.Elapsed.TotalSeconds.ToString("0.000") + "s");
+
       return true;
     }
 

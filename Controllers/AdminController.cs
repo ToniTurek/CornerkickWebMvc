@@ -105,7 +105,7 @@ namespace CornerkickWebMvc.Controllers
       return RedirectToAction("Settings");
     }
 
-    internal void setGameSpeedToAllUsers(int iGameSpeed)
+    internal static void setGameSpeedToAllUsers(int iGameSpeed)
     {
       foreach (CornerkickManager.User user in MvcApplication.ckcore.ltUser) {
         if (user.nextGame != null) user.nextGame.iGameSpeed = iGameSpeed;
