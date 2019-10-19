@@ -38,6 +38,9 @@
         if (!bUpDownloads && ltLog[iL].includes("Succesfully downloaded file")) {
           continue;
         }
+        if (!bUpDownloads && ltLog[iL].includes("Try to upload file")) {
+          continue;
+        }
 
         var rowComments = tblLog.insertRow(0);
         var cellComments = rowComments.insertCell(0);
