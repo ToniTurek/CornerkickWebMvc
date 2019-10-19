@@ -133,7 +133,7 @@ function getPlayer(gLoc, bShowLookAt) {
       var sLookAtXh = ((0.5 + (fLookAtAngleXh / 2) - (fLookAtSize / 2)) * 100).toString();
       var sLookAtYh = ((0.5 + (fLookAtAngleYh / 2) - (fLookAtSize / 2)) * 100).toString();
 
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sColorH0 + '; border: 2px solid ' + sColorH1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
+      sBox += '<div style="position: absolute; width: 2%; height: 3%; min-width: 12px; min-height: 12px; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sColorH0 + '; border: 2px solid ' + sColorH1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
       if (bCardH) {
         sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
       }
@@ -143,7 +143,7 @@ function getPlayer(gLoc, bShowLookAt) {
 
       // draw look-at circle
       if (bShowLookAt) {
-        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; min-width: 4px; min-height: 4px; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
       }
 
       sBox += '</div>';
@@ -167,7 +167,7 @@ function getPlayer(gLoc, bShowLookAt) {
 
       var sLookAtXa = ((0.5 + (fLookAtAngleXa / 2) - (fLookAtSize / 2)) * 100).toString();
       var sLookAtYa = ((0.5 + (fLookAtAngleYa / 2) - (fLookAtSize / 2)) * 100).toString();
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; top: ' + sYa + '%; left: ' + sXa + '%; background-color: ' + sColorA0 + '; border: 2px solid ' + sColorA1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
+      sBox += '<div style="position: absolute; width: 2%; height: 3%; min-width: 12px; min-height: 12px; top: ' + sYa + '%; left: ' + sXa + '%; background-color: ' + sColorA0 + '; border: 2px solid ' + sColorA1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
       if (bCardA) {
         sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
       }
@@ -177,7 +177,7 @@ function getPlayer(gLoc, bShowLookAt) {
 
       // draw look-at circle
       if (bShowLookAt) {
-        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; min-width: 4px; min-height: 4px; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
       }
 
       sBox += '</div>';
@@ -210,7 +210,7 @@ function getPlayer(gLoc, bShowLookAt) {
   var fSizeX = 1.25 + gLoc.gBall.Pos.Z;
   var fSizeY = fSizeX * 1.5;
   //sBox += '<div style="position: absolute; width: ' + fSizeX.toString() + '%; height: ' + fSizeY.toString() + '%; top: ' + sYb + '%; left: ' + sXb + '%; background-color: white; border: 2px solid black; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>';
-  sBox += '<img src="/Content/Icons/ball_white.png\" alt=\"Ball\" style=\"position: absolute; width: ' + fSizeX.toString() + '%; height: ' + fSizeY.toString() + '%; top: ' + sYb + '%; left: ' + sXb + '%; z-index:23"/>';
+  sBox += '<img src="/Content/Icons/ball_white.png\" alt=\"Ball\" style=\"position: absolute; width: ' + fSizeX.toString() + '%; height: ' + fSizeY.toString() + '%; min-width: 10px; min-height: 10px; top: ' + sYb + '%; left: ' + sXb + '%; z-index:23"/>';
 
   return sBox;
 }
