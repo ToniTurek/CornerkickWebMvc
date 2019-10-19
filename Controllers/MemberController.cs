@@ -434,10 +434,11 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Content("", "application/json");
 
-      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
+      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[4];
       dataPoints[0] = new List<Models.DataPointGeneral>();
       dataPoints[1] = new List<Models.DataPointGeneral>();
       dataPoints[2] = new List<Models.DataPointGeneral>();
+      dataPoints[3] = new List<Models.DataPointGeneral>();
 
       List<CornerkickGame.Game.Data> ltGameData = MvcApplication.ckcore.tl.getNextGames(club, MvcApplication.ckcore.dtDatum, false, true);
       int iLg = 0;
@@ -457,6 +458,7 @@ namespace CornerkickWebMvc.Controllers
         int iGameType = 0;
         if      (gs.iGameType == 2) iGameType = 1;
         else if (gs.iGameType == 5) iGameType = 2;
+        else if (gs.iGameType == 7) iGameType = 3;
 
         if (gs.team[0].iGoals == gs.team[1].iGoals) {
           dataPoints[iGameType].Add(new Models.DataPointGeneral(--iLg,  0, sDesc));
