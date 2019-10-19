@@ -897,9 +897,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Update player numbers if nation
       if (club.bNation) {
-        for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) {
-          if (ltPlayerTeam[iP].iNrNat == 0) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
-        }
+        for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
       }
 
       bool bGame = false;
@@ -1355,6 +1353,10 @@ namespace CornerkickWebMvc.Controllers
         fTop  -= fHeight / 2f;
         fLeft -= fWidth  / 2f;
 
+        // Set player no.
+        string sPlNo = pl.iNr.ToString();
+        if (club.bNation) sPlNo = (iPl + 1).ToString();
+
         sDiv += "<div onclick=\"javascript: selectPlayer(" + iPl.ToString() + ")\" style=\"position: absolute; ";
         sDiv += "top: "    + fTop   .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
         sDiv += "left: "   + fLeft  .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
@@ -1371,7 +1373,7 @@ namespace CornerkickWebMvc.Controllers
         int iFontSize = 230;
         if (bMobile) iFontSize = 125;
         sDiv += "<b style=\"position: absolute; width: 100%; text-align:center; font-size:" + iFontSize.ToString() + "%; color: black\">";
-        sDiv += pl.iNr.ToString();
+        sDiv += sPlNo;
         sDiv += "</b>";
         sDiv += "</div>";
       }

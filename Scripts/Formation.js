@@ -22,20 +22,20 @@
 
         if (document.getElementById("rbDefence").checked) {
           // Defence view
-          $.each(teamData.ltPlayer, function (iFormation, player) {
+          $.each(teamData.ltPlayer, function (iPl, player) {
             if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
               plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
 
-              var iPos = convertPosToPix(teamData.formation.ptPos[i].Y, 122 - teamData.formation.ptPos[i].X, -teamData.formationOpp.ptPos[player.iIxManMarking].Y, teamData.formationOpp.ptPos[player.iIxManMarking].X, document.getElementById("drawFormation"), false);
+              var iPos = convertPosToPix(teamData.formation.ptPos[iPl].Y, 122 - teamData.formation.ptPos[iPl].X, -teamData.formationOpp.ptPos[player.iIxManMarking].Y, teamData.formationOpp.ptPos[player.iIxManMarking].X, document.getElementById("drawFormation"), false);
               result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
             }
 
             var sNo = player.iNr.toString();
             if (teamData.bNation) {
-              sNo = player.iNrNat.toString();
+              sNo = (iPl + 1).toString();
             }
 
-            result += getBoxFormation(i, teamData.formation.ptPos[i], player.sName, sNo, teamData.ltPlayerAveSkill[i], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[i], bMobile, 1.0, null, null, teamData.ltPlayerNat[i], i === teamData.iCaptainIx, teamData.ltPlayerSusp[i]);
+            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, teamData.ltPlayerAveSkill[iPl], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[iPl], bMobile, 1.0, null, null, teamData.ltPlayerNat[iPl], iPl === teamData.iCaptainIx, teamData.ltPlayerSusp[iPl]);
 
             i = i + 1;
             return i !== 11;
@@ -47,7 +47,7 @@
             } else if (teamData.ltPlayerOpp) {
               // opponent player
               var j = 0;
-              $.each(teamData.ltPlayerOpp, function (iFormation, playerOpp) {
+              $.each(teamData.ltPlayerOpp, function (iPl, playerOpp) {
                 var sPlayerOppName = "";
                 var sPlayerOppAveSkill = "";
                 var sPlayerOppPos = "";
@@ -55,21 +55,21 @@
                   sPlayerOppName = playerOpp.sName;
 
                   if (teamData.iKibitzer > 2) {
-                    sPlayerOppAveSkill = teamData.ltPlayerOppAveSkill[j];
-                    sPlayerOppPos = teamData.ltPlayerOppPos[j];
+                    sPlayerOppAveSkill = teamData.ltPlayerOppAveSkill[iPl];
+                    sPlayerOppPos = teamData.ltPlayerOppPos[iPl];
                   }
                 }
 
                 var sOppNo = playerOpp.iNr.toString();
                 if (teamData.bNation) {
-                  sOppNo = playerOpp.iNrNat.toString();
+                  sOppNo = (iPl + 1).toString();
                 }
 
-                result += getBoxFormation(i, teamData.formationOpp.ptPos[j], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
+                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
 
                 i = i + 1;
                 j = j + 1;
-                return i !== 11;
+                return j !== 11;
               });
 
               if (teamData.iKibitzer > 2) {
