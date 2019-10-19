@@ -785,8 +785,8 @@ namespace CornerkickWebMvc
         ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
       }
 
-      // Download log
-      as3.downloadFile("ckLog", sHomeDir + "/log.zip");
+      // Download log async
+      downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip");
 #endif
 #endif
 
@@ -855,6 +855,12 @@ namespace CornerkickWebMvc
       }
 
       return false;
+    }
+
+    private static async Task<bool> downloadFileAsync(AmazonS3FileTransfer as3, string sKey, string sFile)
+    {
+      as3.downloadFile(sKey, sFile);
+      return true;
     }
 
     private static async Task<bool> downloadFilesAsync(AmazonS3FileTransfer as3, string sHomeDir, string sTargetPath, string sFiles)
