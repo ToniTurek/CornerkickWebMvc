@@ -65,6 +65,8 @@
       getCurrent();
       getTrGel();
       getJouthInt();
+      getClubHouse();
+      getClubMuseum();
 
       $("#bnBuildTrGel").click(function () {
         buildTrGel();
@@ -72,6 +74,14 @@
 
       $("#bnBuildJouthInt").click(function () {
         buildJouthInt();
+      });
+
+      $("#bnBuildClubHouse").click(function () {
+        buildClubHouse();
+      });
+
+      $("#bnBuildClubMuseum").click(function () {
+        buildClubMuseum();
       });
 
       $("#tbCarpark").on('keyup', function (ev) {
@@ -128,6 +138,24 @@
             $("#pbJouth").css("display", "block");
             $("#tbJouth").css("display", "none");
             $("#bnBuildJouth").css("display", "none");
+          }
+
+          $("#txtClubHouse").text("Aktuell: " + sCurrent[4][0]);
+          if (sCurrent[4][2] != "0") {
+            $("#txtClubHouseNew").text("Ausbau zu: " + sCurrent[4][1] + " (noch " + sCurrent[4][2] + "d)");
+            $("#pbClubHouse").progressbar("value", parseFloat(sCurrent[4][3].replace("%", "").replace(",", ".")));
+            $("#pbClubHouse").css("display", "block");
+            $("#tbClubHouse").css("display", "none");
+            $("#bnBuildClubHouse").css("display", "none");
+          }
+
+          $("#txtClubMuseum").text("Aktuell: " + sCurrent[5][0]);
+          if (sCurrent[5][2] != "0") {
+            $("#txtClubMuseumNew").text("Ausbau zu: " + sCurrent[5][1] + " (noch " + sCurrent[5][2] + "d)");
+            $("#pbClubMuseum").progressbar("value", parseFloat(sCurrent[5][3].replace("%", "").replace(",", ".")));
+            $("#pbClubMuseum").css("display", "block");
+            $("#tbClubMuseum").css("display", "none");
+            $("#bnBuildClubMuseum").css("display", "none");
           }
 
           $("#txtPark").text("Parkplätze - Aktuell: " + sCurrent[2][0]);
@@ -188,6 +216,48 @@
             bnBuildJouthInt.disabled = true;
           } else {
             bnBuildJouthInt.disabled = false;
+          }
+        }
+      });
+    }
+
+    function getClubHouse() {
+      bnBuilClubHouse = document.getElementById("bnBuildClubHouse");
+      bnBuildClubHouse.disabled = true;
+
+      var iCH = $('#ddlClubHouse').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSurr',
+        dataType: "json",
+        data: { i: iCH, iType: 4 },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildClubHouse").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildClubHouse.disabled = true;
+          } else {
+            bnBuildClubHouse.disabled = false;
+          }
+        }
+      });
+    }
+
+    function getClubMuseum() {
+      bnBuilClubMuseum = document.getElementById("bnBuildClubMuseum");
+      bnBuildClubMuseum.disabled = true;
+
+      var iCH = $('#ddlClubMuseum').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetCostSurr',
+        dataType: "json",
+        data: { i: iCH, iType: 5 },
+        success: function (sCostDaysDispo) {
+          $("#bnBuildClubMuseum").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            bnBuildClubMuseum.disabled = true;
+          } else {
+            bnBuildClubMuseum.disabled = false;
           }
         }
       });
@@ -263,6 +333,34 @@
       });
     }
 
+    function buildClubHouse() {
+      var iCH = $('#ddlClubHouse').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildClubHouse',
+        dataType: "json",
+        data: { iLevel: iCH },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function buildClubMuseum() {
+      var iCM = $('#ddlClubMuseum').val();
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildClubMuseum',
+        dataType: "json",
+        data: { iLevel: iCM },
+        success: function (sMessage) {
+          alert(sMessage);
+          window.location.reload(true);
+        }
+      });
+    }
+
     function buildPark() {
       var iPark = $('#tbCarpark').val();
       $.ajax({
@@ -296,6 +394,36 @@
 <body>
   <h2>Stadionumgebung</h2>
   <div style="position: relative; height: 700px">
+    <div style="position: relative; float: left; width: 320px; height: 259px">
+      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
+
+      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
+        <text style="position: relative; width: 264px; font-size: 18px">Vereinsheim</text>
+        <p id="txtClubHouse" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
+        <p id="txtClubHouseNew" style="position: relative; width: 264px; margin: 0"></p>
+        <div id="pbClubHouse" style="position: relative; width: 264px"><div id="plClubHouse" class="progress-label"></div></div>
+        @Html.DropDownListFor(m => m.iClubHouse, Model.ddlClubHouse, new { @class = "form-control", @onchange = "getClubHouse()", id = "ddlClubHouse", @style = "width: 264px; min-width: 264px" })
+        <button type="submit" id="bnBuildClubHouse" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
+      </div>
+    </div>
+
+    <div style="position: relative; float: left; width: 320px; height: 259px">
+      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
+    </div>
+
+    <div style="position: relative; float: left; width: 320px; height: 259px">
+      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
+
+      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
+        <text style="position: relative; width: 264px; font-size: 18px">Vereinsmuseum</text>
+        <p id="txtClubMuseum" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
+        <p id="txtClubMuseumNew" style="position: relative; width: 264px; margin: 0"></p>
+        <div id="pbClubMuseum" style="position: relative; width: 264px"><div id="plClubMuseum" class="progress-label"></div></div>
+        @Html.DropDownListFor(m => m.iClubMuseum, Model.ddlClubMuseum, new { @class = "form-control", @onchange = "getClubMuseum()", id = "ddlClubMuseum", @style = "width: 264px; min-width: 264px" })
+        <button type="submit" id="bnBuildClubMuseum" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
+      </div>
+    </div>
+
     <div style="position: relative; float: left; width: 320px; height: 259px">
       <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
 
@@ -348,6 +476,10 @@
         @Html.EditorFor(Model => Model.iCounter, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: relative; width: 264px; min-width: 264px; text-align: right", id = "tbCounter", autocomplete = "off", min = "0" } })
         <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 264px">Kosten: 0</button>
       </div>
+    </div>
+
+    <div style="position: relative; float: left; width: 320px; height: 259px">
+      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
     </div>
   </div>
 </body>
