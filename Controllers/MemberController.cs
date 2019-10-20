@@ -98,7 +98,7 @@ namespace CornerkickWebMvc.Controllers
       ""
     };
 
-    private static bool bShowNation = true; // Flag if nation will be used if possible
+    private static bool[] bShowClub = new bool[MvcApplication.iNations.Length]; // Flag if club will be used if nation is possible
 
     public MemberController()
     {
@@ -125,7 +125,14 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       // National team
-      if (usr.nation != null && bShowNation) return usr.nation;
+      if (usr.nation != null) {
+        for (byte iN = 0; iN < bShowClub.Length; iN++) {
+          if (usr.nation.iLand == MvcApplication.iNations[iN]) {
+            if (!bShowClub[iN]) return usr.nation;
+            break;
+          }
+        }
+      }
 
       // Club
       return usr.club;
@@ -153,7 +160,14 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       // National team
-      if (usr.nation != null && bShowNation) return usr.nation;
+      if (usr.nation != null) {
+        for (byte iN = 0; iN < bShowClub.Length; iN++) {
+          if (usr.nation.iLand == MvcApplication.iNations[iN]) {
+            if (!bShowClub[iN]) return usr.nation;
+            break;
+          }
+        }
+      }
 
       // Club
       return usr.club;
@@ -205,9 +219,19 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult SwitchClubNation()
     {
-      bShowNation = !bShowNation;
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return null;
 
-      return Json(bShowNation, JsonRequestBehavior.AllowGet);
+      if (usr.nation != null) {
+        for (byte iN = 0; iN < bShowClub.Length; iN++) {
+          if (usr.nation.iLand == MvcApplication.iNations[iN]) {
+            bShowClub[iN] = !bShowClub[iN];
+            break;
+          }
+        }
+      }
+
+      return Json(bShowClub, JsonRequestBehavior.AllowGet);
     }
 
 #if _CONSOLE
