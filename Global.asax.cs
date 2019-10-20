@@ -250,7 +250,7 @@ namespace CornerkickWebMvc
       if (cupWc == null) {
         cupWc = new CornerkickManager.Cup(bKo: true, bKoTwoGames: false, nGroups: 2, bGroupsTwoGames: false, nQualifierKo: 2);
         cupWc.iId = 7;
-        cupWc.sName = "World Cup";
+        cupWc.sName = "Weltmeisterschaft";
         cupWc.settings.iNeutral = 1;
         cupWc.settings.dtStart = dtLeagueEnd.Date + new TimeSpan(20, 30, 00);
         cupWc.settings.dtEnd = ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
