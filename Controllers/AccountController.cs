@@ -256,6 +256,12 @@ namespace CornerkickWebMvc.Controllers
         }
 
         clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision);
+        
+        // Assign club colors
+        clb.cl[0] = registerViewModel.cl1;
+        clb.cl[1] = registerViewModel.cl2;
+        clb.cl[2] = registerViewModel.cl3;
+        clb.cl[3] = registerViewModel.cl4;
       } else {
         clb = clubExist;
       }

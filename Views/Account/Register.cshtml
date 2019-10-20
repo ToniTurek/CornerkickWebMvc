@@ -3,30 +3,96 @@
   ViewBag.Title = "Registrieren";
 }
 
-<h2>@ViewBag.Title.</h2>
+<!DOCTYPE html>
+<html style="height: 100%; min-height: 100%">
+<head>
+  <link rel="stylesheet" href="~/Content/spectrum.css" />
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
+  <script type="text/javascript" src="~/Scripts/spectrum.js"></script>
 
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" })) {
+  <script type="text/javascript">
+    clPalette = [
+      ["#000", "#444", "#666", "#999", "#ccc", "#eee", "#f3f3f3", "#fff"],
+      ["#f00", "#f90", "#ff0", "#0f0", "#0ff", "#00f", "#90f", "#f0f"],
+      ["#f4cccc", "#fce5cd", "#fff2cc", "#d9ead3", "#d0e0e3", "#cfe2f3", "#d9d2e9", "#ead1dc"],
+      ["#ea9999", "#f9cb9c", "#ffe599", "#b6d7a8", "#a2c4c9", "#9fc5e8", "#b4a7d6", "#d5a6bd"],
+      ["#e06666", "#f6b26b", "#ffd966", "#93c47d", "#76a5af", "#6fa8dc", "#8e7cc3", "#c27ba0"],
+      ["#c00", "#e69138", "#f1c232", "#6aa84f", "#45818e", "#3d85c6", "#674ea7", "#a64d79"],
+      ["#900", "#b45f06", "#bf9000", "#38761d", "#134f5c", "#0b5394", "#351c75", "#741b47"],
+      ["#600", "#783f04", "#7f6000", "#274e13", "#0c343d", "#073763", "#20124d", "#4c1130"]
+    ];
+
+    $(document).ready(function () {
+      $("#inputCl1").spectrum({
+        color: "white",
+        showPaletteOnly: true,
+        togglePaletteOnly: true,
+        togglePaletteMoreText: 'mehr',
+        togglePaletteLessText: 'weniger',
+        palette: clPalette
+      });
+
+      $("#inputCl2").spectrum({
+        color: "blue",
+        showPaletteOnly: true,
+        togglePaletteOnly: true,
+        togglePaletteMoreText: 'mehr',
+        togglePaletteLessText: 'weniger',
+        palette: clPalette
+      });
+
+      $("#inputCl3").spectrum({
+        color: "white",
+        showPaletteOnly: true,
+        togglePaletteOnly: true,
+        togglePaletteMoreText: 'mehr',
+        togglePaletteLessText: 'weniger',
+        palette: clPalette
+      });
+
+      $("#inputCl4").spectrum({
+        color: "red",
+        showPaletteOnly: true,
+        togglePaletteOnly: true,
+        togglePaletteMoreText: 'mehr',
+        togglePaletteLessText: 'weniger',
+        palette: clPalette
+      });
+    });
+
+    function setColor(iCl) {
+      var sCl = $("#inputCl" + iCl.toString()).spectrum('get').toHexString();
+      document.getElementById('cl' + iCl.toString()).value = sCl;
+      document.getElementById('divJersey' + iCl.toString()).style.backgroundColor = sCl;
+    }
+  </script>
+</head>
+
+<body style="height: 100%; min-height: 100%">
+  <h2>@ViewBag.Title.</h2>
+
+  @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" })) {
     @Html.AntiForgeryToken()
     <h4>Neues Konto erstellen.</h4>
     <hr />
     @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
-        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-        </div>
+      @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+      <div class="col-md-10">
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+      </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.Vorname, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Vorname, new { @class = "form-control" })
-        </div>
+      @Html.LabelFor(m => m.Vorname, new { @class = "col-md-2 control-label" })
+      <div class="col-md-10">
+        @Html.TextBoxFor(m => m.Vorname, new { @class = "form-control" })
+      </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.Nachname, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Nachname, new { @class = "form-control" })
-        </div>
+      @Html.LabelFor(m => m.Nachname, new { @class = "col-md-2 control-label" })
+      <div class="col-md-10">
+        @Html.TextBoxFor(m => m.Nachname, new { @class = "form-control" })
+      </div>
     </div>
     <div class="form-group">
       @Html.LabelFor(m => m.Verein, new { @class = "col-md-2 control-label" })
@@ -37,7 +103,7 @@
     <div class="form-group">
       <label class="col-md-2 control-label" for="Wappen">Wappen (nur .png)</label>
       <div class="col-md-10">
-        @Html.TextBox("file", "", new { @class = "form-control", type = "file", accept = "*.png" }) <br/>
+        @Html.TextBox("file", "", new { @class = "form-control", type = "file", accept = "*.png" }) <br />
       </div>
     </div>
     <div class="form-group">
@@ -61,16 +127,42 @@
       </div>
     }
     <div class="form-group">
-        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+      <label class="col-md-2 control-label" for="Liga">Vereinsfarben</label>
+      <div class="col-md-10" style="width: 320px; height: 60px">
+        <input type='text' class='basic' id="inputCl1" onchange="setColor(1)" />
+        <input type='text' class='basic' id="inputCl2" onchange="setColor(2)" />
+        <div id="divJersey1" style="position: absolute; top: 0px; right: 20px; width: 48px; height: auto; background-color: white">
+          <img style="position: relative; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
         </div>
+        <div id="divJersey2" style="position: absolute; top: 36px; right: 30px; width: 28px; height: 20px; border: 1px solid black; background-color: blue"></div>
+        @Html.TextBoxFor(m => m.cl1, new { @class = "hidden" })
+        @Html.TextBoxFor(m => m.cl2, new { @class = "hidden" })
+      </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+      <label class="col-md-2 control-label" for="Liga">Alternativfarben</label>
+      <div class="col-md-10" style="width: 320px; height: 60px">
+        <input type="text" class="basic" id="inputCl3" onchange="setColor(3)" />
+        <input type="text" class="basic" id="inputCl4" onchange="setColor(4)" />
+        <div id="divJersey3" style="position: absolute; top: 0px; right: 20px; width: 48px; height: auto; background-color: white">
+          <img style="position: relative; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
         </div>
+        <div id="divJersey4" style="position: absolute; top: 36px; right: 30px; width: 28px; height: 20px; border: 1px solid black; background-color: red"></div>
+        @Html.TextBoxFor(m => m.cl3, new { @class = "hidden" })
+        @Html.TextBoxFor(m => m.cl4, new { @class = "hidden" })
+      </div>
+    </div>
+    <div class="form-group">
+      @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+      <div class="col-md-10">
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+      </div>
+    </div>
+    <div class="form-group">
+      @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
+      <div class="col-md-10">
+        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+      </div>
     </div>
     <div class="form-group">
       <div class="col-md-offset-2 col-md-10">
@@ -85,8 +177,10 @@
         }
       </div>
     </div>
-}
+  }
 
-@section Scripts {
-  @Scripts.Render("~/bundles/jqueryval")
-}
+  @section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+  }
+</body>
+</html>

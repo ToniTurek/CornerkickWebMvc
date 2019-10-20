@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 
 namespace CornerkickWebMvc.Models
 {
@@ -109,6 +110,12 @@ namespace CornerkickWebMvc.Models
     [DataType(DataType.Text)]
     [Display(Name = "Verein")]
     public int iClubIx { get; set; }
+
+    //[Required]
+    public Color cl1 { get; set; }
+    public Color cl2 { get; set; }
+    public Color cl3 { get; set; }
+    public Color cl4 { get; set; }
 
 #if !DEBUG
     [Required]
