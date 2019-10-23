@@ -32,6 +32,16 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       if (usr == null) return null;
 
+      // National team
+      if (usr.nation != null) {
+        for (byte iN = 0; iN < CornerkickWebMvc.Controllers.MemberController.bShowClub.Length; iN++) {
+          if (usr.nation.iLand == MvcApplication.iNations[iN]) {
+            if (!CornerkickWebMvc.Controllers.MemberController.bShowClub[iN]) return usr.nation;
+            break;
+          }
+        }
+      }
+
       return usr.club;
     }
 

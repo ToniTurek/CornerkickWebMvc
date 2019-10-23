@@ -98,7 +98,7 @@ namespace CornerkickWebMvc.Controllers
       ""
     };
 
-    private static bool[] bShowClub = new bool[MvcApplication.iNations.Length]; // Flag if club will be used if nation is possible
+    internal static bool[] bShowClub = new bool[MvcApplication.iNations.Length]; // Flag if club will be used if nation is possible
 
     public MemberController()
     {
