@@ -116,8 +116,8 @@
       </table>
     </div>
 
-    <h4>Rekorde</h4>
     <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
+      <h4>Rekorde</h4>
       <table cellpadding="1" style="width: auto">
         <tbody>
           @if (Model.club.bNation) {
@@ -181,6 +181,19 @@
           }
         </tbody>
       </table>
+    </div>
+
+    <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
+      <h4>Erfolge:</h4>
+      @foreach (CornerkickManager.Main.Success success in Model.club.ltSuccess) {
+        string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
+        string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
+        if (success.cup == null) { continue; }
+
+        <b>@success.cup.sName</b>
+        <p>@sWDD</p>
+        <p>@sCupWin</p>
+      }
     </div>
 
     @if (Model.club.bNation) {
