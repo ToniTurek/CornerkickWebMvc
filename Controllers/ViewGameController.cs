@@ -215,8 +215,10 @@ namespace CornerkickWebMvc.Controllers
           for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
         }
 
+        /*
         if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemH))) sEmblemH = "0.png";
         if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemA))) sEmblemA = "0.png";
+        */
 
         view.sEmblemH = sEmblemDirHtml + sEmblemH;
         view.sEmblemA = sEmblemDirHtml + sEmblemA;
