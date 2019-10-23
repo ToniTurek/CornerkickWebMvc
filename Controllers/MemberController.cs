@@ -1993,17 +1993,16 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0)
+    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0, bool bNegotiate = true)
     {
-      if (iPlayerId < 0) return Json("Invalid player",                    JsonRequestBehavior.AllowGet);
-      if (iYears    < 1) return Json("Invalid number of contract length", JsonRequestBehavior.AllowGet);
+      if (iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       int iGamesPerSeason = MvcApplication.ckcore.tl.getMatchdays(MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision), club);
 
-      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee);
+      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee, bNegotiate: bNegotiate);
 
       return Json(contract, JsonRequestBehavior.AllowGet);
     }

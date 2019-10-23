@@ -1,13 +1,16 @@
-﻿function getSalary(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee) {
+﻿function getContract(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee, bNego) {
   //alert(iPlayerId + ", " + iYears + ", " + iSalaryOffer);
   return $.ajax({
     type: 'post',
     url: '/Member/GetPlayerSalary',
     dataType: "json",
     data: {
-      iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee
+      iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee, bNegotiate: bNego
     },
     success: function (contract) {
+    },
+    error: function (sReturn) {
+      alert(sReturn);
     }
   });
 }
@@ -44,7 +47,7 @@ function createTableTransferDetails() {
 }
 
 function getContractDialog(parent, iPlayerId, bFeeDialog) {
-  $.when(getSalary(iPlayerId, 1, 0, 0, 0)).done(function (contract) {
+  $.when(getContract(iPlayerId, 0, 0, 0, 0, 0, false)).done(function (contract) {
     if (contract.fMood < 0) {
       alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
     } else {
@@ -73,7 +76,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       div12.align = "left";
       var input12 = document.createElement("input");
       input12.className = "form-control tbContractYears text-box single-line";
-      input12.id = "iContractYears2";
+      input12.id = "tbContractYears";
       input12.style.textAlign = "right";
       input12.style.width = "60px";
       input12.type = "tel";
@@ -82,7 +85,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       input12.step = "1";
       input12.value = contract.iLength.toString();
       input12.autocomplete = "off";
-      input12.onkeyup = function () { input12Keyup(input12, iPlayerId); };
+      input12.onkeyup = function () { updateContract(iPlayerId, input12, false); };
       div12.appendChild(input12);
       div1.appendChild(div12);
       div0.appendChild(div1);
@@ -243,6 +246,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       divFixFee.style.position = "relative";
       divFixFee.style.width = "100%";
       divFixFee.style.height = "60px";
+      /*
       var divFixFee1 = document.createElement("div");
       divFixFee1.style.position = "absolute";
       divFixFee1.style.width = "45%";
@@ -253,6 +257,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       pFixFee1.innerText = contract.iFixTransferFee.toLocaleString() + " €";
       divFixFee1.appendChild(pFixFee1);
       divFixFee.appendChild(divFixFee1);
+      */
       var div26 = document.createElement("div");
       div26.style.position = "relative";
       div26.style.width = "45%";
@@ -284,6 +289,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
         aDec: ',',
         mDec: '0'
       });
+      input262.onkeyup = function () { updateContract(iPlayerId, input12, false); };
       div262.appendChild(input262);
       div26.appendChild(div262);
       divFixFee.appendChild(div26);
@@ -306,7 +312,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       bnNegotiate.className = "btn btn-default";
       bnNegotiate.style.width = "100%";
       bnNegotiate.innerText = "verhandeln";
-      bnNegotiate.onclick = function () { bnNegotiateClick(iPlayerId); };
+      bnNegotiate.onclick = function () { updateContract(iPlayerId, input12, true); };
       div6.appendChild(bnNegotiate);
       div0.appendChild(div6);
 
@@ -325,11 +331,11 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
             //class: "foo bar baz",
             id: "bnOk",
             click: function () {
-              var iYears = $("#iContractYears2").val();
+              var iYears = $("#tbContractYears").val();
               var sSalary = $("#txtContractMoney2").text();
               var sBonusPlay = $("#txtContractBonusPlay").text();
               var sBonusGoal = $("#txtContractBonusGoal").text();
-              var sFixTransferFee = $("#txtContractFixFee").text();
+              var sFixTransferFee = $("#tbContractFixTransferFeeOffer").val();
               var sPlayerMood = $("#txtContractMood2").text();
 
               var iMode = 0;
@@ -362,7 +368,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
             text: "Abbrechen",
             icon: "ui-icon-closethick",
             click: function () {
-              $(this).dialog("close");
+              $(this).dialog('destroy').remove();
             }
 
             // Uncommenting the following line would hide the text,
@@ -376,6 +382,10 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
 }
 
 function input12Keyup(input12, iPlayerId) {
+  setInitialContractReq(input12, iPlayerId);
+}
+
+function setInitialContractReq(input12, iPlayerId) {
   var bnNegotiate = document.getElementById("bnNegotiate");
 
   if (input12.value > 10) {
@@ -386,31 +396,49 @@ function input12Keyup(input12, iPlayerId) {
     bnNegotiate.disabled = false;
   }
 
-  $.when(getSalary(iPlayerId, input12.value, 0, 0, 0, 0)).done(function (contract) {
+  var iFixedFee = getIntFromString($("#tbContractFixTransferFeeOffer").val());
+  $.when(getContract(iPlayerId, input12.value, 0, 0, 0, iFixedFee, false)).done(function (contract) {
     $("#txtContractMoney2").text(contract.iSalary.toLocaleString() + " €");
     setMoodText(contract.fMood);
     $("#tbContractSalaryOffer2").val(contract.iSalary.toLocaleString());
   });
 }
 
-function bnNegotiateClick(iPlayerId) {
-  var iYears = $("#iContractYears2").val();
+function updateContract(iPlayerId, input12, bNego) {
+  var bnNegotiate = document.getElementById("bnNegotiate");
+
+  if (input12.value > 10) {
+    input12.style.backgroundColor = "red";
+    bnNegotiate.disabled = true;
+  } else {
+    input12.style.backgroundColor = "";
+    bnNegotiate.disabled = false;
+  }
+
+  var iYears = $("#tbContractYears").val();
   var iSalaryOffer    = getIntFromString($("#tbContractSalaryOffer2").val());
   var iBonusPlayOffer = getIntFromString($("#tbContractBonusPlayOffer").val());
   var iBonusGoalOffer = getIntFromString($("#tbContractBonusGoalOffer").val());
   var iFixedFee = getIntFromString($("#tbContractFixTransferFeeOffer").val());
 
-  $.when(getSalary(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee)).done(function (contract) {
+  $.when(getContract(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee, bNego)).done(function (contract) {
     if (contract.fMood < 0) {
       alert("Der Spieler hat die Vertragsverhandlungen abgebrochen!");
       jTable.ajax.reload();
 
-      $("#dialogContract").dialog("close");
+      $("#dialogContract2").dialog("close");
     } else {
+      if (bNego) {
+        setMoodText(contract.fMood);
+      } else {
+        $("#tbContractSalaryOffer2")  .val(contract.iSalary.toLocaleString());
+        $("#tbContractBonusPlayOffer").val(contract.iPlay  .toLocaleString());
+        $("#tbContractBonusGoalOffer").val(contract.iGoal  .toLocaleString());
+      }
+
       $("#txtContractMoney2"   ).html(contract.iSalary.toLocaleString() + " €");
       $("#txtContractBonusPlay").html(contract.iPlay  .toLocaleString() + " €");
       $("#txtContractBonusGoal").html(contract.iGoal  .toLocaleString() + " €");
-      setMoodText(contract.fMood);
     }
   });
 }
