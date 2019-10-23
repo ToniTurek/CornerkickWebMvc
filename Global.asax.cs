@@ -780,7 +780,7 @@ namespace CornerkickWebMvc
       }
 
       try {
-        Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, sHomeDir, "save/games/", ".ckgx"));
+        Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, "save/games/", sHomeDir, ".ckgx"));
       } catch {
         ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
       }
@@ -847,7 +847,7 @@ namespace CornerkickWebMvc
 
         // Download emblems
 #if _USE_AMAZON_S3
-        Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, sHomeDir, "emblems/", ".png"));
+        Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, "emblems/", sHomeDir + "/../Content/Uploads/", ".png"));
 #endif
 #endif
 
@@ -863,9 +863,9 @@ namespace CornerkickWebMvc
       return true;
     }
 
-    private static async Task<bool> downloadFilesAsync(AmazonS3FileTransfer as3, string sHomeDir, string sTargetPath, string sFiles)
+    private static async Task<bool> downloadFilesAsync(AmazonS3FileTransfer as3, string sS3SubDir, string sTargetPath, string sFiles)
     {
-      as3.downloadAllFiles(sTargetPath, sHomeDir, null, sFiles);
+      as3.downloadAllFiles(sS3SubDir, sTargetPath, null, sFiles);
       return true;
     }
 
