@@ -482,7 +482,7 @@
             url: '/Member/TeamSetIndOrientation',
             type: "GET",
             dataType: "JSON",
-            data: { iIndexPlayer: iSelectedPlayer - 1, fIndOrientation: ui.value / 100 },
+            data: { iIndexPlayer: iSelectedPlayer - 1, iTactic: 0, fIndOrientation: ui.value / 100 },
             success: function (fIndOrientation) {
               drawAufstellung(iFormation, iSelectedPlayer, false);
               //alert("Orientation set to " + fTaktik);

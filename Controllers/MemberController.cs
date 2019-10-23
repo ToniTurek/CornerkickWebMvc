@@ -1052,19 +1052,14 @@ namespace CornerkickWebMvc.Controllers
       return Json("success", JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult TeamSetIndOrientation(int iIndexPlayer, float fIndOrientation)
+    public JsonResult TeamSetIndOrientation(int iIndexPlayer, int iTactic, float fIndOrientation)
     {
       if (iIndexPlayer < 0) return Json("error", JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Player pl = club.ltPlayer[iIndexPlayer];
-
-      pl.fIndOrientation = fIndOrientation;
-
-      //MvcApplication.ckcore.ltPlayer[club.ltPlayer[iIndexPlayer]] = pl;
-      Models.TeamModels.ltPlayer[iIndexPlayer] = pl;
+      club.ltTactic[iTactic].formation.fIndOrientation[iIndexPlayer] = fIndOrientation;
 
       updatePlayerOfGame(ckUser().game, club);
 
@@ -1225,8 +1220,8 @@ namespace CornerkickWebMvc.Controllers
 
       if (iSP >= 0) {
         tD.plSelected = tD.ltPlayer[iSP];
-        tD.fIndOrientation = tD.plSelected.fIndOrientation;
-        if (tD.fIndOrientation < -1f) tD.fIndOrientation = MvcApplication.ckcore.game.tl.getPlayerIndividualOrientationDefault(tD.plSelected);
+        tD.fIndOrientation = tD.formation.fIndOrientation[iSP];
+        if (tD.fIndOrientation < -1f) tD.fIndOrientation = CornerkickGame.Tool.getPlayerIndividualOrientationDefault(tD.ltPlayerPos[iSP]);
 
         tD.sDivRoa               = TeamGetPlayerRadiusOfAction(iSP, club);
         tD.fIndOrientationMinMax = TeamGetIndOrientationMinMax(iSP, club);
@@ -1370,7 +1365,7 @@ namespace CornerkickWebMvc.Controllers
 
         float fWidth  = fHeight * (3f / 2f);
 
-        int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(tc.formation.ptPos[iPl].X, pl, tc.fOrientation);
+        int iXOffence = CornerkickGame.Tool.getXPosOffence(tc, iPl, MvcApplication.ckcore.game.ptPitch);
         float fTop  = 1f - (iXOffence / (float)MvcApplication.ckcore.game.ptPitch.X);
         float fLeft = (tc.formation.ptPos[iPl].Y + MvcApplication.ckcore.game.ptPitch.Y) / (float)(2 * MvcApplication.ckcore.game.ptPitch.Y);
 
@@ -1415,7 +1410,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Tactic tc = club.ltTactic[iTactic];
 
-      int iXOffence = MvcApplication.ckcore.game.tl.getXPosOffence(tc.formation.ptPos[iPlayerIndex].X, pl, tc.fOrientation);
+      int iXOffence = CornerkickGame.Tool.getXPosOffence(tc, iPlayerIndex, MvcApplication.ckcore.game.ptPitch);
 
       for (double fRoa = 0.5; fRoa < 1.01; fRoa += 0.1) {
         System.Drawing.Point ptRoaTL = MvcApplication.ckcore.game.tl.getRndPos(tc.formation.ptPos[iPlayerIndex].X, pl, tc.formation, tc.fOrientation, +1, -1, fRoa, fRoa);
@@ -1501,8 +1496,9 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player pl = club.ltPlayer[iPlayerIndex];
 
-      fIndOrientationMinMax[0] = MvcApplication.ckcore.game.tl.getXPosOffence(club.ltTactic[iTactic].formation.ptPos[iPlayerIndex].X, club.ltTactic[iTactic].fOrientation, -1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
-      fIndOrientationMinMax[1] = MvcApplication.ckcore.game.tl.getXPosOffence(club.ltTactic[iTactic].formation.ptPos[iPlayerIndex].X, club.ltTactic[iTactic].fOrientation, +1f) / (float)MvcApplication.ckcore.game.ptPitch.X;
+      CornerkickGame.Tactic tc = club.ltTactic[iTactic];
+      fIndOrientationMinMax[0] = CornerkickGame.Tool.getXPosOffence(tc.formation.ptPos[iPlayerIndex].X, tc.fOrientation, -1f, MvcApplication.ckcore.game.ptPitch.X) / (float)MvcApplication.ckcore.game.ptPitch.X;
+      fIndOrientationMinMax[1] = CornerkickGame.Tool.getXPosOffence(tc.formation.ptPos[iPlayerIndex].X, tc.fOrientation, +1f, MvcApplication.ckcore.game.ptPitch.X) / (float)MvcApplication.ckcore.game.ptPitch.X;
 
       return fIndOrientationMinMax;
     }
