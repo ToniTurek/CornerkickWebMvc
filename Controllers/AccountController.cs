@@ -306,8 +306,9 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       if (iU == 0) {
 #endif
-      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!",  2, usr.club.iId, 1);
-      MvcApplication.ckcore.Info(usr, usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!", 99, usr.club.iId, 1, System.DateTime.Now, -1);
+      string sWelcomeMsg = usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!";
+      MvcApplication.ckcore.Info(usr, sWelcomeMsg,  2, usr.club.iId);
+      MvcApplication.ckcore.Info(usr, sWelcomeMsg, 99, usr.club.iId, System.DateTime.Now, -1);
 #if DEBUG
       }
       }

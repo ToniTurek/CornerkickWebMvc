@@ -2257,7 +2257,7 @@ namespace CornerkickWebMvc.Controllers
 
                 int iClubPlayer = pl.iClubId;
                 if (iClubPlayer >= 0) {
-                  MvcApplication.ckcore.Info(MvcApplication.ckcore.ltClubs[iClubPlayer].user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId, 0);
+                  MvcApplication.ckcore.Info(MvcApplication.ckcore.ltClubs[iClubPlayer].user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId);
                 }
 
                 pl.character.fMoney += 0.05f;
@@ -4953,7 +4953,7 @@ namespace CornerkickWebMvc.Controllers
       if (iTo < 0) return Json("Error. Unknown user", JsonRequestBehavior.AllowGet);
       if (string.IsNullOrEmpty(sText)) return Json("Error. Nachricht leer", JsonRequestBehavior.AllowGet);
 
-      MvcApplication.ckcore.Info(iTo, sText, 99, 0, 0, System.DateTime.Now, AccountController.getiUser(ckUser()));
+      MvcApplication.ckcore.Info(iTo, sText, 99, 0, System.DateTime.Now, AccountController.getiUser(ckUser()));
 
       return Json("Nachricht an " + MvcApplication.ckcore.ltUser[iTo].sFirstname + " " + MvcApplication.ckcore.ltUser[iTo].sSurname + " gesendet!", JsonRequestBehavior.AllowGet);
     }
