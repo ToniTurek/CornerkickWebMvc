@@ -881,7 +881,13 @@ namespace CornerkickWebMvc
 
       if (nSteps > 0) {
         ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
-        for (int iS = 0; iS < nSteps; iS++) performCalendarStep(false);
+        for (int iS = 0; iS < nSteps; iS++) {
+          bool bBreak = !performCalendarStep(false);
+          if (bBreak) {
+            bCalendarRunning = false;
+            break;
+          }
+        }
       }
 
       if (iGameSpeed > 0) Controllers.AdminController.setGameSpeedToAllUsers(iGameSpeed);
