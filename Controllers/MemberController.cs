@@ -2239,9 +2239,21 @@ namespace CornerkickWebMvc.Controllers
                   return Json("Ihr Kreditrahmen ist leider nicht hoch genug", JsonRequestBehavior.AllowGet);
                 }
 
+                int iClubPlayer = pl.iClubId;
+                CornerkickManager.Club clbGive = null;
+                if (iClubPlayer >= 0) clbGive = MvcApplication.ckcore.ltClubs[iClubPlayer];
+
                 if (iTransferFeeSecret > club.iBalanceSecret) {
                   transfer.ltOffers.Remove(offer);
                   return Json("Sie haben nicht genug Schwarzgeld...", JsonRequestBehavior.AllowGet);
+                }
+
+                if (pl.contract.iFixTransferFee > 0) {
+                  sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " verpflichtet.";
+                  offer.iFee = pl.contract.iFixTransferFee;
+                  MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
+                  MvcApplication.ckcore.Info(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, 1, iPlayerId);
+                  break;
                 }
 
                 offer.dt = MvcApplication.ckcore.dtDatum;
@@ -2255,9 +2267,8 @@ namespace CornerkickWebMvc.Controllers
 
                 MvcApplication.ckcore.tr.informUser(transfer, offer);
 
-                int iClubPlayer = pl.iClubId;
-                if (iClubPlayer >= 0) {
-                  MvcApplication.ckcore.Info(MvcApplication.ckcore.ltClubs[iClubPlayer].user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId);
+                if (clbGive != null) {
+                  MvcApplication.ckcore.Info(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId);
                 }
 
                 pl.character.fMoney += 0.05f;
