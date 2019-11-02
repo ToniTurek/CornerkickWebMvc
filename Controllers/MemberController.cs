@@ -1717,7 +1717,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       long iDateCurrent = convertDateTimeToTimestamp(MvcApplication.ckcore.dtDatum);
-      dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, CornerkickGame.Tool.getAveSkill(pl, 0, false)));
+      dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, CornerkickGame.Tool.getAveSkill(pl, bIdeal: true)));
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
