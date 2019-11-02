@@ -36,5 +36,25 @@ namespace CornerkickWebMvc.Models
     public int iCarparkNew { get; set; }
     public int iCounter { get; set; }
     public int iCounterNew { get; set; }
+
+    public class Buildings
+    {
+      public byte iGround { get; set; }
+      public string sCostBuyGround { get; set; }
+      public List<Building> ltBuildings { get; set; }
+      public List<Building> ltBuildingsFree { get; set; }
+    }
+
+    public class Building
+    {
+      public int iLevel { get; set; }
+      public byte iType { get; set; }
+      public string sName { get; set; }
+      public string sNameNext { get; set; }
+      public int nDaysConstruct { get; set; }
+      public int nDaysConstructTotal { get; set; }
+      public string sCostConstructNext { get; set; }
+      public bool bDispoOk { get; set; }
+    }
   }
 }

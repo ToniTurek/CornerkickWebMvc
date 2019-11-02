@@ -9,98 +9,149 @@
 <head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <style>
-    .ui-widget-header {
-      background: lime;
-    }
-    .ui-progressbar {
-      position: relative;
+    .myPb {
       height: 14px;
-      display: none;
-    }
-    .progress-label {
-      position: absolute;
-      left: 50%;
-      top: -4px;
-      text-shadow: 1px 1px 0 #fff;
-    }
+      background-color: lime;
+      text-align: center; /* To center it horizontally (if you want) */
+      line-height: 14px; /* To center it vertically */
+      color: black;
+      text-shadow: 1px 1px 0 #DCDCDC;
+      -webkit-border-radius: 3px;
+    }  
   </style>
 
   <script type="text/javascript">
-    $(document).ready(function () {
-      for (var iBdg = 0; iBdg < 6; iBdg++) {
-        var pbBuildingNew = $("#pbBuildingNew" + iBdg.toString());
-        if (pbBuildingNew) {
-          pbBuildingNew.progressbar({
-            value: false,
-            change: function () {
-              $(this).find('.progress-label').text($(this).progressbar("value") + "%");
-            }
-          });
+    function getGround(building, ltBuildingsFree) {
+      var div0 = document.createElement("div");
+      div0.style.position = "relative";
+      div0.style.float = "left";
+      div0.style.width = "320px";
+      div0.style.height = "259px";
+
+      var img = document.createElement("img");
+      img.className = "imgGround";
+      img.style.position = "absolute";
+      img.style.top = "0px";
+      img.style.left = "0px";
+      img.style.width = "100%";
+      img.src = "/Content/Images/stadium/stadium_surrounding.png";
+      div0.appendChild(img);
+
+      var div1 = document.createElement("div");
+      div1.style.position = "absolute";
+      div1.style.top = "0px";
+      div1.style.left = "0px";
+      div1.style.width = "100%";
+      div1.style.height = "100%";
+      div1.style.padding = "28px";
+      div1.style.textAlign = "center";
+
+      if (building) {
+        if (building.iLevel > 0 || building.nDaysConstruct > 0) {
+          var bCurr = document.createElement("b");
+          bCurr.innerText = building.sName;
+          bCurr.style.position = "relative";
+          bCurr.style.width = "100%";
+          bCurr.style.left = "0px";
+          bCurr.style.fontSize = "20px";
+          div1.appendChild(bCurr);
+        } else {
+
         }
 
-        getBuilding(iBdg);
+        if (building.nDaysConstruct > 0) {
+          var pNext = document.createElement("p");
+          pNext.innerHTML = "Ausbau zu: " + building.sNameNext + " (noch " + building.nDaysConstruct.toString() + " Tage)";
+          pNext.style.position = "relative";
+          pNext.style.width = "100%";
+          pNext.style.left = "0px";
+          pNext.style.fontSize = "16px";
+          div1.appendChild(pNext);
+
+          var divPb = document.createElement("div");
+          divPb.style.position = "relative";
+          divPb.style.top = "0px";
+          divPb.style.left = "0px";
+          divPb.style.width = "264px";
+          divPb.style.backgroundColor = "white";
+          divPb.style.webkitBorderRadius = "3px";
+          var divPb1 = document.createElement("div");
+          divPb1.className = "myPb";
+          var fProgress = (100 * (building.nDaysConstructTotal - building.nDaysConstruct) / building.nDaysConstructTotal);
+          divPb1.style.width = fProgress.toString() + '%';
+          divPb1.innerHTML = fProgress.toFixed(1) + '%';
+          divPb.appendChild(divPb1);
+          div1.appendChild(divPb);
+        } else {
+          var btn = document.createElement("button");
+          btn.type = "submit";
+          btn.className = "btn btn-default";
+          btn.style.position = "relative";
+          btn.style.width = "100%";
+          btn.style.left = "0px";
+          btn.style.height = "auto";
+          btn.style.fontSize = "16px";
+          setBuildingBtn(btn, building);
+          btn.addEventListener("click", function () { buildBuilding(this); });
+          if (building.bDispoOk == false) {
+            btn.disabled = "disabled";
+          }
+
+          if (building.iLevel == 0) {
+            var sct = document.createElement("select");
+            sct.className = "form-control";
+            sct.style.position = "relative";
+            sct.style.width = "100%";
+            sct.style.left = "0px";
+            sct.style.height = "auto";
+            sct.style.marginBottom = "4px";
+            sct.style.fontSize = "16px";
+            for (var iBdgFree = 0; iBdgFree < ltBuildingsFree.length; iBdgFree++) {
+              var opt = document.createElement("option");
+              opt.value = iBdgFree;
+              opt.innerHTML = ltBuildingsFree[iBdgFree].sNameNext;
+              sct.appendChild(opt);
+            }
+            sct.addEventListener("change", function () { setBuildingBtn(btn, ltBuildingsFree[sct.value]); });
+            div1.appendChild(sct);
+          }
+
+          div1.appendChild(btn);
+        }
       }
 
-      var pbCarpark = $("#pbCarpark");
-      var plCarpark = $("#plCarpark");
-      pbCarpark.progressbar({
-        value: false,
-        change: function () {
-          plCarpark.text(pbCarpark.progressbar("value") + "%");
-        }
-      });
-      var pbCounter = $("#pbCounter");
-      var plCounter = $("#plCounter");
-      pbCounter.progressbar({
-        value: false,
-        change: function () {
-          plCounter.text(pbCounter.progressbar("value") + "%");
-        }
-      });
+      div0.appendChild(div1);
 
-      setImage();
-      getCurrent();
+      return div0;
+    }
 
-      $("#bnBuildBuilding0").click(function () {
-        buildBuilding(0);
-      });
+    function setBuildingBtn(btn, building) {
+      btn.innerHTML = "Ausbau zu " + building.sNameNext + ":<br>" + building.sCostConstructNext + " € / " + building.nDaysConstructTotal.toString() + " Tage";
+      btn.setAttribute('data-itype',  building.iType);
+      btn.setAttribute('data-ilevel', building.iLevel + 1);
+    }
 
-      $("#bnBuildBuilding1").click(function () {
-        buildBuilding(1);
-      });
+    function getGroundStadium() {
+      var div0 = document.createElement("div");
+      div0.style.position = "relative";
+      div0.style.float = "left";
+      div0.style.width = "320px";
+      div0.style.height = "259px";
 
-      $("#bnBuildBuilding2").click(function () {
-        buildBuilding(2);
-      });
+      var img = document.createElement("img");
+      img.style.position = "absolute";
+      img.style.top = "0px";
+      img.style.left = "0px";
+      img.style.width = "100%";
+      img.src = "/Content/Images/stadium/stadion_S.png";
+      div0.appendChild(img);
 
-      $("#bnBuildBuilding3").click(function () {
-        buildBuilding(3);
-      });
+      return div0;
+    }
 
-      $("#bnBuildBuilding4").click(function () {
-        buildBuilding(4);
-      });
-
-      $("#bnBuildBuilding5").click(function () {
-        buildBuilding(5);
-      });
-
-      $("#tbCarpark").on('keyup', function (ev) {
-        getPark();
-      });
-
-      $("#bnBuildCarpark").click(function () {
-        buildPark();
-      });
-
-      $("#tbCounter").on('keyup', function (ev) {
-        getCounter();
-      });
-
-      $("#bnBuildCounter").click(function () {
-        buildCounter();
-      });
-    });
+    $(document).ready(function () {
+      getCurrentBuildings();
+    }); // $(document).ready()
 
     function setImage() {
       $.ajax({
@@ -117,113 +168,62 @@
       });
     }
 
-    function getCurrent() {
+    function getCurrentBuildings() {
+      var divGroundContainer = $("#divGroundContainer");
+      divGroundContainer.html('');
       $.ajax({
         type: 'post',
-        url: '/Member/StadiumGetSurrGetCurrent',
+        url: '/Member/StadiumSurrGetBuildings',
         dataType: "json",
-        success: function (sCurrent) {
-          for (var iT = 0; iT < 6; iT++) {
-            $("#txtBuilding" + iT.toString()).text("Aktuell: " + sCurrent[iT][0]);
-
-            if (sCurrent[iT][2] != "0") {
-              $("#txtBuildingNew"  + iT.toString()).text("Ausbau zu: " + sCurrent[iT][1] + " (noch " + sCurrent[iT][2] + "d)");
-              $("#pbBuildingNew"   + iT.toString()).progressbar("value", parseFloat(sCurrent[iT][3].replace("%", "").replace(",", ".")));
-              $("#pbBuildingNew"   + iT.toString()).css("display", "block");
-              $("#ddlBuilding"     + iT.toString()).css("display", "none");
-              $("#bnBuildBuilding" + iT.toString()).css("display", "none");
+        success: function (buildings) {
+          for (var iB = 0; iB < buildings.iGround; iB++) {
+            if (iB == Math.ceil((buildings.iGround - 1) / 2)) {
+              divGroundContainer.append(getGroundStadium());
             }
-          }
 
-          iType = 6;
-          $("#txtPark").text("Parkplätze - Aktuell: " + sCurrent[iType][0]);
-          if (sCurrent[iType][2] != "0") {
-            $("#txtParkNew").text("Ausbau zu: " + sCurrent[iType][1] + " (noch " + sCurrent[iType][2] + "d)");
-            $("#pbCarpark").progressbar("value", parseFloat(sCurrent[iType][3].replace("%", "").replace(",", ".")));
-            $("#pbCarpark").css("display", "block");
-            $("#tbCarpark").css("display", "none");
-            $("#bnBuildCarpark").css("display", "none");
-          }
-
-          iType = 7;
-          $("#txtCounter").text("Ticketschalter - Aktuell: " + sCurrent[iType][0]);
-          if (sCurrent[iType][2] != "0") {
-            $("#txtCounterNew").text("Ausbau zu: " + sCurrent[iType][1] + " (noch " + sCurrent[iType][2] + "d)");
-            $("#pbCounter").progressbar("value", parseFloat(sCurrent[iType][3].replace("%", "").replace(",", ".")));
-            $("#pbCounter").css("display", "block");
-            $("#tbCounter").css("display", "none");
-            $("#bnBuildCounter").css("display", "none");
-          }
-        }
-      });
-    }
-
-    function getBuilding(iType) {
-      bnBuildBuilding = document.getElementById("bnBuildBuilding" + iType.toString());
-      bnBuildBuilding.disabled = true;
-
-      var iLevel = $('#ddlBuilding' + iType.toString()).val();
-      if (iLevel) {
-        $.ajax({
-          type: 'post',
-          url: '/Member/StadiumGetCostSurr',
-          dataType: "json",
-          data: { i: iLevel, iType: iType },
-          success: function (sCostDaysDispo) {
-            $('#bnBuildBuilding' + iType.toString()).text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
-            if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
+            if (iB < buildings.ltBuildings.length) {
+              divGroundContainer.append(getGround(buildings.ltBuildings    [iB], null));
             } else {
-              $('#bnBuildBuilding' + iType.toString()).prop('disabled', false);
+              divGroundContainer.append(getGround(buildings.ltBuildingsFree[ 0], buildings.ltBuildingsFree));
             }
           }
-        });
-      }
-    }
 
-    function getPark() {
-      bnBuildCarpark = document.getElementById("bnBuildCarpark");
-      bnBuildCarpark.disabled = true;
+          var grdNext = getGround(null);
+          grdNext.getElementsByTagName("img")[0].style.opacity = 0.5;
 
-      var iPark = $('#tbCarpark').val();
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumGetCostSurr',
-        dataType: "json",
-        data: { i: iPark, iType: 6 },
-        success: function (sCostDaysDispo) {
-          $("#bnBuildCarpark").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
-          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
-            bnBuildCarpark.disabled = true;
-          } else {
-            bnBuildCarpark.disabled = false;
-          }
+          var btnBuyGround = document.createElement("button");
+          btnBuyGround.type = "submit";
+          btnBuyGround.className = "btn btn-default";
+          btnBuyGround.style.position = "relative";
+          btnBuyGround.style.width = "80%";
+          btnBuyGround.style.height = "auto";
+          btnBuyGround.style.left = "10%";
+          btnBuyGround.style.top = "40%";
+          btnBuyGround.style.fontSize = "16px";
+          btnBuyGround.innerHTML = "Grundstück kaufen: " + buildings.sCostBuyGround + " €";
+          btnBuyGround.addEventListener("click", buyGround);
+          grdNext.appendChild(btnBuyGround);
+
+          divGroundContainer.append(grdNext);
         }
       });
     }
 
-    function getCounter() {
-      bnBuild = document.getElementById("bnBuildCounter");
-      bnBuild.disabled = true;
-
-      var iCount = $('#tbCounter').val();
+    function buyGround() {
       $.ajax({
         type: 'post',
-        url: '/Member/StadiumGetCostSurr',
+        url: '/Member/StadiumSurrBuyGround',
         dataType: "json",
-        data: { i: iCount, iType: 7 },
-        success: function (sCostDaysDispo) {
-          $("#bnBuildCounter").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
-          if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
-            bnBuild.disabled = true;
-          } else {
-            bnBuild.disabled = false;
-          }
+        success: function (sMessage) {
+          getCurrentBuildings();
         }
       });
     }
 
-    function buildBuilding(iType) {
-      var iLevel = $('#ddlBuilding' + iType.toString()).val();
+    function buildBuilding(btn) {
+      var iType  = btn.getAttribute('data-itype');
+      var iLevel = btn.getAttribute('data-ilevel');
+
       $.ajax({
         type: 'post',
         url: '/Member/StadiumBuildBuilding',
@@ -235,145 +235,11 @@
         }
       });
     }
-
-    function buildPark() {
-      var iPark = $('#tbCarpark').val();
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildPark',
-        dataType: "json",
-        data: { iCount: iPark },
-        success: function (sMessage) {
-          alert(sMessage);
-          window.location.reload(true);
-        }
-      });
-    }
-
-    function buildCounter() {
-      var iCount = $('#tbCounter').val();
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildCounter',
-        dataType: "json",
-        data: { iCount: iCount },
-        success: function (sMessage) {
-          alert(sMessage);
-          window.location.reload(true);
-        }
-      });
-    }
   </script>
 </head>
 
 <body>
   <h2>Stadionumgebung</h2>
-  <div style="position: relative; height: 700px">
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b style="position: relative; width: 264px; font-size: 18px">Vereinsmuseum</b>
-        <p id="txtBuilding5" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
-        <p id="txtBuildingNew5" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbBuildingNew5" style="position: relative; width: 264px"><div id="plBuilding5" class="progress-label"></div></div>
-        @Html.DropDownListFor(m => m.iClubMuseum, Model.ddlClubMuseum, new { @class = "form-control", @onchange = "getBuilding(5)", id = "ddlBuilding5", @style = "width: 264px; min-width: 264px" })
-        <button type="submit" id="bnBuildBuilding5" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b style="position: relative; width: 264px; font-size: 18px">Vereinsheim</b>
-        <p id="txtBuilding4" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
-        <p id="txtBuildingNew4" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbBuildingNew4" style="position: relative; width: 264px"><div id="plBuilding4" class="progress-label"></div></div>
-        @Html.DropDownListFor(m => m.iClubHouse, Model.ddlClubHouse, new { @class = "form-control", @onchange = "getBuilding(4)", id = "ddlBuilding4", @style = "width: 264px; min-width: 264px" })
-        <button type="submit" id="bnBuildBuilding4" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b style="position: relative; width: 264px; font-size: 18px">Jugendinternat</b>
-        <p id="txtBuilding3" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
-        <p id="txtBuildingNew3" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbBuilding3" style="position: relative; width: 264px"><div id="plBuilding3" class="progress-label"></div></div>
-        @Html.DropDownListFor(m => m.iJouthInternat, Model.ddlJouthInternat, new { @class = "form-control", @onchange = "getBuilding(3)", id = "ddlBuilding3", @style = "width: 264px; min-width: 264px" })
-        <button type="submit" id="bnBuildBuilding3" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b style="position: relative; width: 264px; font-size: 18px">Trainingsgelände</b>
-        <p id="txtBuilding0" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
-        <p id="txtBuildingNew0" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbBuildingNew0" style="position: relative; width: 264px"><div id="plBuilding0" class="progress-label"></div></div>
-        @Html.DropDownListFor(m => m.iTrainingsgel, Model.ddlTrainingsgel, new { @class = "form-control", @onchange = "getBuilding(0)", id = "ddlBuilding0", @style = "width: 264px; min-width: 264px" })
-        <button type="submit" id="bnBuildBuilding0" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img id="imgStadium" style="position: relative; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadion_S.jpg" alt="" />
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b id="txtPark" style="position: relative; width: 264px; font-size: 18px"></b>
-        <p id="txtParkNew" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbCarpark" style="position: relative; width: 264px"><div id="plCarpark" class="progress-label"></div></div>
-        @Html.EditorFor(Model => Model.iCarpark, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: relative; width: 264px; min-width: 264px; text-align: right", id = "tbCarpark", autocomplete = "off", min = "0" } })
-        <button type="submit" id="bnBuildCarpark" class="btn btn-default" style="width: 264px">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b style="position: relative; width: 264px; font-size: 18px">Fittnessraum</b>
-        <p id="txtBuilding1" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
-        <p id="txtBuildingNew1" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbBuildingNew1" style="position: relative; width: 264px"><div id="plBuilding1" class="progress-label"></div></div>
-        @Html.DropDownListFor(m => m.iGym, Model.ddlGym, new { @class = "form-control", @onchange = "getBuilding(1)", id = "ddlBuilding1", @style = "width: 264px; min-width: 264px" })
-        <button type="submit" id="bnBuildBuilding1" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b style="position: relative; width: 264px; font-size: 18px">Wellnessraum</b>
-        <p id="txtBuilding2" style="position: relative; width: 264px; margin: 0; font-size: 18px"></p>
-        <p id="txtBuildingNew2" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbBuildingNew2" style="position: relative; width: 264px"><div id="plBuilding2" class="progress-label"></div></div>
-        @Html.DropDownListFor(m => m.iSpa, Model.ddlSpa, new { @class = "form-control", @onchange = "getBuilding(2)", id = "ddlBuilding2", @style = "width: 264px; min-width: 264px" })
-        <button type="submit" id="bnBuildBuilding2" class="btn btn-default" style="width: 264px; float: left">Kosten: 0</button>
-      </div>
-    </div>
-
-    <div style="position: relative; float: left; width: 320px; height: 259px">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Images/stadium/stadium_surrounding.png" />
-
-      <div style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; padding: 28px; text-align: center">
-        <b id="txtCounter" style="position: relative; width: 264px; font-size: 18px"></b>
-        <p id="txtCounterNew" style="position: relative; width: 264px; margin: 0"></p>
-        <div id="pbCounter" style="position: relative; width: 264px"><div id="plCounter" class="progress-label"></div></div>
-        @Html.EditorFor(Model => Model.iCounter, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: relative; width: 264px; min-width: 264px; text-align: right", id = "tbCounter", autocomplete = "off", min = "0" } })
-        <button type="submit" id="bnBuildCounter" class="btn btn-default" style="width: 264px">Kosten: 0</button>
-      </div>
-    </div>
-  </div>
+  <div id="divGroundContainer" style="position: relative; height: 600px"></div>
 </body>
 </html>
