@@ -272,6 +272,11 @@ namespace CornerkickWebMvc
           clbNat.staff.iDoctor = 6;
           clbNat.staff.iKibitzer = 3;
 
+          // Nat. buildings
+          clbNat.buildings.iTrainingCourts[0] = 5;
+          clbNat.buildings.iGym           [0] = 5;
+          clbNat.buildings.iSpa           [0] = 5;
+
           // Colors
           if (iN == 0) { // GER
             clbNat.cl[0] = System.Drawing.Color.White;
