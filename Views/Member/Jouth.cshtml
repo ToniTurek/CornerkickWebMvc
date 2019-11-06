@@ -6,17 +6,17 @@
 }
 
 <head>
-  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
-  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
-  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
-  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function () {
-      var jTable = $('#tableJouth').DataTable({
+      $('#tableJouth').DataTable({
         "pageLength": 50,
         "paging": false,
         "info": false,
@@ -25,7 +25,7 @@
         "order": [[5, "desc"]],
         columnDefs: [
           {
-            targets: 0,
+            "targets": 0,
             "visible": false,
             "searchable": false
           },
