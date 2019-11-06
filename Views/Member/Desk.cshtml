@@ -5,131 +5,99 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script>
-  $(document).ready(function () {
-    setNews();
-
-    $('#iDeleteLog').change(function () {
-      $.ajax({
-        url: '/Member/SetDeleteLog',
-        type: "GET",
-        dataType: "JSON",
-        cache: false,
-        contentType: "application/json; charset=utf-8",
-        data: { iDeleteAfter: $(this).val() }
-      });
-    });
-  });
-
-  function setNews() {
-    var divTableNews    = $("#tableDivNews");
-    var divTableNewsOld = $("#tableDivNewsOld");
-
-    divTableNews   .html('');
-    divTableNews   .html(setNews2($('#divNews'   ).data('name'))).show();
-
-    divTableNewsOld.html('');
-    divTableNewsOld.html(setNews2($('#divNewsOld').data('name'))).show();
-  }
-
-  function setNews2(sNews) {
-    var sBox = '';
-    sBox += '<table id="tableNews" style="width: 100%">';
-
-    sNsplit = sNews.split("\n");
-    var nPlayer = $('#idPlayerCount').data('name');
-    for (var i = 0; i < sNsplit.length; i++) {
-      sN = sNsplit[i];
-
-      if (sN.includes("Stadions")) {
-        sN = sN.replace("Stadions", '@Html.ActionLink("Stadions", "Stadion", "Member")');
-      }
-      if (sN.includes("Stadionumgebung")) {
-        sN = sN.replace("Stadionumgebung", '@Html.ActionLink("Stadionumgebung", "StadiumSurroundings", "Member")');
-      }
-      if (sN.includes("Jugendmannschaft")) {
-        sN = sN.replace("Jugendmannschaft", '@Html.ActionLink("Jugendmannschaft", "Jouth", "Member")');
-      }
-      if (sN.includes("Jugendspieler")) {
-        sN = sN.replace("Jugendspieler", '@Html.ActionLink("Jugendspieler", "Jouth", "Member")');
-      }
-      if (sN.includes("Hauptsponsor")) {
-        sN = sN.replace("Hauptsponsor", '@Html.ActionLink("Hauptsponsor", "Sponsor", "Member")');
-      }
-      if (sN.includes("Pokalauslosung")) {
-        sN = sN.replace("Pokalauslosung", '@Html.ActionLink("Pokalauslosung", "Cup", "Member")');
-      }
-      if (sN.includes("Testspiel")) {
-        sN = sN.replace("Testspiel", '@Html.ActionLink("Testspiel", "Calendar", "Member")');
-      }
-      if (sN.includes("Transferangebot")) {
-        sN = sN.replace("Transferangebot", '@Html.ActionLink("Transferangebot", "Transfer", "Member")');
-      }
-
-      for (var j = 0; j < nPlayer; j++) {
-        var sPlayer = $('#idPlayerNames' + j.toString()).data('name').split(',');
-        if (sPlayer.length > 1) {
-          var sPlayerName = sPlayer[0];
-          var sPlayerId   = sPlayer[1];
-          if (sN.includes(sPlayerName)) {
-            sN = sN.replace(sPlayerName, '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "" })'.replace("name", sPlayerName).replace("id", sPlayerId));
-            break;
-          }
-        }
-      }
-      //var sPlayerName = $('#idPlayerNames' + iBeg[0]).data('name');
-
-      sBox += '<tr>';
-      sBox += '<td>' + sN + '</td>';
-      sBox += '</tr>';
-    }
-
-    sBox += '</table>';
-
-    return sBox;
-  }
-</script>
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width" />
   <title>Index</title>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+
+  <script>
+    function getNewsIcon(iType) {
+      if (iType === 1) return '<img src="/Content/Icons/news/birthday.png" title="birthday" style="width: 16px"/>';
+      if (iType > 9 && iType < 14) return '<img src="/Content/Icons/news/star.ico" title="star" style="width: 16px"/>';
+      if (iType === 20 || iType === 23) return '<img src="/Content/Icons/ambulance2.png" title="ambulance" style="width: 16px"/>';
+      if (iType === 21 || iType === 22 || iType === 24 || iType === 25) return '<img src="/Content/Icons/ambulance.png" title="ambulance" style="width: 16px"/>';
+      if (iType === 50 || iType === 51) return '<img src="/Content/Icons/news/construction.png" title="construction" style="width: 16px"/>';
+      if (iType === 60) return '<img src="/Content/Icons/news/coins.png" title="cash" style="width: 16px"/>';
+
+      return '<img src="/Content/Icons/news/info.png" title="info" style="width: 16px"/>';
+    }
+
+    $(document).ready(function () {
+      setNews();
+
+      $('#iDeleteLog').change(function () {
+        $.ajax({
+          url: '/Member/SetDeleteLog',
+          type: "GET",
+          dataType: "JSON",
+          cache: false,
+          contentType: "application/json; charset=utf-8",
+          data: { iDeleteAfter: $(this).val() }
+        });
+      });
+    });
+
+    function setNews() {
+      $('#tableNews').DataTable({
+        "ajax": {
+          "url": '@Url.Action("DeskGetNews", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "iId" },
+          {
+            "data": "iType",
+            "render": function (iType, type, row) {
+              return getNewsIcon(iType);
+            }
+          },
+          { "data": "sDate" },
+          { "data": "sText" },
+          { "data": "bOld" }
+        ],
+        "paging": false,
+        "info": false,
+        "responsive": false,
+        "searching": false,
+        "order": [[0, "desc"]],
+        "language": {
+          "emptyTable": "Keine News"
+        },
+        "columnDefs": [
+          {
+            "targets": [0, 4], // ID, bOld
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          {
+            targets: [2, 3],
+            className: "dt-nowrap"
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.bOld) {
+            $('td', nRow).css('color', "gray");
+          }
+        }
+      });
+    }
+  </script>
 </head>
 
 <body>
   @{
-    int nPl = 0;
     CornerkickManager.Club clb = Model.club;
 
     if (clb != null) {
-      if (clb.ltPlayer != null) {
-        for (int iPl = 0; iPl < clb.ltPlayer.Count; iPl++, nPl++) {
-          CornerkickGame.Player pl = clb.ltPlayer[iPl];
-          string sId = "idPlayerNames" + iPl.ToString();
-          <div id="@sId" data-name="@pl.sName,@clb.ltPlayer[iPl].iId"></div>
-        }
-      }
-      if (clb.ltPlayerJouth != null) {
-        for (int iPl = 0; iPl < clb.ltPlayerJouth.Count; iPl++, nPl++) {
-          CornerkickGame.Player pl = clb.ltPlayerJouth[iPl];
-          string sId = "idPlayerNames" + (iPl + clb.ltPlayer.Count).ToString();
-          <div id="@sId" data-name="@pl.sName,@clb.ltPlayerJouth[iPl].iId"></div>
-        }
-      }
-
-      <div id="idPlayerCount" data-name="@nPl"></div>
-
-      @*
-        if (CornerkickWebMvc.Controllers.MemberController.countNewMails() > 0) {
-          <div style="position: relative; width: 100%; text-align: center">
-            @Html.ActionLink("Sie haben neue Nachrichten", "Mail", "Member", null)
-          </div>
-        }
-      *@
-
       bool bTraining = false;
       if (clb.training.iType != null) {
         foreach (byte iT in clb.training.iType) {
@@ -295,24 +263,31 @@
     });
   </script>
 
-  @{
-    if (!Model.club.bNation) {
-      <h3>News</h3>
-      <div style="position: relative; width: 100%">
-        <div style="position: absolute; top: -32px; right: 0px">
-          <label>
-            löschen nach:
-            @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-horizontal", @style = "width: 84px; text-align: right" })
-          </label>
-        </div>
+  <h3>News</h3>
+  <div style="position: relative; width: 100%">
+    <div style="position: absolute; top: -32px; right: 0px">
+      <label>
+        löschen nach:
+        @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-horizontal", @style = "width: 84px; text-align: right" })
+      </label>
+    </div>
 
-        <div id="divNews" data-name="@Model.sNews"></div>
-        <div id="tableDivNews"></div>
-
-        <div id="divNewsOld" data-name="@Model.sNewsOld"></div>
-        <div id="tableDivNewsOld" style="color:gray"></div>
-      </div>
-    }
-  }
+    <div id="tableDivNews" style="position: relative; left: 0px; width: 100%">
+      <table id="tableNews" style="position: relative; margin: 0px; width: auto" class="compact">
+        <thead style="display:none">
+          <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Text</th>
+            <th>Old</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
 </html>

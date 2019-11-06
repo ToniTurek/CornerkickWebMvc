@@ -317,8 +317,6 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Desk(Models.DeskModel desk, Models.LeagueModels mlLeague)
     {
-      desk.sNews = "";
-
       if (ModelState.IsValid) {
         ModelState.Clear();
       }
@@ -330,32 +328,6 @@ namespace CornerkickWebMvc.Controllers
 
       if (usr.lti != null) {
         if (usr.lti.Count > 0) desk.iDeleteLog = usr.lti[0];
-      }
-
-      for (int iN = usr.ltNews.Count - 1; iN >= 0; iN--) {
-        CornerkickManager.Main.News news = usr.ltNews[iN];
-        if (news.iType < 99/* && news.bUnread*/) {
-          if (news.bRead && news.bRead2) {
-            if        (desk.iDeleteLog == 1 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays >  7) {
-              usr.ltNews.Remove(news);
-              continue;
-            } else if (desk.iDeleteLog == 2 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 14) {
-              usr.ltNews.Remove(news);
-              continue;
-            } else if (desk.iDeleteLog == 3 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 30) {
-              usr.ltNews.Remove(news);
-              continue;
-            }
-          }
-
-          string sNews = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi()) + " - " + news.sText + '\n';
-          if (news.bRead) desk.sNewsOld += sNews;
-          else            desk.sNews    += sNews;
-
-          news.bRead  = true;
-          news.bRead2 = true;
-          usr.ltNews[iN] = news;
-        }
       }
 
       CornerkickManager.Club club = ckClub();
@@ -440,6 +412,89 @@ namespace CornerkickWebMvc.Controllers
       desk.sStrength = "Durchschnittsstärke (Startelf): " + fTeamAve[3].ToString("0.00") + fTeamAve11[3].ToString(" (0.00)");
 
       return View(desk);
+    }
+
+    public class DatatableNews
+    {
+      public int    iId { get; set; }
+      public int    iType { get; set; }
+      public string sDate { get; set; }
+      public string sText { get; set; }
+      public bool   bOld { get; set; }
+    }
+
+    public JsonResult DeskGetNews()
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr        == null) return Json(null, JsonRequestBehavior.AllowGet);
+      if (usr.ltNews == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      int iDeleteLog = 0;
+      if (usr.lti != null) {
+        if (usr.lti.Count > 0) iDeleteLog = usr.lti[0];
+      }
+
+      CornerkickManager.Club clb = ckClub();
+
+      List<DatatableNews> ltNews = new List<DatatableNews>();
+
+      for (int iN = 0; iN < usr.ltNews.Count; iN++) {
+        CornerkickManager.Main.News news = usr.ltNews[iN];
+        if (news.iType < 99/* && news.bUnread*/) {
+          if (news.bRead && news.bRead2) {
+            if        (iDeleteLog == 1 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays >  7) {
+              usr.ltNews.Remove(news);
+              continue;
+            } else if (iDeleteLog == 2 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 14) {
+              usr.ltNews.Remove(news);
+              continue;
+            } else if (iDeleteLog == 3 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 30) {
+              usr.ltNews.Remove(news);
+              continue;
+            }
+          }
+
+          string sN = news.sText;
+
+          sN = sN.Replace("Stadions",         "<a href=\"/Member/Stadion\">Stadions</a>");
+          sN = sN.Replace("Stadionumgebung",  "<a href=\"/Member/StadiumSurroundings\">Stadionumgebung</a>");
+          sN = sN.Replace("Jugendmannschaft", "<a href=\"/Member/Jouth\">Jugendmannschaft</a>");
+          sN = sN.Replace("Jugendspieler",    "<a href=\"/Member/Jouth\">Jugendspieler</a>");
+          sN = sN.Replace("Hauptsponsor",     "<a href=\"/Member/Sponsor\">Hauptsponsor</a>");
+          sN = sN.Replace("Pokalauslosung",   "<a href=\"/Member/Cup\">Pokalauslosung</a>");
+          sN = sN.Replace("Testspiel",        "<a href=\"/Member/Calendar\">Testspiel</a>");
+          sN = sN.Replace("Transferangebot",  "<a href=\"/Member/Transfer\">Transferangebot</a>");
+
+          foreach (CornerkickGame.Player pl in clb.ltPlayer) {
+            if (sN.Contains(pl.sName)) {
+              sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
+              break;
+            }
+          }
+
+          foreach (CornerkickGame.Player pl in clb.ltPlayerJouth) {
+            if (sN.Contains(pl.sName)) {
+              sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
+              break;
+            }
+          }
+
+          DatatableNews dtn = new DatatableNews();
+          dtn.iId = iN;
+          dtn.sDate = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi());
+          dtn.sText = sN;
+          dtn.iType = news.iType;
+          dtn.bOld = news.bRead;
+
+          ltNews.Add(dtn);
+
+          news.bRead  = true;
+          news.bRead2 = true;
+          usr.ltNews[iN] = news;
+        }
+      }
+
+      return Json(new { aaData = ltNews }, JsonRequestBehavior.AllowGet);
     }
 
     public void SetDeleteLog(int iDeleteAfter)

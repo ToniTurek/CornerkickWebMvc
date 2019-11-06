@@ -604,6 +604,11 @@
     <Content Include="Content\Icons\form4.png" />
     <Content Include="Content\Icons\jersey.png" />
     <Content Include="Content\Icons\minus.png" />
+    <Content Include="Content\Icons\news\birthday.png" />
+    <Content Include="Content\Icons\news\coins.png" />
+    <Content Include="Content\Icons\news\construction.png" />
+    <Content Include="Content\Icons\news\info.png" />
+    <Content Include="Content\Icons\news\star.ico" />
     <Content Include="Content\Icons\plus.png" />
     <Content Include="Content\Icons\rCard.png" />
     <Content Include="Content\Icons\sub.png" />
