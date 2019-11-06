@@ -449,8 +449,8 @@
           <tr>
             @{
               string sVerletzung = "keine";
-              if (player.fInjury[0] > 0.0) {
-                sVerletzung = player.fInjury[0].ToString("0.0") + " Tage (" + (player.fInjury[0] / player.fInjury[1]).ToString("0%") + ") " + MvcApplication.ckcore.sVerletzung[(int)player.fInjury[2]];
+              if (player.injury != null) {
+                sVerletzung = player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + MvcApplication.ckcore.ltInjury[player.injury.iType][player.injury.iType2];
               }
             }
             <td align="right">Verletzung:</td>
