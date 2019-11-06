@@ -2345,18 +2345,19 @@ namespace CornerkickWebMvc.Controllers
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth = false, bool bAll = false, bool bFixTransferFee = false)
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth = false, bool bAll = false, bool bFixTransferFee = false, bool bNoClub = false)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
 
-      int iTr = 0;
-      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist("", -1, iPos, -1f, 0, iFType, iFValue, bJouth, bAll, bFixTransferFee)) {
-        CornerkickManager.Club club = MvcApplication.ckcore.ltClubs[transfer.player.iClubId];
+      int iClub = -9;
+      if (bNoClub) iClub = -1;
 
+      int iTr = 0;
+      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist("", iClub, iPos, -1f, 0, iFType, iFValue, bJouth, bAll, bFixTransferFee)) {
         string sClub = "vereinslos";
         if (transfer.player.iClubId >= 0) {
-          sClub = club.sName;
+          sClub = MvcApplication.ckcore.ltClubs[transfer.player.iClubId].sName;
         }
 
         int iOffer = 0;
@@ -3581,7 +3582,7 @@ namespace CornerkickWebMvc.Controllers
     {
       string sEmblem = "<img src=\"/Content/Uploads/emblems/";
 
-      if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"" + clb.sName + "\"/>";
+      if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"vereinslos\"/>";
 
 #if DEBUG
       string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");

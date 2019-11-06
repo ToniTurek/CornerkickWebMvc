@@ -93,10 +93,11 @@
             d.bJouth  = document.getElementById("rbJouth").checked;
             d.bAll = document.getElementById("rbAll").checked;
             d.bFixTransferFee = document.getElementById("cbFixTransferFee").checked;
+            d.bNoClub = document.getElementById("cbNoClub").checked;
           }
         },
         "info": false,
-        "searching": false,
+        "searching": true,
         'responsive': {
           'details': {
             'type': 'column',
@@ -187,6 +188,10 @@
       });
 
       $("#cbFixTransferFee").on('change', function (ev) {
+        jTable.ajax.reload();
+      });
+
+      $("#cbNoClub").on('change', function (ev) {
         jTable.ajax.reload();
       });
       
@@ -410,10 +415,14 @@
     @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
   </div>
 
-  <div style="position: relative; width: auto; float: left; margin-top: 20px; margin-right: 10px; margin-bottom: 20px">
+  <div style="position: relative; width: auto; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
     <label style="width: 100%; background-color: white">
       <input id="cbFixTransferFee" type="checkbox" value="false">
       Fixe Ablöse
+    </label>
+    <label style="position: absolute; top: 20px; width: 100%; background-color: white">
+      <input id="cbNoClub" type="checkbox" value="false">
+      Vereinslos
     </label>
   </div>
 </div>
