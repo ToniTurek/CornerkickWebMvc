@@ -487,7 +487,7 @@ namespace CornerkickWebMvc
           // Inform users
           foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
             if (offer.iFee < iOfferMax) {
-              ckcore.Info(offer.club.user, "Ihr Transferangebot für den Spieler " + transfer.player.sName + " ist leider nicht (mehr) hoch genug.");
+              ckcore.sendNews(offer.club.user, "Ihr Transferangebot für den Spieler " + transfer.player.sName + " ist leider nicht (mehr) hoch genug.");
             }
           }
         }
@@ -550,8 +550,8 @@ namespace CornerkickWebMvc
               item.club.user.nation = nat;
 
               // Inform user
-              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.Info(item.club.user, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
-              ckcore.Info(item.club.user, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
+              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.sendNews(item.club.user, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
+              ckcore.sendNews(item.club.user, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
 
               bReturn = false;
               break;

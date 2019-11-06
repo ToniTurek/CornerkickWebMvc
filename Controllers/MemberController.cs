@@ -2252,7 +2252,7 @@ namespace CornerkickWebMvc.Controllers
                   sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " verpflichtet.";
                   offer.iFee = pl.contract.iFixTransferFee;
                   MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
-                  MvcApplication.ckcore.Info(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, 1, iPlayerId);
+                  MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, 1, iPlayerId);
                   break;
                 }
 
@@ -2268,7 +2268,7 @@ namespace CornerkickWebMvc.Controllers
                 MvcApplication.ckcore.tr.informUser(transfer, offer);
 
                 if (clbGive != null) {
-                  MvcApplication.ckcore.Info(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId);
+                  MvcApplication.ckcore.sendNews(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", 1, iPlayerId);
                 }
 
                 pl.character.fMoney += 0.05f;
@@ -4306,7 +4306,7 @@ namespace CornerkickWebMvc.Controllers
 
           sReturn = "Anfrage für Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + MvcApplication.ckcore.ltClubs[iTeamId].sName + " gesendet";
 
-          MvcApplication.ckcore.Info(clubRequest.user, "Sie haben eine neue Anfrage für ein Testspiel erhalten.", 2, iTeamId);
+          MvcApplication.ckcore.sendNews(clubRequest.user, "Sie haben eine neue Anfrage für ein Testspiel erhalten.", 2, iTeamId);
         }
       }
 
@@ -4342,7 +4342,7 @@ namespace CornerkickWebMvc.Controllers
                   CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId];
                   clubH.nextGame = MvcApplication.ckcore.tl.getNextGame(clubH, MvcApplication.ckcore.dtDatum);
 
-                  MvcApplication.ckcore.Info(clubH.user, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", getCi()) + " um " + dt.ToString("t", getCi()) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
+                  MvcApplication.ckcore.sendNews(clubH.user, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", getCi()) + " um " + dt.ToString("t", getCi()) + " wurde akzeptiert!", 2, gd.team[0].iTeamId);
 
                   return Json("", JsonRequestBehavior.AllowGet);
                 }
@@ -4394,7 +4394,7 @@ namespace CornerkickWebMvc.Controllers
                   MvcApplication.ckcore.ltCups.RemoveAt(iC);
 
                   CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[gd.team[0].iTeamId];
-                  MvcApplication.ckcore.Info(clubH.user, "Ihre Anfrage an " + clb.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde abgelehnt!", 2, gd.team[0].iTeamId);
+                  MvcApplication.ckcore.sendNews(clubH.user, "Ihre Anfrage an " + clb.sName + " für ein Testspiel am " + dt.ToString("dd.MM.yyyy") + " um " + dt.ToString("hh:mm") + " wurde abgelehnt!", 2, gd.team[0].iTeamId);
 
                   return Json("", JsonRequestBehavior.AllowGet);
                 }
@@ -4779,7 +4779,7 @@ namespace CornerkickWebMvc.Controllers
           deSponsorBoard.bOffer = bOffer;
           deSponsorBoard.iId = spon.iId;
           if (bOffer) deSponsorBoard.iIndex = iSpOffer - 1;
-          deSponsorBoard.sName = MvcApplication.ckcore.fz.ltSponsoren[spon.iId].sName;
+          deSponsorBoard.sName = MvcApplication.ckcore.fz.ltSponsoren[spon.iId].name;
           deSponsorBoard.sMoneyVicHome = spon.iMoneyVicHome.ToString("N0", getCi());
           deSponsorBoard.nBoards = spon.nBoards;
           deSponsorBoard.iYears = spon.iYears;
@@ -5012,7 +5012,7 @@ namespace CornerkickWebMvc.Controllers
       if (iTo < 0) return Json("Error. Unknown user", JsonRequestBehavior.AllowGet);
       if (string.IsNullOrEmpty(sText)) return Json("Error. Nachricht leer", JsonRequestBehavior.AllowGet);
 
-      MvcApplication.ckcore.Info(iTo, sText, 99, 0, System.DateTime.Now, AccountController.getiUser(ckUser()));
+      MvcApplication.ckcore.sendNews(iTo, sText, 99, 0, System.DateTime.Now, AccountController.getiUser(ckUser()));
 
       return Json("Nachricht an " + MvcApplication.ckcore.ltUser[iTo].sFirstname + " " + MvcApplication.ckcore.ltUser[iTo].sSurname + " gesendet!", JsonRequestBehavior.AllowGet);
     }
