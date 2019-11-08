@@ -627,6 +627,7 @@
     <Content Include="Content\Images\ball_red.png" />
     <Content Include="Content\Images\ball_white.png" />
     <Content Include="Content\Images\ball_yellow.png" />
+    <Content Include="Content\Images\ck.png" />
     <Content Include="Content\Images\logo_64.png" />
     <Content Include="Content\Images\sponsors\0.png" />
     <Content Include="Content\Images\sponsors\1.png" />
