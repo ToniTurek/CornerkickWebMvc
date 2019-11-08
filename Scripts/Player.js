@@ -1,18 +1,20 @@
 ﻿function getContract(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee, bNego) {
   //alert(iPlayerId + ", " + iYears + ", " + iSalaryOffer);
-  return $.ajax({
-    type: 'post',
-    url: '/Member/GetPlayerSalary',
-    dataType: "json",
-    data: {
-      iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee, bNegotiate: bNego
-    },
-    success: function (contract) {
-    },
-    error: function (sReturn) {
-      alert(sReturn);
-    }
-  });
+  if (iYears) {
+    return $.ajax({
+      type: 'post',
+      url: '/Member/GetPlayerSalary',
+      dataType: "json",
+      data: {
+        iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee, bNegotiate: bNego
+      },
+      success: function (contract) {
+      },
+      error: function (sReturn) {
+        alert(sReturn);
+      }
+    });
+  }
 }
 
 function getTableTransferDetailsAjax(iPlayerId) {
@@ -47,7 +49,7 @@ function createTableTransferDetails() {
 }
 
 function getContractDialog(parent, iPlayerId, bFeeDialog) {
-  $.when(getContract(iPlayerId, 0, 0, 0, 0, 0, false)).done(function (contract) {
+  $.when(getContract(iPlayerId, 1, 0, 0, 0, 0, false)).done(function (contract) {
     if (contract.fMood < 0) {
       alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
     } else {
