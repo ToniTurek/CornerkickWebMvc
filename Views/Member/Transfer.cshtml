@@ -364,13 +364,34 @@
           });
         }
       });
+
+      $(window).resize(function () {
+        setView();
+      });
+
+      setView();
     });
+
+    function setView() {
+      var divCbTransferlistAll = document.getElementById("divCbTransferlistAll");
+      var divCb = document.getElementById("divCb");
+
+      var fWidth = $(window).width();
+
+      if (fWidth < 450) {
+        divCbTransferlistAll.style.marginTop = "0px"
+        divCb.style.marginTop = "0px"
+      } else {
+        divCbTransferlistAll.style.marginTop = "20px"
+        divCb.style.marginTop = "16px"
+      }
+    }
   </script>
 </head>
 
 <h3>Transferliste</h3>
 <div class="form-group" style="position: relative; width: 100%">
-  <div align="center" style="position: relative; width: 170px; height: auto; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+  <div id="divCbTransferlistAll" align="center" style="position: relative; width: 170px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
     <form>
       <fieldset>
         <label style="font-size:100%; color: black; margin-right: 4%">
@@ -385,7 +406,7 @@
     </form>
   </div>
 
-  <div align="center" style="position: relative; width: 150px; height: auto; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+  <div align="center" style="position: relative; width: 150px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
     <form>
       <fieldset>
         <label style="font-size:100%; color: black; margin-right: 4%">
@@ -415,12 +436,12 @@
     @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
   </div>
 
-  <div style="position: relative; width: auto; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
-    <label style="width: 100%; background-color: white">
+  <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
+    <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
       <input id="cbFixTransferFee" type="checkbox" value="false">
       Fixe Ablöse
     </label>
-    <label style="position: absolute; top: 20px; width: 100%; background-color: white">
+    <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
       <input id="cbNoClub" type="checkbox" value="false">
       Vereinslos
     </label>
