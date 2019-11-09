@@ -4843,7 +4843,9 @@ namespace CornerkickWebMvc.Controllers
       int iSpOffer = 0;
       bool bOffer = false;
       foreach (List<CornerkickManager.Finance.Sponsor> ltSponsor in new List<CornerkickManager.Finance.Sponsor>[] { club.ltSponsorBoards, club.ltSponsorOffers }) {
-        foreach (CornerkickManager.Finance.Sponsor spon in ltSponsor) {
+        for (int iS = 0; iS < ltSponsor.Count; iS++) {
+          CornerkickManager.Finance.Sponsor spon = ltSponsor[iS];
+
           if (bOffer) iSpOffer++;
 
           if (spon.bMain) continue;
@@ -4852,6 +4854,7 @@ namespace CornerkickWebMvc.Controllers
           deSponsorBoard.bOffer = bOffer;
           deSponsorBoard.iId = spon.iId;
           if (bOffer) deSponsorBoard.iIndex = iSpOffer - 1;
+          spon.iId = (byte)Math.Min(spon.iId, MvcApplication.ckcore.fz.ltSponsoren.Count - 1);
           deSponsorBoard.sName = MvcApplication.ckcore.fz.ltSponsoren[spon.iId].name;
           deSponsorBoard.sMoneyVicHome = spon.iMoneyVicHome.ToString("N0", getCi());
           deSponsorBoard.nBoards = spon.nBoards;
