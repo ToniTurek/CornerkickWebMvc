@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
+using System.Web.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace CornerkickWebMvc.Models
@@ -30,9 +31,11 @@ namespace CornerkickWebMvc.Models
 
     public int[] iSeasonalTickets { get; set; }
 
-    public CornerkickManager.Finance.Budget budgetPlan { get; set; }
-    public CornerkickManager.Finance.Budget budgetReal { get; set; }
     public bool bEditable { get; set; }
+
+    public List<SelectListItem> ddlYear { get; set; }
+    [Display(Name = "Jahr: ")]
+    public string sYear { get; set; }
 
     public float  fBalanceSecretFracAdmissionPrice { get; set; }
     public string sBalanceSecret { get; set; }

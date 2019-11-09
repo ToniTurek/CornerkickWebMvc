@@ -18,6 +18,74 @@
 
 <body>
   <script type="text/javascript">
+    function getBudget(bEdit, iYear) {
+      if (iYear >= 0) bEdit = false;
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/FinanceGetBudgetPlan',
+        dataType: "json",
+        data: { iYear: iYear },
+        success: function (sBudget) {
+          // Plan
+          if (bEdit) {
+            var inputIn = "<input class=\"form-control tbBudgetIn\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
+            document.getElementById('tdInSpecPlan')        .innerHTML = inputIn  + sBudget[0][0] + ">";
+            document.getElementById('tdInBonusCupPlan')    .innerHTML = inputIn  + sBudget[0][1] + ">";
+            document.getElementById('tdInBonusSponsorPlan').innerHTML = inputIn  + sBudget[0][2] + ">";
+            document.getElementById('tdInTransferPlan')    .innerHTML = inputIn  + sBudget[0][3] + ">";
+
+            var inputPay = "<input class=\"form-control tbBudgetPay\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
+            document.getElementById('tdPaySalaryPlan')     .innerHTML = inputPay + sBudget[0][4] + ">";
+            document.getElementById('tdPayStaffPlan')      .innerHTML = inputPay + sBudget[0][5] + ">";
+            document.getElementById('tdPayTransferPlan')   .innerHTML = inputPay + sBudget[0][6] + ">";
+            document.getElementById('tdPayStadiumPlan')    .innerHTML = inputPay + sBudget[0][7] + ">";
+            document.getElementById('tdPayInterestPlan')   .innerHTML = inputPay + sBudget[0][8] + ">";
+          } else {
+            document.getElementById('tdInSpecPlan')        .innerHTML = sBudget[0][0];
+            document.getElementById('tdInBonusCupPlan')    .innerHTML = sBudget[0][1];
+            document.getElementById('tdInBonusSponsorPlan').innerHTML = sBudget[0][2];
+            document.getElementById('tdInTransferPlan')    .innerHTML = sBudget[0][3];
+            document.getElementById('tdPaySalaryPlan')     .innerHTML = sBudget[0][4];
+            document.getElementById('tdPayStaffPlan')      .innerHTML = sBudget[0][5];
+            document.getElementById('tdPayTransferPlan')   .innerHTML = sBudget[0][6];
+            document.getElementById('tdPayStadiumPlan')    .innerHTML = sBudget[0][7];
+            document.getElementById('tdPayInterestPlan')   .innerHTML = sBudget[0][8];
+          };
+
+          // Real
+          document.getElementById('tdInSpecReal')        .innerHTML = sBudget[1][0];
+          document.getElementById('tdInBonusCupReal')    .innerHTML = sBudget[1][1];
+          document.getElementById('tdInBonusSponsorReal').innerHTML = sBudget[1][2];
+          document.getElementById('tdInTransferReal')    .innerHTML = sBudget[1][3];
+          document.getElementById('tdPaySalaryReal')     .innerHTML = sBudget[1][4];
+          document.getElementById('tdPayStaffReal')      .innerHTML = sBudget[1][5];
+          document.getElementById('tdPayTransferReal')   .innerHTML = sBudget[1][6];
+          document.getElementById('tdPayStadiumReal')    .innerHTML = sBudget[1][7];
+          document.getElementById('tdPayInterestReal')   .innerHTML = sBudget[1][8];
+
+          // Total
+          document.getElementById('tdTotalInPlan') .innerHTML = sBudget[0][ 9];
+          document.getElementById('tdTotalInReal') .innerHTML = sBudget[1][ 9];
+          document.getElementById('tdTotalPayPlan').innerHTML = sBudget[0][10];
+          document.getElementById('tdTotalPayReal').innerHTML = sBudget[1][10];
+
+          // Summary
+          for (var i = 0; i < 2; i++) {
+            if (sBudget[i][11][0] == '-') {
+              sBudget[i][11] = sBudget[i][11].fontcolor("red");
+            } else {
+              sBudget[i][11] = sBudget[i][11].fontcolor("green");
+            }
+          }
+          document.getElementById('tdSumPlan').innerHTML = sBudget[0][11];
+          document.getElementById('tdSumCurr').innerHTML = sBudget[1][11];
+          document.getElementById('tdSumPlan').style.fontWeight = "bold"
+          document.getElementById('tdSumCurr').style.fontWeight = "bold"
+        }
+      });
+    }
+
     function setBudget() {
       var iBudgetIn = [];
       $('.tbBudgetIn').each(function () {
@@ -35,37 +103,17 @@
         dataType: "json",
         //data: jsModel.budgetPlan,
         data: { iBudgetIn: iBudgetIn, iBudgetPay: iBudgetPay },
-        success: function (sTotal) {
-          // set color
-          if (sTotal[2][0] == '-') {
-            sTotal[2] = sTotal[2].fontcolor("red");
-          } else {
-            sTotal[2] = sTotal[2].fontcolor("green");
-          }
-
-          if (sTotal[3][0] == '-') {
-            sTotal[3] = sTotal[3].fontcolor("red");
-          } else {
-            sTotal[3] = sTotal[3].fontcolor("green");
-          }
-
-          document.getElementById('tdTotalInPlan').innerHTML = sTotal[0];
-          document.getElementById('tdTotalPayPlan').innerHTML = sTotal[1];
-          document.getElementById('tdSumPlan').innerHTML = sTotal[2];
-          document.getElementById('tdSumCurr').innerHTML = sTotal[3];
-
-          document.getElementById('tdSumPlan').style.fontWeight = "bold"
-          document.getElementById('tdSumCurr').style.fontWeight = "bold"
-
-          //alert("Eintrittspreise geändert");
-          //$("#bnBuild").text("Kosten: " + iKostenDauer[0] + " €\nDauer: " + iKostenDauer[1] + " Tage");
+        success: function (result) {
+          getBudget(@Html.Raw(Json.Encode(Model.bEditable)), -1);
         }
       });
     }
 
     $(document).ready(function () {
+      var bEdit = @Html.Raw(Json.Encode(Model.bEditable));
+
       setEintritt();
-      setBudget();
+      getBudget(bEdit, -1);
 
       // Set thousand separator to text boxes
       $('.tbBudgetIn').each(function () {
@@ -115,6 +163,10 @@
         $(this).on('keyup', function (ev) {
           setAdmissionPriceSeasonal();
         });
+      });
+
+      $('#ddlYear').on('change', function (ev) {
+        getBudget(bEdit, $(this).val());
       });
 
       $('#fBalanceSecretFracAdmissionPrice').change(function () {
@@ -238,7 +290,7 @@
     });
   </script>
 
-  <div style="height: 100%; min-height: 1200px; width: 100%">
+  <div style="width: 100%; height: 100%; min-height: 1200px">
     <h3>Finanzen</h3>
 
     <div id="chartContainer" style="height: 300px; width: 100%"></div>
@@ -271,6 +323,14 @@
 
     <h4>Finanzplanung</h4>
     <div style="position: relative; width: 100%; top: 5%; float: left; margin-bottom: 40px">
+      <div style="position: relative; width: 100%">
+        <div style="position: absolute; top: -32px; right: 0px">
+          <label>
+            Jahr:
+            @Html.DropDownListFor(m => m.sYear, Model.ddlYear, new { @class = "form-horizontal", id = "ddlYear", @style = "width:60px" })
+          </label>
+        </div>
+      </div>
       <div style="position: relative; float: left; width: 49%; min-width: 320px; margin-right: 2%; margin-bottom: 2%; height: auto">
         <table id="tableBudgetIn" border="1" cellpadding="4" style="width: 100%" class="display responsive nowrap">
           <thead>
@@ -286,52 +346,28 @@
             </tr>
             <tr>
               <td align="right">Zuschauer</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInSpec, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iInSpec.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdInSpecPlan" style="width:20%" align="right"></td>
+              <td id="tdInSpecReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Prämien</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInBonusCup, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iInBonusCup.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iInBonusCup.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdInBonusCupPlan" style="width:20%" align="right"></td>
+              <td id="tdInBonusCupReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Sponsoren</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInBonusSponsor, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iInBonusSponsor.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iInBonusSponsor.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdInBonusSponsorPlan" style="width:20%" align="right"></td>
+              <td id="tdInBonusSponsorReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Transfer</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iInTransfer, new { @class = "form-control tbBudgetIn", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iInTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iInTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdInTransferPlan" style="width:20%" align="right">0</td>
+              <td id="tdInTransferReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Gesamt</td>
               <td id="tdTotalInPlan" style="width:20%" align="right">0</td>
-              <td style="width:20%" align="right">@MvcApplication.ckcore.fz.getBudgetInTotal(Model.budgetReal).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdTotalInReal" style="width:20%" align="right">0</td>
             </tr>
           </tbody>
         </table>
@@ -352,63 +388,33 @@
             </tr>
             <tr>
               <td align="right">Spielergehälter</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPaySalary, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iPaySalary.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iPaySalary.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdPaySalaryPlan" style="width:20%" align="right">0</td>
+              <td id="tdPaySalaryReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Personalkosten</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayStaff, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iPayStaff.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iPayStaff.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdPayStaffPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayStaffReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Transfer</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayTransfer, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iPayTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iPayTransfer.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdPayTransferPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayTransferReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Stadion</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayStadium, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iPayStadium.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iPayStadium.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdPayStadiumPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayStadiumReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Zinsen</td>
-              @{
-                if (Model.bEditable) {
-                  <td style="width:20%" align="center">@Html.TextBoxFor(m => m.budgetPlan.iPayInterest, new { @class = "form-control tbBudgetPay", autocomplete = "off", style = "text-align: right", type = "tel" })</td>
-                } else {
-                  <td style="width:20%" align="right">@Model.budgetPlan.iPayInterest.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-                }
-              }
-              <td style="width:20%" align="right">@Model.budgetReal.iPayInterest.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdPayInterestPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayInterestReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Gesamt</td>
               <td id="tdTotalPayPlan" style="width:20%" align="right">0</td>
-              <td style="width:20%" align="right">@MvcApplication.ckcore.fz.getBudgetPayTotal(Model.budgetReal).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td id="tdTotalPayReal" style="width:20%" align="right">0</td>
             </tr>
           </tbody>
         </table>

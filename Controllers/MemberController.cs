@@ -4570,6 +4570,9 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Finance(Models.FinanceModel financeModel)
     {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return View(financeModel);
+
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(financeModel);
 
@@ -4587,19 +4590,12 @@ namespace CornerkickWebMvc.Controllers
       financeModel.iSeasonalTickets = clb.iSpectatorsSeasonal;
 
       financeModel.bEditable = MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date);
-      financeModel.budgetPlan = ckUser().budget;
-      financeModel.budgetReal = MvcApplication.ckcore.ui.getActualBudget(clb);
 
-      if (financeModel.budgetPlan.iPaySalary == 0) {
-        CornerkickManager.Finance.Budget bg = financeModel.budgetPlan;
-        bg.iPaySalary = MvcApplication.ckcore.tl.getPlayerSalary(clb);
-        financeModel.budgetPlan = bg;
-      }
-
-      if (financeModel.budgetPlan.iPayStaff == 0) {
-        CornerkickManager.Finance.Budget bg = financeModel.budgetPlan;
-        bg.iPayStaff = MvcApplication.ckcore.tl.getStuffSalary(clb);
-        financeModel.budgetPlan = bg;
+      // Year of budget plan
+      financeModel.ddlYear = new List<SelectListItem>();
+      financeModel.ddlYear.Add(new SelectListItem { Text = MvcApplication.ckcore.dtSeasonStart.Year.ToString(), Value = "-1" });
+      for (int iY = 0; iY < usr.ltBudget.Count; iY++) {
+        financeModel.ddlYear.Add(new SelectListItem { Text = (MvcApplication.ckcore.dtSeasonStart.Year - (iY + 1)).ToString(), Value = iY.ToString() });
       }
 
       // Secret Balance
@@ -4607,6 +4603,54 @@ namespace CornerkickWebMvc.Controllers
       financeModel.sBalanceSecret                   = clb.iBalanceSecret.ToString("N0", getCi()) + " €";
 
       return View(financeModel);
+    }
+
+    public JsonResult FinanceGetBudgetPlan(int iYear)
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Finance.Budget[] bd = new CornerkickManager.Finance.Budget[2];
+      if (iYear < 0) {
+        bd[0] = usr.budget;
+        bd[1] = MvcApplication.ckcore.ui.getActualBudget(clb);
+
+        if (bd[0].iPaySalary == 0) bd[0].iPaySalary = MvcApplication.ckcore.tl.getPlayerSalary(clb);
+        if (bd[0].iPayStaff  == 0) bd[0].iPayStaff  = MvcApplication.ckcore.tl.getStuffSalary (clb);
+      } else  if (iYear < usr.ltBudget.Count) {
+        bd[0] = usr.ltBudget[iYear][0];
+        bd[1] = usr.ltBudget[iYear][1];
+      }
+
+      string[][] sBudget = new string[2][];
+      sBudget[0] = new string[12]; // Plan
+      sBudget[1] = new string[12]; // Real
+
+      for (byte i = 0; i < 2; i++) {
+        sBudget[i][0] = bd[i].iInSpec.ToString("#,#", getCi());
+        sBudget[i][1] = bd[i].iInBonusCup.ToString("#,#", getCi());
+        sBudget[i][2] = bd[i].iInBonusSponsor.ToString("#,#", getCi());
+        sBudget[i][3] = bd[i].iInTransfer.ToString("#,#", getCi());
+        sBudget[i][4] = bd[i].iPaySalary.ToString("#,#", getCi());
+        sBudget[i][5] = bd[i].iPayStaff.ToString("#,#", getCi());
+        sBudget[i][6] = bd[i].iPayTransfer.ToString("#,#", getCi());
+        sBudget[i][7] = bd[i].iPayStadium.ToString("#,#", getCi());
+        sBudget[i][8] = bd[i].iPayInterest.ToString("#,#", getCi());
+
+        long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
+        long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);
+        sBudget[i][ 9] = iInTotal .ToString("#,#", getCi());
+        sBudget[i][10] = iPayTotal.ToString("#,#", getCi());
+
+        sBudget[i][11] = "0";
+        long iResult = iInTotal - iPayTotal;
+        if (iResult != 0) sBudget[i][11] = iResult.ToString("#,#", getCi());
+      }
+
+      return Json(sBudget, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult FinanceGetDevelopmentData(Models.FinanceModel financeModel)
@@ -4724,34 +4768,7 @@ namespace CornerkickWebMvc.Controllers
         user.budget.iPayInterest = iBudgetPay[4];
       }
 
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
-
-      long iInPlanTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (user.budget);
-      long iPayPlanTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(user.budget);
-
-      long iPlannedResult = iInPlanTotal - iPayPlanTotal;
-      string sPlannedResult = "0";
-      if (iPlannedResult != 0) {
-        sPlannedResult = iPlannedResult.ToString("N0", getCi());
-      }
-
-      CornerkickManager.Finance.Budget bgReal = MvcApplication.ckcore.ui.getActualBudget(clb);
-      long iInCurrTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bgReal);
-      long iPayCurrTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bgReal);
-      string sCurrentResult = "0";
-      if (iInCurrTotal - iPayCurrTotal != 0) {
-        sCurrentResult = (iInCurrTotal - iPayCurrTotal).ToString("N0", getCi());
-      }
-
-      string[] sTotal = new string[4] {
-        iInPlanTotal .ToString("N0", getCi()),
-        iPayPlanTotal.ToString("N0", getCi()),
-        sPlannedResult,
-        sCurrentResult
-      };
-
-      return Json(sTotal, JsonRequestBehavior.AllowGet);
+      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
