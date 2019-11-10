@@ -267,7 +267,7 @@ namespace CornerkickWebMvc.Controllers
       gLoc.sColorJerseyA = new string[2] { "white", "red" };
       if (user.game.data.team[1].iTeamId >= 0 && user.game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[user.game.data.team[1].iTeamId];
-        for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
+        for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC + 2].R.ToString() + "," + clubA.cl[iC + 2].G.ToString() + "," + clubA.cl[iC + 2].B.ToString() + ")";
         gLoc.bJerseyTextColorWhiteA = clubA.cl[0].R + clubA.cl[0].G + clubA.cl[0].B < 300;
       }
 
