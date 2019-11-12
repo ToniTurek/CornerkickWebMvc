@@ -485,11 +485,13 @@ namespace CornerkickWebMvc
           }
 
           // Inform users
+          /*
           foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
             if (offer.iFee < iOfferMax) {
               ckcore.sendNews(offer.club.user, "Ihr Transferangebot für den Spieler " + transfer.player.sName + " ist leider nicht (mehr) hoch genug.");
             }
           }
+          */
         }
       }
 
