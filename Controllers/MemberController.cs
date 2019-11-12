@@ -440,16 +440,20 @@ namespace CornerkickWebMvc.Controllers
 
       for (int iN = 0; iN < usr.ltNews.Count; iN++) {
         CornerkickManager.Main.News news = usr.ltNews[iN];
+
         if (news.iType < 99/* && news.bUnread*/) {
           if (news.bRead && news.bRead2) {
             if        (iDeleteLog == 1 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays >  7) {
               usr.ltNews.Remove(news);
+              iN--;
               continue;
             } else if (iDeleteLog == 2 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 14) {
               usr.ltNews.Remove(news);
+              iN--;
               continue;
             } else if (iDeleteLog == 3 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 30) {
               usr.ltNews.Remove(news);
+              iN--;
               continue;
             }
           }
