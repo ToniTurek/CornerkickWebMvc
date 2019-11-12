@@ -443,7 +443,7 @@ namespace CornerkickWebMvc.Controllers
 
         if (news.iType < 99/* && news.bUnread*/) {
           // Remove news offer overbid
-          if (news.iType == CornerkickManager.Main.iNewsTypePlayerTransferOfferOutbid) {
+          if (news.sText.Contains("ist leider nicht (mehr) hoch genug.")/* == CornerkickManager.Main.iNewsTypePlayerTransferOfferOutbid*/) {
             usr.ltNews.Remove(news);
             iN--;
             continue;
