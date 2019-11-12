@@ -442,6 +442,13 @@ namespace CornerkickWebMvc.Controllers
         CornerkickManager.Main.News news = usr.ltNews[iN];
 
         if (news.iType < 99/* && news.bUnread*/) {
+          // Remove news offer overbid
+          if (news.sText.Contains("ist leider nicht (mehr) hoch genug.")/* == CornerkickManager.Main.iNewsTypePlayerTransferOfferOutbid*/) {
+            usr.ltNews.Remove(news);
+            iN--;
+            continue;
+          }
+
           if (news.bRead && news.bRead2) {
             if        (iDeleteLog == 1 && (MvcApplication.ckcore.dtDatum - news.dt).TotalDays >  7) {
               usr.ltNews.Remove(news);
