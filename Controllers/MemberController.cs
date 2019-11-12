@@ -1633,6 +1633,12 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      // Injury
+      if (plDetails.injury != null) {
+        Random rnd = new Random();
+        if (plDetails.injury.iType2 < 0 || plDetails.injury.iType2 >= MvcApplication.ckcore.ltInjury[plDetails.injury.iType].Count) plDetails.injury.iType2 = (sbyte)rnd.Next(MvcApplication.ckcore.ltInjury[plDetails.injury.iType].Count);
+      }
+
       // Next / Prev. Player
       plModel.iPlIdPrev = -1;
       plModel.iPlIdNext = -1;
