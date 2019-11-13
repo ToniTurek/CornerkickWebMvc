@@ -23,11 +23,13 @@
         if (document.getElementById("rbDefence").checked) {
           // Defence view
           $.each(teamData.ltPlayer, function (iPl, player) {
-            if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
-              plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
+            if (teamData.ltPlayerOpp != null) {
+              if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
+                plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
 
-              var iPos = convertPosToPix(teamData.formation.ptPos[iPl].Y, 122 - teamData.formation.ptPos[iPl].X, -teamData.formationOpp.ptPos[player.iIxManMarking].Y, teamData.formationOpp.ptPos[player.iIxManMarking].X, document.getElementById("drawFormation"), false);
-              result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
+                var iPos = convertPosToPix(teamData.formation.ptPos[iPl].Y, 122 - teamData.formation.ptPos[iPl].X, -teamData.formationOpp.ptPos[player.iIxManMarking].Y, teamData.formationOpp.ptPos[player.iIxManMarking].X, document.getElementById("drawFormation"), false);
+                result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
+              }
             }
 
             var sNo = player.iNr.toString();
