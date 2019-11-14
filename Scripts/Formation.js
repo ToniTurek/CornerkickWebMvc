@@ -23,7 +23,7 @@
         if (document.getElementById("rbDefence").checked) {
           // Defence view
           $.each(teamData.ltPlayer, function (iPl, player) {
-            if (teamData.ltPlayerOpp != null) {
+            if (teamData.ltPlayerOpp !== null) {
               if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
                 plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
 

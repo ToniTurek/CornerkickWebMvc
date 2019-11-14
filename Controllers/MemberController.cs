@@ -1259,7 +1259,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Check if player is suspended
         bool bSusp = false;
-        int iSuspIx = 0;
+        int iSuspIx = -1;
         if      (usr.game      != null && !usr.game.data.bFinished) iSuspIx = usr.game.data.iGameType - 1;
         else if (club.nextGame != null)                             iSuspIx = club.nextGame.iGameType - 1;
 
