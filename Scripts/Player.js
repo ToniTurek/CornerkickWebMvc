@@ -426,8 +426,6 @@ function updateContract(iPlayerId, input12, bNego) {
   $.when(getContract(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee, bNego)).done(function (contract) {
     if (contract.fMood < 0) {
       alert("Der Spieler hat die Vertragsverhandlungen abgebrochen!");
-      jTable.ajax.reload();
-
       $("#dialogContract2").dialog("close");
     } else {
       if (bNego) {
