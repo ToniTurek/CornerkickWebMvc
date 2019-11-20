@@ -182,8 +182,8 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
     Über das Menü <i>Saison->Kalender</i> (oder durch klick auf das Datum) kommen Sie in die Kalenderübersicht. Durch klick auf ein Datum haben Sie die Wahl zwischen der Anfrage eines Testspiels und der Buchung eines Trainingslagers.
   </li>
   <li>
-    <u>Machen Sie Ihre Finanzplanung</u><br />
-    Über das Menü <i>Verein->Finanzen</i> (oder durch klick auf den Kontostand) können Sie die Finanzplanung für die kommende Saison durchführen. Hier können Sie auch die Eintrittspreise festlegen. Die Finanzplanung kann nur am ersten Tag jeder Saison festgelegt werden!
+    <u>Machen Sie Ihre <a href="#h3Finance">Finanzplanung</a></u><br />
+    Über das Menü <i>Verein->Finanzen</i> (oder durch klick auf den Kontostand) kann die Finanzplanung für die kommende Saison vorgenommen werden. Hier können Sie auch die Eintrittspreise festlegen. Die Finanzplanung kann nur am ersten Tag jeder Saison festgelegt werden!
   </li>
   <li>
     <u>Geben Sie Ihrem Stadion einen Namen</u><br />
@@ -558,6 +558,25 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
   </ul>
 
+  <h3>Vertrag</h3>
+  Soll ein Spieler am Transfermarkt erworben oder ein auslaufender Vertrag eines eigenen Spielers verlängert werden (über die Schaltfläche "Vertrag verlängern" in der Spieleransicht), muss ein neuer Vertrag ausgehandelt werden.
+  <ul>
+    <li>
+      Zunächst sollte die gewünschte Vertragslaufzeit eingestellt werden (a). Hierdurch kann sich das geforderte Gehalt des Spielers ändern. Junge Spieler verlangen ein höheres Gehalt für lange Vertragslaufzeiten während es bei älteren Spielern umgekehrt ist.
+    </li>
+    <li>
+      Über das Festlegen einer fixen Ablöse kann das geforderte Gehalt reduziert werden (b). Allerdings kann der Spieler dann ohne Zustimmung des Managers den Verein für diese Ablöse verlassen!
+    </li>
+    <li>
+      Nun kann ein eigenes Angebot für das Jahresgehalt sowie Spiel- und Torprämie angegeben und über die Schaltfläche "verhandelt" dem Spieler übermittelt werden (c). Sofern der angebotene Vertrag nicht zu weit von den Vorstellungen des Spielers entfernt ist, wird dieser sich mit seinem Angebot annähern.<br />
+      Dieser Schritt kann wiederholt werden, jedoch sinkt jeden Mal die Verhandlungsbereitschaft des Spielers. Fällt diese unter 0% bricht der Spieler die Verhandlungen ab und ist an einem neuen Vertrag nicht mehr interessiert.
+    </li>
+    <li>
+      Ist der Manager mit dem Vertragsforderungen des Spielers zufrieden, kann er diesem über die Schaltfläche "Bestätigen" zustimmen (d).
+    </li>
+  </ul>
+  <img src="~/Content/Images/user_manual/Nego2.png" width="380"/>
+
   <h2>Verein</h2>
 
   <div id="h3Finance" class="ckLink"></div>
@@ -569,8 +588,9 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
 
   <div id="h3Sponsors" class="ckLink"></div>
   <h3>Sponsoren</h3>
-  Spondoren sind eine wichtige Einnahmequelle. Es gibt zwei verschiedene Arten von Sponsoren: ein Hauptsponsor und Bandenwerbung. Hauptsponsor bieten dir einen einmaligen Sockelbetrag und erfolgsabhängige Leistungen an, während Bandenwerbungen bei jedem Heimspiel Geld generieren.<br />
-  Zu Beginn des Spiels hast du nur ein Angebot eines Hauptsponsors. Mit fortschreitender Spieldauer wirst du aber weitere Angebote bekommen, die (abhängig von deinem Tabellenplatz) durchaus lukrativer sein können. Es lohnt sich also, hier hin und wieder mal vorbei zu schauen.
+  Spondoren sind eine wichtige Einnahmequelle. Es gibt zwei verschiedene Arten von Sponsoren: ein Hauptsponsor und Bandenwerbung. Der Hauptsponsor bieten dir einen einmaligen Sockelbetrag und erfolgsabhängige Leistungen an, während Bandenwerbungen bei jedem Heimspiel Geld generieren.<br />
+  Zu Beginn des Spiels hast du nur ein Angebot eines Hauptsponsors. Mit fortschreitender Spieldauer wirst du aber weitere Angebote bekommen, die (abhängig von deinem Tabellenplatz) durchaus lukrativer sein können. Es lohnt sich also, hier hin und wieder mal vorbei zu schauen.<br />
+  Um ein Sponsorenangebot anzunehmen, muss es in der jeweiligen Liste ausgewählt und die Schaltfläche "Sponsor wählen" gedrückt werden.
 
   <div id="h3Staff" class="ckLink"></div>
   <h3>Personal</h3>
@@ -647,8 +667,24 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
       Jedes zusätzliche Level des Trainingsgeländes erhöht die Wahrscheinlichkeit der Weiterentwicklung der <a href="#h3PlayerSkills">Spielerfähigkeiten</a> deiner Profispieler.
     </li>
     <li>
+      <u>Fittnessraum</u><br />
+      Jedes zusätzliche Level der Fittnesseinrichtung erhöht den Konditionsgewinn pro Trainingseinheit.
+    </li>
+    <li>
+      <u>Wellnessraum</u><br />
+      Jedes zusätzliche Level der Wellnesseinrichtung erhöht den Frischegewinn pro Trainingseinheit.
+    </li>
+    <li>
       <u>Jugendinternat</u><br />
       Jedes zusätzliche Level des Jugendinternats erhöht die Wahrscheinlichkeit der Weiterentwicklung der <a href="#h3PlayerSkills">Spielerfähigkeiten</a> deiner Jugendspieler.
+    </li>
+    <li>
+      <u>Vereinsheim</u><br />
+      Jedes zusätzliche Level des Vereinsheims erhöht das Zuschaueraufkommen um 5%.
+    </li>
+    <li>
+      <u>Vereinsmuseum</u><br />
+      Der Zuschauerbonus für gewonnene Titel (+5% je Titel) wird mit dem aktuellen Level des Vereinsmuseums multipliziert.
     </li>
     <li>
       <u>Parkplätze</u><br />
@@ -659,6 +695,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
       siehe <a href="#h4StadiumExtras">Stadionausstattung</a>
     </li>
   </ul>
+  Um ein Gebäude bauen zu können, muss jedoch zunächst ein Grundstück erworben werden. Die Kosten für jedes neue Grundstück erhöhen sich um 50% zum vorherigen.
 </div>
 
 <div id="h2PreviewGame" class="ckLink"></div>
