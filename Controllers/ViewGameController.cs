@@ -271,7 +271,10 @@ namespace CornerkickWebMvc.Controllers
         gLoc.bJerseyTextColorWhiteA = clubA.cl[0].R + clubA.cl[0].G + clubA.cl[0].B < 300;
       }
 
-      if (MvcApplication.ckcore.ltUser.Count > 0) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      // Set interval
+      if (MvcApplication.ckcore.ltUser.Count > 0) {
+        if (MvcApplication.ckcore.ltUser[0].nextGame != null) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      }
 
       CornerkickGame.Game.State state = user.game.newState();
       if (user.game.data.ltState.Count > 0) state = user.game.data.ltState[user.game.data.ltState.Count - 1];
