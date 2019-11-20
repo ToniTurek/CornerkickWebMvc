@@ -1640,6 +1640,7 @@ namespace CornerkickWebMvc.Controllers
       // Injury
       if (plDetails.injury != null) {
         Random rnd = new Random();
+        if (plDetails.injury.iType >= MvcApplication.ckcore.ltInjury.Length) plDetails.injury.iType = (byte)(MvcApplication.ckcore.ltInjury.Length - 1);
         if (plDetails.injury.iType2 < 0 || plDetails.injury.iType2 >= MvcApplication.ckcore.ltInjury[plDetails.injury.iType].Count) plDetails.injury.iType2 = (sbyte)rnd.Next(MvcApplication.ckcore.ltInjury[plDetails.injury.iType].Count);
       }
 
