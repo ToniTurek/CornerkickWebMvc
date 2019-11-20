@@ -34,6 +34,7 @@ function drawGame(iState, iGameSpeed) {
     },
     error: function () {
       //alert("ERROR");
+      plotStatistics(iState);
       return false;
     },
     complete: function (jqXHR, textStatus) {

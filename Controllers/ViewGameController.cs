@@ -90,6 +90,8 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      if (view.ddlGames.Count > 0) view.ddlGames[0].Selected = true;
+
       if (user.game == null && fiGames.Count > 0) {
         string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
         try {
@@ -97,6 +99,16 @@ namespace CornerkickWebMvc.Controllers
         } catch {
           MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", MvcApplication.ckcore.sErrorFile);
         }
+      }
+
+      // Insert next games
+      List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clubUser, MvcApplication.ckcore.dtDatum);
+      for (byte j = 0; j < ltGdNextGames.Count; j++) {
+        CornerkickGame.Game.Data gd = ltGdNextGames[j];
+        view.ddlGames.Insert(0, new SelectListItem {
+          Text = gd.dt.ToString("d", Controllers.MemberController.getCiStatic(User)) + " " + gd.dt.ToString("t", Controllers.MemberController.getCiStatic(User)) + " *: " + gd.team[0].sTeam + " - " + gd.team[1].sTeam,
+          Value = (-j - 1).ToString()
+        });
       }
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
@@ -181,64 +193,69 @@ namespace CornerkickWebMvc.Controllers
       view.sColorJerseyH = new string[4] { "white", "blue", "blue", "white" };
       view.sColorJerseyA = new string[4] { "white", "red",  "red",  "white" };
 
-      if (game != null) {
-        gD = new Models.ViewGameModel.gameData();
+      if (game == null) {
+        view.gD.iGoalsH = -1;
+        view.gD.iGoalsA = -1;
 
-        string sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems");
-        string sEmblemDirHtml = "/Content/Uploads/emblems/";
-        string sEmblemH = game.data.team[0].iTeamId.ToString() + ".png";
-        string sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
-
-        if (game.data.team[0].iTeamId >= 0 && game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
-          CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[game.data.team[0].iTeamId];
-
-          if (clubH.bNation) {
-            sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
-            sEmblemDirHtml = "/Content/Icons/flags/";
-            int iNationH = clubH.iLand;
-            if (iNationH >= 0 && iNationH < MvcApplication.ckcore.sLandShort.Length) sEmblemH = MvcApplication.ckcore.sLandShort[iNationH] + ".png";
-          }
-
-          for (byte iC = 0; iC < clubH.cl.Length; iC++) view.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
-        }
-
-        if (game.data.team[1].iTeamId >= 0 && game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
-          CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[game.data.team[1].iTeamId];
-
-          if (clubA.bNation) {
-            sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
-            sEmblemDirHtml = "/Content/Icons/flags/";
-            int iNationA = clubA.iLand;
-            if (iNationA >= 0 && iNationA < MvcApplication.ckcore.sLandShort.Length) sEmblemA = MvcApplication.ckcore.sLandShort[iNationA] + ".png";
-          }
-
-          for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
-        }
-
-        /*
-        if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemH))) sEmblemH = "0.png";
-        if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemA))) sEmblemA = "0.png";
-        */
-
-        view.sEmblemH = sEmblemDirHtml + sEmblemH;
-        view.sEmblemA = sEmblemDirHtml + sEmblemA;
-
-        string[] sHA = new string[2] { "H", "A" };
-        // Add player to heatmap
-        for (byte iHA = 0; iHA < 2; iHA++) {
-          for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
-            view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.data.nPlStart) + iPl).ToString() });
-          }
-        }
-
-        view.iGameSpeed = game.data.iGameSpeed;
-
-        view.game = game;
-
-        gD = getAllGameData(view);
-
-        view.gD = gD;
+        return;
       }
+
+      gD = new Models.ViewGameModel.gameData();
+
+      string sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems");
+      string sEmblemDirHtml = "/Content/Uploads/emblems/";
+      string sEmblemH = game.data.team[0].iTeamId.ToString() + ".png";
+      string sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
+
+      if (game.data.team[0].iTeamId >= 0 && game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
+        CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[game.data.team[0].iTeamId];
+
+        if (clubH.bNation) {
+          sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
+          sEmblemDirHtml = "/Content/Icons/flags/";
+          int iNationH = clubH.iLand;
+          if (iNationH >= 0 && iNationH < MvcApplication.ckcore.sLandShort.Length) sEmblemH = MvcApplication.ckcore.sLandShort[iNationH] + ".png";
+        }
+
+        for (byte iC = 0; iC < clubH.cl.Length; iC++) view.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
+      }
+
+      if (game.data.team[1].iTeamId >= 0 && game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
+        CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[game.data.team[1].iTeamId];
+
+        if (clubA.bNation) {
+          sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
+          sEmblemDirHtml = "/Content/Icons/flags/";
+          int iNationA = clubA.iLand;
+          if (iNationA >= 0 && iNationA < MvcApplication.ckcore.sLandShort.Length) sEmblemA = MvcApplication.ckcore.sLandShort[iNationA] + ".png";
+        }
+
+        for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
+      }
+
+      /*
+      if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemH))) sEmblemH = "0.png";
+      if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemA))) sEmblemA = "0.png";
+      */
+
+      view.sEmblemH = sEmblemDirHtml + sEmblemH;
+      view.sEmblemA = sEmblemDirHtml + sEmblemA;
+
+      string[] sHA = new string[2] { "H", "A" };
+      // Add player to heatmap
+      for (byte iHA = 0; iHA < 2; iHA++) {
+        for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
+          view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.data.nPlStart) + iPl).ToString() });
+        }
+      }
+
+      view.iGameSpeed = game.data.iGameSpeed;
+
+      view.game = game;
+
+      gD = getAllGameData(view);
+
+      view.gD = gD;
     }
 
     public JsonResult ViewGameLocations(int iState = -1/*, int iSleep = 0*/, bool bAverage = false)
@@ -399,6 +416,11 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User user = ckUser();
       CornerkickManager.Club club = ckClub();
 
+      if (user.game == null) {
+        setGameData(ref gD, null, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
+        return Json(gD, JsonRequestBehavior.AllowGet);
+      }
+
       CornerkickGame.Game.Data gameData = user.game.data;
 
       // Clear chart arrays
@@ -550,7 +572,11 @@ namespace CornerkickWebMvc.Controllers
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
-      if (user.game == null) return;
+      if (user.game == null) {
+        gD.iGoalsH = -1;
+        gD.iGoalsA = -1;
+        return;
+      }
 
       if (gameData.ltState.Count == 0) return;
 
