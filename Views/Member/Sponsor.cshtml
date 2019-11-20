@@ -74,6 +74,16 @@
 
       loadImageMain(iSponsorID);
 
+      // Set emblem on jersey
+      var divJerseyEmblem = document.getElementById("divJerseyEmblem");
+      divJerseyEmblem.innerHTML = @Html.Raw(Json.Encode(Model.sEmblem));
+
+      var divJerseyContainer = document.getElementById("divJerseyContainer");
+      var fWidth = $(window).width();
+      if (fWidth < 600) {
+        divJerseyContainer.style.left = "-140px"
+      }
+
       $.when(getLtSponsorBoardIds()).done(function (ltSponsor) {
         loadImageBoards(ltSponsor);
       });
@@ -231,9 +241,10 @@
 <h2>Hauptsponsor</h2>
 
 <div class="image" style="position: relative; width: 100%; height: auto; margin-bottom: 2%; background-color: white" align="center">
-  <div class="image" style="position: relative; width: 640px; height: 560px; margin-bottom: 2%; background-color: white" align="center">
+  <div id="divJerseyContainer" class="image" style="position: relative; width: 640px; height: 560px; margin-bottom: 2%; background-color: @Model.sColorJersey" align="center">
     <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
-    <div id="divSponsorMain" style="position: relative; width: 312px; height: 262px; top: 180px; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
+    <div id="divJerseyEmblem" style="position: absolute; width: 60px; height: 60px; top: 110px; left: 380px"></div>
+    <div id="divSponsorMain" style="position: relative; width: 312px; height: 262px; top: 190px; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
   </div>
 </div>
 

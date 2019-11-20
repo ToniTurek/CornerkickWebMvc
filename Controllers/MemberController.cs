@@ -1592,8 +1592,7 @@ namespace CornerkickWebMvc.Controllers
       plModel.sEmblem = getClubEmblem(plDetails.iClubId, "height: 100%; width: 100%; object-fit: contain");
 
       plModel.sColorJersey = "rgb(" + club.cl[0].R.ToString() + "," + club.cl[0].G.ToString() + "," + club.cl[0].B.ToString() + ")";
-      System.Drawing.Color clJerseyNo = System.Drawing.Color.Black;
-      if (club.cl[0].R + club.cl[0].G + club.cl[0].B < 300) clJerseyNo = System.Drawing.Color.White;
+      System.Drawing.Color clJerseyNo = getColorBW(club);
       plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")"; 
 
       List<int> ltNoExist = new List<int>();
@@ -1656,6 +1655,18 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return View(plModel);
+    }
+
+    private System.Drawing.Color getColorBW(CornerkickManager.Club club)
+    {
+      return getColorBW(club.cl[0]);
+    }
+    private System.Drawing.Color getColorBW(System.Drawing.Color cl)
+    {
+      System.Drawing.Color clBW = System.Drawing.Color.Black;
+      if (cl.R + cl.G + cl.B < 300) clBW = System.Drawing.Color.White;
+
+      return clBW;
     }
 
     public ActionResult setPlayerIndTraining(int iPlayer, int iIndTr)
@@ -4826,6 +4837,9 @@ namespace CornerkickWebMvc.Controllers
 
         for (int iB = 0; iB < spon.nBoards; iB++) sponsorModel.ltSponsorBoardIds.Add(spon.iId);
       }
+
+      sponsorModel.sEmblem = getClubEmblem(clb, "height: 100%; width: 100%; object-fit: contain");
+      sponsorModel.sColorJersey = "rgb(" + clb.cl[0].R.ToString() + "," + clb.cl[0].G.ToString() + "," + clb.cl[0].B.ToString() + ")";
 
       return View(sponsorModel);
     }
