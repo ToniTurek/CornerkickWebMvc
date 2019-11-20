@@ -4806,12 +4806,24 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(sponsorModel);
 
+      Random rnd = new Random();
+
+      if (clb.sponsorMain.iId >= MvcApplication.ckcore.fz.ltSponsoren.Count) {
+        clb.sponsorMain.iId = (byte)rnd.Next(1, MvcApplication.ckcore.fz.ltSponsoren.Count);
+      }
+
       sponsorModel.sponsorMain     = clb.sponsorMain;
       sponsorModel.ltSponsorBoards = clb.ltSponsorBoards;
       sponsorModel.ltSponsorOffers = clb.ltSponsorOffers;
 
       sponsorModel.ltSponsorBoardIds = new List<int>();
-      foreach (CornerkickManager.Finance.Sponsor spon in sponsorModel.ltSponsorBoards) {
+      for (int iS = 0; iS < sponsorModel.ltSponsorBoards.Count; iS++) {
+        CornerkickManager.Finance.Sponsor spon = sponsorModel.ltSponsorBoards[iS];
+
+        if (spon.iId >= MvcApplication.ckcore.fz.ltSponsoren.Count) {
+          spon.iId = (byte)rnd.Next(1, MvcApplication.ckcore.fz.ltSponsoren.Count);
+        }
+
         for (int iB = 0; iB < spon.nBoards; iB++) sponsorModel.ltSponsorBoardIds.Add(spon.iId);
       }
 
