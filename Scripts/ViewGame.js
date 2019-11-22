@@ -490,166 +490,168 @@ function plotStatistics(jState = -1) {
       var dataH = gD.fDataH;
       var dataA = gD.fDataA;
 
-      var iGoalsH        = dataH[0][0];
-      var iGoalsA        = dataA[0][0];
-      var iShootsH       = dataH[1][0];
-      var iShootsA       = dataA[1][0];
-      var iShootsOnGoalH = dataH[2][0];
-      var iShootsOnGoalA = dataA[2][0];
-      var iDuelsH        = dataH[4][0];
-      var iDuelsA        = dataA[4][0];
-      var iFoulsH        = dataH[5][0];
-      var iFoulsA        = dataA[5][0];
-      var iCornerkickH   = dataH[6][0];
-      var iCornerkickA   = dataA[6][0];
-      var iOffsiteH      = dataH[7][0];
-      var iOffsiteA      = dataA[7][0];
-      var fPassGoodH     = dataH[8][0];
-      var fPassGoodA     = dataA[8][0];
-      if (iGoalsH + iGoalsA > 0) {
-        dataH[0][0] = 100 * iGoalsH / (iGoalsH + iGoalsA);
-        dataA[0][0] = 100 - dataH[0][0];
-      }
-      if (iShootsH + iShootsA > 0) {
-        dataH[1][0] = 100 * iShootsH / (iShootsH + iShootsA);
-        dataA[1][0] = 100 - dataH[1][0];
-      }
-      if (iShootsOnGoalH + iShootsOnGoalA > 0) {
-        dataH[2][0] = 100 * iShootsOnGoalH / (iShootsOnGoalH + iShootsOnGoalA);
-        dataA[2][0] = 100 - dataH[2][0];
-      }
-      if (iDuelsH + iDuelsA > 0) {
-        dataH[4][0] = 100 * iDuelsH / (iDuelsH + iDuelsA);
-        dataA[4][0] = 100 - dataH[4][0];
-      }
-      if (iFoulsH + iFoulsA > 0) {
-        dataH[5][0] = 100 * iFoulsH / (iFoulsH + iFoulsA);
-        dataA[5][0] = 100 - dataH[5][0];
-      }
-      if (iCornerkickH + iCornerkickA > 0) {
-        dataH[6][0] = 100 * iCornerkickH / (iCornerkickH + iCornerkickA);
-        dataA[6][0] = 100 - dataH[6][0];
-      }
-      if (iOffsiteH + iOffsiteA > 0) {
-        dataH[7][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
-        dataA[7][0] = 100 - dataH[7][0];
-      }
-      if (fPassGoodH + fPassGoodA > 0) {
-        dataH[8][0] = 100 * fPassGoodH / (fPassGoodH + fPassGoodA);
-        dataA[8][0] = 100 - dataH[8][0];
-      }
+      if (dataH && dataA) {
+        var iGoalsH        = dataH[0][0];
+        var iGoalsA        = dataA[0][0];
+        var iShootsH       = dataH[1][0];
+        var iShootsA       = dataA[1][0];
+        var iShootsOnGoalH = dataH[2][0];
+        var iShootsOnGoalA = dataA[2][0];
+        var iDuelsH        = dataH[4][0];
+        var iDuelsA        = dataA[4][0];
+        var iFoulsH        = dataH[5][0];
+        var iFoulsA        = dataA[5][0];
+        var iCornerkickH   = dataH[6][0];
+        var iCornerkickA   = dataA[6][0];
+        var iOffsiteH      = dataH[7][0];
+        var iOffsiteA      = dataA[7][0];
+        var fPassGoodH     = dataH[8][0];
+        var fPassGoodA     = dataA[8][0];
+        if (iGoalsH + iGoalsA > 0) {
+          dataH[0][0] = 100 * iGoalsH / (iGoalsH + iGoalsA);
+          dataA[0][0] = 100 - dataH[0][0];
+        }
+        if (iShootsH + iShootsA > 0) {
+          dataH[1][0] = 100 * iShootsH / (iShootsH + iShootsA);
+          dataA[1][0] = 100 - dataH[1][0];
+        }
+        if (iShootsOnGoalH + iShootsOnGoalA > 0) {
+          dataH[2][0] = 100 * iShootsOnGoalH / (iShootsOnGoalH + iShootsOnGoalA);
+          dataA[2][0] = 100 - dataH[2][0];
+        }
+        if (iDuelsH + iDuelsA > 0) {
+          dataH[4][0] = 100 * iDuelsH / (iDuelsH + iDuelsA);
+          dataA[4][0] = 100 - dataH[4][0];
+        }
+        if (iFoulsH + iFoulsA > 0) {
+          dataH[5][0] = 100 * iFoulsH / (iFoulsH + iFoulsA);
+          dataA[5][0] = 100 - dataH[5][0];
+        }
+        if (iCornerkickH + iCornerkickA > 0) {
+          dataH[6][0] = 100 * iCornerkickH / (iCornerkickH + iCornerkickA);
+          dataA[6][0] = 100 - dataH[6][0];
+        }
+        if (iOffsiteH + iOffsiteA > 0) {
+          dataH[7][0] = 100 * iOffsiteH / (iOffsiteH + iOffsiteA);
+          dataA[7][0] = 100 - dataH[7][0];
+        }
+        if (fPassGoodH + fPassGoodA > 0) {
+          dataH[8][0] = 100 * fPassGoodH / (fPassGoodH + fPassGoodA);
+          dataA[8][0] = 100 - dataH[8][0];
+        }
 
-      // Statistic bars
-      var flotDataset = [
-        { label: "Home", data: dataH, color: "#5482FF" },
-        { label: "Away", data: dataA, color: "#F0000" }
-      ];
+        // Statistic bars
+        var flotDataset = [
+          { label: "Home", data: dataH, color: "#5482FF" },
+          { label: "Away", data: dataA, color: "#F0000" }
+        ];
 
-      var ticks = [
-        [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"], [-8, "Passquote"]
-      ];
+        var ticks = [
+          [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"], [-8, "Passquote"]
+        ];
 
-      var flotOptions = {
-        series: {
-          stack: true,
+        var flotOptions = {
+          series: {
+            stack: true,
+            bars: {
+              show: true,
+              fill: true
+            }
+          },
           bars: {
+            align: "center",
+            lineWidth: 1,
+            barWidth: 0.72,
+            horizontal: true,
+            fillColor: { colors: [{ opacity: 0.5 }, { opacity: 1 }] }
+          },
+          xaxis: {
+            show: false,
+            position: "bottom",
+            min: 0,
+            max: 100,
+            tickFormatter: "string"
+          },
+          yaxis: {
             show: true,
-            fill: true
+            min: -8.6,
+            max: 0.6,
+            ticks: ticks
+          },
+          grid: {
+            hoverable: true,
+            borderWidth: 2,
+            backgroundColor: { colors: ["#EDF5FF", "#ffffff"] }
           }
-        },
-        bars: {
-          align: "center",
-          lineWidth: 1,
-          barWidth: 0.72,
-          horizontal: true,
-          fillColor: { colors: [{ opacity: 0.5 }, { opacity: 1 }] }
-        },
-        xaxis: {
-          show: false,
-          position: "bottom",
-          min: 0,
-          max: 100,
-          tickFormatter: "string"
-        },
-        yaxis: {
-          show: true,
-          min: -8.6,
-          max: 0.6,
-          ticks: ticks
-        },
-        grid: {
-          hoverable: true,
-          borderWidth: 2,
-          backgroundColor: { colors: ["#EDF5FF", "#ffffff"] }
-        }
-      };
+        };
 
-      p = $.plot($("#divPlotStatistics"), flotDataset, flotOptions);
+        p = $.plot($("#divPlotStatistics"), flotDataset, flotOptions);
 
-      var ii = 0;
-      $.each(p.getData()[0].data, function (i, el) {
-        if (el[0] > 0) {
-          var o = p.pointOffset({ x: el[0], y: el[1] });
-          var s = el[0].toFixed(1) + '%';
-          if (ii === 0) {
-            s = iGoalsH.toString();
-          } else if (ii === 1) {
-            s = iShootsH.toString();
-          } else if (ii === 2) {
-            s = iShootsOnGoalH.toString();
-          } else if (ii === 5) {
-            s = iFoulsH.toString();
-          } else if (ii === 6) {
-            s = iCornerkickH.toString();
-          } else if (ii === 7) {
-            s = iOffsiteH.toString();
-          } else if (ii === 8) {
-            s = fPassGoodH.toFixed(1) + '%';
+        var ii = 0;
+        $.each(p.getData()[0].data, function (i, el) {
+          if (el[0] > 0) {
+            var o = p.pointOffset({ x: el[0], y: el[1] });
+            var s = el[0].toFixed(1) + '%';
+            if (ii === 0) {
+              s = iGoalsH.toString();
+            } else if (ii === 1) {
+              s = iShootsH.toString();
+            } else if (ii === 2) {
+              s = iShootsOnGoalH.toString();
+            } else if (ii === 5) {
+              s = iFoulsH.toString();
+            } else if (ii === 6) {
+              s = iCornerkickH.toString();
+            } else if (ii === 7) {
+              s = iOffsiteH.toString();
+            } else if (ii === 8) {
+              s = fPassGoodH.toFixed(1) + '%';
+            }
+
+            $('<div class="data-point-label">' + s + '</div>').css({
+              position: 'absolute',
+              left: (60 + o.left) / 2,
+              top: o.top - 10,
+              display: 'none'
+            }).appendTo(p.getPlaceholder()).show();
           }
 
-          $('<div class="data-point-label">' + s + '</div>').css({
-            position: 'absolute',
-            left: (60 + o.left) / 2,
-            top: o.top - 10,
-            display: 'none'
-          }).appendTo(p.getPlaceholder()).show();
-        }
+          ii = ii + 1;
+        });
 
-        ii = ii + 1;
-      });
+        ii = 0;
+        $.each(p.getData()[1].data, function (i, el) {
+          if (el[0] > 0) {
+            var o = p.pointOffset({ x: el[0], y: el[1] });
+            var s = el[0].toFixed(1) + '%';
+            if (ii === 0) {
+              s = iGoalsA.toString();
+            } else if (ii === 1) {
+              s = iShootsA.toString();
+            } else if (ii === 2) {
+              s = iShootsOnGoalA.toString();
+            } else if (ii === 5) {
+              s = iFoulsA.toString();
+            } else if (ii === 6) {
+              s = iCornerkickA.toString();
+            } else if (ii === 7) {
+              s = iOffsiteA.toString();
+            } else if (ii === 8) {
+              s = fPassGoodA.toFixed(1) + '%';
+            }
 
-      ii = 0;
-      $.each(p.getData()[1].data, function (i, el) {
-        if (el[0] > 0) {
-          var o = p.pointOffset({ x: el[0], y: el[1] });
-          var s = el[0].toFixed(1) + '%';
-          if (ii === 0) {
-            s = iGoalsA.toString();
-          } else if (ii === 1) {
-            s = iShootsA.toString();
-          } else if (ii === 2) {
-            s = iShootsOnGoalA.toString();
-          } else if (ii === 5) {
-            s = iFoulsA.toString();
-          } else if (ii === 6) {
-            s = iCornerkickA.toString();
-          } else if (ii === 7) {
-            s = iOffsiteA.toString();
-          } else if (ii === 8) {
-            s = fPassGoodA.toFixed(1) + '%';
+            $('<div class="data-point-label">' + s + '</div>').css({
+              position: 'absolute',
+              right: (60 + o.left) / 2,
+              top: o.top - 10,
+              display: 'none'
+            }).appendTo(p.getPlaceholder()).show();
+            //}).appendTo(p.getPlaceholder()).fadeIn('slow');
           }
 
-          $('<div class="data-point-label">' + s + '</div>').css({
-            position: 'absolute',
-            right: (60 + o.left) / 2,
-            top: o.top - 10,
-            display: 'none'
-          }).appendTo(p.getPlaceholder()).show();
-          //}).appendTo(p.getPlaceholder()).fadeIn('slow');
-        }
-
-        ii = ii + 1;
-      });
+          ii = ii + 1;
+        });
+      }
 
       $("#txtReferee").html("Schiedsrichter: " + gD.sRefereeQuality + "<br/>Fehlentscheidungen: " + gD.sRefereeDecisions);
 
@@ -667,59 +669,61 @@ function plotStatistics(jState = -1) {
       $('#tableTeamViewGame').DataTable().ajax.reload();
 
       // Charts
-      var i = 0;
-      var j = 0;
-      for (i = 0; i < gD.ltF.length; ++i) {
-        if (!ltF[i]) {
-          ltF[i] = [];
-        }
-        if (!ltM[i]) {
-          ltM[i] = [];
-        }
+      if (gD.ltF && gD.ltM) {
+        var i = 0;
+        var j = 0;
+        for (i = 0; i < gD.ltF.length; ++i) {
+          if (!ltF[i]) {
+            ltF[i] = [];
+          }
+          if (!ltM[i]) {
+            ltM[i] = [];
+          }
 
-        if (gD.ltF[i]) {
-          if (gD.ltF[i].length > 0) {
-            if (jState === -1) {
-              for (k = 0; k < gD.ltF[i].length; ++k) {
-                ltF[i].push(gD.ltF[i][k]);
-              }
-            } else {
-              ltF[i].length = 0;
-
-              for (j = 0; j < iState; ++j) {
-                if (j >= gD.ltF[i].length) {
-                  break;
+          if (gD.ltF[i]) {
+            if (gD.ltF[i].length > 0) {
+              if (jState === -1) {
+                for (k = 0; k < gD.ltF[i].length; ++k) {
+                  ltF[i].push(gD.ltF[i][k]);
                 }
+              } else {
+                ltF[i].length = 0;
 
-                ltF[i].push(gD.ltF[i][j]);
+                for (j = 0; j < iState; ++j) {
+                  if (j >= gD.ltF[i].length) {
+                    break;
+                  }
+
+                  ltF[i].push(gD.ltF[i][j]);
+                }
+              }
+            }
+          }
+
+          if (gD.ltM[i]) {
+            if (gD.ltM[i].length > 0) {
+              if (jState === -1) {
+                for (k = 0; k < gD.ltM[i].length; ++k) {
+                  ltM[i].push(gD.ltM[i][k]);
+                }
+              } else {
+                ltM[i].length = 0;
+
+                for (j = 0; j < iState; ++j) {
+                  if (j >= gD.ltM[i].length) {
+                    break;
+                  }
+
+                  ltM[i].push(gD.ltM[i][j]);
+                }
               }
             }
           }
         }
 
-        if (gD.ltM[i]) {
-          if (gD.ltM[i].length > 0) {
-            if (jState === -1) {
-              for (k = 0; k < gD.ltM[i].length; ++k) {
-                ltM[i].push(gD.ltM[i][k]);
-              }
-            } else {
-              ltM[i].length = 0;
-
-              for (j = 0; j < iState; ++j) {
-                if (j >= gD.ltM[i].length) {
-                  break;
-                }
-
-                ltM[i].push(gD.ltM[i][j]);
-              }
-            }
-          }
-        }
+        chartF.render();
+        chartM.render();
       }
-
-      chartF.render();
-      chartM.render();
 
       //if (document.getElementById("myCheck").checked) {
       if ($('#dialogPlAction').dialog('isOpen')) {

@@ -836,28 +836,26 @@
     </div>
   </div>
 
- @if (Model.game != null) {
-    if (Model.game.data.bFinished || Model.bAdmin) {
-      <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: 40px">
-        @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 160px" })
+  @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
+    <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: 40px">
+      @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 160px" })
 
-        @if (Model.game.data.bFinished) {
-          <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
-            <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
-            <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
-            <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
-            <button type="submit" id="bnForth" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
-            <button type="submit" id="bnEnd" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">>|</button>
-          </div>
-        }
+      @if ((Model.game != null && Model.game.data.bFinished)) {
+        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
+          <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
+          <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
+          <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
+          <button type="submit" id="bnForth" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
+          <button type="submit" id="bnEnd" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">>|</button>
+        </div>
+      }
 
-        @if (Model.bAdmin) {
-          <div id="divAdminOptions" style="position: absolute; top: 0px; left: 40%; width: 20%; text-align: center">
-            <a href="#" id="aAdminOptions" style="color:#000aaa">Admin</a>
-          </div>
-        }
-      </div>
-    }
+      @if (Model.bAdmin) {
+        <div id="divAdminOptions" style="position: absolute; top: 0px; left: 40%; width: 20%; text-align: center">
+          <a href="#" id="aAdminOptions" style="color:#000aaa">Admin</a>
+        </div>
+      }
+    </div>
   }
 
   <div id="divTimeline" style="position: relative; float: left; width: 100%; height: 64px">
