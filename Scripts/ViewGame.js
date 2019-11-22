@@ -417,7 +417,7 @@ function plotStatistics(jState = -1) {
 
       var fMinute = (gD.tsMinute.Hours * 60) + gD.tsMinute.Minutes + (gD.tsMinute.Seconds / 60);
 
-      //document.getElementById("lbGoalsH").innerText = gD.iGoalsH.toString();
+      document.getElementById("lbGoalsH").innerText = gD.iGoalsH.toString();
       document.getElementById("lbGoalsA").innerText = gD.iGoalsA.toString();
 
       pMainSlider = $('#slider-Minute');
