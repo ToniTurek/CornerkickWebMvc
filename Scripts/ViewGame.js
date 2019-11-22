@@ -2,6 +2,7 @@
 var bFinished = true;
 var playerGlobal = [];
 var imgBall;
+var divBallTarget;
 
 // iState: -3: initial call, -2: game finished, -1: running game, >=0: specific state
 function drawGame(iState, iGameSpeed) {
@@ -23,6 +24,7 @@ function drawGame(iState, iGameSpeed) {
       if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
         playerGlobal = drawPlayer(gLoc2);
         imgBall = drawBall();
+        divBallTarget = drawBallTarget();
       }
 
       if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
@@ -78,7 +80,7 @@ function drawGame2(gLoc, iState) {
 
   if (iPositionsValue >= 0) {
     updatePlayer(playerGlobal, gLoc, iPositionsValue == 0);
-    updateBallPos(imgBall, gLoc.gBall);
+    updateBallPos(imgBall, divBallTarget, gLoc.gBall);
     printComments(gLoc);
   }
 
@@ -98,15 +100,14 @@ function drawGame2(gLoc, iState) {
 function drawBall() {
   var divDrawGame = document.getElementById("divDrawGame");
 
-  var divBall = document.createElement("divBall");
-  divBall.id = "divBall";
-  divBall.id = "divBall";
-  divBall.style.position = "absolute";
-  divBall.style.top  = "49.0625%";
-  divBall.style.left = "49.35%";
-  divBall.style.width = "1.25%";
-  divBall.style.height = "1.875%";
-  divBall.style.zIndex = "23";
+  var divBallTmp = document.createElement("div");
+  divBallTmp.id = "divBall";
+  divBallTmp.style.position = "absolute";
+  divBallTmp.style.top  = "49.0625%";
+  divBallTmp.style.left = "49.35%";
+  divBallTmp.style.width = "1.25%";
+  divBallTmp.style.height = "1.875%";
+  divBallTmp.style.zIndex = "23";
   var imgBallTmp = document.createElement("img");
   imgBallTmp.id = "imgBall";
   imgBallTmp.src = "/Content/Icons/ball_white.png";
@@ -116,14 +117,36 @@ function drawBall() {
   imgBallTmp.style.left = "0px";
   imgBallTmp.style.width  = "100%";
   imgBallTmp.style.height = "100%";
-  divBall.appendChild(imgBallTmp);
+  divBallTmp.appendChild(imgBallTmp);
 
-  divDrawGame.appendChild(divBall);
+  divDrawGame.appendChild(divBallTmp);
 
-  return divBall;
+  return divBallTmp;
 }
 
-function updateBallPos(imgBallTmp, gBall) {
+function drawBallTarget() {
+  var divDrawGame = document.getElementById("divDrawGame");
+
+  // Ball target
+  var divBallTargetTmp = document.createElement("div");
+  divBallTargetTmp.id = "divBallTarget";
+  divBallTargetTmp.style.position = "absolute";
+  divBallTargetTmp.style.top  = "49.0%";
+  divBallTargetTmp.style.left = "49.25%";
+  divBallTargetTmp.style.width = "1.50%";
+  divBallTargetTmp.style.height = "2.25%";
+  divBallTargetTmp.style.border = "2px solid rgb(0,230,230)";
+  divBallTargetTmp.style.webkitBorderRadius = "50%";
+  divBallTargetTmp.style.borderRadius = "50%";
+  divBallTargetTmp.style.zIndex = "22";
+  divBallTargetTmp.style.display = "none";
+
+  divDrawGame.appendChild(divBallTargetTmp);
+
+  return divBallTargetTmp;
+}
+
+function updateBallPos(imgBallTmp, divBallTargetTmp, gBall) {
   var fX = ((100 * ( gBall.Pos.X       / 122.0)) - 0.6250);
   var fY = ((100 * ((gBall.Pos.Y + 25) /  50.0)) - 0.9375);
   var fSizeX = 1.25 + gBall.Pos.Z;
@@ -137,6 +160,14 @@ function updateBallPos(imgBallTmp, gBall) {
   iB = 0;
   if (gBall.iPassType > 0) {
     //interpolateBall(gLoc.gBall, 10);
+
+    divBallTargetTmp.style.display = "block";
+    var sXbt = ((100 * ( gBall.ptPosTarget.X       / 122.0)) - 0.750).toString();
+    var sYbt = ((100 * ((gBall.ptPosTarget.Y + 25) /  50.0)) - 1.125).toString();
+    divBallTargetTmp.style.left = sXbt + '%';
+    divBallTargetTmp.style.top  = sYbt + '%';
+  } else {
+    divBallTargetTmp.style.display = "none";
   }
 }
 
@@ -191,9 +222,6 @@ function drawPlayer(gLoc) {
   }
 
   var divDrawGame = document.getElementById("divDrawGame");
-  iDivWidthPix  = divDrawGame.offsetWidth .toString();
-  iDivHeightPix = divDrawGame.offsetHeight.toString();
-
   var fLookAtSize = 0.3;
 
   var player = [];
