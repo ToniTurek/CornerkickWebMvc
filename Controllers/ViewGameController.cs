@@ -277,7 +277,7 @@ namespace CornerkickWebMvc.Controllers
       if (user.game.data.team[0].iTeamId >= 0 && user.game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[user.game.data.team[0].iTeamId];
         for (byte iC = 0; iC < gLoc.sColorJerseyH.Length; iC++) gLoc.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
-        gLoc.bJerseyTextColorWhiteH = clubH.cl[0].R + clubH.cl[0].G + clubH.cl[0].B < 300;
+        gLoc.bJerseyTextColorWhiteH = Controllers.MemberController.checkColorBW(clubH.cl[0]);
       }
 
       // Colors away
@@ -285,7 +285,7 @@ namespace CornerkickWebMvc.Controllers
       if (user.game.data.team[1].iTeamId >= 0 && user.game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[user.game.data.team[1].iTeamId];
         for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC + 2].R.ToString() + "," + clubA.cl[iC + 2].G.ToString() + "," + clubA.cl[iC + 2].B.ToString() + ")";
-        gLoc.bJerseyTextColorWhiteA = clubA.cl[0].R + clubA.cl[0].G + clubA.cl[0].B < 300;
+        gLoc.bJerseyTextColorWhiteA = Controllers.MemberController.checkColorBW(clubA.cl[2]);
       }
 
       // Set interval
@@ -388,6 +388,10 @@ namespace CornerkickWebMvc.Controllers
         else                  gBall.iPassType = 1;
       }
       gBall.ptPosTarget = ball.ptPos;
+      gBall.ptPosLast   = ball.ptPosLast;
+      //gBall.fPassFraction = (ball.nPassSteps - ball.iPassStep) / (float)ball.nPassSteps;
+      gBall.iPassStep  = (byte)ball.iPassStep;
+      gBall.nPassSteps = (byte)ball.nPassSteps;
       //Models.ViewGameModel.ltLoc.Add(new float[5] { ball.ptPos.X, ball.ptPos.Y, fPass, fFinished, 0f });
 
       gLoc.gBall = gBall;
