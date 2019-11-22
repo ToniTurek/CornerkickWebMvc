@@ -320,6 +320,7 @@ function updatePlayer(player, gLoc, bShowLookAt) {
   // Player home
   for (iP = 0; iP < 22; iP++) {
     var pl = gLoc.ltPlayer[iP];
+
     if (pl.iCard < 2) { // if not red card
       var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
       var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
@@ -352,6 +353,8 @@ function updatePlayer(player, gLoc, bShowLookAt) {
         }
       }
       */
+    } else {
+      pl.style.display = "none";
     }
   }
 }
