@@ -793,7 +793,7 @@ namespace CornerkickWebMvc
       }
 
       // Download log async
-      downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip");
+      Task<bool> tkDownloadLog = Task.Run(async () => await downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip"));
 #endif
 #endif
 
