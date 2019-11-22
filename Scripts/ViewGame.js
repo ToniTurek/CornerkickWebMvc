@@ -339,6 +339,19 @@ function updatePlayer(player, gLoc, bShowLookAt) {
 
       player[iP].style.left = sXh + '%';
       player[iP].style.top  = sYh + '%';
+
+      /*
+      if (cbTargetPos) {
+        if (cbTargetPos.checked && gLoc.ltPlayer[iP + 11].ptPosTarget.X > 0) {
+          iX0 = (fXa * iDivWidthPix);
+          iY0 = ((fYa + 0.5) * iDivHeightPix);
+          iX1 = (gLoc.ltPlayer[iP + 11].ptPosTarget.X * iDivWidthPix) / 122;
+          iY1 = ((gLoc.ltPlayer[iP + 11].ptPosTarget.Y + 25) * iDivHeightPix) / 50;
+
+          sBox += drawline(iX0, iY0, iX1, iY1, "black");
+        }
+      }
+      */
     }
   }
 }
