@@ -354,7 +354,7 @@ function updatePlayer(player, gLoc, bShowLookAt) {
       }
       */
     } else {
-      pl.style.display = "none";
+      player[iP].style.display = "none";
     }
   }
 }
