@@ -1657,16 +1657,20 @@ namespace CornerkickWebMvc.Controllers
       return View(plModel);
     }
 
-    private System.Drawing.Color getColorBW(CornerkickManager.Club club)
+    internal static System.Drawing.Color getColorBW(CornerkickManager.Club club)
     {
       return getColorBW(club.cl[0]);
     }
-    private System.Drawing.Color getColorBW(System.Drawing.Color cl)
+    internal static System.Drawing.Color getColorBW(System.Drawing.Color cl)
     {
       System.Drawing.Color clBW = System.Drawing.Color.Black;
-      if (cl.R + cl.G + cl.B < 300) clBW = System.Drawing.Color.White;
+      if (checkColorBW(cl)) clBW = System.Drawing.Color.White;
 
       return clBW;
+    }
+    internal static bool checkColorBW(System.Drawing.Color cl)
+    {
+      return cl.R + cl.G + cl.B < 300;
     }
 
     public ActionResult setPlayerIndTraining(int iPlayer, int iIndTr)

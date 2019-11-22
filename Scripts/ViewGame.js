@@ -1,5 +1,7 @@
 ﻿var gLocArray = []; // Array of gameLoc struct
 var bFinished = true;
+var playerGlobal = [];
+var imgBall;
 
 // iState: -3: initial call, -2: game finished, -1: running game, >=0: specific state
 function drawGame(iState, iGameSpeed) {
@@ -18,6 +20,11 @@ function drawGame(iState, iGameSpeed) {
     dataType: "JSON",
     data: { iState: iState, bAverage: bAverage },
     success: function (gLoc2) {
+      if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
+        playerGlobal = drawPlayer(gLoc2);
+        imgBall = drawBall();
+      }
+
       if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
         $("#tblComments tr").remove();
 
@@ -62,15 +69,16 @@ function drawGame(iState, iGameSpeed) {
   }
 }
 
+var iB = 0;
 function drawGame2(gLoc, iState) {
-  var drawGameDiv = $("#divDrawGame");
+  //var drawGameDiv = $("#divDrawGame");
   var iPositionsValue = $('#ddlPositions').val();
 
-  drawGameDiv.html('');
+  //drawGameDiv.html('');
 
   if (iPositionsValue >= 0) {
-    data = getPlayer(gLoc, iPositionsValue == 0);
-    drawGameDiv.html(data);
+    updatePlayer(playerGlobal, gLoc, iPositionsValue == 0);
+    updateBallPos(imgBall, gLoc.gBall);
     printComments(gLoc);
   }
 
@@ -87,10 +95,86 @@ function drawGame2(gLoc, iState) {
   }
 }
 
-function getPlayer(gLoc, bShowLookAt) {
-  var sBox = "";
+function drawBall() {
+  var divDrawGame = document.getElementById("divDrawGame");
 
-  if (gLoc.ltPlayer.length < 1) return sBox;
+  var divBall = document.createElement("divBall");
+  divBall.id = "divBall";
+  divBall.id = "divBall";
+  divBall.style.position = "absolute";
+  divBall.style.top  = "49.0625%";
+  divBall.style.left = "49.35%";
+  divBall.style.width = "1.25%";
+  divBall.style.height = "1.875%";
+  divBall.style.zIndex = "23";
+  var imgBallTmp = document.createElement("img");
+  imgBallTmp.id = "imgBall";
+  imgBallTmp.src = "/Content/Icons/ball_white.png";
+  imgBallTmp.alt = "Ball";
+  imgBallTmp.style.position = "absolute";
+  imgBallTmp.style.top  = "0px";
+  imgBallTmp.style.left = "0px";
+  imgBallTmp.style.width  = "100%";
+  imgBallTmp.style.height = "100%";
+  divBall.appendChild(imgBallTmp);
+
+  divDrawGame.appendChild(divBall);
+
+  return divBall;
+}
+
+function updateBallPos(imgBallTmp, gBall) {
+  var fX = ((100 * ( gBall.Pos.X       / 122.0)) - 0.6250);
+  var fY = ((100 * ((gBall.Pos.Y + 25) /  50.0)) - 0.9375);
+  var fSizeX = 1.25 + gBall.Pos.Z;
+  var fSizeY = fSizeX * 1.5;
+
+  imgBallTmp.style.left = fX.toString() + '%';
+  imgBallTmp.style.top  = fY.toString() + '%';
+  imgBallTmp.style.width  = fSizeX.toString() + '%';
+  imgBallTmp.style.height = fSizeY.toString() + '%';
+
+  iB = 0;
+  if (gBall.iPassType > 0) {
+    //interpolateBall(gLoc.gBall, 10);
+  }
+}
+
+function interpolateBall(gBall, nInterpSteps) {
+  var imgBall = document.getElementById('imgBall');
+
+  var fX0 = ((100 * ( gBall.ptPosLast  .X       / 122.0)) - 0.6250); // Start X
+  var fY0 = ((100 * ((gBall.ptPosLast  .Y + 25) /  50.0)) - 0.9375); // Start Y
+  var fX1 = ((100 * ( gBall.ptPosTarget.X       / 122.0)) - 0.6250); // Target X
+  var fY1 = ((100 * ((gBall.ptPosTarget.Y + 25) /  50.0)) - 0.9375); // Target Y
+
+  var iPS = gBall.nPassSteps - gBall.iPassStep;
+  var fX00 = (fX0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fX1 * (iPS / gBall.nPassSteps));
+  var fY00 = (fY0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fY1 * (iPS / gBall.nPassSteps));
+
+  var fSizeX = 1.25 + ((iB + (iPS * nInterpSteps)) / (gBall.nPassSteps * nInterpSteps));
+  var fSizeY = fSizeX * 1.5;
+
+  iPS += 1;
+  var fX01 = (fX0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fX1 * (iPS / gBall.nPassSteps));
+  var fY01 = (fY0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fY1 * (iPS / gBall.nPassSteps));
+
+  var fX = (fX00 * ((nInterpSteps - iB) / nInterpSteps)) + (fX01 * (iB / nInterpSteps));
+  var fY = (fY00 * ((nInterpSteps - iB) / nInterpSteps)) + (fY01 * (iB / nInterpSteps));
+
+  imgBall.style.left = fX.toString() + '%';
+  imgBall.style.top  = fY.toString() + '%';
+  imgBall.style.width  = fSizeX.toString() + '%';
+  imgBall.style.height = fSizeY.toString() + '%';
+
+  if (iB < nInterpSteps) {
+    iB = iB + 1;
+    setTimeout(function () { drawBallPos(gBall, nInterpSteps); }, 30);
+  }
+}
+
+function drawPlayer(gLoc) {
+  if (gLoc.ltPlayer.length < 1) return;
 
   var sColorH0 = gLoc.sColorJerseyH[0];
   var sColorH1 = gLoc.sColorJerseyH[1];
@@ -106,114 +190,129 @@ function getPlayer(gLoc, bShowLookAt) {
     sColorTextA = "white";
   }
 
-  var divGame = document.getElementById("divDrawGame");
-  iDivWidthPix  = divGame.offsetWidth .toString();
-  iDivHeightPix = divGame.offsetHeight.toString();
-
-  var cbTargetPos = document.getElementById("cbTargetPos");
+  var divDrawGame = document.getElementById("divDrawGame");
+  iDivWidthPix  = divDrawGame.offsetWidth .toString();
+  iDivHeightPix = divDrawGame.offsetHeight.toString();
 
   var fLookAtSize = 0.3;
 
-  for (var iP = 0; iP < 11; iP++) {
+  var player = [];
+  for (iP = 0; iP < 11; iP++) {
     // Player Home
-    if (gLoc.ltPlayer[iP +  0].iCard < 2) { // if not red card
+    var divPlH = document.createElement("div");
+    divPlH.id = "divPlayerH_" + iP.toString();
+    divPlH.style.position = "absolute";
+    divPlH.style.width = "2%";
+    divPlH.style.height = "3%";
+    divPlH.style.top = (30 + (iP * 4)).toString() + "%";
+    divPlH.style.left = "40%";
+    divPlH.style.backgroundColor = sColorH0;
+    divPlH.style.border = "2px solid " + sColorH1;
+    divPlH.style.webkitBorderRadius = "50%";
+    divPlH.style.borderRadius = "50%";
+    divPlH.style.zIndex = "21";
+
+    var divPlNoH = document.createElement("div");
+    divPlNoH.style.position = "absolute";
+    divPlNoH.style.width = "100%";
+    divPlNoH.style.height = "100%";
+    divPlNoH.style.top = "0px";
+    divPlNoH.style.left = "0px";
+    divPlNoH.innerHTML = '<text style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextH + '; z-index:22">' + gLoc.ltPlayer[iP + 0].iNo.toString() + '</text>';
+    divPlH.appendChild(divPlNoH);
+
+    // Draw look-at circle
+    var divPlLookAtH = document.createElement("div");
+    divPlLookAtH.style.position = "absolute";
+    divPlLookAtH.style.width  = (fLookAtSize * 100).toString() + '%';
+    divPlLookAtH.style.height = (fLookAtSize * 100).toString() + '%';
+    divPlLookAtH.style.top = ((0.5 - (fLookAtSize / 2)) * 100).toString() + '%';
+    divPlLookAtH.style.right = (-(fLookAtSize / 2) * 100).toString() + '%';
+    divPlLookAtH.style.backgroundColor = 'black';
+    divPlLookAtH.style.webkitBorderRadius = "50%";
+    divPlLookAtH.style.borderRadius = "50%";
+    divPlLookAtH.style.zIndex = "24";
+    divPlH.appendChild(divPlLookAtH);
+    divDrawGame.appendChild(divPlH);
+
+    player.push(divPlH);
+  }
+
+  for (iP = 0; iP < 11; iP++) {
+    // Player Away
+    var divPlA = document.createElement("div");
+    divPlA.id = "divPlayerA_" + iP.toString();
+    divPlA.style.position = "absolute";
+    divPlA.style.width = "2%";
+    divPlA.style.height = "3%";
+    divPlA.style.top = (30 + (iP * 4)).toString() + "%";
+    divPlA.style.left = "60%";
+    divPlA.style.backgroundColor = sColorA0;
+    divPlA.style.border = "2px solid " + sColorA1;
+    divPlA.style.webkitBorderRadius = "50%";
+    divPlA.style.borderRadius = "50%";
+    divPlA.style.zIndex = "21";
+
+    var divPlNoA = document.createElement("div");
+    divPlNoA.style.position = "absolute";
+    divPlNoA.style.width = "100%";
+    divPlNoA.style.height = "100%";
+    divPlNoA.style.top = "0px";
+    divPlNoA.style.left = "0px";
+    divPlNoA.innerHTML = '<text style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextA + '; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</text>';
+    divPlA.appendChild(divPlNoA);
+
+    // Draw look-at circle
+    var divPlLookAtA = document.createElement("div");
+    divPlLookAtA.style.position = "absolute";
+    divPlLookAtA.style.width = (fLookAtSize * 100).toString() + '%';
+    divPlLookAtA.style.height = (fLookAtSize * 100).toString() + '%';
+    divPlLookAtA.style.top = ((0.5 - (fLookAtSize / 2)) * 100).toString() + '%';
+    divPlLookAtA.style.left = (-(fLookAtSize / 2) * 100).toString() + '%';
+    divPlLookAtA.style.backgroundColor = 'black';
+    divPlLookAtA.style.webkitBorderRadius = "50%";
+    divPlLookAtA.style.borderRadius = "50%";
+    divPlLookAtA.style.zIndex = "24";
+    divPlA.appendChild(divPlLookAtA);
+    divDrawGame.appendChild(divPlA);
+
+    player.push(divPlA);
+  }
+
+  return player;
+}
+
+function updatePlayer(player, gLoc, bShowLookAt) {
+  if (gLoc.ltPlayer.length < 1) return;
+
+  var fLookAtSize = 0.3;
+
+  var iP = 0;
+
+  // Player home
+  for (iP = 0; iP < 22; iP++) {
+    var pl = gLoc.ltPlayer[iP];
+    if (pl.iCard < 2) { // if not red card
       var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
       var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
-
-      var bCardH = false;
-      if (gLoc.ltPlayer[iP +  0].iCard > 0) {
-        bCardH = true;
-      }
 
       var sXh = ((100 *  fXh       ) - 1.0).toString();
       var sYh = ((100 * (fYh + 0.5)) - 1.5).toString();
 
-      var fLookAtAngleXh = -Math.cos(gLoc.ltPlayer[iP +  0].iLookAt * 60 * Math.PI / 180.0);
-      var fLookAtAngleYh = -Math.sin(gLoc.ltPlayer[iP +  0].iLookAt * 60 * Math.PI / 180.0);
-
-      var sLookAtXh = ((0.5 + (fLookAtAngleXh / 2) - (fLookAtSize / 2)) * 100).toString();
-      var sLookAtYh = ((0.5 + (fLookAtAngleYh / 2) - (fLookAtSize / 2)) * 100).toString();
-
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; min-width: 12px; min-height: 12px; top: ' + sYh + '%; left: ' + sXh + '%; background-color: ' + sColorH0 + '; border: 2px solid ' + sColorH1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
-      if (bCardH) {
-        sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
-      }
-      sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
-                  '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextH + '; z-index:22">' + gLoc.ltPlayer[iP +  0].iNo.toString() + '</h2>' + 
-                '</div>';
-
-      // draw look-at circle
       if (bShowLookAt) {
-        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; min-width: 4px; min-height: 4px; top: ' + sLookAtYh + '%; left: ' + sLookAtXh + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
+        divLookAt = player[iP].children[1];
+        var fLftH = ((1.0 - Math.cos(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
+        divLookAt.style.left = ((fLftH - (fLookAtSize / 2)) * 100).toString() + '%';
+        var fTopH = ((1.0 - Math.sin(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
+        divLookAt.style.top  = ((fTopH - (fLookAtSize / 2)) * 100).toString() + '%';
+      } else {
+        divLookAt.style.display = "none";
       }
 
-      sBox += '</div>';
-    }
-
-    // Player Away
-    if (gLoc.ltPlayer[iP + 11].iCard < 2) { // if not red card
-      var fXa = gLoc.ltPlayer[iP + 11].ptPos.X / 122.0;
-      var fYa = gLoc.ltPlayer[iP + 11].ptPos.Y /  50.0;
-
-      var bCardA = false;
-      if (gLoc.ltPlayer[iP + 11].iCard > 0) {
-        bCardA = true;
-      }
-
-      var sXa = ((100 *  fXa       ) - 1.0).toString();
-      var sYa = ((100 * (fYa + 0.5)) - 1.5).toString();
-
-      var fLookAtAngleXa = -Math.cos(gLoc.ltPlayer[iP + 11].iLookAt * 60 * Math.PI / 180.0);
-      var fLookAtAngleYa = -Math.sin(gLoc.ltPlayer[iP + 11].iLookAt * 60 * Math.PI / 180.0);
-
-      var sLookAtXa = ((0.5 + (fLookAtAngleXa / 2) - (fLookAtSize / 2)) * 100).toString();
-      var sLookAtYa = ((0.5 + (fLookAtAngleYa / 2) - (fLookAtSize / 2)) * 100).toString();
-      sBox += '<div style="position: absolute; width: 2%; height: 3%; min-width: 12px; min-height: 12px; top: ' + sYa + '%; left: ' + sXa + '%; background-color: ' + sColorA0 + '; border: 2px solid ' + sColorA1 + '; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:21">';
-      if (bCardA) {
-        sBox += '<img src="/Content/Icons/yCard.png" alt="Karte" style="position: absolute; top: -6px; left: 10px; width: 8px" title="Gelbe Karte" />';
-      }
-      sBox   += '<div style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%">' +
-                  '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextA + '; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</h2>' + 
-                '</div>';
-
-      // draw look-at circle
-      if (bShowLookAt) {
-        sBox += '<div style="position: absolute; width: ' + (fLookAtSize * 100).toString() + '%; height: ' + (fLookAtSize * 100).toString() + '%; min-width: 4px; min-height: 4px; top: ' + sLookAtYa + '%; left: ' + sLookAtXa + '%; background-color: black; -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:23"></div>';
-      }
-
-      sBox += '</div>';
-
-      if (cbTargetPos) {
-        if (cbTargetPos.checked && gLoc.ltPlayer[iP + 11].ptPosTarget.X > 0) {
-          iX0 = ( fXa        * iDivWidthPix);
-          iY0 = ((fYa + 0.5) * iDivHeightPix);
-          iX1 = ( gLoc.ltPlayer[iP + 11].ptPosTarget.X       * iDivWidthPix ) / 122;
-          iY1 = ((gLoc.ltPlayer[iP + 11].ptPosTarget.Y + 25) * iDivHeightPix) /  50;
-
-          sBox += drawline(iX0, iY0, iX1, iY1, "black");
-        }
-      }
+      player[iP].style.left = sXh + '%';
+      player[iP].style.top  = sYh + '%';
     }
   }
-
-  // Ball target
-  if (gLoc.gBall.iPassType > 0) {
-    var sXbt = ((100 * ( gLoc.gBall.ptPosTarget.X       / 122.0)) - 0.750).toString();
-    var sYbt = ((100 * ((gLoc.gBall.ptPosTarget.Y + 25) /  50.0)) - 1.125).toString();
-    var fSizeXt = 1.5;
-    var fSizeYt = fSizeXt * 1.5;
-    sBox += '<div style="position: absolute; width: ' + fSizeXt.toString() + '%; height: ' + fSizeYt.toString() + '%; top: ' + sYbt + '%; left: ' + sXbt + '%; border: 2px solid rgb(0,230,230); -webkit-border-radius: 50%; -moz-border-radius: 50%; z-index:22"></div>';
-  }
-
-  // Ball
-  var sXb = ((100 * ( gLoc.gBall.Pos.X       / 122.0)) - 0.6250).toString();
-  var sYb = ((100 * ((gLoc.gBall.Pos.Y + 25) /  50.0)) - 0.9375).toString();
-  var fSizeX = 1.25 + gLoc.gBall.Pos.Z;
-  var fSizeY = fSizeX * 1.5;
-  //sBox += '<div style="position: absolute; width: ' + fSizeX.toString() + '%; height: ' + fSizeY.toString() + '%; top: ' + sYb + '%; left: ' + sXb + '%; background-color: white; border: 2px solid black; -webkit-border-radius: 50%; -moz-border-radius: 50%"></div>';
-  sBox += '<img src="/Content/Icons/ball_white.png\" alt=\"Ball\" style=\"position: absolute; width: ' + fSizeX.toString() + '%; height: ' + fSizeY.toString() + '%; min-width: 10px; min-height: 10px; top: ' + sYb + '%; left: ' + sXb + '%; z-index:23"/>';
-
-  return sBox;
 }
 
 function printComments(gLoc) {
@@ -274,7 +373,7 @@ function plotStatistics(jState = -1) {
 
       var fMinute = (gD.tsMinute.Hours * 60) + gD.tsMinute.Minutes + (gD.tsMinute.Seconds / 60);
 
-      document.getElementById("lbGoalsH").innerText = gD.iGoalsH.toString();
+      //document.getElementById("lbGoalsH").innerText = gD.iGoalsH.toString();
       document.getElementById("lbGoalsA").innerText = gD.iGoalsA.toString();
 
       pMainSlider = $('#slider-Minute');
