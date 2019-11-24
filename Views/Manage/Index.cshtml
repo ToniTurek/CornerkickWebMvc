@@ -23,11 +23,13 @@
             }
             ]
         </dd>
+        @*
         <dt>Externe Anmeldungen:</dt>
         <dd>
             @Model.Logins.Count [
             @Html.ActionLink("Verwalten", "ManageLogins") ]
         </dd>
+        *@
         @*
             Telefonnummern können als zweiter Faktor in einem zweistufigen Authentifizierungssystem verwendet werden.
              
@@ -36,7 +38,7 @@
              
              Heben Sie die Auskommentierung für den folgenden Block auf, nachdem Sie die zweistufige Authentifizierung eingerichtet haben.
         *@
-        @*  
+        @*
             <dt>Telefonnummer:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "None")
@@ -56,12 +58,14 @@
                 }
             </dd>
         *@
+        @*
         <dt>Zweistufige Authentifizierung:</dt>
         <dd>
             <p>
                 Es sind keine Anbieter für die zweistufige Authentifizierung konfiguriert. In <a href="https://go.microsoft.com/fwlink/?LinkId=403804">diesem Artikel</a>
                 finden Sie Details zum Einrichten dieser ASP.NET-Anwendung für die Unterstützung der zweistufigen Authentifizierung.
             </p>
+        *@
             @*@if (Model.TwoFactor)
                 {
                     using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
@@ -82,6 +86,8 @@
                         </text>
                     }
                 }*@
+        @*
         </dd>
+        *@
     </dl>
 </div>
