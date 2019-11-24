@@ -895,91 +895,86 @@ namespace CornerkickWebMvc.Controllers
       return View(result.Succeeded ? "ConfirmEmail" : "Error");
     }
 
-      //
-      // GET: /Account/ForgotPassword
-      [AllowAnonymous]
-      public ActionResult ForgotPassword()
-      {
-          return View();
+    //
+    // GET: /Account/ForgotPassword
+    [AllowAnonymous]
+    public ActionResult ForgotPassword()
+    {
+      return View();
+    }
+
+    //
+    // POST: /Account/ForgotPassword
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+      if (ModelState.IsValid) {
+        var usr = await UserManager.FindByNameAsync(model.Email);
+        if (usr == null || !(await UserManager.IsEmailConfirmedAsync(usr.Id))) {
+          // Nicht anzeigen, dass der Benutzer nicht vorhanden ist oder nicht bestätigt wurde.
+          return View("ForgotPasswordConfirmation");
+        }
+
+        // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
+        // E-Mail-Nachricht mit diesem Link senden
+        string code = await UserManager.GeneratePasswordResetTokenAsync(usr.Id);
+        var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = usr.Id, code = code }, protocol: Request.Url.Scheme);		
+        await UserManager.SendEmailAsync(usr.Id, "Kennwort zurücksetzen", "Bitte setzen Sie Ihr Kennwort zurück. Klicken Sie dazu <a href=\"" + callbackUrl + "\">hier</a>");
+        return RedirectToAction("ForgotPasswordConfirmation", "Account");
       }
 
-      //
-      // POST: /Account/ForgotPassword
-      [HttpPost]
-      [AllowAnonymous]
-      [ValidateAntiForgeryToken]
-      public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
-      {
-          if (ModelState.IsValid)
-          {
-              var usr = await UserManager.FindByNameAsync(model.Email);
-              if (usr == null || !(await UserManager.IsEmailConfirmedAsync(usr.Id)))
-              {
-                  // Nicht anzeigen, dass der Benutzer nicht vorhanden ist oder nicht bestätigt wurde.
-                  return View("ForgotPasswordConfirmation");
-              }
+      // Wurde dieser Punkt erreicht, ist ein Fehler aufgetreten; Formular erneut anzeigen.
+      return View(model);
+    }
 
-              // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
-              // E-Mail-Nachricht mit diesem Link senden
-              // string code = await UserManager.GeneratePasswordResetTokenAsync(usr.Id);
-              // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = usr.Id, code = code }, protocol: Request.Url.Scheme);		
-              // await UserManager.SendEmailAsync(usr.Id, "Kennwort zurücksetzen", "Bitte setzen Sie Ihr Kennwort zurück. Klicken Sie dazu <a href=\"" + callbackUrl + "\">hier</a>");
-              // return RedirectToAction("ForgotPasswordConfirmation", "Account");
-          }
+    //
+    // GET: /Account/ForgotPasswordConfirmation
+    [AllowAnonymous]
+    public ActionResult ForgotPasswordConfirmation()
+    {
+      return View();
+    }
 
-          // Wurde dieser Punkt erreicht, ist ein Fehler aufgetreten; Formular erneut anzeigen.
-          return View(model);
+    //
+    // GET: /Account/ResetPassword
+    [AllowAnonymous]
+    public ActionResult ResetPassword(string code)
+    {
+      return code == null ? View("Error") : View();
+    }
+
+    //
+    // POST: /Account/ResetPassword
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+      if (!ModelState.IsValid) {
+        return View(model);
       }
-
-      //
-      // GET: /Account/ForgotPasswordConfirmation
-      [AllowAnonymous]
-      public ActionResult ForgotPasswordConfirmation()
-      {
-          return View();
+      var usr = await UserManager.FindByNameAsync(model.Email);
+      if (usr == null) {
+        // Nicht anzeigen, dass der Benutzer nicht vorhanden ist.
+        return RedirectToAction("ResetPasswordConfirmation", "Account");
       }
-
-      //
-      // GET: /Account/ResetPassword
-      [AllowAnonymous]
-      public ActionResult ResetPassword(string code)
-      {
-          return code == null ? View("Error") : View();
+      var result = await UserManager.ResetPasswordAsync(usr.Id, model.Code, model.Password);
+      if (result.Succeeded) {
+        return RedirectToAction("ResetPasswordConfirmation", "Account");
       }
+      AddErrors(result);
+      return View();
+    }
 
-      //
-      // POST: /Account/ResetPassword
-      [HttpPost]
-      [AllowAnonymous]
-      [ValidateAntiForgeryToken]
-      public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
-      {
-          if (!ModelState.IsValid)
-          {
-              return View(model);
-          }
-          var usr = await UserManager.FindByNameAsync(model.Email);
-          if (usr == null)
-          {
-              // Nicht anzeigen, dass der Benutzer nicht vorhanden ist.
-              return RedirectToAction("ResetPasswordConfirmation", "Account");
-          }
-          var result = await UserManager.ResetPasswordAsync(usr.Id, model.Code, model.Password);
-          if (result.Succeeded)
-          {
-              return RedirectToAction("ResetPasswordConfirmation", "Account");
-          }
-          AddErrors(result);
-          return View();
-      }
-
-      //
-      // GET: /Account/ResetPasswordConfirmation
-      [AllowAnonymous]
-      public ActionResult ResetPasswordConfirmation()
-      {
-          return View();
-      }
+    //
+    // GET: /Account/ResetPasswordConfirmation
+    [AllowAnonymous]
+    public ActionResult ResetPasswordConfirmation()
+    {
+      return View();
+    }
 
       //
       // POST: /Account/ExternalLogin
