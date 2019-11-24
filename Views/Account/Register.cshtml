@@ -118,7 +118,7 @@
         @Html.DropDownListFor(m => m.Liga, CornerkickWebMvc.Models.RegisterViewModel.ltSpKl, new { @class = "form-control", @disabled = "disabled" })
       </div>
     </div>
-    if (MvcApplication.settings.bRegisterDuringGame && MvcApplication.ckcore.dtDatum.CompareTo(MvcApplication.ckcore.dtSeasonStart) > 0) {
+    if (MvcApplication.settings.bRegisterDuringGame && (MvcApplication.ckcore.dtDatum.CompareTo(MvcApplication.ckcore.dtSeasonStart) > 0) || MvcApplication.ckcore.iSeason > 1) {
       <div class="form-group">
         @Html.LabelFor(m => m.iClubIx, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
