@@ -314,9 +314,9 @@ namespace CornerkickWebMvc.Controllers
       }
 #endif
 
-      if (!MvcApplication.timerCkCalender.Enabled) {
+      if (!MvcApplication.timerCkCalender.Enabled && iClubExist < 0) {
         MvcApplication.ckcore.calcMatchdays();
-        MvcApplication.ckcore.drawCup(MvcApplication.ckcore.ltCups[1]);
+        MvcApplication.ckcore.drawCup(league);
       }
     }
 
