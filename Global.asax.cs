@@ -332,7 +332,7 @@ namespace CornerkickWebMvc
       save(timerCkCalender, true);
     }
 
-    private static bool performCalendarStep(bool bSave = true)
+    internal static bool performCalendarStep(bool bSave = true)
     {
       if (ckcore.ltUser.Count == 0) return true;
 
