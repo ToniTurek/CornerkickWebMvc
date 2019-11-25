@@ -138,6 +138,10 @@
   @using (Html.BeginForm("StopCalendar", "Admin", FormMethod.Post)) {
     <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px; left: 184px">Stop</button>
   }
+
+  @using (Html.BeginForm("OneStep", "Admin", FormMethod.Post)) {
+    <button type="submit" class="btn btn-default" style="position: absolute; width: 180px; top: 30px; left: 368px">Next</button>
+  }
 </div>
 
 <button type="submit" id="bnSetWeeks1" class="btn btn-default" style="position: relative; width: 180px">1 Day -> 1 Week</button>

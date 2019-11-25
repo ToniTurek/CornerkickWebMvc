@@ -125,6 +125,14 @@ namespace CornerkickWebMvc.Controllers
       //return View(modelAdmin);
     }
 
+    public ActionResult OneStep()
+    {
+      // Do one step now
+      MvcApplication.performCalendarStep();
+
+      return RedirectToAction("Settings");
+    }
+
     public ActionResult RestartCk(Models.AdminModel modelAdmin)
     {
       if (MvcApplication.timerCkCalender != null) MvcApplication.timerCkCalender.Enabled = false;
