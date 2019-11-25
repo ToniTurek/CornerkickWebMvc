@@ -19,9 +19,11 @@
     function getNewsIcon(iType) {
       if (iType === 1) return '<img src="/Content/Icons/news/birthday.png" title="birthday" style="width: 16px"/>';
       if (iType > 9 && iType < 14) return '<img src="/Content/Icons/news/star.ico" title="star" style="width: 16px"/>';
+      if (iType === 16 || iType === 17) return '<img src="/Content/Icons/news/doping.png" title="doping" style="width: 16px"/>';
       if (iType === 20 || iType === 23) return '<img src="/Content/Icons/ambulance2.png" title="ambulance" style="width: 16px"/>';
       if (iType === 21 || iType === 22 || iType === 24 || iType === 25) return '<img src="/Content/Icons/ambulance.png" title="ambulance" style="width: 16px"/>';
-      if (iType === 50 || iType === 51) return '<img src="/Content/Icons/news/construction.png" title="construction" style="width: 16px"/>';
+      if (iType === 50) return '<img src="/Content/Icons/news/stadium.png" title="stadium" style="width: 16px"/>';
+      if (iType === 51) return '<img src="/Content/Icons/news/construction.png" title="construction" style="width: 16px"/>';
       if (iType === 60) return '<img src="/Content/Icons/news/coins.png" title="cash" style="width: 16px"/>';
 
       return '<img src="/Content/Icons/news/info.png" title="info" style="width: 16px"/>';
