@@ -30,9 +30,13 @@ namespace CornerkickWebMvc
       var apiKey = ConfigurationManager.AppSettings["ckSendGridApiKey"];
       var client = new SendGridClient(apiKey);
 
+      // Reset admin email address
+      string sDest = message.Destination;
+      if (sDest.Equals("admin@ck.com")) sDest = "mail@cornerkick-manager.de";
+
       var from = new EmailAddress("mail@cornerkick-manager.de", "Cornerkick");
       var subject = message.Subject;
-      var to = new EmailAddress(message.Destination);
+      var to = new EmailAddress(sDest);
       var plainTextContent = message.Body;
       var htmlContent = message.Body;
 

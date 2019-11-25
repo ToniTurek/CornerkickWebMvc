@@ -676,8 +676,7 @@ namespace CornerkickWebMvc.Controllers
       var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
       MvcApplication.ckcore.tl.writeLog("  Login result: " + result.ToString());
 
-      switch (result)
-      {
+      switch (result) {
         case SignInStatus.Success:
           //appUser = new ApplicationUser { UserName = model.Email, Email = model.Email };
           ApplicationUser appUser = await UserManager.FindByNameAsync(model.Email);
@@ -691,9 +690,12 @@ namespace CornerkickWebMvc.Controllers
 
           iniCk();
 
+          // Send mail to admin
+          await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, "");
+
           return RedirectToAction("Desk", "Member");
-          //return RedirectToAction("Index", "Home");
-          //return View(model);
+        //return RedirectToAction("Index", "Home");
+        //return View(model);
         case SignInStatus.LockedOut:
           return View("Lockout");
         case SignInStatus.RequiresVerification:
