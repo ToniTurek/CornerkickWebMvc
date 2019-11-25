@@ -67,7 +67,7 @@ namespace CornerkickWebMvc.Models
   {
     public static List<System.Web.Mvc.SelectListItem> ltLand  = new List<System.Web.Mvc.SelectListItem>();
     public static List<System.Web.Mvc.SelectListItem> ltSpKl  = new List<System.Web.Mvc.SelectListItem>();
-    public static List<System.Web.Mvc.SelectListItem> ltClubs = new List<System.Web.Mvc.SelectListItem>();
+    public List<System.Web.Mvc.SelectListItem> ltClubs = new List<System.Web.Mvc.SelectListItem>();
 
     [Required]
     [EmailAddress]
@@ -164,4 +164,15 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "E-Mail")]
     public string Email { get; set; }
   }
+
+  public class RemoveUserViewModel
+  {
+    /*
+    [Required]
+    [EmailAddress]
+    [Display(Name = "E-Mail")]
+    public string Email { get; set; }
+    */
+  }
+
 }

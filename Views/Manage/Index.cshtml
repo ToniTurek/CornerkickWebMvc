@@ -12,16 +12,20 @@
     <dl class="dl-horizontal">
         <dt>Kennwort:</dt>
         <dd>
-            [
-            @if (Model.HasPassword)
-            {
-                @Html.ActionLink("Kennwort ändern", "ChangePassword")
-            }
-            else
-            {
-                @Html.ActionLink("Erstellen", "SetPassword")
-            }
-            ]
+          [
+          @if (Model.HasPassword) {
+            @Html.ActionLink("Kennwort ändern", "ChangePassword")
+          } else {
+            @Html.ActionLink("Erstellen", "SetPassword")
+          }
+          ]
+        </dd>
+
+        <dt>Abmelden:</dt>
+        <dd>
+          [
+            @Html.ActionLink("Karriere beenden", "RemoveUser", "Account")
+          ]
         </dd>
         @*
         <dt>Externe Anmeldungen:</dt>

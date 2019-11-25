@@ -923,6 +923,7 @@
     <Content Include="Views\Member\CupSilver.cshtml" />
     <Content Include="Views\Member\CupWc.cshtml" />
     <Content Include="Views\Member\UserView.cshtml" />
+    <Content Include="Views\Account\RemoveUser.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
