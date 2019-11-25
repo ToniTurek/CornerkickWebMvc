@@ -3280,7 +3280,8 @@ namespace CornerkickWebMvc.Controllers
       int[] iCostDays = new int[2];
 
       byte iType = 0;
-      bdgsAll[iType].iType = 0;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTrainingCourtsName;
       bdgsAll[iType].iLevel = clb.buildings.iTrainingCourts[0];
       bdgsAll[iType].sName = CornerkickManager.Stadium.sTrainingCourts[clb.buildings.iTrainingCourts[0]];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sTrainingCourts[clb.buildings.iTrainingCourts[0] + 1];
@@ -3297,7 +3298,8 @@ namespace CornerkickWebMvc.Controllers
       else                                                                              buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      bdgsAll[iType].iType = 1;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sGymName;
       bdgsAll[iType].iLevel = clb.buildings.iGym[0];
       bdgsAll[iType].sName = CornerkickManager.Stadium.sGym[clb.buildings.iGym[0]];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sGym[clb.buildings.iGym[0] + 1];
@@ -3314,7 +3316,8 @@ namespace CornerkickWebMvc.Controllers
       else                                                        buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      bdgsAll[iType].iType = 2;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sSpaName;
       bdgsAll[iType].iLevel = clb.buildings.iSpa[0];
       bdgsAll[iType].sName = CornerkickManager.Stadium.sSpa[clb.buildings.iSpa[0]];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sSpa[clb.buildings.iSpa[0] + 1];
@@ -3331,7 +3334,8 @@ namespace CornerkickWebMvc.Controllers
       else                                                        buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      bdgsAll[iType].iType = 3;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sJouthInternatName;
       bdgsAll[iType].iLevel = clb.buildings.iJouthInternat[0];
       bdgsAll[iType].sName = CornerkickManager.Stadium.sJouthInternat[clb.buildings.iJouthInternat[0]];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sJouthInternat[clb.buildings.iJouthInternat[0] + 1];
@@ -3348,7 +3352,8 @@ namespace CornerkickWebMvc.Controllers
       else                                                                            buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      bdgsAll[iType].iType = 4;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sClubHouseName;
       bdgsAll[iType].iLevel = clb.buildings.iClubHouse[0];
       bdgsAll[iType].sName = CornerkickManager.Stadium.sClubHouse[clb.buildings.iClubHouse[0]];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sClubHouse[clb.buildings.iClubHouse[0] + 1];
@@ -3365,7 +3370,8 @@ namespace CornerkickWebMvc.Controllers
       else                                                                    buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      bdgsAll[iType].iType = 5;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sClubMuseumName;
       bdgsAll[iType].iLevel = clb.buildings.iClubMuseum[0];
       bdgsAll[iType].sName = CornerkickManager.Stadium.sClubMuseum[clb.buildings.iClubMuseum[0]];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sClubMuseum[clb.buildings.iClubMuseum[0] + 1];
@@ -3383,9 +3389,10 @@ namespace CornerkickWebMvc.Controllers
 
       iType++;
       iCostDays = MvcApplication.ckcore.st.getCostDaysContructCarpark(clb.stadium.iCarparkNew, clb.stadium.iCarpark, usr);
-      bdgsAll[iType].iType = 6;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sCarparkName;
+      bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iCarpark;
-      bdgsAll[iType].sName = "Parkplätze - " + clb.stadium.iCarpark.ToString();
+      bdgsAll[iType].sName = clb.stadium.iCarpark.ToString();
       bdgsAll[iType].sNameNext = clb.stadium.iCarparkNew.ToString();
       bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
       if (clb.stadium.iCarparkNew > clb.stadium.iCarpark) {
@@ -3399,9 +3406,10 @@ namespace CornerkickWebMvc.Controllers
 
       iType++;
       iCostDays = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(clb.stadium.iTicketcounterNew, clb.stadium.iTicketcounter, usr);
-      bdgsAll[iType].iType = 7;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTicketcounterName;
+      bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iTicketcounter;
-      bdgsAll[iType].sName = "Ticketschalter - " + clb.stadium.iTicketcounter.ToString();
+      bdgsAll[iType].sName = clb.stadium.iTicketcounter.ToString();
       bdgsAll[iType].sNameNext = clb.stadium.iTicketcounterNew.ToString();
       bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
       if (clb.stadium.iTicketcounterNew > clb.stadium.iTicketcounter) {
@@ -3417,6 +3425,29 @@ namespace CornerkickWebMvc.Controllers
       buildings.sCostBuyGround = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround).ToString("N0", getCi());
 
       return Json(buildings, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult StadiumSurrGetCarparkTicketCounter(int iType, int iNew, int iCurrent)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      Models.StadiumSurroundingsModel.Building bdg = new Models.StadiumSurroundingsModel.Building();
+
+      bdg.sNameNext = (iCurrent + iNew).ToString();
+
+      int[] iCostDays = new int[2];
+      if      (iType == 6) iCostDays = MvcApplication.ckcore.st.getCostDaysContructCarpark      (clb.stadium.iCarpark       + iNew, clb.stadium.iCarpark,       usr);
+      else if (iType == 7) iCostDays = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(clb.stadium.iTicketcounter + iNew, clb.stadium.iTicketcounter, usr);
+
+      bdg.sCostConstructNext  = iCostDays[0].ToString("N0", getCi());
+      bdg.nDaysConstructTotal = iCostDays[1];
+
+      return Json(bdg, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -3460,20 +3491,20 @@ namespace CornerkickWebMvc.Controllers
         iCostDays = CornerkickManager.Stadium.getCostDaysBuildClubMuseum(clb);
         clb.buildings.iClubMuseum[2] = iCostDays[1];
         sDesc = "Vereinsmuseum";
-      } else if (iType == 6) { // Ticketcounter
-        if (clb.stadium.iTicketcounterNew != iLevel) {
-          clb.stadium.iTicketcounterNew = (byte)iLevel;
-          int[] iCostDaysTc = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
-          clb.stadium.iTicketcounterDaysConstruct = iCostDaysTc[1];
-        }
-        sDesc = "Ticketschalter";
-      } else if (iType == 7) { // Carpark
+      } else if (iType == 6) { // Carpark
         if (clb.stadium.iCarparkNew != iLevel) {
           clb.stadium.iCarparkNew = iLevel;
           int[] iCostDaysCp = MvcApplication.ckcore.st.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
           clb.stadium.iCarparkDaysConstruct = iCostDaysCp[1];
         }
         sDesc = "Parkplätze";
+      } else if (iType == 7) { // Ticketcounter
+        if (clb.stadium.iTicketcounterNew != iLevel) {
+          clb.stadium.iTicketcounterNew = (byte)iLevel;
+          int[] iCostDaysTc = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
+          clb.stadium.iTicketcounterDaysConstruct = iCostDaysTc[1];
+        }
+        sDesc = "Ticketschalter";
       }
 
       MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDays[0], "Bau " + sDesc, CornerkickManager.Finance.iTransferralTypePayStadiumSurr);

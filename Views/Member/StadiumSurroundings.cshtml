@@ -8,6 +8,7 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
   <style>
     .myPb {
       height: 14px;
@@ -17,7 +18,7 @@
       color: black;
       text-shadow: 1px 1px 0 #DCDCDC;
       -webkit-border-radius: 3px;
-    }  
+    }
   </style>
 
   <script type="text/javascript">
@@ -48,13 +49,21 @@
 
       if (building) {
         if (building.iLevel > 0 || building.nDaysConstruct > 0) {
-          var bCurr = document.createElement("b");
-          bCurr.innerText = building.sName;
-          bCurr.style.position = "relative";
-          bCurr.style.width = "100%";
-          bCurr.style.left = "0px";
-          bCurr.style.fontSize = "20px";
-          div1.appendChild(bCurr);
+          var bCategory = document.createElement("b");
+          bCategory.innerText = building.sCategory;
+          bCategory.style.position = "relative";
+          bCategory.style.width = "100%";
+          bCategory.style.left = "0px";
+          bCategory.style.fontSize = "20px";
+          div1.appendChild(bCategory);
+
+          var pCurr = document.createElement("p");
+          pCurr.innerText = "Akt.: " + building.sName;
+          pCurr.style.position = "relative";
+          pCurr.style.width = "100%";
+          pCurr.style.left = "0px";
+          pCurr.style.fontSize = "18px";
+          div1.appendChild(pCurr);
         }
 
         if (building.nDaysConstruct > 0) {
@@ -82,6 +91,50 @@
           div1.appendChild(divPb);
         } else {
           var btn = document.createElement("button");
+
+          if (building.iType > 5) {
+            var divNew = document.createElement("div");
+            divNew.style.position = "relative";
+            divNew.style.width = "50%";
+            divNew.style.left = "25%";
+            divNew.style.height = "40px";
+
+            var txtNew = document.createElement("text");
+            txtNew.innerText = "Neu:";
+            txtNew.style.position = "absolute";
+            txtNew.style.textAlign = "right";
+            txtNew.style.top = "6px";
+            txtNew.style.left = "0px";
+            txtNew.style.width = "48%";
+            txtNew.style.fontSize = "16px";
+            divNew.appendChild(txtNew);
+
+            var iptNew = document.createElement("input");
+            iptNew.className = "form-control";
+            iptNew.style.position = "absolute";
+            iptNew.style.top = "0px";
+            iptNew.style.width = "48%";
+            iptNew.style.left = "52%";
+            iptNew.style.height = "auto";
+            iptNew.style.fontSize = "16px";
+            iptNew.value = 1;
+            iptNew.addEventListener("keyup", function () {
+              $.ajax({
+                url: '/Member/StadiumSurrGetCarparkTicketCounter',
+                type: "post",
+                dataType: "JSON",
+                data: { iType: building.iType, iNew: getIntFromString(iptNew.value), iCurrent: getIntFromString(building.sName) },
+                success: function (bdg) {
+                  setBuildingBtn(btn, bdg);
+                }
+              });
+            });
+            building.sNameNext = (getIntFromString(building.sName) + getIntFromString(iptNew.value)).toString();
+            divNew.appendChild(iptNew);
+
+            div1.appendChild(divNew);
+          }
+
           btn.type = "submit";
           btn.className = "btn btn-default";
           btn.style.position = "relative";
@@ -107,7 +160,7 @@
             for (var iBdgFree = 0; iBdgFree < ltBuildingsFree.length; iBdgFree++) {
               var opt = document.createElement("option");
               opt.value = iBdgFree;
-              opt.innerHTML = ltBuildingsFree[iBdgFree].sNameNext;
+              opt.innerHTML = ltBuildingsFree[iBdgFree].sCategory;
               sct.appendChild(opt);
             }
             sct.addEventListener("change", function () { setBuildingBtn(btn, ltBuildingsFree[sct.value]); });

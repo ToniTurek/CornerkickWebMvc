@@ -47,6 +47,7 @@ namespace CornerkickWebMvc.Models
 
     public class Building
     {
+      public string sCategory { get; set; }
       public int iLevel { get; set; }
       public byte iType { get; set; }
       public string sName { get; set; }
