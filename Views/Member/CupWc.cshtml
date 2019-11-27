@@ -13,7 +13,8 @@
 
   <script>
     $(document).ready(function () {
-      setMatchday(@Model.iMatchday, 0);
+      var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
+      setMatchday(iMatchday, 0);
 
       $("#iGroup").change(function () {
         setMatchday($("#ddlMatchdayCupWc").val(), $(this).val());
