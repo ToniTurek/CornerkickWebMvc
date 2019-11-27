@@ -203,7 +203,9 @@ namespace CornerkickWebMvc
         cupGold.iId = 3;
         cupGold.sName = "Gold Cup";
         cupGold.settings.iNeutral = 2;
-        cupGold.settings.iBonusCupWin = 30000000; // 30 mio.
+        cupGold.settings.iBonusStart    = 10000000; // 10 mio.
+        cupGold.settings.iBonusCupWin   = 30000000; // 30 mio.
+        cupGold.settings.iBonusVicGroup =  5000000; //  5 mio.
         cupGold.settings.bBonusReleaseCupWinInKo = true;
         cupGold.settings.iDayOfWeek = 3;
         ckcore.ltCups.Add(cupGold);
@@ -220,7 +222,9 @@ namespace CornerkickWebMvc
         cupSilver.iId = 4;
         cupSilver.sName = "Silver Cup";
         cupSilver.settings.iNeutral = 2;
-        cupSilver.settings.iBonusCupWin = 15000000; // 15 mio.
+        cupSilver.settings.iBonusStart    =  5000000; //  5 mio.
+        cupSilver.settings.iBonusCupWin   = 15000000; // 15 mio.
+        cupSilver.settings.iBonusVicGroup =  2500000; //  2.5 mio.
         cupSilver.settings.bBonusReleaseCupWinInKo = true;
         cupSilver.settings.iDayOfWeek = 4;
         ckcore.ltCups.Add(cupSilver);
@@ -389,11 +393,19 @@ namespace CornerkickWebMvc
 
       // Beginn of new season
       if (iRetCk == 4) {
+        // Draw leagues
         foreach (int iN in iNations) {
           CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, 0);
           if (league == null) continue;
           ckcore.drawCup(league);
         }
+
+        // Draw gold/silver cup
+        CornerkickManager.Cup cupGold   = ckcore.tl.getCup(3);
+        ckcore.drawCup(cupGold);
+
+        CornerkickManager.Cup cupSilver = ckcore.tl.getCup(4);
+        ckcore.drawCup(cupSilver);
       }
 
       // End of season
@@ -429,10 +441,10 @@ namespace CornerkickWebMvc
           }
         }
 
-        ckcore.calcMatchdays();
+        cupGold  .ltMatchdays.Clear();
+        cupSilver.ltMatchdays.Clear();
 
-        ckcore.drawCup(cupGold);
-        ckcore.drawCup(cupSilver);
+        ckcore.calcMatchdays();
 
         return false;
       }
