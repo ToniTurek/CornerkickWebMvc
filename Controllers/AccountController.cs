@@ -228,8 +228,6 @@ namespace CornerkickWebMvc.Controllers
       for (byte iU = 0; iU < nUser; iU++) {
 #endif
       CornerkickManager.Club clb = null;
-
-      int iClubExistIx = -1;
       if (clubExist == null) {
         // Remove CPU club from league and nat. cup
         for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
@@ -239,6 +237,7 @@ namespace CornerkickWebMvc.Controllers
 
           if (league != null) {
             if (league.ltClubs[0].IndexOf(clubCpu) >= 0) {
+              /*
               league.ltClubs[0].Remove(clubCpu);
 
               if (cup != null) {
@@ -248,22 +247,38 @@ namespace CornerkickWebMvc.Controllers
               MvcApplication.ckcore.ltClubs.Remove(clubCpu);
               foreach (CornerkickGame.Player plRemove in clubCpu.ltPlayer) MvcApplication.ckcore.ltPlayer.Remove(plRemove);
               clubCpu = null;
-              iClubExistIx = iC;
+              */
 
+              // Retire all cpu player
+              while (clubCpu.ltPlayer.Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayer[0]);
+              clubCpu.ltPlayerJouth.Clear();
+        
+              clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
+
+              // Assign club colors
+              clubCpu.cl[0] = registerViewModel.cl1;
+              clubCpu.cl[1] = registerViewModel.cl2;
+              clubCpu.cl[2] = registerViewModel.cl3;
+              clubCpu.cl[3] = registerViewModel.cl4;
+        
+              addPlayerToClub(ref clubCpu);
+
+              // Do initial formation
+              MvcApplication.ckcore.doFormation(clubCpu.iId);
+
+#if DEBUG
+              clubCpu.sName += "_" + clubCpu.iId.ToString();
+#endif
+              
               break;
             }
           }
         }
 
-        clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision);
-        
-        // Assign club colors
-        clb.cl[0] = registerViewModel.cl1;
-        clb.cl[1] = registerViewModel.cl2;
-        clb.cl[2] = registerViewModel.cl3;
-        clb.cl[3] = registerViewModel.cl4;
+        if (clb == null) return;
       } else {
         clb = clubExist;
+        clb.sName = applicationUser.Vereinsname;
       }
 
       CornerkickManager.User usr = createUser(applicationUser);
@@ -279,29 +294,6 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       }
 #endif
-      
-      if (clubExist == null) {
-        // Add club to mng
-        if (iClubExistIx >= 0) {
-          clb.iId = iClubExistIx;
-          MvcApplication.ckcore.ltClubs.Insert(iClubExistIx, clb);
-        } else {
-          MvcApplication.ckcore.ltClubs.Add(clb);
-        }
-      
-        // Do initial formation
-        MvcApplication.ckcore.doFormation(clb.iId);
-
-        // Add club to league/cup
-        if (cup    != null) cup   .ltClubs[0].Add(clb); // nat. cup
-        if (league != null) league.ltClubs[0].Add(clb); // league
-
-#if DEBUG
-        clb.sName += "_" + clb.iId.ToString();
-#endif
-      } else {
-        clb.sName = applicationUser.Vereinsname;
-      }
 
 #if DEBUG
       if (iU == 0) {
@@ -314,10 +306,12 @@ namespace CornerkickWebMvc.Controllers
       }
 #endif
 
+      /*
       if (!MvcApplication.timerCkCalender.Enabled && iClubExist < 0) {
         MvcApplication.ckcore.calcMatchdays();
         MvcApplication.ckcore.drawCup(league);
       }
+      */
     }
 
     private CornerkickManager.User createUser(ApplicationUser applicationUser)
@@ -359,13 +353,15 @@ namespace CornerkickWebMvc.Controllers
       return checkUserIsAdmin(user.Identity.Name);
     }
 
-    internal CornerkickManager.Club createClub(string sTeamname, byte iLand, byte iLiga)
+    internal CornerkickManager.Club createClub(string sTeamname, byte iLand, byte iLiga, CornerkickManager.Club clbReplace = null)
     {
-      CornerkickManager.Club clb = new CornerkickManager.Club();
+      CornerkickManager.Club clb = clbReplace;
+      if (clbReplace == null) clb = new CornerkickManager.Club();
 
       clb.sName = sTeamname;
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
-      clb.iId = MvcApplication.ckcore.ltClubs.Count;
+
+      if (clbReplace == null) clb.iId = MvcApplication.ckcore.ltClubs.Count;
 
       clb.iLand = iLand;
       clb.iDivision = iLiga;
@@ -400,8 +396,6 @@ namespace CornerkickWebMvc.Controllers
       clb.iAdmissionPriceSeasonal[0] =  200;
       clb.iAdmissionPriceSeasonal[1] =  600;
       clb.iAdmissionPriceSeasonal[2] = 2000;
-
-      addPlayerToClub(ref clb);
 
       return clb;
     }
@@ -750,6 +744,17 @@ namespace CornerkickWebMvc.Controllers
     [AllowAnonymous]
     public ActionResult Register(RegisterViewModel mdRegister)
     {
+      mdRegister.ddlDivision = new List<SelectListItem>();
+
+      /*
+      foreach (CornerkickManager.Cup league in MvcApplication.ckcore.ltCups) {
+        if (league.iId == 1 && league.iId2 == ) continue;
+
+        if (clb.user == null) return Json(true, JsonRequestBehavior.AllowGet);
+      }
+      */
+      mdRegister.ddlDivision.Add(new SelectListItem { Text = "Liga 1", Value = "0", Selected = true });
+
       // Add clubs to ddl in register view (need to be relocated if multiple leagues are available)
       mdRegister.ltClubs = new List<SelectListItem>();
 
@@ -764,6 +769,13 @@ namespace CornerkickWebMvc.Controllers
         mdRegister.ltClubs.Add(new SelectListItem { Text = clb.sName, Value = iC.ToString() });
       }
 
+      mdRegister.bRegisterPossible = false;
+      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) ||
+          MvcApplication.ckcore.dtSeasonStart.Year < 1000 ||
+          MvcApplication.settings.bRegisterDuringGame) {
+        mdRegister.bRegisterPossible = true;
+      }
+
       return View(mdRegister);
     }
 
@@ -775,9 +787,6 @@ namespace CornerkickWebMvc.Controllers
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase file)
     {
-      // Set land hard-coded. Can be removed when disabled is removed from DropDownListFor in Register.cshtml
-      model.Land = 36; // GER
-
       // Check emblem
       if (file != null) {
         List<string> sImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
@@ -858,7 +867,7 @@ namespace CornerkickWebMvc.Controllers
             // Create club
             addUserToCk(appUser, model, false, model.iClubIx);
             CornerkickManager.Club clb = ckClub();
-            if (clb != null) uploadFile(file, ckClub().iId);
+            if (clb != null) uploadFile(file, clb.iId);
             iniCk();
           }
 
@@ -876,6 +885,21 @@ namespace CornerkickWebMvc.Controllers
 
       // Wurde dieser Punkt erreicht, ist ein Fehler aufgetreten; Formular erneut anzeigen.
       return View(model);
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public ActionResult RegisterCheckLeague(int iLand, int iDivision)
+    {
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
+
+      foreach (CornerkickManager.Club clb in league.ltClubs[0]) {
+        if (clb == null) continue;
+
+        if (clb.user == null) return Json(true, JsonRequestBehavior.AllowGet);
+      }
+
+      return Json(false, JsonRequestBehavior.AllowGet);
     }
 
     [AllowAnonymous]

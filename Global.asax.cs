@@ -97,9 +97,6 @@ namespace CornerkickWebMvc
       Models.RegisterViewModel.ltLand.Clear();
       foreach (byte iN in iNations) Models.RegisterViewModel.ltLand.Add(new SelectListItem { Text = ckcore.sLand[iN], Value = iN.ToString(), Selected = iN == 36 });
 
-      Models.RegisterViewModel.ltSpKl.Clear();
-      Models.RegisterViewModel.ltSpKl.Add(new SelectListItem { Text = "Liga 1", Value = "1", Selected = true });
-
       /*
       Models.RegisterViewModel.ltSasn.Clear();
       Models.RegisterViewModel.ltSasn.Add(new SelectListItem { Text = "Saison 1", Value = "1", Selected = true });

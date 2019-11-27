@@ -66,7 +66,7 @@ namespace CornerkickWebMvc.Models
   public class RegisterViewModel
   {
     public static List<System.Web.Mvc.SelectListItem> ltLand  = new List<System.Web.Mvc.SelectListItem>();
-    public static List<System.Web.Mvc.SelectListItem> ltSpKl  = new List<System.Web.Mvc.SelectListItem>();
+    public List<System.Web.Mvc.SelectListItem> ddlDivision  = new List<System.Web.Mvc.SelectListItem>();
     public List<System.Web.Mvc.SelectListItem> ltClubs = new List<System.Web.Mvc.SelectListItem>();
 
     [Required]
@@ -129,6 +129,8 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Kennwort bestätigen")]
     [Compare("Password", ErrorMessage = "Das Kennwort entspricht nicht dem Bestätigungskennwort.")]
     public string ConfirmPassword { get; set; }
+
+    public bool bRegisterPossible { get; set; }
 
     public RegisterViewModel()
     {

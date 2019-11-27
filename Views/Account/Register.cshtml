@@ -23,6 +23,8 @@
     ];
 
     $(document).ready(function () {
+      checkLeague();
+
       $("#inputCl1").spectrum({
         color: "white",
         showPaletteOnly: true,
@@ -64,6 +66,28 @@
       var sCl = $("#inputCl" + iCl.toString()).spectrum('get').toHexString();
       document.getElementById('cl' + iCl.toString()).value = sCl;
       document.getElementById('divJersey' + iCl.toString()).style.backgroundColor = sCl;
+    }
+
+    function checkLeague() {
+      var bRegisterPossible = @Html.Raw(Json.Encode(Model.bRegisterPossible));
+      if (bRegisterPossible === false) {
+        document.getElementById("bnRegister").disabled = true;
+        return;
+      }
+
+      var iLand     = parseInt(document.getElementById("ddlLand")    .value);
+      var iDivision = parseInt(document.getElementById("ddlDivision").value);
+
+      $.ajax({
+        url: '/Account/RegisterCheckLeague',
+        type: "GET",
+        dataType: "JSON",
+        contentType: "application/json; charset=utf-8",
+        data: { iLand: iLand, iDivision: iDivision },
+        success: function (bReturn) {
+          document.getElementById("bnRegister").disabled = !bReturn;
+        }
+      });
     }
   </script>
 </head>
@@ -109,15 +133,16 @@
     <div class="form-group">
       @Html.LabelFor(m => m.Land, new { @class = "col-md-2 control-label" })
       <div class="col-md-10">
-        @Html.DropDownListFor(m => m.Land, CornerkickWebMvc.Models.RegisterViewModel.ltLand, new { @class = "form-control", @disabled = "disabled" })
+        @Html.DropDownListFor(m => m.Land, CornerkickWebMvc.Models.RegisterViewModel.ltLand, new { @Id = "ddlLand", @class = "form-control", @onchange = "checkLeague()" })
       </div>
     </div>
     <div class="form-group">
       @Html.LabelFor(m => m.Liga, new { @class = "col-md-2 control-label" })
       <div class="col-md-10">
-        @Html.DropDownListFor(m => m.Liga, CornerkickWebMvc.Models.RegisterViewModel.ltSpKl, new { @class = "form-control", @disabled = "disabled" })
+        @Html.DropDownListFor(m => m.Liga, Model.ddlDivision, new { @Id = "ddlDivision", @class = "form-control", @onchange = "checkLeague()" })
       </div>
     </div>
+    /*
     if (MvcApplication.settings.bRegisterDuringGame && (MvcApplication.ckcore.dtDatum.CompareTo(MvcApplication.ckcore.dtSeasonStart) > 0) || MvcApplication.ckcore.iSeason > 1) {
       <div class="form-group">
         @Html.LabelFor(m => m.iClubIx, new { @class = "col-md-2 control-label" })
@@ -126,6 +151,7 @@
         </div>
       </div>
     }
+    */
     <div class="form-group">
       <label class="col-md-2 control-label" for="Liga">Vereinsfarben</label>
       <div class="col-md-10" style="width: 320px; height: 60px">
@@ -166,15 +192,7 @@
     </div>
     <div class="form-group">
       <div class="col-md-offset-2 col-md-10">
-        @{
-          if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) ||
-              MvcApplication.ckcore.dtSeasonStart.Year < 1000 ||
-              MvcApplication.settings.bRegisterDuringGame) {
-            <input type="submit" class="btn btn-default" value="Registrieren" />
-          } else {
-            <input type="submit" class="btn btn-default" disabled="disabled" value="Registrieren" />
-          }
-        }
+        <input type="submit" id="bnRegister" class="btn btn-default" disabled="disabled" value="Registrieren" />
       </div>
     </div>
   }
