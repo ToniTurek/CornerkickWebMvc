@@ -203,7 +203,7 @@ namespace CornerkickWebMvc
         cupGold.sName = "Gold Cup";
         cupGold.settings.iNeutral = 2;
         cupGold.settings.iBonusStart    = 10000000; // 10 mio.
-        cupGold.settings.iBonusCupWin   = 30000000; // 30 mio.
+        cupGold.settings.iBonusCupWin   = 32000000; // 32 mio.
         cupGold.settings.iBonusVicGroup =  5000000; //  5 mio.
         cupGold.settings.bBonusReleaseCupWinInKo = true;
         cupGold.settings.iDayOfWeek = 3;
@@ -222,7 +222,7 @@ namespace CornerkickWebMvc
         cupSilver.sName = "Silver Cup";
         cupSilver.settings.iNeutral = 2;
         cupSilver.settings.iBonusStart    =  5000000; //  5 mio.
-        cupSilver.settings.iBonusCupWin   = 15000000; // 15 mio.
+        cupSilver.settings.iBonusCupWin   = 16000000; // 16 mio.
         cupSilver.settings.iBonusVicGroup =  2500000; //  2.5 mio.
         cupSilver.settings.bBonusReleaseCupWinInKo = true;
         cupSilver.settings.iDayOfWeek = 4;
