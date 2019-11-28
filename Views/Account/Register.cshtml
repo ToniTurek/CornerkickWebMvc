@@ -84,8 +84,11 @@
         dataType: "JSON",
         contentType: "application/json; charset=utf-8",
         data: { iLand: iLand, iDivision: iDivision },
-        success: function (bReturn) {
-          document.getElementById("bnRegister").disabled = !bReturn;
+        success: function (iUser) {
+          document.getElementById("txtAvailableClubs").innerText = "Noch " + iUser[1].toString() + " von " + iUser[0].toString() + " Vereinen verfügbar";
+          if (iUser[1] > 0) {
+            document.getElementById("bnRegister").disabled = false;
+          }
         }
       });
     }
@@ -139,7 +142,13 @@
     <div class="form-group">
       @Html.LabelFor(m => m.Liga, new { @class = "col-md-2 control-label" })
       <div class="col-md-10">
-        @Html.DropDownListFor(m => m.Liga, Model.ddlDivision, new { @Id = "ddlDivision", @class = "form-control", @onchange = "checkLeague()" })
+        @Html.DropDownListFor(m => m.Liga, Model.ddlDivision, new { @Id = "ddlDivision", @class = "form-control", @onchange = "checkLeague()", @disabled = "disabled" })
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label" for=""></label>
+      <div class="col-md-10">
+        <p id="txtAvailableClubs" style="margin-top: -10px"></p>
       </div>
     </div>
     /*

@@ -893,13 +893,15 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
 
+      int[] iUser = new int[2];
       foreach (CornerkickManager.Club clb in league.ltClubs[0]) {
         if (clb == null) continue;
 
-        if (clb.user == null) return Json(true, JsonRequestBehavior.AllowGet);
+        if (clb.user == null) iUser[1]++;
+        iUser[0]++;
       }
 
-      return Json(false, JsonRequestBehavior.AllowGet);
+      return Json(iUser, JsonRequestBehavior.AllowGet);
     }
 
     [AllowAnonymous]
