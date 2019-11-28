@@ -1,4 +1,5 @@
-﻿function changeLand(iSaison, iDivision) {
+﻿function changeLand(iDivision) {
+  var iSaison = $('#ddlSeason').val();
   var iLand = $('#ddlLand').val();
 
   $.ajax({
@@ -50,16 +51,16 @@ function setLeague2(iSaison, iDivision) {
     success: function (sTable) {
       var sBox = drawTable(sTable);
       divDrawTable.html(sBox).show();
-    }
-  });
 
-  $.ajax({
-    url: '/Member/setLeagueTeams',
-    type: "GET",
-    dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
-    success: function (sTeams) {
-      actionDrawTeams(sTeams);
+      $.ajax({
+        url: '/Member/setLeagueTeams',
+        type: "GET",
+        dataType: "JSON",
+        data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
+        success: function (sTeams) {
+          actionDrawTeams(sTeams);
+        }
+      });
     }
   });
 

@@ -51,7 +51,7 @@ namespace CornerkickWebMvc
     }
 
     //const string sSaveZip = "ckSave.zip";
-    const string sFilenameSave     = ".autosave.ckx";
+    internal const string sFilenameSave = ".autosave.ckx";
     const string sFilenameSettings = "laststate.txt";
 
     internal static byte[] iNations = new byte[8] {
@@ -126,8 +126,7 @@ namespace CornerkickWebMvc
       swLoad.Start();
 
       // Load autosave
-      if (load()) {
-      } else {
+      if (!load()) {
         // New game
         DateTime dtLeagueStart;
         DateTime dtLeagueEnd;

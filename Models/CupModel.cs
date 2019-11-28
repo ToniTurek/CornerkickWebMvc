@@ -11,10 +11,14 @@ namespace CornerkickWebMvc.Models
   {
     public int iClubId { get; set; }
 
+    [Display(Name = "Saison: ")]
+    public int iSeason { get; set; }
+
     public int iLand { get; set; }
 
     public List<List<CornerkickGame.Game.Data>> ltErg { get; set; }
 
+    public List<SelectListItem> ddlSeason { get; set; }
     public List<SelectListItem> ddlLand { get; set; }
 
     public CupModel()

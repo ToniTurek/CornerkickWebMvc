@@ -1,11 +1,12 @@
-﻿function changeLand(iSaison) {
+﻿function changeLandCup() {
   var iLand = $('#ddlLandCup').val();
+  var iSeason = $('#ddlSeasonCup').val();
 
   $.ajax({
     url: '/Member/CupGetDdlMatchdays',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand },
+    data: { iSaison: iSeason, iLand: iLand },
     success: function (ltMd) {
       $('#ddlMatchdayCup').empty();
       $.each(ltMd, function (i, p) {
@@ -17,10 +18,10 @@
         url: '/Member/CupGetMatchday',
         type: "GET",
         dataType: "JSON",
-        data: { iSaison: iSaison, iLand: iLand },
+        data: { iSaison: iSeason, iLand: iLand },
         success: function (iMd) {
           document.getElementById("ddlMatchdayCup").value = iMd;
-          setCup2(iSaison);
+          setCup2(iSeason);
         }
       });
     }

@@ -11,7 +11,8 @@ namespace CornerkickWebMvc.Models
   {
     public int iClubId { get; set; }
 
-    public ushort iSaison { get; set; }
+    [Display(Name = "Saison: ")]
+    public int iSeason { get; set; }
 
     [Display(Name = "Land: ")]
     public int iLand { get; set; }
@@ -25,8 +26,7 @@ namespace CornerkickWebMvc.Models
     public int iLeagueSize { get; set; }
 
     public List<SelectListItem> ddlLand { get; set; }
-
-    public static List<System.Web.Mvc.SelectListItem> ltSasn = new List<System.Web.Mvc.SelectListItem>();
+    public List<SelectListItem> ddlSeason { get; set; }
 
     public LeagueModels()
     {
