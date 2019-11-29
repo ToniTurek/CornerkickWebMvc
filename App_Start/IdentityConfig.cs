@@ -27,8 +27,11 @@ namespace CornerkickWebMvc
     // Use NuGet to install SendGrid (Basic C# client lib) 
     private async Task configSendGridasync(IdentityMessage message)
     {
-      var apiKey = ConfigurationManager.AppSettings["ckSendGridApiKey"];
-      var client = new SendGridClient(apiKey);
+      string sApiKey = ConfigurationManager.AppSettings["ckSendGridApiKey"];
+      if (string.IsNullOrEmpty(sApiKey)) {
+        MvcApplication.ckcore.tl.writeLog("Error: Cannot read ApiKey 'ckSendGridApiKey' from ConfigurationManager", MvcApplication.ckcore.sErrorFile);
+      }
+      var client = new SendGridClient(sApiKey);
 
       // Reset admin email address
       string sDest = message.Destination;
