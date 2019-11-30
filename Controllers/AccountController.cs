@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -330,7 +331,9 @@ namespace CornerkickWebMvc.Controllers
 
     internal static bool checkUserIsAdmin(string sEmail, string sPw = "")
     {
-      if (!sEmail.Equals("admin@ck.com")) return false;
+      string sAdminEmail = ConfigurationManager.AppSettings["ckAdminEmail"];
+      if (string.IsNullOrEmpty(sAdminEmail)) return false;
+      if (!sEmail.Equals(sAdminEmail)) return false;
 
       if (!string.IsNullOrEmpty(sPw)) {
         if (!sPw.Equals("!Cornerkick1")) return false;
