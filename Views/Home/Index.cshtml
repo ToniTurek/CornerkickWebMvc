@@ -7,19 +7,28 @@
 <head>
   <meta charset="utf-8">
 
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+
   <style>
     .ckTeaser {
       font-size: 20px;
+      font-family: Arial, Helvetica, sans-serif
+    }
+
+    .ckTeaserSmall {
+      font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif
     }
   </style>
-  <script type="text/javascript">
-    $(window).resize(function () {
-      setView();
-    });
 
+  <script type="text/javascript">
     $(document).ready(function () {
       setView();
     }); // $(document).ready(function () {});
+
+    $(window).resize(function () {
+      setView();
+    });
 
     function setView() {
       var divImg = document.getElementById("divImg");
@@ -33,10 +42,20 @@
 
       if (fWidth < 450) {
         divImg.style.width = "280px"
-        divImg.style.top   = "-20px"
+        divImg.style.top = "-20px"
+
+        ltEl = document.getElementsByName("txtTeaser");
+        for (var iEl = 0; iEl < ltEl.length; iEl++) {
+          ltEl[iEl].className = " ckTeaserSmall";
+        }
       } else {
         divImg.style.width = "420px"
-        divImg.style.top   = "-40px"
+        divImg.style.top = "-40px"
+
+        ltEl = document.getElementsByName("txtTeaser");
+        for (var iEl = 0; iEl < ltEl.length; iEl++) {
+          ltEl[iEl].className = " ckTeaser";
+        }
       }
     }
   </script>
@@ -59,27 +78,32 @@
   <div class="jumbotron" style="background-color: rgb(31, 158, 69)">
     <div style="position: relative; color: white; margin-top: 0px">
       <img src="~/Content/Images/logo_64.png" width="24" />
-      <b class="ckTeaser">Absolut kostenlos, keine in-game Käufe</b>
+      <text name="txtTeaser" class="ckTeaser">Absolut kostenlos, keine in-game Käufe</text>
     </div>
 
     <div style="position: relative; color: white; margin-top: -10px">
       <img src="~/Content/Images/logo_64.png" width="24" />
-      <b class="ckTeaser">Komplette Simulation der Spiele in Echtzeit</b>
+      <text name="txtTeaser" class="ckTeaser">Komplette Simulation der Spiele in Echtzeit</text>
     </div>
 
     <div style="position: relative; color: white; margin-top: -10px">
       <img src="~/Content/Images/logo_64.png" width="24" />
-      <b class="ckTeaser">Spiele nationale Wettbewerbe und qualifiziere dich für internationale Pokale</b>
+      <text name="txtTeaser" class="ckTeaser">Spiele nationale Wettbewerbe und qualifiziere dich für internationale Pokale</text>
     </div>
 
     <div style="position: relative; color: white; margin-top: -10px">
       <img src="~/Content/Images/logo_64.png" width="24" />
-      <b class="ckTeaser">Gewinne die Meisterschaft und coache die Nationalmannschaft</b>
+      <text name="txtTeaser" class="ckTeaser">Gewinne die Meisterschaft und coache die Nationalmannschaft</text>
     </div>
 
     <div style="position: relative; color: white; margin-top: -10px">
       <img src="~/Content/Images/logo_64.png" width="24" />
-      <b class="ckTeaser">Baue dein Stadion aus und errichte weitere Gebäude um deinen Verein nach ganz oben zu bringen</b>
+      <text name="txtTeaser" class="ckTeaser">Baue dein Stadion aus und errichte weitere Gebäude um deinen Verein nach ganz oben zu bringen</text>
+    </div>
+
+    <div style="position: relative; color: white; margin-top: -10px">
+      <img src="~/Content/Images/logo_64.png" width="24" />
+      <text name="txtTeaser" class="ckTeaser">Umfassende Statistik z.B. deiner Spieler</text>
     </div>
   </div>
 
@@ -88,7 +112,8 @@
       <p><a href="/Home/UserManual" class="btn btn-default" style="font-size:20px">Anleitung &raquo;</a></p>
     </div>
   </div>
-  <p style="position: relative">Version: 1.33.1</p>
+
+  <p style="position: relative; margin-top: 30px">Version: 1.33.2</p>
   <p style="position: relative">Commit: @System.Web.Configuration.WebConfigurationManager.AppSettings["appharbor.commit_id"]</p>
 </body>
 </html>
