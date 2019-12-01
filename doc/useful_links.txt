@@ -1,0 +1,4 @@
+### Javascript
+https://howchoo.com/g/mmu0nguznjg/learn-the-slow-and-fast-way-to-append-elements-to-the-dom
+http://jonraasch.com/blog/10-javascript-performance-boosting-tips-from-nicholas-zakas
+https://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
