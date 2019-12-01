@@ -27,31 +27,40 @@ namespace CornerkickWebMvc
     // Use NuGet to install SendGrid (Basic C# client lib) 
     private async Task configSendGridasync(IdentityMessage message)
     {
+      const string sCkEmail = "mail@cornerkick-manager.de";
+
+      // Read SendGrid api key from ConfigurationManager
       string sApiKey = ConfigurationManager.AppSettings["ckSendGridApiKey"];
       if (string.IsNullOrEmpty(sApiKey)) {
         MvcApplication.ckcore.tl.writeLog("Error: Cannot read ApiKey 'ckSendGridApiKey' from ConfigurationManager", MvcApplication.ckcore.sErrorFile);
       }
-      var client = new SendGridClient(sApiKey);
 
-      string sFrom = "mail@cornerkick-manager.de";
+      // Create email client
+      SendGridClient sgc = new SendGridClient(sApiKey);
+
+      string sFrom = sCkEmail;
 
       // Reset admin email address
       string sDest = message.Destination;
       string sAdminEmail = ConfigurationManager.AppSettings["ckAdminEmail"];
       if (sDest.Equals(sAdminEmail)) {
-        sDest = "mail@cornerkick-manager.de";
+        sDest = sCkEmail;
         sFrom = sAdminEmail;
       }
 
-      var from = new EmailAddress(sFrom, "Cornerkick Manager");
-      var subject = message.Subject;
-      var to = new EmailAddress(sDest);
-      var plainTextContent = message.Body;
-      var htmlContent = message.Body;
+      // Create email
+      EmailAddress emailFrom = new EmailAddress(sFrom, "Cornerkick Manager");
+      string sSubject = message.Subject;
+      EmailAddress emailTo = new EmailAddress(sDest);
+      string sPlainTextContent = message.Body;
+      string sHtmlContent = message.Body;
+      SendGridMessage sgm = MailHelper.CreateSingleEmail(emailFrom, emailTo, sSubject, sPlainTextContent, sHtmlContent);
 
-      var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+      // Send email
+      Response response = await sgc.SendEmailAsync(sgm);
 
-      var response = await client.SendEmailAsync(msg);
+      // Log status code
+      MvcApplication.ckcore.tl.writeLog("SendGrid mail status code: " + response.StatusCode.ToString());
     }
   }
 

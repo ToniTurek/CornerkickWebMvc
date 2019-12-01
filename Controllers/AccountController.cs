@@ -688,7 +688,7 @@ namespace CornerkickWebMvc.Controllers
           iniCk();
 
           // Send mail to admin
-          await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, "");
+          await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
 
           return RedirectToAction("Desk", "Member");
         //return RedirectToAction("Index", "Home");
@@ -857,12 +857,12 @@ namespace CornerkickWebMvc.Controllers
               string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
               var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
               MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
-              await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+              await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
 
               // Uncomment to debug locally
               // TempData["ViewBagLink"] = callbackUrl;
 
-              ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-Konto zu bestätigen!";
+              ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-MANAGER Konto zu bestätigen!";
             } else {
               await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
             }
