@@ -30,6 +30,17 @@
       setView();
     });
 
+    function zoomImg(img) {
+      var small = { width: "200px" };
+      var large = { width: "800px" };
+
+      if (img.width() == "200") {
+        img.animate(large);
+      } else {
+        img.animate(small);
+      }
+    }
+
     function setView() {
       var divImg = document.getElementById("divImg");
 
@@ -107,13 +118,31 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-4">
-      <p><a href="/Home/UserManual" class="btn btn-default" style="font-size:20px">Anleitung &raquo;</a></p>
+  <div style="width: 100%; height: 400px; z-index: 99">
+    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Team1a.png" />
+    </div>
+
+    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Team3a.png" />
+    </div>
+
+    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/PlayerDetails.png" />
+    </div>
+
+    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Tactic.png" />
+    </div>
+
+    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Game.png" />
     </div>
   </div>
 
-  <p style="position: relative; margin-top: 30px">Version: 1.33.2</p>
+  <p><a href="/Home/UserManual" class="btn btn-default" style="font-size:20px">Anleitung &raquo;</a></p>
+
+  <p style="position: relative; margin-top: 30px">Version: 1.34.0</p>
   <p style="position: relative">Commit: @System.Web.Configuration.WebConfigurationManager.AppSettings["appharbor.commit_id"]</p>
 </body>
 </html>

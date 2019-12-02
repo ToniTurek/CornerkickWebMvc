@@ -657,9 +657,13 @@
     <Content Include="Content\Images\stadium\stadion_S.png" />
     <Content Include="Content\Images\stadium\stadium_surrounding.png" />
     <Content Include="Content\Images\tactic.png" />
+    <Content Include="Content\Images\user_manual\Game.png" />
     <Content Include="Content\Images\user_manual\LiveGame_options.png" />
     <Content Include="Content\Images\user_manual\Nego2.png" />
+    <Content Include="Content\Images\user_manual\PlayerDetails.PNG" />
+    <Content Include="Content\Images\user_manual\Tactic.PNG" />
     <Content Include="Content\Images\user_manual\Team0.PNG" />
+    <Content Include="Content\Images\user_manual\Team1a.PNG" />
     <Content Include="Content\Images\user_manual\Team3a.PNG" />
     <Content Include="Content\spectrum.css" />
     <Content Include="Content\themes\base\accordion.css" />
