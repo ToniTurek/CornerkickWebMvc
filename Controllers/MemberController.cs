@@ -1832,6 +1832,15 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td align=\"center\">" + iStat[0] + "</td>";
       }
       sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Minuten</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[28].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
       sBox += "<tr>";
       sBox += "<td align=\"right\">Tore</td>";
       for (int i = 0; i < nStatLength; i++) {
@@ -1927,7 +1936,7 @@ namespace CornerkickWebMvc.Controllers
       sBox += "</tr>";
 
       sBox += "<tr>";
-      sBox += "<td align=\"right\">Vorlagen</td>";
+      sBox += "<td align=\"right\">Torvorlagen</td>";
       for (int i = 0; i < nStatLength; i++) {
         int[] iStat = plStat[i].iStat;
         sBox += "<td align=\"center\">" + iStat[8].ToString() + "</td>";
@@ -1961,6 +1970,14 @@ namespace CornerkickWebMvc.Controllers
       sBox += "</tr>";
 
       sBox += "<tr>";
+      sBox += "<td align=\"right\">Torschussvorl.</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[27].ToString() + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
       sBox += "<td align=\"right\">Abspiel +</td>";
       for (int i = 0; i < nStatLength; i++) {
         int[] iStat = plStat[i].iStat;
@@ -1983,6 +2000,14 @@ namespace CornerkickWebMvc.Controllers
         string s = "-";
         if (iStat[15] + iStat[16] > 0) s = (iStat[15] / (float)(iStat[15] + iStat[16])).ToString("0.0%");
         sBox += "<td align=\"center\">" + s + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Pässe abgef.</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        sBox += "<td align=\"center\">" + iStat[26].ToString() + "</td>";
       }
       sBox += "</tr>";
 
