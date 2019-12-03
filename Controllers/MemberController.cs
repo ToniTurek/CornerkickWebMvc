@@ -1842,6 +1842,26 @@ namespace CornerkickWebMvc.Controllers
       sBox += "</tr>";
 
       sBox += "<tr>";
+      sBox += "<td align=\"right\">Min./Spiel</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string sMinPerGame = "-";
+        if (iStat[0] > 0) sMinPerGame = (iStat[28] / (float)iStat[0]).ToString("0");
+        sBox += "<td align=\"center\">" + sMinPerGame + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
+      sBox += "<td align=\"right\">Note</td>";
+      for (int i = 0; i < nStatLength; i++) {
+        int[] iStat = plStat[i].iStat;
+        string sGrade = "-";
+        if (iStat[30] > 0) sGrade = ((iStat[29] * 0.1f) / iStat[30]).ToString("0.0");
+        sBox += "<td align=\"center\">" + sGrade + "</td>";
+      }
+      sBox += "</tr>";
+
+      sBox += "<tr>";
       sBox += "<td align=\"right\">Tore</td>";
       for (int i = 0; i < nStatLength; i++) {
         int[] iStat = plStat[i].iStat;
