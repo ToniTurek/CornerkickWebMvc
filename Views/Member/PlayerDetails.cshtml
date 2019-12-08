@@ -352,7 +352,10 @@
 
   @{
     string sTalent = (player.iTalent + 1).ToString();
-    string sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
+    string sClub = "vereinslos";
+    if (player.iClubId >= 0) {
+      sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
+    }
 
     <div style="position: relative; width: 100%; height: 30px">
       @{
