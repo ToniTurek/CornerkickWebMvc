@@ -130,7 +130,7 @@
     <div class="form-group">
       <label class="col-md-2 control-label" for="Wappen">Wappen (nur .png)</label>
       <div class="col-md-10">
-        @Html.TextBox("file", "", new { @class = "form-control", type = "file", accept = "*.png" }) <br />
+        @Html.TextBoxFor(m => m.fileEmblem, new { @class = "form-control", @type = "file" }) <br />
       </div>
     </div>
     <div class="form-group">

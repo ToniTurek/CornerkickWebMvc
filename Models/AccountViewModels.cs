@@ -111,6 +111,8 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "Verein")]
     public int iClubIx { get; set; }
 
+    public System.Web.HttpPostedFileBase fileEmblem { get; set; }
+
     //[Required]
     public Color cl1 = System.Drawing.Color.White;
     public Color cl2 = System.Drawing.Color.Blue;

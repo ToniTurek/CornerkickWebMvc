@@ -191,7 +191,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
 #if DEBUG
-    public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1)
+    public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #else
     private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1)
 #endif
@@ -295,6 +295,10 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
       }
 #endif
+
+      if (clb != null && fileEmblem != null) {
+        Task<bool> tkDownloadLog = Task.Run(async () => await uploadFileAsync(fileEmblem, clb.iId));
+      }
 
 #if DEBUG
       if (iU == 0) {
@@ -598,7 +602,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public bool uploadFile(HttpPostedFileBase file, int iClub)
+    public static async Task<bool> uploadFileAsync(HttpPostedFileBase file, int iClub)
     {
 #if DEBUG
       return false;
@@ -606,11 +610,13 @@ namespace CornerkickWebMvc.Controllers
 
       try {
         if (file.ContentLength > 0) {
-          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir(), "../Content/Uploads", iClub.ToString() + ".png");
+          string sFileExt = Path.GetExtension(file.FileName);
+
+          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir(), "../Content/Uploads", iClub.ToString() + sFileExt);
           file.SaveAs(sFilenameLocal);
 
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-          as3.uploadFile(sFilenameLocal, "emblems/" + iClub.ToString() + ".png", "image/custom");
+          as3.uploadFile(sFilenameLocal, "emblems/" + iClub.ToString() + sFileExt, "image/custom");
         }
 
         return true;
@@ -788,12 +794,12 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase file)
+    public async Task<ActionResult> Register(RegisterViewModel model, bool b = false)
     {
       // Check emblem
-      if (file != null) {
+      if (model.fileEmblem != null) {
         List<string> sImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
-        if (!sImageExtensions.Contains(Path.GetExtension(file.FileName).ToUpperInvariant())) {
+        if (!sImageExtensions.Contains(Path.GetExtension(model.fileEmblem.FileName).ToUpperInvariant())) {
           ModelState.AddModelError("", "Nur Bilddateien möglich!");
           return View(model);
         }
@@ -868,9 +874,7 @@ namespace CornerkickWebMvc.Controllers
             }
 
             // Create club
-            addUserToCk(appUser, model, false, model.iClubIx);
-            CornerkickManager.Club clb = ckClub();
-            if (clb != null) uploadFile(file, clb.iId);
+            addUserToCk(appUser, model, false, iClubExist: model.iClubIx, fileEmblem: model.fileEmblem);
             iniCk();
           }
 
