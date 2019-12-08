@@ -193,7 +193,7 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
     public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #else
-    private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1)
+    private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #endif
     {
       CornerkickManager.Club clubExist = null;
