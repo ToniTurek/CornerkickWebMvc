@@ -25,13 +25,14 @@ function drawGame(iState, iGameSpeed) {
         playerGlobal = drawPlayer(gLoc2);
         imgBall = drawBall();
         divBallTarget = drawBallTarget();
+        //ptBallLast = gLoc2.gBall.ptPos;
       }
 
       if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
         $("#tblComments tr").remove();
 
         gLocArray = [];
-        drawGame2(gLoc2, iState);
+        drawGame2(gLoc2, iState, iGameSpeed);
       } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
         bFinished = gLoc2.bFinished;
         if (!bFinished) {
@@ -58,7 +59,7 @@ function drawGame(iState, iGameSpeed) {
     bFinished = gLoc.bFinished;
 
     if (gLocArray.length > 2 && iState === -1) {
-      drawGame2(gLoc, iState);
+      drawGame2(gLoc, iState, iGameSpeed);
 
       // Remove first element from the array
       gLocArray.splice(0, 1);
@@ -72,7 +73,7 @@ function drawGame(iState, iGameSpeed) {
 }
 
 var iB = 0;
-function drawGame2(gLoc, iState) {
+function drawGame2(gLoc, iState, iGameSpeed) {
   //var drawGameDiv = $("#divDrawGame");
   var iPositionsValue = $('#ddlPositions').val();
 
@@ -80,7 +81,7 @@ function drawGame2(gLoc, iState) {
 
   if (iPositionsValue >= 0) {
     updatePlayer(playerGlobal, gLoc, iPositionsValue == 0);
-    updateBallPos(imgBall, divBallTarget, gLoc.gBall);
+    updateBallPos(imgBall, divBallTarget, gLoc.gBall, iGameSpeed);
     printComments(gLoc);
   }
 
@@ -131,10 +132,10 @@ function drawBallTarget() {
   var divBallTargetTmp = document.createElement("div");
   divBallTargetTmp.id = "divBallTarget";
   divBallTargetTmp.style.position = "absolute";
-  divBallTargetTmp.style.top  = "49.0%";
-  divBallTargetTmp.style.left = "49.25%";
-  divBallTargetTmp.style.width = "1.50%";
-  divBallTargetTmp.style.height = "2.25%";
+  divBallTargetTmp.style.top  = "49.1%";
+  divBallTargetTmp.style.left = "49.4%";
+  divBallTargetTmp.style.width = "1.2%";
+  divBallTargetTmp.style.height = "1.8%";
   divBallTargetTmp.style.border = "2px solid rgb(0,230,230)";
   divBallTargetTmp.style.webkitBorderRadius = "50%";
   divBallTargetTmp.style.borderRadius = "50%";
@@ -146,62 +147,89 @@ function drawBallTarget() {
   return divBallTargetTmp;
 }
 
-function updateBallPos(imgBallTmp, divBallTargetTmp, gBall) {
-  var fX = ((100 * ( gBall.Pos.X       / 122.0)) - 0.6250);
-  var fY = ((100 * ((gBall.Pos.Y + 25) /  50.0)) - 0.9375);
-  var fSizeX = 1.25 + gBall.Pos.Z;
-  var fSizeY = fSizeX * 1.5;
+//var ptBallLast;
+var ptBallTargetGlobal;
+function updateBallPos(imgBallTmp, divBallTargetTmp, gBall, iGameSpeed) {
+  if (gBall.nPassSteps > 0) {
+    //alert(gBall.nPassSteps + ", " + gBall.iPassStep);
+    ptBallTargetGlobal = gBall.ptPosTarget;
 
-  imgBallTmp.style.left = fX.toString() + '%';
-  imgBallTmp.style.top  = fY.toString() + '%';
-  imgBallTmp.style.width  = fSizeX.toString() + '%';
-  imgBallTmp.style.height = fSizeY.toString() + '%';
+    // Interpolate ball
+    if (gBall.nPassSteps - gBall.iPassStep === 0) { // Start interpolation at first pass step only
+      interpolateBall(imgBallTmp, gBall.ptPosLast, gBall.ptPosTarget, !gBall.bLowPass, 10 * gBall.nPassSteps, iGameSpeed * gBall.nPassSteps);
+    }
 
-  iB = 0;
-  if (gBall.iPassType > 0) {
-    //interpolateBall(gLoc.gBall, 10);
+    /*
+    if (gBall.nPassSteps - gBall.iPassStep === 0) {
+      ptBallLast = gBall.ptPosLast;
+    }
+
+    if (!ptBallLast) {
+      ptBallLast = gBall.ptPosLast;
+    }
+
+    interpolateBall(imgBallTmp, ptBallLast, gBall.Pos, gBall, gBall.iPassType === 2, 10, iGameSpeed);
+
+    ptBallLast.X = gBall.Pos.X;
+    ptBallLast.Y = gBall.Pos.Y;
+     */
 
     divBallTargetTmp.style.display = "block";
-    var sXbt = ((100 * ( gBall.ptPosTarget.X       / 122.0)) - 0.750).toString();
-    var sYbt = ((100 * ((gBall.ptPosTarget.Y + 25) /  50.0)) - 1.125).toString();
+    var sXbt = ((100 * ( gBall.ptPosTarget.X       / 122.0)) - 0.60).toString();
+    var sYbt = ((100 * ((gBall.ptPosTarget.Y + 25) /  50.0)) - 0.90).toString();
     divBallTargetTmp.style.left = sXbt + '%';
     divBallTargetTmp.style.top  = sYbt + '%';
   } else {
+    var ptBall = getPosPix(gBall.Pos);
+    var fSizeX = 1.25;
+    var fSizeY = fSizeX * 1.5;
+
+    imgBallTmp.style.left = ptBall[0].toString() + '%';
+    imgBallTmp.style.top  = ptBall[1].toString() + '%';
+    imgBallTmp.style.width  = fSizeX.toString() + '%';
+    imgBallTmp.style.height = fSizeY.toString() + '%';
+
     divBallTargetTmp.style.display = "none";
   }
 }
 
-function interpolateBall(gBall, nInterpSteps) {
-  var imgBall = document.getElementById('imgBall');
+function interpolateBall(imgBallTmp, pt0Ck, pt1Ck, bHighPass, nInterpSteps, iGameSpeed) {
+  var pt0 = getPosPix(pt0Ck);
+  var pt1 = getPosPix(pt1Ck);
 
-  var fX0 = ((100 * ( gBall.ptPosLast  .X       / 122.0)) - 0.6250); // Start X
-  var fY0 = ((100 * ((gBall.ptPosLast  .Y + 25) /  50.0)) - 0.9375); // Start Y
-  var fX1 = ((100 * ( gBall.ptPosTarget.X       / 122.0)) - 0.6250); // Target X
-  var fY1 = ((100 * ((gBall.ptPosTarget.Y + 25) /  50.0)) - 0.9375); // Target Y
+  interpolateBall2(imgBallTmp, 0, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed);
+}
 
-  var iPS = gBall.nPassSteps - gBall.iPassStep;
-  var fX00 = (fX0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fX1 * (iPS / gBall.nPassSteps));
-  var fY00 = (fY0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fY1 * (iPS / gBall.nPassSteps));
+function interpolateBall2(imgBallTmp, iB, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed) {
+  pt1 = getPosPix(ptBallTargetGlobal);
 
-  var fSizeX = 1.25 + ((iB + (iPS * nInterpSteps)) / (gBall.nPassSteps * nInterpSteps));
+  // Position
+  var fX = (pt0[0] * ((nInterpSteps - iB) / nInterpSteps)) + (pt1[0] * (iB / nInterpSteps));
+  var fY = (pt0[1] * ((nInterpSteps - iB) / nInterpSteps)) + (pt1[1] * (iB / nInterpSteps));
+  imgBallTmp.style.left = fX.toString() + '%';
+  imgBallTmp.style.top  = fY.toString() + '%';
+
+  // Size
+  //var fSizeX = 1.25 + ((iB + (iPS * nInterpSteps)) / (nPS * nInterpSteps));
+  var fSizeX = 1.25;
+  if (bHighPass) {
+    fSizeX = 1.25 + (1.0 - Math.pow((2.0 * (iB / nInterpSteps)) - 1.0, 2));
+  }
   var fSizeY = fSizeX * 1.5;
-
-  iPS += 1;
-  var fX01 = (fX0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fX1 * (iPS / gBall.nPassSteps));
-  var fY01 = (fY0 * ((gBall.nPassSteps - iPS) / gBall.nPassSteps)) + (fY1 * (iPS / gBall.nPassSteps));
-
-  var fX = (fX00 * ((nInterpSteps - iB) / nInterpSteps)) + (fX01 * (iB / nInterpSteps));
-  var fY = (fY00 * ((nInterpSteps - iB) / nInterpSteps)) + (fY01 * (iB / nInterpSteps));
-
-  imgBall.style.left = fX.toString() + '%';
-  imgBall.style.top  = fY.toString() + '%';
-  imgBall.style.width  = fSizeX.toString() + '%';
-  imgBall.style.height = fSizeY.toString() + '%';
+  imgBallTmp.style.width  = fSizeX.toString() + '%';
+  imgBallTmp.style.height = fSizeY.toString() + '%';
 
   if (iB < nInterpSteps) {
     iB = iB + 1;
-    setTimeout(function () { drawBallPos(gBall, nInterpSteps); }, 30);
+    setTimeout(function () { interpolateBall2(imgBallTmp, iB + 1, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed); }, iGameSpeed / nInterpSteps);
   }
+}
+
+function getPosPix(ptPos) {
+  var fX = ((100 * ( ptPos.X       / 122.0)) - 0.6250);
+  var fY = ((100 * ((ptPos.Y + 25) /  50.0)) - 0.9375);
+
+  return [fX, fY];
 }
 
 function drawPlayer(gLoc) {

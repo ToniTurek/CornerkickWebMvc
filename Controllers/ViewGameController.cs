@@ -384,8 +384,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Ball target
       if (ball.iPassStep > 0 && ball.nPassSteps > 0) {
-        if (ball.Pos.Z > 0.0) gBall.iPassType = 2;
-        else                  gBall.iPassType = 1;
+        gBall.bLowPass = ball.bLowPass;
       }
       gBall.ptPosTarget = ball.ptPos;
       gBall.ptPosLast   = ball.ptPosLast;

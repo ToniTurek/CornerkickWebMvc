@@ -72,7 +72,7 @@ namespace CornerkickWebMvc.Models
       public System.Drawing.Point ptPosTarget { get; set; }
       public System.Drawing.Point ptPosLast { get; set; }
 
-      public byte iPassType { get; set; } // 0 - no pass, 1 - low pass, 2 - high pass
+      public bool bLowPass { get; set; }
 
       public byte iPassStep  { get; set; }
       public byte nPassSteps { get; set; }
