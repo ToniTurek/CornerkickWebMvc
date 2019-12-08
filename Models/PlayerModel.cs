@@ -43,5 +43,7 @@ namespace CornerkickWebMvc.Models
 
     public int iDp { get; set; }
     public List<SelectListItem> ddlDoping { get; set; }
+
+    public bool bEditable { get; set; }
   }
 }

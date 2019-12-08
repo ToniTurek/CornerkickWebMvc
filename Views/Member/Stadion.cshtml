@@ -412,7 +412,7 @@
       }
     }
 
-    if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSeason <= 1) {
+    if (Model.bEditable) {
       <div class="form-group">
         @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
       </div>

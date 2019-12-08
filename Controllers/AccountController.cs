@@ -286,6 +286,7 @@ namespace CornerkickWebMvc.Controllers
       usr.iLevel = 1;
       usr.club = clb;
       usr.nextGame.iGameSpeed = 250;
+      usr.dtClubStart = MvcApplication.ckcore.dtDatum;
       
 #if DEBUG
       if (iU == 0) {

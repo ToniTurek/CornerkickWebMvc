@@ -377,7 +377,7 @@
 
     <div style="position: relative; width: 100%; height: 94px; margin-top: 1%">
       @{
-        if (Model.bOwnPlayer && ((MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSeason <= 1) || Model.bJouth)) {
+        if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
           <div class="form-group">
             @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
           </div>
@@ -398,7 +398,7 @@
       }
     </div>
 
-    if (Model.bOwnPlayer && (player.iNr < 1 || (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) && MvcApplication.ckcore.iSeason <= 1)) && !Model.bJouth) {
+    if (Model.bOwnPlayer && (player.iNr < 1 || Model.bEditable) && !Model.bJouth) {
       <div class="form-group">
         @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">

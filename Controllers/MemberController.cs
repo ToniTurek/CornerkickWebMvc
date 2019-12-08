@@ -1567,6 +1567,9 @@ namespace CornerkickWebMvc.Controllers
     {
       Models.PlayerModel plModel = new Models.PlayerModel();
 
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(false, JsonRequestBehavior.AllowGet);
+
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
@@ -1653,6 +1656,9 @@ namespace CornerkickWebMvc.Controllers
         if (iIndex >                       0) plModel.iPlIdPrev = club.ltPlayer[iIndex - 1].iId;
         if (iIndex < club.ltPlayer.Count - 1) plModel.iPlIdNext = club.ltPlayer[iIndex + 1].iId;
       }
+
+      // Player is editable
+      plModel.bEditable = (MvcApplication.ckcore.dtDatum - usr.dtClubStart).TotalHours < 24;
 
       return View(plModel);
     }
@@ -2905,6 +2911,9 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Stadion(Models.StadionModel stadionModel)
     {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(false, JsonRequestBehavior.AllowGet);
+
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(stadionModel);
 
@@ -2951,6 +2960,9 @@ namespace CornerkickWebMvc.Controllers
         }
       }
       */
+
+      // Stadium name editable
+      stadionModel.bEditable = (MvcApplication.ckcore.dtDatum - usr.dtClubStart).TotalHours < 24;
 
       return View(stadionModel);
     }
