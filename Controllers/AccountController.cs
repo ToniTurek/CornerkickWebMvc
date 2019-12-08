@@ -282,6 +282,9 @@ namespace CornerkickWebMvc.Controllers
         clb.sName = applicationUser.Vereinsname;
       }
 
+      // Set club account to 10 mio.
+      clb.iBalance = 10000000;
+      
       CornerkickManager.User usr = createUser(applicationUser);
       usr.iLevel = 1;
       usr.club = clb;
