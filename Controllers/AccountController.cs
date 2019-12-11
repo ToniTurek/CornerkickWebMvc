@@ -616,7 +616,12 @@ namespace CornerkickWebMvc.Controllers
         if (file.ContentLength > 0) {
           string sFileExt = Path.GetExtension(file.FileName);
 
-          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir(), "..", "Content", "Uploads", "emblems", iClub.ToString() + sFileExt);
+          // Get base directory
+          string sBaseDir = MvcApplication.ckcore.sHomeDir;
+          if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
+          sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
+
+          string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", "emblems", iClub.ToString() + sFileExt);
           MvcApplication.ckcore.tl.writeLog("Save emblem to '" + sFilenameLocal + "'");
           file.SaveAs(sFilenameLocal);
 
