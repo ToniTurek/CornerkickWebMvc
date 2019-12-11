@@ -301,7 +301,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       if (clb != null && fileEmblem != null) {
-        Task<bool> tkDownloadLog = Task.Run(async () => await uploadFileAsync(fileEmblem, clb.iId));
+        Task<bool> tkUploadEmblem = Task.Run(async () => await uploadFileAsync(fileEmblem, clb.iId));
       }
 
 #if DEBUG
@@ -616,7 +616,8 @@ namespace CornerkickWebMvc.Controllers
         if (file.ContentLength > 0) {
           string sFileExt = Path.GetExtension(file.FileName);
 
-          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir(), "../Content/Uploads", iClub.ToString() + sFileExt);
+          string sFilenameLocal = Path.Combine(MvcApplication.getHomeDir(), "..", "Content", "Uploads", "emblems", iClub.ToString() + sFileExt);
+          MvcApplication.ckcore.tl.writeLog("Save emblem to '" + sFilenameLocal + "'");
           file.SaveAs(sFilenameLocal);
 
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
