@@ -1191,7 +1191,31 @@ namespace CornerkickWebMvc.Controllers
 
         if (result.Succeeded) {
           CornerkickManager.User usr = ckUser();
-          if (usr.club   != null) usr.club  .user = null;
+
+          if (usr.club != null) {
+            // Set CPU name to club
+            string sNameNew = "";
+            int iC = 0;
+            while (iC < 10000) {
+              iC++;
+              sNameNew = "Team_" + MvcApplication.ckcore.sLand[usr.club.iLand] + "_" + iC.ToString();
+
+              bool bFound = true;
+              foreach (CornerkickManager.Club clbExist in MvcApplication.ckcore.ltClubs) {
+                if (clbExist.sName.Equals(sNameNew)) {
+                  bFound = false;
+                  break;
+                }
+              }
+
+              if (bFound) break;
+            }
+            if (!string.IsNullOrEmpty(sNameNew)) usr.club.sName = sNameNew;
+
+            // Clear user
+            usr.club.user = null;
+          }
+
           if (usr.nation != null) usr.nation.user = null;
           MvcApplication.ckcore.ltUser.Remove(usr);
 
