@@ -284,6 +284,10 @@ namespace CornerkickWebMvc.Controllers
 
       // Set club account to 10 mio.
       clb.iBalance = 10000000;
+
+      // Clear sponsors
+      clb.sponsorMain = new CornerkickManager.Finance.Sponsor();
+      clb.ltSponsorBoards.Clear();
       
       CornerkickManager.User usr = createUser(applicationUser);
       usr.iLevel = 1;
