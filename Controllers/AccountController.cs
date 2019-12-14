@@ -613,17 +613,19 @@ namespace CornerkickWebMvc.Controllers
     public static async Task<bool> uploadFileAsync(HttpPostedFileBase file, int iClub)
     {
 #if DEBUG
-      return false;
+      //return false;
 #endif
 
       try {
-        if (file.ContentLength > 0) {
+        if (file != null && file.ContentLength > 0) {
           string sFileExt = Path.GetExtension(file.FileName);
 
           // Get base directory
           string sBaseDir = MvcApplication.ckcore.sHomeDir;
           if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
+#if !DEBUG
           sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
+#endif
 
           string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", "emblems", iClub.ToString() + sFileExt);
           MvcApplication.ckcore.tl.writeLog("Save emblem to '" + sFilenameLocal + "'");
