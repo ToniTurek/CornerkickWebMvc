@@ -19,6 +19,8 @@ namespace CornerkickWebMvc.Models
     public string sStrength { get; set; }
     public byte   iWeather { get; set; }
 
+    public bool bEmblemExist { get; set; }
+
     public List<SelectListItem> ddlDeleteLog { get; set; }
     public int iDeleteLog { get; set; }
 

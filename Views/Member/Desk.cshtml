@@ -144,6 +144,12 @@
           </div>
         }
       }
+
+      if (!Model.bEmblemExist) {
+        <div style="position: relative; width: 100%; text-align: center">
+          @Html.ActionLink("Sie haben noch kein Wappen für Ihren Verein ausgewählt", "ClubDetails", "Member", new { iClub = clb.iId }, new { @style = "color:orange" })
+        </div>
+      }
       @*
         <h2>Schreibtisch</h2>
       *@

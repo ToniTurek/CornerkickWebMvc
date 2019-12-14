@@ -411,6 +411,9 @@ namespace CornerkickWebMvc.Controllers
       desk.sKFM = "K: " + fTeamAve[0].ToString("0.0%") + ", F: " + fTeamAve[1].ToString("0.0%") + ", M: " + fTeamAve[2].ToString("0.0%");
       desk.sStrength = "Durchschnittsstärke (Startelf): " + fTeamAve[3].ToString("0.00") + fTeamAve11[3].ToString(" (0.00)");
 
+      // Check if emblem exist
+      desk.bEmblemExist = !getClubEmblem(club).StartsWith("<img src=\"/Content/Uploads/emblems/0.png");
+
       return View(desk);
     }
 
@@ -3719,12 +3722,19 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Club Details"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-    public ActionResult ClubDetails(Models.ClubModel mdClub, int iClub)
+    public ActionResult ClubDetails(Models.ClubModel mdClub, int iClub, HttpPostedFileBase file = null)
     {
+      if (file != null) AccountController.uploadFileAsync(file, iClub);
+
       if (iClub >= 0 && iClub < MvcApplication.ckcore.ltClubs.Count) {
         mdClub.club = MvcApplication.ckcore.ltClubs[iClub];
 
         mdClub.sEmblem = getClubEmblem(mdClub.club, "height: 100%; width: 100%; object-fit: contain");
+
+        // Check if own club and emblem exist
+        if (ckClub() == mdClub.club) {
+          mdClub.bEmblemEditable = mdClub.sEmblem.StartsWith("<img src=\"/Content/Uploads/emblems/0.png");
+        }
 
         mdClub.sRecordLWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 0));
         mdClub.sRecordLWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 1));

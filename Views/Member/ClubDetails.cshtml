@@ -10,9 +10,9 @@
 <head>
   <script type="text/javascript">
     $(document).ready(function () {
-      document.getElementById("divEmblem").style.backgroundImage = '';
+      var divEmblem = document.getElementById("divEmblemClub");
       var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
-      $("#divEmblemClub").html(sEmblemImg);
+      divEmblem.innerHTML += sEmblemImg;
     });
   </script>
 </head>
@@ -47,7 +47,23 @@
   }
 
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
-    <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; border: 1px solid black"></div>
+    <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; text-align: center; border: 1px solid black; z-index: 99">
+     @if (Model.bEmblemEditable) {
+        using (Html.BeginForm("ClubDetails",
+                              "Member",
+                              new { iClub = Model.club.iId },
+                              FormMethod.Post,
+                              new { enctype = "multipart/form-data" })) {
+          <div style="position: absolute; padding-top: 10px; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.9)">
+            <label>
+              Wappen auswählen
+              <input name="file" type="file" size="10" accept="image/png" style="position: absolute; left: -40px;">
+            </label>
+            <input type="submit" class="btn btn-default" style="position: absolute; left: 0px; top: 77px; width: 100%" value="hochladen" />
+          </div>
+        }
+      }
+    </div>
 
     <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
       <table cellpadding="3" style="width: auto">

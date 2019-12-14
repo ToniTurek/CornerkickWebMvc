@@ -12,6 +12,8 @@ namespace CornerkickWebMvc.Models
     // Emblem
     public string sEmblem { get; set; }
 
+    public bool bEmblemEditable { get; set; }
+
     // Record games
     // League
     public string sRecordLWinH;
