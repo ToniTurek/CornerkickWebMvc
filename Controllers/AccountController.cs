@@ -641,6 +641,18 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
+    public static async Task<bool> deleteFileAsync(string sKey)
+    {
+      try {
+        AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+        as3.deleteFile(sKey);
+
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
     public ApplicationSignInManager SignInManager {
       get {
         return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
@@ -1220,6 +1232,24 @@ namespace CornerkickWebMvc.Controllers
 
             // Clear user
             usr.club.user = null;
+
+            // Delete emblem
+            string sBaseDir = MvcApplication.ckcore.sHomeDir;
+            if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
+#if !DEBUG
+            sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
+#endif
+
+            foreach (string sFileExt in new string[3] { ".png", ".jpg", ".gif" }) {
+              string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", "emblems", usr.club.iId.ToString() + sFileExt);
+              try {
+                System.IO.File.Delete(sFilenameLocal);
+              } catch {
+              }
+
+              // Remove emblem from aws
+              deleteFileAsync("emblems/" + usr.club.iId + sFileExt);
+            }
           }
 
           if (usr.nation != null) usr.nation.user = null;

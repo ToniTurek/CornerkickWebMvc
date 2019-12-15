@@ -82,12 +82,14 @@ namespace CornerkickWebMvc
       }
     }
 
-    private void deleteFile(string sKey, IAmazonS3 client)
+    internal void deleteFile(string sKey, IAmazonS3 client = null)
     {
 #if _NO_UPLOAD
       return;
 
 #endif
+      if (client == null) client = new AmazonS3Client(sAwsKeyId, sAwsSecretKey, bucketRegion);
+
       DeleteObjectRequest deleteRequest = new DeleteObjectRequest();
       deleteRequest.BucketName = sBucketName;
       deleteRequest.Key = sKey;
