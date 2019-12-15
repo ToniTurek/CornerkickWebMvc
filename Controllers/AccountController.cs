@@ -906,7 +906,8 @@ namespace CornerkickWebMvc.Controllers
             iniCk();
           }
 
-          MvcApplication.save(MvcApplication.timerCkCalender);
+          // Save
+          Task<bool> tkSave = Task.Run(async () => await MvcApplication.saveAsync(MvcApplication.timerCkCalender));
 
           if (MvcApplication.settings.bEmailCertification) {
             return View("Info");
