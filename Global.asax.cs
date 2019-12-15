@@ -582,6 +582,11 @@ namespace CornerkickWebMvc
     }
     */
 
+    internal static async Task<bool> saveAsync(System.Timers.Timer timerCkCalender, bool bForce = false)
+    {
+      save(timerCkCalender, bForce);
+      return true;
+    }
     internal static void save(System.Timers.Timer timerCkCalender, bool bForce = false)
     {
       // Don't save if calendar to fast
