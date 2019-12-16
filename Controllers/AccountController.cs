@@ -904,6 +904,9 @@ namespace CornerkickWebMvc.Controllers
             // Create club
             addUserToCk(appUser, model, false, iClubExist: model.iClubIx, fileEmblem: model.fileEmblem);
             iniCk();
+
+            // Send mail to admin
+            await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered");
           }
 
           // Save
@@ -1260,6 +1263,10 @@ namespace CornerkickWebMvc.Controllers
 
           // Sign out
           AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+
+          // Send mail to admin
+          await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User retired: " + sUserName, sUserName + " has retired");
+
           return RedirectToAction("Index", "Home");
         }
       }
