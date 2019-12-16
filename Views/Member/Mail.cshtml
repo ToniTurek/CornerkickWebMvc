@@ -148,7 +148,7 @@
 
         if (iFrom < 0) {
           sFrom = "Admin";
-        } else {
+        } else if (iFrom < MvcApplication.ckcore.ltUser.Count) {
           CornerkickManager.User user = MvcApplication.ckcore.ltUser[iFrom];
           sFrom = user.sFirstname + " " + user.sSurname;
           sFrom += " (" + user.club.sName + ")";
