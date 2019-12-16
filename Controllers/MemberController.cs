@@ -4208,27 +4208,33 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupGold(Models.CupGoldModel cupGoldModel)
     {
+      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
+      cupGoldModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupGold, MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
+
       return View(cupGoldModel);
     }
 
-    public JsonResult setCupGold(int iMatchday)
+    public JsonResult setCupGold(int iMatchday, int iGroup)
     {
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
 
-      return Json(getCupTeams(cupGold, iMatchday), JsonRequestBehavior.AllowGet);
+      return Json(getCupTeams(cupGold, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
 
     //[Authorize]
     public ActionResult CupSilver(Models.CupSilverModel cupSilverModel)
     {
+      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+      cupSilverModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupSilver, MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
+
       return View(cupSilverModel);
     }
 
-    public JsonResult setCupSilver(int iMatchday)
+    public JsonResult setCupSilver(int iMatchday, int iGroup)
     {
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
 
-      return Json(getCupTeams(cupSilver, iMatchday), JsonRequestBehavior.AllowGet);
+      return Json(getCupTeams(cupSilver, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
 
     //[Authorize]
@@ -4247,13 +4253,13 @@ namespace CornerkickWebMvc.Controllers
       return Json(getCupTeams(cupWc, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult CupWcGetLeague(int iSaison, int iMatchday, sbyte iGroup)
+    public JsonResult CupGetLeague(int iCupId, int iSaison, int iMatchday, sbyte iGroup)
     {
       string sBox = "";
 
-      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
-      if (cupWc.checkCupGroupPhase(iMatchday)) {
-        sBox = getTable(cupWc, iMatchday + 1, iGroup, iColor1: 2);
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(iCupId);
+      if (cup.checkCupGroupPhase(iMatchday)) {
+        sBox = getTable(cup, iMatchday + 1, iGroup, iColor1: 2);
       }
 
       return Json(sBox, JsonRequestBehavior.AllowGet);

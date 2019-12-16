@@ -14,10 +14,15 @@
 
   <script>
     $(document).ready(function () {
-      setMatchday(0);
+      var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
+      setMatchdayCupSilver(iMatchday, 0);
 
-      $("#ddlMatchday").change(function () {
-        setMatchday($(this).val());
+      $("#ddlGroupsCupSilver").change(function () {
+        setMatchdayCupSilver($("#ddlMatchdayCupSilver").val(), $(this).val());
+      });
+
+      $("#ddlMatchdayCupSilver").change(function () {
+        setMatchdayCupSilver($(this).val(), $("#ddlGroupsCupSilver").val());
       });
     });
   </script>
@@ -25,11 +30,17 @@
 
 <body style="height: 100%; min-height: 100%">
   <label style="margin-left: 10px">
+    Gruppe:
+    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupSilver" })
+  </label>
+
+  <label style="margin-left: 10px">
     Spieltag:
-    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchday" })
+    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupSilver" })
   </label>
 
   <div id="tableDivCupSilverTeams"></div>
+  <div id="divCupSilverTable" style="position: relative; width: 100%"></div>
 
   <div id="divCupSilverScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
 </body>

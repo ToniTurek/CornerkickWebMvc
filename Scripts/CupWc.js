@@ -1,4 +1,4 @@
-﻿function setMatchday(iMd, iGroup) {
+﻿function setMatchdayCupWc(iMd, iGroup) {
   $.ajax({
     url: '/Member/setCupWc',
     type: "GET",
@@ -20,19 +20,19 @@ function actionDrawTeams(sTeams) {
 
 function drawTableWc() {
   var iMd = parseInt($('#ddlMatchdayCupWc').val());
-  var iGp = $('#iGroup')     .val();
+  var iGp = parseInt($('#ddlGroupsCupWc').val());
 
   var divTableWc = $("#divCupWcTable");
-  var divScorer = $("#divLeagueScorer");
+  var divScorer = $("#divCupWcScorer");
 
   divTableWc.html('');
   divScorer.html('');
 
   $.ajax({
-    url: '/Member/CupWcGetLeague',
+    url: '/Member/CupGetLeague',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: 1, iMatchday: iMd, iGroup: iGp },
+    data: { iCupId: 7, iSaison: 1, iMatchday: iMd, iGroup: iGp },
     success: function (sTable) {
       var sBox = drawTable(sTable);
       divTableWc.html(sBox).show();
