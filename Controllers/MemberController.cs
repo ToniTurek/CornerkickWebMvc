@@ -5259,8 +5259,6 @@ namespace CornerkickWebMvc.Controllers
         mdUser.ltDdlUser.Add(new SelectListItem { Text = sName, Value = iU.ToString() });
       }
 
-      mdUser.ltUserMail = new List<CornerkickManager.Main.News>();
-
       CornerkickManager.User user = ckUser();
 
       mdUser.ltUserMail = new List<CornerkickManager.Main.News>();
