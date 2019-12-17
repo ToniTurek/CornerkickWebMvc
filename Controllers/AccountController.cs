@@ -1254,6 +1254,15 @@ namespace CornerkickWebMvc.Controllers
               // Remove emblem from aws
               Task<bool> tkDeleteEmblem = Task.Run(async () => await deleteFileAsync("emblems/" + usr.club.iId + sFileExt));
             }
+
+            // Remove staff
+            usr.club.staff = new CornerkickManager.Main.Staff();
+
+            // Clear training
+            usr.club.training = new CornerkickManager.Main.Training();
+
+            // Clear captain
+            usr.club.iCaptainId = new int[3] { -1, -1, -1 };
           }
 
           if (usr.nation != null) usr.nation.user = null;
