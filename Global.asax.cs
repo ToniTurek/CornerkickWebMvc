@@ -794,6 +794,9 @@ namespace CornerkickWebMvc
 
       // Download log async
       Task<bool> tkDownloadLog = Task.Run(async () => await downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip"));
+
+      // Download Google ads.txt async
+      Task<bool> tkDownloadAds = Task.Run(async () => await downloadFileAsync(as3, "ads.txt", sHomeDir));
 #endif
 #endif
 
