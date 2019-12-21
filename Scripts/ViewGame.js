@@ -345,7 +345,7 @@ function updatePlayer(player, gLoc, bShowLookAt) {
 
   var iP = 0;
 
-  // Player home
+  // For each player
   for (iP = 0; iP < 22; iP++) {
     var pl = gLoc.ltPlayer[iP];
 
@@ -383,6 +383,20 @@ function updatePlayer(player, gLoc, bShowLookAt) {
       */
     } else {
       player[iP].style.display = "none";
+    }
+  }
+}
+
+function changePlayerJerseyColor(iHA, cl1, cl2) {
+  if (iHA === 0) {
+    for (iP = 0; iP < 11; iP++) {
+      playerGlobal[iP].style.backgroundColor = cl1;
+      playerGlobal[iP].style.borderColor = cl2;
+    }
+  } else if (iHA === 1) {
+    for (iP = 11; iP < 22; iP++) {
+      playerGlobal[iP].style.backgroundColor = cl1;
+      playerGlobal[iP].style.borderColor = cl2;
     }
   }
 }
