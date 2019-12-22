@@ -284,10 +284,23 @@ namespace CornerkickWebMvc.Controllers
 
       // Set club account to 10 mio.
       clb.iBalance = 10000000;
-
+      clb.iBalanceSecret = 0;
+      
       // Clear sponsors
       clb.sponsorMain = new CornerkickManager.Finance.Sponsor();
       clb.ltSponsorBoards.Clear();
+      
+      // Clear account
+      clb.ltAccount.Clear();
+      
+      // Remove staff
+      clb.staff = new CornerkickManager.Main.Staff();
+
+      // Clear training
+      clb.training = new CornerkickManager.Main.Training();
+
+      // Clear captain
+      clb.iCaptainId = new int[3] { -1, -1, -1 };
       
       CornerkickManager.User usr = createUser(applicationUser);
       usr.iLevel = 1;
@@ -1254,15 +1267,6 @@ namespace CornerkickWebMvc.Controllers
               // Remove emblem from aws
               Task<bool> tkDeleteEmblem = Task.Run(async () => await deleteFileAsync("emblems/" + usr.club.iId + sFileExt));
             }
-
-            // Remove staff
-            usr.club.staff = new CornerkickManager.Main.Staff();
-
-            // Clear training
-            usr.club.training = new CornerkickManager.Main.Training();
-
-            // Clear captain
-            usr.club.iCaptainId = new int[3] { -1, -1, -1 };
           }
 
           if (usr.nation != null) usr.nation.user = null;
