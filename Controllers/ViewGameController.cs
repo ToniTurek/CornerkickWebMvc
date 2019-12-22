@@ -1020,7 +1020,37 @@ namespace CornerkickWebMvc.Controllers
         userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
       }
 
-      userAdmin.game.player[iHA][iPl].ptPos = new System.Drawing.Point(iX, iY);
+      if (iHA < 0) {
+        userAdmin.game.ball.ptPos = new System.Drawing.Point(iX, iY);
+        userAdmin.game.ball.iPassStep  = 0;
+        userAdmin.game.ball.nPassSteps = 0;
+        userAdmin.game.ball.setPos();
+        userAdmin.game.ball.plAtBall = null;
+      } else {
+        userAdmin.game.player[iHA][iPl].ptPos = new System.Drawing.Point(iX, iY);
+      }
+
+      for (int jHA = 0; jHA < 2; jHA++) {
+        foreach (CornerkickGame.Player pl in userAdmin.game.player[jHA]) {
+          if (pl.ptPos == userAdmin.game.ball.ptPos) {
+            userAdmin.game.ball.plAtBall = pl;
+            break;
+          }
+        }
+      }
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult AdminSetReferee(Models.ViewGameModel view, float fReferee)
+    {
+      CornerkickManager.User userAdmin = ckUser();
+
+      if (userAdmin.game == null) {
+        userAdmin.game = MvcApplication.ckcore.game.tl.getDefaultGame();
+      }
+
+      userAdmin.game.data.referee.fStrict = fReferee;
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

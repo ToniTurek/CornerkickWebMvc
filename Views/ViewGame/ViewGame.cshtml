@@ -238,6 +238,7 @@
         });
       });
 
+      // Admin options
       $("#bnAdminSetPos").click(function () {
         var iHA = document.getElementById("ddlAdminSetPosHA").value;
         var iPl = document.getElementById("ddlAdminSetPosPl").value;
@@ -248,6 +249,18 @@
           type: "GET",
           dataType: "JSON",
           data: { iHA: iHA, iPl: iPl, iX: iX, iY: iY },
+          success: function () {
+            drawGame(-2);
+          }
+        });
+      });
+
+      $("#itAdminReferee").keyup(function () {
+        $.ajax({
+          url: '/ViewGame/AdminSetReferee',
+          type: "GET",
+          dataType: "JSON",
+          data: { fReferee: $(this).val() },
           success: function () {
             drawGame(-2);
           }
@@ -607,7 +620,7 @@
 
       $("#dialogAdminOptions").dialog({
         autoOpen: false,
-        height: 210,
+        height: 240,
         width: 280
       });
 
@@ -1054,6 +1067,12 @@
         Target Pos.
       </label>
     </div>
+    <div style="position: relative; height: 30px; width: 100%">
+      <label>
+        Referee:
+        <input id="itAdminReferee" style="width: 40px" type="text" value="1" data-val="true" autocomplete="off">
+      </label>
+    </div>
     <div style="position: relative; height: 40px">
       <label>
         Nächste Aktion:
@@ -1069,11 +1088,11 @@
     </div>
     <div style="position: relative; width: 240px; height: 40px">
       <select id="ddlAdminSetPosHA">
+        <option value="-1">Ball</option>
         <option value="0">H</option>
         <option value="1">A</option>
       </select>
       <select id="ddlAdminSetPosPl">
-        <option value="-1">Ball</option>
         <option value="0">1</option>
         <option value="1">2</option>
         <option value="2">3</option>
