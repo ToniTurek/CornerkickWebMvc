@@ -325,6 +325,11 @@
             title: "Stärke",
             includeZero: false
           },
+          axisY2: {
+            title: "Marktwert [mio. €]",
+            valueFormatString: "#,,.",
+            includeZero: false
+          },
           legend: {
             horizontalAlign: "center", // left, center ,right
             verticalAlign: "bottom",  // top, center, bottom
@@ -336,7 +341,14 @@
               type: "line",
               xValueType: "dateTime",
               yValueFormatString: "0.00",
-              dataPoints: dataDev
+              dataPoints: dataDev[0]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              xValueType: "dateTime",
+              axisYType: "secondary",
+              dataPoints: dataDev[1]
             }
           ]
         });

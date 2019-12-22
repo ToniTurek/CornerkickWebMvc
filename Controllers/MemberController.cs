@@ -1799,19 +1799,23 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
 
-      List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
+      List<Models.DataPointGeneral>[] ltDataPoints = new List<Models.DataPointGeneral>[2];
+      ltDataPoints[0] = new List<Models.DataPointGeneral>(); // Skill
+      ltDataPoints[1] = new List<Models.DataPointGeneral>(); // Value
 
       foreach (CornerkickGame.Player.History hty in pl.ltHistory) {
         long iDate = convertDateTimeToTimestamp(hty.dt);
-        dataPoints.Add(new Models.DataPointGeneral(iDate, hty.fStrength));
+        ltDataPoints[0].Add(new Models.DataPointGeneral(iDate, hty.fStrength));
+        if (hty.iValue > 0) ltDataPoints[1].Add(new Models.DataPointGeneral(iDate, hty.iValue * 1000));
       }
 
       long iDateCurrent = convertDateTimeToTimestamp(MvcApplication.ckcore.dtDatum);
-      dataPoints.Add(new Models.DataPointGeneral(iDateCurrent, CornerkickGame.Tool.getAveSkill(pl, bIdeal: true)));
+      ltDataPoints[0].Add(new Models.DataPointGeneral(iDateCurrent, CornerkickGame.Tool.getAveSkill(pl, bIdeal: true)));
+      ltDataPoints[1].Add(new Models.DataPointGeneral(iDateCurrent, pl.getValue(MvcApplication.ckcore.dtDatum) * 1000));
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
-      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+      return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
     public JsonResult PlayerDetailsGetStatistic(int iPlayer, bool bSeason = true)
