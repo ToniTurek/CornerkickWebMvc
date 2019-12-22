@@ -918,8 +918,13 @@ namespace CornerkickWebMvc.Controllers
             addUserToCk(appUser, model, false, iClubExist: model.iClubIx, fileEmblem: model.fileEmblem);
             iniCk();
 
+#if !DEBUG
             // Send mail to admin
-            await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered");
+            try {
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered");
+            } catch {
+            }
+#endif
           }
 
           // Save
