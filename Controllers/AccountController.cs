@@ -734,12 +734,15 @@ namespace CornerkickWebMvc.Controllers
 
           iniCk();
 
+#if !DEBUG
           // Send mail to admin
-          await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
+          try {
+            await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
+          } catch {
+          }
+#endif
 
           return RedirectToAction("Desk", "Member");
-        //return RedirectToAction("Index", "Home");
-        //return View(model);
         case SignInStatus.LockedOut:
           return View("Lockout");
         case SignInStatus.RequiresVerification:
