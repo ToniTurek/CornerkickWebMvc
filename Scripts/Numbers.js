@@ -3,6 +3,8 @@
 }
 
 function getIntFromString(s) {
+  if (!s) return 0;
+
   s = s.toString();
 
   s = s.replace(/\./g, '');

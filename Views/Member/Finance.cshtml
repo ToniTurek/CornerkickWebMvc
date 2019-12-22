@@ -18,7 +18,7 @@
 
 <body>
   <script type="text/javascript">
-    function getBudget(bEdit, iYear) {
+    function getBudget(bEdit, iYear, bSet) {
       if (iYear >= 0) bEdit = false;
 
       $.ajax({
@@ -29,18 +29,37 @@
         success: function (sBudget) {
           // Plan
           if (bEdit) {
-            var inputIn = "<input class=\"form-control tbBudgetIn\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
-            document.getElementById('tdInSpecPlan')        .innerHTML = inputIn  + sBudget[0][0] + ">";
-            document.getElementById('tdInBonusCupPlan')    .innerHTML = inputIn  + sBudget[0][1] + ">";
-            document.getElementById('tdInBonusSponsorPlan').innerHTML = inputIn  + sBudget[0][2] + ">";
-            document.getElementById('tdInTransferPlan')    .innerHTML = inputIn  + sBudget[0][3] + ">";
+            if (bSet) {
+              var inputIn = "<input class=\"form-control tbBudgetIn\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
+              document.getElementById('tdInSpecPlan')        .innerHTML = inputIn  + sBudget[0][0] + ">";
+              document.getElementById('tdInBonusCupPlan')    .innerHTML = inputIn  + sBudget[0][1] + ">";
+              document.getElementById('tdInBonusSponsorPlan').innerHTML = inputIn  + sBudget[0][2] + ">";
+              document.getElementById('tdInTransferPlan')    .innerHTML = inputIn  + sBudget[0][3] + ">";
 
-            var inputPay = "<input class=\"form-control tbBudgetPay\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
-            document.getElementById('tdPaySalaryPlan')     .innerHTML = inputPay + sBudget[0][4] + ">";
-            document.getElementById('tdPayStaffPlan')      .innerHTML = inputPay + sBudget[0][5] + ">";
-            document.getElementById('tdPayTransferPlan')   .innerHTML = inputPay + sBudget[0][6] + ">";
-            document.getElementById('tdPayStadiumPlan')    .innerHTML = inputPay + sBudget[0][7] + ">";
-            document.getElementById('tdPayInterestPlan')   .innerHTML = inputPay + sBudget[0][8] + ">";
+              var inputPay = "<input class=\"form-control tbBudgetPay\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
+              document.getElementById('tdPaySalaryPlan')     .innerHTML = inputPay + sBudget[0][4] + ">";
+              document.getElementById('tdPayStaffPlan')      .innerHTML = inputPay + sBudget[0][5] + ">";
+              document.getElementById('tdPayTransferPlan')   .innerHTML = inputPay + sBudget[0][6] + ">";
+              document.getElementById('tdPayStadiumPlan')    .innerHTML = inputPay + sBudget[0][7] + ">";
+              document.getElementById('tdPayInterestPlan')   .innerHTML = inputPay + sBudget[0][8] + ">";
+            }
+
+            // Set thousand separator to text boxes
+            $('.tbBudgetIn').each(function () {
+              $(this).autoNumeric('init', {
+                aSep: '.',
+                aDec: ',',
+                mDec: '0'
+              });
+            });
+
+            $('.tbBudgetPay').each(function () {
+              $(this).autoNumeric('init', {
+                aSep: '.',
+                aDec: ',',
+                mDec: '0'
+              });
+            });
           } else {
             document.getElementById('tdInSpecPlan')        .innerHTML = sBudget[0][0];
             document.getElementById('tdInBonusCupPlan')    .innerHTML = sBudget[0][1];
@@ -104,7 +123,7 @@
         //data: jsModel.budgetPlan,
         data: { iBudgetIn: iBudgetIn, iBudgetPay: iBudgetPay },
         success: function (result) {
-          getBudget(@Html.Raw(Json.Encode(Model.bEditable)), -1);
+          getBudget(@Html.Raw(Json.Encode(Model.bEditable)), -1, false);
         }
       });
     }
@@ -113,24 +132,7 @@
       var bEdit = @Html.Raw(Json.Encode(Model.bEditable));
 
       setEintritt();
-      getBudget(bEdit, -1);
-
-      // Set thousand separator to text boxes
-      $('.tbBudgetIn').each(function () {
-        $(this).autoNumeric('init', {
-          aSep: '.',
-          aDec: ',',
-          mDec: '0'
-        });
-      });
-
-      $('.tbBudgetPay').each(function () {
-        $(this).autoNumeric('init', {
-          aSep: '.',
-          aDec: ',',
-          mDec: '0'
-        });
-      });
+      getBudget(bEdit, -1, true);
 
       $('.tbEintritt').each(function () {
         $(this).on('keyup', function (ev) {
@@ -166,7 +168,7 @@
       });
 
       $('#ddlYear').on('change', function (ev) {
-        getBudget(bEdit, $(this).val());
+        getBudget(bEdit, $(this).val(), true);
       });
 
       $('#fBalanceSecretFracAdmissionPrice').change(function () {

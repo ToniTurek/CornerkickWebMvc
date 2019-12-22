@@ -4807,15 +4807,15 @@ namespace CornerkickWebMvc.Controllers
       sBudget[1] = new string[12]; // Real
 
       for (byte i = 0; i < 2; i++) {
-        sBudget[i][0] = bd[i].iInSpec.ToString("#,#", getCi());
-        sBudget[i][1] = bd[i].iInBonusCup.ToString("#,#", getCi());
-        sBudget[i][2] = bd[i].iInBonusSponsor.ToString("#,#", getCi());
-        sBudget[i][3] = bd[i].iInTransfer.ToString("#,#", getCi());
-        sBudget[i][4] = bd[i].iPaySalary.ToString("#,#", getCi());
-        sBudget[i][5] = bd[i].iPayStaff.ToString("#,#", getCi());
-        sBudget[i][6] = bd[i].iPayTransfer.ToString("#,#", getCi());
-        sBudget[i][7] = bd[i].iPayStadium.ToString("#,#", getCi());
-        sBudget[i][8] = bd[i].iPayInterest.ToString("#,#", getCi());
+        sBudget[i][0] = bd[i].iInSpec.ToString();
+        sBudget[i][1] = bd[i].iInBonusCup.ToString();
+        sBudget[i][2] = bd[i].iInBonusSponsor.ToString();
+        sBudget[i][3] = bd[i].iInTransfer.ToString();
+        sBudget[i][4] = bd[i].iPaySalary.ToString();
+        sBudget[i][5] = bd[i].iPayStaff.ToString();
+        sBudget[i][6] = bd[i].iPayTransfer.ToString();
+        sBudget[i][7] = bd[i].iPayStadium.ToString();
+        sBudget[i][8] = bd[i].iPayInterest.ToString();
 
         long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
         long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);
