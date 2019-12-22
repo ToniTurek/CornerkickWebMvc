@@ -3828,13 +3828,21 @@ namespace CornerkickWebMvc.Controllers
         mlLeague.ddlLand.Add(new SelectListItem { Text = MvcApplication.ckcore.sLand[iLand], Value = iLand.ToString() });
       }
 
-      mlLeague.ddlSeason = new List<SelectListItem>();
-      for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
-        mlLeague.ddlSeason.Add(new SelectListItem { Text = iS.ToString(), Value = iS.ToString() });
-      }
+      mlLeague.ddlSeason = getDdlSeason();
       mlLeague.iSeason = MvcApplication.ckcore.iSeason;
 
       return View(mlLeague);
+    }
+
+    private List<SelectListItem> getDdlSeason()
+    {
+      List<SelectListItem> ddlSeason = new List<SelectListItem>();
+
+      for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
+        ddlSeason.Add(new SelectListItem { Text = iS.ToString(), Value = iS.ToString() });
+      }
+
+      return ddlSeason;
     }
 
     public JsonResult getDdlMatchdays(int iSaison, int iLand, byte iDivision)
@@ -3874,18 +3882,22 @@ namespace CornerkickWebMvc.Controllers
       return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
-    private CornerkickManager.Cup getCup(int iSeason, int iType, int iLand, int iDivision = -1)
+    private CornerkickManager.Cup getCup(int iSeason, int iType, int iLand = -1, int iDivision = -1)
     {
       CornerkickManager.Cup cup = null;
 
+      if (iSeason < 0) iSeason = MvcApplication.ckcore.iSeason;
+
       if (iSeason < MvcApplication.ckcore.iSeason) { // Past seasons
-        if (iSeason == iSeasonGlobal && cupGlobal != null) return cupGlobal;
+        if (iSeason == iSeasonGlobal && cupGlobal != null) {
+          if (cupGlobal.iId == iType) return cupGlobal;
+        }
 
         string sFileLoad = System.IO.Path.Combine(MvcApplication.getHomeDir(), "archive");
         List<CornerkickManager.Cup> ltCupsTmp = MvcApplication.ckcore.io.readCup(sFileLoad, iSeason);
 
         foreach (CornerkickManager.Cup cp in ltCupsTmp) {
-          if (cp.iId == iType && cp.iId2 == iLand && (iDivision < 0 || cp.iId3 == iDivision)) {
+          if (cp.iId == iType && (iLand < 0 || cp.iId2 == iLand) && (iDivision < 0 || cp.iId3 == iDivision)) {
             cup = cp;
             cupGlobal = cp;
             iSeasonGlobal = iSeason;
@@ -4080,10 +4092,7 @@ namespace CornerkickWebMvc.Controllers
         cupModel.ddlLand.Add(new SelectListItem { Text = MvcApplication.ckcore.sLand[iLand], Value = iLand.ToString() });
       }
 
-      cupModel.ddlSeason = new List<SelectListItem>();
-      for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
-        cupModel.ddlSeason.Add(new SelectListItem { Text = iS.ToString(), Value = iS.ToString() });
-      }
+      cupModel.ddlSeason = getDdlSeason();
       cupModel.iSeason = MvcApplication.ckcore.iSeason;
 
       return View(cupModel);
@@ -4198,7 +4207,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult setCup(Models.CupModel cupModel, ushort iSaison, int iLand, int iMatchday)
+    public JsonResult setCup(Models.CupModel cupModel, int iSaison, int iLand, int iMatchday)
     {
       CornerkickManager.Cup cup = getCup(iSaison, 2, iLand);
 
@@ -4208,15 +4217,19 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupGold(Models.CupGoldModel cupGoldModel)
     {
+      cupGoldModel.ddlSeason = getDdlSeason();
+      if (cupGoldModel.ddlSeason.Count > 0) cupGoldModel.ddlSeason.RemoveAt(0);
+      cupGoldModel.iSeason = MvcApplication.ckcore.iSeason;
+
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
       cupGoldModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupGold, MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
 
       return View(cupGoldModel);
     }
 
-    public JsonResult setCupGold(int iMatchday, int iGroup)
+    public JsonResult setCupGold(int iSaison, int iMatchday, int iGroup)
     {
-      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
+      CornerkickManager.Cup cupGold = getCup(iSaison, 3);
 
       return Json(getCupTeams(cupGold, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
@@ -4224,15 +4237,19 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupSilver(Models.CupSilverModel cupSilverModel)
     {
+      cupSilverModel.ddlSeason = getDdlSeason();
+      if (cupSilverModel.ddlSeason.Count > 0) cupSilverModel.ddlSeason.RemoveAt(0);
+      cupSilverModel.iSeason = MvcApplication.ckcore.iSeason;
+
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
       cupSilverModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupSilver, MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
 
       return View(cupSilverModel);
     }
 
-    public JsonResult setCupSilver(int iMatchday, int iGroup)
+    public JsonResult setCupSilver(int iSaison, int iMatchday, int iGroup)
     {
-      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
+      CornerkickManager.Cup cupSilver = getCup(iSaison, 4);
 
       return Json(getCupTeams(cupSilver, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
@@ -4240,15 +4257,18 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupWc(Models.CupWcModel cupWcModel)
     {
+      cupWcModel.ddlSeason = getDdlSeason();
+      cupWcModel.iSeason = MvcApplication.ckcore.iSeason;
+
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
       cupWcModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupWc, MvcApplication.ckcore.dtDatum), cupWc.ltMatchdays.Count - 1);
 
       return View(cupWcModel);
     }
 
-    public JsonResult setCupWc(int iMatchday, int iGroup)
+    public JsonResult setCupWc(int iSaison, int iMatchday, int iGroup)
     {
-      CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
+      CornerkickManager.Cup cupWc = getCup(iSaison, 7);
 
       return Json(getCupTeams(cupWc, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }

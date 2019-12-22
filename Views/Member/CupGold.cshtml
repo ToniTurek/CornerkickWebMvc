@@ -15,20 +15,29 @@
   <script>
     $(document).ready(function () {
       var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
-      setMatchdayCupGold(iMatchday, 0);
+      setMatchdayCupGold(-1, iMatchday, 0);
+
+      $("#ddlSeasonCupGold").change(function () {
+        setMatchdayCupGold($(this).val(), $("#ddlMatchdayCupGold").val(), $("#ddlGroupsCupGold").val());
+      });
 
       $("#ddlGroupsCupGold").change(function () {
-        setMatchdayCupGold($("#ddlMatchdayCupGold").val(), $(this).val());
+        setMatchdayCupGold($("#ddlSeasonCupGold").val(), $("#ddlMatchdayCupGold").val(), $(this).val());
       });
 
       $("#ddlMatchdayCupGold").change(function () {
-        setMatchdayCupGold($(this).val(), $("#ddlGroupsCupGold").val());
+        setMatchdayCupGold($("#ddlSeasonCupGold").val(), $(this).val(), $("#ddlGroupsCupGold").val());
       });
     });
   </script>
 </head>
 
 <body style="height: 100%; min-height: 100%">
+  <label>
+    Saison:
+    @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupGold" })
+  </label>
+
   <label style="margin-left: 10px">
     Gruppe:
     @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupGold" })

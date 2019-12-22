@@ -1,9 +1,9 @@
-﻿function setMatchdayCupGold(iMd, iGroup) {
+﻿function setMatchdayCupGold(iSaison, iMd, iGroup) {
   $.ajax({
     url: '/Member/setCupGold',
     type: "GET",
     dataType: "JSON",
-    data: { iMatchday: iMd, iGroup: iGroup },
+    data: { iSaison: iSaison, iMatchday: iMd, iGroup: iGroup },
     success: function (sTeams) {
       actionDrawTeams(sTeams);
       drawTableCupGold();

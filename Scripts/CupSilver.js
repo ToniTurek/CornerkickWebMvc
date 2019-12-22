@@ -1,9 +1,9 @@
-﻿function setMatchdayCupSilver(iMd, iGroup) {
+﻿function setMatchdayCupSilver(iSaison, iMd, iGroup) {
   $.ajax({
     url: '/Member/setCupSilver',
     type: "GET",
     dataType: "JSON",
-    data: { iMatchday: iMd, iGroup: iGroup },
+    data: { iSaison: iSaison, iMatchday: iMd, iGroup: iGroup },
     success: function (sTeams) {
       actionDrawTeams(sTeams);
       drawTableCupSilver();

@@ -1,9 +1,9 @@
-﻿function setMatchdayCupWc(iMd, iGroup) {
+﻿function setMatchdayCupWc(iSaison, iMd, iGroup) {
   $.ajax({
     url: '/Member/setCupWc',
     type: "GET",
     dataType: "JSON",
-    data: { iMatchday: iMd, iGroup: iGroup },
+    data: { iSaison: iSaison, iMatchday: iMd, iGroup: iGroup },
     success: function (sTeams) {
       actionDrawTeams(sTeams);
       drawTableWc();

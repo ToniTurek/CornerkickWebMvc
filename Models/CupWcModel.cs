@@ -8,6 +8,9 @@ namespace CornerkickWebMvc.Models
 {
   public class CupWcModel
   {
+    public List<SelectListItem> ddlSeason { get; set; }
+    public int iSeason { get; set; }
+
     public List<SelectListItem> ddlGroup { get; set; }
     public int iGroup { get; set; }
 

@@ -15,20 +15,29 @@
   <script>
     $(document).ready(function () {
       var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
-      setMatchdayCupWc(iMatchday, 0);
+      setMatchdayCupWc(-1, iMatchday, 0);
+
+      $("#ddlSeasonCupWc").change(function () {
+        setMatchdayCupWc($(this).val(), $("#ddlMatchdayCupWc").val(), $("#ddlGroupsCupWc").val());
+      });
 
       $("#ddlGroupsCupWc").change(function () {
-        setMatchdayCupWc($("#ddlMatchdayCupWc").val(), $(this).val());
+        setMatchdayCupWc($("#ddlSeasonCupWc").val(), $("#ddlMatchdayCupWc").val(), $(this).val());
       });
 
       $("#ddlMatchdayCupWc").change(function () {
-        setMatchdayCupWc($(this).val(), $("#ddlGroupsCupWc").val());
+        setMatchdayCupWc($("#ddlSeasonCupWc").val(), $(this).val(), $("#ddlGroupsCupWc").val());
       });
     });
   </script>
 </head>
 
 <body style="height: 100%; min-height: 100%">
+  <label>
+    Saison:
+    @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupWc" })
+  </label>
+
   <label style="margin-left: 10px">
     Gruppe:
     @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupWc" })
