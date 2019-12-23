@@ -25,6 +25,8 @@
       });
     }
   });
+
+  plotLeaguePlaceGraph(iSaison);
 }
 
 function setLeague2(iSaison, iDivision) {

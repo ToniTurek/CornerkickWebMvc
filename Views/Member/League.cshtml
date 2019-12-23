@@ -16,9 +16,6 @@
     $(document).ready(function () {
       changeLand(0);
 
-      var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
-      fLigaMax = fLigaMax + 0.1;
-
       // Radio-buttons league
       $("#rbTableTotal").on('change', function (ev) {
         setLeague2(1, 0);
@@ -32,43 +29,56 @@
         setLeague2(1, 0);
       });
 
-      $.get("/Member/GetLeaguePlaceHistory/", function (ltPlace) {
-        var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          axisX: {
-            labelFontSize: 16,
-            lineThickness: 0,
-            gridThickness: 1,
-            interval: 1,
-            minimum: 0.9
-          },
-          axisY: {
-            labelFontSize: 16,
-            interval: 1,
-            minimum: 0.9,
-            maximum: fLigaMax,
-            reversed: true
-          },
-          /*legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },*/
-          data: [
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              showInLegend: false,
-              legendText: "Tabellenplatz",
-              dataPoints: ltPlace
-            }
-          ]
-        });
-
-        chart.render();
-      });
+      plotLeaguePlaceGraph($('#ddlSeason').val());
     });
+
+    function plotLeaguePlaceGraph(iSaison) {
+      var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
+      fLigaMax = fLigaMax + 0.1;
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/GetLeaguePlaceHistory',
+        dataType: "json",
+        data: { iSeason: iSaison },
+        success: function (ltPlace) {
+          var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            axisX: {
+              labelFontSize: 16,
+              lineThickness: 0,
+              gridThickness: 1,
+              interval: 1,
+              minimum: 0.9
+            },
+            axisY: {
+              labelFontSize: 16,
+              interval: 1,
+              minimum: 0.9,
+              maximum: fLigaMax,
+              reversed: true
+            },
+            /*legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },*/
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                showInLegend: false,
+                legendText: "Tabellenplatz",
+                dataPoints: ltPlace
+              }
+            ]
+          });
+
+          chart.render();
+        }
+      });
+    }
   </script>
 </head>
 
