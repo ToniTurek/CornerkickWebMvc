@@ -353,7 +353,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
 
       desk.sTabellenplatz = "-";
-      List<CornerkickManager.Tool.TableItem> ltTbl = MvcApplication.ckcore.tl.getLeagueTable(league);
+      List<CornerkickManager.Tool.TableItem> ltTbl = CornerkickManager.Tool.getLeagueTable(league);
       int iPlatz = 1;
       int iSpl = 0;
       foreach (CornerkickManager.Tool.TableItem tbl in ltTbl) {
@@ -595,7 +595,7 @@ namespace CornerkickWebMvc.Controllers
       if (cup != null) {
         sBox += "<div style=\"position: relative; width: 100%; text-align: center\">";
         sBox += "<text>" + cup.sName + " - ";
-        int iMd = MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum);
+        int iMd = CornerkickManager.Tool.getMatchday(cup, MvcApplication.ckcore.dtDatum);
         if (cup.checkCupGroupPhase(iMd, 0)) sBox += (iMd + 1).ToString() + ". Spieltag";
         else                                sBox += MvcApplication.ckcore.sCupRound[cup.getMatchdaysTotal() - iMd - 1];
         sBox += "</text>";
@@ -3822,9 +3822,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, mlLeague.iLand, mlLeague.iSpKl);
       if (league == null) return View(mlLeague);
 
-      int iMd = MvcApplication.ckcore.tl.getMatchday(league, MvcApplication.ckcore.dtDatum);
+      int iMd = CornerkickManager.Tool.getMatchday(league, MvcApplication.ckcore.dtDatum);
       mlLeague.league = league;
-      mlLeague.ltTbl  = MvcApplication.ckcore.tl.getLeagueTable(league, iMd - 1, 0);
+      mlLeague.ltTbl  = CornerkickManager.Tool.getLeagueTable(league, iMd - 1, 0);
       mlLeague.iLeagueSize = MvcApplication.ckcore.tl.getCupParticipants(league, iMd).Count;
 
       // Add lands to dropdown list
@@ -3927,8 +3927,8 @@ namespace CornerkickWebMvc.Controllers
 
     private string getTable(CornerkickManager.Cup cup, int iMatchday, sbyte iGroup = -1, byte iHA = 0, CornerkickManager.Club clubUser = null, int iColor1 = 0, int iColor2 = 0, int iColor3 = 0, int iColor4 = 0)
     {
-      List<CornerkickManager.Tool.TableItem> ltTblLast = MvcApplication.ckcore.tl.getLeagueTable(cup, iMatchday - 1, iHA, iGroup);
-      List<CornerkickManager.Tool.TableItem> ltTbl     = MvcApplication.ckcore.tl.getLeagueTable(cup, iMatchday,     iHA, iGroup);
+      List<CornerkickManager.Tool.TableItem> ltTblLast = CornerkickManager.Tool.getLeagueTable(cup, iMatchday - 1, iHA, iGroup);
+      List<CornerkickManager.Tool.TableItem> ltTbl     = CornerkickManager.Tool.getLeagueTable(cup, iMatchday,     iHA, iGroup);
 
       string sBox = "";
       for (var i = 0; i < ltTbl.Count; i++) {
@@ -4056,17 +4056,17 @@ namespace CornerkickWebMvc.Controllers
       return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
-    public ContentResult GetLeaguePlaceHistory()
+    public ContentResult GetLeaguePlaceHistory(int iSeason = 0)
     {
       CornerkickManager.Club club = ckClub();
 
-      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
+      CornerkickManager.Cup league = getCup(iSeason, 1, club.iLand, club.iDivision);
 
       List<Models.DataPointGeneral> dataPoints = new List<Models.DataPointGeneral>();
 
-      for (int iSpT = 1; iSpT < league.getMatchdaysTotal(); iSpT++) {
-        int iPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, club, MvcApplication.ckcore.dtDatum, iSpT);
-        if (iPlace > 0) dataPoints.Add(new Models.DataPointGeneral(iSpT, iPlace));
+      for (int iMd = 1; iMd < CornerkickManager.Tool.getMatchday(league, MvcApplication.ckcore.dtDatum); iMd++) {
+        int iPlace = CornerkickManager.Tool.getLeaguePlace(league, club, iMd);
+        if (iPlace > 0) dataPoints.Add(new Models.DataPointGeneral(iMd, iPlace));
       }
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
@@ -4196,7 +4196,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cup = getCup(iSaison, 2, iLand);
 
       // Get current matchday
-      int iMd = MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum);
+      int iMd = CornerkickManager.Tool.getMatchday(cup, MvcApplication.ckcore.dtDatum);
 
       CornerkickManager.Club clb = ckClub();
       if (clb != null) {
@@ -4226,7 +4226,7 @@ namespace CornerkickWebMvc.Controllers
       cupGoldModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-      cupGoldModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupGold, MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
+      cupGoldModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupGold, MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
 
       return View(cupGoldModel);
     }
@@ -4246,7 +4246,7 @@ namespace CornerkickWebMvc.Controllers
       cupSilverModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-      cupSilverModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupSilver, MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
+      cupSilverModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupSilver, MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
 
       return View(cupSilverModel);
     }
@@ -4265,7 +4265,7 @@ namespace CornerkickWebMvc.Controllers
       cupWcModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
-      cupWcModel.iMatchday = Math.Min(MvcApplication.ckcore.tl.getMatchday(cupWc, MvcApplication.ckcore.dtDatum), cupWc.ltMatchdays.Count - 1);
+      cupWcModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupWc, MvcApplication.ckcore.dtDatum), cupWc.ltMatchdays.Count - 1);
 
       return View(cupWcModel);
     }

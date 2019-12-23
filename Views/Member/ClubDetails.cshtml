@@ -33,7 +33,7 @@
     string sPlace = "-";
     if (!Model.club.bNation) {
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, Model.club.iLand, Model.club.iDivision);
-      sPlace = MvcApplication.ckcore.tl.getLeaguePlace(league, Model.club, MvcApplication.ckcore.dtDatum).ToString();
+      sPlace = CornerkickManager.Tool.getLeaguePlace(league, Model.club, MvcApplication.ckcore.dtDatum).ToString();
     }
 
     float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
