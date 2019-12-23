@@ -3754,6 +3754,21 @@ namespace CornerkickWebMvc.Controllers
       return View(mdClub);
     }
 
+    public ContentResult ClubDetailsGetPlaceHistory(int iClubId)
+    {
+      CornerkickManager.Club clb = MvcApplication.ckcore.ltClubs[iClubId];
+
+      List<Models.DataPointGeneral> ltDataPoints = new List<Models.DataPointGeneral>();
+
+      for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
+        ltDataPoints.Add(new Models.DataPointGeneral(iS, CornerkickManager.Tool.getLeaguePlace(getCup(iS, 1, clb.iLand, clb.iDivision), clb)));
+      }
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
+    }
+
     private string getClubEmblem(int iClubId, string sStyle = "")
     {
       CornerkickManager.Club clb = null;
@@ -3890,7 +3905,7 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Cup cup = null;
 
-      if (iSeason < 0) iSeason = MvcApplication.ckcore.iSeason;
+      if (iSeason <= 0) iSeason = MvcApplication.ckcore.iSeason;
 
       if (iSeason < MvcApplication.ckcore.iSeason) { // Past seasons
         if (iSeason == iSeasonGlobal && cupGlobal != null) {

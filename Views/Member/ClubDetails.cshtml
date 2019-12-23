@@ -8,12 +8,59 @@
 
 <html>
 <head>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+
   <script type="text/javascript">
     $(document).ready(function () {
       var divEmblem = document.getElementById("divEmblemClub");
       var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
       divEmblem.innerHTML += sEmblemImg;
+
+      plotPlaceHistory();
     });
+
+    function plotPlaceHistory() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/ClubDetailsGetPlaceHistory',
+        dataType: "json",
+        data: { iClubId: @Model.club.iId },
+        success: function (dataPlace) {
+          var chartDev = new CanvasJS.Chart("divChartPlaceHistory", {
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            axisX: {
+              title: "Saison",
+              interval: 1,
+              gridThickness: 1,
+              labelAngle: -20
+            },
+            axisY: {
+              title: "Platzierung",
+              interval: 1,
+              minimum: 0.9,
+              includeZero: false,
+              reversed: true
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                dataPoints: dataPlace
+              }
+            ]
+          });
+
+          chartDev.render();
+        }
+      });
+    }
   </script>
 </head>
 <body>
@@ -48,7 +95,7 @@
 
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
     <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; text-align: center; border: 1px solid black; z-index: 99">
-     @if (Model.bEmblemEditable) {
+      @if (Model.bEmblemEditable) {
         using (Html.BeginForm("ClubDetails",
                               "Member",
                               new { iClub = Model.club.iId },
@@ -227,6 +274,8 @@
         </table>
       </div>
     }
+
+    <div id="divChartPlaceHistory" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
   </div>
 </body>
 </html>
