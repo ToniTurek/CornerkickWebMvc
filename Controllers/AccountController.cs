@@ -286,22 +286,6 @@ namespace CornerkickWebMvc.Controllers
       clb.iBalance = 10000000;
       clb.iBalanceSecret = 0;
       
-      // Clear sponsors
-      clb.sponsorMain = new CornerkickManager.Finance.Sponsor();
-      clb.ltSponsorBoards.Clear();
-      
-      // Clear account
-      clb.ltAccount.Clear();
-      
-      // Remove staff
-      clb.staff = new CornerkickManager.Main.Staff();
-
-      // Clear training
-      clb.training = new CornerkickManager.Main.Training();
-
-      // Clear captain
-      clb.iCaptainId = new int[3] { -1, -1, -1 };
-      
       CornerkickManager.User usr = createUser(applicationUser);
       usr.iLevel = 1;
       usr.club = clb;
@@ -411,11 +395,29 @@ namespace CornerkickWebMvc.Controllers
       }
       for (byte iB = 3; iB < 8; iB++) clb.stadium.blocks[iB].iSeats = 1000;
 
+
+      // Clear sponsors
+      clb.sponsorMain = new CornerkickManager.Finance.Sponsor();
+      clb.ltSponsorBoards.Clear();
       clb.ltSponsorOffers.Add(createDefaultSponsor());
+
+      // Clear account
+      clb.ltAccount.Clear();
+
+      // Remove staff
+      clb.staff = new CornerkickManager.Main.Staff();
+
+      // Clear training
+      clb.training = new CornerkickManager.Main.Training();
+
+      // Clear captain
+      clb.iCaptainId = new int[3] { -1, -1, -1 };
 
       // Stadium
       clb.stadium.sName = clb.sName + " Stadion";
       clb.stadium.iTicketcounter = 1;
+      clb.stadium.iCarpark = 5;
+      clb.buildings.iGround = 2;
 
       clb.iAdmissionPrice[0] =  10;
       clb.iAdmissionPrice[1] =  30;
