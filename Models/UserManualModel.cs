@@ -8,6 +8,14 @@ namespace CornerkickWebMvc.Models
 {
   public class UserManualModel
   {
+    // Cup attraction factors
+    public string sAfLeague { get; set; }
+    public string sAfCup { get; set; }
+    public string sAfCupGold { get; set; }
+    public string sAfCupSilver { get; set; }
+    public string sAfWc { get; set; }
+    public string sAfTg { get; set; }
+
     public string sTraining { get; set; }
     public List<SelectListItem> ddlTraining { get; set; }
 

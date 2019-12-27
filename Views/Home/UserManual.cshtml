@@ -195,11 +195,11 @@ Die wichtigsten Schritte zu Beginn des Spiels sind folgende:
 Während einer Saison werden in jedem Land folgende nationale Wettbewerbe durchgeführt:
 <ul>
   <li>
-    <u><b>Nationale Ligen</b></u><br />
+    <u><b>Nationale Ligen</b></u> (Prioritätsfaktor: @Model.sAfLeague)<br />
     Eine Liga besteht aus jeweils 16 Mannschaften. Es werden Hin- und Rückspiele durchgeführt.
   </li>
   <li>
-    <u><b>Nationale Pokale</b></u><br />
+    <u><b>Nationale Pokale</b></u> (Prioritätsfaktor: @Model.sAfCup)<br />
     Für die nationalen Pokale sind alle Mannschaften des jeweiligen Landes qualifiziert. Die Pokalrunden werden im KO-Modus (nur ein Spiel) durchgeführt.
   </li>
 </ul>
@@ -207,7 +207,7 @@ Während einer Saison werden in jedem Land folgende nationale Wettbewerbe durchg
 Über die nationalen Ligen jedes Landes besteht die Möglichkeit, sich für die folgenden internationalen Pokale zu qualifizieren:
 <ul>
   <li>
-    <u><b>Gold-Cup</b></u><br />
+    <u><b>Gold-Cup</b></u> (Prioritätsfaktor: @Model.sAfCupGold)<br />
     Die ersten vier Mannschaften jeder ersten nationalen Liga qualifizieren sich für den Gold-Cup. Die insgesamt 32 Mannschaften werden zunächst auf 8 Gruppen je 4 Mannschaften aufgeteilt und spielen eine Gruppenphase mit Hin- und Rückspiel. Die ersten zwei Mannschaften jeder Gruppe qualifizieren sich für das Achtelfinale. Achtel- Viertel und Halbfinale werden im KO-Modus mit Hin- und Rückspiel ausgetragen. Im Finale gibt es kein Rückspiel.<br />
     <u>Präminen</u><br />
     <ul>
@@ -220,7 +220,7 @@ Während einer Saison werden in jedem Land folgende nationale Wettbewerbe durchg
     </ul>
   </li>
   <li>
-    <u><b>Silver-Cup</b></u><br />
+    <u><b>Silver-Cup</b></u> (Prioritätsfaktor: @Model.sAfCupSilver)<br />
     Die Mannschaften auf den Plätzen fünf bis acht jeder ersten nationalen Liga qualifizieren sich für den Silver-Cup. Der Modus ist der gleiche wie der des Gold-Cups.<br />
     <u>Präminen</u><br />
     <ul>
@@ -234,7 +234,11 @@ Während einer Saison werden in jedem Land folgende nationale Wettbewerbe durchg
   </li>
 </ul>
 
-Am Ende jeder Saison findet eine <u><b>Weltmeisterschaft</b></u> statt. Der bestplatzierte Manager jedes Landes darf die jeweilige Nationalmannschaft coachen.
+Am Ende jeder Saison findet eine <u><b>Weltmeisterschaft</b></u> (Prioritätsfaktor: @Model.sAfWc) statt. Der bestplatzierte Manager jedes Landes darf die jeweilige Nationalmannschaft coachen.<br />
+
+<u><b>Freundschaftsspiele</b></u> (Prioritätsfaktor: @Model.sAfTg) können jederzeit durchgeführt werden. Es muss nur ein Abstand von 24h bis zum nächsten Spiel eingehalten werden.<br />
+
+Der Prioritätsfaktor eines Wettbewerbs beeinflußt die Moraländerungen durch ein Spiel (Torerfolg, Gegentor, Sieg, Niederlage, etc), sowie die ausbezahlten Sponsorenprämien durch Bandenwerbung.
 
 <h2>Mannschaft</h2>
 <div id="h3Team" class="ckLink"></div>

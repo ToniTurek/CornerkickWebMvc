@@ -4636,6 +4636,7 @@ namespace CornerkickWebMvc.Controllers
         cupTestGames.iId = 5;
         cupTestGames.settings.fAttraction = 0.5f;
         cupTestGames.settings.iNeutral = 1;
+        cupTestGames.settings.fAttraction = 0.25f;
         cupTestGames.sName = "Testspiel";
         MvcApplication.ckcore.ltCups.Add(cupTestGames);
       }

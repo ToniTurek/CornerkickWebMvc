@@ -140,6 +140,7 @@ namespace CornerkickWebMvc
           cup.iId = 2;
           cup.iId2 = iLand;
           cup.sName = "Pokal " + ckcore.sLand[iLand];
+          cup.settings.fAttraction = 1.0f;
           ckcore.ltCups.Add(cup);
 
           // Create league
@@ -148,6 +149,7 @@ namespace CornerkickWebMvc
           league.iId2 = iLand;
           league.iId3 = 0;
           league.sName = "Liga " + ckcore.sLand[iLand];
+          league.settings.fAttraction = 1.0f;
           ckcore.ltCups.Add(league);
 
           fillLeaguesWithCpuClubs(league, cup);
@@ -207,6 +209,7 @@ namespace CornerkickWebMvc
         cupGold.settings.iBonusVicGroup =  5000000; //  5 mio.
         cupGold.settings.bBonusReleaseCupWinInKo = true;
         cupGold.settings.iDayOfWeek = 3;
+        cupGold.settings.fAttraction = 1.25f;
         ckcore.ltCups.Add(cupGold);
       }
     }
@@ -226,6 +229,7 @@ namespace CornerkickWebMvc
         cupSilver.settings.iBonusVicGroup =  2500000; //  2.5 mio.
         cupSilver.settings.bBonusReleaseCupWinInKo = true;
         cupSilver.settings.iDayOfWeek = 4;
+        cupSilver.settings.fAttraction = 0.90f;
         ckcore.ltCups.Add(cupSilver);
       }
     }
@@ -241,6 +245,7 @@ namespace CornerkickWebMvc
         cupWc.settings.iNeutral = 1;
         cupWc.settings.dtStart = dtLeagueEnd.Date + new TimeSpan(20, 30, 00);
         cupWc.settings.dtEnd = ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
+        cupWc.settings.fAttraction = 1.50f;
         ckcore.ltCups.Add(cupWc);
 
         int iGroup = 0;
