@@ -791,12 +791,6 @@ namespace CornerkickWebMvc
         */
       }
 
-      try {
-        Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, "save/games/", sHomeDir, ".ckgx"));
-      } catch {
-        ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
-      }
-
       // Download log async
       Task<bool> tkDownloadLog = Task.Run(async () => await downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip"));
 
@@ -863,6 +857,29 @@ namespace CornerkickWebMvc
         // Download emblems
 #if _USE_AMAZON_S3
         Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, "emblems/", sHomeDir + "/../Content/Uploads/", ".png"));
+
+        // Download archive games
+        try {
+          Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, "save/games/", sHomeDir, ".ckgx"));
+        } catch {
+          ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
+        }
+
+        // Download archive cups
+        if (!System.IO.Directory.Exists(Path.Combine(sHomeDir, "archive"))) System.IO.Directory.CreateDirectory(Path.Combine(sHomeDir, "archive"));
+
+        for (int iS = 1; iS < ckcore.iSeason; iS++) {
+          string sCupDir = Path.Combine(sHomeDir, "archive", iS.ToString());
+          string sCupKey = "archive/" + iS.ToString() + "/Cup";
+
+          if (!System.IO.Directory.Exists(sCupDir)) System.IO.Directory.CreateDirectory(sCupDir);
+
+          try {
+            Task<bool> tkDownloadCups = Task.Run(async () => await downloadFileAsync(as3, sCupKey, Path.Combine(sCupDir, "Cup")));
+          } catch {
+            ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
+          }
+        }
 #endif
 #endif
 
