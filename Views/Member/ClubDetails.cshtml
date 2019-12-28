@@ -30,11 +30,13 @@
           var chartDev = new CanvasJS.Chart("divChartPlaceHistory", {
             animationEnabled: true,
             theme: "theme2",//theme1
+            title: {
+              text: "Tabellenplatzentwicklung"
+            },
             axisX: {
               title: "Saison",
               interval: 1,
-              gridThickness: 1,
-              labelAngle: -20
+              gridThickness: 1
             },
             axisY: {
               title: "Platzierung",
@@ -247,15 +249,19 @@
     </div>
 
     <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-      <h4>Erfolge:</h4>
-      @foreach (CornerkickManager.Main.Success success in Model.club.ltSuccess) {
-        string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
-        string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
-        if (success.cup == null) { continue; }
+      <h4>Erfolge</h4>
+      @if (Model.club.ltSuccess.Count == 0) {
+        <p>keine</p>
+      } else {
+        foreach (CornerkickManager.Main.Success success in Model.club.ltSuccess) {
+          string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
+          string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
+          if (success.cup == null) { continue; }
 
-        <b>@success.cup.sName</b>
-        <p>@sWDD</p>
-        <p>@sCupWin</p>
+          <b>@success.cup.sName</b>
+          <p>@sWDD</p>
+          <p>@sCupWin</p>
+        }
       }
     </div>
 
