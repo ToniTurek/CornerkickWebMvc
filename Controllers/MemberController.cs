@@ -688,13 +688,17 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (bExpected) {
+        // Create temp. array of training values
+        float[][] fCFMI = new float[clb.ltPlayer.Count][];
+        for (int iP = 0; iP < fCFMI.Length; iP++) {
+          CornerkickGame.Player plTmp = clb.ltPlayer[iP];
+          fCFMI[iP] = new float[4] { plTmp.fCondition, plTmp.fFresh, plTmp.fMoral, plTmp.fIndTraining[plTmp.iIndTraining] };
+        }
+
         // Initialize dataPoints list
         for (byte j = 0; j < dataPoints[1].Length; j++) dataPoints[1][j] = new List<Models.DataPointGeneral>();
 
-        // Create temp. player
-        List<CornerkickGame.Player> ltPlayerTmp = new List<CornerkickGame.Player>();
-        foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTmp.Add(pl.Clone());
-
+        // Get training camp
         CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
         foreach (CornerkickManager.TrainingCamp.Camp cp in MvcApplication.ckcore.tcp.ltCamps) {
           if (cp.iId == iTrainingsCamp) {
@@ -713,22 +717,31 @@ namespace CornerkickWebMvc.Controllers
             if ((int)dtTmp.DayOfWeek == 0) break;
 
             // ... do training for each player
-            for (int iP = 0; iP < ltPlayerTmp.Count; iP++) {
-              CornerkickGame.Player plTmp = ltPlayerTmp[iP];
-              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp, camp, false, true);
+            for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
+              CornerkickGame.Player plTmp = clb.ltPlayer[iP];
+              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp, campBooking: camp, bJouth: false, bNation: false, bNoInjuries: true);
             }
           }
 
           // ... get training history data
           CornerkickManager.Main.TrainingHistory trHistExp = new CornerkickManager.Main.TrainingHistory();
           trHistExp.dt   = dtTmp;
-          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTmp, clb.ltTactic[0].formation);
+          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb.ltPlayer, clb.ltTactic[0].formation);
 
           // ... add training history data to dataPoints
           for (byte j = 0; j < dataPoints[1].Length; j++) {
             long iDate = convertDateTimeToTimestamp(trHistExp.dt);
             dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j]));
           }
+        }
+
+        // Set training values back
+        for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
+          CornerkickGame.Player plTmp = clb.ltPlayer[iP];
+          plTmp.fCondition                       = fCFMI[iP][0];
+          plTmp.fFresh                           = fCFMI[iP][1];
+          plTmp.fMoral                           = fCFMI[iP][2];
+          plTmp.fIndTraining[plTmp.iIndTraining] = fCFMI[iP][3];
         }
       }
 
