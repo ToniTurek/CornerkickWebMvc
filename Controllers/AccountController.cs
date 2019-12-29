@@ -738,9 +738,11 @@ namespace CornerkickWebMvc.Controllers
 
 #if !DEBUG
           // Send mail to admin
-          try {
-            await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
-          } catch {
+          if (!model.Email.Equals("s.jan@web.de")) {
+            try {
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
+            } catch {
+            }
           }
 #endif
 
