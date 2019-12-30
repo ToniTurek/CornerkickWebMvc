@@ -83,6 +83,46 @@
       $('#ddlStatLeagues').change(function () {
         dtTeams.ajax.reload();
       });
+    
+      $('#tblStatisticTransfers').DataTable({
+        "ajax": {
+          "url": '@Url.Action("StatisticGetTransferTable", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "iIx" },
+          { "data": "sDt" },
+          { "data": "sClubName" },
+          { "data": "sTransferFee" },
+          { "data": "sValue" }
+        ],
+        rowReorder: {
+          dataSrc: 'iIx'
+        },
+        "language": {
+          "emptyTable": "Keine Transfers"
+        },
+        "pageLength": 10,
+        "paging": false,
+        "info": false,
+        "responsive": false,
+        "searching": false,
+        "columnDefs": [
+          { "targets": [3], "orderSequence": ["desc", "asc"] },
+          {
+            "targets": [0], // iIx
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          { "targets": [1, 2], "className": "dt-center" },
+          { "targets": [3, 4], "className": "dt-right" }
+        ],
+        select: false
+      });
     });
 
     function drawBest11() {
@@ -160,8 +200,8 @@
   </div>
   <text id="txtStatAverage" style="position: relative; width: 100%"></text>
 
-  <h3 style="position: relative; margin-top: 30px">Mannschaftsübersicht</h3>
   <div style="position: relative">
+    <h3 style="position: relative; margin-top: 30px">Mannschaftsübersicht</h3>
     <div style="position: relative; width: 160px; height: auto; z-index: 99">
       <b class="left">Liga:</b>
       @Html.DropDownListFor(m => m.iLeague, Model.ddlLeagues, new { @Id = "ddlStatLeagues", @class = "form-control" })
@@ -182,6 +222,27 @@
             <th>&#8709;-Alter Startelf</th>
             <th>&#8709;-MW Startelf</th>
             <th>Liga</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="position: relative">
+    <h3 style="position: relative; margin-top: 30px">Rekordtransfers</h3>
+
+    <div style="position: relative; width: auto; top: 0px">
+      <table id="tblStatisticTransfers" cellspacing="0" style="width: auto" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Datum</th>
+            <th>Verein</th>
+            <th>Ablöse [€]</th>
+            <th>Marktwert [€]</th>
           </tr>
         </thead>
         <tbody>

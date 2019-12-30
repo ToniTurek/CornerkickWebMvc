@@ -5327,6 +5327,45 @@ namespace CornerkickWebMvc.Controllers
       return Json(new { aaData = ltDeTeams.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
+    public ActionResult StatisticGetTransferTable()
+    {
+      //The table or entity I'm querying
+      List<Models.PlayerModel.DatatableEntryClubHistory> ltDeClubHistory = new List<Models.PlayerModel.DatatableEntryClubHistory>();
+
+      int iT = 1;
+      foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
+        foreach (CornerkickGame.Player.ClubHistory ch in pl.ltClubHistory) {
+          if (ch.iTransferFee > 0) {
+            // Get club name
+            string sClubName = "vereinslos";
+            if (ch.iClubId >= 0) {
+              sClubName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
+              //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
+            }
+
+            // Get player value at transfer date
+            int iValue = 0;
+            if (pl.ltHistory != null) {
+              foreach (CornerkickGame.Player.History hy in pl.ltHistory) {
+                iValue = hy.iValue;
+                if (hy.dt.CompareTo(ch.dt) > 0) break;
+              }
+            }
+
+            ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
+              iIx = iT++,
+              sClubName = sClubName,
+              sDt = ch.dt.ToString("d", getCi()),
+              sValue = (iValue * 1000).ToString("N0", getCi()),
+              sTransferFee = ch.iTransferFee.ToString("N0", getCi())
+            });
+          }
+        }
+      }
+
+      return Json(new { aaData = ltDeClubHistory.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// Mail
