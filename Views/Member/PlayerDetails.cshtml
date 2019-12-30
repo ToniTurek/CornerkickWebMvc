@@ -1,11 +1,13 @@
 ﻿@model CornerkickWebMvc.Models.PlayerModel
 
 <head>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
@@ -99,6 +101,47 @@
     plotCFM();
     plotPlayerDevelopment();
     drawStatistic(0);
+    
+    // List team
+    $('#tableClubHistory').DataTable({
+      "ajax": {
+        "url": '@Url.Action("PlayerDetailsGetClubHistoryTable", "Member")',
+        "type": 'GET',
+        "dataType": "JSON",
+        "cache": false,
+        "contentType": "application/json; charset=utf-8",
+        "data": function (d) {
+          d.iPlayerId = 100;
+        }
+      },
+      "columns": [
+        { "data": "iIx" },
+        { "data": "sDt" },
+        { "data": "sClubName" },
+        { "data": "sTransferFee" },
+        { "data": "sValue" }
+      ],
+      rowReorder: {
+        dataSrc: 'iIx'
+      },
+      "pageLength": 10,
+      "paging": false,
+      "info": false,
+      "responsive": false,
+      "searching": false,
+      "columnDefs": [
+        { "targets": [0], "orderSequence": ["desc", "asc"] },
+        {
+          "targets": [0], // iIx
+          "orderable": false,
+          "visible": false,
+          "searchable": false
+        },
+        { "targets": [1, 2], "className": "dt-center" },
+        { "targets": [3, 4], "className": "dt-right" }
+      ],
+      select: false
+    });
 
     $("#bnContract").click(function () {
       getContractDialog(document.body, @Model.iPlayer, false);
@@ -390,26 +433,23 @@
       }
     </div>
 
-    <div style="position: relative; width: 100%; height: 94px; margin-top: 1%">
-      @{
-        if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
-          <div class="form-group">
-            @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
-          </div>
-        } else {
-          string sPlName = player.sName;
-          <div style="position: relative; width: 100%">
-
-            @if (!Model.bJouth) {
-              string sPlNo = player.iNr.ToString();
-              <div style="position: relative; float: left; width: 96px; height: 84px; text-align: center; background-color: @Model.sColorJersey">
-                <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
-                <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
-              </div>
-            }
-            <text style="position: relative; float: left; top: 16px; font-size: 36px; margin-left: 10px">@sPlName</text>
-          </div>
-        }
+    <div style="position: relative; width: 100%; margin-top: 1%">
+     @if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
+        <div class="form-group">
+          @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
+        </div>
+      } else {
+        string sPlName = player.sName;
+        <div style="position: relative; width: 100%; height: 94px">
+         @if (!Model.bJouth) {
+            string sPlNo = player.iNr.ToString();
+            <div style="position: relative; float: left; width: 96px; height: 84px; text-align: center; background-color: @Model.sColorJersey">
+              <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+              <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
+            </div>
+          }
+          <text style="position: relative; float: left; top: 16px; font-size: 36px; margin-left: 10px">@sPlName</text>
+        </div>
       }
     </div>
 
@@ -424,6 +464,7 @@
   }
 
   <div style="position: relative; width: 100%; height: auto">
+    <h4>Allgemeine Daten</h4>
     <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
       <table cellpadding="1" style="width: 100%">
         <tbody>
@@ -475,7 +516,7 @@
             <td align="right">Gehalt:</td>
             <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
           </tr>
-          @if (!Model.bJouth) {
+         @if (!Model.bJouth) {
             <tr>
               <td align="right">Auflaufprämie:</td>
               <td align="right">@player.contract.iPlay.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
@@ -630,7 +671,7 @@
             <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
           }
 
-          @if (!Model.bJouth) {
+         @if (!Model.bJouth) {
             if (!Model.bCaptain) {
               <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Kapitän machen</button>
             }
@@ -648,7 +689,26 @@
     <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
   </div>
 
+  <div id="divTableClubHistory" style="position: relative; float: left; width: auto; margin-top: 10px; margin-bottom: 10px">
+    <h4>Vereinshistorie</h4>
+    <table id="tableClubHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Datum</th>
+          <th>Verein</th>
+          <th>Ablöse [€]</th>
+          <th>Marktwert [€]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+    </table>
+  </div>
+
   <div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 10px">
+    <h4>Fähigkeiten / Statistik</h4>
     <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
       <table border="1" cellpadding="4" style="width: auto">
         <thead>

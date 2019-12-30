@@ -1831,6 +1831,46 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
+    public ActionResult PlayerDetailsGetClubHistoryTable(int iPlayerId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      //The table or entity I'm querying
+      List<Models.PlayerModel.DatatableEntryClubHistory> ltDeClubHistory = new List<Models.PlayerModel.DatatableEntryClubHistory>();
+
+      if (pl.ltClubHistory != null) {
+        for (int iCh = 0; iCh < pl.ltClubHistory.Count; iCh++) {
+          CornerkickGame.Player.ClubHistory ch = pl.ltClubHistory[iCh];
+
+          // Get club name
+          string sClubName = "vereinslos";
+          if (ch.iClubId >= 0) {
+            sClubName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
+            //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
+          }
+
+          // Get player value at transfer date
+          int iValue = 0;
+          if (pl.ltHistory != null) {
+            foreach (CornerkickGame.Player.History hy in pl.ltHistory) {
+              iValue = hy.iValue;
+              if (hy.dt.CompareTo(ch.dt) > 0) break;
+            }
+          }
+
+          ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
+            iIx = iCh,
+            sClubName = sClubName,
+            sDt = ch.dt.ToString("d", getCi()),
+            sValue = (iValue * 1000).ToString("N0", getCi()),
+            sTransferFee = ch.iTransferFee.ToString("N0", getCi())
+          });
+        }
+      }
+
+      return Json(new { aaData = ltDeClubHistory.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult PlayerDetailsGetStatistic(int iPlayer, bool bSeason = true)
     {
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];

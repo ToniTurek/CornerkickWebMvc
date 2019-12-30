@@ -45,5 +45,14 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ddlDoping { get; set; }
 
     public bool bEditable { get; set; }
+
+    public class DatatableEntryClubHistory
+    {
+      public int    iIx { get; set; }
+      public string sClubName { get; set; }
+      public string sDt { get; set; }
+      public string sValue { get; set; }
+      public string sTransferFee { get; set; }
+    }
   }
 }
