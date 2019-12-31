@@ -5198,7 +5198,10 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Club clbUser = ckClub();
 
-      statisticModel.iLeague = clbUser.iLand;
+      int iLand = 0;
+      if (clbUser != null) iLand = clbUser.iLand;
+
+      statisticModel.iLeague = iLand;
       for (int iC = 0; iC < MvcApplication.ckcore.ltCups.Count; iC++) {
         CornerkickManager.Cup cup = MvcApplication.ckcore.ltCups[iC];
 
@@ -5207,7 +5210,7 @@ namespace CornerkickWebMvc.Controllers
         statisticModel.ddlLeagues.Add(new SelectListItem {
                                         Text = cup.sName,
                                         Value = cup.iId2.ToString(),
-                                        Selected = clbUser.iLand == cup.iId2
+                                        Selected = iLand == cup.iId2
                                       }
         );
       }
