@@ -3833,6 +3833,8 @@ namespace CornerkickWebMvc.Controllers
     {
       string sEmblem = "<img src=\"/Content/Uploads/emblems/";
 
+      if (!string.IsNullOrEmpty(sStyle)) sStyle = " style=\"" + sStyle + "\"";
+
       if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"vereinslos\"/>";
 
 #if DEBUG
@@ -3851,7 +3853,6 @@ namespace CornerkickWebMvc.Controllers
         else                                    sEmblem += "0";
       }
 
-      if (!string.IsNullOrEmpty(sStyle)) sStyle = " style=\"" + sStyle + "\"";
       sEmblem += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + clb.sName + "\"/>";
 
       return sEmblem;
