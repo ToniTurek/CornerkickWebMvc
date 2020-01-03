@@ -2431,13 +2431,19 @@ namespace CornerkickWebMvc.Controllers
                   return Json("Ihr Kreditrahmen ist leider nicht hoch genug", JsonRequestBehavior.AllowGet);
                 }
 
-                int iClubPlayer = pl.iClubId;
                 CornerkickManager.Club clbGive = null;
-                if (iClubPlayer >= 0) clbGive = MvcApplication.ckcore.ltClubs[iClubPlayer];
+                if (pl.iClubId >= 0) clbGive = MvcApplication.ckcore.ltClubs[pl.iClubId];
 
                 if (iTransferFeeSecret > club.iBalanceSecret) {
                   transfer.ltOffers.Remove(offer);
                   return Json("Sie haben nicht genug Schwarzgeld...", JsonRequestBehavior.AllowGet);
+                }
+
+                if (clbGive == null) {
+                  sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
+                  offer.iFee = 0;
+                  MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
+                  break;
                 }
 
                 if (pl.contract.iFixTransferFee > 0) {

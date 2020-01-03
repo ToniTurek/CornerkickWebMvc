@@ -231,13 +231,16 @@
             bnAcceptOffer.style.display = "none";
 
             // Initialize transfer fee
+            var sClubName = data[0].club;
             var iFixedFee = getIntFromString(data[0].fixtransferfee);
             var tbTransferFee = document.getElementById("tbTransferFee");
             var tbTransferFeeSecret = document.getElementById("tbTransferFeeSecret");
-            if (iFixedFee > 0) {
+            if (sClubName === "vereinslos" || iFixedFee > 0) {
               tbTransferFee.disabled = true;
               tbTransferFeeSecret.disabled = true;
-              tbTransferFee.value = data[0].fixtransferfee;
+              if (iFixedFee > 0) {
+                tbTransferFee.value = data[0].fixtransferfee;
+              }
             } else {
               tbTransferFee.disabled = false;
               tbTransferFeeSecret.disabled = false;
