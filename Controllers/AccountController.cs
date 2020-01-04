@@ -833,6 +833,12 @@ namespace CornerkickWebMvc.Controllers
         mdRegister.bRegisterPossible = true;
       }
 
+      // Set jersey colors
+      mdRegister.cl1 = System.Drawing.Color.White;
+      mdRegister.cl2 = System.Drawing.Color.Blue;
+      mdRegister.cl3 = System.Drawing.Color.White;
+      mdRegister.cl4 = System.Drawing.Color.Red;
+
       return View(mdRegister);
     }
 

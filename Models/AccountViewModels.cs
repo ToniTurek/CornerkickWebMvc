@@ -114,10 +114,10 @@ namespace CornerkickWebMvc.Models
     public System.Web.HttpPostedFileBase fileEmblem { get; set; }
 
     //[Required]
-    public Color cl1 = System.Drawing.Color.White;
-    public Color cl2 = System.Drawing.Color.Blue;
-    public Color cl3 = System.Drawing.Color.White;
-    public Color cl4 = System.Drawing.Color.Red;
+    public Color cl1 { get; set; }
+    public Color cl2 { get; set; }
+    public Color cl3 { get; set; }
+    public Color cl4 { get; set; }
 
 #if !DEBUG
     [Required]
