@@ -94,10 +94,12 @@
         },
         "columns": [
           { "data": "iIx" },
-          { "data": "sDt" },
-          { "data": "sClubName" },
+          { "data": "sPlayerName" },
           { "data": "sTransferFee" },
-          { "data": "sValue" }
+          { "data": "sValue" },
+          { "data": "sClubTakeName" },
+          { "data": "sClubGiveName" },
+          { "data": "sDt" }
         ],
         rowReorder: {
           dataSrc: 'iIx'
@@ -118,8 +120,8 @@
             "visible": false,
             "searchable": false
           },
-          { "targets": [1, 2], "className": "dt-center" },
-          { "targets": [3, 4], "className": "dt-right" }
+          { "targets": [1, 4, 5, 6], "className": "dt-center" },
+          { "targets": [2, 3], "className": "dt-right" }
         ],
         select: false
       });
@@ -239,10 +241,12 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Datum</th>
-            <th>Verein</th>
+            <th>Spieler</th>
             <th>Ablöse [€]</th>
             <th>Marktwert [€]</th>
+            <th>Aufn. Verein</th>
+            <th>Abg. Verein</th>
+            <th>Datum</th>
           </tr>
         </thead>
         <tbody>

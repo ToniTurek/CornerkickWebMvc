@@ -1849,20 +1849,11 @@ namespace CornerkickWebMvc.Controllers
             //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
           }
 
-          // Get player value at transfer date
-          int iValue = 0;
-          if (pl.ltHistory != null) {
-            foreach (CornerkickGame.Player.History hy in pl.ltHistory) {
-              iValue = hy.iValue;
-              if (hy.dt.CompareTo(ch.dt) > 0) break;
-            }
-          }
-
           ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
             iIx = iCh,
-            sClubName = sClubName,
+            sClubTakeName = sClubName,
             sDt = ch.dt.ToString("d", getCi()),
-            sValue = (iValue * 1000).ToString("N0", getCi()),
+            sValue = (pl.getValueHistory(ch.dt) * 1000).ToString("N0", getCi()),
             sTransferFee = ch.iTransferFee.ToString("N0", getCi())
           });
         }
@@ -5344,29 +5335,34 @@ namespace CornerkickWebMvc.Controllers
 
       int iT = 1;
       foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
-        foreach (CornerkickGame.Player.ClubHistory ch in pl.ltClubHistory) {
+        for (int iCh = 0; iCh < pl.ltClubHistory.Count; iCh++) {
+          CornerkickGame.Player.ClubHistory ch = pl.ltClubHistory[iCh];
+
           if (ch.iTransferFee > 0) {
-            // Get club name
-            string sClubName = "vereinslos";
+            // Get name of new club
+            string sClubTakeName = "vereinslos";
             if (ch.iClubId >= 0) {
-              sClubName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
+              sClubTakeName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
               //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
             }
 
-            // Get player value at transfer date
-            int iValue = 0;
-            if (pl.ltHistory != null) {
-              foreach (CornerkickGame.Player.History hy in pl.ltHistory) {
-                iValue = hy.iValue;
-                if (hy.dt.CompareTo(ch.dt) > 0) break;
+            // Get name of old club
+            string sClubGiveName = "vereinslos";
+            if (iCh > 0) {
+              CornerkickGame.Player.ClubHistory chLast = pl.ltClubHistory[iCh - 1];
+              if (chLast.iClubId >= 0) {
+                sClubGiveName = MvcApplication.ckcore.ltClubs[chLast.iClubId].sName;
+                //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
               }
             }
 
             ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
               iIx = iT++,
-              sClubName = sClubName,
+              sPlayerName = pl.sName,
+              sClubTakeName = sClubTakeName,
+              sClubGiveName = sClubGiveName,
               sDt = ch.dt.ToString("d", getCi()),
-              sValue = (iValue * 1000).ToString("N0", getCi()),
+              sValue = (pl.getValueHistory(ch.dt) * 1000).ToString("N0", getCi()),
               sTransferFee = ch.iTransferFee.ToString("N0", getCi())
             });
           }

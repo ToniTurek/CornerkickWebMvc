@@ -49,7 +49,9 @@ namespace CornerkickWebMvc.Models
     public class DatatableEntryClubHistory
     {
       public int    iIx { get; set; }
-      public string sClubName { get; set; }
+      public string sPlayerName { get; set; }
+      public string sClubTakeName { get; set; }
+      public string sClubGiveName { get; set; }
       public string sDt { get; set; }
       public string sValue { get; set; }
       public string sTransferFee { get; set; }
