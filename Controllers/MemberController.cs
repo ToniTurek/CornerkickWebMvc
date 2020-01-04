@@ -2433,6 +2433,7 @@ namespace CornerkickWebMvc.Controllers
                 if (clbGive == null) {
                   sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
                   offer.iFee = 0;
+                  offer.iFeeSecret = 0;
                   MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
                   break;
                 }
@@ -2440,6 +2441,7 @@ namespace CornerkickWebMvc.Controllers
                 if (pl.contract.iFixTransferFee > 0) {
                   sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " verpflichtet.";
                   offer.iFee = pl.contract.iFixTransferFee;
+                  offer.iFeeSecret = 0;
                   MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
                   MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   break;
@@ -2451,7 +2453,6 @@ namespace CornerkickWebMvc.Controllers
                 offer.iFeeSecret = iTransferFeeSecret;
 
                 transfer.ltOffers[iO] = offer;
-
                 MvcApplication.ckcore.ltTransfer[iT] = transfer;
 
                 MvcApplication.ckcore.tr.informUser(transfer, offer);
