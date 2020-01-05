@@ -2431,19 +2431,21 @@ namespace CornerkickWebMvc.Controllers
                 }
 
                 if (clbGive == null) {
-                  sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
                   offer.iFee = 0;
                   offer.iFeeSecret = 0;
-                  MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
+                  if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                    sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
+                  }
                   break;
                 }
 
                 if (pl.contract.iFixTransferFee > 0) {
-                  sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " verpflichtet.";
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
-                  MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club);
-                  MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
+                  if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                    sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " verpflichtet.";
+                    MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
+                  }
                   break;
                 }
 
@@ -2459,11 +2461,11 @@ namespace CornerkickWebMvc.Controllers
 
                 if (clbGive != null) {
                   MvcApplication.ckcore.sendNews(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", iType: CornerkickManager.Main.iNewsTypePlayerTransferNewOffer, iId: iPlayerId);
+                  sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.sName + " erfolgreich abgegeben.";
                 }
 
                 pl.character.fMoney += 0.05f;
 
-                sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.sName + " erfolgreich abgegeben.";
                 break;
               }
             }
