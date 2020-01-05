@@ -5417,7 +5417,7 @@ namespace CornerkickWebMvc.Controllers
       if (iTo < 0) return Json("Error. Unknown user", JsonRequestBehavior.AllowGet);
       if (string.IsNullOrEmpty(sText)) return Json("Error. Nachricht leer", JsonRequestBehavior.AllowGet);
 
-      MvcApplication.ckcore.sendNews(iTo, sText, 99, 0, System.DateTime.Now, AccountController.getiUser(ckUser()));
+      MvcApplication.ckcore.sendNews(iTo, sText, iType: 99, iId: 0, dt: System.DateTime.Now, iFrom: AccountController.getiUser(ckUser()));
 
       return Json("Nachricht an " + MvcApplication.ckcore.ltUser[iTo].sFirstname + " " + MvcApplication.ckcore.ltUser[iTo].sSurname + " gesendet!", JsonRequestBehavior.AllowGet);
     }
