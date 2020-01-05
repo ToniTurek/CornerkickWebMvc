@@ -2443,8 +2443,8 @@ namespace CornerkickWebMvc.Controllers
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
                   if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
-                    sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " verpflichtet.";
-                    MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + pl.contract.iFixTransferFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
+                    sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
+                    MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   }
                   break;
                 }
