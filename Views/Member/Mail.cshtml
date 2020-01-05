@@ -115,10 +115,10 @@
     });
 
     function ddlMailToChanged() {
-      bnSend    = document.getElementById("bnSend");
-      tbNewMail = document.getElementById("tbNewMail");
+      var bnSend = document.getElementById("bnSend");
+      var tbNewMail = document.getElementById("tbNewMail");
 
-      bnSend.disabled = false;
+      bnSend.disabled = $('#ddlUser').val() < 0;
 
       tbNewMail.focus();
       tbNewMail.selectionEnd = 0;
@@ -176,8 +176,8 @@
 <div style="margin-top: 4%"></div>
 <b class="left">An:</b>
 @Html.DropDownListFor(m => m.sMailTo, Model.ltDdlUser, new { @class = "form-control", id = "ddlUser", @onchange = "ddlMailToChanged()" })
+Max. 128 Zeichen
 <div class="form-group">
   <textarea id="tbNewMail" rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
 </div>
-
 <button type="submit" id="bnSend" class="btn btn-default" style="width: 100%">abschicken</button>
