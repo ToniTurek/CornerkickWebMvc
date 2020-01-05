@@ -413,6 +413,9 @@ namespace CornerkickWebMvc.Controllers
       // Clear captain
       clb.iCaptainId = new int[3] { -1, -1, -1 };
 
+      // Clear record games
+      clb.ltGameRecord.Clear();
+
       // Stadium
       clb.stadium.sName = clb.sName + " Stadion";
       clb.stadium.iTicketcounter = 1;
@@ -457,7 +460,7 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
           pl.fFresh = 1f;
 #endif
-          pl.contract = MvcApplication.ckcore.plr.getContract(pl, (byte)rnd.Next(1, 4), 1000);
+          pl.contract = MvcApplication.ckcore.plr.getContract(pl, (byte)rnd.Next(1, 4));
 
           pl.iNr = (byte)(iPos + (11 * iPl));
 
