@@ -455,7 +455,7 @@
     </div>
 
     if (Model.bOwnPlayer && (player.iNr < 1 || Model.bEditable) && !Model.bJouth) {
-      <div class="form-group">
+      <div class="form-group" style="height: 30px">
         @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
           @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @class = "form-control", @onchange = "setNo()", id = "iDdlINo", @style = "width:70px" })
