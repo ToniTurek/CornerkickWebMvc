@@ -4487,16 +4487,31 @@ namespace CornerkickWebMvc.Controllers
 
         // Cup
         foreach (CornerkickManager.Cup cup in MvcApplication.ckcore.ltCups) {
-          int iSpTg = 0;
+          int iMd = 0;
           foreach (CornerkickManager.Cup.Matchday md in cup.ltMatchdays) {
             if (dt.Date.Equals(md.dt.Date)) {
-              if (md.ltGameData == null) continue;
+              if (md.ltGameData == null || md.ltGameData.Count == 0) { // If no data
+                if (cup.iId == 2 && cup.iId2 == club.iLand && iMd == 0) { // If nat. cup and first round
+                  ltEvents.Add(new Models.DiaryEvent {
+                    iID = ltEvents.Count,
+                    sTitle = " " + cup.sName + ", 1. Pokalrunde",
+                    sStartDate = md.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    sEndDate = md.dt.AddMinutes(105).ToString("yyyy-MM-ddTHH:mm:ss"),
+                    sColor = "rgb(100, 100, 255)",
+                    bEditable = false,
+                    bAllDay = false
+                  });
+                }
+
+                continue;
+              }
 
               foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
                 int iIdH = gd.team[0].iTeamId;
                 int iIdA = gd.team[1].iTeamId;
                 if (iIdH == club.iId ||
                     iIdA == club.iId ||
+                    (cup.iId == 2 && iMd == 0) ||
                     cup.iId == 7) {
                   string sH = "";
                   string sA = "";
@@ -4508,13 +4523,10 @@ namespace CornerkickWebMvc.Controllers
                   string sTitle = " " + cup.sName;
                   string sColor = "rgb(200, 0, 200)";
                   if (cup.iId == 1) { // Nat. league
-                    sTitle = " Liga, " + (iSpTg + 1).ToString().PadLeft(2) + ". Spieltag";
+                    sTitle = " Liga, " + (iMd + 1).ToString().PadLeft(2) + ". Spieltag";
                     sColor = "rgb(0, 175, 100)";
                   } else if (cup.iId == 2) { // Nat. Cup
-                    string sPokalrunde = "";
-                    sPokalrunde = MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count)];
-                    sTitle += ", " + sPokalrunde;
-
+                    sTitle += ", " + MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count)];
                     sColor = "rgb(100, 100, 255)";
                   } else if (cup.iId == -5) { // Testgame requests
                     sColor = "rgb(255, 200, 255)";
@@ -4549,7 +4561,7 @@ namespace CornerkickWebMvc.Controllers
                   break;
                 }
               }
-            } else if (cup.iId == 2 && cup.iId2 == club.iLand && iSpTg == 0 && dt.Date.Equals(MvcApplication.ckcore.dtSeasonStart.AddDays(6).Date)) {
+            } else if (cup.iId == 2 && cup.iId2 == club.iLand && iMd == 0 && dt.Date.Equals(MvcApplication.ckcore.dtSeasonStart.AddDays(6).Date)) {
               ltEvents.Add(new Models.DiaryEvent {
                 iID = ltEvents.Count,
                 sTitle = " " + cup.sName + ", Auslosung 1. Runde",
@@ -4561,7 +4573,7 @@ namespace CornerkickWebMvc.Controllers
               });
             }
 
-            iSpTg++;
+            iMd++;
           }
         }
 
