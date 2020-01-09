@@ -284,6 +284,8 @@ namespace CornerkickWebMvc.Controllers
 
     public void SetAdminClub(int iClubIx)
     {
+      MvcApplication.clubAdmin = null;
+
       if (iClubIx <                                    0) return;
       if (iClubIx >= MvcApplication.ckcore.ltClubs.Count) return;
 
