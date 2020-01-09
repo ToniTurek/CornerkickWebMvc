@@ -881,6 +881,8 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult SwitchPlayerByIndex(int iIndex1, int iIndex2)
     {
+      if (iIndex1 < 0 || iIndex2 < 0) return Json(false, JsonRequestBehavior.AllowGet);
+
       CornerkickManager.User user = ckUser();
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -935,7 +937,19 @@ namespace CornerkickWebMvc.Controllers
       if (iID1 >= MvcApplication.ckcore.ltPlayer.Count) return null;
       if (iID2 >= MvcApplication.ckcore.ltPlayer.Count) return null;
 
-      return Json(SwitchPlayer(MvcApplication.ckcore.ltPlayer[iID1], MvcApplication.ckcore.ltPlayer[iID2]), JsonRequestBehavior.AllowGet);
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return null;
+
+      int iIndex1 = -1;
+      int iIndex2 = -1;
+      for (int iIx = 0; iIx < clb.ltPlayer.Count; iIx++) {
+        if      (clb.ltPlayer[iIx].iId == iID1) iIndex1 = iIx;
+        else if (clb.ltPlayer[iIx].iId == iID2) iIndex2 = iIx;
+
+        if (iIndex1 >= 0 && iIndex2 >= 0) break;
+      }
+
+      return Json(SwitchPlayerByIndex(iIndex1, iIndex2), JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult SwitchPlayer(CornerkickGame.Player pl1, CornerkickGame.Player pl2)
