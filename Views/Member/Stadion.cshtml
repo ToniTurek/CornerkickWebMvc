@@ -166,6 +166,8 @@
         dataType: "json",
         data: { iSeats: seats, iArt: seattypes },
         success: function (sKostenDauer) {
+          bnBuild = document.getElementById("bnBuild");
+
           $("#bnBuild").text("Kosten: " + sKostenDauer[0] + " €, Dauer: " + sKostenDauer[1] + " Tage");
 
           if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
