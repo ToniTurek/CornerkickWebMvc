@@ -181,11 +181,15 @@
         url: '/Member/StadiumGetCostTopring',
         dataType: "json",
         success: function (sKostenDauer) {
-          $("#bnBuildTopring").text("Oberring bauen. Kosten: " + sKostenDauer[0] + ", Dauer: " + sKostenDauer[1] + " Tage");
-          if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
-            bnBuildTopring.disabled = true;
-          } else {
-            bnBuildTopring.disabled = false;
+          bnBuildTopring.disabled = true;
+
+          if (sKostenDauer) {
+            $("#bnBuildTopring").text("Oberring bauen. Kosten: " + sKostenDauer[0] + ", Dauer: " + sKostenDauer[1] + " Tage");
+            if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
+              bnBuildTopring.disabled = true;
+            } else {
+              bnBuildTopring.disabled = false;
+            }
           }
         }
       });
@@ -465,25 +469,25 @@
 
               var htmlAttributesEditorFor = new Dictionary<string, object>
               {
-                            { "type", "number" },
-                            { "class", "form-control tbSeats" },
-                            { "id", "tbSeats_" + iB.ToString() },
-                            //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
-                            { "style", "position: relative width: 100%; text-align: right" },
-                            { "autocomplete", "off" },
-                            { "min", "0" }
-                          };
+                { "type", "number" },
+                { "class", "form-control tbSeats" },
+                { "id", "tbSeats_" + iB.ToString() },
+                //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
+                { "style", "position: relative width: 100%; text-align: right" },
+                { "autocomplete", "off" },
+                { "min", "0" }
+              };
               if (Model.iSeatsBuild[iB] > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
 
               //@Html.EditorFor(model => model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
 
               var htmlAttributesDropDownListFor = new Dictionary<string, object>
               {
-                            { "class", "form-control ddlSeatTypes" },
-                            { "id", "iDdlId" + iB.ToString() },
-                            { "style", "position: relative; text-align: right" },
-                            { "onchange", "getStadion()" }
-                          };
+                { "class", "form-control ddlSeatTypes" },
+                { "id", "iDdlId" + iB.ToString() },
+                { "style", "position: relative; text-align: right" },
+                { "onchange", "getStadion()" }
+              };
 
               if (Model.iSeatsBuild[iB] > 0) {
                 htmlAttributesDropDownListFor.Add("disabled", "disabled");

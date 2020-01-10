@@ -3099,6 +3099,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      if (clb.stadium.bTopring) return Json(false, JsonRequestBehavior.AllowGet);
+      if (clb.stadium.iTopringDaysConstruct > 0) return Json(false, JsonRequestBehavior.AllowGet);
+
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.bTopring = !clb.stadium.bTopring;
 
