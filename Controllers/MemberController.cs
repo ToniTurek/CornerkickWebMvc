@@ -2876,7 +2876,7 @@ namespace CornerkickWebMvc.Controllers
       sBox[1] += "<select name=\"sAutoSubsIn" + iAS.ToString() + "\" class=\"form-control\" id =\"ddlAutoSubIn" + iAS.ToString() + "\" onchange =\"setAutoSubs(" + iAS.ToString() + ")\"><option value=\"-1\">aus</option>";
 
       // foreach player
-      for (int iPl = 0; iPl < MvcApplication.ckcore.game.data.nPlStart + MvcApplication.ckcore.game.data.nPlRes; iPl++) {
+      for (byte iPl = 0; iPl < MvcApplication.ckcore.game.data.nPlStart + MvcApplication.ckcore.game.data.nPlRes; iPl++) {
         CornerkickGame.Player pl = clb.ltPlayer[iPl];
 
         bool bOut = iPl < MvcApplication.ckcore.game.data.nPlStart;
@@ -2900,6 +2900,7 @@ namespace CornerkickWebMvc.Controllers
         }
 
         string sPos = "";
+        pl.iIndex = iPl;
         if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
         else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
         string sStrength = CornerkickGame.Tool.getAveSkill(pl).ToString(" (0.0)");
