@@ -4122,7 +4122,7 @@ namespace CornerkickWebMvc.Controllers
 
       string sBox = "";
 
-      var ltScorer = MvcApplication.ckcore.ui.getScorer(iGameType, iLand, iDivision);
+      var ltScorer = MvcApplication.ckcore.ui.getScorer(iGameType, iLand: iLand, iDivision: iDivision, bNation: iGameType == 7);
 
       int iNo = 0;
       foreach (CornerkickManager.UI.Scorer sc in ltScorer) {
