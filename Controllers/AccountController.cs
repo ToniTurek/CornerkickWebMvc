@@ -253,7 +253,7 @@ namespace CornerkickWebMvc.Controllers
               // Retire all cpu player
               while (clubCpu.ltPlayer.Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayer[0]);
               clubCpu.ltPlayerJouth.Clear();
-        
+
               clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
 
               // Assign club colors
@@ -439,7 +439,7 @@ namespace CornerkickWebMvc.Controllers
 
       sponUser.bMain = true;
       sponUser.iId = 1;
-      sponUser.iYears = 2;
+      sponUser.iYears = 1;
       sponUser.iGeldJahr     = 8000000; // 8 mio.
       sponUser.iGeldMeister  = 1000000; // 1 mio.
       sponUser.iMoneyVicHome =   10000;
