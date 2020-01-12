@@ -18,21 +18,21 @@
 
       // Radio-buttons league
       $("#rbTableTotal").on('change', function (ev) {
-        setLeague2(1, 0);
+        setLeague2(0);
       });
 
       $("#rbTableH").on('change', function (ev) {
-        setLeague2(1, 0);
+        setLeague2(0);
       });
 
       $("#rbTableA").on('change', function (ev) {
-        setLeague2(1, 0);
+        setLeague2(0);
       });
 
       plotLeaguePlaceGraph($('#ddlSeason').val());
     });
 
-    function plotLeaguePlaceGraph(iSaison) {
+    function plotLeaguePlaceGraph(iSeason) {
       var fLigaMax = @Html.Raw(Json.Encode(Model.iLeagueSize));
       fLigaMax = fLigaMax + 0.1;
 
@@ -40,7 +40,7 @@
         type: 'post',
         url: '/Member/GetLeaguePlaceHistory',
         dataType: "json",
-        data: { iSeason: iSaison },
+        data: { iSeason: iSeason },
         success: function (ltPlace) {
           var chart = new CanvasJS.Chart("chartContainerPlaceHist", {
             animationEnabled: true,
@@ -104,7 +104,7 @@
 
     <label style="margin-left: 10px">
       Spieltag:
-      <select id="ddlMatchday" onchange="setLeague2(1, 0)"></select>
+      <select id="ddlMatchday" onchange="setLeague2(0)"></select>
     </label>
 
     <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">

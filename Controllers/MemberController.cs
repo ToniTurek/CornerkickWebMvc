@@ -3936,7 +3936,7 @@ namespace CornerkickWebMvc.Controllers
       return ddlSeason;
     }
 
-    public JsonResult getDdlMatchdays(int iSaison, int iLand, byte iDivision)
+    public JsonResult getDdlMatchdays(int iSeason, int iLand, byte iDivision)
     {
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision);
 
@@ -3949,11 +3949,11 @@ namespace CornerkickWebMvc.Controllers
       return Json(ltMd, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult LeagueGetMatchday(int iSaison, int iLand, byte iDivision)
+    public JsonResult LeagueGetMatchday(int iSeason, int iLand, byte iDivision)
     {
       int iMd = 0;
 
-      if (iSaison < MvcApplication.ckcore.iSeason) { // Past seasons
+      if (iSeason < MvcApplication.ckcore.iSeason) { // Past seasons
         iMd = MvcApplication.ckcore.tl.getCup(1, iLand, iDivision).getMatchdaysTotal();
       } else { // Current seasons
         // Get current matchday
@@ -4002,10 +4002,10 @@ namespace CornerkickWebMvc.Controllers
       return cup;
     }
 
-    public JsonResult setLeague(Models.LeagueModels mlLeague, int iSaison, int iLand, byte iDivision, int iMatchday, byte iHA)
+    public JsonResult setLeague(Models.LeagueModels mlLeague, int iSeason, int iLand, byte iDivision, int iMatchday, byte iHA)
     {
       CornerkickManager.Club clb = ckClub();
-      CornerkickManager.Cup league = getCup(iSaison, 1, iLand, iDivision);
+      CornerkickManager.Cup league = getCup(iSeason, 1, iLand, iDivision);
 
       string sBox = getTable(league, iMatchday, -1, iHA, clb, 1, 4, 8, -1);
 
@@ -4075,13 +4075,13 @@ namespace CornerkickWebMvc.Controllers
       return sBox;
     }
 
-    public JsonResult setLeagueTeams(int iSaison, int iLand, byte iDivision, int iMatchday)
+    public JsonResult setLeagueTeams(int iSeason, int iLand, byte iDivision, int iMatchday)
     {
       if (iMatchday < 1) return Json("", JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Club clbUser = ckClub();
 
-      CornerkickManager.Cup league = getCup(iSaison, 1, iLand, iDivision);
+      CornerkickManager.Cup league = getCup(iSeason, 1, iLand, iDivision);
 
       CornerkickManager.Cup.Matchday md = new CornerkickManager.Cup.Matchday();
       md.ltGameData = new List<CornerkickGame.Game.Data>();

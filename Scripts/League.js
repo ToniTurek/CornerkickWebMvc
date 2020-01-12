@@ -1,12 +1,12 @@
 ﻿function changeLand(iDivision) {
-  var iSaison = $('#ddlSeason').val();
+  var iSeason = $('#ddlSeason').val();
   var iLand = $('#ddlLand').val();
 
   $.ajax({
     url: '/Member/getDdlMatchdays',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision },
+    data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision },
     success: function (ltMd) {
       $('#ddlMatchday').empty();
       $.each(ltMd, function (i, p) {
@@ -17,19 +17,20 @@
         url: '/Member/LeagueGetMatchday',
         type: "GET",
         dataType: "JSON",
-        data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision },
+        data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision },
         success: function (iMd) {
           document.getElementById("ddlMatchday").value = iMd;
-          setLeague2(iSaison, iDivision);
+          setLeague2(iDivision);
         }
       });
     }
   });
 
-  plotLeaguePlaceGraph(iSaison);
+  plotLeaguePlaceGraph(iSeason);
 }
 
-function setLeague2(iSaison, iDivision) {
+function setLeague2(iDivision) {
+  var iSeason = $('#ddlSeason').val();
   var iLand = $('#ddlLand').val();
   var iMd = $('#ddlMatchday').val();
   var divDrawTable    = $("#tableDivLeague");
@@ -49,7 +50,7 @@ function setLeague2(iSaison, iDivision) {
     url: '/Member/setLeague',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd, iHA: iHA },
+    data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision, iMatchday: iMd, iHA: iHA },
     success: function (sTable) {
       var sBox = drawTable(sTable);
       divDrawTable.html(sBox).show();
@@ -58,7 +59,7 @@ function setLeague2(iSaison, iDivision) {
         url: '/Member/setLeagueTeams',
         type: "GET",
         dataType: "JSON",
-        data: { iSaison: iSaison, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
+        data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
         success: function (sTeams) {
           actionDrawTeams(sTeams);
         }
