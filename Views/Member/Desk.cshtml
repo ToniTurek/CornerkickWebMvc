@@ -185,6 +185,10 @@
             sDt += " (Liga)";
           } else if (clb.nextGame.iGameType == 2) {
             sDt += " (Pokal)";
+          } else if (clb.nextGame.iGameType == 3) {
+            sDt += " (Gold-Cup)";
+          } else if (clb.nextGame.iGameType == 4) {
+            sDt += " (Silver-Cup)";
           } else if (clb.nextGame.iGameType == 5) {
             sDt += " (Testspiel)";
           } else if (clb.nextGame.iGameType == 7) {
@@ -259,9 +263,20 @@
               lineColor: "white",
               //showInLegend: true,
               markerSize: 20,
+              markerColor: "rgb(255, 200, 14)",
+              legendText: "Int.",
+              dataPoints: dataLastGames[2]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
               markerColor: "rgb(91, 146, 229)",
               legendText: "Nat.",
-              dataPoints: dataLastGames[3]
+              dataPoints: dataLastGames[4]
             }
           ]
         });
