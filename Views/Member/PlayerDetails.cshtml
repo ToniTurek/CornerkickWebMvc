@@ -507,7 +507,7 @@
             @{
               string sVerletzung = "keine";
               if (player.injury != null) {
-                sVerletzung = player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + MvcApplication.ckcore.ltInjury[player.injury.iType][player.injury.iType2];
+                sVerletzung = "Noch " + player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + MvcApplication.ckcore.ltInjury[player.injury.iType][player.injury.iType2];
               }
             }
             <td align="right">Verletzung:</td>
