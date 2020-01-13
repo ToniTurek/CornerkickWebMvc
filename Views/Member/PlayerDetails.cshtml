@@ -665,7 +665,9 @@
 
         <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px; text-align: center">
           @* Extend player contract *@
-          <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
+          @if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
+            <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
+          }
 
           @* Put on / take from transferlist *@
           @if (MvcApplication.ckcore.plr.onTransferlist(player)) {

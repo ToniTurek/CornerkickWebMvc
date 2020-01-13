@@ -2214,6 +2214,12 @@ namespace CornerkickWebMvc.Controllers
       if (iId    < 0) return Json("Error", JsonRequestBehavior.AllowGet);
       if (iYears < 1) return Json("0",     JsonRequestBehavior.AllowGet);
 
+      if (iId < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (iId >= MvcApplication.ckcore.ltPlayer.Count) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      // Get player
+      CornerkickGame.Player plContract = MvcApplication.ckcore.ltPlayer[iId];
+
       // Convert salary to int
       int iSalary = convertCurrencyToInt(sSalary);
       if (iSalary < 0) return Json("Error", JsonRequestBehavior.AllowGet);
@@ -2240,19 +2246,31 @@ namespace CornerkickWebMvc.Controllers
 
       string sReturn = "";
       if (iMode == 0) { // contract extention
-        CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iId];
+        if (plContract.contract.iLength + iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
 
-        if (player.contract.iLength + iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
+        plContract.contract.iLength += (byte)iYears;
+        plContract.contract.iSalary = iSalary;
+        plContract.contract.iPlay = iBonusPlay;
+        plContract.contract.iGoal = iBonusGoal;
+        plContract.contract.iFixTransferFee = iFixTransferFee;
+        plContract.contract.fMood = fPlayerMood;
 
-        player.contract.iLength += (byte)iYears;
-        player.contract.iSalary = iSalary;
-        player.contract.iPlay = iBonusPlay;
-        player.contract.iGoal = iBonusGoal;
-        player.contract.iFixTransferFee = iFixTransferFee;
-        player.contract.fMood = fPlayerMood;
-        MvcApplication.ckcore.ltPlayer[iId] = player;
+        if (plContract.iClubId >= 0 && plContract.iClubId < MvcApplication.ckcore.ltClubs.Count) {
+          CornerkickManager.Club clb = MvcApplication.ckcore.ltClubs[plContract.iClubId];
 
-        sReturn = "Der Vertrag mit " + player.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.";
+          for (int iPlJ = 0; iPlJ < clb.ltPlayerJouth.Count; iPlJ++) {
+            CornerkickGame.Player plJ = clb.ltPlayerJouth[iPlJ];
+            if (plJ.iId == plContract.iId) {
+              if ((int)plJ.getAge(MvcApplication.ckcore.dtDatum) < 16) return Json("Error: Spieler zu jung für Profivertrag", JsonRequestBehavior.AllowGet);
+
+              clb.ltPlayerJouth.RemoveAt(iPlJ);
+              clb.ltPlayer.Add(plJ);
+              break;
+            }
+          }
+        }
+
+        sReturn = "Der Vertrag mit " + plContract.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.";
       } else { // new contract
         if (iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
 
@@ -2269,7 +2287,7 @@ namespace CornerkickWebMvc.Controllers
         offer.club = ckClub();
 
         MvcApplication.ckcore.tr.addChangeOffer(iId, offer);
-        sReturn = "Sie haben sich mit dem Spieler " + MvcApplication.ckcore.ltPlayer[iId].sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
+        sReturn = "Sie haben sich mit dem Spieler " + plContract.sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
       }
 
       // Set status code to OK
