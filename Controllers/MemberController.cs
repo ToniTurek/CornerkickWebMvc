@@ -5111,6 +5111,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      if (fBalanceSecretFracAdmissionPrice < 0.0) {
+        return Json("Falsche Eingabe!", JsonRequestBehavior.AllowGet);
+      }
+
+      if (fBalanceSecretFracAdmissionPrice > 0.2) {
+        return Json("Maximal 20% erlaubt!", JsonRequestBehavior.AllowGet);
+      }
+
       clb.fBalanceSecretFracAdmissionPrice = fBalanceSecretFracAdmissionPrice / 100f;
 
       return Json(true, JsonRequestBehavior.AllowGet);
