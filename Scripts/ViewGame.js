@@ -697,6 +697,9 @@ function plotStatistics(jState = -1) {
 
       $("#txtReferee").html("Schiedsrichter: " + gD.sRefereeQuality + "<br/>Fehlentscheidungen: " + gD.sRefereeDecisions);
 
+      $("#statistikGoals").html('');
+      $("#statistikCards").html('');
+      $("#statistikSubs") .html('');
       $("#statistikGoals").html(gD.sStatGoals);
       $("#statistikCards").html(gD.sStatCards);
       $("#statistikSubs") .html(gD.sStatSubs);
