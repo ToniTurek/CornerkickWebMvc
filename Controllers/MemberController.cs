@@ -4526,7 +4526,8 @@ namespace CornerkickWebMvc.Controllers
             sDescription = MvcApplication.ckcore.sTraining[club.training.iType[(int)dt.DayOfWeek]],
             sStartDate = dtTmp.ToString("yyyy-MM-ddTHH:mm:ss"),
             sEndDate = dtTmp.AddMinutes(120).ToString("yyyy-MM-ddTHH:mm:ss"),
-            sColor = "rgb(255, 200, 0)",
+            sColor = "rgb(255, 255, 0)",
+            sTextColor = "rgb(100, 100, 100)",
             bEditable = false,
             bAllDay = false
           });
@@ -4575,6 +4576,8 @@ namespace CornerkickWebMvc.Controllers
                   } else if (cup.iId == 2) { // Nat. Cup
                     sTitle += ", " + MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count)];
                     sColor = "rgb(100, 100, 255)";
+                  } else if (cup.iId == 3 || cup.iId == 4) { // Int. games
+                    sColor = "rgb(255, 200, 14)";
                   } else if (cup.iId == -5) { // Testgame requests
                     sColor = "rgb(255, 200, 255)";
                   } else if (cup.iId == 7) { // World cup
@@ -4644,6 +4647,7 @@ namespace CornerkickWebMvc.Controllers
                         start       = e.sStartDate,
                         end         = e.sEndDate,
                         color       = e.sColor,
+                        textColor   = e.sTextColor,
                         editable    = e.bEditable,
                         allDay      = e.bAllDay
                       };
