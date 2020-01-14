@@ -5147,6 +5147,12 @@ namespace CornerkickWebMvc.Controllers
       sponsorModel.ltSponsorBoards = clb.ltSponsorBoards;
       sponsorModel.ltSponsorOffers = clb.ltSponsorOffers;
 
+      // Collect sponsor names
+      sponsorModel.ltSponsorNames = new List<string>();
+      foreach (CornerkickManager.Finance.Spons spns in MvcApplication.ckcore.fz.ltSponsoren) {
+        sponsorModel.ltSponsorNames.Add(spns.name);
+      }
+
       sponsorModel.ltSponsorBoardIds = new List<int>();
       for (int iS = 0; iS < sponsorModel.ltSponsorBoards.Count; iS++) {
         CornerkickManager.Finance.Sponsor spon = sponsorModel.ltSponsorBoards[iS];

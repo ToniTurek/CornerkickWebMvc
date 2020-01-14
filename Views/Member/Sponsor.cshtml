@@ -30,13 +30,13 @@
     sponsorMain.push('<img src="/Content/Images/sponsors/1a.png" style="position: relative; width: 100%; height: 100%"/>');
     sponsorMain.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=12&l=ez&f=ifr&linkID=af710bb1d1484bd029e76eeada862979&t=cornerkick03-21&tracking_id=cornerkick03-21" width="300" height="250" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
     sponsorMain.push(sSponsorGoogleQuad);
-  
+
     var sponsorBoards = [];
     sponsorBoards.push('');
     sponsorBoards.push('<img src="/Content/Images/sponsors/1.png" style="position: relative; width: 100%; height: 100%"/>');
     //var iB = 1;
     while (sponsorBoards.length < 10) {
-      sponsorBoards.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=288&l=ez&f=ifr&linkID=304dbf1425f3596b252609b0812b5e4b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="320" height="50" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
+      sponsorBoards.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=288&l=ez&f=ifr&linkID=304dbf1425f3596b252609b0812b5e4b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="320" height="50" scrolling="no" border="0" marginwidth="0" style="border:none" frameborder="0"></iframe>');
       sponsorBoards.push(sSponsorGoogleHori);
       //iB++;
     }
@@ -54,7 +54,12 @@
 
     function loadImageMain(iSponsorID) {
       divSponsorMain = document.getElementById("divSponsorMain");
-      divSponsorMain.innerHTML = sponsorMain[iSponsorID];
+      var ltSponsorNames = @Html.Raw(Json.Encode(Model.ltSponsorNames));
+      divSponsorMain.innerHTML = "";
+      if (iSponsorID > 0) {
+        divSponsorMain.innerHTML = "<div style=\"position: absolute; width: 300px; height: 250px; font-size: 30px; background-color:lightblue\" align=\"center\">" + ltSponsorNames[iSponsorID] + "</div>";
+      }
+      divSponsorMain.innerHTML += "<div style=\"position: absolute; width: 300px; height: 250px; z-index: 2\">" + sponsorMain[iSponsorID] + "</div>";
     }
 
     function loadImageBoards(ltSponsorIds) {
@@ -64,9 +69,13 @@
           ltSponsorTmp.push(0);
         }
 
+        var ltSponsorNames = @Html.Raw(Json.Encode(Model.ltSponsorNames));
         for (i = 0; i < ltSponsorTmp.length; i++) {
-          divBoard = document.getElementById("divSponsorBoard_" + i.toString());
-          divBoard.innerHTML = sponsorBoards[ltSponsorTmp[i]];
+          if (ltSponsorTmp[i] > 0) {
+            divBoard = document.getElementById("divSponsorBoard_" + i.toString());
+            divBoard.innerHTML = "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; font-size: 30px; background-color: lightblue\" align=\"center\">" + ltSponsorNames[ltSponsorTmp[i]] + "</div>";
+            divBoard.innerHTML += "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2\">" + sponsorBoards[ltSponsorTmp[i]] + "</div>";
+          }
         }
       }
     }

@@ -11,6 +11,7 @@ namespace CornerkickWebMvc.Models
     public List<CornerkickManager.Finance.Sponsor> ltSponsorBoards { get; set; }
     public      CornerkickManager.Finance.Sponsor  sponsorMain { get; set; }
     public List<int> ltSponsorBoardIds { get; set; }
+    public List<string> ltSponsorNames { get; set; }
 
     public string sEmblem { get; set; }
     public string sColorJersey   { get; set; }
