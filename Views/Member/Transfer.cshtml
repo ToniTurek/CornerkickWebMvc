@@ -5,13 +5,15 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!DOCTYPE html>
+<html>
 <head>
-  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
-  <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
@@ -19,6 +21,13 @@
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
+
+  <style>
+    .disabledDivTransfer {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  </style>
 
   <style media="screen" type="text/css">
     tr.details-control td.symbol {
@@ -154,47 +163,51 @@
           } else if (aData.iOffer < 0) { // negotiation cancelled
             $('td', nRow).css('color', "rgb(180,180,180)");
           }
+        },
+        "drawCallback": function (settings) {
+          $("#divTransferlistContainer").removeClass("disabledDivTransfer");
+          $("body").css("cursor", "default");
         }
       });
 
       // Filter
       $('#ddlFilterPos').on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $('#ddlFilterFType').on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $('#ddlFilterF').on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       // Radio-buttons defence/offence
       $("#rbProfi").on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $("#rbJouth").on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $("#rbTransferlist").on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $("#rbAll").on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $("#cbFixTransferFee").on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
 
       $("#cbNoClub").on('change', function (ev) {
-        jTable.ajax.reload();
+        reloadTransferlist(jTable);
       });
-      
+
       // Select row
       $('#tableTransfer tbody').on('click', 'tr', function () {
         if ($(this).hasClass('selected')) {
@@ -375,6 +388,12 @@
       setView();
     });
 
+    function reloadTransferlist(jTable) {
+      $("#divTransferlistContainer").addClass("disabledDivTransfer");
+      $("body").css("cursor", "progress");
+      jTable.ajax.reload();
+    }
+
     function setView() {
       var divCbTransferlistAll = document.getElementById("divCbTransferlistAll");
       var divCb = document.getElementById("divCb");
@@ -392,110 +411,115 @@
   </script>
 </head>
 
-<h3>Transferliste</h3>
-<div class="form-group" style="position: relative; width: 100%">
-  <div id="divCbTransferlistAll" align="center" style="position: relative; width: 170px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-    <form>
-      <fieldset>
-        <label style="font-size:100%; color: black; margin-right: 4%">
-          <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
-          Transferliste
+<body>
+  <h3>Transferliste</h3>
+  <div id="divTransferlistContainer">
+    <div class="form-group" style="position: relative; width: 100%">
+      <div id="divCbTransferlistAll" align="center" style="position: relative; width: 170px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+        <form>
+          <fieldset>
+            <label style="font-size:100%; color: black; margin-right: 4%">
+              <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
+              Transferliste
+            </label>
+            <label style="font-size:100%; color: black">
+              <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
+              Alle
+            </label>
+          </fieldset>
+        </form>
+      </div>
+
+      <div align="center" style="position: relative; width: 150px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+        <form>
+          <fieldset>
+            <label style="font-size:100%; color: black; margin-right: 4%">
+              <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+              Profis
+            </label>
+            <label style="font-size:100%; color: black">
+              <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+              Jugend
+            </label>
+          </fieldset>
+        </form>
+      </div>
+
+      <div style="position: relative; width: auto; float: left; margin-bottom: 10px; margin-right: 10px">
+        <b class="left">Position:</b>
+        @Html.DropDownListFor(m => m.sFilterPos, Model.ltDdlFilterPos, new { @class = "form-control", id = "ddlFilterPos", @style = "width:80px" })
+      </div>
+
+      <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
+        <b class="left">Fähigkeit:</b>
+        @Html.DropDownListFor(m => m.sFilterFType, Model.ltDdlFilterFType, new { @class = "form-control", id = "ddlFilterFType", @style = "width:160px" })
+      </div>
+
+      <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
+        <b class="left">Wert:</b>
+        @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
+      </div>
+
+      <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
+        <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
+          <input id="cbFixTransferFee" type="checkbox" value="false">
+          Fixe Ablöse
         </label>
-        <label style="font-size:100%; color: black">
-          <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
-          Alle
+        <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
+          <input id="cbNoClub" type="checkbox" value="false">
+          Vereinslos
         </label>
-      </fieldset>
-    </form>
-  </div>
-
-  <div align="center" style="position: relative; width: 150px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-    <form>
-      <fieldset>
-        <label style="font-size:100%; color: black; margin-right: 4%">
-          <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
-          Profis
-        </label>
-        <label style="font-size:100%; color: black">
-          <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
-          Jugend
-        </label>
-      </fieldset>
-    </form>
-  </div>
-
-  <div style="position: relative; width: auto; float: left; margin-bottom: 10px; margin-right: 10px">
-    <b class="left">Position:</b>
-    @Html.DropDownListFor(m => m.sFilterPos, Model.ltDdlFilterPos, new { @class = "form-control", id = "ddlFilterPos", @style = "width:80px" })
-  </div>
-
-  <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
-    <b class="left">Fähigkeit:</b>
-    @Html.DropDownListFor(m => m.sFilterFType, Model.ltDdlFilterFType, new { @class = "form-control", id = "ddlFilterFType", @style = "width:160px" })
-  </div>
-
-  <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
-    <b class="left">Wert:</b>
-    @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
-  </div>
-
-  <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
-    <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
-      <input id="cbFixTransferFee" type="checkbox" value="false">
-      Fixe Ablöse
-    </label>
-    <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
-      <input id="cbNoClub" type="checkbox" value="false">
-      Vereinslos
-    </label>
-  </div>
-</div>
-
-<table id="tableTransfer" cellspacing="0" style="width: auto" class="display responsive nowrap">
-  <thead>
-    <tr>
-      <th></th>
-      <th>IdPlayer</th>
-      <th>iOffer</th>
-      <th>#</th>
-      <th>Datum</th>
-      <th>Name</th>
-      <th>Verein</th>
-      <th>Position</th>
-      <th>Stärke</th>
-      <th>St. ber.</th>
-      <th>Alter</th>
-      <th>Talent</th>
-      <th>Marktwert [€]</th>
-      <th>Fixe Ablöse [€]</th>
-      <th>Nat.</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!---Data and tags are dynamically generated--->
-  </tbody>
-</table>
-
-<button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%; margin-top: 6px">Spieler verpflichten</button>
-<button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot annehmen</button>
-<button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot zurückziehen</button>
-
-<div id="dialogTransferFee" title="Ablöseverhandlungen">
-  <div style="position: relative; width: 100%; height: 30px" class="form-group">
-    <div style="position: absolute; width: 50%; height: auto; top: 10px; left: 6px" class="form-group">
-      <b>Ablöse [€]:</b>
+      </div>
     </div>
-    <div style="position: absolute; width: 50%; left: 50%" class="col-md-10">
-      @Html.TextBoxFor(m => m.iTransferFee, new { @id = "tbTransferFee", @class = "form-control tbTransferFee", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
+
+    <table id="tableTransfer" cellspacing="0" style="width: auto" class="display responsive nowrap">
+      <thead>
+        <tr>
+          <th></th>
+          <th>IdPlayer</th>
+          <th>iOffer</th>
+          <th>#</th>
+          <th>Datum</th>
+          <th>Name</th>
+          <th>Verein</th>
+          <th>Position</th>
+          <th>Stärke</th>
+          <th>St. ber.</th>
+          <th>Alter</th>
+          <th>Talent</th>
+          <th>Marktwert [€]</th>
+          <th>Fixe Ablöse [€]</th>
+          <th>Nat.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+    </table>
+
+    <button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%; margin-top: 6px">Spieler verpflichten</button>
+    <button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot annehmen</button>
+    <button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot zurückziehen</button>
+  </div>
+
+  <div id="dialogTransferFee" title="Ablöseverhandlungen">
+    <div style="position: relative; width: 100%; height: 30px" class="form-group">
+      <div style="position: absolute; width: 50%; height: auto; top: 10px; left: 6px" class="form-group">
+        <b>Ablöse [€]:</b>
+      </div>
+      <div style="position: absolute; width: 50%; left: 50%" class="col-md-10">
+        @Html.TextBoxFor(m => m.iTransferFee, new { @id = "tbTransferFee", @class = "form-control tbTransferFee", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
+      </div>
+    </div>
+
+    <div style="position: relative; width: 100%; height: 50px; background-color: black; -webkit-border-radius: 10px; -moz-border-radius: 10px" class="form-group">
+      <div style="position: absolute; width: 50%; height: auto; top: 18px; left: 6px" class="form-group">
+        <b style="color: white">Handgeld [€]:</b>
+      </div>
+      <div style="position: absolute; width: 50%; left: 50%; top: 8px" class="col-md-10">
+        @Html.TextBoxFor(m => m.iTransferFeeSecretBalance, new { @id = "tbTransferFeeSecret", @class = "form-control tbTransferFeeSecret", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
+      </div>
     </div>
   </div>
-
-  <div style="position: relative; width: 100%; height: 50px; background-color: black; -webkit-border-radius: 10px; -moz-border-radius: 10px" class="form-group">
-    <div style="position: absolute; width: 50%; height: auto; top: 18px; left: 6px" class="form-group">
-      <b style="color: white">Handgeld [€]:</b>
-    </div>
-    <div style="position: absolute; width: 50%; left: 50%; top: 8px" class="col-md-10">
-      @Html.TextBoxFor(m => m.iTransferFeeSecretBalance, new { @id = "tbTransferFeeSecret", @class = "form-control tbTransferFeeSecret", @type = "tel", @min = "0", @value = "0", @style = "text-align: right; width:100px", @autocomplete = "off" })
-    </div>
-  </div>
-</div>
+</body>
+</html>

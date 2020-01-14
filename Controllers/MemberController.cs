@@ -2571,7 +2571,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth = false, bool bAll = false, bool bFixTransferFee = false, bool bNoClub = false)
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, bool bAll, bool bFixTransferFee, bool bNoClub)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
@@ -2580,7 +2580,16 @@ namespace CornerkickWebMvc.Controllers
       if (bNoClub) iClub = -1;
 
       int iTr = 0;
-      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist("", iClub, iPos, -1f, 0, iFType, iFValue, bJouth, bAll, bFixTransferFee)) {
+      foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist(sName: "",
+                                                                                                       iClubId: iClub,
+                                                                                                       iPos: iPos,
+                                                                                                       fStrength: -1f,
+                                                                                                       iTalent: 0,
+                                                                                                       iFType: iFType,
+                                                                                                       iF: iFValue,
+                                                                                                       bJouth: bJouth,
+                                                                                                       bAll: bAll,
+                                                                                                       bFixTransferFee: bFixTransferFee)) {
         string sClub = "vereinslos";
         if (transfer.player.iClubId >= 0) {
           sClub = MvcApplication.ckcore.ltClubs[transfer.player.iClubId].sName;
