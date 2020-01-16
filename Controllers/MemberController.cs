@@ -3602,6 +3602,8 @@ namespace CornerkickWebMvc.Controllers
 
       Models.StadiumSurroundingsModel.Building bdg = new Models.StadiumSurroundingsModel.Building();
 
+      bdg.iType = (byte)iType;
+      bdg.iLevel = (iCurrent + iNew) - 1;
       bdg.sNameNext = (iCurrent + iNew).ToString();
 
       int[] iCostDays = new int[2];
