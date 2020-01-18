@@ -15,7 +15,7 @@ namespace CornerkickWebMvc.Controllers
 {
   public class ViewGameController : Controller
   {
-    private static Models.ViewGameModel.gameData gD;
+    private static List<Models.ViewGameModel.gameData> ltGd;
 
     private CornerkickManager.User ckUser()
     {
@@ -52,6 +52,15 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="ViewGame"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    private static Models.ViewGameModel.gameData getGameData(int iTeamId)
+    {
+      for (int iGd = 0; iGd < ltGd.Count; iGd++) {
+        if (ltGd[iGd].iTeamId == iTeamId) return ltGd[iGd];
+      }
+
+      return null;
+    }
+
     [Authorize]
     public ActionResult ViewGame(Models.ViewGameModel view)
     {
@@ -190,6 +199,8 @@ namespace CornerkickWebMvc.Controllers
 
     public void setGame(Models.ViewGameModel view, CornerkickGame.Game game)
     {
+      CornerkickManager.Club clbUser = ckClub();
+
       view.sColorJerseyH = new string[4] { "white", "blue", "blue", "white" };
       view.sColorJerseyA = new string[4] { "white", "red",  "red",  "white" };
 
@@ -200,6 +211,13 @@ namespace CornerkickWebMvc.Controllers
         return;
       }
 
+      if (ltGd == null) ltGd = new List<Models.ViewGameModel.gameData>();
+      Models.ViewGameModel.gameData gD = getGameData(clbUser.iId);
+      if (gD == null) {
+        gD = new Models.ViewGameModel.gameData();
+        gD.iTeamId = clbUser.iId;
+        ltGd.Add(gD);
+      }
       gD = new Models.ViewGameModel.gameData();
 
       string sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems");
@@ -418,6 +436,8 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.User user = ckUser();
       CornerkickManager.Club club = ckClub();
+
+      Models.ViewGameModel.gameData gD = getGameData(club.iId);
 
       if (user.game == null) {
         setGameData(ref gD, null, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
@@ -862,6 +882,9 @@ namespace CornerkickWebMvc.Controllers
 
     public Models.ViewGameModel.gameData getAllGameData(Models.ViewGameModel view, int iState = -1)
     {
+      CornerkickManager.Club clbUser = ckClub();
+
+      Models.ViewGameModel.gameData gD = getGameData(clbUser.iId);
       gD = new Models.ViewGameModel.gameData();
 
       NumberFormatInfo nfi = new NumberFormatInfo();

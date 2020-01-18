@@ -78,10 +78,11 @@ namespace CornerkickWebMvc.Models
       public byte nPassSteps { get; set; }
     }
 
-    public struct gameData
+    public class gameData
     {
       public TimeSpan tsMinute { get; set; }
 
+      public int iTeamId { get; set; }
       public int iGoalsH { get; set; }
       public int iGoalsA { get; set; }
       public int[] iShoots { get; set; }
