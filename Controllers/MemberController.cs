@@ -2619,7 +2619,7 @@ namespace CornerkickWebMvc.Controllers
           position = MvcApplication.ckcore.plr.getStrPos(transfer.player),
           strength      = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false).ToString("0.0"),
           strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true) .ToString("0.0"),
-          age = transfer.player.getAge(MvcApplication.ckcore.dtDatum).ToString("0"),
+          age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
           talent = (transfer.player.iTalent + 1).ToString(),
           mw = (transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000).ToString("N0", getCi()),
           fixtransferfee = sFixTransferFee,
