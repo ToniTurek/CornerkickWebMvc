@@ -141,6 +141,8 @@ namespace CornerkickWebMvc
           cup.iId2 = iLand;
           cup.sName = "Pokal " + ckcore.sLand[iLand];
           cup.settings.fAttraction = 1.0f;
+          cup.settings.iBonusCupWin = 8000000; // 8 mio.
+          cup.settings.bBonusReleaseCupWinInKo = true;
           ckcore.ltCups.Add(cup);
 
           // Create league
