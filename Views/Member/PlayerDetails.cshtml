@@ -117,8 +117,14 @@
         { "data": "iIx" },
         { "data": "sDt" },
         { "data": "sClubTakeName" },
-        { "data": "sTransferFee" },
-        { "data": "sValue" }
+        {
+          "data": "iTransferFee",
+          render: $.fn.dataTable.render.number('.', ',', 0, '')
+        },
+        {
+          "data": "iValue",
+          render: $.fn.dataTable.render.number('.', ',', 0, '')
+        }
       ],
       rowReorder: {
         dataSrc: 'iIx'

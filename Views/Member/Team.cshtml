@@ -197,8 +197,14 @@
           { "data": "sTalent" },
           { "data": "sStaerkeIdeal" },
           { "data": "sCaptain" },
-          { "data": "sMarktwert" },
-          { "data": "sGehalt" },
+          {
+            "data": "iMarktwert",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iGehalt",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "sLz" },
           {
             "data": "sNat",

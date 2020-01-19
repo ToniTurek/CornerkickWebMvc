@@ -53,8 +53,8 @@ namespace CornerkickWebMvc.Models
       public string sClubTakeName { get; set; }
       public string sClubGiveName { get; set; }
       public string sDt { get; set; }
-      public string sValue { get; set; }
-      public string sTransferFee { get; set; }
+      public int iValue { get; set; }
+      public int iTransferFee { get; set; }
     }
   }
 }

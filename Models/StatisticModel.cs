@@ -25,11 +25,11 @@ namespace CornerkickWebMvc.Models
     public string sTeamName { get; set; }
     public string sTeamAveSkill { get; set; }
     public string sTeamAveAge { get; set; }
-    public string sTeamValueTotal { get; set; }
+    public int iTeamValueTotal { get; set; }
     public int nPlayer { get; set; }
     public string sTeamAveSkill11 { get; set; }
     public string sTeamAveAge11 { get; set; }
-    public string sTeamValueTotal11 { get; set; }
+    public int iTeamValueTotal11 { get; set; }
     public string sLeague { get; set; }
   }
 }

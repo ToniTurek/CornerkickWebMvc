@@ -64,11 +64,19 @@
           },
           { "data": "sTeamAveSkill", "className": "dt-center" },
           { "data": "sTeamAveAge", "className": "dt-center" },
-          { "data": "sTeamValueTotal", "className": "dt-right" },
+          {
+            "data": "iTeamValueTotal",
+            "className": "dt-right",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "nPlayer", "className": "dt-center" },
           { "data": "sTeamAveSkill11", "className": "dt-center" },
           { "data": "sTeamAveAge11", "className": "dt-center" },
-          { "data": "sTeamValueTotal11", "className": "dt-right" },
+          {
+            "data": "iTeamValueTotal11",
+            "className": "dt-right",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "sLeague", "className": "dt-center" }
         ],
         columnDefs: [
@@ -95,7 +103,10 @@
         "columns": [
           { "data": "iIx" },
           { "data": "sPlayerName" },
-          { "data": "sTransferFee" },
+          {
+            "data": "iTransferFee",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           {
             "data": "iValue",
             render: $.fn.dataTable.render.number('.', ',', 0, '')
@@ -218,11 +229,11 @@
             <th>Team</th>
             <th>&#8709;-Stärke</th>
             <th>&#8709;-Alter</th>
-            <th>&#8709;-MW</th>
+            <th>&#8709;-MW [€]</th>
             <th>Spieler</th>
             <th>&#8709;-Stärke Startelf</th>
             <th>&#8709;-Alter Startelf</th>
-            <th>&#8709;-MW Startelf</th>
+            <th>&#8709;-MW Startelf [€]</th>
             <th>Liga</th>
           </tr>
         </thead>
