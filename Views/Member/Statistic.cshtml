@@ -47,9 +47,9 @@
             d.iLand = $('#ddlStatLeagues').val();
           }
         },
-        "info": true,
         "searching": true,
         "paging": false,
+        "info": false,
         "pageLength": 20,
         "order": [[3, "desc"]],
         "columns": [
@@ -96,14 +96,14 @@
           { "data": "iIx" },
           { "data": "sPlayerName" },
           { "data": "sTransferFee" },
-          { "data": "sValue" },
+          {
+            "data": "iValue",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "sClubTakeName" },
           { "data": "sClubGiveName" },
           { "data": "sDt" }
         ],
-        rowReorder: {
-          dataSrc: 'iIx'
-        },
         "language": {
           "emptyTable": "Keine Transfers"
         },
@@ -112,8 +112,9 @@
         "info": false,
         "responsive": false,
         "searching": false,
+        "select": false,
+        "order": [[2, "desc"]],
         "columnDefs": [
-          { "targets": [3], "orderSequence": ["desc", "asc"] },
           {
             "targets": [0], // iIx
             "orderable": false,
@@ -122,8 +123,7 @@
           },
           { "targets": [1, 4, 5, 6], "className": "dt-center" },
           { "targets": [2, 3], "className": "dt-right" }
-        ],
-        select: false
+        ]
       });
     });
 
