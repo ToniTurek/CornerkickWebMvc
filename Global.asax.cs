@@ -352,6 +352,20 @@ namespace CornerkickWebMvc
         }
       }
 
+      // Put player from cpu club on transferlist if too many
+      const int iClubCpuPlayerMax = 25;
+      for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
+        CornerkickManager.Club clbCpu = ckcore.ltClubs[iC];
+
+        if (clbCpu.user != null) continue;
+
+        ckcore.doFormation(iC);
+        while (clbCpu.ltPlayer.Count > iClubCpuPlayerMax) {
+          CornerkickGame.Player plToCpu = clbCpu.ltPlayer[clbCpu.ltPlayer.Count - 1];
+          ckcore.ui.putPlayerOnTransferlist(plToCpu, 0);
+        }
+      }
+
       // Check if new jouth player and put on transferlist
       if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0) {
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
