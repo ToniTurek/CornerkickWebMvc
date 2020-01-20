@@ -983,8 +983,8 @@ namespace CornerkickWebMvc.Controllers
       public string sTalent { get; set; }
       public bool   bSubstituted { get; set; }
       public string sLeader { get; set; }
-      public string sMarktwert { get; set; }
-      public string sGehalt { get; set; }
+      public int iMarktwert { get; set; }
+      public int iGehalt { get; set; }
       public string sLz { get; set; }
       public string sNat { get; set; }
       public int iSuspended { get; set; }
@@ -1048,8 +1048,11 @@ namespace CornerkickWebMvc.Controllers
         int iNat = int.Parse(ltLV[i][12]);
         string sNat = MvcApplication.ckcore.sLandShort[iNat];
 
+        int iVal = int.Parse(ltLV[i][ 9].Replace(".", ""));
+        int iSal = int.Parse(ltLV[i][10].Replace(".", ""));
+
         //Hard coded data here that I want to replace with query results
-        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], sMarktwert = ltLV[i][9], sGehalt = ltLV[i][10], sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21] };
+        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], iMarktwert = iVal, iGehalt = iSal, sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21] };
       }
 
       return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
@@ -1869,8 +1872,8 @@ namespace CornerkickWebMvc.Controllers
             iIx = iCh,
             sClubTakeName = sClubName,
             sDt = ch.dt.ToString("d", getCi()),
-            sValue = (pl.getValueHistory(ch.dt) * 1000).ToString("N0", getCi()),
-            sTransferFee = ch.iTransferFee.ToString("N0", getCi())
+            iValue = pl.getValueHistory(ch.dt) * 1000,
+            iTransferFee = ch.iTransferFee
           });
         }
       }
@@ -2621,7 +2624,7 @@ namespace CornerkickWebMvc.Controllers
           strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true) .ToString("0.0"),
           age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
           talent = (transfer.player.iTalent + 1).ToString(),
-          mw = (transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000).ToString("N0", getCi()),
+          mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
           fixtransferfee = sFixTransferFee,
           club = sClub,
           nat = MvcApplication.ckcore.sLandShort[transfer.player.iNat1]
@@ -5379,12 +5382,12 @@ namespace CornerkickWebMvc.Controllers
         float[] fAve = MvcApplication.ckcore.tl.getTeamAve(clb, bTeamValue: true);
         string sSkill = fAve[3].ToString("0.0");
         string sAge   = fAve[4].ToString("0.0");
-        string sVal   = fAve[5].ToString("N0", getCi()) + " €";
+        int    iVal   = (int)fAve[5];
 
         float[] fAve11 = MvcApplication.ckcore.tl.getTeamAve(clb, 11, bTeamValue: true);
         string sSkill11 = fAve11[3].ToString("0.0");
         string sAge11   = fAve11[4].ToString("0.0");
-        string sVal11   = fAve11[5].ToString("N0", getCi()) + " €";
+        int    iVal11   = (int)fAve11[5];
 
         CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, clb.iLand, clb.iDivision);
         string sLeagueName = "-";
@@ -5396,11 +5399,11 @@ namespace CornerkickWebMvc.Controllers
           sTeamName = clb.sName,
           sTeamAveSkill = sSkill,
           sTeamAveAge = sAge,
-          sTeamValueTotal = sVal,
+          iTeamValueTotal = iVal,
           nPlayer = clb.ltPlayer.Count,
           sTeamAveSkill11 = sSkill11,
           sTeamAveAge11 = sAge11,
-          sTeamValueTotal11 = sVal11,
+          iTeamValueTotal11 = iVal11,
           sLeague = sLeagueName
         });
 
@@ -5444,12 +5447,14 @@ namespace CornerkickWebMvc.Controllers
               sClubTakeName = sClubTakeName,
               sClubGiveName = sClubGiveName,
               sDt = ch.dt.ToString("d", getCi()),
-              sValue = (pl.getValueHistory(ch.dt) * 1000).ToString("N0", getCi()),
-              sTransferFee = ch.iTransferFee.ToString("N0", getCi())
+              iValue = pl.getValueHistory(ch.dt) * 1000,
+              iTransferFee = ch.iTransferFee
             });
           }
         }
       }
+
+      //ltDeClubHistory = ltDeClubHistory.OrderBy(o => o.iValue).ToList(); // Not required
 
       return Json(new { aaData = ltDeClubHistory.ToArray() }, JsonRequestBehavior.AllowGet);
     }
