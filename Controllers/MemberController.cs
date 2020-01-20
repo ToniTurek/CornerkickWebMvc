@@ -716,7 +716,8 @@ namespace CornerkickWebMvc.Controllers
           DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iD);
 
           if (iD > 0) {
-            if ((int)dtTmp.DayOfWeek == 0) break;
+            if      ((int)dtTmp.DayOfWeek == 0 && dtTmp.Hour > 10) break;
+            else if ((int)dtTmp.DayOfWeek == 1 && dtTmp.Hour < 10) break;
 
             // ... do training for each player
             for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
