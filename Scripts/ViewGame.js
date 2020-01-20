@@ -584,12 +584,8 @@ function plotStatistics(jState = -1) {
 
         // Statistic bars
         var flotDataset = [
-          { label: "Home", data: dataH, color: "#5482FF" },
-          { label: "Away", data: dataA, color: "#F0000" }
-        ];
-
-        var ticks = [
-          [0, "Tore"], [-1, "Torschüsse"], [-2, "aufs Tor"], [-3, "Ballbesitz"], [-4, "Zweikämpfe"], [-5, "Fouls"], [-6, "Ecken"], [-7, "Abseits"], [-8, "Passquote"]
+          { label: "Home", data: dataH, yaxis: 1, color: "#5482FF" },
+          { label: "Away", data: dataA, yaxis: 2, color: "#F0000" }
         ];
 
         var flotOptions = {
@@ -614,12 +610,10 @@ function plotStatistics(jState = -1) {
             max: 100,
             tickFormatter: "string"
           },
-          yaxis: {
-            show: true,
-            min: -8.6,
-            max: 0.6,
-            ticks: ticks
-          },
+          yaxes: [
+            { show: false },
+            { show: false }
+          ],
           grid: {
             hoverable: true,
             borderWidth: 2,
@@ -633,62 +627,71 @@ function plotStatistics(jState = -1) {
         $.each(p.getData()[0].data, function (i, el) {
           if (el[0] > 0) {
             var o = p.pointOffset({ x: el[0], y: el[1] });
-            var s = el[0].toFixed(1) + '%';
+
+            var s = "";
+            var sH = dataH[ii][0].toFixed(1) + '%';
+            var sA = dataA[ii][0].toFixed(1) + '%';
+
             if (ii === 0) {
-              s = iGoalsH.toString();
+              s = "Tore";
+              sH = iGoalsH.toString();
+              sA = iGoalsA.toString();
             } else if (ii === 1) {
-              s = iShootsH.toString();
+              s = "Torschüsse";
+              sH = iShootsH.toString();
+              sA = iShootsA.toString();
             } else if (ii === 2) {
-              s = iShootsOnGoalH.toString();
+              s = "aufs Tor";
+              sH = iShootsOnGoalH.toString();
+              sA = iShootsOnGoalA.toString();
+            } else if (ii === 3) {
+              s = "Ballbesitz";
+            } else if (ii === 4) {
+              s = "Zweikämpfe";
             } else if (ii === 5) {
-              s = iFoulsH.toString();
+              s = "Fouls";
+              sH = iFoulsH.toString();
+              sA = iFoulsA.toString();
             } else if (ii === 6) {
-              s = iCornerkickH.toString();
+              s = "Ecken";
+              sH = iCornerkickH.toString();
+              sA = iCornerkickA.toString();
             } else if (ii === 7) {
-              s = iOffsiteH.toString();
+              s = "Abseits";
+              sH = iOffsiteH.toString();
+              sA = iOffsiteA.toString();
             } else if (ii === 8) {
-              s = fPassGoodH.toFixed(1) + '%';
+              s = "Passquote";
+              sH = fPassGoodH.toFixed(1) + '%';
+              sA = fPassGoodA.toFixed(1) + '%';
             }
 
             $('<div class="data-point-label">' + s + '</div>').css({
               position: 'absolute',
-              left: (60 + o.left) / 2,
-              top: o.top - 10,
-              display: 'none'
+              width: "100%",
+              textAlign: "center",
+              color: "white",
+              left: 0,
+              top: o.top - 10
             }).appendTo(p.getPlaceholder()).show();
-          }
 
-          ii = ii + 1;
-        });
-
-        ii = 0;
-        $.each(p.getData()[1].data, function (i, el) {
-          if (el[0] > 0) {
-            var o = p.pointOffset({ x: el[0], y: el[1] });
-            var s = el[0].toFixed(1) + '%';
-            if (ii === 0) {
-              s = iGoalsA.toString();
-            } else if (ii === 1) {
-              s = iShootsA.toString();
-            } else if (ii === 2) {
-              s = iShootsOnGoalA.toString();
-            } else if (ii === 5) {
-              s = iFoulsA.toString();
-            } else if (ii === 6) {
-              s = iCornerkickA.toString();
-            } else if (ii === 7) {
-              s = iOffsiteA.toString();
-            } else if (ii === 8) {
-              s = fPassGoodA.toFixed(1) + '%';
-            }
-
-            $('<div class="data-point-label">' + s + '</div>').css({
+            $('<div class="data-point-label">' + sH + '</div>').css({
               position: 'absolute',
-              right: (60 + o.left) / 2,
-              top: o.top - 10,
-              display: 'none'
+              width: "50%",
+              textAlign: "left",
+              color: "white",
+              left: 10,
+              top: o.top - 10
             }).appendTo(p.getPlaceholder()).show();
-            //}).appendTo(p.getPlaceholder()).fadeIn('slow');
+
+            $('<div class="data-point-label">' + sA + '</div>').css({
+              position: 'absolute',
+              width: "50%",
+              textAlign: "right",
+              color: "white",
+              right: 10,
+              top: o.top - 10
+            }).appendTo(p.getPlaceholder()).show();
           }
 
           ii = ii + 1;
