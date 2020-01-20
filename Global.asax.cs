@@ -360,9 +360,8 @@ namespace CornerkickWebMvc
         if (clbCpu.user != null) continue;
 
         ckcore.doFormation(iC);
-        while (clbCpu.ltPlayer.Count > iClubCpuPlayerMax) {
-          CornerkickGame.Player plToCpu = clbCpu.ltPlayer[clbCpu.ltPlayer.Count - 1];
-          ckcore.ui.putPlayerOnTransferlist(plToCpu, 0);
+        for (int iP = iClubCpuPlayerMax; iP < clbCpu.ltPlayer.Count; iP++) {
+          ckcore.ui.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
         }
       }
 
