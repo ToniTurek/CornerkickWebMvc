@@ -487,6 +487,7 @@ namespace CornerkickWebMvc
       if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(12, 00, 00))) {
         // For each transfer
         foreach (CornerkickManager.Transfer.Item transfer in ckcore.ltTransfer) {
+          if (transfer.player == null) continue;
           if (transfer.player.iClubId <                     0) continue;
           if (transfer.player.iClubId >= ckcore.ltClubs.Count) continue;
 
