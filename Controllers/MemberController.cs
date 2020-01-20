@@ -5329,6 +5329,11 @@ namespace CornerkickWebMvc.Controllers
           if (bJouth && pl.getAge(MvcApplication.ckcore.dtDatum) > 18f) continue;
           if (iNat >= 0 && pl.iNat1 != iNat) continue;
 
+          // Check if club is nation
+          if (pl.iClubId >= 0) {
+            if (MvcApplication.ckcore.ltClubs[pl.iClubId].bNation) continue;
+          }
+
           // Check if same player already in same role
           if (iPos > 0) {
             bool bSame = false;
