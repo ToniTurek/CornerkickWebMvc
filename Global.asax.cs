@@ -86,7 +86,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickManager.Main();
+      ckcore = new CornerkickManager.Main(bContinuingTime: true);
 
 #if !DEBUG
       ckcore.sHomeDir = sHomeDir;
@@ -267,9 +267,9 @@ namespace CornerkickWebMvc
           clbNat.staff.iKibitzer = 3;
 
           // Nat. buildings
-          clbNat.buildings.iTrainingCourts[0] = 5;
-          clbNat.buildings.iGym           [0] = 5;
-          clbNat.buildings.iSpa           [0] = 5;
+          clbNat.buildings.bgTrainingCourts.iLevel = 5;
+          clbNat.buildings.bgGym.iLevel = 5;
+          clbNat.buildings.bgSpa.iLevel = 5;
 
           // Colors
           if (iN == 0) { // GER
@@ -408,7 +408,7 @@ namespace CornerkickWebMvc
       }
 
       // Do next step
-      int iRetCk = ckcore.next(true);
+      int iRetCk = ckcore.next();
 
       // Beginn of new season
       if (iRetCk == 4) {
