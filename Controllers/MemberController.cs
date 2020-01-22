@@ -2738,7 +2738,6 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      //fillDdlAutoSubs(taktik);
       const byte nSubs = 3;
       tactic.ddlAutoSubsOut = new List<SelectListItem>[nSubs];
       tactic.ddlAutoSubsIn  = new List<SelectListItem>[nSubs];
@@ -2830,69 +2829,6 @@ namespace CornerkickWebMvc.Controllers
       return Json("", JsonRequestBehavior.AllowGet);
     }
 
-    public void fillDdlAutoSubs(Models.TaktikModel tactic)
-    {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return;
-
-      if (clb.nextGame == null) return;
-
-      const byte nSubs = 3;
-      tactic.ddlAutoSubsOut = new List<SelectListItem>[nSubs];
-      tactic.ddlAutoSubsIn  = new List<SelectListItem>[nSubs];
-      tactic.iAutoSubsMin   = new int                 [nSubs];
-      byte iHA = 0;
-      if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
-      for (byte iAS = 0; iAS < nSubs; iAS++) {
-        tactic.ddlAutoSubsOut[iAS] = new List<SelectListItem>();
-        tactic.ddlAutoSubsIn [iAS] = new List<SelectListItem>();
-
-        tactic.ddlAutoSubsOut[iAS].Add(new SelectListItem { Text = "aus", Value = "-1" });
-        tactic.ddlAutoSubsIn [iAS].Add(new SelectListItem { Text = "aus", Value = "-1" });
-
-        for (byte iPl = 0; iPl < clb.ltPlayer.Count; iPl++) {
-          CornerkickGame.Player pl = clb.ltPlayer[iPl];
-
-          bool bSelected = false;
-          if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) {
-            if (iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][0] || iPl == clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][1]) bSelected = true;
-          }
-
-          string sPos = "";
-          if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
-          else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
-          string sStrength = CornerkickGame.Tool.getAveSkill(pl, bIdeal: false).ToString(" (0.0)");
-          SelectListItem sliAutoSub = new SelectListItem { Text = pl.sName + " - " + sPos + sStrength,
-                                                           Value = iPl.ToString(),
-                                                           Selected = bSelected
-                                                         };
-
-          if (iPl < MvcApplication.ckcore.game.data.nPlStart) {
-            if (!checkIfAlreadyInDdl(iPl, tactic.ddlAutoSubsOut, iAS)) tactic.ddlAutoSubsOut[iAS].Add(sliAutoSub);
-          } else {
-            if (!checkIfAlreadyInDdl(iPl, tactic.ddlAutoSubsIn,  iAS)) tactic.ddlAutoSubsIn[iAS].Add(sliAutoSub);
-          }
-        }
-
-        tactic.iAutoSubsMin[iAS] = 60;
-        if (iAS < clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count) tactic.iAutoSubsMin[iAS] = clb.nextGame.team[iHA].ltSubstitutionsPlanned[iAS][2];
-      }
-    }
-
-    private bool checkIfAlreadyInDdl(int iPl, List<SelectListItem>[] ddlAutoSubs, byte iAsCurrent)
-    {
-      for (int jAS = iAsCurrent - 1; jAS >= 0; jAS--) {
-        foreach (SelectListItem sliAutoSubTmp in ddlAutoSubs[jAS]) {
-          if (sliAutoSubTmp.Value.Equals(iPl.ToString())) {
-            if (sliAutoSubTmp.Selected) return true;
-            break;
-          }
-        }
-      }
-
-      return false;
-    }
-
     public JsonResult getHtmlAutoSubOut(Models.TaktikModel tactic, byte iAS)
     {
       string[] sBox = new string[2]; // [Out, In]
@@ -2933,10 +2869,16 @@ namespace CornerkickWebMvc.Controllers
         }
 
         string sPos = "";
+        string sStrength = "";
         pl.iIndex = iPl;
-        if (iPl < MvcApplication.ckcore.game.data.nPlStart) sPos = MvcApplication.ckcore.sPosition[CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch))];
-        else                                                sPos = MvcApplication.ckcore.plr.getStrPos(pl);
-        string sStrength = CornerkickGame.Tool.getAveSkill(pl).ToString(" (0.0)");
+        if (iPl < MvcApplication.ckcore.game.data.nPlStart) {
+          byte iPosRole = CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch));
+          sPos = MvcApplication.ckcore.sPosition[iPosRole];
+          sStrength = CornerkickGame.Tool.getAveSkill(pl, iPos: iPosRole, bIdeal: false).ToString(" (0.0)");
+        } else {
+          sPos = MvcApplication.ckcore.plr.getStrPos(pl);
+          sStrength = CornerkickGame.Tool.getAveSkill(pl, bIdeal: false).ToString(" (0.0)");
+        }
 
         if (bOut) sBox[0] += "<option" + sSelectedO + " value=\"" + iPl.ToString() + "\">" + pl.sName + " - " + sPos + sStrength + "</option>";
         else      sBox[1] += "<option" + sSelectedI + " value=\"" + iPl.ToString() + "\">" + pl.sName + " - " + sPos + sStrength + "</option>";
