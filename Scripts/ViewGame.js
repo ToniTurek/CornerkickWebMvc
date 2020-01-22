@@ -26,6 +26,7 @@ function drawGame(iState, iGameSpeed) {
         imgBall = drawBall();
         divBallTarget = drawBallTarget();
         //ptBallLast = gLoc2.gBall.ptPos;
+        plotStatistics(-3);
       }
 
       if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once

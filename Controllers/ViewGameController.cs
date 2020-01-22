@@ -60,6 +60,15 @@ namespace CornerkickWebMvc.Controllers
 
       return null;
     }
+    private static void setGameDataList(Models.ViewGameModel.gameData gd)
+    {
+      for (int iGd = 0; iGd < ltGd.Count; iGd++) {
+        if (ltGd[iGd].iTeamId == gd.iTeamId) {
+          ltGd[iGd] = gd;
+          break;
+        };
+      }
+    }
 
     [Authorize]
     public ActionResult ViewGame(Models.ViewGameModel view)
@@ -459,7 +468,7 @@ namespace CornerkickWebMvc.Controllers
         gD = getAllGameData(view, iState);
       } else if (iState <  0) {
         // Return null if not new round
-        if (gameData.ltState.Count > 0) {
+        if (gameData.ltState.Count > 0 && iState != -3) {
           if (!gameData.ltState[gameData.ltState.Count - 1].bNewRound) return Json(null, JsonRequestBehavior.AllowGet);
         }
 
@@ -757,6 +766,8 @@ namespace CornerkickWebMvc.Controllers
       // Player action chances
       gD.fPlAction    = state.fPlAction;
       gD.fPlActionRnd = state.fPlActionRandom;
+
+      setGameDataList(gD);
     }
 
     private void getStatisticHAPlayerIx(int i, byte nPlStart, out byte iHA, out int iPl)
@@ -882,16 +893,14 @@ namespace CornerkickWebMvc.Controllers
 
     public Models.ViewGameModel.gameData getAllGameData(Models.ViewGameModel view, int iState = -1)
     {
+      CornerkickManager.User user = ckUser();
       CornerkickManager.Club clbUser = ckClub();
 
-      Models.ViewGameModel.gameData gD = getGameData(clbUser.iId);
-      gD = new Models.ViewGameModel.gameData();
+      Models.ViewGameModel.gameData gD = new Models.ViewGameModel.gameData();
+      gD.iTeamId = clbUser.iId;
 
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
-
-      CornerkickManager.User user = ckUser();
-      CornerkickManager.Club club = ckClub();
 
       if (user.game == null) return gD;
 
@@ -914,7 +923,7 @@ namespace CornerkickWebMvc.Controllers
 
       for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
         CornerkickGame.Game.State state = gameData.ltState[iSt];
-        addGameData(ref gD, gameData, user, club, iSt, state.tsMinute.Seconds == 0 && state.bNewRound);
+        addGameData(ref gD, gameData, user, clbUser, iSt, state.tsMinute.Seconds == 0 && state.bNewRound);
 
         if (iState == iSt) break;
       }
