@@ -221,8 +221,10 @@ function interpolateBall2(imgBallTmp, iB, pt0, pt1, bHighPass, nInterpSteps, iGa
   imgBallTmp.style.height = fSizeY.toString() + '%';
 
   if (iB < nInterpSteps) {
+    var fSlowDownFactor = 1.6;
+
     iB = iB + 1;
-    setTimeout(function () { interpolateBall2(imgBallTmp, iB + 1, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed); }, iGameSpeed / nInterpSteps);
+    setTimeout(function () { interpolateBall2(imgBallTmp, iB + 1, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed); }, (iGameSpeed * fSlowDownFactor) / nInterpSteps);
   }
 }
 
