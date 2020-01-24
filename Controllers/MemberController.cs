@@ -5385,7 +5385,10 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      //ltDeClubHistory = ltDeClubHistory.OrderBy(o => o.iValue).ToList(); // Not required
+      ltDeClubHistory = ltDeClubHistory.OrderByDescending(o => o.iTransferFee).ToList().GetRange(0, 20);
+      for (int i = 0; i < ltDeClubHistory.Count; i++) {
+        ltDeClubHistory[i].iIx = i + 1;
+      }
 
       return Json(new { aaData = ltDeClubHistory.ToArray() }, JsonRequestBehavior.AllowGet);
     }
