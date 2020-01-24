@@ -663,6 +663,8 @@ namespace CornerkickWebMvc.Controllers
 
     public ContentResult GetTeamDevelopmentData(bool bExpected = false, int iTrainingsCamp = 0)
     {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Content("", "application/json");
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Content("", "application/json");
 
@@ -690,13 +692,6 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (bExpected) {
-        // Create temp. array of training values
-        float[][] fCFMI = new float[clb.ltPlayer.Count][];
-        for (int iP = 0; iP < fCFMI.Length; iP++) {
-          CornerkickGame.Player plTmp = clb.ltPlayer[iP];
-          fCFMI[iP] = new float[4] { plTmp.fCondition, plTmp.fFresh, plTmp.fMoral, plTmp.fIndTraining[plTmp.iIndTraining] };
-        }
-
         // Initialize dataPoints list
         for (byte j = 0; j < dataPoints[1].Length; j++) dataPoints[1][j] = new List<Models.DataPointGeneral>();
 
@@ -711,6 +706,10 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
+        // Clone list of player in club
+        List<CornerkickGame.Player> ltPlayerTrExp = new List<CornerkickGame.Player>();
+        foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTrExp.Add(pl.Clone());
+
         // For the next 7 days ...
         for (byte iD = 0; iD < 7; iD++) {
           DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iD);
@@ -720,31 +719,34 @@ namespace CornerkickWebMvc.Controllers
             else if ((int)dtTmp.DayOfWeek == 1 && dtTmp.Hour < 10) break;
 
             // ... do training for each player
-            for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-              CornerkickGame.Player plTmp = clb.ltPlayer[iP];
-              MvcApplication.ckcore.plr.doTraining(ref plTmp, dtTmp, campBooking: camp, bJouth: false, bNation: false, bNoInjuries: true);
+            for (int iP = 0; iP < ltPlayerTrExp.Count; iP++) {
+              CornerkickGame.Player plTmp = ltPlayerTrExp[iP];
+              CornerkickManager.Player.doTraining(ref plTmp,
+                                                  clb.training,
+                                                  clb.staff.iCondiTrainer,
+                                                  clb.staff.iPhysio,
+                                                  clb.buildings.bgGym.iLevel,
+                                                  clb.buildings.bgSpa.iLevel,
+                                                  dtTmp,
+                                                  usr,
+                                                  iTrainingPerDay: 1,
+                                                  ltPlayerTeam: ltPlayerTrExp,
+                                                  campBooking: camp,
+                                                  bJouth: false,
+                                                  bNoInjuries: true);
             }
           }
 
           // ... get training history data
           CornerkickManager.Main.TrainingHistory trHistExp = new CornerkickManager.Main.TrainingHistory();
           trHistExp.dt   = dtTmp;
-          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb.ltPlayer, clb.ltTactic[0].formation);
+          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation);
 
           // ... add training history data to dataPoints
           for (byte j = 0; j < dataPoints[1].Length; j++) {
             long iDate = convertDateTimeToTimestamp(trHistExp.dt);
             dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j]));
           }
-        }
-
-        // Set training values back
-        for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-          CornerkickGame.Player plTmp = clb.ltPlayer[iP];
-          plTmp.fCondition                       = fCFMI[iP][0];
-          plTmp.fFresh                           = fCFMI[iP][1];
-          plTmp.fMoral                           = fCFMI[iP][2];
-          plTmp.fIndTraining[plTmp.iIndTraining] = fCFMI[iP][3];
         }
       }
 

@@ -1,0 +1,38 @@
+{
+  "doping":
+    [
+      {
+        "name": "Mittel 1",
+        "reduction": 0.40,
+        "condi": 0.10,
+        "fresh": 0.0,
+        "detectable": 1.0,
+        "cost": 10000
+      },
+      {
+        "name": "Mittel 2",
+        "reduction": 0.08,
+        "condi": 0.25,
+        "fresh": 0.0,
+        "detectable": 0.8,
+        "cost": 50000
+      },
+      {
+        "name": "Mittel 3",
+        "reduction": 0.03,
+        "condi": 0.50,
+        "fresh": 0.0,
+        "detectable": 0.5,
+        "cost": 100000
+      },
+      {
+        "name": "Mittel 4",
+        "reduction": 0.3,
+        "condi": 0.00,
+        "fresh": 0.05,
+        "detectable": 0.5,
+        "cost": 20000
+      }
+    ]
+}
+

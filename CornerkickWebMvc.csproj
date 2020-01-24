@@ -723,6 +723,14 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Resources\cup_round_names.txt" />
+    <Content Include="Resources\nations.txt" />
+    <Content Include="Resources\player_names.txt" />
+    <Content Include="Resources\player_surnames.txt" />
+    <Content Include="Resources\position_names.txt" />
+    <Content Include="Resources\skill_names.txt" />
+    <Content Include="Resources\trainingcamps.txt" />
+    <Content Include="Resources\training_names.txt" />
     <Content Include="Scripts\autoNumeric\autoNumeric-min.js" />
     <Content Include="Scripts\autoNumeric\autoNumeric.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -942,6 +950,10 @@
     <Content Include="Views\Member\CupWc.cshtml" />
     <Content Include="Views\Member\UserView.cshtml" />
     <Content Include="Views\Account\RemoveUser.cshtml" />
+    <Content Include="Resources\doping.json" />
+    <Content Include="Resources\injury_names.json" />
+    <Content Include="Resources\news.json" />
+    <Content Include="Resources\sponsor.json" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

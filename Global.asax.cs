@@ -86,7 +86,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickManager.Main(bContinuingTime: true);
+      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true);
 
 #if !DEBUG
       ckcore.sHomeDir = sHomeDir;
@@ -95,7 +95,12 @@ namespace CornerkickWebMvc
       ckcore.tl.writeLog("WebMvc START");
 
       Models.RegisterViewModel.ltLand.Clear();
-      foreach (byte iN in iNations) Models.RegisterViewModel.ltLand.Add(new SelectListItem { Text = ckcore.sLand[iN], Value = iN.ToString(), Selected = iN == 36 });
+      foreach (byte iN in iNations) {
+        string sLand = "Land " + iN.ToString();
+        if (ckcore.sLand != null && iN < ckcore.sLand.Length) sLand = ckcore.sLand[iN];
+
+        Models.RegisterViewModel.ltLand.Add(new SelectListItem { Text = sLand, Value = iN.ToString(), Selected = iN == 36 });
+      }
 
       /*
       Models.RegisterViewModel.ltSasn.Clear();

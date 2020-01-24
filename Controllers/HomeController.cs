@@ -126,18 +126,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = new CornerkickManager.User();
       mnUm.ltUser.Add(usr);
 
-      // Create club
-      CornerkickManager.Club clb = new CornerkickManager.Club();
-      clb.iId = 0;
-      clb.sName = "Team";
-      clb.iLand = 0;
-      clb.iDivision = 0;
-      clb.user = usr;
-      for (byte iT = 0; iT < clb.training.iType.Length; iT++) clb.training.iType[iT] = (byte)iType; // Condition
-      clb.staff.iCondiTrainer = 4;
-      mnUm.ltClubs.Add(clb);
-
-      usr.club = clb;
+      CornerkickManager.Main.Training training = new CornerkickManager.Main.Training();
+      for (byte iT = 0; iT < training.iType.Length; iT++) training.iType[iT] = (byte)iType; // Condition
 
       // Create player
       CornerkickGame.Player pl = new CornerkickGame.Player();
@@ -146,11 +136,6 @@ namespace CornerkickWebMvc.Controllers
       pl.fMoral = 1.0f;
       pl.iClubId = 0;
       pl.dtBirthday = mnUm.dtDatum.AddYears(-iAge);
-      clb.ltPlayer.Add(pl);
-
-      // Trainer
-      clb.staff.iCondiTrainer = (byte)iTrainerCondi;
-      clb.staff.iPhysio       = (byte)iTrainerPhysio;
 
       // Trainings camp
       CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
@@ -171,7 +156,7 @@ namespace CornerkickWebMvc.Controllers
           //if ((int)dtTmp.DayOfWeek == 0) break;
 
           // ... do training
-          mnUm.plr.doTraining(ref pl, dtTmp, camp, false, true);
+          CornerkickManager.Player.doTraining(ref pl, training, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
         }
 
         // ... add training data to dataPoints
