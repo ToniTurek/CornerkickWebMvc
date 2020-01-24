@@ -49,6 +49,14 @@ function createTableTransferDetails() {
 }
 
 function getContractDialog(parent, iPlayerId, bFeeDialog) {
+  // Remove existing contract dialogs
+  var dgCt = document.getElementsByClassName("ui-dialog");
+  for (var i = dgCt.length - 1; i >= 0; i--) {
+    if (dgCt[i] && dgCt[i].parentElement && dgCt[i].contains(document.getElementById("dialogContract2"))) {
+      dgCt[i].parentElement.removeChild(dgCt[i]);
+    }
+  }
+
   $.when(getContract(iPlayerId, 1, 0, 0, 0, 0, false)).done(function (contract) {
     if (contract.fMood < 0) {
       alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
@@ -363,7 +371,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
                 }
               });
 
-              $(this).dialog("close");
+              $(this).dialog('destroy').remove();
             }
           },
           {
