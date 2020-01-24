@@ -280,7 +280,7 @@ namespace CornerkickWebMvc.Controllers
 
       view.game = game;
 
-      gD = getAllGameData(view);
+      //gD = getAllGameData(view);
 
       view.gD = gD;
     }
@@ -438,10 +438,13 @@ namespace CornerkickWebMvc.Controllers
         gLoc.ltComments.Add(sCommentarNew);
       }
 
+      // Set flag for updating statistic
+      gLoc.bUpdateStatistic = state.bNewRound;
+
       return Json(gLoc, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iStateLast = 0, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       CornerkickManager.User user = ckUser();
       CornerkickManager.Club club = ckClub();
@@ -467,13 +470,15 @@ namespace CornerkickWebMvc.Controllers
       } else if (iState >= 0) {
         gD = getAllGameData(view, iState);
       } else if (iState <  0) {
+        /*
         // Return null if not new round
         if (gameData.ltState.Count > 0 && iState != -3) {
           if (!gameData.ltState[gameData.ltState.Count - 1].bNewRound) return Json(null, JsonRequestBehavior.AllowGet);
         }
+        */
 
         // Add game data to struct
-        for (int i = iStateLast; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, user, club, i);
+        for (int i = gD.iLastStatePerformed; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, user, club, i);
       }
 
       setGameData(ref gD, gameData, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
@@ -597,6 +602,9 @@ namespace CornerkickWebMvc.Controllers
           gD.ltM[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fMoral));
         }
       }
+
+      // Set counter of performed state
+      gD.iLastStatePerformed = iState;
     }
 
     private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)

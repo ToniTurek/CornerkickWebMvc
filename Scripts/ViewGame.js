@@ -90,8 +90,9 @@ function drawGame2(gLoc, iState, iGameSpeed) {
     iState = -2;
   }
 
-  var bUpdate = true;
-  if (iState === -1) {
+  // Update statistic
+  var bUpdate = gLoc.bUpdateStatistic;
+  if (bUpdate === true && iState === -1) {
     bUpdate = document.getElementById("cbUpdateStatistic").checked;
   }
   if (bUpdate === true) {
@@ -194,9 +195,15 @@ function updateBallPos(imgBallTmp, divBallTargetTmp, gBall, iGameSpeed) {
   }
 }
 
+var timerInterpolateBall = null;
 function interpolateBall(imgBallTmp, pt0Ck, pt1Ck, bHighPass, nInterpSteps, iGameSpeed) {
   var pt0 = getPosPix(pt0Ck);
   var pt1 = getPosPix(pt1Ck);
+
+  if (timerInterpolateBall !== null) {
+    clearTimeout(timerInterpolateBall);
+    timerInterpolateBall = null;
+  }
 
   interpolateBall2(imgBallTmp, 0, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed);
 }
@@ -224,7 +231,7 @@ function interpolateBall2(imgBallTmp, iB, pt0, pt1, bHighPass, nInterpSteps, iGa
     var fSlowDownFactor = 1.6;
 
     iB = iB + 1;
-    setTimeout(function () { interpolateBall2(imgBallTmp, iB + 1, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed); }, (iGameSpeed * fSlowDownFactor) / nInterpSteps);
+    timerInterpolateBall = setTimeout(function () { interpolateBall2(imgBallTmp, iB + 1, pt0, pt1, bHighPass, nInterpSteps, iGameSpeed); }, (iGameSpeed * fSlowDownFactor) / nInterpSteps);
   }
 }
 
@@ -433,7 +440,6 @@ function printComments(gLoc) {
   }
 }
 
-var iStateLast = 0;
 function plotStatistics(jState = -1) {
   var iState = jState;
 
@@ -446,7 +452,7 @@ function plotStatistics(jState = -1) {
     url: '/ViewGame/ViewGameGetDataStatisticObject',
     type: "GET",
     dataType: "JSON",
-    data: { iState: iState, iStateLast: iStateLast, iHeatmap: iHeatmapValue, iAllShoots: iShootsValue, iAllDuels: iDuelsValue, iAllPasses: iPassesValue },
+    data: { iState: iState, iHeatmap: iHeatmapValue, iAllShoots: iShootsValue, iAllDuels: iDuelsValue, iAllPasses: iPassesValue },
     cache: false,
     contentType: "application/json; charset=utf-8",
     error: function (xhr) {
@@ -454,7 +460,6 @@ function plotStatistics(jState = -1) {
     },
     success: function (gD) {
       nStates = gD.nStates;
-      iStateLast = nStates;
 
       if (jState === -2) {
         iState = nStates;
@@ -587,8 +592,8 @@ function plotStatistics(jState = -1) {
 
         // Statistic bars
         var flotDataset = [
-          { label: "Home", data: dataH, yaxis: 1, color: "#5482FF" },
-          { label: "Away", data: dataA, yaxis: 2, color: "#F0000" }
+          { data: dataH, yaxis: 1, color: "#5482FF" },
+          { data: dataA, yaxis: 2, color: "#F0000" }
         ];
 
         var flotOptions = {

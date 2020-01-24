@@ -55,6 +55,7 @@ namespace CornerkickWebMvc.Models
       public bool bJerseyTextColorWhiteA { get; set; }
 
       public List<string[]> ltComments { get; set; }
+      public bool bUpdateStatistic { get; set; }
     }
 
     public struct gamePlayer
@@ -80,6 +81,8 @@ namespace CornerkickWebMvc.Models
 
     public class gameData
     {
+      public int iLastStatePerformed { get; set; }
+
       public TimeSpan tsMinute { get; set; }
 
       public int iTeamId { get; set; }
