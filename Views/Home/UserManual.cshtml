@@ -348,7 +348,7 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die FÃ
   </tr>
   @{
     for (int iT = 0; iT < MvcApplication.ckcore.sTraining.Length; iT++) {
-      float[] fTr = MvcApplication.ckcore.plr.fTrainingFactors(iT);
+      float[] fTr = CornerkickManager.Player.fTrainingFactors(iT);
       string[] sTr = new string[3];
       int[] iMulti = new int[3];
       if (fTr[0] > 0) { // Type: Kondition
