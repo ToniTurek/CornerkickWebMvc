@@ -23,6 +23,10 @@ function drawGame(iState, iGameSpeed) {
     success: function (gLoc2) {
       if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
         playerGlobal = drawPlayer(gLoc2);
+
+        changePlayerJerseyColor(0, gLoc2.sColorJerseyH[0], gLoc2.sColorJerseyH[1]);
+        changePlayerJerseyColor(1, gLoc2.sColorJerseyA[0], gLoc2.sColorJerseyA[1]);
+
         imgBall = drawBall();
         divBallTarget = drawBallTarget();
         //ptBallLast = gLoc2.gBall.ptPos;
@@ -245,11 +249,6 @@ function getPosPix(ptPos) {
 function drawPlayer(gLoc) {
   if (gLoc.ltPlayer.length < 1) return;
 
-  var sColorH0 = gLoc.sColorJerseyH[0];
-  var sColorH1 = gLoc.sColorJerseyH[1];
-  var sColorA0 = gLoc.sColorJerseyA[0];
-  var sColorA1 = gLoc.sColorJerseyA[1];
-
   var sColorTextH = "black";
   if (gLoc.bJerseyTextColorWhiteH) {
     sColorTextH = "white";
@@ -272,8 +271,7 @@ function drawPlayer(gLoc) {
     divPlH.style.height = "3%";
     divPlH.style.top = (30 + (iP * 4)).toString() + "%";
     divPlH.style.left = "40%";
-    divPlH.style.backgroundColor = sColorH0;
-    divPlH.style.border = "2px solid " + sColorH1;
+    divPlH.style.border = "2px solid";
     divPlH.style.webkitBorderRadius = "50%";
     divPlH.style.borderRadius = "50%";
     divPlH.style.zIndex = "21";
@@ -313,8 +311,7 @@ function drawPlayer(gLoc) {
     divPlA.style.height = "3%";
     divPlA.style.top = (30 + (iP * 4)).toString() + "%";
     divPlA.style.left = "60%";
-    divPlA.style.backgroundColor = sColorA0;
-    divPlA.style.border = "2px solid " + sColorA1;
+    divPlA.style.border = "2px solid";
     divPlA.style.webkitBorderRadius = "50%";
     divPlA.style.borderRadius = "50%";
     divPlA.style.zIndex = "21";
@@ -401,12 +398,20 @@ function changePlayerJerseyColor(iHA, cl1, cl2) {
   if (iHA === 0) {
     for (iP = 0; iP < 11; iP++) {
       playerGlobal[iP].style.backgroundColor = cl1;
-      playerGlobal[iP].style.borderColor = cl2;
+      if (iP === 0) {
+        playerGlobal[iP].style.borderColor = "rgb(57,255,20)";
+      } else {
+        playerGlobal[iP].style.borderColor = cl2;
+      }
     }
   } else if (iHA === 1) {
     for (iP = 11; iP < 22; iP++) {
       playerGlobal[iP].style.backgroundColor = cl1;
-      playerGlobal[iP].style.borderColor = cl2;
+      if (iP === 11) {
+        playerGlobal[iP].style.borderColor = "rgb(243,243,21)";
+      } else {
+        playerGlobal[iP].style.borderColor = cl2;
+      }
     }
   }
 }
