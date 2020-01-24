@@ -88,10 +88,6 @@ namespace CornerkickWebMvc
 
       ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true);
 
-#if !DEBUG
-      ckcore.sHomeDir = sHomeDir;
-#endif
-
       ckcore.tl.writeLog("WebMvc START");
 
       Models.RegisterViewModel.ltLand.Clear();

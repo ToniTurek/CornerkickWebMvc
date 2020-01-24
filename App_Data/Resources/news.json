@@ -1,0 +1,132 @@
+{
+  "news": [
+    {
+      "sText": "Herzlichen Glückwunsch zum #INT#. Geburtstag!",
+      "iType": 1
+    },
+    {
+      "sText": "Frohes Neues Jahr #INT#!",
+      "iType": 2
+    },
+    {
+      "sText": "Ihr Spieler #STRING# hat seine Fähigkeiten durch gute Trainingsleistungen verbessert. #STRING2#: #STRING3#",
+      "iType": 10
+    },
+    {
+      "sText": "Ihr Spieler #STRING# hat sich unerwarteterweise verbessert. #STRING2#: #STRING3#",
+      "iType": 11
+    },
+    {
+      "sText": "Ihr Jugendspieler #STRING# hat seine Fähigkeiten durch gute Trainingsleistungen verbessert. #STRING2#: #STRING3#",
+      "iType": 12
+    },
+    {
+      "sText": "Ihr Jugendspieler #STRING# hat sich unerwarteterweise verbessert. #STRING2#: #STRING3#",
+      "iType": 13
+    },
+    {
+      "sText": "Ihr Spieler #STRING# ist nicht mehr der Schnellste. Schnelligkeit: #STRING2#: #STRING3#",
+      "iType": 14
+    },
+    {
+      "sText": "#STRING# schließt sich als neuer Spieler Ihrer Jugendmannschaft an.",
+      "iType": 15
+    },
+    {
+      "sText": "#STRING# wurde zur Dopingkontrolle gebeten. Ergebnis: negativ",
+      "iType": 16
+    },
+    {
+      "sText": "Bei Ihrem Spieler #STRING# wurde bei einer Routinedopingkontrolle das Dopingmittel #STRING2# nachgewiesen! Daraufhin wurde er von der Dopingagentur für #INT# Monate für sämtliche Wettbewerbe gesperrt.",
+      "iType": 17
+    },
+    {
+      "sText": "Ihr Spieler #STRING# hat sich leicht verletzt. Diagnose: #STRING2#. Vorraussichtliche Verletzungsdauer: #STRING3# Tage.",
+      "iType": 20
+    },
+    {
+      "sText": "Ihr Spieler #STRING# hat sich verletzt. Diagnose: #STRING2#. Vorraussichtliche Verletzungsdauer: #STRING3# Wochen.",
+      "iType": 21
+    },
+    {
+      "sText": "Ihr Spieler #STRING# hat sich schwer verletzt. Diagnose: #STRING2#. Vorraussichtliche Verletzungsdauer: #STRING3# Monate.",
+      "iType": 22
+    },
+    {
+      "sText": "Ihr Jugendspieler #STRING# hat sich leicht verletzt. Diagnose: #STRING2#. Vorraussichtliche Verletzungsdauer: #STRING3# Tage",
+      "iType": 23
+    },
+    {
+      "sText": "Ihr Jugendspieler #STRING# hat sich verletzt. Diagnose: #STRING2#. Vorraussichtliche Verletzungsdauer: #STRING3# Wochen",
+      "iType": 24
+    },
+    {
+      "sText": "Ihr Jugendspieler #STRING# hat sich schwer verletzt. Diagnose: #STRING2#. Vorraussichtliche Verletzungsdauer: #STRING3# Monate",
+      "iType": 25
+    },
+    {
+      "sText": "Sie haben ein neues Transferangebot für den Spieler #STRING# erhalten!",
+      "iType": 30
+    },
+    {
+      "sText": "Ihr Gebot für den Spieler #STRING# wurde gerade von einem anderen Manager überboten.",
+      "iType": 31
+    },
+    {
+      "sText": "Ihr Transferangebot für den Spieler #STRING# von #STRING2# wurde angenommen!",
+      "iType": 32
+    },
+    {
+      "sText": "Herzlichen Glückwunsch! Dies war gerade der höchste #STRING#-Heimsieg der Clubgeschichte!",
+      "iType": 40
+    },
+    {
+      "sText": "Ein ganz bitterer Moment! Dies war gerade die höchste #STRING#-Heimniederlage der Clubgeschichte...",
+      "iType": 41
+    },
+    {
+      "sText": "Herzlichen Glückwunsch! Dies war gerade der höchste #STRING#-Auswärtssieg der Clubgeschichte!",
+      "iType": 42
+    },
+    {
+      "sText": "Ein ganz bitterer Moment! Dies war gerade die höchste #STRING#-Auswärtsniederlage der Clubgeschichte...",
+      "iType": 43
+    },
+    {
+      "sText": "Folgende Spieler besitzen einen auslaufenden Vertrag und verlassen den Verein zum Saisonende: #STRING#",
+      "iType": 44
+    },
+    {
+      "sText": "Folgende Spieler haben den Verein zum Saisonende verlassen: #STRING#",
+      "iType": 45
+    },
+    {
+      "sText": "Ein Teil Ihres Stadions wurde fertig gestellt! (#STRING#)",
+      "iType": 50
+    },
+    {
+      "sText": "Ein Teil Ihrer Stadionumgebung wurde fertig gestellt! (#STRING#)",
+      "iType": 51
+    },
+    {
+      "sText": "Sie haben ein neues Angebot von #STRING# als Hauptsponsor erhalten",
+      "iType": 60
+    },
+    {
+      "sText": "Einem Ihrer Mitarbeiter fällt auf, dass ein erheblicher Teil der Zuschauereinnahmen verschwunden zu sein scheint und meldet dies der Polizei. Die anschließende Untersuchung deckt eine schwarze Kasse auf von der Sie natürlich nichts wissen. Trotzdem wird das Geld konfisziert und Ihrem Verein #INT# Punkte in der laufenden Saison abgezogen.",
+      "iType": 61
+    },
+    {
+      "sText": "Einem Ihrer Mitarbeiter fällt auf, dass ein erheblicher Teil der Zuschauereinnahmen verschwunden zu sein scheint und meldet dies der Polizei. Die anschließende Untersuchung deckt eine schwarze Kasse auf von der Sie natürlich nichts wissen. Trotzdem wird das Geld (insgesammt #INT# €) konfisziert.",
+      "iType": 62
+    },
+    {
+      "sText": "Pokalauslosung abgeschlossen",
+      "iType": 70
+    },
+    {
+      "sText": "Herzlichen Glückwunsch an #STRING# zum Gewinn der #STRING2#!",
+      "iType": 71
+    }
+  ]
+}

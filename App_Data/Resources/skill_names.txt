@@ -1,0 +1,17 @@
+Schnelligkeit
+Technik
+Dribbling
+Zweikampf
+Passstärke
+Passgenauigkeit
+Flankenstärke
+Flankengenauigkeit
+Schusskraft
+Schussgenauigkeit
+Kopfball
+Freistoß
+Elfmeter
+Reaktion
+Sprungkraft
+Ballsicherheit
+Beidfüßigkeit

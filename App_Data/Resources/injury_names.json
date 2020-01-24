@@ -1,0 +1,13 @@
+{
+  "injuries":
+    [
+      [ "Zerrung", "Erkältung" ],
+      [ "Bänderdehnung", "Jochbeinbruch", "Magen-Darm-Virus" ],
+      [ "Muskelfaserriss", "Zehenbruch", "Nasenbeinbruch" ],
+      [ "Aussenbandanriss" ],
+      [ "Aussenbandriss" ],
+      [ "Kreuzbandriss", "Leistenbruch" ],
+      [ "Knorpelschaden", "Archillessehnenriss" ]
+    ]
+}
+
