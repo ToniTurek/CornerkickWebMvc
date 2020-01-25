@@ -126,9 +126,6 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = new CornerkickManager.User();
       mnUm.ltUser.Add(usr);
 
-      CornerkickManager.Main.Training training = new CornerkickManager.Main.Training();
-      for (byte iT = 0; iT < training.iType.Length; iT++) training.iType[iT] = (byte)iType; // Condition
-
       // Create player
       CornerkickGame.Player pl = new CornerkickGame.Player();
       pl.fCondition = 0.6f;
@@ -156,7 +153,7 @@ namespace CornerkickWebMvc.Controllers
           //if ((int)dtTmp.DayOfWeek == 0) break;
 
           // ... do training
-          CornerkickManager.Player.doTraining(ref pl, training, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
+          CornerkickManager.Player.doTraining(ref pl, 2, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
         }
 
         // ... add training data to dataPoints
