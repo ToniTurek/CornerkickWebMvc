@@ -381,12 +381,12 @@ namespace CornerkickWebMvc.Controllers
       clb.ltTactic[0].formation = MvcApplication.ckcore.ltFormationen[7];
 
 #if DEBUG
-      clb.training.iType[1] = 2;
-      clb.training.iType[2] = 3;
-      clb.training.iType[3] = 4;
-      clb.training.iType[4] = 6;
-      clb.training.iType[5] = 9;
-      clb.training.iType[6] = 1;
+      clb.training.ltType.Add(new byte[] { 2, 2, 0 });
+      clb.training.ltType.Add(new byte[] { 3, 3, 0 });
+      clb.training.ltType.Add(new byte[] { 4, 4, 0 });
+      clb.training.ltType.Add(new byte[] { 6, 6, 0 });
+      clb.training.ltType.Add(new byte[] { 9, 9, 0 });
+      clb.training.ltType.Add(new byte[] { 1, 1, 0 });
 #endif
 
       for (byte iB = 0; iB < 3; iB++) {
@@ -394,7 +394,6 @@ namespace CornerkickWebMvc.Controllers
         clb.stadium.blocks[iB].iType = 1;
       }
       for (byte iB = 3; iB < 8; iB++) clb.stadium.blocks[iB].iSeats = 1000;
-
 
       // Clear sponsors
       clb.sponsorMain = new CornerkickManager.Finance.Sponsor();

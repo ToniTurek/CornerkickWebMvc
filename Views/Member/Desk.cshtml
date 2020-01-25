@@ -101,10 +101,15 @@
 
     if (clb != null) {
       bool bTraining = false;
-      if (clb.training.iType != null) {
-        foreach (byte iT in clb.training.iType) {
-          if (iT > 0) {
-            bTraining = true;
+      if (clb.training.ltType != null) {
+        foreach (byte[] iT in clb.training.ltType) {
+          foreach (byte jT in iT) {
+            if (jT > 0) {
+              bTraining = true;
+              break;
+            }
+          }
+          if (bTraining) {
             break;
           }
         }
