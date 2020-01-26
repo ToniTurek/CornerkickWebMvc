@@ -257,6 +257,7 @@
           string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
           string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
           if (success.cup == null) { continue; }
+          if (Math.Abs(success.cup.iId) == 5) { continue; }
 
           <b>@success.cup.sName</b>
           <p>@sWDD</p>
