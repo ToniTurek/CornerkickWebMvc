@@ -376,10 +376,16 @@ namespace CornerkickWebMvc.Controllers
 
               if (nPartFirstRound > 0) {
                 int nRound = cup.getKoRound(nPartFirstRound);
-                //int iMdCup = MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum);
                 int iMdClub = MvcApplication.ckcore.tl.getMatchdays(cup, club);
-                if (iMdClub >= 0) desk.sPokalrunde = MvcApplication.ckcore.sCupRound[nRound - iMdClub - 1];
-                //if (nRound - club.iPokalrunde > 0 && nRound - club.iPokalrunde < MvcApplication.ckcore.sPokalrunde.Length) desk.sPokalrunde = MvcApplication.ckcore.sPokalrunde[nRound - club.iPokalrunde];
+                int iMdCurr = CornerkickManager.Tool.getMatchday(cup, MvcApplication.ckcore.dtDatum); // Current matchday
+
+                string sCupRound = "";
+                if (nRound - iMdClub - 1 >= 0) {
+                  sCupRound = MvcApplication.ckcore.sCupRound[nRound - iMdClub - 1];
+
+                  if (iMdClub < iMdCurr) desk.sPokalrunde = "ausgeschieden (" + sCupRound + ")";
+                  else                   desk.sPokalrunde = sCupRound;
+                }
               }
             }
           }
