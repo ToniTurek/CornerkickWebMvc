@@ -827,6 +827,7 @@
     <Content Include="Scripts\DataTables\responsive.jqueryui.min.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
+    <Content Include="Scripts\dialog.js" />
     <Content Include="Scripts\draw.js" />
     <Content Include="Scripts\Finance.js" />
     <Content Include="Scripts\flot\excanvas.js" />
