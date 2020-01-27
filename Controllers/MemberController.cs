@@ -4964,6 +4964,8 @@ namespace CornerkickWebMvc.Controllers
           string sCupName = "";
           if      (gd.iGameType == 1) sCupName = " - Liga";
           else if (gd.iGameType == 2) sCupName = " - Pokal";
+          else if (gd.iGameType == 3) sCupName = " - Gold-Cup";
+          else if (gd.iGameType == 4) sCupName = " - Silver-Cup";
           else if (gd.iGameType == 5) sCupName = " - Testspiel";
 
           string sInfo0 = gd.dt.ToString("d", getCi()) + sCupName + "</br>" +
