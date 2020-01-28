@@ -2273,6 +2273,64 @@ namespace CornerkickWebMvc.Controllers
       return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
+    public ContentResult PlayerDetailsGetChanceDevelopment(int iPlId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+
+      CornerkickManager.Club clb = null;
+      if (pl.iClubId >= 0) clb = MvcApplication.ckcore.ltClubs[pl.iClubId];
+
+      if (!MvcApplication.ckcore.plr.ownPlayer(clb, pl)) return Content(null, "application/json");
+
+      CornerkickManager.User user = ckUser();
+      if (user == null) return Content(null, "application/json");
+
+      // Get diff. level
+      float fLevel = 1f;
+      if      (user.iLevel == 0) fLevel = 2.0f;
+      else if (user.iLevel == 1) fLevel = 1.4f;
+      else if (user.iLevel == 2) fLevel = 1.0f;
+      else if (user.iLevel == 3) fLevel = 0.8f;
+
+      byte iCoach = 1;
+      byte iBuilding = 1;
+      if (clb != null) {
+        bool bJouth = MvcApplication.ckcore.plr.ownPlayer(clb, pl, 2);
+        if (bJouth) {
+          iCoach    = clb.staff.iJouthTrainer; // Jouth coach
+          iBuilding = clb.buildings.bgJouthInternat.iLevel; // Jouth Internat
+        } else {
+          iCoach    = clb.staff.iCoTrainer; // Co-Coach
+          iBuilding = clb.buildings.bgTrainingCourts.iLevel; // Training Court
+        }
+      }
+
+      DateTime dt25 = MvcApplication.ckcore.dtDatum.AddYears(-25);
+      double fChanceDev    =              CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevInd = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience,               1, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevSkl = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent,                         6f, pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevTal = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday,          1, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevExp = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], 1f,             pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevAge = fChanceDev - CornerkickManager.Player.getChanceDevelopment(         dt25, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevCch = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      1, iBuilding, fLevel);
+      double fChanceDevBdg = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         1, fLevel);
+      double fChanceDevBns = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining],                               0f, pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+
+      Models.DataPointGeneral[] dataPoints = new Models.DataPointGeneral[9];
+
+      dataPoints[0] = new Models.DataPointGeneral(0, fChanceDevInd, fChanceDevInd.ToString("0.00%"));
+      dataPoints[1] = new Models.DataPointGeneral(1, fChanceDevSkl, fChanceDevSkl.ToString("0.00%"));
+      dataPoints[2] = new Models.DataPointGeneral(2, fChanceDevTal, fChanceDevTal.ToString("0.00%"));
+      dataPoints[3] = new Models.DataPointGeneral(3, fChanceDevExp, fChanceDevExp.ToString("0.00%"));
+      dataPoints[4] = new Models.DataPointGeneral(4, fChanceDevAge, fChanceDevAge.ToString("0.00%"));
+      dataPoints[5] = new Models.DataPointGeneral(5, fChanceDevCch, fChanceDevCch.ToString("0.00%"));
+      dataPoints[6] = new Models.DataPointGeneral(6, fChanceDevBdg, fChanceDevBdg.ToString("0.00%"));
+      dataPoints[7] = new Models.DataPointGeneral(7, fChanceDevBns, fChanceDevBns.ToString("0.00%"));
+      dataPoints[8] = new Models.DataPointGeneral(8, fChanceDev,    fChanceDev   .ToString("0.00%"));
+
+      return Content(JsonConvert.SerializeObject(dataPoints), "application/json");
+    }
+
     [HttpPost]
     public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0, bool bNegotiate = true)
     {
