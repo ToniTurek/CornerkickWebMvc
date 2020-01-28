@@ -4579,10 +4579,10 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Training
-        if ((dt - dtStartWeek).TotalDays >= 0 &&
-            (dt - dtStartWeek).TotalDays <  7 &&
-            club.training.iType[(int)dt.DayOfWeek] > 0 &&
-            !bCampTravelDay) {
+        if (dt.CompareTo(MvcApplication.ckcore.dtDatum) > 0 && // If in future
+           (dt - dtStartWeek).TotalDays < 7 && // And before next sunday
+           club.training.iType[(int)dt.DayOfWeek] > 0 && // And training not type 'free'
+           !bCampTravelDay) { // And no travel date
           DateTime dtTmp = new DateTime(dt.Year, dt.Month, dt.Day, 10, 00, 00);
 
           ltEvents.Add(new Models.DiaryEvent {
@@ -4596,6 +4596,23 @@ namespace CornerkickWebMvc.Controllers
             bEditable = false,
             bAllDay = false
           });
+        }
+
+        // Past trainings
+        foreach (CornerkickManager.Main.TrainingHistory th in club.ltTrainingHist) {
+          if (th.dt.Date.Equals(dt) && th.iType > 1) {
+            ltEvents.Add(new Models.DiaryEvent {
+              iID = ltEvents.Count,
+              sTitle = " Training (" + MvcApplication.ckcore.sTraining[th.iType - 1] + ")",
+              sDescription = MvcApplication.ckcore.sTraining[th.iType - 1],
+              sStartDate = th.dt.AddMinutes(-120).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = th.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sColor = "rgb(255, 255, 180)",
+              sTextColor = "rgb(100, 100, 100)",
+              bEditable = false,
+              bAllDay = false
+            });
+          }
         }
 
         // Cup
