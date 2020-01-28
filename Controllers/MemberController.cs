@@ -701,6 +701,11 @@ namespace CornerkickWebMvc.Controllers
         // Initialize dataPoints list
         for (byte j = 0; j < dataPoints[1].Length; j++) dataPoints[1][j] = new List<Models.DataPointGeneral>();
 
+        // Add current training history data to dataPoints
+        for (byte j = 0; j < dataPoints[1].Length; j++) {
+          dataPoints[1][j].Add(dataPoints[0][j][dataPoints[0][j].Count - 1]);
+        }
+
         // Get training camp
         CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
         foreach (CornerkickManager.TrainingCamp.Camp cp in MvcApplication.ckcore.tcp.ltCamps) {
@@ -717,45 +722,42 @@ namespace CornerkickWebMvc.Controllers
         foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTrExp.Add(pl.Clone());
 
         // For the next 7 days ...
-        for (byte iD = 0; iD < Math.Min(clb.training.ltType.Count, 7); iD++) {
-          for (byte iT = 0; iT < MvcApplication.ckcore.settings.iTrainingsPerDayMax; iT++) {
-            DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iD).Date;
-            dtTmp.Add(MvcApplication.ckcore.settings.tsTraining[iT]);
+        foreach (CornerkickManager.Main.Training.Unit tu in clb.training.ltUnit) {
+          if (tu.iType < 0) continue;
+          if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0) continue; // If in past
+          if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(7)) > 0) continue; // If too far in future
 
-            if (iD > 0) {
-              if      ((int)dtTmp.DayOfWeek == 0 && dtTmp.Hour > 10) break;
-              else if ((int)dtTmp.DayOfWeek == 1 && dtTmp.Hour < 10) break;
+          //if      ((int)dtTmp.DayOfWeek == 0 && dtTmp.Hour > 10) break;
+          //else if ((int)dtTmp.DayOfWeek == 1 && dtTmp.Hour < 10) break;
 
-              // ... do training for each player
-              for (int iP = 0; iP < ltPlayerTrExp.Count; iP++) {
-                CornerkickGame.Player plTmp = ltPlayerTrExp[iP];
-                CornerkickManager.Player.doTraining(ref plTmp,
-                                                    clb.training.ltType[iD][iT],
-                                                    clb.staff.iCondiTrainer,
-                                                    clb.staff.iPhysio,
-                                                    clb.buildings.bgGym.iLevel,
-                                                    clb.buildings.bgSpa.iLevel,
-                                                    dtTmp,
-                                                    usr,
-                                                    iTrainingPerDay: 1,
-                                                    ltPlayerTeam: ltPlayerTrExp,
-                                                    campBooking: camp,
-                                                    bJouth: false,
-                                                    bNoInjuries: true,
-                                                    ltTrRule: clb.training.ltRule);
-              }
-            }
+          // ... do training for each player
+          for (int iP = 0; iP < ltPlayerTrExp.Count; iP++) {
+            CornerkickGame.Player plTmp = ltPlayerTrExp[iP];
+            CornerkickManager.Player.doTraining(ref plTmp,
+                                                (byte)tu.iType,
+                                                clb.staff.iCondiTrainer,
+                                                clb.staff.iPhysio,
+                                                clb.buildings.bgGym.iLevel,
+                                                clb.buildings.bgSpa.iLevel,
+                                                tu.dt,
+                                                usr,
+                                                iTrainingPerDay: 1,
+                                                ltPlayerTeam: ltPlayerTrExp,
+                                                campBooking: camp,
+                                                bJouth: false,
+                                                bNoInjuries: true,
+                                                ltTrRule: clb.training.ltRule);
+          }
 
-            // ... get training history data
-            CornerkickManager.Main.TrainingHistory trHistExp = new CornerkickManager.Main.TrainingHistory();
-            trHistExp.dt   = dtTmp;
-            trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation);
+          // ... get training history data
+          CornerkickManager.Main.TrainingHistory trHistExp = new CornerkickManager.Main.TrainingHistory();
+          trHistExp.dt   = tu.dt;
+          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation);
 
-            // ... add training history data to dataPoints
-            for (byte j = 0; j < dataPoints[1].Length; j++) {
-              long iDate = convertDateTimeToTimestamp(trHistExp.dt);
-              dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j]));
-            }
+          // ... add training history data to dataPoints
+          for (byte j = 0; j < dataPoints[1].Length; j++) {
+            long iDate = convertDateTimeToTimestamp(trHistExp.dt);
+            dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j]));
           }
         }
       }
@@ -3071,25 +3073,67 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Training"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    readonly TimeSpan[] tsTraining = new TimeSpan[] { new TimeSpan(9, 30, 00), new TimeSpan(12, 00, 00), new TimeSpan(16, 30, 00) };
+
     [Authorize]
     public ActionResult Training(Models.TrainingModel mdTraining)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdTraining);
 
-      mdTraining.training = clb.training;
+      // Get last Sunday
+      DateTime dtSunday = MvcApplication.ckcore.dtDatum.Date;
+      while ((int)(dtSunday.DayOfWeek) != 0) dtSunday = dtSunday.AddDays(-1);
+
+      mdTraining.ltTu = new CornerkickManager.Main.Training.Unit[7][]; // For each day of week
+      for (int iD = 0; iD < mdTraining.ltTu.Length; iD++) { // Loop until Saturday
+        mdTraining.ltTu[iD] = new CornerkickManager.Main.Training.Unit[3];
+
+        foreach (CornerkickManager.Main.Training.Unit tu in clb.training.ltUnit) {
+          if ((tu.dt.Date - dtSunday.AddDays(iD)).TotalDays == 0) {
+            int iIxTimeOfDay = 0; // 1st training
+            if      (tu.dt.Hour >= tsTraining[2].Hours) iIxTimeOfDay = 2; // 3rd training
+            else if (tu.dt.Hour >= tsTraining[1].Hours) iIxTimeOfDay = 1; // 2nd training
+
+            mdTraining.ltTu[iD][iIxTimeOfDay] = tu;
+          }
+        }
+      }
+
+      // Set training type 'free' if null
+      for (int iD = 0; iD < mdTraining.ltTu.Length; iD++) { // Loop until Saturday
+        for (int iT = 0; iT < mdTraining.ltTu[iD].Length; iT++) { // Loop until Saturday
+          if (mdTraining.ltTu[iD][iT] == null) mdTraining.ltTu[iD][iT] = new CornerkickManager.Main.Training.Unit() { dt = dtSunday.AddDays(iD).Add(tsTraining[iT]), iType = 0 };
+        }
+      }
 
       return View(mdTraining);
     }
 
-    public ActionResult setTraining(int iTraining, int iDay, int iTimeOfDay)
+    //public ActionResult setTraining(int iTrainingType, DateTime dtTraining)
+    public ActionResult setTraining(int iTrainingType, int iDay, int iIxTimeOfDay)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      while (clb.training.ltType.Count < iDay) clb.training.ltType.Add(new byte[] { 0, 0, 0 });
-      clb.training.ltType[iDay][iTimeOfDay] = (byte)iTraining;
-      return Json(iTraining, JsonRequestBehavior.AllowGet);
+      // Get last Sunday
+      DateTime dtSunday = MvcApplication.ckcore.dtDatum.Date;
+      while ((int)(dtSunday.DayOfWeek) != 0) dtSunday = dtSunday.AddDays(-1);
+
+      DateTime dtTraining = dtSunday.AddDays(iDay).Add(tsTraining[iIxTimeOfDay]);
+
+      if (dtTraining.CompareTo(MvcApplication.ckcore.dtDatum) < 0) return Json(false, JsonRequestBehavior.AllowGet); // Return, if in past
+
+      CornerkickManager.Main.Training.Unit tu = clb.training.getTrainingUnit(dtTraining);
+      if (tu == null) {
+        tu = new CornerkickManager.Main.Training.Unit();
+        tu.dt = dtTraining;
+        clb.training.ltUnit.Add(tu);
+      }
+
+      tu.iType = (sbyte)iTrainingType;
+
+      return Json(iTrainingType, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -4585,26 +4629,19 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Future training
-        if (iDay < club.training.ltType.Count) {
-          for (byte iT = 0; iT < MvcApplication.ckcore.settings.iTrainingsPerDayMax; iT++) {
-            byte iTrainingType = club.training.ltType[iDay][iT];
-
-            if (iTrainingType > 0 && !bCampTravelDay) {
-              DateTime dtTmp = new DateTime(dt.Year, dt.Month, dt.Day);
-              dtTmp.Add(MvcApplication.ckcore.settings.tsTraining[iT]);
-
-              ltEvents.Add(new Models.DiaryEvent {
-                iID = ltEvents.Count,
-                sTitle = " Training (" + MvcApplication.ckcore.sTraining[iTrainingType] + ")",
-                sDescription = MvcApplication.ckcore.sTraining[iTrainingType],
-                sStartDate = dtTmp.ToString("yyyy-MM-ddTHH:mm:ss"),
-                sEndDate = dtTmp.AddMinutes(90).ToString("yyyy-MM-ddTHH:mm:ss"),
-                sColor = "rgb(255, 255, 0)",
-                sTextColor = "rgb(100, 100, 100)",
-                bEditable = false,
-                bAllDay = false
-              });
-            }
+        foreach (CornerkickManager.Main.Training.Unit tu in club.training.ltUnit) {
+          if (tu.dt.Equals(dt) && tu.iType > 0 && !bCampTravelDay) {
+            ltEvents.Add(new Models.DiaryEvent {
+              iID = ltEvents.Count,
+              sTitle = " Training (" + MvcApplication.ckcore.sTraining[tu.iType] + ")",
+              sDescription = MvcApplication.ckcore.sTraining[tu.iType],
+              sStartDate = tu.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = tu.dt.AddMinutes(90).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sColor = "rgb(255, 255, 0)",
+              sTextColor = "rgb(100, 100, 100)",
+              bEditable = false,
+              bAllDay = false
+            });
           }
         }
 

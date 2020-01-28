@@ -6,13 +6,12 @@
 }
 
 <script>
-  function setTraining(iDay, iTimeOfDay) {
-    var iTr = $('#iDdlId' + iDay).val();
+  function setTraining(iTr, iDay, iIxTimeOfDay) {
     $.ajax({
       url: '/Member/setTraining',
       type: "GET",
       dataType: "JSON",
-      data: { iTraining: iTr, iDay: iDay, iTimeOfDay: iTimeOfDay },
+      data: { iTrainingType: iTr, iDay: iDay, iIxTimeOfDay: iIxTimeOfDay },
       success: function () {
         plotTrainingDevelopment(false);
         //alert(iTg);
@@ -28,9 +27,7 @@
   <title>Index</title>
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
-</head>
 
-<body>
   <script type="text/javascript">
     dataPointsNew = [];
 
@@ -67,12 +64,12 @@
               yValueFormatString: "0.00%",
               dataPoints: [
                 { label: "Schnelligkeit", y: dataFAve[0].y },
-                { label: "Technik",       y: dataFAve[1].y },
-                { label: "Zweikampf",     y: dataFAve[2].y },
-                { label: "Abspiel",       y: dataFAve[3].y },
-                { label: "Abschluss",     y: dataFAve[4].y },
-                { label: "Standards",     y: dataFAve[5].y },
-                { label: "Torwart",       y: dataFAve[6].y }
+                { label: "Technik", y: dataFAve[1].y },
+                { label: "Zweikampf", y: dataFAve[2].y },
+                { label: "Abspiel", y: dataFAve[3].y },
+                { label: "Abschluss", y: dataFAve[4].y },
+                { label: "Standards", y: dataFAve[5].y },
+                { label: "Torwart", y: dataFAve[6].y }
               ]
             }
           ]
@@ -187,22 +184,53 @@
       });
     }
   </script>
+</head>
 
+<body>
   <h2>Training</h2>
 
-  @{
-    string[] sDayOfWeek = new string[7] { "So.:", "Mo.:", "Di.:", "Mi.:", "Do.:", "Fr.:", "Sa.:" };
-    for (int i = 0; i < Model.training.ltType.Count; i++) {
-      <div style="position: relative; height: 40px">
-        <label style="position: absolute; text-align: right; width: 60px; top: 4px">
-          @sDayOfWeek[i]
-        </label>
-        <div style="position: absolute; height: 30px; left: 70px">
-          @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", Model.training.ltType[i][0]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ", 0)", id = "iDdlId" + i.ToString(), style = "width: 180px" })
-        </div>
-      </div>
-    }
-  }
+  <div style="position: relative; width: auto; height: auto">
+    <table border="1" cellpadding="4" style="width: auto">
+      <thead>
+        <tr>
+          <th style="text-align:center"></th>
+          <th style="text-align:center">1. Training (9:30 Uhr)</th>
+          <th style="text-align:center">2. Training (12:00 Uhr)</th>
+          <th style="text-align:center">3. Training (16:30 Uhr)</th>
+        </tr>
+      </thead>
+      <tbody>
+      @{
+        string[] sDayOfWeek = new string[7] { "So.:", "Mo.:", "Di.:", "Mi.:", "Do.:", "Fr.:", "Sa.:" };
+        for (int iD = 0; iD < sDayOfWeek.Length; iD++) {
+          <tr>
+            <td align="center"><span style="font-weight:bold">@sDayOfWeek[iD]</span></td>
+          @{
+            for (int iT = 0; iT < 3; iT++) {
+              int iType = 0;
+              bool bDisabled = false;
+              if (Model.ltTu[iD][iT] != null) {
+                iType = Model.ltTu[iD][iT].iType;
+                bDisabled = Model.ltTu[iD][iT].dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0;
+              }
+
+              <td>
+                @{
+                  if (bDisabled) {
+                    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", iType), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(this.value, " + iD.ToString() + ", " + iT.ToString() + ")", id = "ddlTraining_" + iD.ToString() + "_" + iT.ToString(), style = "width: 180px; text-align: center", @disabled = "disabled" })
+                  } else {
+                    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", iType), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(this.value, " + iD.ToString() + ", " + iT.ToString() + ")", id = "ddlTraining_" + iD.ToString() + "_" + iT.ToString(), style = "width: 180px; text-align: center" })
+                  }
+                }
+              </td>
+            }
+          }
+          </tr>
+        }
+      }
+      </tbody>
+    </table>
+  </div>
 
   <div style="position: relative; width: 100%">
     <div id="chartContainer" style="height: 400px; width: 100%"></div>

@@ -86,7 +86,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true);
+      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true, iTrainingsPerDay: 3, iTrainingsPerDayMax: 3);
 
       ckcore.tl.writeLog("WebMvc START");
 
