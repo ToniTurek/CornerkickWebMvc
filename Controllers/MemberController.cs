@@ -2543,11 +2543,30 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult PutOnTransferList(int iPlayerId)
+    public JsonResult TransferPutOnTakeFromTransferList(int iPlayerId)
     {
-      MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+      if (iPlayerId < 0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
 
-      return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      if (MvcApplication.ckcore.plr.onTransferlist(pl)) {
+        for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
+          CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
+
+          if (transfer.player == pl) {
+            MvcApplication.ckcore.ltTransfer.RemoveAt(iT);
+            break;
+          }
+        }
+
+        return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
+      } else {
+        MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+        return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
+      }
+
+      return Json(null, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]

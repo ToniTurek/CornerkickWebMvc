@@ -103,7 +103,7 @@
     plotPlayerDevelopment();
     drawStatistic(0);
     plotChanceDevelopment();
-    
+
     $('#tableClubHistory').DataTable({
       "ajax": {
         "url": '@Url.Action("PlayerDetailsGetClubHistoryTable", "Member")',
@@ -154,40 +154,8 @@
       getContractDialog(document.body, @Model.iPlayer, false);
     });
 
-    $("#bnPutOnTransfer").click(function () {
-      $.ajax({
-        url: "/Member/PutOnTransferList",
-        type: 'POST',
-        traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
-        dataType: "json",
-        success: function (response) {
-          alert(response);
-          window.location.reload(true);
-        },
-        error: function (xhr) {
-          debugger;
-          alert(xhr);
-        }
-      });
-    });
-
-    $("#bnTakeFromTransfer").click(function () {
-      $.ajax({
-        url: "/Member/TakeFromTransferList",
-        type: 'POST',
-        traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
-        dataType: "json",
-        success: function (response) {
-          alert(response);
-          window.location.reload(true);
-        },
-        error: function (xhr) {
-          debugger;
-          alert(xhr);
-        }
-      });
+    $("#bnPutOnTakeFromTransfer").click(function () {
+      putOnTakeFromTransferlist();
     });
 
     $("#bnCaptain").click(function () {
@@ -266,6 +234,41 @@
       }
     });
   }); // $(document).ready(function () {
+
+  function putOnTakeFromTransferlist() {
+    $.ajax({
+      url: "/Member/TransferPutOnTakeFromTransferList",
+      type: 'POST',
+      traditional: true,
+      data: { iPlayerId: @Model.iPlayer },
+      dataType: "json",
+      success: function (response) {
+        alert(response);
+
+        // Switch buttons
+        if (response.indexOf("gesetzt") > -1) {
+          setTransferlistButton(0);
+        } else {
+          setTransferlistButton(1);
+        }
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
+  }
+
+  function setTransferlistButton(iOption) {
+    var sText = "";
+    if (iOption === 0) {
+      sText = "Von Transferliste nehmen";
+    } else {
+      sText = "Auf Transferliste setzen";
+    }
+
+    document.getElementById("bnPutOnTakeFromTransfer").innerHTML = sText;
+  }
 
   function getCaptainIdAjax(iC) {
     return $.ajax({
@@ -747,9 +750,9 @@
 
           @* Put on / take from transferlist *@
           @if (MvcApplication.ckcore.plr.onTransferlist(player)) {
-            <button type="submit" id="bnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
+            <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
           } else {
-            <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
+            <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
           }
 
          @if (!Model.bJouth) {
