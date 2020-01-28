@@ -1,0 +1,128 @@
+﻿@model CornerkickWebMvc.Models.ContractsModel
+
+@{
+  ViewBag.Title = "Verträge";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<head>
+  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
+  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/draw.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
+  <script type="text/javascript" src="~/Scripts/Formation.js"></script>
+
+  <script type="text/javascript">
+    function drawDatatableContracts() {
+      var oTable = $('#tableTeamContracts').DataTable({
+        "ajax": {
+          "url": '@Url.Action("ContractsGetTableTeam", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "sID" },
+          { "data": "sNb" },
+          {
+            "data": "sName",
+            "render": function (data, type, row) {
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "" })'.replace("name", data).replace("id", row.sID);
+            }
+          },
+          { "data": "sPosition" },
+          { "data": "sSkill" },
+          { "data": "sSkillIdeal" },
+          { "data": "sAge" },
+          { "data": "sTalent" },
+          {
+            "data": "iValue",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iSalary",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iBonusPlay",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iBonusGoal",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          { "data": "sLength" },
+          { "data": "sFixTransferFee" },
+          {
+            "data": "sNat",
+            "render": function (sNat, type, row) {
+              return getNatIcon(sNat);
+            }
+          }
+        ],
+        "rowReorder": {
+          dataSrc: 'iGehalt'
+        },
+        "pageLength": 50,
+        "paging": false,
+        "info": false,
+        "responsive": true,
+        "searching": false,
+        "order": [[2, "asc"]],
+        "columnDefs": [
+          {
+            "targets": [0], // sID, bSubstituted, sGrade, iSuspended
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          { "targets": [1, 2, 3, 4, 5, 6, 7, 12, 14], "className": "dt-center" },
+          { "targets": [8, 9, 10, 11, 13], "className": "dt-right" }
+        ],
+        "select": false
+      });
+
+      return oTable;
+    }
+
+    $(document).ready(function () {
+      drawDatatableContracts();
+    }); // $(document).ready(function () {});
+  </script>
+</head>
+
+<h3>Spielerverträge</h3>
+<div class="dataTables_wrapper">
+  <table id="tableTeamContracts" cellspacing="0" style="width: 100%" class="display responsive nowrap">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nr</th>
+        <th>Name</th>
+        <th>Position</th>
+        <th>Stärke</th>
+        <th>St. ber.</th>
+        <th>Alter</th>
+        <th>Tal.</th>
+        <th>Marktwert [€]</th>
+        <th>Gehalt [€/a]</th>
+        <th>Auflaufpr. [€]</th>
+        <th>Torprämie [€]</th>
+        <th>Lz [a]</th>
+        <th>Fixe Ablöse [€]</th>
+        <th>Nat.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!---Data and tags are dynamically generated--->
+    </tbody>
+  </table>
+</div>

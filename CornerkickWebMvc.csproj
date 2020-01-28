@@ -307,6 +307,7 @@
     <Compile Include="Models\CalendarModels.cs" />
     <Compile Include="Models\ClubModel.cs" />
     <Compile Include="Models\ConsoleModels.cs" />
+    <Compile Include="Models\ContractsModel.cs" />
     <Compile Include="Models\CupGoldModel.cs" />
     <Compile Include="Models\CupModel.cs" />
     <Compile Include="Models\CupSilverModel.cs" />
@@ -967,6 +968,7 @@
     <Content Include="App_Data\Resources\injury_names.json" />
     <Content Include="App_Data\Resources\news.json" />
     <Content Include="App_Data\Resources\sponsor.json" />
+    <Content Include="Views\Member\Contracts.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

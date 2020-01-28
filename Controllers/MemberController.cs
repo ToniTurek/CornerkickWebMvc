@@ -1606,6 +1606,76 @@ namespace CornerkickWebMvc.Controllers
       return fIndOrientationMinMax;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Contracts
+    /// </summary>
+    /// <param name="Contracts"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult Contracts(Models.ContractsModel mdContracts)
+    {
+
+      return View(mdContracts);
+    }
+
+    public ActionResult ContractsGetTableTeam()
+    {
+      CornerkickManager.Club club = ckClub();
+      if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      int iGameType = 0;
+      if (club.nextGame != null) iGameType = club.nextGame.iGameType;
+
+      List<CornerkickGame.Player> ltPlayerTeam = club.ltPlayer;
+
+      // Update player numbers if nation
+      if (club.bNation) {
+        for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
+      }
+
+      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType);
+
+      //The table or entity I'm querying
+      Models.ContractsModel.DatatableEntry[] query = new Models.ContractsModel.DatatableEntry[ltLV.Count];
+
+      for (int i = 0; i < query.Length; i++) {
+        string sName = ltLV[i][2];
+        int iId = -1;
+        int.TryParse(ltLV[i][0], out iId);
+
+        int iNat = int.Parse(ltLV[i][12]);
+        string sNat = MvcApplication.ckcore.sLandShort[iNat];
+
+        int iVal    = int.Parse(ltLV[i][ 9].Replace(".", ""));
+        int iSal    = int.Parse(ltLV[i][10].Replace(".", ""));
+        int iPlay   = int.Parse(ltLV[i][22].Replace(".", ""));
+        int iGoal   = int.Parse(ltLV[i][23].Replace(".", ""));
+
+        //Hard coded data here that I want to replace with query results
+        query[i] = new Models.ContractsModel.DatatableEntry {
+          sID = ltLV[i][0],
+          sNb = ltLV[i][1],
+          sName = sName,
+          sPosition = ltLV[i][3],
+          sSkill = ltLV[i][4],
+          iValue = iVal,
+          iSalary = iSal,
+          sLength = ltLV[i][11],
+          sNat = sNat,
+          sAge = ltLV[i][14],
+          sTalent = ltLV[i][15],
+          sSkillIdeal = ltLV[i][17],
+          iBonusPlay = iPlay,
+          iBonusGoal = iGoal,
+          sFixTransferFee = ltLV[i][24]
+        };
+      }
+
+      return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
+    }
+
     [Authorize]
     public ActionResult PlayerDetails(int i)
     {
