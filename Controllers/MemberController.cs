@@ -376,10 +376,16 @@ namespace CornerkickWebMvc.Controllers
 
               if (nPartFirstRound > 0) {
                 int nRound = cup.getKoRound(nPartFirstRound);
-                //int iMdCup = MvcApplication.ckcore.tl.getMatchday(cup, MvcApplication.ckcore.dtDatum);
                 int iMdClub = MvcApplication.ckcore.tl.getMatchdays(cup, club);
-                if (iMdClub >= 0) desk.sPokalrunde = MvcApplication.ckcore.sCupRound[nRound - iMdClub - 1];
-                //if (nRound - club.iPokalrunde > 0 && nRound - club.iPokalrunde < MvcApplication.ckcore.sPokalrunde.Length) desk.sPokalrunde = MvcApplication.ckcore.sPokalrunde[nRound - club.iPokalrunde];
+                int iMdCurr = CornerkickManager.Tool.getMatchday(cup, MvcApplication.ckcore.dtDatum); // Current matchday
+
+                string sCupRound = "";
+                if (nRound - iMdClub - 1 >= 0) {
+                  sCupRound = MvcApplication.ckcore.sCupRound[nRound - iMdClub - 1];
+
+                  if (iMdClub < iMdCurr) desk.sPokalrunde = "ausgeschieden (" + sCupRound + ")";
+                  else                   desk.sPokalrunde = sCupRound;
+                }
               }
             }
           }
@@ -1604,6 +1610,76 @@ namespace CornerkickWebMvc.Controllers
       return fIndOrientationMinMax;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Contracts
+    /// </summary>
+    /// <param name="Contracts"></param>
+    /// <returns></returns>
+    //////////////////////////////////////////////////////////////////////////
+    [Authorize]
+    public ActionResult Contracts(Models.ContractsModel mdContracts)
+    {
+
+      return View(mdContracts);
+    }
+
+    public ActionResult ContractsGetTableTeam()
+    {
+      CornerkickManager.Club club = ckClub();
+      if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      int iGameType = 0;
+      if (club.nextGame != null) iGameType = club.nextGame.iGameType;
+
+      List<CornerkickGame.Player> ltPlayerTeam = club.ltPlayer;
+
+      // Update player numbers if nation
+      if (club.bNation) {
+        for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
+      }
+
+      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType);
+
+      //The table or entity I'm querying
+      Models.ContractsModel.DatatableEntry[] query = new Models.ContractsModel.DatatableEntry[ltLV.Count];
+
+      for (int i = 0; i < query.Length; i++) {
+        string sName = ltLV[i][2];
+        int iId = -1;
+        int.TryParse(ltLV[i][0], out iId);
+
+        int iNat = int.Parse(ltLV[i][12]);
+        string sNat = MvcApplication.ckcore.sLandShort[iNat];
+
+        int iVal    = int.Parse(ltLV[i][ 9].Replace(".", ""));
+        int iSal    = int.Parse(ltLV[i][10].Replace(".", ""));
+        int iPlay   = int.Parse(ltLV[i][22].Replace(".", ""));
+        int iGoal   = int.Parse(ltLV[i][23].Replace(".", ""));
+
+        //Hard coded data here that I want to replace with query results
+        query[i] = new Models.ContractsModel.DatatableEntry {
+          sID = ltLV[i][0],
+          sNb = ltLV[i][1],
+          sName = sName,
+          sPosition = ltLV[i][3],
+          sSkill = ltLV[i][4],
+          iValue = iVal,
+          iSalary = iSal,
+          sLength = ltLV[i][11],
+          sNat = sNat,
+          sAge = ltLV[i][14],
+          sTalent = ltLV[i][15],
+          sSkillIdeal = ltLV[i][17],
+          iBonusPlay = iPlay,
+          iBonusGoal = iGoal,
+          sFixTransferFee = ltLV[i][24]
+        };
+      }
+
+      return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
+    }
+
     [Authorize]
     public ActionResult PlayerDetails(int i)
     {
@@ -2199,6 +2275,64 @@ namespace CornerkickWebMvc.Controllers
       sBox += "</tr>";
 
       return Json(sBox, JsonRequestBehavior.AllowGet);
+    }
+
+    public ContentResult PlayerDetailsGetChanceDevelopment(int iPlId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlId];
+
+      CornerkickManager.Club clb = null;
+      if (pl.iClubId >= 0) clb = MvcApplication.ckcore.ltClubs[pl.iClubId];
+
+      if (!MvcApplication.ckcore.plr.ownPlayer(clb, pl)) return Content(null, "application/json");
+
+      CornerkickManager.User user = ckUser();
+      if (user == null) return Content(null, "application/json");
+
+      // Get diff. level
+      float fLevel = 1f;
+      if      (user.iLevel == 0) fLevel = 2.0f;
+      else if (user.iLevel == 1) fLevel = 1.4f;
+      else if (user.iLevel == 2) fLevel = 1.0f;
+      else if (user.iLevel == 3) fLevel = 0.8f;
+
+      byte iCoach = 1;
+      byte iBuilding = 1;
+      if (clb != null) {
+        bool bJouth = MvcApplication.ckcore.plr.ownPlayer(clb, pl, 2);
+        if (bJouth) {
+          iCoach    = clb.staff.iJouthTrainer; // Jouth coach
+          iBuilding = clb.buildings.bgJouthInternat.iLevel; // Jouth Internat
+        } else {
+          iCoach    = clb.staff.iCoTrainer; // Co-Coach
+          iBuilding = clb.buildings.bgTrainingCourts.iLevel; // Training Court
+        }
+      }
+
+      DateTime dt25 = MvcApplication.ckcore.dtDatum.AddYears(-25);
+      double fChanceDev    =              CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevInd = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience,               1, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevSkl = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent,                         6f, pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevTal = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday,          1, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevExp = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], 1f,             pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevAge = fChanceDev - CornerkickManager.Player.getChanceDevelopment(         dt25, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDevCch = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      1, iBuilding, fLevel);
+      double fChanceDevBdg = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         1, fLevel);
+      double fChanceDevBns = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining],                               0f, pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+
+      Models.DataPointGeneral[] dataPoints = new Models.DataPointGeneral[9];
+
+      dataPoints[0] = new Models.DataPointGeneral(0, fChanceDevInd, fChanceDevInd.ToString("0.00%"));
+      dataPoints[1] = new Models.DataPointGeneral(1, fChanceDevSkl, fChanceDevSkl.ToString("0.00%"));
+      dataPoints[2] = new Models.DataPointGeneral(2, fChanceDevTal, fChanceDevTal.ToString("0.00%"));
+      dataPoints[3] = new Models.DataPointGeneral(3, fChanceDevExp, fChanceDevExp.ToString("0.00%"));
+      dataPoints[4] = new Models.DataPointGeneral(4, fChanceDevAge, fChanceDevAge.ToString("0.00%"));
+      dataPoints[5] = new Models.DataPointGeneral(5, fChanceDevCch, fChanceDevCch.ToString("0.00%"));
+      dataPoints[6] = new Models.DataPointGeneral(6, fChanceDevBdg, fChanceDevBdg.ToString("0.00%"));
+      dataPoints[7] = new Models.DataPointGeneral(7, fChanceDevBns, fChanceDevBns.ToString("0.00%"));
+      dataPoints[8] = new Models.DataPointGeneral(8, fChanceDev,    fChanceDev   .ToString("0.00%"));
+
+      return Content(JsonConvert.SerializeObject(dataPoints), "application/json");
     }
 
     [HttpPost]
@@ -4969,6 +5103,8 @@ namespace CornerkickWebMvc.Controllers
           string sCupName = "";
           if      (gd.iGameType == 1) sCupName = " - Liga";
           else if (gd.iGameType == 2) sCupName = " - Pokal";
+          else if (gd.iGameType == 3) sCupName = " - Gold-Cup";
+          else if (gd.iGameType == 4) sCupName = " - Silver-Cup";
           else if (gd.iGameType == 5) sCupName = " - Testspiel";
 
           string sInfo0 = gd.dt.ToString("d", getCi()) + sCupName + "</br>" +

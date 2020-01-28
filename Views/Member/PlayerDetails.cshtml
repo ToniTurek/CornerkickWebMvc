@@ -29,6 +29,7 @@
       dataType: "JSON",
       data: { iPlayer: @Model.iPlayer, iIndTr: iInd },
       success: function (iIndTr) {
+        plotChanceDevelopment();
         //alert(iInd);
       }
     });
@@ -101,6 +102,7 @@
     plotCFM();
     plotPlayerDevelopment();
     drawStatistic(0);
+    plotChanceDevelopment();
     
     $('#tableClubHistory').DataTable({
       "ajax": {
@@ -402,6 +404,74 @@
         });
 
         chartDev.render();
+      }
+    });
+  }
+
+  function plotChanceDevelopment() {
+    $.ajax({
+      type: 'post',
+      url: '/Member/PlayerDetailsGetChanceDevelopment',
+      dataType: "json",
+      data: { iPlId: @Model.iPlayer },
+      success: function (dataCFM) {
+        CanvasJS.addColorSet("customColorSet1",
+          [
+            "blue",
+            "red",
+            "green",
+            "BlueViolet",
+            "yellow",
+            "DeepPink",
+            "orange",
+            "lightblue",
+            "DimGray",
+          ]);
+
+        var chartCFM = new CanvasJS.Chart("divChartChanceDevelopment", {
+          colorSet: "customColorSet1",
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          title: {
+            text: "Chancen Entwicklung",
+          },
+          axisX: {
+            gridThickness: 1,
+            interval: 1
+          },
+          axisY: {
+            valueFormatString: "0.0%",
+            includeZero: true
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "column",
+              indexLabel: "{y}",
+              indexLabelFontColor: "black",
+              indexLabelPlacement: "outside",
+              yValueFormatString: "0.0%",
+              dataPoints: [
+                { label: "Tr.-Bonus", x: 0, y: dataCFM[7].y },
+                { label: "Talent",    x: 1, y: dataCFM[2].y },
+                { label: "Erf.",      x: 2, y: dataCFM[3].y },
+                { label: "Alter",     x: 3, y: dataCFM[4].y },
+                { label: "Trainer",   x: 4, y: dataCFM[5].y },
+                { label: "Gebäude",   x: 5, y: dataCFM[6].y },
+                { label: "F-Level",   x: 6, y: dataCFM[1].y },
+                { label: "Ind. Tr.",  x: 7, y: dataCFM[0].y },
+                { label: "Total",     x: 8, y: dataCFM[8].y }
+              ]
+            }
+          ]
+        });
+
+        chartCFM.render();
       }
     });
   }
@@ -718,7 +788,7 @@
     </table>
   </div>
 
-  <div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 10px">
+  <div style="position: relative; width: 100%; float: left; margin-top: 10px">
     <h4>Fähigkeiten / Statistik</h4>
     <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
       <table border="1" cellpadding="4" style="width: auto">
@@ -754,6 +824,10 @@
       </table>
     </div>
 
+    <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 50%; min-width: 320px; margin-left: 0px; margin-bottom: 10px; float: left"></div>
+  </div>
+
+  <div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 10px">
     <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
       <table border="1" cellpadding="4" style="width: auto">
         <thead>
@@ -799,10 +873,10 @@
                   <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
                 </label>
               </th>
-              <th align="center">Liga</th>
-              <th align="center">Pokal</th>
-              <th align="center">Int.</th>
-              <th align="center">Nat.</th>
+              <th style="text-align:center">Liga</th>
+              <th style="text-align:center">Pokal</th>
+              <th style="text-align:center">Int.</th>
+              <th style="text-align:center">Nat.</th>
             </tr>
           </thead>
           <tbody></tbody>

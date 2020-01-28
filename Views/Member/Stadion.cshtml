@@ -9,6 +9,10 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/dialog.js"></script>
+
   <style>
     .ui-widget-header {
       background: lime;
@@ -101,7 +105,11 @@
 
       $("#bnBuild").click(function () {
         $.when(getStadion()).done(function () {
-          setStadion();
+          bnBuild = document.getElementById("bnBuild");
+          var sCost = bnBuild.getAttribute('data-sCost');
+          var sDur  = bnBuild.getAttribute('data-sDur');
+          var sDesc = "Wollen Sie das Stadion für " + sCost + "€ wirklich ausbauen?<br>Der Ausbau würde " + sDur + " Tage dauern.";
+          getDialog(document.body, sDesc, "Stadionausbau", setStadion);
         });
       });
 
@@ -168,7 +176,9 @@
         success: function (sKostenDauer) {
           bnBuild = document.getElementById("bnBuild");
 
-          $("#bnBuild").text("Kosten: " + sKostenDauer[0] + " €, Dauer: " + sKostenDauer[1] + " Tage");
+          bnBuild.setAttribute('data-sCost', sKostenDauer[0]);
+          bnBuild.setAttribute('data-sDur',  sKostenDauer[1]);
+          bnBuild.innerHTML = "Kosten: " + sKostenDauer[0] + " €, Dauer: " + sKostenDauer[1] + " Tage";
 
           if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
             bnBuild.disabled = true;
