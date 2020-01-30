@@ -49,11 +49,13 @@
       bnAcceptOffer = document.getElementById("bnAcceptOffer");
       bnMakeOffer   = document.getElementById("bnMakeOffer");
       bnCancelOffer = document.getElementById("bnCancelOffer");
+      bnAddToFavLst = document.getElementById("bnAddToFavLst");
 
       iAcceptClubId = rBOffer.value;
 
       bnMakeOffer  .style.display = "none";
       bnCancelOffer.style.display = "none";
+      bnAddToFavLst.style.display = "none";
 
       if (iAcceptPlId >= 0) {
         bnAcceptOffer.style.display = "block";
@@ -78,6 +80,8 @@
       bnAcceptOffer.style.display = "none";
       bnCancelOffer = document.getElementById("bnCancelOffer");
       bnCancelOffer.style.display = "none";
+      bnAddToFavLst = document.getElementById("bnAddToFavLst");
+      bnAddToFavLst.style.display = "none";
 
       $("#tbTransferFee").autoNumeric('init', {
         aSep: '.',
@@ -96,13 +100,25 @@
           "url": '@Url.Action("getTableTransfer", "Member")',
           "type": 'POST',
           "data": function (d) {
+            var iType = 0;
+            if (document.getElementById("rbAll").checked) {
+              iType = 1;
+            } else if (document.getElementById("rbFav").checked) {
+              iType = 2;
+            }
+
+            var iClubId = -9;
+            if (document.getElementById("cbNoClub").checked) {
+              iClubId = -1;
+            }
+
             d.iPos    = $('#ddlFilterPos')  .val();
             d.iFType  = $('#ddlFilterFType').val();
             d.iFValue = $('#ddlFilterF').val();
             d.bJouth  = document.getElementById("rbJouth").checked;
-            d.bAll = document.getElementById("rbAll").checked;
+            d.iType = iType;
             d.bFixTransferFee = document.getElementById("cbFixTransferFee").checked;
-            d.bNoClub = document.getElementById("cbNoClub").checked;
+            d.iClubId = iClubId;
           }
         },
         "info": false,
@@ -115,7 +131,7 @@
         },
         "language": {
           "emptyTable": "Keine Einträge",
-          paginate: {
+          "paginate": {
             next: '&#8594;', // or '→'
             previous: '&#8592;' // or '←'
           }
@@ -204,10 +220,17 @@
 
       $("#rbTransferlist").on('change', function (ev) {
         reloadTransferlist(jTable);
+        bnAddToFavLst.innerHTML = "Zu Favoritenliste hinzufügen";
       });
 
       $("#rbAll").on('change', function (ev) {
         reloadTransferlist(jTable);
+        bnAddToFavLst.innerHTML = "Zu Favoritenliste hinzufügen";
+      });
+
+      $("#rbFav").on('change', function (ev) {
+        reloadTransferlist(jTable);
+        bnAddToFavLst.innerHTML = "Von Favoritenliste entfernen";
       });
 
       $("#cbFixTransferFee").on('change', function (ev) {
@@ -226,6 +249,7 @@
 
           bnMakeOffer  .style.display = "none";
           bnCancelOffer.style.display = "none";
+          bnAddToFavLst.style.display = "none";
         } else {
           jTable.$('tr.selected').removeClass('selected');
           $(this).addClass('selected');
@@ -239,17 +263,19 @@
             iAcceptPlId = data[0].playerId;
 
             if (data[0].iOffer == 1) {
-              $("#bnMakeOffer").text("Angebot ändern");
+              bnMakeOffer.innerHTML = "Angebot ändern";
               bnCancelOffer.style.display = "block";
             } else {
-              $("#bnMakeOffer").text("Spieler verpflichten");
+              bnMakeOffer.innerHTML = "Spieler verpflichten";
               bnCancelOffer.style.display = "none";
             }
 
             if (data[0].iOffer == 2) {
               bnMakeOffer.style.display = "none";
+              bnAddToFavLst.style.display = "none";
             } else {
               bnMakeOffer.style.display = "block";
+              bnAddToFavLst.style.display = "block";
             }
             bnAcceptOffer.style.display = "none";
 
@@ -334,6 +360,30 @@
         }
       }
 
+      $("#bnAddToFavLst").click(function () {
+        var data = jTable.rows('.selected').data();
+        if (data) {
+          var iIdPl = data[0].playerId;
+
+          $.ajax({
+            url: "/Member/TransferAddToRemFromFavorites",
+            type: 'POST',
+            traditional: true,
+            data: { iPlayerId: iIdPl },
+            dataType: "json",
+            success: function (response) {
+              reloadTransferlist(jTable);
+              //alert(response);
+              //window.location.reload(true);
+            },
+            error: function (xhr) {
+              debugger;
+              alert(xhr.error);
+            }
+          });
+        }
+      });
+
       // Transfer Fee
       $("#dialogTransferFee").dialog({
         autoOpen: false,
@@ -405,16 +455,16 @@
     }
 
     function setView() {
-      var divCbTransferlistAll = document.getElementById("divCbTransferlistAll");
+      //var divCbTransferlistAll = document.getElementById("divCbTransferlistAll");
       var divCb = document.getElementById("divCb");
 
       var fWidth = $(window).width();
 
       if (fWidth < 450) {
-        divCbTransferlistAll.style.marginTop = "0px"
+        //divCbTransferlistAll.style.marginTop = "0px"
         divCb.style.marginTop = "0px"
       } else {
-        divCbTransferlistAll.style.marginTop = "20px"
+        //divCbTransferlistAll.style.marginTop = "20px"
         divCb.style.marginTop = "16px"
       }
     }
@@ -425,34 +475,40 @@
   <h3>Transferliste</h3>
   <div id="divTransferlistContainer">
     <div class="form-group" style="position: relative; width: 100%">
-      <div id="divCbTransferlistAll" align="center" style="position: relative; width: 170px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-        <form>
-          <fieldset>
-            <label style="font-size:100%; color: black; margin-right: 4%">
-              <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
-              Transferliste
-            </label>
-            <label style="font-size:100%; color: black">
-              <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
-              Alle
-            </label>
-          </fieldset>
-        </form>
-      </div>
+      <div style="position: relative; width: 262px; height: 54px; float: left; margin-bottom: 10px; margin-right: 10px">
+        <div id="divCbTransferlistAll" align="center" style="position: absolute; width: 260px; height: 24px; top: 0px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+          <form>
+            <fieldset>
+              <label style="font-size:100%; color: black; margin-right: 6px">
+                <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
+                Transferliste
+              </label>
+              <label style="font-size:100%; color: black; margin-right: 6px">
+                <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
+                Alle
+              </label>
+              <label style="font-size:100%; color: black">
+                <input type="radio" id="rbFav" name="rbTransferlistAll" value="2">
+                Favoriten
+              </label>
+            </fieldset>
+          </form>
+        </div>
 
-      <div align="center" style="position: relative; width: 150px; height: 24px; float: left; margin-top: 20px; margin-bottom: 10px; margin-right: 10px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-        <form>
-          <fieldset>
-            <label style="font-size:100%; color: black; margin-right: 4%">
-              <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
-              Profis
-            </label>
-            <label style="font-size:100%; color: black">
-              <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
-              Jugend
-            </label>
-          </fieldset>
-        </form>
+        <div id="divCbProfiJouth" align="center" style="position: absolute; width: 170px; height: 24px; top: 30px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+          <form>
+            <fieldset>
+              <label style="font-size:100%; color: black; margin-right: 4%">
+                <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+                Profis
+              </label>
+              <label style="font-size:100%; color: black">
+                <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+                Jugend
+              </label>
+            </fieldset>
+          </form>
+        </div>
       </div>
 
       <div style="position: relative; width: auto; float: left; margin-bottom: 10px; margin-right: 10px">
@@ -468,6 +524,11 @@
       <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
         <b class="left">Wert:</b>
         @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterF", @style = "width:60px" })
+      </div>
+
+      <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
+        @Html.DropDownListFor(m => m.sFilterNation, Model.ddlFilterNation, new { @class = "form-control", id = "ddlFilterNation", @style = "width:160px", @disabled = "disabled" })
+        @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterClub", @style = "width:160px", @disabled = "disabled" })
       </div>
 
       <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
@@ -507,9 +568,10 @@
       </tbody>
     </table>
 
-    <button type="submit" id="bnMakeOffer" class="btn btn-default" style="width: 100%; margin-top: 6px">Spieler verpflichten</button>
+    <button type="submit" id="bnMakeOffer"   class="btn btn-default" style="width: 100%; margin-top: 6px">Spieler verpflichten</button>
     <button type="submit" id="bnAcceptOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot annehmen</button>
     <button type="submit" id="bnCancelOffer" class="btn btn-default" style="width: 100%; margin-top: 4px">Angebot zurückziehen</button>
+    <button type="submit" id="bnAddToFavLst" class="btn btn-default" style="width: 100%; margin-top: 4px">Zu Favoritenliste hinzufügen</button>
   </div>
 
   <div id="dialogTransferFee" title="Ablöseverhandlungen">

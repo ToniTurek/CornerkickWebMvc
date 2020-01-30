@@ -2535,10 +2535,16 @@ namespace CornerkickWebMvc.Controllers
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
     [Authorize]
-    public ActionResult Transfer(Models.TransferModel transfer)
+    public ActionResult Transfer(Models.TransferModel mdTransfer)
     {
-      transfer.iContractYears = 1;
-      return View(transfer);
+      mdTransfer.iContractYears = 1;
+
+      foreach (byte iN in MvcApplication.iNations) {
+        CornerkickManager.Cup leage = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+        mdTransfer.ddlFilterNation.Add(new SelectListItem { Text = leage.sName, Value = iN.ToString(), Selected = iN == 36 });
+      }
+
+      return View(mdTransfer);
     }
 
     [HttpPost]
@@ -2723,30 +2729,53 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
         player.character.fMoney -= 0.05f;
         sReturn = "Sie haben Ihr Transferangebot für dem Spieler " + player.sName + " zurückgezogen.";
-        MvcApplication.ckcore.ltPlayer[iPlayerId] = player;
       }
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, bool bAll, bool bFixTransferFee, bool bNoClub)
+    [HttpPost]
+    public JsonResult TransferAddToRemFromFavorites(int iPlayerId)
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json("", JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player plFav = MvcApplication.ckcore.ltPlayer[iPlayerId];
+      if (usr.ltPlayerFavorites.IndexOf(plFav) >= 0) usr.ltPlayerFavorites.Remove(plFav);
+      else                                           usr.ltPlayerFavorites.Add(plFav);
+
+      return Json("Ok", JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
 
-      int iClub = -9;
-      if (bNoClub) iClub = -1;
+      //int iClub = -9;
+      //if (bNoClub) iClub = -1;
+
+      CornerkickManager.User usr = ckUser();
+
+      List<CornerkickGame.Player> ltPlayer = null;
+      if (iType == 1) {
+        ltPlayer = MvcApplication.ckcore.ltPlayer;
+      } else if (iType == 2) {
+        if (usr == null) return Json(new { aaData = ltDeTransfer.ToArray() }, JsonRequestBehavior.AllowGet);
+
+        ltPlayer = usr.ltPlayerFavorites;
+      }
 
       int iTr = 0;
       foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist(sName: "",
-                                                                                                       iClubId: iClub,
+                                                                                                       iClubId: iClubId,
                                                                                                        iPos: iPos,
                                                                                                        fStrength: -1f,
                                                                                                        iTalent: 0,
                                                                                                        iFType: iFType,
                                                                                                        iF: iFValue,
                                                                                                        bJouth: bJouth,
-                                                                                                       bAll: bAll,
+                                                                                                       ltPlayer: ltPlayer,
                                                                                                        bFixTransferFee: bFixTransferFee)) {
         string sClub = "vereinslos";
         if (transfer.player.iClubId >= 0) {
