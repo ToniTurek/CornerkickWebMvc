@@ -735,7 +735,6 @@ namespace CornerkickWebMvc.Controllers
                                                   clb.buildings.bgSpa.iLevel,
                                                   dtTmp,
                                                   usr,
-                                                  iTrainingPerDay: 1,
                                                   ltPlayerTeam: ltPlayerTrExp,
                                                   campBooking: camp,
                                                   bJouth: false,
