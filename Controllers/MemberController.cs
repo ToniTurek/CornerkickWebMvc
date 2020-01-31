@@ -4804,6 +4804,7 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Game.Data gd = new CornerkickGame.Game.Data();
         gd.team[0].iTeamId = iTeamIdUser;
         gd.team[1].iTeamId = iTeamId;
+        gd.dt = md.dt;
 
         md.ltGameData.Add(gd);
 
