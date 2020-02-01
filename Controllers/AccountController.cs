@@ -395,7 +395,6 @@ namespace CornerkickWebMvc.Controllers
       }
       for (byte iB = 3; iB < 8; iB++) clb.stadium.blocks[iB].iSeats = 1000;
 
-
       // Clear sponsors
       clb.sponsorMain = new CornerkickManager.Finance.Sponsor();
       clb.ltSponsorBoards.Clear();
@@ -429,6 +428,9 @@ namespace CornerkickWebMvc.Controllers
       clb.iAdmissionPriceSeasonal[0] =  200;
       clb.iAdmissionPriceSeasonal[1] =  600;
       clb.iAdmissionPriceSeasonal[2] = 2000;
+
+      // Clear position last season (for new sponsors)
+      clb.iPosLigaLetzteSaison = 0;
 
       return clb;
     }
