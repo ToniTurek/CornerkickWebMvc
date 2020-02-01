@@ -4456,6 +4456,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
       cupGoldModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupGold, MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
 
+      cupGoldModel.ddlMatchday = new List<SelectListItem>();
+      for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 1); iMd++) {
+        string sText = (iMd + 1).ToString();
+        if (iMd > 5) sText = MvcApplication.ckcore.sCupRound[3 - ((iMd - 6) / 2)];
+
+        cupGoldModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+      }
+
       return View(cupGoldModel);
     }
 
@@ -4475,6 +4483,14 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
       cupSilverModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupSilver, MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
+
+      cupSilverModel.ddlMatchday = new List<SelectListItem>();
+      for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 1); iMd++) {
+        string sText = (iMd + 1).ToString();
+        if (iMd > 5) sText = MvcApplication.ckcore.sCupRound[3 - ((iMd - 6) / 2)];
+
+        cupSilverModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+      }
 
       return View(cupSilverModel);
     }

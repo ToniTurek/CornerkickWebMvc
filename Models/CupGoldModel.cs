@@ -21,11 +21,6 @@ namespace CornerkickWebMvc.Models
     {
       ddlGroup = new List<SelectListItem>();
       for (byte iG = 0; iG < 8; iG++) ddlGroup.Add(new SelectListItem { Text = ((char)(65 + iG)).ToString(), Value = iG.ToString() });
-
-      ddlMatchday = new List<SelectListItem>();
-      for (int iMd = 0; iMd < 6; iMd++) {
-        ddlMatchday.Add(new SelectListItem { Text = (iMd + 1).ToString(), Value = iMd.ToString() });
-      }
     }
   }
 }
