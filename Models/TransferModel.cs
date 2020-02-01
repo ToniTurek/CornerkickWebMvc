@@ -31,6 +31,9 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ltDdlFilterF { get; set; }
     public string sFilterF { get; set; }
 
+    public List<SelectListItem> ddlFilterNation { get; set; }
+    public string sFilterNation { get; set; }
+
     public TransferModel()
     {
       ltDdlFilterPos = new List<SelectListItem>();
@@ -43,18 +46,19 @@ namespace CornerkickWebMvc.Models
 
       ltDdlFilterFType = new List<SelectListItem>();
       ltDdlFilterFType.Add(new SelectListItem { Text = "-", Value = "-1" });
-
       // Positionen zu Dropdown Menü hinzufügen
       for (int iF = 0; iF < MvcApplication.ckcore.plr.sSkills.Length - 1; iF++) {
         ltDdlFilterFType.Add(new SelectListItem { Text = MvcApplication.ckcore.plr.sSkills[iF], Value = iF.ToString() });
       }
 
       ltDdlFilterF = new List<SelectListItem>();
-
       // Positionen zu Dropdown Menü hinzufügen
       for (int iF = 1; iF < 11; iF++) {
         ltDdlFilterF.Add(new SelectListItem { Text = iF.ToString(), Value = iF.ToString() });
       }
+
+      // Nations
+      ddlFilterNation = new List<SelectListItem>();
     }
   }
 

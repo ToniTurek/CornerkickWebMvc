@@ -364,6 +364,8 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
 
                   if (bFeeDialog) {
                     $("#dialogTransferFee").dialog("open");
+                  } else {
+                    window.location.reload(true);
                   }
                 },
                 error: function (xhr) {

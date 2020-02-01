@@ -429,6 +429,9 @@ namespace CornerkickWebMvc.Controllers
       clb.iAdmissionPriceSeasonal[1] =  600;
       clb.iAdmissionPriceSeasonal[2] = 2000;
 
+      // Clear position last season (for new sponsors)
+      clb.iPosLigaLetzteSaison = 0;
+
       return clb;
     }
 

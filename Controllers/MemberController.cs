@@ -474,10 +474,15 @@ namespace CornerkickWebMvc.Controllers
           sN = sN.Replace("Jugendmannschaft", "<a href=\"/Member/Jouth\">Jugendmannschaft</a>");
           sN = sN.Replace("Jugendspieler",    "<a href=\"/Member/Jouth\">Jugendspieler</a>");
           sN = sN.Replace("Hauptsponsor",     "<a href=\"/Member/Sponsor\">Hauptsponsor</a>");
-          sN = sN.Replace("Pokalauslosung",   "<a href=\"/Member/Cup\">Pokalauslosung</a>");
+          sN = sN.Replace("Gold Cup",         "<a href=\"/Member/CupGold\">Gold Cup</a>");
+          sN = sN.Replace("Silver Cup",       "<a href=\"/Member/CupSilver\">Silver Cup</a>");
           sN = sN.Replace("Testspiel",        "<a href=\"/Member/Calendar\">Testspiel</a>");
           sN = sN.Replace("Transferangebot",  "<a href=\"/Member/Transfer\">Transferangebot</a>");
 
+          for (int iNat = 0; iNat < MvcApplication.iNations.Length; iNat++) {
+            string sReplace = "Pokal " + MvcApplication.ckcore.sLand[MvcApplication.iNations[iNat]];
+            sN = sN.Replace(sReplace, "<a href=\"/Member/Cup\">" + sReplace + "</a>");
+          }
           foreach (CornerkickGame.Player pl in clb.ltPlayer) {
             if (sN.Contains(pl.sName)) {
               sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
@@ -2318,8 +2323,8 @@ namespace CornerkickWebMvc.Controllers
       double fChanceDevTal = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday,          1, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
       double fChanceDevExp = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], 1f,             pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
       double fChanceDevAge = fChanceDev - CornerkickManager.Player.getChanceDevelopment(         dt25, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevCch = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      1, iBuilding, fLevel);
-      double fChanceDevBdg = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         1, fLevel);
+      double fChanceDevCch = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      0, iBuilding, fLevel);
+      double fChanceDevBdg = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         0, fLevel);
       double fChanceDevBns = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining],                               0f, pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
 
       Models.DataPointGeneral[] dataPoints = new Models.DataPointGeneral[9];
@@ -2542,18 +2547,43 @@ namespace CornerkickWebMvc.Controllers
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
     [Authorize]
-    public ActionResult Transfer(Models.TransferModel transfer)
+    public ActionResult Transfer(Models.TransferModel mdTransfer)
     {
-      transfer.iContractYears = 1;
-      return View(transfer);
+      mdTransfer.iContractYears = 1;
+
+      foreach (byte iN in MvcApplication.iNations) {
+        CornerkickManager.Cup leage = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+        mdTransfer.ddlFilterNation.Add(new SelectListItem { Text = leage.sName, Value = iN.ToString(), Selected = iN == 36 });
+      }
+
+      return View(mdTransfer);
     }
 
     [HttpPost]
-    public JsonResult PutOnTransferList(int iPlayerId)
+    public JsonResult TransferPutOnTakeFromTransferList(int iPlayerId)
     {
-      MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+      if (iPlayerId < 0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
 
-      return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      if (MvcApplication.ckcore.plr.onTransferlist(pl)) {
+        for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
+          CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
+
+          if (transfer.player == pl) {
+            MvcApplication.ckcore.ltTransfer.RemoveAt(iT);
+            break;
+          }
+        }
+
+        return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
+      } else {
+        MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+        return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
+      }
+
+      return Json(null, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -2711,30 +2741,53 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
         player.character.fMoney -= 0.05f;
         sReturn = "Sie haben Ihr Transferangebot für dem Spieler " + player.sName + " zurückgezogen.";
-        MvcApplication.ckcore.ltPlayer[iPlayerId] = player;
       }
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, bool bAll, bool bFixTransferFee, bool bNoClub)
+    [HttpPost]
+    public JsonResult TransferAddToRemFromFavorites(int iPlayerId)
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json("", JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player plFav = MvcApplication.ckcore.ltPlayer[iPlayerId];
+      if (usr.ltPlayerFavorites.IndexOf(plFav) >= 0) usr.ltPlayerFavorites.Remove(plFav);
+      else                                           usr.ltPlayerFavorites.Add(plFav);
+
+      return Json("Ok", JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
 
-      int iClub = -9;
-      if (bNoClub) iClub = -1;
+      //int iClub = -9;
+      //if (bNoClub) iClub = -1;
+
+      CornerkickManager.User usr = ckUser();
+
+      List<CornerkickGame.Player> ltPlayer = null;
+      if (iType == 1) {
+        ltPlayer = MvcApplication.ckcore.ltPlayer;
+      } else if (iType == 2) {
+        if (usr == null) return Json(new { aaData = ltDeTransfer.ToArray() }, JsonRequestBehavior.AllowGet);
+
+        ltPlayer = usr.ltPlayerFavorites;
+      }
 
       int iTr = 0;
       foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist(sName: "",
-                                                                                                       iClubId: iClub,
+                                                                                                       iClubId: iClubId,
                                                                                                        iPos: iPos,
                                                                                                        fStrength: -1f,
                                                                                                        iTalent: 0,
                                                                                                        iFType: iFType,
                                                                                                        iF: iFValue,
                                                                                                        bJouth: bJouth,
-                                                                                                       bAll: bAll,
+                                                                                                       ltPlayer: ltPlayer,
                                                                                                        bFixTransferFee: bFixTransferFee)) {
         string sClub = "vereinslos";
         if (transfer.player.iClubId >= 0) {
@@ -4458,6 +4511,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
       cupGoldModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupGold, MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
 
+      cupGoldModel.ddlMatchday = new List<SelectListItem>();
+      for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 1); iMd++) {
+        string sText = (iMd + 1).ToString();
+        if (iMd > 5) sText = MvcApplication.ckcore.sCupRound[3 - ((iMd - 6) / 2)];
+
+        cupGoldModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+      }
+
       return View(cupGoldModel);
     }
 
@@ -4477,6 +4538,14 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
       cupSilverModel.iMatchday = Math.Min(CornerkickManager.Tool.getMatchday(cupSilver, MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
+
+      cupSilverModel.ddlMatchday = new List<SelectListItem>();
+      for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 1); iMd++) {
+        string sText = (iMd + 1).ToString();
+        if (iMd > 5) sText = MvcApplication.ckcore.sCupRound[3 - ((iMd - 6) / 2)];
+
+        cupSilverModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+      }
 
       return View(cupSilverModel);
     }
@@ -4645,6 +4714,23 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
+        // Past trainings
+        foreach (CornerkickManager.Main.TrainingHistory th in club.ltTrainingHist) {
+          if (th.dt.Date.Equals(dt) && th.iType > 1) {
+            ltEvents.Add(new Models.DiaryEvent {
+              iID = ltEvents.Count,
+              sTitle = " Training (" + MvcApplication.ckcore.sTraining[th.iType - 1] + ")",
+              sDescription = MvcApplication.ckcore.sTraining[th.iType - 1],
+              sStartDate = th.dt.AddMinutes(-120).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = th.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sColor = "rgb(255, 255, 180)",
+              sTextColor = "rgb(100, 100, 100)",
+              bEditable = false,
+              bAllDay = false
+            });
+          }
+        }
+
         // Cup
         foreach (CornerkickManager.Cup cup in MvcApplication.ckcore.ltCups) {
           int iMd = 0;
@@ -4788,6 +4874,7 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Game.Data gd = new CornerkickGame.Game.Data();
         gd.team[0].iTeamId = iTeamIdUser;
         gd.team[1].iTeamId = iTeamId;
+        gd.dt = md.dt;
 
         md.ltGameData.Add(gd);
 

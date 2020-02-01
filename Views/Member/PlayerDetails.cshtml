@@ -103,7 +103,7 @@
     plotPlayerDevelopment();
     drawStatistic(0);
     plotChanceDevelopment();
-    
+
     $('#tableClubHistory').DataTable({
       "ajax": {
         "url": '@Url.Action("PlayerDetailsGetClubHistoryTable", "Member")',
@@ -154,40 +154,8 @@
       getContractDialog(document.body, @Model.iPlayer, false);
     });
 
-    $("#bnPutOnTransfer").click(function () {
-      $.ajax({
-        url: "/Member/PutOnTransferList",
-        type: 'POST',
-        traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
-        dataType: "json",
-        success: function (response) {
-          alert(response);
-          window.location.reload(true);
-        },
-        error: function (xhr) {
-          debugger;
-          alert(xhr);
-        }
-      });
-    });
-
-    $("#bnTakeFromTransfer").click(function () {
-      $.ajax({
-        url: "/Member/TakeFromTransferList",
-        type: 'POST',
-        traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
-        dataType: "json",
-        success: function (response) {
-          alert(response);
-          window.location.reload(true);
-        },
-        error: function (xhr) {
-          debugger;
-          alert(xhr);
-        }
-      });
+    $("#bnPutOnTakeFromTransfer").click(function () {
+      putOnTakeFromTransferlist();
     });
 
     $("#bnCaptain").click(function () {
@@ -266,6 +234,41 @@
       }
     });
   }); // $(document).ready(function () {
+
+  function putOnTakeFromTransferlist() {
+    $.ajax({
+      url: "/Member/TransferPutOnTakeFromTransferList",
+      type: 'POST',
+      traditional: true,
+      data: { iPlayerId: @Model.iPlayer },
+      dataType: "json",
+      success: function (response) {
+        alert(response);
+
+        // Switch buttons
+        if (response.indexOf("gesetzt") > -1) {
+          setTransferlistButton(0);
+        } else {
+          setTransferlistButton(1);
+        }
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
+  }
+
+  function setTransferlistButton(iOption) {
+    var sText = "";
+    if (iOption === 0) {
+      sText = "Von Transferliste nehmen";
+    } else {
+      sText = "Auf Transferliste setzen";
+    }
+
+    document.getElementById("bnPutOnTakeFromTransfer").innerHTML = sText;
+  }
 
   function getCaptainIdAjax(iC) {
     return $.ajax({
@@ -377,7 +380,7 @@
           },
           axisY2: {
             title: "Marktwert [mio. €]",
-            valueFormatString: "#,,.#",
+            valueFormatString: "#,,.###",
             includeZero: false
           },
           legend: {
@@ -455,7 +458,7 @@
               indexLabel: "{y}",
               indexLabelFontColor: "black",
               indexLabelPlacement: "outside",
-              yValueFormatString: "0.0%",
+              yValueFormatString: "0.00%",
               dataPoints: [
                 { label: "Tr.-Bonus", x: 0, y: dataCFM[7].y },
                 { label: "Talent",    x: 1, y: dataCFM[2].y },
@@ -741,15 +744,15 @@
 
         <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px; text-align: center">
           @* Extend player contract *@
-          @if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
+         @if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
             <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
           }
 
           @* Put on / take from transferlist *@
-          @if (MvcApplication.ckcore.plr.onTransferlist(player)) {
-            <button type="submit" id="bnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
+         @if (MvcApplication.ckcore.plr.onTransferlist(player)) {
+            <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
           } else {
-            <button type="submit" id="bnPutOnTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
+            <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
           }
 
          @if (!Model.bJouth) {
@@ -790,6 +793,12 @@
 
   <div style="position: relative; width: 100%; float: left; margin-top: 10px">
     <h4>Fähigkeiten / Statistik</h4>
+   @if (Model.bOwnPlayer && !Model.bNation) {
+      <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 60%; min-width: 320px; margin-left: 0px; margin-bottom: 10px; float: left"></div>
+    }
+  </div>
+
+  <div style="position: relative; width: 100%; float: left; margin-top: 10px">
     <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
       <table border="1" cellpadding="4" style="width: auto">
         <thead>
@@ -806,7 +815,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (int i = 0; i < player.iSkill.Length; i++) {
+         @for (int i = 0; i < player.iSkill.Length; i++) {
             var fTraining = player.fSkillTraining[i] + 1.0;
             <tr>
               <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
@@ -824,10 +833,6 @@
       </table>
     </div>
 
-    <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 50%; min-width: 320px; margin-left: 0px; margin-bottom: 10px; float: left"></div>
-  </div>
-
-  <div style="position: relative; width: 100%; height: 1000px; float: left; margin-top: 10px">
     <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
       <table border="1" cellpadding="4" style="width: auto">
         <thead>
@@ -838,7 +843,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (byte i = 0; i < player.fExperiencePos.Length; i++) {
+         @for (byte i = 0; i < player.fExperiencePos.Length; i++) {
             byte j = (byte)(i + 1);
 
             string sColor = "";
