@@ -474,10 +474,15 @@ namespace CornerkickWebMvc.Controllers
           sN = sN.Replace("Jugendmannschaft", "<a href=\"/Member/Jouth\">Jugendmannschaft</a>");
           sN = sN.Replace("Jugendspieler",    "<a href=\"/Member/Jouth\">Jugendspieler</a>");
           sN = sN.Replace("Hauptsponsor",     "<a href=\"/Member/Sponsor\">Hauptsponsor</a>");
-          sN = sN.Replace("Pokalauslosung",   "<a href=\"/Member/Cup\">Pokalauslosung</a>");
+          sN = sN.Replace("Gold Cup",         "<a href=\"/Member/CupGold\">Gold Cup</a>");
+          sN = sN.Replace("Silver Cup",       "<a href=\"/Member/CupSilver\">Silver Cup</a>");
           sN = sN.Replace("Testspiel",        "<a href=\"/Member/Calendar\">Testspiel</a>");
           sN = sN.Replace("Transferangebot",  "<a href=\"/Member/Transfer\">Transferangebot</a>");
 
+          for (int iNat = 0; iNat < MvcApplication.iNations.Length; iNat++) {
+            string sReplace = "Pokal " + MvcApplication.ckcore.sLand[MvcApplication.iNations[iNat]];
+            sN = sN.Replace(sReplace, "<a href=\"/Member/Cup\">" + sReplace + "</a>");
+          }
           foreach (CornerkickGame.Player pl in clb.ltPlayer) {
             if (sN.Contains(pl.sName)) {
               sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
