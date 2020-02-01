@@ -4699,7 +4699,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Future training
         foreach (CornerkickManager.Main.Training.Unit tu in club.training.ltUnit) {
-          if (tu.dt.Equals(dt) && tu.iType > 0 && !bCampTravelDay) {
+          if (tu.dt.Date.Equals(dt) && tu.iType > 0 && !bCampTravelDay) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
               sTitle = " Training (" + MvcApplication.ckcore.sTraining[tu.iType] + ")",
