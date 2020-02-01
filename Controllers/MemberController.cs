@@ -726,8 +726,11 @@ namespace CornerkickWebMvc.Controllers
         List<CornerkickGame.Player> ltPlayerTrExp = new List<CornerkickGame.Player>();
         foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTrExp.Add(pl.Clone());
 
+        // Sort by training date
+        List<CornerkickManager.Main.Training.Unit> ltTrUnits = clb.training.ltUnit.OrderBy(tu => tu.dt).ToList();
+
         // For the next 7 days ...
-        foreach (CornerkickManager.Main.Training.Unit tu in clb.training.ltUnit) {
+        foreach (CornerkickManager.Main.Training.Unit tu in ltTrUnits) {
           if (tu.iType < 0) continue;
           if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0) continue; // If in past
           if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(7)) > 0) continue; // If too far in future
