@@ -560,7 +560,7 @@ namespace CornerkickWebMvc
             if (item.club.user != null) {
               if (ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
 
-              CornerkickManager.Club nat = ckcore.tl.getNation(league.iId2);
+              CornerkickManager.Club nat = CornerkickManager.Tool.getNation(league.iId2, ckcore.ltClubs);
               if (nat == null) continue;
 
               // Add all player of that nation
