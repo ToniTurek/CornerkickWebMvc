@@ -905,9 +905,6 @@ namespace CornerkickWebMvc.Controllers
       int jPosMin = Math.Min(iIndex1, iIndex2);
       int jPosMax = Math.Max(iIndex1, iIndex2);
 
-      CornerkickGame.Player pl1 = club.ltPlayer[jPosMin];
-      CornerkickGame.Player pl2 = club.ltPlayer[jPosMax];
-
       if (user.game != null) {
         if (!user.game.data.bFinished) {
           byte iHA = 0;
@@ -918,6 +915,7 @@ namespace CornerkickWebMvc.Controllers
             // Return if ...
             if (user.game.player[iHA][jPosMax].bPlayed) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
             if (user.game.iSubstitutionsLeft[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... no subs left
+            if (!club.bNation && CornerkickManager.Player.atNationalTeam(user.game.player[iHA][jPosMax], MvcApplication.ckcore.ltClubs)) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in is at national team
             if (user.game.data.iGameType >                                              0 &&
                 user.game.data.iGameType <= user.game.player[iHA][jPosMin].iSuspension.Length &&
                 user.game.player[iHA][jPosMin].iSuspension[user.game.data.iGameType - 1] > 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player out is suspended
@@ -931,6 +929,9 @@ namespace CornerkickWebMvc.Controllers
           }
         }
       }
+
+      CornerkickGame.Player pl1 = club.ltPlayer[jPosMin];
+      CornerkickGame.Player pl2 = club.ltPlayer[jPosMax];
 
       // Switch player in club list
       club.ltPlayer.Remove(pl1);
@@ -1003,6 +1004,7 @@ namespace CornerkickWebMvc.Controllers
       public int iSuspended { get; set; }
       public string sCaptain { get; set; }
       public string sGrade { get; set; }
+      public bool bAtNationalTeam { get; set; }
     }
 
     public ActionResult getTableTeam(int iPlayerMax)
@@ -1065,7 +1067,7 @@ namespace CornerkickWebMvc.Controllers
         int iSal = int.Parse(ltLV[i][10].Replace(".", ""));
 
         //Hard coded data here that I want to replace with query results
-        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], iMarktwert = iVal, iGehalt = iSal, sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21] };
+        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], iMarktwert = iVal, iGehalt = iSal, sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21], bAtNationalTeam = ltLV[i][1].StartsWith("-") };
       }
 
       return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);

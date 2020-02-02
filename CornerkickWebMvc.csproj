@@ -615,6 +615,7 @@
     <Content Include="Content\Icons\flags\USA.png" />
     <Content Include="Content\Icons\flags\VEN.png" />
     <Content Include="Content\Icons\flags\WAL.png" />
+    <Content Include="Content\Icons\flags\world.png" />
     <Content Include="Content\Icons\flags\ZAF.png" />
     <Content Include="Content\Icons\form0.png" />
     <Content Include="Content\Icons\form1.png" />
