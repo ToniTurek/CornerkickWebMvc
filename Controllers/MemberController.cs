@@ -1705,7 +1705,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Player plDetails = MvcApplication.ckcore.ltPlayer[i];
       plModel.iPlayerIndTr = plDetails.iIndTraining;
 
-      plModel.bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(club, plDetails);
+      plModel.bOwnPlayer = CornerkickManager.Player.ownPlayer(club, plDetails);
       if (plDetails.iClubId >= 0 && plDetails.iClubId < MvcApplication.ckcore.ltClubs.Count) {
         plModel.bJouth = MvcApplication.ckcore.ltClubs[plDetails.iClubId].ltPlayerJouth.IndexOf(plDetails) >= 0;
         plModel.bJouthBelow16 = plDetails.getAge(MvcApplication.ckcore.dtDatum) < 16;
@@ -2294,7 +2294,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = null;
       if (pl.iClubId >= 0) clb = MvcApplication.ckcore.ltClubs[pl.iClubId];
 
-      if (!MvcApplication.ckcore.plr.ownPlayer(clb, pl)) return Content(null, "application/json");
+      if (!CornerkickManager.Player.ownPlayer(clb, pl)) return Content(null, "application/json");
 
       CornerkickManager.User user = ckUser();
       if (user == null) return Content(null, "application/json");
@@ -2309,7 +2309,7 @@ namespace CornerkickWebMvc.Controllers
       byte iCoach = 1;
       byte iBuilding = 1;
       if (clb != null) {
-        bool bJouth = MvcApplication.ckcore.plr.ownPlayer(clb, pl, 2);
+        bool bJouth = CornerkickManager.Player.ownPlayer(clb, pl, 2);
         if (bJouth) {
           iCoach    = clb.staff.iJouthTrainer; // Jouth coach
           iBuilding = clb.buildings.bgJouthInternat.iLevel; // Jouth Internat
@@ -2802,7 +2802,7 @@ namespace CornerkickWebMvc.Controllers
         if (clubUser.iId > 0) {
           if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
           else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
-          else if (MvcApplication.ckcore.plr.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
+          else if (CornerkickManager.Player.ownPlayer            (clubUser, transfer.player)) iOffer = +2;
         }
 
         string sDatePutOnTl = "-";
@@ -2864,7 +2864,7 @@ namespace CornerkickWebMvc.Controllers
         if (transfer.player == pl) {
           if (transfer.ltOffers == null) break;
 
-          bool bOwnPlayer = MvcApplication.ckcore.plr.ownPlayer(clubUser, MvcApplication.ckcore.ltPlayer[iPlayerId]);
+          bool bOwnPlayer = CornerkickManager.Player.ownPlayer(clubUser, MvcApplication.ckcore.ltPlayer[iPlayerId]);
 
           foreach (CornerkickManager.Transfer.Offer offer in transfer.ltOffers) {
             if (bOwnPlayer || // If own player
