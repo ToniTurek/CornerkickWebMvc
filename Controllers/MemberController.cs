@@ -2574,7 +2574,7 @@ namespace CornerkickWebMvc.Controllers
 
         return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
       } else {
-        MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+        MvcApplication.ckcore.tr.putPlayerOnTransferlist(iPlayerId, 0);
         return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
       }
 
@@ -2638,7 +2638,7 @@ namespace CornerkickWebMvc.Controllers
                 if (clbGive == null) {
                   offer.iFee = 0;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.acceptTransferOffer(clbGive, iPlayerId, club)) {
                     sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
                   }
                   break;
@@ -2647,7 +2647,7 @@ namespace CornerkickWebMvc.Controllers
                 if (pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.acceptTransferOffer(clbGive, iPlayerId, club)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
                     MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   }
@@ -2687,7 +2687,7 @@ namespace CornerkickWebMvc.Controllers
       string sReturn = "Error";
 
       CornerkickManager.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
-      if (MvcApplication.ckcore.ui.acceptTransferOffer(ckClub(), iPlayerId, clubTake)) {
+      if (MvcApplication.ckcore.tr.acceptTransferOffer(ckClub(), iPlayerId, clubTake)) {
         sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
       }
       /*
@@ -2732,7 +2732,7 @@ namespace CornerkickWebMvc.Controllers
     {
       string sReturn = "Error";
 
-      if (MvcApplication.ckcore.ui.cancelTransferOffer(iPlayerId, ckClub())) {
+      if (MvcApplication.ckcore.tr.cancelTransferOffer(iPlayerId, ckClub())) {
         CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
         player.character.fMoney -= 0.05f;
         sReturn = "Sie haben Ihr Transferangebot für dem Spieler " + player.sName + " zurückgezogen.";

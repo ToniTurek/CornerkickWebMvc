@@ -910,7 +910,7 @@ namespace CornerkickWebMvc.Controllers
 
             for (int iPl = 0; iPl < 100; iPl++) {
               CornerkickGame.Player sp = MvcApplication.ckcore.plr.newPlayer(club0);
-              MvcApplication.ckcore.ui.putPlayerOnTransferlist(sp.iId, 0);
+              MvcApplication.ckcore.tr.putPlayerOnTransferlist(sp.iId, 0);
             }
 
             MvcApplication.ckcore.ltClubs.Add(club0);
