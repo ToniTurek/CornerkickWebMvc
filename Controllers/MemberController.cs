@@ -2574,7 +2574,10 @@ namespace CornerkickWebMvc.Controllers
 
         return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
       } else {
-        MvcApplication.ckcore.tr.putPlayerOnTransferlist(iPlayerId, 0);
+        if (MvcApplication.ckcore.tr.putPlayerOnTransferlist(iPlayerId, 0) == 2) {
+          return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " kann in dieser Saison den Verein nicht mehr wechslen", JsonRequestBehavior.AllowGet);
+        }
+
         return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
       }
 
