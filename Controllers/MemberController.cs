@@ -5129,7 +5129,8 @@ namespace CornerkickWebMvc.Controllers
         sBudget[i][5] = bd[i].iPayStaff.ToString();
         sBudget[i][6] = bd[i].iPayTransfer.ToString();
         sBudget[i][7] = bd[i].iPayStadium.ToString();
-        sBudget[i][8] = bd[i].iPayInterest.ToString();
+        sBudget[i][8] = bd[i].iPayTravel.ToString();
+        sBudget[i][9] = bd[i].iPayInterest.ToString();
 
         long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
         long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);

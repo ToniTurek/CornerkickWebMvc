@@ -41,7 +41,8 @@
               document.getElementById('tdPayStaffPlan')      .innerHTML = inputPay + sBudget[0][5] + ">";
               document.getElementById('tdPayTransferPlan')   .innerHTML = inputPay + sBudget[0][6] + ">";
               document.getElementById('tdPayStadiumPlan')    .innerHTML = inputPay + sBudget[0][7] + ">";
-              document.getElementById('tdPayInterestPlan')   .innerHTML = inputPay + sBudget[0][8] + ">";
+              document.getElementById('tdPayTravelPlan')     .innerHTML = inputPay + sBudget[0][8] + ">";
+              document.getElementById('tdPayInterestPlan')   .innerHTML = inputPay + sBudget[0][9] + ">";
             }
 
             // Set thousand separator to text boxes
@@ -69,7 +70,8 @@
             document.getElementById('tdPayStaffPlan')      .innerHTML = sBudget[0][5];
             document.getElementById('tdPayTransferPlan')   .innerHTML = sBudget[0][6];
             document.getElementById('tdPayStadiumPlan')    .innerHTML = sBudget[0][7];
-            document.getElementById('tdPayInterestPlan')   .innerHTML = sBudget[0][8];
+            document.getElementById('tdPayTravelPlan')     .innerHTML = sBudget[0][8];
+            document.getElementById('tdPayInterestPlan')   .innerHTML = sBudget[0][9];
           };
 
           // Real
@@ -81,7 +83,8 @@
           document.getElementById('tdPayStaffReal')      .innerHTML = sBudget[1][5];
           document.getElementById('tdPayTransferReal')   .innerHTML = sBudget[1][6];
           document.getElementById('tdPayStadiumReal')    .innerHTML = sBudget[1][7];
-          document.getElementById('tdPayInterestReal')   .innerHTML = sBudget[1][8];
+          document.getElementById('tdPayTravelReal')     .innerHTML = sBudget[1][8];
+          document.getElementById('tdPayInterestReal')   .innerHTML = sBudget[1][9];
 
           // Total
           document.getElementById('tdTotalInPlan') .innerHTML = sBudget[0][ 9];
@@ -407,6 +410,11 @@
               <td align="right">Stadion</td>
               <td id="tdPayStadiumPlan" style="width:20%" align="right">0</td>
               <td id="tdPayStadiumReal" style="width:20%" align="right">0</td>
+            </tr>
+            <tr>
+              <td align="right">Reisekosten</td>
+              <td id="tdPayTravelPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayTravelReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Zinsen</td>
