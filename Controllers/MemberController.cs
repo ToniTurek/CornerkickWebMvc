@@ -1624,7 +1624,6 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Contracts(Models.ContractsModel mdContracts)
     {
-
       return View(mdContracts);
     }
 
