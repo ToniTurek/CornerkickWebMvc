@@ -3013,11 +3013,11 @@ namespace CornerkickWebMvc.Controllers
 
       clb.iStandards[iStandard] = iIndexPlayer;
 
-      // Set tactic of current game
+      // Set standards of current game
       if (usr.game != null) {
         if (!usr.game.data.bFinished) {
-          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].ltTactic[0] = clb.ltTactic[0];
-          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].ltTactic[0] = clb.ltTactic[0];
+          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].iStandards = clb.iStandards;
+          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].iStandards = clb.iStandards;
         }
       }
 
