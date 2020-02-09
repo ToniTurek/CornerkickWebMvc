@@ -866,6 +866,8 @@ namespace CornerkickWebMvc.Controllers
           byte iHA = 0;
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
+          Models.TeamModels.ltPlayer = user.game.data.ltState[user.game.data.ltState.Count - 1].player[iHA].ToList();
+
           Models.TeamModels.iSubRest = user.game.iSubstitutionsLeft[iHA];
 
           if (Models.TeamModels.ltiSubstitution != null) {
