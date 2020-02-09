@@ -5116,33 +5116,31 @@ namespace CornerkickWebMvc.Controllers
         bd[1] = usr.ltBudget[iYear][1];
       }
 
-      string[][] sBudget = new string[2][];
-      sBudget[0] = new string[12]; // Plan
-      sBudget[1] = new string[12]; // Real
+      long[][] iBudget = new long[2][];
+      iBudget[0] = new long[13]; // Plan
+      iBudget[1] = new long[13]; // Real
 
       for (byte i = 0; i < 2; i++) {
-        sBudget[i][0] = bd[i].iInSpec.ToString();
-        sBudget[i][1] = bd[i].iInBonusCup.ToString();
-        sBudget[i][2] = bd[i].iInBonusSponsor.ToString();
-        sBudget[i][3] = bd[i].iInTransfer.ToString();
-        sBudget[i][4] = bd[i].iPaySalary.ToString();
-        sBudget[i][5] = bd[i].iPayStaff.ToString();
-        sBudget[i][6] = bd[i].iPayTransfer.ToString();
-        sBudget[i][7] = bd[i].iPayStadium.ToString();
-        sBudget[i][8] = bd[i].iPayTravel.ToString();
-        sBudget[i][9] = bd[i].iPayInterest.ToString();
+        iBudget[i][0] = bd[i].iInSpec;
+        iBudget[i][1] = bd[i].iInBonusCup;
+        iBudget[i][2] = bd[i].iInBonusSponsor;
+        iBudget[i][3] = bd[i].iInTransfer;
+        iBudget[i][4] = bd[i].iPaySalary;
+        iBudget[i][5] = bd[i].iPayStaff;
+        iBudget[i][6] = bd[i].iPayTransfer;
+        iBudget[i][7] = bd[i].iPayStadium;
+        iBudget[i][8] = bd[i].iPayTravel;
+        iBudget[i][9] = bd[i].iPayInterest;
 
         long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
         long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);
-        sBudget[i][ 9] = iInTotal .ToString("#,#", getCi());
-        sBudget[i][10] = iPayTotal.ToString("#,#", getCi());
+        iBudget[i][10] = iInTotal;
+        iBudget[i][11] = iPayTotal;
 
-        sBudget[i][11] = "0";
-        long iResult = iInTotal - iPayTotal;
-        if (iResult != 0) sBudget[i][11] = iResult.ToString("#,#", getCi());
+        iBudget[i][12] = iInTotal - iPayTotal;
       }
 
-      return Json(sBudget, JsonRequestBehavior.AllowGet);
+      return Json(iBudget, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult FinanceGetDevelopmentData(Models.FinanceModel financeModel)
