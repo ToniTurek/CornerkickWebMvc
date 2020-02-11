@@ -172,7 +172,15 @@
           { "data": "iIndex" },
           { "data": "sID" },
           { "data": "bSubstituted" },
-          { "data": "sNr" },
+          {
+            "data": "sNr",
+            "render": function (sNr, type, row) {
+              if (row.bAtNationalTeam) {
+                return getNatIcon("world");
+              }
+              return sNr;
+            }
+          },
           {
             "data": "sName",
             "render": function (data, type, row) {
@@ -229,14 +237,14 @@
         },
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
           if        (aData.iIndex < 12) {
-            if (aData.iIndex % 2 == 0) {
+            if (iDisplayIndex % 2 == 0) {
               $('td', nRow).css('background-color', "rgb(235,255,235)");
             } else {
               $('td', nRow).css('background-color', "rgb(245,255,245)");
             }
             $('td', nRow).eq( 0).css('background-color', "rgb(210,230,188)");
           } else if (aData.iIndex < 19) {
-            if (aData.iIndex % 2 == 0) {
+            if (iDisplayIndex % 2 == 0) {
               $('td', nRow).css('background-color', "rgb(230,240,255)");
             } else {
               $('td', nRow).css('background-color', "rgb(240,250,255)");
@@ -246,13 +254,15 @@
 //            $('td', nRow).eq(0).css('background-color', "rgb(220,140,0)");
           }
 
-          if (aData.bSubstituted) {
-            $('td', nRow).css('color', "rgb(180,180,180)");
+          if (aData.bSubstituted) { // Player is substituted -->
+            $('td', nRow).css('color', "rgb(180,180,180)"); // --> text color grey
+          } else if (aData.bAtNationalTeam) { // Player is at national team -->
+            $('td', nRow).css('color', "rgb(180,180,180)"); // --> text color grey
           } else {
-            if (aData.iSuspended < 0) {
-              $('td', nRow).css('color', "rgb(220,140,0)");
-            } else if (aData.iSuspended > 0) {
-              $('td', nRow).css('color', "rgb(255,0,0)");
+            if (aData.iSuspended < 0) { // Player has yellow card -->
+              $('td', nRow).css('color', "rgb(220,140,0)"); // --> text color yellow
+            } else if (aData.iSuspended > 0) { // Player has red card -->
+              $('td', nRow).css('color', "rgb(255,0,0)"); // --> text color red
             }
           }
         }
