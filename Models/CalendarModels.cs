@@ -30,6 +30,9 @@ namespace CornerkickWebMvc.Models
 
     public bool allday { get; set; }
 
+    public List<SelectListItem> ddlTestgameClubs { get; set; }
+    public string[] sTestgameClub { get; set; }
+
     public List<Testgame> ltTestgames { get; set; }
 
     public CornerkickManager.TrainingCamp.Camp camp { get; set; }
