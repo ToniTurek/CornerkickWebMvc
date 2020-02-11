@@ -362,7 +362,7 @@ namespace CornerkickWebMvc
 
         ckcore.doFormation(iC);
         for (int iP = iClubCpuPlayerMax; iP < clbCpu.ltPlayer.Count; iP++) {
-          ckcore.ui.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
+          ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
         }
       }
 
@@ -371,11 +371,11 @@ namespace CornerkickWebMvc
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
         CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0);
-        ckcore.ui.putPlayerOnTransferlist(plNew.iId, 0);
+        ckcore.tr.putPlayerOnTransferlist(plNew.iId, 0);
 
         // Player jouth
         foreach (CornerkickGame.Player plJ in club0.ltPlayerJouth) {
-          ckcore.ui.putPlayerOnTransferlist(plJ, 0);
+          ckcore.tr.putPlayerOnTransferlist(plJ, 0);
         }
 
         if (countCpuPlayerOnTransferlist() > 200) {

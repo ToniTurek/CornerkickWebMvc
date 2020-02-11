@@ -876,6 +876,8 @@ namespace CornerkickWebMvc.Controllers
           byte iHA = 0;
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
+          Models.TeamModels.ltPlayer = user.game.player[iHA].ToList();
+
           Models.TeamModels.iSubRest = user.game.iSubstitutionsLeft[iHA];
 
           if (Models.TeamModels.ltiSubstitution != null) {
@@ -918,16 +920,26 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Player pl1 = club.ltPlayer[jPosMin];
       CornerkickGame.Player pl2 = club.ltPlayer[jPosMax];
 
+      // Switch player in club list
+      club.ltPlayer.Remove(pl1);
+      club.ltPlayer.Remove(pl2);
+
+      club.ltPlayer.Insert(jPosMin, pl2);
+      club.ltPlayer.Insert(jPosMax, pl1);
+
       if (user.game != null) {
         if (!user.game.data.bFinished) {
           byte iHA = 0;
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
           // If switch of player in starting 11 --> do it directly
-          if (jPosMin < user.game.data.nPlStart && jPosMax >= user.game.data.nPlStart) {
+          if (jPosMin < user.game.data.nPlStart && jPosMax < user.game.data.nPlStart) {
+            user.game.doSubstitution(iHA, (byte)jPosMin, (byte)jPosMax);
+          } else {
             // Return if ...
             if (user.game.player[iHA][jPosMax].bPlayed) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
             if (user.game.iSubstitutionsLeft[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... no subs left
+            if (!club.bNation && CornerkickManager.Player.atNationalTeam(user.game.player[iHA][jPosMax], MvcApplication.ckcore.ltClubs)) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in is at national team
             if (user.game.data.iGameType >                                              0 &&
                 user.game.data.iGameType <= user.game.player[iHA][jPosMin].iSuspension.Length &&
                 user.game.player[iHA][jPosMin].iSuspension[user.game.data.iGameType - 1] > 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player out is suspended
@@ -936,20 +948,10 @@ namespace CornerkickWebMvc.Controllers
               Models.TeamModels.ltiSubstitution = new List<int[]>();
             }
             Models.TeamModels.ltiSubstitution.Add(new int[] { jPosMin, jPosMax, 0 });
-          } else {
-            user.game.substitute(iHA == 0, (byte)jPosMin, (byte)jPosMax, 0);
           }
         }
       }
 
-      // Switch player in club list
-      club.ltPlayer.Remove(pl1);
-      club.ltPlayer.Remove(pl2);
-
-      club.ltPlayer.Insert(jPosMin, pl2);
-      club.ltPlayer.Insert(jPosMax, pl1);
-
-      //MvcApplication.ckcore.ltClubs[iC] = club;
       setModelLtPlayer(user);
 
       return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
@@ -1013,6 +1015,7 @@ namespace CornerkickWebMvc.Controllers
       public int iSuspended { get; set; }
       public string sCaptain { get; set; }
       public string sGrade { get; set; }
+      public bool bAtNationalTeam { get; set; }
     }
 
     public ActionResult getTableTeam(int iPlayerMax)
@@ -1048,7 +1051,7 @@ namespace CornerkickWebMvc.Controllers
             byte iHA = 0;
             if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
-            ltPlayerTeam = user.game.data.ltState[user.game.data.ltState.Count - 1].player[iHA].ToList();
+            ltPlayerTeam = user.game.player[iHA].ToList();
           }
         }
       }
@@ -1075,7 +1078,7 @@ namespace CornerkickWebMvc.Controllers
         int iSal = int.Parse(ltLV[i][10].Replace(".", ""));
 
         //Hard coded data here that I want to replace with query results
-        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], iMarktwert = iVal, iGehalt = iSal, sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21] };
+        query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], iMarktwert = iVal, iGehalt = iSal, sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21], bAtNationalTeam = ltLV[i][1].StartsWith("-") };
       }
 
       return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
@@ -1630,7 +1633,6 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Contracts(Models.ContractsModel mdContracts)
     {
-
       return View(mdContracts);
     }
 
@@ -1642,49 +1644,54 @@ namespace CornerkickWebMvc.Controllers
       int iGameType = 0;
       if (club.nextGame != null) iGameType = club.nextGame.iGameType;
 
-      List<CornerkickGame.Player> ltPlayerTeam = club.ltPlayer;
-
-      // Update player numbers if nation
-      if (club.bNation) {
-        for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
-      }
-
-      List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType);
-
       //The table or entity I'm querying
-      Models.ContractsModel.DatatableEntry[] query = new Models.ContractsModel.DatatableEntry[ltLV.Count];
+      Models.ContractsModel.DatatableEntry[] query = new Models.ContractsModel.DatatableEntry[club.ltPlayer.Count + club.ltPlayerJouth.Count];
 
-      for (int i = 0; i < query.Length; i++) {
-        string sName = ltLV[i][2];
-        int iId = -1;
-        int.TryParse(ltLV[i][0], out iId);
+      int iIx = 0;
+      foreach (List<CornerkickGame.Player> ltPlayerTeam in new List<CornerkickGame.Player>[] { club.ltPlayer, club.ltPlayerJouth }) {
+        // Update player numbers if nation
+        if (club.bNation) {
+          for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
+        }
 
-        int iNat = int.Parse(ltLV[i][12]);
-        string sNat = MvcApplication.ckcore.sLandShort[iNat];
+        List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType);
 
-        int iVal    = int.Parse(ltLV[i][ 9].Replace(".", ""));
-        int iSal    = int.Parse(ltLV[i][10].Replace(".", ""));
-        int iPlay   = int.Parse(ltLV[i][22].Replace(".", ""));
-        int iGoal   = int.Parse(ltLV[i][23].Replace(".", ""));
+        for (int i = 0; i < ltPlayerTeam.Count; i++) {
+          string sName = ltLV[i][2];
+          int iId = -1;
+          int.TryParse(ltLV[i][0], out iId);
 
-        //Hard coded data here that I want to replace with query results
-        query[i] = new Models.ContractsModel.DatatableEntry {
-          sID = ltLV[i][0],
-          sNb = ltLV[i][1],
-          sName = sName,
-          sPosition = ltLV[i][3],
-          sSkill = ltLV[i][4],
-          iValue = iVal,
-          iSalary = iSal,
-          sLength = ltLV[i][11],
-          sNat = sNat,
-          sAge = ltLV[i][14],
-          sTalent = ltLV[i][15],
-          sSkillIdeal = ltLV[i][17],
-          iBonusPlay = iPlay,
-          iBonusGoal = iGoal,
-          sFixTransferFee = ltLV[i][24]
-        };
+          int iNat = int.Parse(ltLV[i][12]);
+          string sNat = MvcApplication.ckcore.sLandShort[iNat];
+
+          int iVal    = int.Parse(ltLV[i][ 9].Replace(".", ""));
+          int iSal    = int.Parse(ltLV[i][10].Replace(".", ""));
+          int iPlay   = int.Parse(ltLV[i][22].Replace(".", ""));
+          int iGoal   = int.Parse(ltLV[i][23].Replace(".", ""));
+
+          string sNb = ltLV[i][1];
+          if (iIx > club.ltPlayer.Count) sNb = "-";
+
+          //Hard coded data here that I want to replace with query results
+          query[iIx++] = new Models.ContractsModel.DatatableEntry {
+            sID = ltLV[i][0],
+            sNb = sNb,
+            sName = sName,
+            sPosition = ltLV[i][3],
+            sSkill = ltLV[i][4],
+            iValue = iVal,
+            iSalary = iSal,
+            sLength = ltLV[i][11],
+            sNat = sNat,
+            sAge = ltLV[i][14],
+            sTalent = ltLV[i][15],
+            sSkillIdeal = ltLV[i][17],
+            iBonusPlay = iPlay,
+            iBonusGoal = iGoal,
+            sFixTransferFee = ltLV[i][24],
+            bJouth = iIx > club.ltPlayer.Count
+          };
+        }
       }
 
       return Json(new { aaData = query }, JsonRequestBehavior.AllowGet);
@@ -2582,7 +2589,10 @@ namespace CornerkickWebMvc.Controllers
 
         return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
       } else {
-        MvcApplication.ckcore.ui.putPlayerOnTransferlist(iPlayerId, 0);
+        if (MvcApplication.ckcore.tr.putPlayerOnTransferlist(iPlayerId, 0) == 2) {
+          return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " kann in dieser Saison den Verein nicht mehr wechslen", JsonRequestBehavior.AllowGet);
+        }
+
         return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
       }
 
@@ -2646,7 +2656,7 @@ namespace CornerkickWebMvc.Controllers
                 if (clbGive == null) {
                   offer.iFee = 0;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.acceptTransferOffer(clbGive, iPlayerId, club)) {
                     sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
                   }
                   break;
@@ -2655,7 +2665,7 @@ namespace CornerkickWebMvc.Controllers
                 if (pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.ui.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.acceptTransferOffer(clbGive, iPlayerId, club)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
                     MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   }
@@ -2695,7 +2705,7 @@ namespace CornerkickWebMvc.Controllers
       string sReturn = "Error";
 
       CornerkickManager.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
-      if (MvcApplication.ckcore.ui.acceptTransferOffer(ckClub(), iPlayerId, clubTake)) {
+      if (MvcApplication.ckcore.tr.acceptTransferOffer(ckClub(), iPlayerId, clubTake)) {
         sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
       }
       /*
@@ -2740,7 +2750,7 @@ namespace CornerkickWebMvc.Controllers
     {
       string sReturn = "Error";
 
-      if (MvcApplication.ckcore.ui.cancelTransferOffer(iPlayerId, ckClub())) {
+      if (MvcApplication.ckcore.tr.cancelTransferOffer(iPlayerId, ckClub())) {
         CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId];
         player.character.fMoney -= 0.05f;
         sReturn = "Sie haben Ihr Transferangebot für dem Spieler " + player.sName + " zurückgezogen.";
@@ -2800,9 +2810,10 @@ namespace CornerkickWebMvc.Controllers
         int iOffer = 0;
         CornerkickManager.Club clubUser = ckClub();
         if (clubUser.iId > 0) {
-          if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
-          else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
-          else if (CornerkickManager.Player.ownPlayer            (clubUser, transfer.player)) iOffer = +2;
+          if      (MvcApplication.ckcore.tr.negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
+          else if (MvcApplication.ckcore.tr.alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
+          else if (CornerkickManager.Player.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
+          else if (transfer.player.iClubId >= 0 && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
         }
 
         string sDatePutOnTl = "-";
@@ -3016,11 +3027,11 @@ namespace CornerkickWebMvc.Controllers
 
       clb.iStandards[iStandard] = iIndexPlayer;
 
-      // Set tactic of current game
+      // Set standards of current game
       if (usr.game != null) {
         if (!usr.game.data.bFinished) {
-          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].ltTactic[0] = clb.ltTactic[0];
-          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].ltTactic[0] = clb.ltTactic[0];
+          if      (usr.game.data.team[0].iTeamId == clb.iId) usr.game.data.team[0].iStandards = clb.iStandards;
+          else if (usr.game.data.team[1].iTeamId == clb.iId) usr.game.data.team[1].iStandards = clb.iStandards;
         }
       }
 
@@ -5162,32 +5173,31 @@ namespace CornerkickWebMvc.Controllers
         bd[1] = usr.ltBudget[iYear][1];
       }
 
-      string[][] sBudget = new string[2][];
-      sBudget[0] = new string[12]; // Plan
-      sBudget[1] = new string[12]; // Real
+      long[][] iBudget = new long[2][];
+      iBudget[0] = new long[13]; // Plan
+      iBudget[1] = new long[13]; // Real
 
       for (byte i = 0; i < 2; i++) {
-        sBudget[i][0] = bd[i].iInSpec.ToString();
-        sBudget[i][1] = bd[i].iInBonusCup.ToString();
-        sBudget[i][2] = bd[i].iInBonusSponsor.ToString();
-        sBudget[i][3] = bd[i].iInTransfer.ToString();
-        sBudget[i][4] = bd[i].iPaySalary.ToString();
-        sBudget[i][5] = bd[i].iPayStaff.ToString();
-        sBudget[i][6] = bd[i].iPayTransfer.ToString();
-        sBudget[i][7] = bd[i].iPayStadium.ToString();
-        sBudget[i][8] = bd[i].iPayInterest.ToString();
+        iBudget[i][0] = bd[i].iInSpec;
+        iBudget[i][1] = bd[i].iInBonusCup;
+        iBudget[i][2] = bd[i].iInBonusSponsor;
+        iBudget[i][3] = bd[i].iInTransfer;
+        iBudget[i][4] = bd[i].iPaySalary;
+        iBudget[i][5] = bd[i].iPayStaff;
+        iBudget[i][6] = bd[i].iPayTransfer;
+        iBudget[i][7] = bd[i].iPayStadium;
+        iBudget[i][8] = bd[i].iPayTravel;
+        iBudget[i][9] = bd[i].iPayInterest;
 
         long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
         long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);
-        sBudget[i][ 9] = iInTotal .ToString("#,#", getCi());
-        sBudget[i][10] = iPayTotal.ToString("#,#", getCi());
+        iBudget[i][10] = iInTotal;
+        iBudget[i][11] = iPayTotal;
 
-        sBudget[i][11] = "0";
-        long iResult = iInTotal - iPayTotal;
-        if (iResult != 0) sBudget[i][11] = iResult.ToString("#,#", getCi());
+        iBudget[i][12] = iInTotal - iPayTotal;
       }
 
-      return Json(sBudget, JsonRequestBehavior.AllowGet);
+      return Json(iBudget, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult FinanceGetDevelopmentData(Models.FinanceModel financeModel)

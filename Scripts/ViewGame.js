@@ -38,6 +38,7 @@ function drawGame(iState, iGameSpeed) {
 
         gLocArray = [];
         drawGame2(gLoc2, iState, iGameSpeed);
+        plotStatistics(iState);
       } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
         bFinished = gLoc2.bFinished;
         if (!bFinished) {

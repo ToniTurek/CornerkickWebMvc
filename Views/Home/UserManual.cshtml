@@ -348,7 +348,7 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
   </tr>
   @{
     for (int iT = 0; iT < MvcApplication.ckcore.sTraining.Length; iT++) {
-      float[] fTr = CornerkickManager.Player.fTrainingFactors(iT);
+      float[] fTr = CornerkickManager.Player.getTrainingFactors(iT);
       string[] sTr = new string[3];
       int[] iMulti = new int[3];
       if (fTr[0] > 0) { // Type: Kondition
@@ -486,7 +486,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     <li>
       <u>Spielpraxis</u><br /><div id="uPlayerSkillsExperience" class="ckLinkLarge"></div>
       Je höher die Spielpraxis des Spielers, desto größer ist die Wahrscheinlichkeit, dass er sich in seinen Fähigkeiten verbessert.<br />
-      Die Spielpraxis steigt mit jeder gespielten Spielminute und sinkt im Lauf der Zeit kontinuierlich ab. Junge Spieler gewinnen schneller/verlieren langsamer Spielpraxis als ältere.<br />
+      Die Spielpraxis eines Profispielers steigt mit jeder gespielten Spielminute und sinkt im Lauf der Zeit kontinuierlich ab. Junge Profispieler gewinnen schneller/verlieren langsamer Spielpraxis als ältere. Jugendspieler haben eine konstante Spielpraxis von 50.<br />
       Der Bereich der Spielpraxis liegt zwischen 10 < Spielpraxis < 100.
     </li>
     <li>
@@ -569,8 +569,14 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   </ul>
 
   <h4>Verbessern der Spielerfertigkeiten</h4>
-  Die Fähigkeiten der Spieler können durch Training verbessert werden. Die Wahrscheinlichkeit, dass sich ein Spieler in einer Fähigkeit verbessert ist von folgenden Faktoren abhängig:
+  Die Fähigkeiten der Spieler können durch individuelles Training verbessert werden. Die Wahrscheinlichkeit, dass sich ein Spieler in einer Fähigkeit verbessert ist von folgenden Faktoren abhängig:
   <ul>
+    <li>
+      <u>Dem erarbeiteten Wert des Trainingsbonus</u><br />
+      In jedem Mannschaftstraining wird auch individuell trainiert. Der trainierende Spieler gewinnt Trainingsbonus in der Fähigkeit welche er gerade individuell trainiert. Das individuelle Training jedes Spielers kann in der Spieleransicht festgelegt werden.<br />
+      Ist die Durchschnittsstärke der Mannschaft höher als die Stärke des einzelnen Spielers, erhöht sich der pro Training gewonnene Trainingsbonus. Im Gegensatz dazu sinkt der gewonnene Trainingsbonus guter Spieler, welche mit einer relativ schlechten Mannschaft trainieren.<br />
+      Verbessert sich der Spieler in einer Fähigkeit, wird der Trainingsbonus auf 0 zurückgesetzt.
+    </li>
     <li>
       <u>Dem bereits erreichten Level der Fähigkeit</u><br />
       Je höher eine Fähigkeit bereits ist, desto schwieriger ist es, den Spieler in dieser weiter zu verbessern.
@@ -586,12 +592,12 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
       <u>Der aktuellen <a href="#uPlayerSkillsExperience">Spielpraxis</a> des Spielers</u><br />
     </li>
     <li>
-      <u>Der aktuellen Stärke der Mitspieler</u><br />
-      Ist die Durchschnittsstärke der Mannschaft höher als die Stärke des einzelnen Spielers, erhöht sich die Wahrscheinlichkeit, dass dieser seine Fähigkeiten verbessert. Im Gegensatz dazu haben es gute Spieler schwerer, sich in einer schlechten Mannschaft zu verbessern.
+      <u>Trainer</u><br />
+      Je besser der <a href="#h3Staff">Co-Trainer</a> (Profi-Spieler) bzw. der <a href="#h3Staff">Jugendtrainer</a> (Jugendspieler) ist, desto eher verbessern sich deine Spieler.
     </li>
     <li>
-      <u>Trainer</u><br />
-      Je besser der <a href="#h3Staff">Co-Trainer/Jugendtrainer</a> ist, desto eher verbessern sich deine Spieler.
+      <u>Gebäude</u><br />
+      Je höher das Level des <a href="#h4Buildings">Trainingsgeländes</a> (Profi-Spieler) bzw. des <a href="#h4Buildings">Jugendinternats</a> (Jugendspieler) ist, desto eher verbessern sich deine Spieler.
     </li>
     <li>
       <u>Trainingslager</u><br />
@@ -709,6 +715,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   </ul>
   Mit anderen Worten: @sCarpark Parkplätze genügen für 10.000 Stehplatz-, 8.000 Sitzplatz- und 400 VIP Zuschauer. Sind keine vorhanden reduziert sich die Anzahl der potentiellen Zuschauer um 25%.
 
+  <div id="h4Buildings" class="ckLink"></div>
   <h3>Vereinsgelände</h3>
   Auf dem Vereinsgelände können verschiedene Gebäudetypen (aus-)gebaut werden:
   <ul>

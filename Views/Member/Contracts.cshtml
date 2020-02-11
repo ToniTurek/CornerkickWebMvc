@@ -7,17 +7,10 @@
 
 <!DOCTYPE html>
 <head>
-  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
-  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
-  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
-  <script type="text/javascript" src="~/Scripts/draw.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
-  <script type="text/javascript" src="~/Scripts/Formation.js"></script>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
 
   <script type="text/javascript">
     function drawDatatableContracts() {
@@ -68,9 +61,6 @@
             }
           }
         ],
-        "rowReorder": {
-          dataSrc: 'iGehalt'
-        },
         "pageLength": 50,
         "paging": false,
         "info": false,
@@ -87,7 +77,41 @@
           { "targets": [1, 2, 3, 4, 5, 6, 7, 12, 14], "className": "dt-center" },
           { "targets": [8, 9, 10, 11, 13], "className": "dt-right" }
         ],
-        "select": false
+        "select": false,
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.bJouth) {
+            if (iDisplayIndex % 2 == 0) {
+              $('td', nRow).css('background-color', "rgb(255,240,240)");
+            } else {
+              $('td', nRow).css('background-color', "rgb(255,245,245)");
+            }
+          }
+        },
+        "footerCallback": function (row, data, start, end, display) {
+          var api = this.api(), data;
+
+          // Remove the formatting to get integer data for summation
+          var intVal = function (i) {
+            return typeof i === 'string' ?
+              i.replace(/[\$,]/g, '') * 1 :
+              typeof i === 'number' ?
+                i : 0;
+          };
+
+          // Calculate sum for columns 8 till 12
+          var iCn;
+          for (iCn = 8; iCn < 12; iCn++) {
+            iSum = api
+              .column(iCn)
+              .data()
+              .reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+              }, 0);
+
+            // Update table footer
+            $(api.column(iCn).footer()).html(iSum.toLocaleString());
+          }
+        }
       });
 
       return oTable;
@@ -101,7 +125,7 @@
 
 <h3>Spielerverträge</h3>
 <div class="dataTables_wrapper">
-  <table id="tableTeamContracts" cellspacing="0" style="width: 100%" class="display responsive nowrap">
+  <table id="tableTeamContracts" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">
     <thead>
       <tr>
         <th>ID</th>
@@ -124,5 +148,17 @@
     <tbody>
       <!---Data and tags are dynamically generated--->
     </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="8" style="text-align:right">Summe:</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </tfoot>
   </table>
 </div>

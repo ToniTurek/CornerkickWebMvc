@@ -184,9 +184,9 @@
           }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-          if (aData.iOffer > 0) { // already offered or own player
+          if (aData.iOffer > 0) { // Already offered or own player
             $(nRow).addClass('details-control');
-          } else if (aData.iOffer < 0) { // negotiation cancelled
+          } else if (aData.iOffer === -1) { // Negotiation cancelled
             $('td', nRow).css('color', "rgb(180,180,180)");
           }
         },
@@ -255,14 +255,11 @@
           $(this).addClass('selected');
           $(this).addClass('selected-Details');
 
-          // Remove select class for first column (not working!)
-          //$('#td details-control').removeClass('selected');
-
           var data = jTable.rows('.selected').data();
           if (data) {
             iAcceptPlId = data[0].playerId;
 
-            if (data[0].iOffer == 1) {
+            if (data[0].iOffer == 1) { // Already offered
               bnMakeOffer.innerHTML = "Angebot ändern";
               bnCancelOffer.style.display = "block";
             } else {
@@ -270,9 +267,12 @@
               bnCancelOffer.style.display = "none";
             }
 
-            if (data[0].iOffer == 2) {
+            if (data[0].iOffer == 2) { // Own player
               bnMakeOffer.style.display = "none";
               bnAddToFavLst.style.display = "none";
+            } else if (data[0].iOffer == -2) { // Not on transfer list
+              bnMakeOffer.style.display = "none";
+              bnAddToFavLst.style.display = "block";
             } else {
               bnMakeOffer.style.display = "block";
               bnAddToFavLst.style.display = "block";
