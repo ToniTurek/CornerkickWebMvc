@@ -6,15 +6,17 @@
 }
 
 <script>
-  function setTraining(iTr, iDay, iIxTimeOfDay) {
+  function setTraining(sct) {
+    var iDay = parseInt(sct.getAttribute('data-iDay'));
+    var iToD = parseInt(sct.getAttribute('data-iToD'));
+
     $.ajax({
       url: '/Member/setTraining',
       type: "GET",
       dataType: "JSON",
-      data: { iTrainingType: iTr, iDay: iDay, iIxTimeOfDay: iIxTimeOfDay },
+      data: { iTrainingType: sct.value, iDay: iDay + (iWeekGlobal * 7), iIxTimeOfDay: iToD },
       success: function () {
         plotTrainingDevelopment(false);
-        //alert(iTg);
       }
     });
   }
@@ -24,14 +26,16 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width" />
-  <title>Index</title>
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/moment.js"></script>
 
   <script type="text/javascript">
     dataPointsNew = [];
+    var iWeekGlobal = 0;
 
     $(document).ready(function () {
+      plotTrainingPlan(0);
       plotTrainingDevelopment(true);
 
       $.get("/Member/GetTeamFAve/", function (dataFAve) {
@@ -78,6 +82,68 @@
         chartFAve.render();
       });
     });
+
+    var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel"];
+    var dateOptions = { weekday: 'short', month: '2-digit', day: '2-digit' };
+    function plotTrainingPlan(iWeek) {
+      $.ajax({
+        type: 'post',
+        url: '/Member/TrainingGetPlan',
+        dataType: "json",
+        data: { iWeek: iWeek },
+        success: function (ltTu) {
+          var tblTrainingPlan = document.getElementById("tblTrainingPlan").getElementsByTagName('tbody')[0];
+          while (tblTrainingPlan.hasChildNodes()) {
+            tblTrainingPlan.removeChild(tblTrainingPlan.firstChild);
+          }
+
+          var iD;
+          for (iD = 0; iD < ltTu.length; iD++) {
+            var row = tblTrainingPlan.insertRow();
+
+            var date = moment(ltTu[iD][0].dt).toDate();
+            //row.insertCell(0).innerHTML = date.getDate() + "." + (date.getMonth() + 1);
+            var cell0 = row.insertCell(0);
+            cell0.innerHTML = date.toLocaleDateString("de-DE", dateOptions);
+            cell0.style.textAlign = "right";
+            cell0.style.fontWeight = 'bold';
+
+            var iIxDay;
+            for (iIxDay = 0; iIxDay < ltTu[iD].length; iIxDay++) {
+              var sct = document.createElement("select");
+
+              var iT;
+              for (iT = 0; iT < sTrainingNames.length; iT++) {
+                var opt = document.createElement('option');
+                opt.value = iT;
+                opt.innerHTML = sTrainingNames[iT];
+                opt.selected = iT === ltTu[iD][iIxDay].iType;
+                sct.appendChild(opt);
+              }
+
+              sct.classList.add('form-control');
+              sct.style.width = "180px";
+              if (ltTu[iD][iIxDay].iType < 0) {
+                sct.disabled = true;
+              } else {
+                sct.setAttribute('data-iDay', iD);
+                sct.setAttribute('data-iToD', iIxDay);
+                sct.onchange = function () { setTraining(this); };
+              }
+
+              var cell = row.insertCell(iIxDay + 1);
+              //cell.className = "alignRight";
+              cell.appendChild(sct);
+            }
+          }
+        }
+      });
+    }
+
+    function changeWeek(iDeltaWeek) {
+      iWeekGlobal += iDeltaWeek;
+      plotTrainingPlan(iWeekGlobal);
+    }
 
     function plotTrainingDevelopment(bAnimate) {
       var bExpected = document.getElementById("cbPlotExpected").checked;
@@ -189,8 +255,10 @@
 <body>
   <h2>Training</h2>
 
-  <div style="position: relative; width: auto; height: auto">
-    <table border="1" cellpadding="4" style="width: auto">
+  <div style="position: relative; width: 100%; height: auto; margin-bottom: 20px">
+    <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: relative; width: 49%; left: 0px"><</button>
+    <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: relative; width: 49%; right: 0px">></button>
+    <table id="tblTrainingPlan" border="1" cellpadding="4" style="position: relative; width: 100%; margin-top: 6px">
       <thead>
         <tr>
           <th style="text-align:center"></th>
@@ -199,36 +267,7 @@
           <th style="text-align:center">3. Training (16:30 Uhr)</th>
         </tr>
       </thead>
-      <tbody>
-      @{
-        string[] sDayOfWeek = new string[7] { "So.:", "Mo.:", "Di.:", "Mi.:", "Do.:", "Fr.:", "Sa.:" };
-        for (int iD = 0; iD < sDayOfWeek.Length; iD++) {
-          <tr>
-            <td align="center"><span style="font-weight:bold">@sDayOfWeek[iD]</span></td>
-          @{
-            for (int iT = 0; iT < 3; iT++) {
-              int iType = 0;
-              bool bDisabled = false;
-              if (Model.ltTu[iD][iT] != null) {
-                iType = Model.ltTu[iD][iT].iType;
-                bDisabled = Model.ltTu[iD][iT].dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0;
-              }
-
-              <td>
-                @{
-                  if (bDisabled) {
-                    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", iType), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(this.value, " + iD.ToString() + ", " + iT.ToString() + ")", id = "ddlTraining_" + iD.ToString() + "_" + iT.ToString(), style = "width: 180px; text-align: center", @disabled = "disabled" })
-                  } else {
-                    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", iType), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(this.value, " + iD.ToString() + ", " + iT.ToString() + ")", id = "ddlTraining_" + iD.ToString() + "_" + iT.ToString(), style = "width: 180px; text-align: center" })
-                  }
-                }
-              </td>
-            }
-          }
-          </tr>
-        }
-      }
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 
