@@ -726,14 +726,32 @@ namespace CornerkickWebMvc.Controllers
         List<CornerkickGame.Player> ltPlayerTrExp = new List<CornerkickGame.Player>();
         foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTrExp.Add(pl.Clone());
 
+        // Add training if none for the next 7 days
+        for (int iD = 0; iD < 7; iD++) {
+          if (clb.training.getTrainingUnitsToday(MvcApplication.ckcore.dtDatum.AddDays(iD)) == null) {
+            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[0]), iType = 0 });
+            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[1]), iType = 0 });
+            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[2]), iType = 0 });
+          }
+
+          int iT = 0;
+          while (clb.training.getTrainingUnitsToday(MvcApplication.ckcore.dtDatum.AddDays(iD)).Count < 3) {
+            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[iT++]), iType = 0 });
+          }
+        }
+
         // Sort by training date
         List<CornerkickManager.Main.Training.Unit> ltTrUnits = clb.training.ltUnit.OrderBy(tu => tu.dt).ToList();
 
-        // For the next 7 days ...
+        // Get next saturday
+        DateTime dtNextSaturday = MvcApplication.ckcore.dtDatum.Date;
+        while ((int)dtNextSaturday.DayOfWeek != 6) dtNextSaturday = dtNextSaturday.AddDays(1);
+
+        // Until next saturday ...
         foreach (CornerkickManager.Main.Training.Unit tu in ltTrUnits) {
           if (tu.iType < 0) continue;
           if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0) continue; // If in past
-          if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(7)) > 0) continue; // If too far in future
+          if (tu.dt.CompareTo(dtNextSaturday.Add(new TimeSpan(15, 30, 00))) > 0) break; // If too far in future
 
           //if      ((int)dtTmp.DayOfWeek == 0 && dtTmp.Hour > 10) break;
           //else if ((int)dtTmp.DayOfWeek == 1 && dtTmp.Hour < 10) break;
