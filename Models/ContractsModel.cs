@@ -24,6 +24,7 @@ namespace CornerkickWebMvc.Models
       public string sFixTransferFee { get; set; }
       public string sLength { get; set; }
       public string sNat { get; set; }
+      public bool bJouth { get; set; }
     }
   }
 }
