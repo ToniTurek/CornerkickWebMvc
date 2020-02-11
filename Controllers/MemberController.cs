@@ -2800,9 +2800,10 @@ namespace CornerkickWebMvc.Controllers
         int iOffer = 0;
         CornerkickManager.Club clubUser = ckClub();
         if (clubUser.iId > 0) {
-          if      (MvcApplication.ckcore.tr .negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
-          else if (MvcApplication.ckcore.tr .alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
-          else if (CornerkickManager.Player.ownPlayer            (clubUser, transfer.player)) iOffer = +2;
+          if      (MvcApplication.ckcore.tr.negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
+          else if (MvcApplication.ckcore.tr.alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
+          else if (CornerkickManager.Player.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
+          else if (transfer.player.iClubId >= 0 && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
         }
 
         string sDatePutOnTl = "-";
