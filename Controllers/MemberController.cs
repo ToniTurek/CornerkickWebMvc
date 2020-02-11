@@ -866,7 +866,7 @@ namespace CornerkickWebMvc.Controllers
           byte iHA = 0;
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
-          Models.TeamModels.ltPlayer = user.game.data.ltState[user.game.data.ltState.Count - 1].player[iHA].ToList();
+          Models.TeamModels.ltPlayer = user.game.player[iHA].ToList();
 
           Models.TeamModels.iSubRest = user.game.iSubstitutionsLeft[iHA];
 
@@ -907,13 +907,25 @@ namespace CornerkickWebMvc.Controllers
       int jPosMin = Math.Min(iIndex1, iIndex2);
       int jPosMax = Math.Max(iIndex1, iIndex2);
 
+      CornerkickGame.Player pl1 = club.ltPlayer[jPosMin];
+      CornerkickGame.Player pl2 = club.ltPlayer[jPosMax];
+
+      // Switch player in club list
+      club.ltPlayer.Remove(pl1);
+      club.ltPlayer.Remove(pl2);
+
+      club.ltPlayer.Insert(jPosMin, pl2);
+      club.ltPlayer.Insert(jPosMax, pl1);
+
       if (user.game != null) {
         if (!user.game.data.bFinished) {
           byte iHA = 0;
           if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
           // If switch of player in starting 11 --> do it directly
-          if (jPosMin < user.game.data.nPlStart && jPosMax >= user.game.data.nPlStart) {
+          if (jPosMin < user.game.data.nPlStart && jPosMax < user.game.data.nPlStart) {
+            user.game.doSubstitution(iHA, (byte)jPosMin, (byte)jPosMax);
+          } else {
             // Return if ...
             if (user.game.player[iHA][jPosMax].bPlayed) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
             if (user.game.iSubstitutionsLeft[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... no subs left
@@ -926,23 +938,10 @@ namespace CornerkickWebMvc.Controllers
               Models.TeamModels.ltiSubstitution = new List<int[]>();
             }
             Models.TeamModels.ltiSubstitution.Add(new int[] { jPosMin, jPosMax, 0 });
-          } else {
-            user.game.substitute(iHA == 0, (byte)jPosMin, (byte)jPosMax, 0);
           }
         }
       }
 
-      CornerkickGame.Player pl1 = club.ltPlayer[jPosMin];
-      CornerkickGame.Player pl2 = club.ltPlayer[jPosMax];
-
-      // Switch player in club list
-      club.ltPlayer.Remove(pl1);
-      club.ltPlayer.Remove(pl2);
-
-      club.ltPlayer.Insert(jPosMin, pl2);
-      club.ltPlayer.Insert(jPosMax, pl1);
-
-      //MvcApplication.ckcore.ltClubs[iC] = club;
       setModelLtPlayer(user);
 
       return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
@@ -1042,7 +1041,7 @@ namespace CornerkickWebMvc.Controllers
             byte iHA = 0;
             if (club.iId == user.game.data.team[1].iTeamId) iHA = 1;
 
-            ltPlayerTeam = user.game.data.ltState[user.game.data.ltState.Count - 1].player[iHA].ToList();
+            ltPlayerTeam = user.game.player[iHA].ToList();
           }
         }
       }
