@@ -760,7 +760,7 @@ namespace CornerkickWebMvc.Controllers
           for (int iP = 0; iP < ltPlayerTrExp.Count; iP++) {
             CornerkickGame.Player plTmp = ltPlayerTrExp[iP];
             CornerkickManager.Player.doTraining(ref plTmp,
-                                                (byte)tu.iType,
+                                                tu.iType,
                                                 clb.staff.iCondiTrainer,
                                                 clb.staff.iPhysio,
                                                 clb.buildings.bgGym.iLevel,
