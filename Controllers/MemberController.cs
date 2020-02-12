@@ -4678,6 +4678,16 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      cal.ddlTestgameClubs = new List<SelectListItem>();
+      foreach (CornerkickManager.Club clbTg in MvcApplication.ckcore.ltClubs) {
+        if (clbTg.iId == cal.iClubId) continue;
+        if (clbTg.iLand < 0) continue;
+
+        //CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clbTg, MvcApplication.ckcore.dtDatum, false);
+
+        cal.ddlTestgameClubs.Add(new SelectListItem { Text = clbTg.sName, Value = clbTg.iId.ToString() });
+      }
+
       return View(cal);
     }
 
@@ -4935,6 +4945,12 @@ namespace CornerkickWebMvc.Controllers
         // Inform user
         CornerkickManager.Club clubRequest = MvcApplication.ckcore.ltClubs[iTeamId];
         if (clubRequest.user == null) {
+          CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clubRequest, md.dt, bPre: false);
+          if ((gdNext.dt - md.dt).TotalDays < 4) return Json("Anfrage für Testspiel abgelehnt. Begründung: Zu nah am nächsten Spiel", JsonRequestBehavior.AllowGet);
+
+          CornerkickGame.Game.Data gdPrev = MvcApplication.ckcore.tl.getNextGame(clubRequest, md.dt, bPre: true);
+          if ((md.dt - gdPrev.dt).TotalDays < 4) return Json("Anfrage für Testspiel abgelehnt. Begründung: Zu kurz nach letztem Spiel", JsonRequestBehavior.AllowGet);
+
           createTestgame(md);
 
           sReturn = "Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + clubRequest.sName + " vereinbart";

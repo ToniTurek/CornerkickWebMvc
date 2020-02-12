@@ -173,7 +173,7 @@
         autoOpen: false,
         buttons: {
           "Bestätigen": function () {
-            var iTeamId = $("#selectTeam").val();
+            var iTeamId = $("#ddlSelectClubTestgame").val();
             var sTitle = "Testspiel";
 
             // Set time from options
@@ -396,15 +396,7 @@
   </select>
 
   <p style="position: relative; margin-top: 10px">Wählen Sie Ihren gewünschten Testspielgegner:</p>
-  <select name="Team" id="selectTeam">
-    @{
-      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
-        if (iC != Model.iClubId && MvcApplication.ckcore.ltClubs[iC].iLand >= 0) {
-          <option value="@iC.ToString()">@MvcApplication.ckcore.ltClubs[iC].sName</option>
-        }
-      }
-    }
-  </select>
+  @Html.DropDownListFor(m => m.sTestgameClub, Model.ddlTestgameClubs, new { id = "ddlSelectClubTestgame", @style = "position: relative; text-align: right" })
 </div>
 
 <div id="dialogTrainingscamp" title="Trainingslager buchen" style="width: 200px">
