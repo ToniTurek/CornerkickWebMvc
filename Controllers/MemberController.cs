@@ -726,22 +726,34 @@ namespace CornerkickWebMvc.Controllers
         List<CornerkickGame.Player> ltPlayerTrExp = new List<CornerkickGame.Player>();
         foreach (CornerkickGame.Player pl in clb.ltPlayer) ltPlayerTrExp.Add(pl.Clone());
 
-        // Add training if none for the next 7 days
-        for (int iD = 0; iD < 7; iD++) {
-          if (clb.training.getTrainingUnitsToday(MvcApplication.ckcore.dtDatum.AddDays(iD)) == null) {
-            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[0]), iType = 0 });
-            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[1]), iType = 0 });
-            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[2]), iType = 0 });
-          }
-
-          int iT = 0;
-          while (clb.training.getTrainingUnitsToday(MvcApplication.ckcore.dtDatum.AddDays(iD)).Count < 3) {
-            clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[iT++]), iType = 0 });
-          }
-        }
-
         // Sort by training date
         List<CornerkickManager.Main.Training.Unit> ltTrUnits = clb.training.ltUnit.OrderBy(tu => tu.dt).ToList();
+
+        // Add training if none for the next 7 days
+        for (int iD = 0; iD < 7; iD++) {
+          List<CornerkickManager.Main.Training.Unit> ltTrUnitsToday = CornerkickManager.Main.Training.getTrainingUnitsToday(ltTrUnits, MvcApplication.ckcore.dtDatum.AddDays(iD));
+
+          if (ltTrUnitsToday == null) {
+            ltTrUnits.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[0]), iType = 0 });
+            ltTrUnits.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[1]), iType = 0 });
+            ltTrUnits.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[2]), iType = 0 });
+          }
+
+          for (int iToD = 0; iToD < 3; iToD++) {
+            bool bTuFound = false;
+            for (int iTu = 0; iTu < ltTrUnitsToday.Count; iTu++) {
+              if (ltTrUnitsToday[iTu].dt.TimeOfDay.Equals(tsTraining[iToD])) {
+                bTuFound = true;
+                break;
+              }
+            }
+            if (bTuFound) continue;
+
+            CornerkickManager.Main.Training.Unit tuTmp = new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[iToD]), iType = 0 };
+            ltTrUnits.Add(tuTmp);
+            ltTrUnitsToday.Add(tuTmp);
+          }
+        }
 
         // Get next saturday
         DateTime dtNextSaturday = MvcApplication.ckcore.dtDatum.Date;
