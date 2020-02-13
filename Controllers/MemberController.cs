@@ -3255,6 +3255,12 @@ namespace CornerkickWebMvc.Controllers
       return Json(iTrainingType, JsonRequestBehavior.AllowGet);
     }
 
+    [HttpPost]
+    public JsonResult TrainingCopyPlan(int iWeek)
+    {
+      return Json(getTrainingPlan(iWeek), JsonRequestBehavior.AllowGet);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// Stadion

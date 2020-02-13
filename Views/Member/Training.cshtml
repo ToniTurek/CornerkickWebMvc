@@ -83,7 +83,7 @@
       });
     });
 
-    var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel"];
+    var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel", ""];
     var dateOptions = { weekday: 'short', month: '2-digit', day: '2-digit' };
     function plotTrainingPlan(iWeek) {
       $.ajax({
@@ -117,7 +117,11 @@
                 var opt = document.createElement('option');
                 opt.value = iT;
                 opt.innerHTML = sTrainingNames[iT];
-                opt.selected = iT === ltTu[iD][iIxDay].iType;
+                if (ltTu[iD][iIxDay].iType < 0) {
+                  opt.selected = iT === -(ltTu[iD][iIxDay].iType + 1);
+                } else {
+                  opt.selected = iT === ltTu[iD][iIxDay].iType;
+                }
                 sct.appendChild(opt);
               }
 
@@ -143,6 +147,65 @@
     function changeWeek(iDeltaWeek) {
       iWeekGlobal += iDeltaWeek;
       plotTrainingPlan(iWeekGlobal);
+    }
+
+    function copyWeek() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/TrainingGetPlan',
+        dataType: "json",
+        data: { iWeek: iWeek },
+        success: function (ltTu) {
+          var tblTrainingPlan = document.getElementById("tblTrainingPlan").getElementsByTagName('tbody')[0];
+          while (tblTrainingPlan.hasChildNodes()) {
+            tblTrainingPlan.removeChild(tblTrainingPlan.firstChild);
+          }
+
+          var iD;
+          for (iD = 0; iD < ltTu.length; iD++) {
+            var row = tblTrainingPlan.insertRow();
+
+            var date = moment(ltTu[iD][0].dt).toDate();
+            //row.insertCell(0).innerHTML = date.getDate() + "." + (date.getMonth() + 1);
+            var cell0 = row.insertCell(0);
+            cell0.innerHTML = date.toLocaleDateString("de-DE", dateOptions);
+            cell0.style.textAlign = "right";
+            cell0.style.fontWeight = 'bold';
+
+            var iIxDay;
+            for (iIxDay = 0; iIxDay < ltTu[iD].length; iIxDay++) {
+              var sct = document.createElement("select");
+
+              var iT;
+              for (iT = 0; iT < sTrainingNames.length; iT++) {
+                var opt = document.createElement('option');
+                opt.value = iT;
+                opt.innerHTML = sTrainingNames[iT];
+                if (ltTu[iD][iIxDay].iType < 0) {
+                  opt.selected = iT === -(ltTu[iD][iIxDay].iType + 1);
+                } else {
+                  opt.selected = iT === ltTu[iD][iIxDay].iType;
+                }
+                sct.appendChild(opt);
+              }
+
+              sct.classList.add('form-control');
+              sct.style.width = "180px";
+              if (ltTu[iD][iIxDay].iType < 0) {
+                sct.disabled = true;
+              } else {
+                sct.setAttribute('data-iDay', iD);
+                sct.setAttribute('data-iToD', iIxDay);
+                sct.onchange = function () { setTraining(this); };
+              }
+
+              var cell = row.insertCell(iIxDay + 1);
+              //cell.className = "alignRight";
+              cell.appendChild(sct);
+            }
+          }
+        }
+      });
     }
 
     function plotTrainingDevelopment(bAnimate) {
@@ -269,6 +332,7 @@
       </thead>
       <tbody></tbody>
     </table>
+    <button type="submit" id="bnCopyWeek" class="btn btn-default" onclick="copyWeek()" style="position: relative; width: 100%; margin-top: 4px">Trainingswoche bis Saisonende fortführen</button>
   </div>
 
   <div style="position: relative; width: 100%">
