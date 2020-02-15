@@ -381,12 +381,12 @@ namespace CornerkickWebMvc.Controllers
       clb.ltTactic[0].formation = MvcApplication.ckcore.ltFormationen[7];
 
 #if DEBUG
-      clb.training.iType[1] = 2;
-      clb.training.iType[2] = 3;
-      clb.training.iType[3] = 4;
-      clb.training.iType[4] = 6;
-      clb.training.iType[5] = 9;
-      clb.training.iType[6] = 1;
+      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 2 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 3 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 4 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 6 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 9 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 1 });
 #endif
 
       for (byte iB = 0; iB < 3; iB++) {

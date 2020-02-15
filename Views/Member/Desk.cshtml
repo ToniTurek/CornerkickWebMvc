@@ -101,9 +101,9 @@
 
     if (clb != null) {
       bool bTraining = false;
-      if (clb.training.iType != null) {
-        foreach (byte iT in clb.training.iType) {
-          if (iT > 0) {
+      if (clb.training.ltUnit != null) {
+        foreach (CornerkickManager.Main.Training.Unit tu in clb.training.ltUnit) {
+          if (tu.iType > 0) {
             bTraining = true;
             break;
           }

@@ -86,7 +86,7 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true);
+      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true, iTrainingsPerDay: 3, iTrainingsPerDayMax: 3);
 
       ckcore.tl.writeLog("WebMvc START");
 
@@ -822,6 +822,18 @@ namespace CornerkickWebMvc
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
+
+        // Delete past trainings from club
+        for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clb = ckcore.ltClubs[iC];
+
+          for (int iTU = 0; iTU < clb.training.ltUnit.Count; iTU++) {
+            if (clb.training.ltUnit[iTU].dt.CompareTo(ckcore.dtDatum) < 0) {
+              clb.training.ltUnit.RemoveAt(iTU);
+              iTU--;
+            }
+          }
+        }
 
         // TMP section
         // END TMP section

@@ -10,22 +10,10 @@ namespace CornerkickWebMvc.Models
 {
   public class TrainingModel
   {
-    public CornerkickManager.Main.Training training { get; set; }
-    public string sTraining { get; set; }
-    public List<SelectListItem> ltDdlTraining { get; set; }
+    public CornerkickManager.Main.Training.Unit[][] ltTu { get; set; }
 
     public TrainingModel()
     {
-      ltDdlTraining = new List<SelectListItem>();
-
-      for (byte i = 0; i < MvcApplication.ckcore.sTraining.Length; i++) {
-        ltDdlTraining.Add(
-          new SelectListItem {
-            Text = MvcApplication.ckcore.sTraining[i],
-            Value = i.ToString()
-          }
-        );
-      }
     }
   }
 

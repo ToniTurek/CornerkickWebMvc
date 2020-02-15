@@ -6,16 +6,17 @@
 }
 
 <script>
-  function setTraining(iTg) {
-    var iTr = $('#iDdlId' + iTg).val();
+  function setTraining(sct) {
+    var iDay = parseInt(sct.getAttribute('data-iDay'));
+    var iToD = parseInt(sct.getAttribute('data-iToD'));
+
     $.ajax({
       url: '/Member/setTraining',
       type: "GET",
       dataType: "JSON",
-      data: { iTraining: iTr, iTag: iTg },
+      data: { iTrainingType: sct.value, iDay: iDay + (iWeekGlobal * 7), iIxTimeOfDay: iToD },
       success: function () {
         plotTrainingDevelopment(false);
-        //alert(iTg);
       }
     });
   }
@@ -25,16 +26,16 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width" />
-  <title>Index</title>
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
-</head>
+  <script type="text/javascript" src="~/Scripts/moment.js"></script>
 
-<body>
   <script type="text/javascript">
     dataPointsNew = [];
+    var iWeekGlobal = 0;
 
     $(document).ready(function () {
+      plotTrainingPlan(0);
       plotTrainingDevelopment(true);
 
       $.get("/Member/GetTeamFAve/", function (dataFAve) {
@@ -67,12 +68,12 @@
               yValueFormatString: "0.00%",
               dataPoints: [
                 { label: "Schnelligkeit", y: dataFAve[0].y },
-                { label: "Technik",       y: dataFAve[1].y },
-                { label: "Zweikampf",     y: dataFAve[2].y },
-                { label: "Abspiel",       y: dataFAve[3].y },
-                { label: "Abschluss",     y: dataFAve[4].y },
-                { label: "Standards",     y: dataFAve[5].y },
-                { label: "Torwart",       y: dataFAve[6].y }
+                { label: "Technik", y: dataFAve[1].y },
+                { label: "Zweikampf", y: dataFAve[2].y },
+                { label: "Abspiel", y: dataFAve[3].y },
+                { label: "Abschluss", y: dataFAve[4].y },
+                { label: "Standards", y: dataFAve[5].y },
+                { label: "Torwart", y: dataFAve[6].y }
               ]
             }
           ]
@@ -81,6 +82,83 @@
         chartFAve.render();
       });
     });
+
+    var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel", ""];
+    var dateOptions = { weekday: 'short', month: '2-digit', day: '2-digit' };
+    function plotTrainingPlan(iWeek) {
+      $.ajax({
+        type: 'post',
+        url: '/Member/TrainingGetPlan',
+        dataType: "json",
+        data: { iWeek: iWeek },
+        success: function (ltTu) {
+          var tblTrainingPlan = document.getElementById("tblTrainingPlan").getElementsByTagName('tbody')[0];
+          while (tblTrainingPlan.hasChildNodes()) {
+            tblTrainingPlan.removeChild(tblTrainingPlan.firstChild);
+          }
+
+          var iD;
+          for (iD = 0; iD < ltTu.length; iD++) {
+            var row = tblTrainingPlan.insertRow();
+
+            var date = moment(ltTu[iD][0].dt).toDate();
+            //row.insertCell(0).innerHTML = date.getDate() + "." + (date.getMonth() + 1);
+            var cell0 = row.insertCell(0);
+            cell0.innerHTML = date.toLocaleDateString("de-DE", dateOptions);
+            cell0.style.textAlign = "right";
+            cell0.style.fontWeight = 'bold';
+
+            var iIxDay;
+            for (iIxDay = 0; iIxDay < ltTu[iD].length; iIxDay++) {
+              var sct = document.createElement("select");
+
+              var iT;
+              for (iT = 0; iT < sTrainingNames.length; iT++) {
+                var opt = document.createElement('option');
+                opt.value = iT;
+                opt.innerHTML = sTrainingNames[iT];
+                if (ltTu[iD][iIxDay].iType < 0) {
+                  opt.selected = iT === -(ltTu[iD][iIxDay].iType + 1);
+                } else {
+                  opt.selected = iT === ltTu[iD][iIxDay].iType;
+                }
+                sct.appendChild(opt);
+              }
+
+              sct.classList.add('form-control');
+              sct.style.width = "180px";
+              if (ltTu[iD][iIxDay].iType < 0) {
+                sct.disabled = true;
+              } else {
+                sct.setAttribute('data-iDay', iD);
+                sct.setAttribute('data-iToD', iIxDay);
+                sct.onchange = function () { setTraining(this); };
+              }
+
+              var cell = row.insertCell(iIxDay + 1);
+              //cell.className = "alignRight";
+              cell.appendChild(sct);
+            }
+          }
+        }
+      });
+    }
+
+    function changeWeek(iDeltaWeek) {
+      iWeekGlobal += iDeltaWeek;
+      plotTrainingPlan(iWeekGlobal);
+    }
+
+    function copyWeek() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/TrainingCopyPlan',
+        dataType: "json",
+        data: { iWeek: iWeekGlobal },
+        success: function () {
+        }
+      });
+    }
 
     function plotTrainingDevelopment(bAnimate) {
       var bExpected = document.getElementById("cbPlotExpected").checked;
@@ -187,22 +265,27 @@
       });
     }
   </script>
+</head>
 
+<body>
   <h2>Training</h2>
 
-  @{
-    string[] sDayOfWeek = new string[7] { "So.:", "Mo.:", "Di.:", "Mi.:", "Do.:", "Fr.:", "Sa.:" };
-    for (int i = 0; i < Model.training.iType.Length; i++) {
-      <div style="position: relative; height: 40px">
-        <label style="position: absolute; text-align: right; width: 60px; top: 4px">
-          @sDayOfWeek[i]
-        </label>
-        <div style="position: absolute; height: 30px; left: 70px">
-          @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ltDdlTraining, "Value", "Text", Model.training.iType[i]), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setTraining(" + i.ToString() + ")", id = "iDdlId" + i.ToString(), style = "width: 180px" })
-        </div>
-      </div>
-    }
-  }
+  <div style="position: relative; width: 100%; min-width: 660px; height: auto; margin-bottom: 20px">
+    <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: relative; width: 49%; left: 0px"><</button>
+    <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: relative; width: 49%; right: 0px">></button>
+    <table id="tblTrainingPlan" border="1" cellpadding="4" style="position: relative; width: 100%; margin-top: 6px">
+      <thead>
+        <tr>
+          <th width="90px" style="text-align:center">Tag</th>
+          <th style="text-align:center">1. Training (9:30 Uhr)</th>
+          <th style="text-align:center">2. Training (12:00 Uhr)</th>
+          <th style="text-align:center">3. Training (16:30 Uhr)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="submit" id="bnCopyWeek" class="btn btn-default" onclick="copyWeek()" style="position: relative; width: 100%; margin-top: 4px">Trainingswoche bis Saisonende fortführen</button>
+  </div>
 
   <div style="position: relative; width: 100%">
     <div id="chartContainer" style="height: 400px; width: 100%"></div>
