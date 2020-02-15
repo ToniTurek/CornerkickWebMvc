@@ -2686,7 +2686,7 @@ namespace CornerkickWebMvc.Controllers
                 if (clbGive == null) {
                   offer.iFee = 0;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.tr.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club)) {
                     sReturn = "Sie haben den vereinslosen Spieler " + pl.sName + " ablösefrei unter Vertrag genommen.";
                   }
                   break;
@@ -2695,7 +2695,7 @@ namespace CornerkickWebMvc.Controllers
                 if (pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.tr.acceptTransferOffer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
                     MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   }
@@ -2735,7 +2735,7 @@ namespace CornerkickWebMvc.Controllers
       string sReturn = "Error";
 
       CornerkickManager.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
-      if (MvcApplication.ckcore.tr.acceptTransferOffer(ckClub(), iPlayerId, clubTake)) {
+      if (MvcApplication.ckcore.tr.transferPlayer(ckClub(), iPlayerId, clubTake)) {
         sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
       }
       /*
@@ -3170,7 +3170,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Training"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-    readonly TimeSpan[] tsTraining = new TimeSpan[] { new TimeSpan(9, 30, 00), new TimeSpan(12, 00, 00), new TimeSpan(16, 30, 00) };
+    readonly static TimeSpan[] tsTraining = new TimeSpan[] { new TimeSpan(9, 30, 00), new TimeSpan(12, 00, 00), new TimeSpan(16, 30, 00) };
 
     [Authorize]
     public ActionResult Training(Models.TrainingModel mdTraining)
@@ -3181,9 +3181,8 @@ namespace CornerkickWebMvc.Controllers
       return View(mdTraining);
     }
 
-    private CornerkickManager.Main.Training.Unit[][] getTrainingPlan(int iWeek)
+    private static CornerkickManager.Main.Training.Unit[][] getTrainingPlan(CornerkickManager.Club clb, int iWeek)
     {
-      CornerkickManager.Club clb = ckClub();
       if (clb == null) return null;
 
       // Get last Sunday
@@ -3227,7 +3226,7 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public JsonResult TrainingGetPlan(int iWeek)
     {
-      return Json(getTrainingPlan(iWeek), JsonRequestBehavior.AllowGet);
+      return Json(getTrainingPlan(ckClub(), iWeek), JsonRequestBehavior.AllowGet);
     }
 
     public ActionResult setTraining(int iTrainingType, int iDay, int iIxTimeOfDay)
@@ -3258,7 +3257,47 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     public JsonResult TrainingCopyPlan(int iWeek)
     {
-      return Json(getTrainingPlan(iWeek), JsonRequestBehavior.AllowGet);
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      copyTrainingPlan(clb, iWeek);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    internal static void copyTrainingPlan(CornerkickManager.Club clb, int iWeek)
+    {
+      CornerkickManager.Main.Training.Unit[][] tuPlan = getTrainingPlan(clb, iWeek);
+
+      // Get next Sunday
+      DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iWeek * 7).Date;
+      while ((int)(dtTmp.DayOfWeek) != 0) dtTmp = dtTmp.AddDays(+1);
+
+      while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
+        for (byte iD = 0; iD < tuPlan.Length; iD++) {
+          List<CornerkickManager.Main.Training.Unit> ltTuToday = clb.training.getTrainingUnitsToday(dtTmp);
+
+          for (byte iT = 0; iT < tuPlan[iD].Length; iT++) {
+            if (tuPlan[iD][iT].iType > 0) {
+              // Check if already training planned
+              bool bAlreadySet = false;
+              foreach (CornerkickManager.Main.Training.Unit tu in ltTuToday) {
+                if ((int)(tu.dt.DayOfWeek) == (int)(dtTmp.DayOfWeek) && tu.dt.TimeOfDay.Equals(tuPlan[iD][iT].dt.TimeOfDay)) {
+                  bAlreadySet = true;
+                  break;
+                }
+              }
+              if (bAlreadySet) continue;
+
+              CornerkickManager.Main.Training.Unit tuCopy = tuPlan[iD][iT].Clone();
+              tuCopy.dt = dtTmp.Add(tuPlan[iD][iT].dt.TimeOfDay);
+              clb.training.ltUnit.Add(tuCopy);
+            }
+          }
+
+          dtTmp = dtTmp.AddDays(+1);
+        }
+      }
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -4722,6 +4761,18 @@ namespace CornerkickWebMvc.Controllers
       //DateTime dt = new DateTime(MvcApplication.ckcore.dtDatum.Year, MvcApplication.ckcore.dtDatum.Month, MvcApplication.ckcore.dtDatum.Day);
       DateTime dt = MvcApplication.ckcore.dtSeasonStart.Date;
       while (dt.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
+        // Night
+        ltEvents.Add(new Models.DiaryEvent {
+          iID = ltEvents.Count,
+          sTitle = "Nachtruhe",
+          sDescription = "Nachtruhe",
+          sStartDate = dt.Add(new TimeSpan(23, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
+          sEndDate = dt.AddDays(1).Add(new TimeSpan(7, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
+          sColor = "rgb(0, 0, 140)",
+          bEditable = false,
+          bAllDay = false
+        });
+
         // New Year
         if (dt.Day == 1 && dt.Month == 1) {
           ltEvents.Add(new Models.DiaryEvent {
@@ -4803,7 +4854,7 @@ namespace CornerkickWebMvc.Controllers
               iID = ltEvents.Count,
               sTitle = " Training (" + MvcApplication.ckcore.sTraining[th.iType - 1] + ")",
               sDescription = MvcApplication.ckcore.sTraining[th.iType - 1],
-              sStartDate = th.dt.AddMinutes(-120).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sStartDate = th.dt.AddMinutes(90).ToString("yyyy-MM-ddTHH:mm:ss"),
               sEndDate = th.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(255, 255, 180)",
               sTextColor = "rgb(100, 100, 100)",
