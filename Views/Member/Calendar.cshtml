@@ -177,14 +177,15 @@
             var sTitle = "Testspiel";
 
             // Set time from options
-            dtStart = dtStart.hour  ($("#selectH").val());
-            dtStart = dtStart.minute($("#selectM").val());
+            var dateTestgame = new Date(dtStart);
+            dateTestgame.setHours($("#selectH").val());
+            dateTestgame.setMinutes($("#selectM").val());
 
             $.ajax({
               url: "/Member/AddTestGameToCalendar",
               type: 'POST',
               traditional: true,
-              data: { title: sTitle, start: dtStart.format(), iTeamId: iTeamId },
+              data: { title: sTitle, start: dateTestgame.toISOString(), iTeamId: iTeamId },
               dataType: "json",
               success: function (response) {
                 alert(response);
