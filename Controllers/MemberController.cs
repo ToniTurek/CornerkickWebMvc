@@ -5477,7 +5477,7 @@ namespace CornerkickWebMvc.Controllers
         return Json("Falsche Eingabe!", JsonRequestBehavior.AllowGet);
       }
 
-      if (fBalanceSecretFracAdmissionPrice > 0.2) {
+      if (fBalanceSecretFracAdmissionPrice > 20) {
         return Json("Maximal 20% erlaubt!", JsonRequestBehavior.AllowGet);
       }
 

@@ -174,7 +174,7 @@
         getBudget(bEdit, $(this).val(), true);
       });
 
-      $('#fBalanceSecretFracAdmissionPrice').change(function () {
+      $('#fBalanceSecretFracAdmissionPrice').keyup(function () {
         $.ajax({
           type: 'post',
           url: '/Member/FinanceSetBalanceSecret',
