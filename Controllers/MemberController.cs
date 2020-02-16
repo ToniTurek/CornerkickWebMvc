@@ -3193,6 +3193,22 @@ namespace CornerkickWebMvc.Controllers
       for (int iD = 0; iD < ltTu.Length; iD++) { // Loop until Saturday
         ltTu[iD] = new CornerkickManager.Main.Training.Unit[3];
 
+        foreach (CornerkickManager.Main.TrainingHistory th in clb.ltTrainingHist) {
+          if (th.dt.Date.Equals(dtSunday.AddDays(iD))) {
+            int iIxTimeOfDay = 0; // 1st training
+            if      (th.dt.Hour >= tsTraining[2].Hours) iIxTimeOfDay = 2; // 3rd training
+            else if (th.dt.Hour >= tsTraining[1].Hours) iIxTimeOfDay = 1; // 2nd training
+
+            if (ltTu[iD][iIxTimeOfDay] != null && ltTu[iD][iIxTimeOfDay].iType < 0) continue; // Already set
+
+            CornerkickManager.Main.Training.Unit tuPast = new CornerkickManager.Main.Training.Unit();
+            tuPast.dt = th.dt;
+            tuPast.iType = (sbyte)-(th.iType + 1);
+
+            ltTu[iD][iIxTimeOfDay] = tuPast;
+          }
+        }
+
         foreach (CornerkickManager.Main.Training.Unit tu in clb.training.ltUnit) {
           if ((tu.dt.Date - dtSunday.AddDays(iD)).TotalDays == 0) {
             int iIxTimeOfDay = 0; // 1st training
