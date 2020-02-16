@@ -1684,7 +1684,7 @@ namespace CornerkickWebMvc.Controllers
           for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
         }
 
-        List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType);
+        List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType, nPlStart: 0);
 
         for (int i = 0; i < ltPlayerTeam.Count; i++) {
           string sName = ltLV[i][2];
