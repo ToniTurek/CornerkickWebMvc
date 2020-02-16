@@ -3294,8 +3294,9 @@ namespace CornerkickWebMvc.Controllers
           List<CornerkickManager.Main.Training.Unit> ltTuToday = clb.training.getTrainingUnitsToday(dtTmp);
 
           for (byte iT = 0; iT < tuPlan[iD].Length; iT++) {
-            if (tuPlan[iD][iT].iType > 0) {
+            if (tuPlan[iD][iT].iType >= 0) {
               // Check if already training planned
+              /*
               bool bAlreadySet = false;
               foreach (CornerkickManager.Main.Training.Unit tu in ltTuToday) {
                 if ((int)(tu.dt.DayOfWeek) == (int)(dtTmp.DayOfWeek) && tu.dt.TimeOfDay.Equals(tuPlan[iD][iT].dt.TimeOfDay)) {
@@ -3304,6 +3305,7 @@ namespace CornerkickWebMvc.Controllers
                 }
               }
               if (bAlreadySet) continue;
+              */
 
               CornerkickManager.Main.Training.Unit tuCopy = tuPlan[iD][iT].Clone();
               tuCopy.dt = dtTmp.Add(tuPlan[iD][iT].dt.TimeOfDay);

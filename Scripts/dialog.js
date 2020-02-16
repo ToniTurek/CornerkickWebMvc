@@ -1,4 +1,11 @@
-﻿function getDialog(parent, sText, sTitle, fctToExecute) {
+﻿/*
+ Required jquery files:
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+ */
+
+function getDialog(parent, sText, sTitle, fctToExecute) {
   var div0 = document.createElement("div");
   div0.id = "divDialogYN";
   div0.title = sTitle;

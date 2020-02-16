@@ -26,9 +26,12 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
   <script type="text/javascript" src="~/Scripts/moment.js"></script>
+  <script type="text/javascript" src="~/Scripts/dialog.js"></script>
 
   <script type="text/javascript">
     dataPointsNew = [];
@@ -160,6 +163,10 @@
     }
 
     function copyWeek() {
+      getDialog(document.body, "Achtung:<br>Bereits festgelegte Trainingseinheiten werden überschrieben!", "Trainingsplan", copyWeekAjax);
+    }
+
+    function copyWeekAjax() {
       $.ajax({
         type: 'post',
         url: '/Member/TrainingCopyPlan',
