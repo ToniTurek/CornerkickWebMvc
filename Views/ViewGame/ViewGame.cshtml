@@ -96,12 +96,6 @@
     });
 
     $(document).ready(function () {
-      bnStart = document.getElementById("bnStart");
-      bnBack  = document.getElementById("bnBack");
-      bnPlay  = document.getElementById("bnPlay");
-      bnForth = document.getElementById("bnForth");
-      bnEnd   = document.getElementById("bnEnd");
-
       // Admin
       bnAdminPlay = document.getElementById("bnAdminPlay");
       bnAdminNext = document.getElementById("bnAdminNext");
@@ -153,6 +147,16 @@
         drawGame(0);
       });
 
+      $("#bnBackFast").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        var iStatePlay = $('#slider-Minute').slider("value");
+        if (iStatePlay > 9) {
+          drawGame(iStatePlay - 10);
+        }
+      });
+
       $("#bnBack").click(function () {
         bStopPlay = true;
         bnPlay.innerText = '►';
@@ -183,6 +187,23 @@
         var iStatePlay = $('#slider-Minute').slider("value");
         if (iStatePlay < $("#slider-Minute").slider("option", "max") - 1) {
           drawGame(iStatePlay + 1);
+        }
+      });
+
+      $("#bnEnd").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        drawGame($("#slider-Minute").slider("option", "max") - 1);
+      });
+
+      $("#bnForthFast").click(function () {
+        bStopPlay = true;
+        bnPlay.innerText = '►';
+
+        var iStatePlay = $('#slider-Minute').slider("value");
+        if (iStatePlay < $("#slider-Minute").slider("option", "max") - 10) {
+          drawGame(iStatePlay + 10);
         }
       });
 
@@ -844,9 +865,16 @@
 </head>
 
 <body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
+
+ @if (Model.game == null || (Model.game != null && Model.game.data.bFinished)) {
+    <div id="divOptions" style="position: relative; left: 0px; width: 100%; height: 40px">
+      @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 165px" })
+    </div>
+  }
+
   <div id="divHeader" style="position: relative; width: 100%; height: 71px; background-color: lightgrey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
     <div style="position: absolute; width: 4%; height: 60%; top: 20%; left: 36%">
-      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@Model.sEmblemH alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';"/>
+      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@Model.sEmblemH alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';" />
     </div>
     <div style="position: absolute; width: 30px; height: 30px; left:  1%; margin-top: 12px">
       <div id="divJerseyH" style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyH[0]; border: 2px solid @Model.sColorJerseyH[1]; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(0, this)"></div>
@@ -882,21 +910,21 @@
     </div>
   </div>
 
-  @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
-    <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: 40px">
-      @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 160px" })
-
-      @if ((Model.game != null && Model.game.data.bFinished)) {
-        <div style="position: relative; float: right; width: 25%; min-width: 200px; height: 40px">
-          <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 2%; width: 18%; height: auto">|<</button>
-          <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 22%; width: 18%; height: auto"><</button>
-          <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 42%; width: 18%; height: auto">&#9658;</button>
-          <button type="submit" id="bnForth" class="btn btn-default" style="position: absolute; left: 62%; width: 18%; height: auto">></button>
-          <button type="submit" id="bnEnd" class="btn btn-default" style="position: absolute; left: 82%; width: 18%; height: auto">>|</button>
+ @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
+    <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: 40px; margin-top: 2px">
+     @if ((Model.game != null && Model.game.data.bFinished)) {
+        <div style="position: relative; float: right; width: 35%; min-width: 320px; height: 40px">
+          <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 3%; width: 13%; height: auto">|<</button>
+          <button type="submit" id="bnBackFast" class="btn btn-default" style="position: absolute; left: 17%; width: 13%; height: auto"><<</button>
+          <button type="submit" id="bnBack" class="btn btn-default" style="position: absolute; left: 31%; width: 13%; height: auto"><</button>
+          <button type="submit" id="bnPlay" class="btn btn-default" style="position: absolute; left: 45%; width: 13%; height: auto">&#9658;</button>
+          <button type="submit" id="bnForth" class="btn btn-default" style="position: absolute; left: 59%; width: 13%; height: auto">></button>
+          <button type="submit" id="bnForthFast" class="btn btn-default" style="position: absolute; left: 73%; width: 13%; height: auto">>></button>
+          <button type="submit" id="bnEnd" class="btn btn-default" style="position: absolute; left: 87%; width: 13%; height: auto">>|</button>
         </div>
       }
 
-      @if (Model.bAdmin) {
+     @if (Model.bAdmin) {
         <div id="divAdminOptions" style="position: absolute; top: 0px; left: 40%; width: 20%; text-align: center">
           <a href="#" id="aAdminOptions" style="color:#000aaa">Admin</a>
         </div>
