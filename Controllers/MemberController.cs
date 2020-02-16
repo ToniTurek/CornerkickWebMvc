@@ -5655,6 +5655,40 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      statisticModel.sPlayerSkillBest = new string[MvcApplication.ckcore.plr.sSkills.Length][];
+      for (byte iS = 0; iS < MvcApplication.ckcore.plr.sSkills.Length; iS++) {
+        if (iS == 16) continue; // Both foot skill
+
+        statisticModel.sPlayerSkillBest[iS] = new string[4]; // Skill name, player name, skill value, club
+
+        CornerkickGame.Player plSkillBest = null;
+        float fSkillBest = 0f;
+
+        foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
+          // Get position role
+          byte iPos = 0;
+          for (byte jPos = 1; jPos <= pl.fExperiencePos.Length; jPos++) {
+            if (CornerkickGame.Tool.bPlayerMainPos(pl, iPos: jPos)) {
+              iPos = jPos;
+              break;
+            }
+          }
+
+          float fSkillTmp = CornerkickGame.Tool.getSkillEff(pl, iS, iPos);
+          if (fSkillTmp > fSkillBest) {
+            plSkillBest = pl;
+            fSkillBest = fSkillTmp;
+          }
+        }
+
+        statisticModel.sPlayerSkillBest[iS][0] = MvcApplication.ckcore.plr.sSkills[iS];
+        if (plSkillBest != null) {
+          statisticModel.sPlayerSkillBest[iS][1] = plSkillBest.sName;
+          statisticModel.sPlayerSkillBest[iS][2] = fSkillBest.ToString("0.000");
+          statisticModel.sPlayerSkillBest[iS][3] = MvcApplication.ckcore.ltClubs[plSkillBest.iClubId].sName;
+        }
+      }
+
       return View(statisticModel);
     }
 

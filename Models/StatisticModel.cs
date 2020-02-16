@@ -16,6 +16,8 @@ namespace CornerkickWebMvc.Models
 
     public int iLeague { get; set; }
     public List<SelectListItem> ddlLeagues { get; set; }
+
+    public string[][] sPlayerSkillBest { get; set; }
   }
 
   public class DatatableEntryTeams

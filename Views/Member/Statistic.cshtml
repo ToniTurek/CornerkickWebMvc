@@ -172,39 +172,66 @@
 
 <body>
   <h3>Beste Spieler</h3>
-  <div style="position: relative; width: 160px; height: auto; margin-bottom: 6px">
-    @Html.DropDownListFor(m => m.iNation, Model.ddlNations, new { @Id = "ddlStatNations", @class = "form-control" })
-  </div>
-
-  <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-bottom: 6px">
-    <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
-    <div style="position: absolute; margin-left: 5%; width: 90%; height: 94%; top: 0px; left: 0%">
-      <div id="drawFormation" style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%"></div>
+  <div style="position: relative; width: 70%; min-width: 360px; margin-bottom: 6px">
+    <div style="position: relative; width: 100%; height: 32px">
+      @Html.DropDownListFor(m => m.iNation, Model.ddlNations, new { @Id = "ddlStatNations", @class = "form-control", @style = "position: absolute; width: 140px" })
+      @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlStatFormation", @class = "form-control", @style = "position: absolute; width: 140px; right: 0px" })
     </div>
-    <div align="center" style="position: absolute; top: 2px; width: 100%">
-      <div style="position: relative; width: 300px; height: 30px; top: -15px; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-        <form>
-          <fieldset>
-            <label style="font-size:140%; color: black; margin-right: 4%">
-              <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
-              Profis
-            </label>
-            <label style="font-size:140%; color: black">
-              <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
-              U18
-            </label>
-          </fieldset>
-        </form>
+
+    <div class="image" id="divFieldContainer" style="position: relative; width: 100%; margin-top: 25px; margin-bottom: 6px">
+      <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
+      <div style="position: absolute; margin-left: 5%; width: 90%; height: 94%; top: 0px; left: 0%">
+        <div id="drawFormation" style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%"></div>
       </div>
+      <div align="center" style="position: absolute; top: 2px; width: 100%">
+        <div style="position: relative; width: 160px; height: 30px; top: -25px; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+          <form>
+            <fieldset>
+              <label style="font-size:140%; color: black; margin-right: 4%">
+                <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+                Profis
+              </label>
+              <label style="font-size:140%; color: black">
+                <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+                U18
+              </label>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+
+      <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
     </div>
-
-    <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
   </div>
 
-  <div style="position: relative; width: 120px; height: auto">
-    @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlStatFormation", @class = "form-control" })
-  </div>
   <text id="txtStatAverage" style="position: relative; width: 100%"></text>
+
+  <div style="position: relative; width: auto; height: auto; margin-top: 20px">
+    <table border="1" cellpadding="4" style="width: auto">
+      <thead>
+        <tr>
+          <th style="text-align:center">Fähigkeit</th>
+          <th style="text-align:center">Spieler</th>
+          <th style="text-align:center">Stärke</th>
+          <th style="text-align:center">Verein</th>
+        </tr>
+      </thead>
+      <tbody>
+       @for (byte iS = 0; iS < Model.sPlayerSkillBest.Length; iS++) {
+          if (Model.sPlayerSkillBest[iS] == null) {
+            continue;
+          }
+
+          <tr>
+            <td align="center">@Model.sPlayerSkillBest[iS][0]</td>
+            <td align="center">@Model.sPlayerSkillBest[iS][1]</td>
+            <td align="right">@Model.sPlayerSkillBest[iS][2]</td>
+            <td align="center">@Model.sPlayerSkillBest[iS][3]</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 
   <div style="position: relative">
     <h3 style="position: relative; margin-top: 30px">Mannschaftsübersicht</h3>
