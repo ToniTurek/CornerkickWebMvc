@@ -544,8 +544,8 @@
   }
 
   <div style="position: relative; width: 100%; height: auto">
-    <h4>Allgemeine Daten</h4>
     <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
+      <h4>Allgemeine Daten</h4>
       <table cellpadding="1" style="width: 100%">
         <tbody>
           <tr>
@@ -636,6 +636,7 @@
     </div>
 
     <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+      <h4>Charakter</h4>
       <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
         <tbody>
           <tr>
@@ -661,6 +662,10 @@
           <tr>
             <td align="right">Robustheit:</td>
             <td align="right">@player.character.fRobustness.ToString("0.0%")</td>
+          </tr>
+          <tr>
+            <td align="right">Gemüt:</td>
+            <td align="right">@((2 - player.character.fCholeric).ToString("0.0%"))</td>
           </tr>
         </tbody>
       </table>
