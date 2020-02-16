@@ -97,19 +97,29 @@
             tblTrainingPlan.removeChild(tblTrainingPlan.firstChild);
           }
 
-          var iD;
+          // Add header row
+          var rowHead = tblTrainingPlan.insertRow();
+          rowHead.insertCell();
           for (iD = 0; iD < ltTu.length; iD++) {
+            var date = moment(ltTu[iD][0].dt).toDate();
+            var cell0 = rowHead.insertCell();
+            cell0.innerHTML = date.toLocaleDateString("de-DE", dateOptions);
+            cell0.style.textAlign = "center";
+            cell0.style.fontWeight = 'bold';
+          }
+
+          var iIxDay;
+          for (iIxDay = 0; iIxDay < ltTu[0].length; iIxDay++) {
             var row = tblTrainingPlan.insertRow();
 
-            var date = moment(ltTu[iD][0].dt).toDate();
-            //row.insertCell(0).innerHTML = date.getDate() + "." + (date.getMonth() + 1);
-            var cell0 = row.insertCell(0);
-            cell0.innerHTML = date.toLocaleDateString("de-DE", dateOptions);
+            //var date = moment(ltTu[0][iIxDay].dt).toDate();
+            var cell0 = row.insertCell();
+            cell0.innerHTML = (iIxDay + 1).toString() + ".";
             cell0.style.textAlign = "right";
             cell0.style.fontWeight = 'bold';
 
-            var iIxDay;
-            for (iIxDay = 0; iIxDay < ltTu[iD].length; iIxDay++) {
+            var iD;
+            for (iD = 0; iD < ltTu.length; iD++) {
               var sct = document.createElement("select");
 
               var iT;
@@ -126,7 +136,7 @@
               }
 
               sct.classList.add('form-control');
-              sct.style.width = "180px";
+              sct.style.width = "130px";
               if (ltTu[iD][iIxDay].iType < 0) {
                 sct.disabled = true;
               } else {
@@ -135,7 +145,7 @@
                 sct.onchange = function () { setTraining(this); };
               }
 
-              var cell = row.insertCell(iIxDay + 1);
+              var cell = row.insertCell();
               //cell.className = "alignRight";
               cell.appendChild(sct);
             }
@@ -270,18 +280,10 @@
 <body>
   <h2>Training</h2>
 
-  <div style="position: relative; width: 100%; min-width: 660px; height: auto; margin-bottom: 20px">
-    <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: relative; width: 49%; left: 0px"><</button>
-    <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: relative; width: 49%; right: 0px">></button>
+  <div style="position: relative; width: 1000px; height: auto; margin-bottom: 20px">
+    <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: relative; width: 49%; left: 0px">vorherige Woche</button>
+    <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: relative; width: 49%; right: 0px">nächste Woche</button>
     <table id="tblTrainingPlan" border="1" cellpadding="4" style="position: relative; width: 100%; margin-top: 6px">
-      <thead>
-        <tr>
-          <th width="90px" style="text-align:center">Tag</th>
-          <th style="text-align:center">1. Training (9:30 Uhr)</th>
-          <th style="text-align:center">2. Training (12:00 Uhr)</th>
-          <th style="text-align:center">3. Training (16:30 Uhr)</th>
-        </tr>
-      </thead>
       <tbody></tbody>
     </table>
     <button type="submit" id="bnCopyWeek" class="btn btn-default" onclick="copyWeek()" style="position: relative; width: 100%; margin-top: 4px">Trainingswoche bis Saisonende fortführen</button>
