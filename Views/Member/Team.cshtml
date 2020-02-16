@@ -68,7 +68,6 @@
 
       iFormation = 0;
       document.getElementById('ddlFormation').value = iFormation;
-
       document.getElementById("bnSaveFormation").disabled = false;
 
       movePlayerAjax(iMoveDirection);
@@ -150,6 +149,10 @@
         data: { iIndexPlayer: iSelectedPlayer - 1, iDirection: iMoveDirection },
         success: function () {
           drawAufstellung(-1, iSelectedPlayer, false);
+
+          iFormation = 0;
+          document.getElementById('ddlFormation').value = iFormation;
+          document.getElementById("bnSaveFormation").disabled = false;
         }
       });
     }
@@ -493,6 +496,10 @@
             success: function (fIndOrientation) {
               drawAufstellung(iFormation, iSelectedPlayer, false);
               //alert("Orientation set to " + fTaktik);
+
+              iFormation = 0;
+              document.getElementById('ddlFormation').value = iFormation;
+              document.getElementById("bnSaveFormation").disabled = false;
             }
           });
         }
