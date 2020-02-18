@@ -1,4 +1,4 @@
-Frei
+﻿Frei
 Regeneration
 Kondition
 Spritzigkeit
@@ -8,3 +8,7 @@ Torschüsse
 Flanken/Abschluss
 Standardsituationen
 Trainingsspiel
+Fussballtennis
+Kopfballpendel
+Yoga
+Elfmeterschießen
