@@ -3288,9 +3288,9 @@ namespace CornerkickWebMvc.Controllers
       // Clear current training plan
       clb.training.ltUnit.Clear();
 
-      // Get next Sunday
+      // Get last Sunday
       DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iWeek * 7).Date;
-      while ((int)(dtTmp.DayOfWeek) != 0) dtTmp = dtTmp.AddDays(+1);
+      while ((int)(dtTmp.DayOfWeek) != 0) dtTmp = dtTmp.AddDays(-1);
 
       while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         for (byte iD = 0; iD < tuPlan.Length; iD++) {
