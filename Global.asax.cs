@@ -388,6 +388,7 @@ namespace CornerkickWebMvc
             }
           }
         }
+        */
 
         // retire cpu player
         if (club0.ltPlayer.Count > 500) {
