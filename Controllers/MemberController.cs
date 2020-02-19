@@ -3215,7 +3215,7 @@ namespace CornerkickWebMvc.Controllers
             if      (tu.dt.Hour >= tsTraining[2].Hours) iIxTimeOfDay = 2; // 3rd training
             else if (tu.dt.Hour >= tsTraining[1].Hours) iIxTimeOfDay = 1; // 2nd training
 
-            if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0) tu.iType *= -1;
+            if (tu.dt.CompareTo(MvcApplication.ckcore.dtDatum) <= 0) tu.iType *= -1;
 
             ltTu[iD][iIxTimeOfDay] = tu;
           }
@@ -3229,7 +3229,7 @@ namespace CornerkickWebMvc.Controllers
             DateTime dtTraining = dtSunday.AddDays(iD).Add(tsTraining[iT]);
 
             sbyte iType = 0;
-            if (dtTraining.CompareTo(MvcApplication.ckcore.dtDatum) < 0) iType = -1; // Past training
+            if (dtTraining.CompareTo(MvcApplication.ckcore.dtDatum) <= 0) iType = -1; // Past training
 
             ltTu[iD][iT] = new CornerkickManager.Main.Training.Unit() { dt = dtTraining, iType = iType };
           }
@@ -3285,17 +3285,26 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Main.Training.Unit[][] tuPlan = getTrainingPlan(clb, iWeek);
 
-      // Clear current training plan
-      clb.training.ltUnit.Clear();
+      // Get next Sunday
+      DateTime dtStartCopy = MvcApplication.ckcore.dtDatum.AddDays(iWeek * 7).Date;
+      while ((int)(dtStartCopy.DayOfWeek) != 0) dtStartCopy = dtStartCopy.AddDays(+1);
 
-      // Get last Sunday
-      DateTime dtTmp = MvcApplication.ckcore.dtDatum.AddDays(iWeek * 7).Date;
-      while ((int)(dtTmp.DayOfWeek) != 0) dtTmp = dtTmp.AddDays(-1);
+      // First delete all trainings starting from next week
+      DateTime dtTmp = dtStartCopy;
+      while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
+        for (int iT = 0; iT < clb.training.ltUnit.Count; iT++) {
+          if (clb.training.ltUnit[iT].dt.Date.Equals(dtTmp)) {
+            clb.training.ltUnit.RemoveAt(iT--);
+          }
+        }
 
+        dtTmp = dtTmp.AddDays(+1);
+      }
+
+      // Then copy trainings plan of current week
+      dtTmp = dtStartCopy;
       while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         for (byte iD = 0; iD < tuPlan.Length; iD++) {
-          List<CornerkickManager.Main.Training.Unit> ltTuToday = clb.training.getTrainingUnitsToday(dtTmp);
-
           for (byte iT = 0; iT < tuPlan[iD].Length; iT++) {
             if (tuPlan[iD][iT].iType >= 0) {
               // Check if already training planned
@@ -4873,8 +4882,8 @@ namespace CornerkickWebMvc.Controllers
           if (th.dt.Date.Equals(dt) && th.iType > 1) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
-              sTitle = " Training (" + MvcApplication.ckcore.sTraining[th.iType - 1] + ")",
-              sDescription = MvcApplication.ckcore.sTraining[th.iType - 1],
+              sTitle = " Training (" + MvcApplication.ckcore.sTraining[th.iType] + ")",
+              sDescription = MvcApplication.ckcore.sTraining[th.iType],
               sStartDate = th.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
               sEndDate = th.dt.AddMinutes(90).ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(255, 255, 180)",
