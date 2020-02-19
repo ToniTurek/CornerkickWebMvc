@@ -371,13 +371,14 @@ namespace CornerkickWebMvc
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
         CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0);
-        ckcore.tr.putPlayerOnTransferlist(plNew.iId, 0);
+        ckcore.tr.putPlayerOnTransferlist(plNew, 0);
 
         // Player jouth
         foreach (CornerkickGame.Player plJ in club0.ltPlayerJouth) {
           ckcore.tr.putPlayerOnTransferlist(plJ, 0);
         }
 
+        /*
         if (countCpuPlayerOnTransferlist() > 200) {
           for (int iT = 0; iT < ckcore.ltTransfer.Count; iT++) {
             CornerkickManager.Transfer.Item transfer = ckcore.ltTransfer[iT];
@@ -410,6 +411,12 @@ namespace CornerkickWebMvc
 
       // Do next step
       int iRetCk = ckcore.next();
+
+      // Player reset?
+      CornerkickGame.Player plIvenHoffmann = ckcore.ltPlayer[163];
+      if (plIvenHoffmann.fMoral < 1.001 && plIvenHoffmann.fCondition > 0.999 && plIvenHoffmann.fFresh > 0.999) {
+        ckcore.tl.writeLog(plIvenHoffmann.sName + " C/F/M: " + plIvenHoffmann.fCondition.ToString("0.0%") + "/" + plIvenHoffmann.fFresh.ToString("0.0%") + "/" + plIvenHoffmann.fMoral.ToString("0.0%"), ckcore.sErrorFile);
+      }
 
       // Beginn of new season
       if (iRetCk == 4) {
