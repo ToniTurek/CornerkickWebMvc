@@ -413,6 +413,9 @@ namespace CornerkickWebMvc
       // Do next step
       int iRetCk = ckcore.next();
 
+      // Jan no injury
+      ckcore.ltPlayer[101].injury = null;
+
       // Player reset?
       CornerkickGame.Player plIvenHoffmann = ckcore.ltPlayer[163];
       if (plIvenHoffmann.fMoral < 1.001 && plIvenHoffmann.fCondition > 0.999 && plIvenHoffmann.fFresh > 0.999) {
