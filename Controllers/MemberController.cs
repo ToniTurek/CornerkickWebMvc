@@ -815,7 +815,7 @@ namespace CornerkickWebMvc.Controllers
       double[] fFAve = new double[7];
       int nPlKeeper = 0;
       foreach (CornerkickGame.Player pl in clb.ltPlayer) {
-        fFAve[0] +=  pl.fSkillTraining[ 0];
+        fFAve[0] += (pl.fSkillTraining[ 0] + pl.fSkillTraining[16])                                                / 2f; // Speed + acceleration
         fFAve[1] += (pl.fSkillTraining[ 1] + pl.fSkillTraining[ 2])                                                / 2f; // Technik + Dribbling
         fFAve[2] +=  pl.fSkillTraining[ 3];                                                                              // Zweikampf
         fFAve[3] += (pl.fSkillTraining[ 4] + pl.fSkillTraining[ 5] + pl.fSkillTraining[ 6] + pl.fSkillTraining[7]) / 4f; // Abspiel
