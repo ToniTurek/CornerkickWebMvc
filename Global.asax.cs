@@ -547,7 +547,7 @@ namespace CornerkickWebMvc
 
             // Remove national coaches
             CornerkickManager.Cup.Matchday mdWcFinal = cupWc.ltMatchdays[cupWc.ltMatchdays.Count - 1];
-            if (mdWcFinal.ltGameData.Count == 1 && ckcore.dtDatum.Equals(mdWcFinal.dt.AddDays(1))) { // Final game
+            if (mdWcFinal.ltGameData != null && mdWcFinal.ltGameData.Count == 1 && ckcore.dtDatum.Equals(mdWcFinal.dt.AddDays(1))) { // Final game
               foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.nation = null;
               foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
                 if (nat.bNation) nat.user = null;
@@ -559,32 +559,42 @@ namespace CornerkickWebMvc
 
       // Nominate user for WC
       bool bReturn = true;
-      foreach (CornerkickManager.Cup league in ckcore.ltCups) { // For each 1st division league
-        if (league.iId  != 1) continue;
-        if (league.iId3 >  0) continue;
-        if (league.ltMatchdays == null) continue;
-        if (league.ltMatchdays.Count < 2) continue;
+      CornerkickManager.Cup leagueGer = ckcore.tl.getCup(1, iNations[0], 0);
+      if (leagueGer != null) {
+        DateTime dtWcDraw = leagueGer.ltMatchdays[leagueGer.ltMatchdays.Count - 1].dt.Date.AddDays(8).AddHours(12);
 
-        if (ckcore.dtDatum.Equals(league.ltMatchdays[league.ltMatchdays.Count - 1].dt.AddDays(1))) {
-          List<CornerkickManager.Tool.TableItem> tbl = CornerkickManager.Tool.getLeagueTable(league);
-          foreach (CornerkickManager.Tool.TableItem item in tbl) {
-            if (item.club.user != null) {
-              if (ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
+        if (ckcore.dtDatum.Equals(dtWcDraw)) {
+          cupWc.settings.dtStart = dtWcDraw.AddDays(13).Date + new TimeSpan(20, 30, 00);
+          cupWc.settings.dtEnd = ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
+          ckcore.calcMatchdays(cupWc, ckcore.dtSeasonStart, ckcore.dtSeasonEnd);
+          ckcore.drawCup(cupWc);
+        } else if (ckcore.dtDatum.Equals(dtWcDraw.AddMinutes(15))) {
+          foreach (CornerkickManager.Cup league in ckcore.ltCups) { // For each 1st division league
+            if (league.iId != 1) continue;
+            if (league.iId3 > 0) continue;
+            if (league.ltMatchdays == null) continue;
+            if (league.ltMatchdays.Count < 2) continue;
 
-              CornerkickManager.Club nat = CornerkickManager.Tool.getNation(league.iId2, ckcore.ltClubs);
-              if (nat == null) continue;
+            List<CornerkickManager.Tool.TableItem> tbl = CornerkickManager.Tool.getLeagueTable(league);
+            foreach (CornerkickManager.Tool.TableItem item in tbl) {
+              if (item.club.user != null) {
+                if (ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
 
-              // Add all player of that nation
-              nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
-              nat.user = item.club.user;
-              item.club.user.nation = nat;
+                CornerkickManager.Club nat = CornerkickManager.Tool.getNation(league.iId2, ckcore.ltClubs);
+                if (nat == null) continue;
 
-              // Inform user
-              if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.sendNews(item.club.user, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
-              ckcore.sendNews(item.club.user, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
+                // Add all player of that nation
+                nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
+                nat.user = item.club.user;
+                item.club.user.nation = nat;
 
-              bReturn = false;
-              break;
+                // Inform user
+                if (dtWcSelectPlayerFinish.CompareTo(ckcore.dtDatum) > 0) ckcore.sendNews(item.club.user, "Bitte wählen Sie noch bis zum " + dtWcSelectPlayerFinish.ToString("d", Controllers.MemberController.getCiStatic(league.iId2)) + " Ihre " + nPlayerNat.ToString() + " Spieler für die Endrunde aus.");
+                ckcore.sendNews(item.club.user, "Welche Ehre! Der Verband von " + nat.sName + " stellt Sie als Nationaltrainer für die kommende WM ein.");
+
+                bReturn = false;
+                break;
+              }
             }
           }
         }
