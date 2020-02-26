@@ -34,6 +34,8 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ddlFilterNation { get; set; }
     public string sFilterNation { get; set; }
 
+    public bool bNation { get; set; }
+
     public TransferModel()
     {
       ltDdlFilterPos = new List<SelectListItem>();

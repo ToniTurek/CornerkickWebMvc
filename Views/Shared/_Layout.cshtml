@@ -177,8 +177,12 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Büro @sMails</a>
                 <ul class="dropdown-menu">
                   <li>@Html.ActionLink("Postfach" + @sMails, "Mail", "Member")</li>
-                  @if (clb != null && !clb.bNation) {
-                    <li>@Html.ActionLink("Transfermarkt", "Transfer", "Member")</li>
+                  @if (clb != null) {
+                    if (clb.bNation) {
+                      <li>@Html.ActionLink("Spielernominierungen", "Transfer", "Member")</li>
+                    } else {
+                      <li>@Html.ActionLink("Transfermarkt", "Transfer", "Member")</li>
+                    }
                   }
                   <li>@Html.ActionLink("Statistik", "Statistic", "Member")</li>
                   <li>@Html.ActionLink("Persönliches", "UserView", "Member")</li>

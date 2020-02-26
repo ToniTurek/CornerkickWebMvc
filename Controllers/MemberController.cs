@@ -2589,11 +2589,27 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Transfer(Models.TransferModel mdTransfer)
     {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(mdTransfer);
+
       mdTransfer.iContractYears = 1;
 
+      mdTransfer.bNation = clb.bNation;
+
+      mdTransfer.ddlFilterNation.Add(new SelectListItem { Text = "Alle", Value = "-1", Selected = !clb.bNation });
       foreach (byte iN in MvcApplication.iNations) {
-        CornerkickManager.Cup leage = MvcApplication.ckcore.tl.getCup(1, iN, 0);
-        mdTransfer.ddlFilterNation.Add(new SelectListItem { Text = leage.sName, Value = iN.ToString(), Selected = iN == 36 });
+        string sLand = "";
+        bool bSelected = false;
+
+        if (clb.bNation) {
+          sLand = MvcApplication.ckcore.sLand[iN];
+          bSelected = iN == clb.iLand;
+        } else {
+          CornerkickManager.Cup leage = MvcApplication.ckcore.tl.getCup(1, iN, 0);
+          if (leage != null) sLand = leage.sName;
+        }
+
+        mdTransfer.ddlFilterNation.Add(new SelectListItem { Text = sLand, Value = iN.ToString(), Selected = bSelected });
       }
 
       return View(mdTransfer);
@@ -2738,39 +2754,6 @@ namespace CornerkickWebMvc.Controllers
       if (MvcApplication.ckcore.tr.transferPlayer(ckClub(), iPlayerId, clubTake)) {
         sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
       }
-      /*
-      for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-        CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
-
-        if (transfer.iPlayerId == iPlayerId) {
-          if (transfer.ltOffers != null) {
-            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
-              CornerkickManager.Transfer.Offer offer = transfer.ltOffers[iO];
-              if (offer.iClubId == iClubId) {
-                CornerkickManager.Club clubUser = ckClub();
-                clubUser.iKontostand += offer.iMoney;
-                clubUser.ltPlayer.Remove(iPlayerId);
-                MvcApplication.ckcore.fz.setKonto(ref clubUser, MvcApplication.ckcore.dtDatum, +offer.iMoney, "Spielertransfer");
-                AccountController.setCkClub(clubUser);
-
-                CornerkickManager.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
-                clubTake.iKontostand -= offer.iMoney;
-                clubTake.ltPlayer.Add(iPlayerId);
-                MvcApplication.ckcore.fz.setKonto(ref clubTake, MvcApplication.ckcore.dtDatum, -offer.iMoney, "Spielertransfer");
-                MvcApplication.ckcore.Info("Ihr Transferangebot für den Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " von " + offer.iMoney.ToString("N0", getCi()) + " wurde angenommen!", clubTake.iUser, 3, 0, clubTake.iUser);
-                MvcApplication.ckcore.ltClubs[iClubId] = clubTake;
-
-                MvcApplication.ckcore.ltTransfer.Remove(transfer);
-
-                sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[transfer.iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
-
-                return Json(sReturn, JsonRequestBehavior.AllowGet);
-              }
-            }
-          }
-        }
-      }
-      */
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
@@ -2802,7 +2785,25 @@ namespace CornerkickWebMvc.Controllers
       return Json("Ok", JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9)
+    [HttpPost]
+    public JsonResult TransferNominatePlayer(int iPlayerId)
+    {
+      CornerkickManager.Club nation = ckClub();
+      if (nation == null) return Json(null, JsonRequestBehavior.AllowGet);
+      if (!nation.bNation) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player plNom = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      if (plNom.iNat1 != nation.iLand) return Json(null, JsonRequestBehavior.AllowGet);
+
+      bool bNominate = !CornerkickManager.Player.ownPlayer(nation, plNom);
+      if (bNominate) nation.ltPlayer.Add   (plNom);
+      else           nation.ltPlayer.Remove(plNom);
+
+      return Json(bNominate, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9, int iNation = -1)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
@@ -2831,7 +2832,8 @@ namespace CornerkickWebMvc.Controllers
                                                                                                        iF: iFValue,
                                                                                                        bJouth: bJouth,
                                                                                                        ltPlayer: ltPlayer,
-                                                                                                       bFixTransferFee: bFixTransferFee)) {
+                                                                                                       bFixTransferFee: bFixTransferFee,
+                                                                                                       iNation: iNation)) {
         string sClub = "vereinslos";
         if (transfer.player.iClubId >= 0) {
           sClub = MvcApplication.ckcore.ltClubs[transfer.player.iClubId].sName;

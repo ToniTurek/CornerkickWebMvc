@@ -584,7 +584,7 @@ namespace CornerkickWebMvc
                 if (nat == null) continue;
 
                 // Add all player of that nation
-                nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
+                //nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
                 nat.user = item.club.user;
                 item.club.user.nation = nat;
 

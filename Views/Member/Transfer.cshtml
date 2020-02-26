@@ -37,6 +37,13 @@
 
     tr.shown td.symbol {
       background: url('/Content/Icons/minus.png') no-repeat center center;
+      cursor: pointer;
+    }
+
+    tr.nation td.symbol {
+      background: url('/Content/Icons/flags/world.png') no-repeat center center;
+      background-size: 32px 32px;
+      cursor: pointer;
     }
   </style>
 
@@ -74,7 +81,9 @@
     }
 
     $(document).ready(function () {
-      bnMakeOffer   = document.getElementById("bnMakeOffer");
+      var bNation = @Html.Raw(Json.Encode(Model.bNation));
+
+      bnMakeOffer = document.getElementById("bnMakeOffer");
       bnMakeOffer  .style.display = "none";
       bnAcceptOffer = document.getElementById("bnAcceptOffer");
       bnAcceptOffer.style.display = "none";
@@ -100,25 +109,47 @@
           "url": '@Url.Action("getTableTransfer", "Member")',
           "type": 'POST',
           "data": function (d) {
+            rbAll = document.getElementById("rbAll");
+            rbFav = document.getElementById("rbFav");
+            cbNoClub = document.getElementById("cbNoClub");
+            rbJouth = document.getElementById("rbJouth");
+            cbFixTransferFee = document.getElementById("cbFixTransferFee");
+
             var iType = 0;
-            if (document.getElementById("rbAll").checked) {
+            if (bNation) {
               iType = 1;
-            } else if (document.getElementById("rbFav").checked) {
-              iType = 2;
+            } else {
+              if (rbAll != null && rbAll.checked) {
+                iType = 1;
+              } else if (rbFav != null && rbFav.checked) {
+                iType = 2;
+              }
             }
 
             var iClubId = -9;
-            if (document.getElementById("cbNoClub").checked) {
+            if (cbNoClub != null && cbNoClub.checked) {
               iClubId = -1;
             }
 
             d.iPos    = $('#ddlFilterPos')  .val();
             d.iFType  = $('#ddlFilterFType').val();
             d.iFValue = $('#ddlFilterF').val();
-            d.bJouth  = document.getElementById("rbJouth").checked;
+
+            d.bJouth = false;
+            if (rbJouth != null) {
+              d.bJouth = rbJouth.checked;
+            }
+
             d.iType = iType;
-            d.bFixTransferFee = document.getElementById("cbFixTransferFee").checked;
+
+            d.bFixTransferFee = false;
+            if (cbFixTransferFee != null) {
+              d.bFixTransferFee = cbFixTransferFee.checked;
+            }
+
             d.iClubId = iClubId;
+            
+            d.iNation = $('#ddlFilterNation').val();
           }
         },
         "info": false,
@@ -184,7 +215,9 @@
           }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-          if (aData.iOffer > 0) { // Already offered or own player
+          if (aData.iOffer === 2 && bNation) { // Nation and already nominated
+            $(nRow).addClass('nation');
+          } else if (aData.iOffer > 0 && !bNation) { // Already offered or own player
             $(nRow).addClass('details-control');
           } else if (aData.iOffer === -1) { // Negotiation cancelled
             $('td', nRow).css('color', "rgb(180,180,180)");
@@ -263,19 +296,29 @@
               bnMakeOffer.innerHTML = "Angebot ändern";
               bnCancelOffer.style.display = "block";
             } else {
-              bnMakeOffer.innerHTML = "Spieler verpflichten";
+              if (bNation) {
+                bnMakeOffer.innerHTML = "Spieler nominieren";
+              } else {
+                bnMakeOffer.innerHTML = "Spieler verpflichten";
+              }
               bnCancelOffer.style.display = "none";
             }
 
             if (data[0].iOffer == 2) { // Own player
               bnMakeOffer.style.display = "none";
               bnAddToFavLst.style.display = "none";
-            } else if (data[0].iOffer == -2) { // Not on transfer list
+              if (bNation) {
+                bnMakeOffer.style.display = "block";
+                bnMakeOffer.innerHTML = "Spieler ausladen";
+              }
+            } else if (data[0].iOffer == -2 && !bNation) { // Not on transfer list
               bnMakeOffer.style.display = "none";
               bnAddToFavLst.style.display = "block";
             } else {
               bnMakeOffer.style.display = "block";
-              bnAddToFavLst.style.display = "block";
+              if (!bNation) {
+                bnAddToFavLst.style.display = "block";
+              }
             }
             bnAcceptOffer.style.display = "none";
 
@@ -327,9 +370,36 @@
 
       $("#bnMakeOffer").click(function () {
         var data = jTable.rows('.selected').data();
+
         if (data) {
           var iIdPl = data[0].playerId;
-          getContractDialog(document.body, iIdPl, true);
+
+          if (bNation) {
+            $.ajax({
+              url: "/Member/TransferNominatePlayer",
+              type: 'POST',
+              traditional: true,
+              data: { iPlayerId: iIdPl },
+              dataType: "json",
+              success: function (ret) {
+                if (ret == null) {
+                  alert("Error");
+                } else {
+                  /*
+                  if (ret) {
+                    bnMakeOffer.innerHTML = "Spieler ausladen";
+                  } else {
+                    bnMakeOffer.innerHTML = "Spieler nominieren";
+                  }
+                  */
+                  bnMakeOffer.style.display = "none";
+                  jTable.ajax.reload();
+                }
+              }
+            });
+          } else {
+            getContractDialog(document.body, iIdPl, true);
+          }
         }
       });
 
@@ -476,39 +546,41 @@
   <div id="divTransferlistContainer">
     <div class="form-group" style="position: relative; width: 100%">
       <div style="position: relative; width: 262px; height: 54px; float: left; margin-bottom: 10px; margin-right: 10px">
-        <div id="divCbTransferlistAll" align="center" style="position: absolute; width: 260px; height: 24px; top: 0px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-          <form>
-            <fieldset>
-              <label style="font-size:100%; color: black; margin-right: 6px">
-                <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
-                Transferliste
-              </label>
-              <label style="font-size:100%; color: black; margin-right: 6px">
-                <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
-                Alle
-              </label>
-              <label style="font-size:100%; color: black">
-                <input type="radio" id="rbFav" name="rbTransferlistAll" value="2">
-                Favoriten
-              </label>
-            </fieldset>
-          </form>
-        </div>
+       @if (!Model.bNation) {
+          <div id="divCbTransferlistAll" align="center" style="position: absolute; width: 260px; height: 24px; top: 0px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+            <form>
+              <fieldset>
+                <label style="font-size:100%; color: black; margin-right: 6px">
+                  <input type="radio" id="rbTransferlist" name="rbTransferlistAll" value="0" checked>
+                  Transferliste
+                </label>
+                <label style="font-size:100%; color: black; margin-right: 6px">
+                  <input type="radio" id="rbAll" name="rbTransferlistAll" value="1">
+                  Alle
+                </label>
+                <label style="font-size:100%; color: black">
+                  <input type="radio" id="rbFav" name="rbTransferlistAll" value="2">
+                  Favoriten
+                </label>
+              </fieldset>
+            </form>
+          </div>
 
-        <div id="divCbProfiJouth" align="center" style="position: absolute; width: 170px; height: 24px; top: 30px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-          <form>
-            <fieldset>
-              <label style="font-size:100%; color: black; margin-right: 4%">
-                <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
-                Profis
-              </label>
-              <label style="font-size:100%; color: black">
-                <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
-                Jugend
-              </label>
-            </fieldset>
-          </form>
-        </div>
+          <div id="divCbProfiJouth" align="center" style="position: absolute; width: 170px; height: 24px; top: 30px; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+            <form>
+              <fieldset>
+                <label style="font-size:100%; color: black; margin-right: 4%">
+                  <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
+                  Profis
+                </label>
+                <label style="font-size:100%; color: black">
+                  <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
+                  Jugend
+                </label>
+              </fieldset>
+            </form>
+          </div>
+       }
       </div>
 
       <div style="position: relative; width: auto; float: left; margin-bottom: 10px; margin-right: 10px">
@@ -528,19 +600,23 @@
 
       <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
         @Html.DropDownListFor(m => m.sFilterNation, Model.ddlFilterNation, new { @class = "form-control", id = "ddlFilterNation", @style = "width:160px", @disabled = "disabled" })
-        @Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterClub", @style = "width:160px", @disabled = "disabled" })
+        @if (!Model.bNation) {
+          Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterClub", @style = "width:160px", @disabled = "disabled" });
+        }
       </div>
 
-      <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
-        <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
-          <input id="cbFixTransferFee" type="checkbox" value="false">
-          Fixe Ablöse
-        </label>
-        <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
-          <input id="cbNoClub" type="checkbox" value="false">
-          Vereinslos
-        </label>
-      </div>
+     @if (!Model.bNation) {
+        <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
+          <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
+            <input id="cbFixTransferFee" type="checkbox" value="false">
+            Fixe Ablöse
+          </label>
+          <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
+            <input id="cbNoClub" type="checkbox" value="false">
+            Vereinslos
+          </label>
+        </div>
+      }
     </div>
 
     <table id="tableTransfer" cellspacing="0" style="width: auto" class="display responsive nowrap">
