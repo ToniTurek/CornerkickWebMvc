@@ -3462,13 +3462,35 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.bTopring = !clb.stadium.bTopring;
 
-      int[] iKostenDauer = CornerkickManager.Stadium.getCostDaysContructStadium(stadion, clb.stadium, ckUser());
+      int[] iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(stadion, clb.stadium, ckUser());
       int iDispoOk = 0;
-      if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
+      if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
-      string[] sCostDays = new string[] { (iKostenDauer[0] / 1000000).ToString("N0", getCi()) + " mio. €", iKostenDauer[1].ToString(), iDispoOk.ToString() };
+      string[] sCostDays = new string[] { (iCostDays[0] / 1000000).ToString("N0", getCi()) + " mio. €", iCostDays[1].ToString(), iDispoOk.ToString() };
 
       return Json(sCostDays, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult StadiumGetMaxSeats()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      if (clb.stadium.bTopring) return Json(false, JsonRequestBehavior.AllowGet);
+      if (clb.stadium.iTopringDaysConstruct > 0) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Stadium st = clb.stadium.Clone();
+      st.bTopring = true;
+
+      int iSeatsMaxLv0 = CornerkickManager.Stadium.getMaxSeats(st, 0);
+
+      int[] iSeatsMax = new int[3];
+      for (byte iS = 0; iS < iSeatsMax.Length; iS++) {
+        iSeatsMax[iS] = (int)(iSeatsMaxLv0 * CornerkickManager.Stadium.getFactorBlockSeats(iS, 0));
+      }
+
+      return Json(iSeatsMax, JsonRequestBehavior.AllowGet);
     }
 
     private bool bStadiumGetTopring(CornerkickManager.Club clb)
@@ -3500,6 +3522,19 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(fPg, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult StadiumGetTopringProgress()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Stadium st = clb.stadium.Clone();
+      st.bTopring = false;
+
+      int[] iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(clb.stadium, st, ckUser());
+      return Json((iCostDays[1] - clb.stadium.iTopringDaysConstruct) / (float)iCostDays[1], JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]

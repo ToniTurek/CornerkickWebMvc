@@ -114,7 +114,16 @@
       });
 
       $("#bnBuildTopring").click(function () {
-        buildTopring();
+        $.ajax({
+          type: 'post',
+          url: '/Member/StadiumGetMaxSeats',
+          dataType: "json",
+          success: function (iSeatsMax) {
+            var sCost = bnBuildTopring.getAttribute('data-sCost');
+            var sDur  = bnBuildTopring.getAttribute('data-sDur');
+            getDialog(document.body, "Wollen Sie wirklich für " + sCost + " einen Oberring bauen? Der Ausbau würde " + sDur + " Tage dauern.<br><br>Die unteren Blöcke könnten dann nur noch bis maximal:<br>&emsp;" + iSeatsMax[0].toLocaleString() + " (Steh)<br>&emsp;" + iSeatsMax[1].toLocaleString() + " (Sitz)<br>&emsp;" + iSeatsMax[2].toLocaleString() + " (VIP)<br> ausgebaut werden.", "Stadionausbau", buildTopring);
+          }
+        });
       });
 
       $("#bnBuildVideo").click(function () {
@@ -173,14 +182,14 @@
         url: '/Member/StadiumChange',
         dataType: "json",
         data: { iSeats: seats, iArt: seattypes },
-        success: function (sKostenDauer) {
+        success: function (sCostLength) {
           bnBuild = document.getElementById("bnBuild");
 
-          bnBuild.setAttribute('data-sCost', sKostenDauer[0]);
-          bnBuild.setAttribute('data-sDur',  sKostenDauer[1]);
-          bnBuild.innerHTML = "Kosten: " + sKostenDauer[0] + " €, Dauer: " + sKostenDauer[1] + " Tage";
+          bnBuild.setAttribute('data-sCost', sCostLength[0]);
+          bnBuild.setAttribute('data-sDur',  sCostLength[1]);
+          bnBuild.innerHTML = "Kosten: " + sCostLength[0] + " €, Dauer: " + sCostLength[1] + " Tage";
 
-          if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
+          if (sCostLength[1] == "0" || sCostLength[1] == "" || sCostLength[2] == "0") {
             bnBuild.disabled = true;
           } else {
             bnBuild.disabled = false;
@@ -192,12 +201,17 @@
         type: 'post',
         url: '/Member/StadiumGetCostTopring',
         dataType: "json",
-        success: function (sKostenDauer) {
+        success: function (sCostLength) {
+          bnBuildTopring = document.getElementById("bnBuildTopring");
+
           bnBuildTopring.disabled = true;
 
-          if (sKostenDauer) {
-            $("#bnBuildTopring").text("Oberring bauen. Kosten: " + sKostenDauer[0] + ", Dauer: " + sKostenDauer[1] + " Tage");
-            if (sKostenDauer[1] == "0" || sKostenDauer[1] == "" || sKostenDauer[2] == "0") {
+          if (sCostLength) {
+            bnBuildTopring.setAttribute('data-sCost', sCostLength[0]);
+            bnBuildTopring.setAttribute('data-sDur',  sCostLength[1]);
+            bnBuildTopring.innerHTML = "Oberring bauen. Kosten: " + sCostLength[0] + ", Dauer: " + sCostLength[1] + " Tage";
+
+            if (sCostLength[1] == "0" || sCostLength[1] == "" || sCostLength[2] == "0") {
               bnBuildTopring.disabled = true;
             } else {
               bnBuildTopring.disabled = false;
@@ -237,6 +251,26 @@
               });
               pbBlock.css("display", "block");
             }
+          }
+        }
+      });
+
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumGetTopringProgress',
+        dataType: "json",
+        success: function (fPgTr) {
+          if (fPgTr >= 0.0) {
+            // Create progress bars
+            var pbTr = $("#pbTopring");
+            pbTr.progressbar({
+              value: fPgTr * 100
+            });
+            pbTr.css("display", "block");
+
+            bnBuildTopring = document.getElementById("bnBuildTopring");
+            bnBuildTopring.disabled = true;
+            bnBuildTopring.innerHTML = "Oberring: " + (fPgTr * 100).toFixed(1) + "%";
           }
         }
       });
@@ -447,12 +481,12 @@
           if (Model.iSeats != null) {
             float[,] sLoc = new float[Model.iSeats.Length, 2];
 
-            sLoc[0, 0] = 0.31f; sLoc[0, 1] = 0.78f;       // A
+            sLoc[0, 0] = 0.31f; sLoc[0, 1] = 0.75f;       // A
             sLoc[1, 0] = 0.50f; sLoc[1, 1] = sLoc[0, 1]; // B
             sLoc[2, 0] = 1 - sLoc[0, 0]; sLoc[2, 1] = sLoc[0, 1]; // C
-            sLoc[3, 0] = 0.83f; sLoc[3, 1] = 0.58f;       // D
-            sLoc[4, 0] = sLoc[3, 0]; sLoc[4, 1] = 0.35f;       // E
-            sLoc[5, 0] = sLoc[2, 0]; sLoc[5, 1] = 0.18f;       // F
+            sLoc[3, 0] = 0.83f; sLoc[3, 1] = 0.55f;       // D
+            sLoc[4, 0] = sLoc[3, 0]; sLoc[4, 1] = 0.32f;       // E
+            sLoc[5, 0] = sLoc[2, 0]; sLoc[5, 1] = 0.14f;       // F
             sLoc[6, 0] = sLoc[1, 0]; sLoc[6, 1] = sLoc[5, 1]; // G
             sLoc[7, 0] = sLoc[0, 0]; sLoc[7, 1] = sLoc[5, 1]; // H
             sLoc[8, 0] = 1 - sLoc[3, 0]; sLoc[8, 1] = sLoc[4, 1]; // I
@@ -546,10 +580,14 @@
       </div>
     </div>
 
-    <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
     @{
       if (Model.stadion != null) {
-        <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
+        <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
+        
+        <div style="position: relative; width: 100%">
+          <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
+          <div id="pbTopring" style="position: absolute; width: 100%; top: 28px"></div>
+        </div>
 
         bool bShow = false;
         for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
