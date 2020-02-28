@@ -21,19 +21,40 @@
       bnReply = document.getElementById("bnReply");
       bnReply.disabled = true;
 
+      bnDelete = document.getElementById("bnDelete");
+      bnDelete.disabled = true;
+
       tbNewMail = document.getElementById("tbNewMail");
       //tbNewMail.readOnly = "true";
 
       var tblMail = $('#tblMail').DataTable({
+        "ajax": {
+          "url": '@Url.Action("MailGetList", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
         "pageLength": 50,
         "paging": false,
         "info": false,
+        "language": {
+          "emptyTable": "Keine Mails"
+        },
         "responsive": true,
         "searching": false,
         "order": [[1, "desc"]],
-        columnDefs: [
+        "columns": [
+          { "data": "iIndex" },
+          { "data": "sFromId" },
+          { "data": "sDt" },
+          { "data": "sFrom" },
+          { "data": "sFirstLine" },
+          { "data": "sText" }
+        ],
+        "columnDefs": [
           {
-            targets: [0, 1],
+            "targets": [0, 1, 5],
             "visible": false,
             "searchable": false
           }
@@ -45,23 +66,25 @@
           $(this).removeClass('selected');
           tbNewMail.value = "";
           bnReply.disabled = true;
+          bnDelete.disabled = true;
         } else {
           tblMail.$('tr.selected').removeClass('selected');
           $(this).addClass('selected');
 
           var data = tblMail.row('.selected').data();
           if (data) {
-            tbNewMail.value = data[4];
+            tbNewMail.value = data.sText;
 
-            if (data[1] >= 0) {
+            if (data.sFromId) {
               bnReply.disabled = false;
+              bnDelete.disabled = false;
             }
 
             $.ajax({
               type: 'post',
               url: '/Member/MailMarkRead',
               dataType: "json",
-              data: { iIndexMail: data[0] },
+              data: { iIndexMail: data.iIndex },
               success: function () {
                 tblMail.ajax.reload();
               }
@@ -74,14 +97,20 @@
         var data = tblMail.row('.selected').data();
 
         if (data) {
-          if (data[1] >= 0) {
-            $('#ddlUser').val(data[1]);
+          if (data.sFrom) {
+            var ddlUser = document.getElementById('ddlUser');
+            for (var i = 0; i < ddlUser.options.length; i++) {
+              if (ddlUser.options[i].text === data.sFrom) {
+                ddlUser.selectedIndex = i;
+                break;
+              }
+            }
 
             tbNewMail.value = "\n\n";
             tbNewMail.value += "-------------------------------------------------------------------------------------\n";
-            tbNewMail.value += " " + data[2] + " - Von: " + data[3] + "\n";
+            tbNewMail.value += " " + data.sDt + " - Von: " + data.sFrom + "\n";
             tbNewMail.value += "-------------------------------------------------------------------------------------\n";
-            tbNewMail.value += data[4];
+            tbNewMail.value += data.sText;
 
             //tbNewMail.readOnly = "false";
             tbNewMail.focus();
@@ -112,7 +141,45 @@
           });
         }
       });
-    });
+
+      $("#bnDelete").click(function () {
+        var data = tblMail.row('.selected').data();
+
+        if (data) {
+          if (data.iIndex >= 0) {
+            $.ajax({
+              type: 'post',
+              url: '/Member/MailDelete',
+              dataType: "json",
+              data: { iMailIx: data.iIndex },
+              success: function () {
+                tblMail.ajax.reload();
+                tbNewMail.value = "";
+                bnSend.disabled = true;
+                bnReply.disabled = true;
+                bnDelete.disabled = true;
+              }
+            });
+
+            $.ajax({
+              type: 'post',
+              url: '/Member/MailDeleteTxt',
+              dataType: "json",
+              data: { sDate: data.sDt, sFrom: data.sFromId },
+              success: function () {
+                /*
+                tblMail.ajax.reload();
+                tbNewMail.value = "";
+                bnSend.disabled = true;
+                bnReply.disabled = true;
+                bnDelete.disabled = true;
+                */
+              }
+            });
+          }
+        }
+      });
+    }); // document.ready
 
     function ddlMailToChanged() {
       var bnSend = document.getElementById("bnSend");
@@ -135,49 +202,25 @@
       <th>Datum</th>
       <th>Von</th>
       <th>Nachricht</th>
+      <th>sText</th>
     </tr>
   </thead>
   <tbody>
-    @{
-      int iIndex = 0;
-      foreach (CornerkickManager.Main.News news in Model.ltUserMail) {
-        int iFrom = news.iFrom;
-        string sFrom = "-";
-        string sFirstLine = news.sText.Split('\n')[0];
-        string sStyle = "";
-
-        if (iFrom < 0) {
-          sFrom = "Admin";
-        } else if (iFrom < MvcApplication.ckcore.ltUser.Count) {
-          CornerkickManager.User user = MvcApplication.ckcore.ltUser[iFrom];
-          sFrom = user.sFirstname + " " + user.sSurname;
-          sFrom += " (" + user.club.sName + ")";
-        }
-
-        if (!news.bRead) {
-          sStyle = "font-weight:bold";
-        }
-
-        <tr style=@sStyle>
-          <td align="center">@iIndex</td>
-          <td align="center">@iFrom</td>
-          <td align="center">@news.dt.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-          <td align="center">@sFrom</td>
-          <td align="center">@sFirstLine</td>
-        </tr>
-
-        iIndex++;
-      }
-    }
   </tbody>
 </table>
-<button type="submit" id="bnReply" class="btn btn-default" style="width: 100%">antworten</button>
 
-<div style="margin-top: 4%"></div>
-<b class="left">An:</b>
-@Html.DropDownListFor(m => m.sMailTo, Model.ltDdlUser, new { @class = "form-control", id = "ddlUser", @onchange = "ddlMailToChanged()" })
-Max. 128 Zeichen
-<div class="form-group">
-  <textarea id="tbNewMail" rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
+<div style="position: relative; width: 100%; margin-top: 6px">
+  <button type="submit" id="bnReply" class="btn btn-default" style="width: 49%">antworten</button>
+  <button type="submit" id="bnDelete" class="btn btn-default" style="width: 49%">löschen</button>
 </div>
-<button type="submit" id="bnSend" class="btn btn-default" style="width: 100%">abschicken</button>
+
+
+<div style="margin-top: 10px">
+  <b class="left">An:</b>
+  @Html.DropDownListFor(m => m.sMailTo, Model.ltDdlUser, new { @class = "form-control", id = "ddlUser", @onchange = "ddlMailToChanged()" })
+  Max. 128 Zeichen
+  <div class="form-group">
+    <textarea id="tbNewMail" rows='10' style="position: relative; width: 100%; max-width: 100%"></textarea>
+  </div>
+  <button type="submit" id="bnSend" class="btn btn-default" style="width: 100%">abschicken</button>
+</div>
