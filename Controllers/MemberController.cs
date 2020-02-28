@@ -5022,7 +5022,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(rows, JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult AddTestGameToCalendar(string title, string start, int iTeamId)
+    public JsonResult AddTestGameToCalendar(string title, string start, int iH, int iM, int iTeamId)
     {
       string sReturn = "Error";
 
@@ -5035,6 +5035,7 @@ namespace CornerkickWebMvc.Controllers
       if (iTeamId >= 0 && iTeamId < MvcApplication.ckcore.ltClubs.Count && iTeamId != iTeamIdUser) {
         CornerkickManager.Cup.Matchday md = new CornerkickManager.Cup.Matchday();
         DateTime.TryParse(start, out md.dt);
+        md.dt = md.dt.Date.AddHours(iH).AddMinutes(iM);
 
         md.ltGameData = new List<CornerkickGame.Game.Data>();
         CornerkickGame.Game.Data gd = new CornerkickGame.Game.Data();
