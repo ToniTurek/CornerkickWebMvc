@@ -3428,7 +3428,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Stadium stadiumNew = getStadiumUpdate(clb.stadium, iSeats, iArt);
 
-      int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stadiumNew, clb.stadium, ckUser());
+      int[] iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(stadiumNew, clb.stadium, ckUser());
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
@@ -3462,7 +3462,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Stadium stadion = clb.stadium.Clone();
       stadion.bTopring = !clb.stadium.bTopring;
 
-      int[] iKostenDauer = MvcApplication.ckcore.st.getCostDaysContructStadium(stadion, clb.stadium, ckUser());
+      int[] iKostenDauer = CornerkickManager.Stadium.getCostDaysContructStadium(stadion, clb.stadium, ckUser());
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iKostenDauer[0], clb)) iDispoOk = 1;
 
@@ -3494,7 +3494,7 @@ namespace CornerkickWebMvc.Controllers
       float[] fPg = new float[nBlocksMax];
 
       for (byte iB = 0; iB < nBlocksMax; iB++) {
-        int iDaysMax = MvcApplication.ckcore.st.getCostDaysContructStadiumBlock(clb.stadium.blocks[iB], clb.stadium.blocks[iB], 0, ckUser())[0];
+        int iDaysMax = CornerkickManager.Stadium.getCostDaysContructStadiumBlock(clb.stadium.blocks[iB], clb.stadium.blocks[iB], 0, ckUser())[0];
         if (clb.stadium.blocks[iB].iSeatsDaysConstruct > 0) fPg[iB] = (clb.stadium.blocks[iB].iSeatsDaysConstructIni - clb.stadium.blocks[iB].iSeatsDaysConstruct) / (float)clb.stadium.blocks[iB].iSeatsDaysConstructIni;
         else                                                fPg[iB] = -1f;
       }
@@ -3511,8 +3511,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
 
       int nVideoDaysConstract    = CornerkickManager.Stadium.iVideoDaysConstruct[clb.stadium.iVideoNew];
-      int nSnackbarDaysConstract = MvcApplication.ckcore.st.getCostDaysContructSnackbar(clb.stadium.iSnackbarNew, clb.stadium.iSnackbar, usr)[1];
-      int nToiletsDaysConstract  = MvcApplication.ckcore.st.getCostDaysContructToilets (clb.stadium.iToiletsNew,  clb.stadium.iToilets,  usr)[1];
+      int nSnackbarDaysConstract = CornerkickManager.Stadium.getCostDaysContructSnackbar(clb.stadium.iSnackbarNew, clb.stadium.iSnackbar, usr)[1];
+      int nToiletsDaysConstract  = CornerkickManager.Stadium.getCostDaysContructToilets (clb.stadium.iToiletsNew,  clb.stadium.iToilets,  usr)[1];
       float fVideoDaysConstract    = 0f;
       float fSnackbarDaysConstract = 0f;
       float fToiletsDaysConstract  = 0f;
@@ -3587,7 +3587,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (iBuildNew != 0) {
         int iDispoOk = 0;
-        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructSnackbar(clb.stadium.iSnackbarNew + iBuildNew, clb.stadium.iSnackbarNew, usr);
+        int[] iCostDays = CornerkickManager.Stadium.getCostDaysContructSnackbar(clb.stadium.iSnackbarNew + iBuildNew, clb.stadium.iSnackbarNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
         sCostDaysDispo[0] = iCostDays[0].ToString("N0", getCi());
@@ -3624,7 +3624,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (iBuildNew != 0) {
         int iDispoOk = 0;
-        int[] iCostDays = MvcApplication.ckcore.st.getCostDaysContructToilets(clb.stadium.iToiletsNew + iBuildNew, clb.stadium.iToiletsNew, usr);
+        int[] iCostDays = CornerkickManager.Stadium.getCostDaysContructToilets(clb.stadium.iToiletsNew + iBuildNew, clb.stadium.iToiletsNew, usr);
         if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
         sCostDaysDispo[0] = iCostDays[0].ToString("N0", getCi());
@@ -3881,7 +3881,7 @@ namespace CornerkickWebMvc.Controllers
       else                                                                      buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      iCostDays = MvcApplication.ckcore.st.getCostDaysContructCarpark(clb.stadium.iCarparkNew, clb.stadium.iCarpark, usr);
+      iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark(clb.stadium.iCarparkNew, clb.stadium.iCarpark, usr);
       bdgsAll[iType].sCategory = CornerkickManager.Stadium.sCarparkName;
       bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iCarpark;
@@ -3898,7 +3898,7 @@ namespace CornerkickWebMvc.Controllers
       else                                                         buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      iCostDays = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(clb.stadium.iTicketcounterNew, clb.stadium.iTicketcounter, usr);
+      iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(clb.stadium.iTicketcounterNew, clb.stadium.iTicketcounter, usr);
       bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTicketcounterName;
       bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iTicketcounter;
@@ -3936,8 +3936,8 @@ namespace CornerkickWebMvc.Controllers
       bdg.sNameNext = (iCurrent + iNew).ToString();
 
       int[] iCostDays = new int[2];
-      if      (iType == 6) iCostDays = MvcApplication.ckcore.st.getCostDaysContructCarpark      (clb.stadium.iCarpark       + iNew, clb.stadium.iCarpark,       usr);
-      else if (iType == 7) iCostDays = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(clb.stadium.iTicketcounter + iNew, clb.stadium.iTicketcounter, usr);
+      if      (iType == 6) iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark      (clb.stadium.iCarpark       + iNew, clb.stadium.iCarpark,       usr);
+      else if (iType == 7) iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(clb.stadium.iTicketcounter + iNew, clb.stadium.iTicketcounter, usr);
 
       bdg.sCostConstructNext  = iCostDays[0].ToString("N0", getCi());
       bdg.nDaysConstructTotal = iCostDays[1];
@@ -3964,24 +3964,25 @@ namespace CornerkickWebMvc.Controllers
         CornerkickManager.Stadium.sTicketcounterName
       };
 
-      int[] iCostDays = new int[2];
       if (iType < 6) {
-        CornerkickManager.UI.doConstruction(clb, iType, (byte)iLevel);
+        CornerkickManager.UI.doConstruction(clb, iType, (byte)iLevel, MvcApplication.ckcore.dtDatum, sConstructionNames[iType]);
       } else if (iType == 6) { // Carpark
         if (clb.stadium.iCarparkNew != iLevel) {
           clb.stadium.iCarparkNew = iLevel;
-          int[] iCostDaysCp = MvcApplication.ckcore.st.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
+          int[] iCostDaysCp = CornerkickManager.Stadium.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
           clb.stadium.iCarparkDaysConstruct = iCostDaysCp[1];
+
+          CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDaysCp[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
         }
       } else if (iType == 7) { // Ticketcounter
         if (clb.stadium.iTicketcounterNew != iLevel) {
           clb.stadium.iTicketcounterNew = (byte)iLevel;
-          int[] iCostDaysTc = MvcApplication.ckcore.st.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
+          int[] iCostDaysTc = CornerkickManager.Stadium.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
           clb.stadium.iTicketcounterDaysConstruct = iCostDaysTc[1];
+
+          CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDaysTc[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
         }
       }
-
-      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDays[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
 
       return Json("Der Bau des " + sConstructionNames[iType] + "s wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -3994,7 +3995,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iCost = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround);
       clb.buildings.iGround++;
-      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCost, "Grundstückskauf", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+      CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCost, "Grundstückskauf", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
 
       return Json("Das Grundstück wurde erworben", JsonRequestBehavior.AllowGet);
     }
@@ -4114,7 +4115,7 @@ namespace CornerkickWebMvc.Controllers
 
       // First: Pay personal pay-off costs
       int iPayOff = getPersonalPayOff(iLevel);
-      MvcApplication.ckcore.fz.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
+      CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
 
       // Then, hire new personal
       clb.staff.iCoTrainer     = (byte)iLevel[0];

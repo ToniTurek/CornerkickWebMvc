@@ -94,15 +94,15 @@ namespace CornerkickWebMvc.Controllers
         CornerkickGame.Stadium stNew = new CornerkickGame.Stadium();
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats +  500;
-        iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);
+        iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(stNew, stDatum, user);
         dataPoints[iDp].Add(new Models.DataPointGeneral( 500, iCostDays[0]));
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats + 1000;
-        iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);
+        iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(stNew, stDatum, user);
         dataPoints[iDp].Add(new Models.DataPointGeneral(1000, iCostDays[0]));
 
         stNew.blocks[0].iSeats = stDatum.blocks[0].iSeats + 2000;
-        iCostDays = MvcApplication.ckcore.st.getCostDaysContructStadium(stNew, stDatum, user);
+        iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(stNew, stDatum, user);
         dataPoints[iDp].Add(new Models.DataPointGeneral(2000, iCostDays[0]));
       }
 
