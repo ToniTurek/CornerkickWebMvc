@@ -5957,6 +5957,7 @@ namespace CornerkickWebMvc.Controllers
       public string sDt { get; set; }
       public string sFirstLine { get; set; }
       public string sText { get; set; }
+      public bool bNew { get; set; }
     }
 
     public ActionResult MailGetList()
@@ -5969,63 +5970,39 @@ namespace CornerkickWebMvc.Controllers
       List<DatatableEntryMail> ltDeMail = new List<DatatableEntryMail>();
 
       string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
-      System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
+      if (System.IO.Directory.Exists(sDirMail)) {
+        System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
 
-      int iIx = 0;
-      foreach (var fileMail in diMail.GetFiles(usr.id + "_*.txt")) {
-        string sContent = System.IO.File.ReadAllText(fileMail.FullName);
-        string[] sContentSplit = sContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+        int iIx = 0;
+        foreach (var fileMail in diMail.GetFiles(usr.id + "_*.txt")) {
+          string sContent = System.IO.File.ReadAllText(fileMail.FullName);
+          string[] sContentSplit = sContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-        string sHeader    = sContentSplit[0];
-        string sFirstLine = sContentSplit[1];
+          string sHeader    = sContentSplit[0];
+          string sFirstLine = sContentSplit[1];
 
-        string sFromId = sHeader.Split()[1];
-        string sDate   = sHeader.Split()[2];
-        DateTime dtMail = DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+          string sFromId = sHeader.Split()[1];
+          string sDate   = sHeader.Split()[2];
+          bool bNew = sHeader.Split()[3].Equals("true");
 
-        string sFrom = "-";
-        if (string.IsNullOrEmpty(sFromId)) {
-          sFrom = "Admin";
-        } else {
-          CornerkickManager.User user = MvcApplication.ckcore.tl.getUserFromId(sFromId);
-          if (user == null) continue;
+          DateTime dtMail = DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
 
-          sFrom = user.sFirstname + " " + user.sSurname;
-          sFrom += " (" + user.club.sName + ")";
-        }
+          string sFrom = "-";
+          if (string.IsNullOrEmpty(sFromId)) {
+            sFrom = "Admin";
+          } else {
+            CornerkickManager.User user = MvcApplication.ckcore.tl.getUserFromId(sFromId);
+            if (user == null) continue;
 
-        ltDeMail.Add(new DatatableEntryMail { iIndex = iIx, sFromId = sFromId, sFrom = sFrom, sDt = dtMail.ToString("d", getCi()) + " " + dtMail.ToString("hh:mm:ss"), sFirstLine = sFirstLine, sText = sContent.Replace(sFirstLine, "") });
+            sFrom = user.sFirstname + " " + user.sSurname;
+            sFrom += " (" + user.club.sName + ")";
+          }
 
-        iIx++;
-      }
+          ltDeMail.Add(new DatatableEntryMail { iIndex = iIx, sFromId = sFromId, sFrom = sFrom, sDt = dtMail.ToString("d", getCi()) + " " + dtMail.ToString("HH:mm:ss"), sFirstLine = sFirstLine, sText = sContent.Replace(sHeader + Environment.NewLine, ""), bNew = bNew });
 
-      /*
-      if (usr.ltNews != null) {
-        foreach (CornerkickManager.Main.News news in usr.ltNews) {
-          if (news.iType == 99) ltUserMail.Add(news);
+          iIx++;
         }
       }
-
-      for (int iM = 0; iM < ltUserMail.Count; iM++) {
-        CornerkickManager.Main.News mail = ltUserMail[iM];
-
-        string sFrom = "-";
-        string sFirstLine = mail.sText.Split('\n')[0];
-        string sStyle = "";
-
-        if (string.IsNullOrEmpty(mail.sFromId)) {
-          sFrom = "Admin";
-        } else {
-          CornerkickManager.User user = MvcApplication.ckcore.tl.getUserFromId(mail.sFromId);
-          if (user == null) continue;
-
-          sFrom = user.sFirstname + " " + user.sSurname;
-          sFrom += " (" + user.club.sName + ")";
-        }
-
-        ltDeMail.Add(new DatatableEntryMail { iIndex = iM, sFromId = mail.sFromId, sFrom = sFrom, sDt = mail.dt.ToString("d", getCi()) + " " + mail.dt.ToString("hh:mm:ss"), sFirstLine = sFirstLine, sText = mail.sText } );
-      }
-      */
 
       return Json(new { aaData = ltDeMail.ToArray() }, JsonRequestBehavior.AllowGet);
     }
@@ -6039,14 +6016,17 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       CornerkickManager.User usrTo = MvcApplication.ckcore.ltUser[iTo];
 
-      MvcApplication.ckcore.sendNews(usrTo.id, sText, iType: 99, iId: 0, dt: System.DateTime.Now, sFromId: usr.id);
+      //MvcApplication.ckcore.sendNews(usrTo.id, sText, iType: 99, iId: 0, dt: System.DateTime.Now, sFromId: usr.id);
+
+      string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
+      if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
 
       // Write text mail
       string sDateNow = DateTime.Now.ToString("yyyyMMddHHmmss");
       string sFilenameMail = usrTo.id + "_" + sDateNow + ".txt";
-      using (System.IO.StreamWriter fileMail = new System.IO.StreamWriter(System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail", sFilenameMail))) {
+      using (System.IO.StreamWriter fileMail = new System.IO.StreamWriter(System.IO.Path.Combine(sDirMail, sFilenameMail))) {
         // Add header
-        sText = usrTo.id + " " + usr.id + " " + sDateNow + Environment.NewLine + sText;
+        sText = usrTo.id + " " + usr.id + " " + sDateNow + " true" + Environment.NewLine + sText;
         fileMail.Write(sText);
         fileMail.Close();
       }
@@ -6054,57 +6034,19 @@ namespace CornerkickWebMvc.Controllers
       return Json("Nachricht an " + usrTo.sFirstname + " " + usrTo.sSurname + " gesendet!", JsonRequestBehavior.AllowGet);
     }
 
-    public void MailMarkRead(int iIndexMail)
+    public void MailMarkRead(string sDate, string sFrom)
     {
-      if (iIndexMail < 0) return;
-
       CornerkickManager.User user = ckUser();
 
-      if (user.ltNews != null) {
-        int iMail = 0;
+      DateTime dtMail = DateTime.Parse(sDate);
 
-        for (int iN = 0; iN < user.ltNews.Count; iN++) {
-          CornerkickManager.Main.News news = user.ltNews[iN];
-
-          if (news.iType == 99) {
-            if (iMail == iIndexMail) {
-              news.bRead = true;
-              user.ltNews[iN] = news;
-              return;
-            }
-
-            iMail++;
-          }
-        }
+      string sMail = getMailFilename(user, dtMail, sFrom);
+      string sMailFull = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail", sMail);
+      if (System.IO.File.Exists(sMailFull)) {
+        string[] lines = System.IO.File.ReadAllLines(sMailFull);
+        lines[0] = lines[0].Replace("true", "false");
+        System.IO.File.WriteAllLines(sMailFull, lines);
       }
-    }
-
-    [HttpPost]
-    public JsonResult MailDelete(int iMailIx)
-    {
-      if (iMailIx < 0) return Json(false, JsonRequestBehavior.AllowGet);
-
-      CornerkickManager.User user = ckUser();
-      if (user == null) return Json(false, JsonRequestBehavior.AllowGet);
-
-      if (user.ltNews != null) {
-        int iMail = 0;
-
-        for (int iN = 0; iN < user.ltNews.Count; iN++) {
-          CornerkickManager.Main.News news = user.ltNews[iN];
-
-          if (news.iType == 99) {
-            if (iMail == iMailIx) {
-              user.ltNews.RemoveAt(iN);
-              return Json(true, JsonRequestBehavior.AllowGet);
-            }
-
-            iMail++;
-          }
-        }
-      }
-
-      return Json(false, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -6120,7 +6062,7 @@ namespace CornerkickWebMvc.Controllers
       System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
       */
 
-      string sMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
+      string sMail = getMailFilename(user, dtMail, sFrom);
       if (System.IO.File.Exists(sMail)) System.IO.File.Delete(sMail);
       /*
       foreach (var fileMail in diMail.GetFiles(sMail)) {
@@ -6131,16 +6073,22 @@ namespace CornerkickWebMvc.Controllers
       return Json(false, JsonRequestBehavior.AllowGet);
     }
 
+    private static string getMailFilename(CornerkickManager.User user, DateTime dtMail, string sFrom)
+    {
+      return System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
+    }
+
     public int countNewMails()
     {
       CornerkickManager.User user = ckUser();
       if (user == null) return 0;
 
       int iMails = 0;
-      if (user.ltNews != null) {
-        foreach (CornerkickManager.Main.News news in user.ltNews) {
-          if (news.iType == 99 && !news.bRead) iMails++;
-        }
+
+      string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
+      System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
+      foreach (var fileMail in diMail.GetFiles(user.id + "_*.txt")) {
+        
       }
 
       return iMails;

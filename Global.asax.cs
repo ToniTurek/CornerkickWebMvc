@@ -757,14 +757,27 @@ namespace CornerkickWebMvc
 #endif
         } catch {
 #if _USE_BLOB
-          ckcore.tl.writeLog("ERROR: could not upload log file to blob", ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: could not upload log.zip file to blob", ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
-          ckcore.tl.writeLog("ERROR: could not upload log file to amazon s3", ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: could not upload log.zip file to amazon s3", ckcore.sErrorFile);
 #endif
         }
 #endif
       }
+
+
+#if _USE_AMAZON_S3
+      // Upload mails
+      DirectoryInfo diMails = new DirectoryInfo(Path.Combine(sHomeDir, "mail"));
+      if (diMails.Exists) {
+        FileInfo[] ltMailFiles = diMails.GetFiles("*.txt");
+        foreach (FileInfo fiMail in ltMailFiles) {
+          string sFileMail = Path.Combine(sHomeDir, "mail", fiMail.Name);
+          as3.uploadFile(sFileMail, "mail/" + fiMail.Name);
+        }
+      }
+#endif
     }
 
     internal static void saveLaststate(string sTargetDir)
@@ -904,8 +917,8 @@ namespace CornerkickWebMvc
           ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
         }
 
-        // Download emblems
 #if _USE_AMAZON_S3
+        // Download emblems
         Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, "emblems/", sHomeDir + "/../Content/Uploads/", ".png"));
 
         // Download archive games
@@ -930,6 +943,9 @@ namespace CornerkickWebMvc
             ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
           }
         }
+
+        // Download mails
+        Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
 #endif
 #endif
 

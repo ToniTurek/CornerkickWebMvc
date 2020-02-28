@@ -310,7 +310,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
       string sWelcomeMsg = usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!";
       MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  2, usr.club.iId);
-      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg, 99, usr.club.iId, System.DateTime.Now, -1);
+      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg, 99, usr.club.iId, System.DateTime.Now);
 #if DEBUG
       }
       }

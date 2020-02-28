@@ -50,15 +50,22 @@
           { "data": "sDt" },
           { "data": "sFrom" },
           { "data": "sFirstLine" },
-          { "data": "sText" }
+          { "data": "sText" },
+          { "data": "bNew" }
         ],
         "columnDefs": [
           {
-            "targets": [0, 1, 5],
+            "targets": [0, 1, 5, 6],
             "visible": false,
             "searchable": false
           }
-        ]
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.bNew) {
+            $('td', nRow).css('font-weight', "bold");
+          }
+        }
+
       });
 
       $('#tblMail tbody').on('click', 'tr', function () {
@@ -84,7 +91,7 @@
               type: 'post',
               url: '/Member/MailMarkRead',
               dataType: "json",
-              data: { iIndexMail: data.iIndex },
+              data: { sDate: data.sDt, sFrom: data.sFromId },
               success: function () {
                 tblMail.ajax.reload();
               }
@@ -147,20 +154,6 @@
 
         if (data) {
           if (data.iIndex >= 0) {
-            $.ajax({
-              type: 'post',
-              url: '/Member/MailDelete',
-              dataType: "json",
-              data: { iMailIx: data.iIndex },
-              success: function () {
-                tblMail.ajax.reload();
-                tbNewMail.value = "";
-                bnSend.disabled = true;
-                bnReply.disabled = true;
-                bnDelete.disabled = true;
-              }
-            });
-
             $.ajax({
               type: 'post',
               url: '/Member/MailDeleteTxt',

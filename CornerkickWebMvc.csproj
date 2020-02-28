@@ -1054,6 +1054,7 @@
     <Content Include="Views\Blobs\ListBlobs.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\mail\" />
     <Folder Include="App_Data\save\games\" />
     <Folder Include="Views\MemberPages\" />
   </ItemGroup>
