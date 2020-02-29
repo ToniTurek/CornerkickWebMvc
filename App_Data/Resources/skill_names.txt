@@ -14,5 +14,5 @@ Elfmeter
 Reaktion
 Sprungkraft
 Ballsicherheit
-Beschleunigung
+Antritt
 Beidfüßigkeit
