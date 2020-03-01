@@ -381,7 +381,7 @@ namespace CornerkickWebMvc.Controllers
 
                 string sCupRound = "";
                 if (nRound - iMdClub - 1 >= 0) {
-                  sCupRound = MvcApplication.ckcore.sCupRound[nRound - iMdClub - 1];
+                  sCupRound = CornerkickManager.Main.sCupRound[nRound - iMdClub - 1];
 
                   if (iMdClub < iMdCurr) desk.sPokalrunde = "ausgeschieden (" + sCupRound + ")";
                   else                   desk.sPokalrunde = sCupRound;
@@ -480,7 +480,7 @@ namespace CornerkickWebMvc.Controllers
           sN = sN.Replace("Transferangebot",  "<a href=\"/Member/Transfer\">Transferangebot</a>");
 
           for (int iNat = 0; iNat < MvcApplication.iNations.Length; iNat++) {
-            string sReplace = "Pokal " + MvcApplication.ckcore.sLand[MvcApplication.iNations[iNat]];
+            string sReplace = "Pokal " + CornerkickManager.Main.sLand[MvcApplication.iNations[iNat]];
             sN = sN.Replace(sReplace, "<a href=\"/Member/Cup\">" + sReplace + "</a>");
           }
           foreach (CornerkickGame.Player pl in clb.ltPlayer) {
@@ -610,7 +610,7 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<text>" + cup.sName + " - ";
         int iMd = CornerkickManager.Tool.getMatchday(cup, MvcApplication.ckcore.dtDatum);
         if (cup.checkCupGroupPhase(iMd, 0)) sBox += (iMd + 1).ToString() + ". Spieltag";
-        else                                sBox += MvcApplication.ckcore.sCupRound[cup.getMatchdaysTotal() - iMd - 1];
+        else                                sBox += CornerkickManager.Main.sCupRound[cup.getMatchdaysTotal() - iMd - 1];
         sBox += "</text>";
         sBox += "</div>";
       }
@@ -1102,7 +1102,7 @@ namespace CornerkickWebMvc.Controllers
         if (i == MvcApplication.ckcore.plr.getCaptainIx(club)) sName += " (C)";
 
         int iNat = int.Parse(ltLV[i][12]);
-        string sNat = MvcApplication.ckcore.sLandShort[iNat];
+        string sNat = CornerkickManager.Main.sLandShort[iNat];
 
         int iVal = int.Parse(ltLV[i][ 9].Replace(".", ""));
         int iSal = int.Parse(ltLV[i][10].Replace(".", ""));
@@ -1346,7 +1346,7 @@ namespace CornerkickWebMvc.Controllers
       tD.ltPlayerNat      = new List<string>();
       tD.ltPlayerSusp     = new List<bool>  ();
       foreach (CornerkickGame.Player pl in tD.ltPlayer) {
-        tD.ltPlayerNat.Add(MvcApplication.ckcore.sLandShort[pl.iNat1]);
+        tD.ltPlayerNat.Add(CornerkickManager.Main.sLandShort[pl.iNat1]);
 
         // Check if player is suspended
         bool bSusp = false;
@@ -1692,7 +1692,7 @@ namespace CornerkickWebMvc.Controllers
           int.TryParse(ltLV[i][0], out iId);
 
           int iNat = int.Parse(ltLV[i][12]);
-          string sNat = MvcApplication.ckcore.sLandShort[iNat];
+          string sNat = CornerkickManager.Main.sLandShort[iNat];
 
           int iVal    = int.Parse(ltLV[i][ 9].Replace(".", ""));
           int iSal    = int.Parse(ltLV[i][10].Replace(".", ""));
@@ -1807,8 +1807,8 @@ namespace CornerkickWebMvc.Controllers
       // Injury
       if (plDetails.injury != null) {
         Random rnd = new Random();
-        if (plDetails.injury.iType >= MvcApplication.ckcore.ltInjury.Length) plDetails.injury.iType = (byte)(MvcApplication.ckcore.ltInjury.Length - 1);
-        if (plDetails.injury.iType2 < 0 || plDetails.injury.iType2 >= MvcApplication.ckcore.ltInjury[plDetails.injury.iType].Count) plDetails.injury.iType2 = (sbyte)rnd.Next(MvcApplication.ckcore.ltInjury[plDetails.injury.iType].Count);
+        if (plDetails.injury.iType >= CornerkickManager.Main.ltInjury.Length) plDetails.injury.iType = (byte)(CornerkickManager.Main.ltInjury.Length - 1);
+        if (plDetails.injury.iType2 < 0 || plDetails.injury.iType2 >= CornerkickManager.Main.ltInjury[plDetails.injury.iType].Count) plDetails.injury.iType2 = (sbyte)rnd.Next(CornerkickManager.Main.ltInjury[plDetails.injury.iType].Count);
       }
 
       // Next / Prev. Player
@@ -2602,7 +2602,7 @@ namespace CornerkickWebMvc.Controllers
         bool bSelected = false;
 
         if (clb.bNation) {
-          sLand = MvcApplication.ckcore.sLand[iN];
+          sLand = CornerkickManager.Main.sLand[iN];
           bSelected = iN == clb.iLand;
         } else {
           CornerkickManager.Cup leage = MvcApplication.ckcore.tl.getCup(1, iN, 0);
@@ -2861,7 +2861,7 @@ namespace CornerkickWebMvc.Controllers
           index = (iTr + 1).ToString(),
           datum = sDatePutOnTl,
           name = transfer.player.sName,
-          position = MvcApplication.ckcore.plr.getStrPos(transfer.player),
+          position = CornerkickManager.Player.getStrPos(transfer.player),
           strength      = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false).ToString("0.0"),
           strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true) .ToString("0.0"),
           age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
@@ -2869,7 +2869,7 @@ namespace CornerkickWebMvc.Controllers
           mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
           fixtransferfee = sFixTransferFee,
           club = sClub,
-          nat = MvcApplication.ckcore.sLandShort[transfer.player.iNat1]
+          nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1]
         });
 
         iTr++;
@@ -3114,10 +3114,10 @@ namespace CornerkickWebMvc.Controllers
         pl.iIndex = iPl;
         if (iPl < MvcApplication.ckcore.game.data.nPlStart) {
           byte iPosRole = CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(pl, clb.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch));
-          sPos = MvcApplication.ckcore.sPosition[iPosRole];
+          sPos = CornerkickManager.Main.sPosition[iPosRole];
           sStrength = CornerkickGame.Tool.getAveSkill(pl, iPos: iPosRole, bIdeal: false).ToString(" (0.0)");
         } else {
-          sPos = MvcApplication.ckcore.plr.getStrPos(pl);
+          sPos = CornerkickManager.Player.getStrPos(pl);
           sStrength = CornerkickGame.Tool.getAveSkill(pl, bIdeal: false).ToString(" (0.0)");
         }
 
@@ -4232,14 +4232,14 @@ namespace CornerkickWebMvc.Controllers
 
 #if DEBUG
       string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
-      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", MvcApplication.ckcore.sLandShort[clb.iLand] + ".png");
+      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[clb.iLand] + ".png");
 #else
       string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
-      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", MvcApplication.ckcore.sLandShort[clb.iLand] + ".png");
+      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[clb.iLand] + ".png");
 #endif
       if (clb.bNation) {
         sEmblem = "<img src=\"/Content/Icons/flags/";
-        if (System.IO.File.Exists(sEmblemFile)) sEmblem += MvcApplication.ckcore.sLandShort[clb.iLand];
+        if (System.IO.File.Exists(sEmblemFile)) sEmblem += CornerkickManager.Main.sLandShort[clb.iLand];
         else                                    sEmblem += "0";
       } else {
         if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
@@ -4291,7 +4291,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Add lands to dropdown list
       foreach (int iLand in MvcApplication.iNations) {
-        mlLeague.ddlLand.Add(new SelectListItem { Text = MvcApplication.ckcore.sLand[iLand], Value = iLand.ToString() });
+        mlLeague.ddlLand.Add(new SelectListItem { Text = CornerkickManager.Main.sLand[iLand], Value = iLand.ToString() });
       }
 
       mlLeague.ddlSeason = getDdlSeason();
@@ -4555,7 +4555,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Add lands to dropdown list
       foreach (int iLand in MvcApplication.iNations) {
-        cupModel.ddlLand.Add(new SelectListItem { Text = MvcApplication.ckcore.sLand[iLand], Value = iLand.ToString() });
+        cupModel.ddlLand.Add(new SelectListItem { Text = CornerkickManager.Main.sLand[iLand], Value = iLand.ToString() });
       }
 
       cupModel.ddlSeason = getDdlSeason();
@@ -4575,7 +4575,7 @@ namespace CornerkickWebMvc.Controllers
         ltMd[iMd] = (iMd + 1).ToString();
 
         int nRound = cup.getKoRound(cup.ltClubs[0].Count);
-        ltMd[iMd] += ";" + MvcApplication.ckcore.sCupRound[nRound - iMd - 1];
+        ltMd[iMd] += ";" + CornerkickManager.Main.sCupRound[nRound - iMd - 1];
       }
 
       /*
@@ -4584,7 +4584,7 @@ namespace CornerkickWebMvc.Controllers
         int nRound = cup.getKoRound(cup.ltClubs[0].Count);
         while (cupModel.ltDdlSpTg.Count < nRound) {
           int iMd = cupModel.ltDdlSpTg.Count + 1;
-          cupModel.ltDdlSpTg.Add(new SelectListItem { Text = MvcApplication.ckcore.sCupRound[nRound - iMd], Value = iMd.ToString() });
+          cupModel.ltDdlSpTg.Add(new SelectListItem { Text = CornerkickManager.Main.sCupRound[nRound - iMd], Value = iMd.ToString() });
         }
       }
       */
@@ -4693,7 +4693,7 @@ namespace CornerkickWebMvc.Controllers
       cupGoldModel.ddlMatchday = new List<SelectListItem>();
       for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 1); iMd++) {
         string sText = (iMd + 1).ToString();
-        if (iMd > 5) sText = MvcApplication.ckcore.sCupRound[3 - ((iMd - 6) / 2)];
+        if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
         cupGoldModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
       }
@@ -4721,7 +4721,7 @@ namespace CornerkickWebMvc.Controllers
       cupSilverModel.ddlMatchday = new List<SelectListItem>();
       for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 1); iMd++) {
         string sText = (iMd + 1).ToString();
-        if (iMd > 5) sText = MvcApplication.ckcore.sCupRound[3 - ((iMd - 6) / 2)];
+        if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
         cupSilverModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
       }
@@ -4903,8 +4903,8 @@ namespace CornerkickWebMvc.Controllers
           if (tu.dt.Date.Equals(dt) && tu.iType > 0 && !bCampTravelDay) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
-              sTitle = " Training (" + MvcApplication.ckcore.sTraining[tu.iType] + ")",
-              sDescription = MvcApplication.ckcore.sTraining[tu.iType],
+              sTitle = " Training (" + CornerkickManager.Main.sTraining[tu.iType] + ")",
+              sDescription = CornerkickManager.Main.sTraining[tu.iType],
               sStartDate = tu.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
               sEndDate = tu.dt.AddMinutes(90).ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(255, 255, 0)",
@@ -4920,8 +4920,8 @@ namespace CornerkickWebMvc.Controllers
           if (th.dt.Date.Equals(dt) && th.iType > 1) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
-              sTitle = " Training (" + MvcApplication.ckcore.sTraining[th.iType] + ")",
-              sDescription = MvcApplication.ckcore.sTraining[th.iType],
+              sTitle = " Training (" + CornerkickManager.Main.sTraining[th.iType] + ")",
+              sDescription = CornerkickManager.Main.sTraining[th.iType],
               sStartDate = th.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
               sEndDate = th.dt.AddMinutes(90).ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(255, 255, 180)",
@@ -4973,7 +4973,7 @@ namespace CornerkickWebMvc.Controllers
                     sTitle = " Liga, " + (iMd + 1).ToString().PadLeft(2) + ". Spieltag";
                     sColor = "rgb(0, 175, 100)";
                   } else if (cup.iId == 2) { // Nat. Cup
-                    sTitle += ", " + MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count)];
+                    sTitle += ", " + CornerkickManager.Main.sCupRound[cup.getKoRound(md.ltGameData.Count)];
                     sColor = "rgb(100, 100, 255)";
                   } else if (cup.iId == 3 || cup.iId == 4) { // Int. games
                     sColor = "rgb(255, 200, 14)";
@@ -4998,7 +4998,7 @@ namespace CornerkickWebMvc.Controllers
                   if (cup.iId == 2 && cup.iId2 == club.iLand && md.ltGameData.Count > 1) {
                     ltEvents.Add(new Models.DiaryEvent {
                       iID = ltEvents.Count,
-                      sTitle = " " + cup.sName + ", Auslosung " + MvcApplication.ckcore.sCupRound[cup.getKoRound(md.ltGameData.Count) - 1],
+                      sTitle = " " + cup.sName + ", Auslosung " + CornerkickManager.Main.sCupRound[cup.getKoRound(md.ltGameData.Count) - 1],
                       sStartDate = new DateTime(md.dt.Year, md.dt.Month, md.dt.AddDays(1).Day, 12,  0, 0).ToString("yyyy-MM-ddTHH:mm:ss"),
                       sEndDate   = new DateTime(md.dt.Year, md.dt.Month, md.dt.AddDays(1).Day, 12, 30, 0).ToString("yyyy-MM-ddTHH:mm:ss"),
                       sColor     = "rgb(100, 200, 255)",
@@ -5665,7 +5665,7 @@ namespace CornerkickWebMvc.Controllers
       );
       for (int iN = 0; iN < MvcApplication.iNations.Length; iN++) {
         statisticModel.ddlNations.Add(new SelectListItem {
-                                        Text  = MvcApplication.ckcore.sLand[MvcApplication.iNations[iN]],
+                                        Text  = CornerkickManager.Main.sLand[MvcApplication.iNations[iN]],
                                         Value = MvcApplication.iNations[iN].ToString()
                                       }
         );
@@ -5708,8 +5708,8 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
-      statisticModel.sPlayerSkillBest = new string[MvcApplication.ckcore.plr.sSkills.Length][];
-      for (byte iS = 0; iS < MvcApplication.ckcore.plr.sSkills.Length; iS++) {
+      statisticModel.sPlayerSkillBest = new string[CornerkickManager.Player.sSkills.Length][];
+      for (byte iS = 0; iS < CornerkickManager.Player.sSkills.Length; iS++) {
         if (iS == 16) continue; // Both foot skill
 
         statisticModel.sPlayerSkillBest[iS] = new string[4]; // Skill name, player name, skill value, club
@@ -5734,7 +5734,7 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
-        statisticModel.sPlayerSkillBest[iS][0] = MvcApplication.ckcore.plr.sSkills[iS];
+        statisticModel.sPlayerSkillBest[iS][0] = CornerkickManager.Player.sSkills[iS];
         if (plSkillBest != null) {
           statisticModel.sPlayerSkillBest[iS][1] = plSkillBest.sName;
           statisticModel.sPlayerSkillBest[iS][2] = fSkillBest.ToString("0.000");
@@ -5806,7 +5806,7 @@ namespace CornerkickWebMvc.Controllers
         if (tD.ltPlayer[iP] != null) {
           if (tD.ltPlayer[iP].iClubId >= 0) tD.ltPlayerTeamname[iP] = MvcApplication.ckcore.ltClubs[tD.ltPlayer[iP].iClubId].sName;
           tD.ltPlayerAge[iP] = tD.ltPlayer[iP].getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
-          tD.ltPlayerNat[iP] = MvcApplication.ckcore.sLandShort[tD.ltPlayer[iP].iNat1];
+          tD.ltPlayerNat[iP] = CornerkickManager.Main.sLandShort[tD.ltPlayer[iP].iNat1];
         }
       }
 
@@ -5969,7 +5969,7 @@ namespace CornerkickWebMvc.Controllers
       //The table or entity I'm querying
       List<DatatableEntryMail> ltDeMail = new List<DatatableEntryMail>();
 
-      string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       if (System.IO.Directory.Exists(sDirMail)) {
         System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
 
@@ -6018,7 +6018,7 @@ namespace CornerkickWebMvc.Controllers
 
       //MvcApplication.ckcore.sendNews(usrTo.id, sText, iType: 99, iId: 0, dt: System.DateTime.Now, sFromId: usr.id);
 
-      string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
 
       // Write text mail
@@ -6041,7 +6041,7 @@ namespace CornerkickWebMvc.Controllers
       DateTime dtMail = DateTime.Parse(sDate);
 
       string sMail = getMailFilename(user, dtMail, sFrom);
-      string sMailFull = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail", sMail);
+      string sMailFull = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", sMail);
       if (System.IO.File.Exists(sMailFull)) {
         string[] lines = System.IO.File.ReadAllLines(sMailFull);
         lines[0] = lines[0].Replace("true", "false");
@@ -6058,7 +6058,7 @@ namespace CornerkickWebMvc.Controllers
       DateTime dtMail = DateTime.Parse(sDate);
 
       /*
-      string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
       */
 
@@ -6075,7 +6075,7 @@ namespace CornerkickWebMvc.Controllers
 
     private static string getMailFilename(CornerkickManager.User user, DateTime dtMail, string sFrom)
     {
-      return System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
+      return System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
     }
 
     public int countNewMails()
@@ -6085,7 +6085,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iMails = 0;
 
-      string sDirMail = System.IO.Path.Combine(MvcApplication.ckcore.sHomeDir, "mail");
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
       foreach (var fileMail in diMail.GetFiles(user.id + "_*.txt")) {
         

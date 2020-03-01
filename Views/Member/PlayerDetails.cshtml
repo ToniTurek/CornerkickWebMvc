@@ -562,7 +562,7 @@
           </tr>
           <tr>
             <td align="right">Positionen:</td>
-            <td align="right">@MvcApplication.ckcore.plr.getStrPos(player)</td>
+            <td align="right">@CornerkickManager.Player.getStrPos(player)</td>
           </tr>
           <tr>
             <td align="right">Stärke (bereinigt):</td>
@@ -586,7 +586,7 @@
             @{
               string sVerletzung = "keine";
               if (player.injury != null) {
-                sVerletzung = "Noch " + player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + MvcApplication.ckcore.ltInjury[player.injury.iType][player.injury.iType2];
+                sVerletzung = "Noch " + player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.injury.iType][player.injury.iType2];
               }
             }
             <td align="right">Verletzung:</td>
@@ -725,7 +725,7 @@
       }
 
       @{
-        string sNat = MvcApplication.ckcore.sLandShort[player.iNat1];
+        string sNat = CornerkickManager.Main.sLandShort[player.iNat1];
 
         if (string.IsNullOrEmpty(sNat)) {
           <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
@@ -829,7 +829,7 @@
          @for (int i = 0; i < player.iSkill.Length; i++) {
             var fTraining = player.fSkillTraining[i] + 1.0;
             <tr>
-              <td align="right">@MvcApplication.ckcore.plr.sSkills[i]</td>
+              <td align="right">@CornerkickManager.Player.sSkills[i]</td>
               <td align="center">@player.iSkill[i]</td>
               @{
                 if (Model.bOwnPlayer && !Model.bNation) {
@@ -865,7 +865,7 @@
               sColor = "style=color:blue";
             }
             <tr @sBold>
-              <td align="center">@MvcApplication.ckcore.sPosition[i + 1]</td>
+              <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
               <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
               <td align="center">@CornerkickGame.Tool.getAveSkill(player, j).ToString("0.0")</td>
             </tr>

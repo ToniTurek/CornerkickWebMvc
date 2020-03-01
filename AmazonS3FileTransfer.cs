@@ -63,22 +63,22 @@ namespace CornerkickWebMvc
          PutObjectResponse response = client.PutObject(putRequest);
           //using (S3Response r = client.PutObject(putRequest)) { }
         } catch (AmazonS3Exception amazonS3Exception) {
-          MvcApplication.ckcore.tl.writeLog("ERROR! S3 PutObjectResponse Exception Message: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
+          MvcApplication.ckcore.tl.writeLog("ERROR! S3 PutObjectResponse Exception Message: " + amazonS3Exception.Message, CornerkickManager.Main.sErrorFile);
         }
       } catch (AmazonS3Exception amazonS3Exception) {
-        MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception Message: " + amazonS3Exception.Message, MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR! S3 Exception Message: " + amazonS3Exception.Message, CornerkickManager.Main.sErrorFile);
 
         if (amazonS3Exception.ErrorCode != null) {
-          MvcApplication.ckcore.tl.writeLog("Error Code: " + amazonS3Exception.ErrorCode, MvcApplication.ckcore.sErrorFile);
+          MvcApplication.ckcore.tl.writeLog("Error Code: " + amazonS3Exception.ErrorCode, CornerkickManager.Main.sErrorFile);
 
           if (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")) {
-            MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", MvcApplication.ckcore.sErrorFile);
+            MvcApplication.ckcore.tl.writeLog("Check the provided AWS Credentials.", CornerkickManager.Main.sErrorFile);
           }
         }
       } catch (Exception e) {
-        MvcApplication.ckcore.tl.writeLog("ERROR! Exception Message: " + e.Message + " File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR! Exception Message: " + e.Message + " File '" + sFile + "' not uploaded", CornerkickManager.Main.sErrorFile);
       } catch {
-        MvcApplication.ckcore.tl.writeLog("ERROR! Unknown Exception. File '" + sFile + "' not uploaded", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("ERROR! Unknown Exception. File '" + sFile + "' not uploaded", CornerkickManager.Main.sErrorFile);
       }
     }
 

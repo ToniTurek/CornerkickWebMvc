@@ -347,7 +347,7 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die FÃ
     <th style="text-align:center">Balls.</th>
   </tr>
   @{
-    for (int iT = 0; iT < MvcApplication.ckcore.sTraining.Length; iT++) {
+    for (int iT = 0; iT < CornerkickManager.Main.sTraining.Length; iT++) {
       float[] fTr = CornerkickManager.Player.getTrainingFactors(iT);
       string[] sTr = new string[3];
       int[] iMulti = new int[3];
@@ -421,7 +421,7 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die FÃ
       }
 
       <tr style="border: 1px solid black">
-        <td align="center">@MvcApplication.ckcore.sTraining[iT]</td>
+        <td align="center">@CornerkickManager.Main.sTraining[iT]</td>
         <td align="center" style="@sStyle[0]">@sTr[0]</td>
         <td align="center" style="@sStyle[1]">@sTr[1]</td>
         <td align="center" style="@sStyle[2]">@sTr[2]</td>

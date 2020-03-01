@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
       // Read SendGrid api key from ConfigurationManager
       string sApiKey = ConfigurationManager.AppSettings["ckSendGridApiKey"];
       if (string.IsNullOrEmpty(sApiKey)) {
-        MvcApplication.ckcore.tl.writeLog("Error: Cannot read ApiKey 'ckSendGridApiKey' from ConfigurationManager", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("Error: Cannot read ApiKey 'ckSendGridApiKey' from ConfigurationManager", CornerkickManager.Main.sErrorFile);
       }
 
       // Create email client

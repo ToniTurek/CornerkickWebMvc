@@ -115,7 +115,7 @@ namespace CornerkickWebMvc.Controllers
         try {
           user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
         } catch {
-          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", MvcApplication.ckcore.sErrorFile);
+          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", CornerkickManager.Main.sErrorFile);
         }
       }
 
@@ -200,7 +200,7 @@ namespace CornerkickWebMvc.Controllers
         user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
         setGame(view, user.game);
       } catch {
-        MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", MvcApplication.ckcore.sErrorFile);
+        MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", CornerkickManager.Main.sErrorFile);
       }
 
       return Json(true, JsonRequestBehavior.AllowGet);
@@ -241,7 +241,7 @@ namespace CornerkickWebMvc.Controllers
           sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
           sEmblemDirHtml = "/Content/Icons/flags/";
           int iNationH = clubH.iLand;
-          if (iNationH >= 0 && iNationH < MvcApplication.ckcore.sLandShort.Length) sEmblemH = MvcApplication.ckcore.sLandShort[iNationH] + ".png";
+          if (iNationH >= 0 && iNationH < CornerkickManager.Main.sLandShort.Length) sEmblemH = CornerkickManager.Main.sLandShort[iNationH] + ".png";
         }
 
         for (byte iC = 0; iC < clubH.cl.Length; iC++) view.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
@@ -254,7 +254,7 @@ namespace CornerkickWebMvc.Controllers
           sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
           sEmblemDirHtml = "/Content/Icons/flags/";
           int iNationA = clubA.iLand;
-          if (iNationA >= 0 && iNationA < MvcApplication.ckcore.sLandShort.Length) sEmblemA = MvcApplication.ckcore.sLandShort[iNationA] + ".png";
+          if (iNationA >= 0 && iNationA < CornerkickManager.Main.sLandShort.Length) sEmblemA = CornerkickManager.Main.sLandShort[iNationA] + ".png";
         }
 
         for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";

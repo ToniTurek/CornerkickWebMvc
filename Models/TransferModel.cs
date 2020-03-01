@@ -43,14 +43,14 @@ namespace CornerkickWebMvc.Models
 
       // Positionen zu Dropdown Menü hinzufügen
       for (int iPos = 1; iPos < 12; iPos++) {
-        ltDdlFilterPos.Add(new SelectListItem { Text = MvcApplication.ckcore.sPosition[iPos], Value = iPos.ToString() });
+        ltDdlFilterPos.Add(new SelectListItem { Text = CornerkickManager.Main.sPosition[iPos], Value = iPos.ToString() });
       }
 
       ltDdlFilterFType = new List<SelectListItem>();
       ltDdlFilterFType.Add(new SelectListItem { Text = "-", Value = "-1" });
       // Positionen zu Dropdown Menü hinzufügen
-      for (int iF = 0; iF < MvcApplication.ckcore.plr.sSkills.Length - 1; iF++) {
-        ltDdlFilterFType.Add(new SelectListItem { Text = MvcApplication.ckcore.plr.sSkills[iF], Value = iF.ToString() });
+      for (int iF = 0; iF < CornerkickManager.Player.sSkills.Length - 1; iF++) {
+        ltDdlFilterFType.Add(new SelectListItem { Text = CornerkickManager.Player.sSkills[iF], Value = iF.ToString() });
       }
 
       ltDdlFilterF = new List<SelectListItem>();

@@ -34,10 +34,10 @@ namespace CornerkickWebMvc.Models
     public UserManualModel()
     {
       ddlTraining = new List<SelectListItem>();
-      for (byte i = 0; i < MvcApplication.ckcore.sTraining.Length; i++) {
+      for (byte i = 0; i < CornerkickManager.Main.sTraining.Length; i++) {
         ddlTraining.Add(
           new SelectListItem {
-            Text = MvcApplication.ckcore.sTraining[i],
+            Text = CornerkickManager.Main.sTraining[i],
             Value = i.ToString()
           }
         );

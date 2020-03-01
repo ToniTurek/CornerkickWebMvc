@@ -83,8 +83,8 @@
 <body style="height: 100%; min-height: 100%">
   @{
     var sLand = "";
-    if (Model.iLand >= 0 && Model.iLand < MvcApplication.ckcore.sLand.Length) {
-      sLand = MvcApplication.ckcore.sLand[Model.iLand];
+    if (Model.iLand >= 0 && Model.iLand < CornerkickManager.Main.sLand.Length) {
+      sLand = CornerkickManager.Main.sLand[Model.iLand];
     }
     var sLiga = (Model.iSpKl + 1).ToString();
   }

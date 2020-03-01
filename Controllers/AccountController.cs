@@ -641,7 +641,7 @@ namespace CornerkickWebMvc.Controllers
           string sFileExt = Path.GetExtension(file.FileName);
 
           // Get base directory
-          string sBaseDir = MvcApplication.ckcore.sHomeDir;
+          string sBaseDir = CornerkickManager.Main.sHomeDir;
           if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
 #if !DEBUG
           sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
@@ -1256,7 +1256,7 @@ namespace CornerkickWebMvc.Controllers
             int iC = 0;
             while (iC < 10000) {
               iC++;
-              sNameNew = "Team_" + MvcApplication.ckcore.sLand[usr.club.iLand] + "_" + iC.ToString();
+              sNameNew = "Team_" + CornerkickManager.Main.sLand[usr.club.iLand] + "_" + iC.ToString();
 
               bool bFound = true;
               foreach (CornerkickManager.Club clbExist in MvcApplication.ckcore.ltClubs) {
@@ -1274,7 +1274,7 @@ namespace CornerkickWebMvc.Controllers
             usr.club.user = null;
 
             // Delete emblem
-            string sBaseDir = MvcApplication.ckcore.sHomeDir;
+            string sBaseDir = CornerkickManager.Main.sHomeDir;
             if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
 #if !DEBUG
             sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;

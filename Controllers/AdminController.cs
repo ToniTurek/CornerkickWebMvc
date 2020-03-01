@@ -100,7 +100,7 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.timerCkCalender.Enabled = true;
 
       // Save last state
-      MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
+      MvcApplication.saveLaststate(CornerkickManager.Main.sHomeDir);
 
       return RedirectToAction("Settings");
     }
@@ -118,7 +118,7 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.timerSave.Enabled = true;
 
       // Save last state
-      MvcApplication.saveLaststate(MvcApplication.ckcore.sHomeDir);
+      MvcApplication.saveLaststate(CornerkickManager.Main.sHomeDir);
 
       return RedirectToAction("Settings");
       //return View("Settings", "");
