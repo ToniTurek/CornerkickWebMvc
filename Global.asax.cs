@@ -93,7 +93,7 @@ namespace CornerkickWebMvc
       Models.RegisterViewModel.ltLand.Clear();
       foreach (byte iN in iNations) {
         string sLand = "Land " + iN.ToString();
-        if (ckcore.sLand != null && iN < ckcore.sLand.Length) sLand = ckcore.sLand[iN];
+        if (CornerkickManager.Main.sLand != null && iN < CornerkickManager.Main.sLand.Length) sLand = CornerkickManager.Main.sLand[iN];
 
         Models.RegisterViewModel.ltLand.Add(new SelectListItem { Text = sLand, Value = iN.ToString(), Selected = iN == 36 });
       }
@@ -140,7 +140,7 @@ namespace CornerkickWebMvc
           CornerkickManager.Cup cup = new CornerkickManager.Cup(bKo: true);
           cup.iId = 2;
           cup.iId2 = iLand;
-          cup.sName = "Pokal " + ckcore.sLand[iLand];
+          cup.sName = "Pokal " + CornerkickManager.Main.sLand[iLand];
           cup.settings.fAttraction = 1.0f;
           cup.settings.iBonusCupWin = 8000000; // 8 mio.
           cup.settings.bBonusReleaseCupWinInKo = true;
@@ -151,7 +151,7 @@ namespace CornerkickWebMvc
           league.iId = 1;
           league.iId2 = iLand;
           league.iId3 = 0;
-          league.sName = "Liga " + ckcore.sLand[iLand];
+          league.sName = "Liga " + CornerkickManager.Main.sLand[iLand];
           league.settings.fAttraction = 1.0f;
           ckcore.ltCups.Add(league);
 
@@ -187,7 +187,7 @@ namespace CornerkickWebMvc
 
       int iC = 0;
       while (league.ltClubs[0].Count < nLeagueSize) {
-        CornerkickManager.Club clb = accountController.createClub("Team_" + ckcore.sLand[league.iId2] + "_" + (iC + 1).ToString(), (byte)league.iId2, 0);
+        CornerkickManager.Club clb = accountController.createClub("Team_" + CornerkickManager.Main.sLand[league.iId2] + "_" + (iC + 1).ToString(), (byte)league.iId2, 0);
         ckcore.ltClubs.Add(clb);
 
         cup   .ltClubs[0].Add(clb);
@@ -256,7 +256,7 @@ namespace CornerkickWebMvc
           CornerkickManager.Club clbNat = new CornerkickManager.Club();
           clbNat.bNation = true;
           clbNat.iId = ckcore.ltClubs.Count;
-          clbNat.sName = ckcore.sLand[iN];
+          clbNat.sName = CornerkickManager.Main.sLand[iN];
           clbNat.iLand = iN;
           clbNat.ltTactic[0].formation = ckcore.ltFormationen[8];
 
@@ -419,7 +419,7 @@ namespace CornerkickWebMvc
       // Player reset?
       CornerkickGame.Player plIvenHoffmann = ckcore.ltPlayer[163];
       if (plIvenHoffmann.fMoral < 1.001 && plIvenHoffmann.fCondition > 0.999 && plIvenHoffmann.fFresh > 0.999) {
-        ckcore.tl.writeLog(plIvenHoffmann.sName + " C/F/M: " + plIvenHoffmann.fCondition.ToString("0.0%") + "/" + plIvenHoffmann.fFresh.ToString("0.0%") + "/" + plIvenHoffmann.fMoral.ToString("0.0%"), ckcore.sErrorFile);
+        ckcore.tl.writeLog(plIvenHoffmann.sName + " C/F/M: " + plIvenHoffmann.fCondition.ToString("0.0%") + "/" + plIvenHoffmann.fFresh.ToString("0.0%") + "/" + plIvenHoffmann.fMoral.ToString("0.0%"), CornerkickManager.Main.sErrorFile);
       }
 
       // Beginn of new season
@@ -635,7 +635,7 @@ namespace CornerkickWebMvc
       // Don't save if calendar to fast
       if (timerCkCalender.Interval < 10000 && !bForce) return;
 
-      string sHomeDir = ckcore.sHomeDir;
+      string sHomeDir = CornerkickManager.Main.sHomeDir;
       if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = getHomeDir();
 
 #if DEBUG
@@ -652,7 +652,7 @@ namespace CornerkickWebMvc
         sHomeDir = "D:\\home\\site\\wwwroot";
 #endif
       } catch {
-        ckcore.tl.writeLog("save: unable to create sHomeDir from Server.MapPath", ckcore.sErrorFile);
+        ckcore.tl.writeLog("save: unable to create sHomeDir from Server.MapPath", CornerkickManager.Main.sErrorFile);
 #if _DEPLOY_ON_AZURE
         sHomeDir = "D:\\home\\site\\wwwroot";
 #endif
@@ -683,7 +683,7 @@ namespace CornerkickWebMvc
       try {
         bSaveOk = ckcore.io.save(sFileSave2);
       } catch {
-        ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, ckcore.sErrorFile);
+        ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, CornerkickManager.Main.sErrorFile);
       }
 
       // Upload save
@@ -760,7 +760,7 @@ namespace CornerkickWebMvc
           ckcore.tl.writeLog("ERROR: could not upload log.zip file to blob", ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
-          ckcore.tl.writeLog("ERROR: could not upload log.zip file to amazon s3", ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: could not upload log.zip file to amazon s3", CornerkickManager.Main.sErrorFile);
 #endif
         }
 #endif
@@ -826,7 +826,7 @@ namespace CornerkickWebMvc
         try {
           as3.downloadFile(sFilenameSave, sFileLoad);
         } catch {
-          ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to: " + sFileLoad, ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: Unable to download file " + sFilenameSave + " to: " + sFileLoad, CornerkickManager.Main.sErrorFile);
         }
         /*
         if (Directory.Exists(sHomeDir + "save")) {
@@ -925,7 +925,7 @@ namespace CornerkickWebMvc
         try {
           Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, "save/games/", sHomeDir, ".ckgx"));
         } catch {
-          ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
+          ckcore.tl.writeLog("ERROR: Unable to download games", CornerkickManager.Main.sErrorFile);
         }
 
         // Download archive cups
@@ -940,7 +940,7 @@ namespace CornerkickWebMvc
           try {
             Task<bool> tkDownloadCups = Task.Run(async () => await downloadFileAsync(as3, sCupKey, Path.Combine(sCupDir, "Cup")));
           } catch {
-            ckcore.tl.writeLog("ERROR: Unable to download games", ckcore.sErrorFile);
+            ckcore.tl.writeLog("ERROR: Unable to download games", CornerkickManager.Main.sErrorFile);
           }
         }
 
