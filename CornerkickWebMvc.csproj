@@ -332,6 +332,7 @@
     <Compile Include="Models\UserManualModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\ViewGameModel.cs" />
+    <Compile Include="Models\WishListModel.cs" />
     <Compile Include="MySqlConfiguration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="MySqlInitializer.cs" />
@@ -970,6 +971,7 @@
     <Content Include="App_Data\Resources\news.json" />
     <Content Include="App_Data\Resources\sponsor.json" />
     <Content Include="Views\Member\Contracts.cshtml" />
+    <Content Include="Views\Member\WishList.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1056,6 +1058,7 @@
   <ItemGroup>
     <Folder Include="App_Data\mail\" />
     <Folder Include="App_Data\save\games\" />
+    <Folder Include="App_Data\wishlist\" />
     <Folder Include="Views\MemberPages\" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,220 @@
+﻿@model CornerkickWebMvc.Models.WishListModel
+
+@{
+  ViewBag.Title = "Wunschliste";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+
+  <title>Wunschliste</title>
+
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+
+  <style media="screen" type="text/css">
+    tr.details-control td.symbol {
+      background: url('/Content/Icons/plus.png') no-repeat center center;
+      cursor: pointer;
+    }
+
+    tr.shown td.symbol {
+      background: url('/Content/Icons/minus.png') no-repeat center center;
+      cursor: pointer;
+    }
+  </style>
+
+  <script>
+    var jTable;
+
+    $(document).ready(function () {
+      jTable = setWishes();
+
+      $('#tableWishList tbody').on('click', 'tr', function () {
+        bnVoteWish = document.getElementById("bnVoteWish");
+        bnVoteWish.disabled = true;
+
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+        } else {
+          jTable.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+
+          var data = jTable.row('.selected').data();
+          if (data) {
+            bnVoteWish.disabled = false;
+          }
+        }
+      });
+
+      // Add event listener for opening and closing details
+      $('#tableWishList tbody').on('click', 'tr.details-control td.symbol', function () {
+        var tr = $(this).closest('tr');
+        var row = jTable.row(tr);
+
+        if (row.child.isShown()) {
+          // This row is already open - close it
+          row.child.hide();
+          tr.removeClass('shown');
+        } else {
+          // Open this row
+          data = row.data();
+          if (data) {
+            row.child(data.sDesc).show();
+            tr.addClass('shown');
+          }
+        }
+      });
+    });
+
+    function setWishes() {
+      return $('#tableWishList').DataTable({
+        "ajax": {
+          "url": '@Url.Action("WishListGetWishes", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": null },
+          { "data": "iIx" },
+          { "data": "sTitle" },
+          { "data": "sDesc" },
+          { "data": "sOwner" },
+          { "data": "sDate" },
+          { "data": "iVotes" },
+          { "data": "iComplexity" },
+          { "data": "fRank" }
+        ],
+        "paging": false,
+        "info": false,
+        "searching": false,
+        "responsive": true,
+        "order": [[1, "asc"]],
+        "language": {
+          "emptyTable": "Keine Wünsche"
+        },
+        "columnDefs": [
+          {
+            "targets": 0,
+            "className": "symbol",
+            "orderable": false,
+            "data": null,
+            "defaultContent": '',
+            "searchable": false
+          },
+          {
+            "targets": [4, 5, 6, 7, 8],
+            "className": "dt-center"
+          },
+          {
+            "targets": 2,
+            "className": "dt-left"
+          },
+          {
+            "targets": 3,
+            "visible": false,
+            "searchable": false
+          },
+          {
+            "targets": 1,
+            "className": "dt-right"
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          $(nRow).addClass('details-control');
+        },
+      });
+    }
+
+    function addWish() {
+      iptNewWishTitle = document.getElementById("iptNewWishTitle");
+      iptNewWishDesc  = document.getElementById("iptNewWishDesc");
+
+      $.ajax({
+        url: '/Member/WishListAddWish',
+        type: "GET",
+        dataType: "JSON",
+        data: { sTitle: iptNewWishTitle.value, sDesc: iptNewWishDesc.value },
+        success: function () {
+          jTable.ajax.reload();
+        },
+        error: function (xhr) {
+          alert(xhr.responseText);
+        }
+      });
+    }
+
+    function voteForWish() {
+      bnVoteWish = document.getElementById("bnVoteWish");
+      bnVoteWish.disabled = true;
+
+      var data = jTable.row('.selected').data();
+
+      if (data) {
+        $.ajax({
+          url: '/Member/WishListVoteWish',
+          type: "GET",
+          dataType: "JSON",
+          data: { iWishIx: data.iIx },
+          success: function () {
+            jTable.ajax.reload();
+          },
+          error: function (xhr) {
+            alert(xhr.responseText);
+          }
+        });
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <h3>Cornerkick Wunschliste</h3>
+
+  <div id="divTableWishList" style="position: relative; left: 0px; width: auto">
+    <table id="tableWishList" style="position: relative; margin: 0px; width: auto" class="display responsive nowrap">
+      <thead>
+        <tr>
+          <th></th>
+          <th>#</th>
+          <th>Title</th>
+          <th>Beschreibung</th>
+          <th>Owner</th>
+          <th>Datum</th>
+          <th>Votes</th>
+          <th>Komplexität</th>
+          <th>Faktor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+    </table>
+    <button class="btn btn-default" id="bnVoteWish" style="width: 100%; margin-top: 4px" type="submit" onclick="voteForWish()" disabled="disabled">Wunsch favorisieren</button>
+  </div>
+
+  <h4 style="margin-top: 40px">Neuen Wunsch hinzufügen</h4>
+  <div>
+    <label style="width: 100%">
+      Titel:
+      <input class="form-control" id="iptNewWishTitle" type="text" style="width: 100%; min-width: 100%">
+    </label>
+
+    <label style="width: 100%">
+      Beschreibung:
+      <input class="form-control" id="iptNewWishDesc" type="text" style="width: 100%; min-width: 100%">
+    </label>
+
+    <button class="btn btn-default" id="bnAddWish" style="width: 100%; margin-top: 4px" type="submit" onclick="addWish()">Wunsch hinzufügen</button>
+  </div>
+</body>
+</html>

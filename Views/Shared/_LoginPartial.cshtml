@@ -6,7 +6,7 @@
 
     <ul class="nav navbar-nav navbar-right">
         <li>
-            @Html.ActionLink("Hallo " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            @Html.ActionLink(User.Identity.GetUserName(), "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
         </li>
         <li><a href="javascript:document.getElementById('logoutForm').submit()">Abmelden</a></li>
     </ul>
@@ -22,5 +22,8 @@ else
 
 <ul class="nav navbar-nav navbar-right">
   <li>@Html.ActionLink("Hilfe", "UserManual", "Home")</li>
+  @if (Request.IsAuthenticated) {
+    <li>@Html.ActionLink("Wunschliste", "Wishlist", "Member")</li>
+  }
   <li>@Html.ActionLink("Kontakt", "Contact", "Home")</li>
 </ul>
