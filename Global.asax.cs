@@ -951,7 +951,7 @@ namespace CornerkickWebMvc
         Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
 
         // Download wishlist
-        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist")));
+        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist", "wishlist.json")));
 #endif
 #endif
 
