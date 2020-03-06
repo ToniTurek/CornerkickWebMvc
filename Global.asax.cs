@@ -924,12 +924,11 @@ namespace CornerkickWebMvc
         // Download emblems
         Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, "emblems/", sHomeDir + "/../Content/Uploads/", ".png"));
 
-        // Download archive games
-        try {
-          Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, "save/games/", sHomeDir, ".ckgx"));
-        } catch {
-          ckcore.tl.writeLog("ERROR: Unable to download games", CornerkickManager.Main.sErrorFile);
-        }
+        // Download mails
+        Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
+
+        // Download wishlist
+        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist", "wishlist.json")));
 
         // Download archive cups
         if (!System.IO.Directory.Exists(Path.Combine(sHomeDir, "archive"))) System.IO.Directory.CreateDirectory(Path.Combine(sHomeDir, "archive"));
@@ -947,11 +946,12 @@ namespace CornerkickWebMvc
           }
         }
 
-        // Download mails
-        Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
-
-        // Download wishlist
-        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist", "wishlist.json")));
+        // Download archive games
+        try {
+          Task<bool> tkDownloadGames = Task.Run(async () => await downloadFilesAsync(as3, "save/games/", sHomeDir, ".ckgx"));
+        } catch {
+          ckcore.tl.writeLog("ERROR: Unable to download games", CornerkickManager.Main.sErrorFile);
+        }
 #endif
 #endif
 
