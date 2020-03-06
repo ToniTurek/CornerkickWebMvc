@@ -167,5 +167,61 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
+    public ContentResult UmGetPlayerStepsFreshLoss(int iSpeed, int iAcceleration, int iStepsLast, string sFreshStart, string sCondition, string sForm, string sTcPower)
+    {
+      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
+
+      float fTcPower = 0.0f;
+      if (!float.TryParse(sTcPower, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out fTcPower)) return null;
+
+      // Create player
+      CornerkickGame.Player pl = new CornerkickGame.Player();
+      if (!float.TryParse(sCondition,  System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out pl.fCondition)) return null;
+      if (!float.TryParse(sForm,       System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out pl.fForm))      return null;
+      if (!float.TryParse(sFreshStart, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out pl.fFresh))     return null;
+      pl.iSkill[ 0] = (byte)iSpeed;
+      pl.iSkill[16] = (byte)iAcceleration;
+      pl.fMoral = 1.0f;
+      pl.fExperiencePos[10] = 1f;
+
+      CornerkickGame.Tool.setPlayerSteps(pl, 11, 0);
+      pl.iStepsCurr = 0;
+      pl.iStepsLast = (byte)iStepsLast;
+
+      // Create player with no acceleration effect
+      CornerkickGame.Player plNoAcc = pl.Clone();
+      plNoAcc.iStepsLast = (byte)iSpeed;
+
+      // Initialize dataPoints list
+      for (byte j = 0; j < dataPoints.Length; j++) dataPoints[j] = new List<Models.DataPointGeneral>();
+
+      float[] fFreshLoss = new float[2];
+      // For all steps ...
+      byte iS = 0;
+      while (pl.fSteps > 0) {
+        // ... add fresh
+        dataPoints[0].Add(new Models.DataPointGeneral(iS, pl     .fFresh));
+        dataPoints[1].Add(new Models.DataPointGeneral(iS, plNoAcc.fFresh));
+        dataPoints[2].Add(new Models.DataPointGeneral(iS, CornerkickGame.AI.getFreshPlayerMoveLimit(pl.fSteps, fTcPower)));
+
+        pl     .fSteps -= 1f;
+        plNoAcc.fSteps -= 1f;
+
+        pl     .iStepsCurr++;
+        plNoAcc.iStepsCurr++;
+
+        // Reduce fresh
+        float fAcceleration = CornerkickGame.Tool.getSkillEff(pl, 16, 11);
+        pl     .fFresh -= CornerkickGame.Tool.getFreshLoss(pl,      15, fAcceleration);
+        plNoAcc.fFresh -= CornerkickGame.Tool.getFreshLoss(plNoAcc, 15, fAcceleration);
+
+        iS++;
+      }
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
   }
 }

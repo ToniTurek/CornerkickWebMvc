@@ -81,6 +81,7 @@
       });
 
       plotPlayerTraining();
+      plotPlayerStepsFreshLoss();
     });
 
     function plotPlayerTraining() {
@@ -133,6 +134,85 @@
                 legendText: "Moral",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[2]
+              }
+            ]
+          });
+
+          chartPlayerTraining.render();
+        }
+      });
+    }
+
+    function plotPlayerStepsFreshLoss() {
+      var iSpeed = $("#ddlStepsSpeed").val();
+      var iAcceleration = $("#ddlStepsAcceleration").val();
+      var iStepsLast = $("#ddlStepsLastSteps").val();
+      var sFresh = document.getElementById('iptFresh').value;
+      var sCondition = document.getElementById('iptCondition').value;
+      var sForm = document.getElementById('iptForm').value;
+      var sTcPower = document.getElementById('iptTcPower').value;
+
+      var fFreshMin = parseFloat(sFresh) - 0.010;
+      var fFreshMax = parseFloat(sFresh) + 0.002;
+
+      $.ajax({
+        type: 'post',
+        url: '/Home/UmGetPlayerStepsFreshLoss',
+        dataType: "json",
+        data: { iSpeed: iSpeed, iAcceleration: iAcceleration, iStepsLast: iStepsLast, sFreshStart: sFresh, sCondition: sCondition, sForm: sForm, sTcPower: sTcPower },
+        success: function (dataSteps) {
+          var chartPlayerTraining = new CanvasJS.Chart("divChartPlayerStepsFreshLoss", {
+            animationEnabled: false,
+            theme: "theme2",//theme1
+            axisX: {
+              gridThickness: 1,
+              title: "Schritte",
+              interval: 1
+            },
+            axisY: {
+              valueFormatString: "0.0%",
+              title: "Frische",
+              minimum: fFreshMin,
+              maximum: fFreshMax,
+              includeZero: false
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                color: "blue",
+                showInLegend: true,
+                legendText: "Frische",
+                yValueFormatString: "0.000%",
+                dataPoints: dataSteps[0]
+              },
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                color: "blue",
+                lineThickness: 1,
+                lineDashType: "dash",
+                markerType: "none",
+                showInLegend: true,
+                legendText: "Frische ohne Antrittsverlust",
+                yValueFormatString: "0.000%",
+                dataPoints: dataSteps[1]
+              },
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                color: "red",
+                lineDashType: "dash",
+                markerType: "none",
+                showInLegend: true,
+                legendText: "Limit",
+                yValueFormatString: "0.000%",
+                dataPoints: dataSteps[2]
               }
             ]
           });
@@ -290,7 +370,7 @@ Folgende taktische Einstellungen stehen zur Verfügung:
   </li>
   <li>
     <u>Einsatz</u><div id="uTacticPower" class="ckLinkLarge"></div>
-    Bei hohem Einsatz legen die Spieler mehr Schritte pro Runde zurück. Je mehr sich die Anzahl der zurück gelegten Schritte der maximal möglichen Schrittzahl annähert, desto mehr Frische wird verbraucht.
+    Bei hohem Einsatz legen die Spieler mehr Schritte pro Runde zurück. Je mehr sich die Anzahl der zurück gelegten Schritte der maximal möglichen Schrittzahl annähert, desto mehr Frische wird verbraucht (s. <a href="#h4FreshLoss">Frischeverlust im Spiel</a>).
   </li>
   <li>
     <u>Aggresivität</u><br />
@@ -450,22 +530,22 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
 <h4>Kondition/Frische/Moral</h4>
 Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leichter Kondition auf, ältere schwerer. Ein besserer Konditionstrainer/Masseur sowie Trainingslager und Doping können das Training beeinflussen.
 <p>In der folgenden Graphik können diese Faktoren am Beispiel eines Spielers ausprobiert werden.</p>
-<div style="position: relative; width: 100%; margin-top: 10px; margin-bottom: 10px">
-  <div style="position: relative; margin-bottom: 6px; float: left">
+<div style="position: relative; width: 100%; height: 380px; margin-top: 10px; margin-bottom: 10px">
+  <div id="divChartPlayerTraining" style="position: absolute; height: 100%; width: 80%"></div>
+  <div style="position: absolute; right: 0px">
     <label>Training:</label>
-    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ddlTraining, "Value", "Text", 2), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "selectPlayerTrainingType", style = "width: 20%; min-width: 120px" })
+    @Html.DropDownListFor(m => m.sTraining, new SelectList(Model.ddlTraining, "Value", "Text", 2), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "selectPlayerTrainingType", style = "width: 110px" })
     <label>Konditionstrainer:</label>
-    @Html.DropDownListFor(m => m.sPlayerTrainingCoachCondi, new SelectList(Model.ddlPlayerTrainingCoachCondi, "Value", "Text", 5), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCoachCondi", @style = "width: 120px" })
+    @Html.DropDownListFor(m => m.sPlayerTrainingCoachCondi, new SelectList(Model.ddlPlayerTrainingCoachCondi, "Value", "Text", 5), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCoachCondi", @style = "width: 110px" })
     <label>Masseur:</label>
-    @Html.DropDownListFor(m => m.sPlayerTrainingCoachPhysio, new SelectList(Model.ddlPlayerTrainingCoachPhysio, "Value", "Text", 5), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCoachPhysio", @style = "width: 120px" })
+    @Html.DropDownListFor(m => m.sPlayerTrainingCoachPhysio, new SelectList(Model.ddlPlayerTrainingCoachPhysio, "Value", "Text", 5), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCoachPhysio", @style = "width: 110px" })
     <label>Trainingslager:</label>
-    @Html.DropDownListFor(m => m.sPlayerTrainingCamp, new SelectList(Model.ddlPlayerTrainingCamp, "Value", "Text", -1), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCamp", @style = "width: 120px" })
+    @Html.DropDownListFor(m => m.sPlayerTrainingCamp, new SelectList(Model.ddlPlayerTrainingCamp, "Value", "Text", -1), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingCamp", @style = "width: 110px" })
     <label>Doping:</label>
-    @Html.DropDownListFor(m => m.sPlayerTrainingDoping, new SelectList(Model.ddlPlayerTrainingDoping, "Value", "Text", -1), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingDoping", @style = "width: 120px" })
+    @Html.DropDownListFor(m => m.sPlayerTrainingDoping, new SelectList(Model.ddlPlayerTrainingDoping, "Value", "Text", -1), new { @class = "form-control", @onchange = "plotPlayerTraining()", id = "ddlPlayerTrainingDoping", @style = "width: 110px" })
     <label>Alter Spieler:</label>
-    <input class="form-control" style="width: 120px" id="inputAge" onchange="plotPlayerTraining()" type="number" value="25">
+    <input class="form-control" style="width: 110px" id="inputAge" onkeyup="plotPlayerTraining()" type="number" value="25">
   </div>
-  <div id="divChartPlayerTraining" style="position: relative; height: 380px; width: 80%; min-width: 320px; float: left"></div>
 </div>
 
 <div style="float: left">
@@ -484,10 +564,34 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       <u>Frische</u><div id="uPlayerFresh" class="ckLinkLarge"></div>
-      Je größer die Frische des Spielers, desto mehr Strecke kann er zurücklegen.<br />
+      Je größer die Frische des Spielers, desto mehr Schritte kann er zurücklegen.<br />
       Der Frischebereich liegt zwischen 10 < Frische < 100.
     </li>
   </ul>
+
+  <div id="h4FreshLoss" class="ckLink"></div>
+  <h4>Frischeverlust im Spiel</h4>
+  Folgende Graphik veranschaulicht, wie sich die Frische eines Spielers pro Schritt abhängig von den bereits zurückgelegten Schritten innerhalb der aktuellen Runde, der Schnelligkeit, des Antritts (in Kombination mit den zurückgelegten Schritten der vorherigen Runde), der Tagesform und der Kondition des Spielers verringert.<br />
+  Die rote Linie markiert die Grenze bis zu der der Spieler Schritte durchführt, d.h der nächste ganzzahlige Wert links der Linie entspricht der Anzahl der Schritte des Spielers in der Runde. Das Limit kann mit Hilfe der Taktikeinstellung "<a href="#uTacticPower">Einsatz</a>" verschoben werden.
+  <div style="position: relative; width: 100%; height: 440px; margin-top: 10px; margin-bottom: 10px">
+    <div id="divChartPlayerStepsFreshLoss" style="position: absolute; height: 100%; width: 80%"></div>
+    <div style="position: absolute; right: 0px">
+      <label>Schnelligkeit:</label>
+      @Html.DropDownListFor(m => m.sStepsSpeed, new SelectList(Model.ddlStepsSpeed, "Value", "Text", 6), new { @class = "form-control", @onchange = "plotPlayerStepsFreshLoss()", id = "ddlStepsSpeed", @style = "width: 80px" })
+      <label>Antritt:</label>
+      @Html.DropDownListFor(m => m.sStepsAcceleration, new SelectList(Model.ddlStepsAcceleration, "Value", "Text", 6), new { @class = "form-control", @onchange = "plotPlayerStepsFreshLoss()", id = "ddlStepsAcceleration", @style = "width: 80px" })
+      <label>Letzte Schritte:</label>
+      @Html.DropDownListFor(m => m.sStepsLastSteps, new SelectList(Model.ddlStepsLastSteps, "Value", "Text", 0), new { @class = "form-control", @onchange = "plotPlayerStepsFreshLoss()", id = "ddlStepsLastSteps", @style = "width: 80px" })
+      <label>Frische (Start):</label>
+      <input class="form-control" style="width: 80px" id="iptFresh" onkeyup="plotPlayerStepsFreshLoss()" type="number" value="0.99">
+      <label>Kondition:</label>
+      <input class="form-control" style="width: 80px" id="iptCondition" onkeyup="plotPlayerStepsFreshLoss()" type="number" value="0.9">
+      <label>Form:</label>
+      <input class="form-control" style="width: 80px" id="iptForm" onkeyup="plotPlayerStepsFreshLoss()" type="number" value="1.0">
+      <label>Taktik Einsatz:</label>
+      <input class="form-control" style="width: 80px" id="iptTcPower" onkeyup="plotPlayerStepsFreshLoss()" type="number" value="0.0">
+    </div>
+  </div>
 
   <h3>Soft-skills</h3>
   <ul>
@@ -519,11 +623,11 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   <ul>
     <li>
       <u>Schnelligkeit</u><br />
-      Der Wert der Schnelligkeit eines Spielers gibt die maximale Anzahl von Schritten pro Spielzug an. Der Wert wird im Spiel reduziert durch die aktuelle Frische des Spielers, die Taktikeinstellung <a href="#uTacticPower">Einsatz</a> sowie das Führen des Balles abhängig von der <a href="#uPlayerSkillsTechnic">Technik</a> des Spielers.
+      Der Wert der Schnelligkeit eines Spielers gibt die maximale Anzahl von Schritten pro Spielzug an. Der Wert wird im Spiel reduziert durch die aktuelle Frische des Spielers, die Taktikeinstellung <a href="#uTacticPower">Einsatz</a> sowie das Führen des Balles abhängig von der <a href="#uPlayerSkillsTechnic">Technik</a> des Spielers (s. <a href="#h4FreshLoss">Frischeverlust im Spiel</a>).
     </li>
     <li>
       <u>Antritt</u><br />
-      Je höher der Antritt eines Spielers, desto geringer ist der zusätzliche Frischeverlust bei Schritten die in der letzten Runde nicht gemacht wurden.
+      Je höher der Antritt eines Spielers, desto geringer ist der zusätzliche Frischeverlust bei Schritten die in der letzten Runde nicht gemacht wurden (s. <a href="#h4FreshLoss">Frischeverlust im Spiel</a>).
     </li>
     <li>
       <u>Technik</u><div id="uPlayerSkillsTechnic" class="ckLinkLarge"></div>

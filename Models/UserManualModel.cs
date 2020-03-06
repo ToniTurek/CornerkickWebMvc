@@ -16,6 +16,7 @@ namespace CornerkickWebMvc.Models
     public string sAfWc { get; set; }
     public string sAfTg { get; set; }
 
+    // Chart training CFM
     public string sTraining { get; set; }
     public List<SelectListItem> ddlTraining { get; set; }
 
@@ -31,8 +32,19 @@ namespace CornerkickWebMvc.Models
     public string sPlayerTrainingDoping { get; set; }
     public List<SelectListItem> ddlPlayerTrainingDoping { get; set; }
 
+    // Chart player steps fresh loss
+    public string sStepsSpeed { get; set; }
+    public List<SelectListItem> ddlStepsSpeed { get; set; }
+
+    public string sStepsAcceleration { get; set; }
+    public List<SelectListItem> ddlStepsAcceleration { get; set; }
+
+    public string sStepsLastSteps { get; set; }
+    public List<SelectListItem> ddlStepsLastSteps { get; set; }
+
     public UserManualModel()
     {
+      // Chart training CFM
       ddlTraining = new List<SelectListItem>();
       for (byte i = 0; i < CornerkickManager.Main.sTraining.Length; i++) {
         ddlTraining.Add(
@@ -60,6 +72,16 @@ namespace CornerkickWebMvc.Models
       ddlPlayerTrainingDoping = new List<SelectListItem>();
       ddlPlayerTrainingDoping.Add(new SelectListItem { Text = "-", Value = "-1" });
       for (byte i = 0; i < MvcApplication.ckcore.ltDoping.Count; i++) ddlPlayerTrainingDoping.Add(new SelectListItem { Text = MvcApplication.ckcore.ltDoping[i].sName, Value = i.ToString() });
+
+      // Chart player steps fresh loss
+      ddlStepsSpeed = new List<SelectListItem>();
+      for (byte i = 4; i < 11; i++) ddlStepsSpeed.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString() });
+
+      ddlStepsAcceleration = new List<SelectListItem>();
+      for (byte i = 4; i < 11; i++) ddlStepsAcceleration.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString() });
+
+      ddlStepsLastSteps = new List<SelectListItem>();
+      for (byte i = 0; i < 9; i++) ddlStepsLastSteps.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString() });
     }
 
   }
