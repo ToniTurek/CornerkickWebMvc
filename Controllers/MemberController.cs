@@ -376,7 +376,7 @@ namespace CornerkickWebMvc.Controllers
 
               if (nPartFirstRound > 0) {
                 int nRound = cup.getKoRound(nPartFirstRound);
-                int iMdClub = MvcApplication.ckcore.tl.getMatchdays(cup, club);
+                int iMdClub = Math.Max(MvcApplication.ckcore.tl.getMatchdays(cup, club), 0);
                 int iMdCurr = CornerkickManager.Tool.getMatchday(cup, MvcApplication.ckcore.dtDatum); // Current matchday
 
                 string sCupRound = "";
