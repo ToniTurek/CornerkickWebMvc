@@ -4206,9 +4206,17 @@ namespace CornerkickWebMvc.Controllers
 
       List<Models.DataPointGeneral> ltDataPoints = new List<Models.DataPointGeneral>();
 
-      for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
-        ltDataPoints.Add(new Models.DataPointGeneral(iS, CornerkickManager.Tool.getLeaguePlace(getCup(iS, 1, clb.iLand, clb.iDivision), clb)));
+      // Get league
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, clb.iLand, clb.iDivision);
+
+      // Add past league places
+      CornerkickManager.Main.Success sucLge = CornerkickManager.Tool.getSuccess(clb, league);
+      for (int iS = 0; iS < sucLge.ltCupPlace.Count; iS++) {
+        ltDataPoints.Add(new Models.DataPointGeneral(iS + 1, sucLge.ltCupPlace[iS]));
       }
+
+      // Add current league place
+      ltDataPoints.Add(new Models.DataPointGeneral(MvcApplication.ckcore.iSeason, CornerkickManager.Tool.getLeaguePlace(league, clb)));
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
@@ -4348,7 +4356,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(iMd, JsonRequestBehavior.AllowGet);
     }
 
-    private CornerkickManager.Cup getCup(int iSeason, int iType, int iLand = -1, int iDivision = -1)
+    internal static CornerkickManager.Cup getCup(int iSeason, int iType, int iLand = -1, int iDivision = -1)
     {
       CornerkickManager.Cup cup = null;
 

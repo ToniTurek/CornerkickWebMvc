@@ -30,9 +30,6 @@
           var chartDev = new CanvasJS.Chart("divChartPlaceHistory", {
             animationEnabled: true,
             theme: "theme2",//theme1
-            title: {
-              text: "Tabellenplatzentwicklung"
-            },
             axisX: {
               title: "Saison",
               interval: 1,
@@ -115,6 +112,7 @@
       }
     </div>
 
+    <h4>Allgemeines</h4>
     <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
       <table cellpadding="3" style="width: auto">
         <tbody>
@@ -284,7 +282,8 @@
       </div>
     }
 
-    <div id="divChartPlaceHistory" style="position: relative; height: 400px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
+    <h4>Tabellenplatzentwicklung</h4>
+    <div id="divChartPlaceHistory" style="position: relative; height: 400px; width: 100%; margin-bottom: 10px; float: left"></div>
   </div>
 </body>
 </html>
