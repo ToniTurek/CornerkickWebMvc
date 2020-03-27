@@ -6195,18 +6195,23 @@ namespace CornerkickWebMvc.Controllers
       Models.WishListModel.ltWish[iWishIx - 1].votes.Add(user.id);
 
       // Recalculate ranking
-      for (int iW = 0; iW < Models.WishListModel.ltWish.Count; iW++) {
-        Models.WishListModel.Wish wish = Models.WishListModel.ltWish[iW];
+      calculateWishRating(Models.WishListModel.ltWish);
+
+      writeWishesToJsonFile(Models.WishListModel.ltWish);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    private void calculateWishRating(List<Models.WishListModel.Wish> ltWish)
+    {
+      for (int iW = 0; iW < ltWish.Count; iW++) {
+        Models.WishListModel.Wish wish = ltWish[iW];
 
         if (wish.votes == null) wish.votes = new List<string>();
 
         if (wish.complexity <= 0.1) wish.ranking = 0f;
         else                        wish.ranking = wish.votes.Count / (float)wish.complexity;
       }
-
-      writeWishesToJsonFile(Models.WishListModel.ltWish);
-
-      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     private void writeWishesToJsonFile(List<Models.WishListModel.Wish> ltWish)
@@ -6226,16 +6231,17 @@ namespace CornerkickWebMvc.Controllers
       if (iWishIx > Models.WishListModel.ltWish.Count) return Json("Error", JsonRequestBehavior.AllowGet);
 
       int iComplex = -1;
-      int.TryParse(sComplexity, out iComplex);
+      if (!string.IsNullOrEmpty(sComplexity)) int  .TryParse(sComplexity, out iComplex);
 
       float fProgress = -1f;
-      float.TryParse(sProgress, out fProgress);
+      if (!string.IsNullOrEmpty(sProgress))   float.TryParse(sProgress,   out fProgress);
 
       if (iComplex  >= 0) Models.WishListModel.ltWish[iWishIx - 1].complexity = iComplex;
       if (fProgress >= 0) Models.WishListModel.ltWish[iWishIx - 1].progress   = fProgress;
       if (!string.IsNullOrEmpty(sVer))     Models.WishListModel.ltWish[iWishIx - 1].version = sVer;
       if (!string.IsNullOrEmpty(sDateRel)) Models.WishListModel.ltWish[iWishIx - 1].dateRel = sDateRel;
 
+      calculateWishRating  (Models.WishListModel.ltWish);
       writeWishesToJsonFile(Models.WishListModel.ltWish);
 
       return Json(true, JsonRequestBehavior.AllowGet);
