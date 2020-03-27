@@ -15,9 +15,24 @@
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
   <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
   <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
-  <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+
+  <style>
+    .myPb {
+      width: 100%;
+      height: 14px;
+      background-color: lime;
+      text-align: center; /* To center it horizontally (if you want) */
+      line-height: 14px; /* To center it vertically */
+      color: black;
+      text-shadow: 1px 1px 0 #DCDCDC;
+      -webkit-border-radius: 3px;
+    }
+  </style>
 
   <style media="screen" type="text/css">
     tr.details-control td.symbol {
@@ -92,7 +107,9 @@
           { "data": "sDate" },
           { "data": "iVotes" },
           { "data": "iComplexity" },
-          { "data": "fRank" }
+          { "data": "fRank" },
+          { "data": "fProgress" },
+          { "data": "sVerRelease" }
         ],
         "paging": false,
         "info": false,
@@ -112,7 +129,7 @@
             "searchable": false
           },
           {
-            "targets": [4, 5, 6, 7, 8],
+            "targets": [4, 5, 6, 7, 8, 9, 10],
             "className": "dt-center"
           },
           {
@@ -131,7 +148,31 @@
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
           $(nRow).addClass('details-control');
-        },
+
+          var divPb = document.createElement("div");
+          divPb.style.position = "relative";
+          divPb.style.top = "0px";
+          divPb.style.left = "0px";
+          divPb.style.width = "100%";
+          divPb.style.backgroundColor = "white";
+          divPb.style.webkitBorderRadius = "3px";
+
+          if (aData.fProgress > 0) {
+            var divPb1 = document.createElement("div");
+            divPb1.className = "myPb";
+            var fProgress = aData.fProgress * 100;
+            divPb1.style.width = fProgress.toString() + '%';
+            divPb1.innerHTML = fProgress.toFixed(0) + '%';
+            divPb.appendChild(divPb1);
+
+            /* Turn the fifth row -- progress -- into a progressbar with jQuery UI styling */
+            $('td:eq(8)', nRow).html(divPb);
+          } else {
+            $('td:eq(8)', nRow).html('-');
+          }
+
+          return nRow;
+        }
       });
     }
 
@@ -146,6 +187,7 @@
         data: { sTitle: iptNewWishTitle.value, sDesc: iptNewWishDesc.value },
         success: function () {
           jTable.ajax.reload();
+          iptNewWishTitle.text = "";
         },
         error: function (xhr) {
           alert(xhr.responseText);
@@ -174,6 +216,30 @@
         });
       }
     }
+
+    function updateWish() {
+      var data = jTable.row('.selected').data();
+
+      if (data) {
+        iptSetWishComplexity     = document.getElementById("iptSetWishComplexity");
+        iptSetWishProgress       = document.getElementById("iptSetWishProgress");
+        iptSetWishVersionRelease = document.getElementById("iptSetWishVersionRelease");
+        iptSetWishVersionDate    = document.getElementById("iptSetWishVersionDate");
+
+        $.ajax({
+          url: '/Member/WishListUpdateWish',
+          type: "GET",
+          dataType: "JSON",
+          data: { iWishIx: data.iIx, sComplexity: iptSetWishComplexity.value, sProgress: iptSetWishProgress.value, sVer: iptSetWishVersionRelease.value, sDateRel: iptSetWishVersionDate.value },
+          success: function () {
+            jTable.ajax.reload();
+          },
+          error: function (xhr) {
+            alert(xhr.responseText);
+          }
+        });
+      }
+    }
   </script>
 </head>
 
@@ -193,6 +259,8 @@
           <th>Votes</th>
           <th>Komplexität</th>
           <th>Faktor</th>
+          <th>Fortschritt</th>
+          <th>Version</th>
         </tr>
       </thead>
       <tbody>
@@ -216,5 +284,32 @@
 
     <button class="btn btn-default" id="bnAddWish" style="width: 100%; margin-top: 4px" type="submit" onclick="addWish()">Wunsch hinzufügen</button>
   </div>
+
+  @if (Model.bAdmin) {
+    <h4 style="margin-top: 40px">Admin</h4>
+    <div>
+      <label style="width: 100%">
+        Complexity:
+        <input class="form-control" id="iptSetWishComplexity" type="text" style="width: 100%; min-width: 100%">
+      </label>
+
+      <label style="width: 100%">
+        Progress:
+        <input class="form-control" id="iptSetWishProgress" type="text" style="width: 100%; min-width: 100%">
+      </label>
+
+      <label style="width: 100%">
+        Release Version:
+        <input class="form-control" id="iptSetWishVersionRelease" type="text" style="width: 100%; min-width: 100%">
+      </label>
+
+      <label style="width: 100%">
+        Release Date:
+        <input class="form-control" id="iptSetWishVersionDate" type="text" style="width: 100%; min-width: 100%">
+      </label>
+
+      <button class="btn btn-default" id="bnUpdateWish" style="width: 100%; margin-top: 4px" type="submit" onclick="updateWish()">update</button>
+    </div>
+  }
 </body>
 </html>

@@ -6099,6 +6099,8 @@ namespace CornerkickWebMvc.Controllers
     {
       ViewBag.Message = "Cornerkick Wish-list";
 
+      mdWl.bAdmin = AccountController.checkUserIsAdmin(User.Identity.GetUserName());
+
       return View(mdWl);
     }
 
@@ -6111,7 +6113,9 @@ namespace CornerkickWebMvc.Controllers
       public int iComplexity { get; set; }
       public int iVotes { get; set; }
       public float fRank { get; set; }
+      public float fProgress { get; set; }
       public string sDate { get; set; }
+      public string sVerRelease { get; set; }
     }
     public JsonResult WishListGetWishes()
     {
@@ -6136,7 +6140,11 @@ namespace CornerkickWebMvc.Controllers
 
           if (Models.WishListModel.ltWish[iW].votes == null) Models.WishListModel.ltWish[iW].votes = new List<string>();
 
-          ltDtWish.Add(new DatatableWish() { iIx = iW + 1, sTitle = Models.WishListModel.ltWish[iW].title, sDesc = Models.WishListModel.ltWish[iW].description, sOwner = sUsername, iComplexity = Models.WishListModel.ltWish[iW].complexity, iVotes = Models.WishListModel.ltWish[iW].votes.Count, fRank = Models.WishListModel.ltWish[iW].ranking, sDate = dt.ToString("d", getCi()) });
+          string sVer = "-";
+          if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].version)) sVer = Models.WishListModel.ltWish[iW].version;
+          if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].dateRel)) sVer += " (" + DateTime.ParseExact(Models.WishListModel.ltWish[iW].dateRel, "yyyyMMddHHmm", CultureInfo.InvariantCulture) + ")";
+
+          ltDtWish.Add(new DatatableWish() { iIx = iW + 1, sTitle = Models.WishListModel.ltWish[iW].title, sDesc = Models.WishListModel.ltWish[iW].description, sOwner = sUsername, iComplexity = Models.WishListModel.ltWish[iW].complexity, iVotes = Models.WishListModel.ltWish[iW].votes.Count, fRank = Models.WishListModel.ltWish[iW].ranking, sDate = dt.ToString("d", getCi()), fProgress = Models.WishListModel.ltWish[iW].progress, sVerRelease = sVer });
         }
       }
 
@@ -6171,7 +6179,6 @@ namespace CornerkickWebMvc.Controllers
       if (user == null) return Json("Error", JsonRequestBehavior.AllowGet);
 
       if (Models.WishListModel.ltWish == null) return Json("Error", JsonRequestBehavior.AllowGet);
-
       if (iWishIx > Models.WishListModel.ltWish.Count) return Json("Error", JsonRequestBehavior.AllowGet);
 
       // Remove vote from all wishes
@@ -6192,7 +6199,9 @@ namespace CornerkickWebMvc.Controllers
         Models.WishListModel.Wish wish = Models.WishListModel.ltWish[iW];
 
         if (wish.votes == null) wish.votes = new List<string>();
-        wish.ranking = wish.votes.Count / (float)(wish.complexity + 1);
+
+        if (wish.complexity <= 0.1) wish.ranking = 0f;
+        else                        wish.ranking = wish.votes.Count / (float)wish.complexity;
       }
 
       writeWishesToJsonFile(Models.WishListModel.ltWish);
@@ -6209,6 +6218,27 @@ namespace CornerkickWebMvc.Controllers
       // Write string to file
       string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
       System.IO.File.WriteAllText(sFileWl, sJsonWishes);
+    }
+
+    public ActionResult WishListUpdateWish(int iWishIx, string sComplexity, string sProgress, string sVer, string sDateRel)
+    {
+      if (Models.WishListModel.ltWish == null) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (iWishIx > Models.WishListModel.ltWish.Count) return Json("Error", JsonRequestBehavior.AllowGet);
+
+      int iComplex = -1;
+      int.TryParse(sComplexity, out iComplex);
+
+      float fProgress = -1f;
+      float.TryParse(sProgress, out fProgress);
+
+      if (iComplex  >= 0) Models.WishListModel.ltWish[iWishIx - 1].complexity = iComplex;
+      if (fProgress >= 0) Models.WishListModel.ltWish[iWishIx - 1].progress   = fProgress;
+      if (!string.IsNullOrEmpty(sVer))     Models.WishListModel.ltWish[iWishIx - 1].version = sVer;
+      if (!string.IsNullOrEmpty(sDateRel)) Models.WishListModel.ltWish[iWishIx - 1].dateRel = sDateRel;
+
+      writeWishesToJsonFile(Models.WishListModel.ltWish);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////

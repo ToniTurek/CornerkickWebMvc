@@ -8,6 +8,7 @@ namespace CornerkickWebMvc.Models
   public class WishListModel
   {
     public static List<Wish> ltWish { get; set; }
+    public bool bAdmin { get; set; }
 
     public class WishJson
     {
@@ -22,6 +23,9 @@ namespace CornerkickWebMvc.Models
       public int complexity { get; set; }
       public List<string> votes { get; set; }
       public string date { get; set; }
+      public float progress { get; set; }
+      public string dateRel { get; set; } // Date of release
+      public string version { get; set; } // Version of release
     }
   }
 }
