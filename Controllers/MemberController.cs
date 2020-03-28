@@ -4211,8 +4211,10 @@ namespace CornerkickWebMvc.Controllers
 
       // Add past league places
       CornerkickManager.Main.Success sucLge = CornerkickManager.Tool.getSuccess(clb, league);
-      for (int iS = 0; iS < sucLge.ltCupPlace.Count; iS++) {
-        ltDataPoints.Add(new Models.DataPointGeneral(iS + 1, sucLge.ltCupPlace[iS]));
+      if (sucLge != null) {
+        for (int iS = 0; iS < sucLge.ltCupPlace.Count; iS++) {
+          ltDataPoints.Add(new Models.DataPointGeneral(iS + 1, sucLge.ltCupPlace[iS]));
+        }
       }
 
       // Add current league place
