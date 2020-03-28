@@ -432,6 +432,9 @@ namespace CornerkickWebMvc.Controllers
       // Clear position last season (for new sponsors)
       clb.iPosLastSeason = 0;
 
+      // Clear successes
+      clb.ltSuccess.Clear();
+
       return clb;
     }
 
