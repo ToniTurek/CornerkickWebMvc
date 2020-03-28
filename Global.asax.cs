@@ -413,6 +413,17 @@ namespace CornerkickWebMvc
       // Do next step
       int iRetCk = ckcore.next();
 
+      // Reset CPU player
+      for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
+        CornerkickManager.Club clb = ckcore.ltClubs[iC];
+        if (clb.user != null) continue;
+
+        for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
+          clb.ltPlayer[iP].fCondition = 1.0f;
+          clb.ltPlayer[iP].fFresh     = 1.0f;
+        }
+      }
+
       // Jan no injury
       ckcore.ltPlayer[101].injury = null;
 
