@@ -205,7 +205,10 @@
             "data": "mw", "className": "dt-right",
             render: $.fn.dataTable.render.number('.', ',', 0, '')
           },
-          { "data": "fixtransferfee", "className": "dt-right" },
+          {
+            "data": "fixtransferfee", "className": "dt-right",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           {
             "data": "nat",
             "className": "dt-center",
@@ -221,6 +224,10 @@
             $(nRow).addClass('details-control');
           } else if (aData.iOffer === -1) { // Negotiation cancelled
             $('td', nRow).css('color', "rgb(180,180,180)");
+          }
+
+          if (aData.fixtransferfee <= 0) {
+            $('td:eq(10)', nRow).html('-');
           }
         },
         "drawCallback": function (settings) {

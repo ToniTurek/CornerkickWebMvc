@@ -2851,9 +2851,6 @@ namespace CornerkickWebMvc.Controllers
         string sDatePutOnTl = "-";
         if (transfer.dt.Year > 1) sDatePutOnTl = transfer.dt.ToString("d", getCi());
 
-        string sFixTransferFee = "-";
-        if (transfer.player.contract.iFixTransferFee > 0) sFixTransferFee = transfer.player.contract.iFixTransferFee.ToString("N0", getCi());
-
         ltDeTransfer.Add(new Models.DatatableEntryTransfer {
           playerId = transfer.player.iId,
           empty = "",
@@ -2867,7 +2864,7 @@ namespace CornerkickWebMvc.Controllers
           age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
           talent = (transfer.player.iTalent + 1).ToString(),
           mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
-          fixtransferfee = sFixTransferFee,
+          fixtransferfee = transfer.player.contract.iFixTransferFee,
           club = sClub,
           nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1]
         });
