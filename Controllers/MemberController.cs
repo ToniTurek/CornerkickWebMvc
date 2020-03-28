@@ -1991,6 +1991,13 @@ namespace CornerkickWebMvc.Controllers
         for (int iCh = 0; iCh < pl.ltClubHistory.Count; iCh++) {
           CornerkickGame.Player.ClubHistory ch = pl.ltClubHistory[iCh];
 
+          // Remove corrupt entry
+          if (ch.iClubId >= MvcApplication.ckcore.ltClubs.Count) {
+            pl.ltClubHistory.RemoveAt(iCh);
+            iCh--;
+            continue;
+          }
+
           // Get club name
           string sClubName = "vereinslos";
           if (ch.iClubId >= 0) {
