@@ -469,6 +469,7 @@ namespace CornerkickWebMvc.Controllers
 
           string sN = news.sText;
 
+          sN = sN.Replace("Anleitung",        "<a href=\"/Home/UserManual\">Anleitung</a>");
           sN = sN.Replace("Stadions",         "<a href=\"/Member/Stadion\">Stadions</a>");
           sN = sN.Replace("Stadionumgebung",  "<a href=\"/Member/StadiumSurroundings\">Stadionumgebung</a>");
           sN = sN.Replace("Jugendmannschaft", "<a href=\"/Member/Jouth\">Jugendmannschaft</a>");
