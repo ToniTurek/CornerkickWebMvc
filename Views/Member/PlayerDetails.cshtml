@@ -592,7 +592,7 @@
             <td align="right">Verletzung:</td>
             <td align="right">@sVerletzung</td>
           </tr>
-         @if (player.contract.iLength > 0) {
+         @if (player.contract != null && player.contract.iLength > 0) {
             <tr>
               <td align="right">Gehalt:</td>
               <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
