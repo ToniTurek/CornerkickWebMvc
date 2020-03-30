@@ -446,9 +446,9 @@ namespace CornerkickWebMvc.Controllers
       sponUser.bMain = true;
       sponUser.iId = 1;
       sponUser.iYears = 1;
-      sponUser.iGeldJahr     = 8000000; // 8 mio.
-      sponUser.iGeldMeister  = 1000000; // 1 mio.
-      sponUser.iMoneyVicHome =   10000;
+      sponUser.iGeldJahr     = 15000000; // 15 mio.
+      sponUser.iGeldMeister  =  1000000; //  1 mio.
+      sponUser.iMoneyVicHome =    10000;
 
       return sponUser;
     }
