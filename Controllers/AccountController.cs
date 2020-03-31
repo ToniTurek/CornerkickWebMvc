@@ -333,8 +333,8 @@ namespace CornerkickWebMvc.Controllers
 
       usr.id = applicationUser.Id;
 
-      usr.sFirstname = applicationUser.Vorname;
-      usr.sSurname   = applicationUser.Nachname;
+      usr.sFirstname = applicationUser.Vorname .Trim();
+      usr.sSurname   = applicationUser.Nachname.Trim();
       
       return usr;
     }
@@ -371,7 +371,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = clbReplace;
       if (clbReplace == null) clb = new CornerkickManager.Club();
 
-      clb.sName = sTeamname;
+      clb.sName = sTeamname.Trim();
       if (string.IsNullOrEmpty(clb.sName)) clb.sName = "Team";
 
       if (clbReplace == null) clb.iId = MvcApplication.ckcore.ltClubs.Count;
