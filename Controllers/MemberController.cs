@@ -2398,9 +2398,17 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      CornerkickGame.Player plSalary = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
       int iGamesPerSeason = MvcApplication.ckcore.tl.getMatchdays(MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision), club);
 
-      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee, bNegotiate: bNegotiate);
+      CornerkickManager.Club clbPlayer = null;
+      if (plSalary.iClubId >= 0) clbPlayer = MvcApplication.ckcore.ltClubs[plSalary.iClubId];
+
+      bool bForceNewContract = false;
+      if (clbPlayer != null) bForceNewContract = club.iId != clbPlayer.iId;
+
+      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(plSalary, club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee, bNegotiate: bNegotiate, bForceNewContract: bForceNewContract);
 
       return Json(contract, JsonRequestBehavior.AllowGet);
     }
@@ -2686,6 +2694,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      CornerkickManager.Club clbGive = null;
+      if (pl.iClubId >= 0) clbGive = MvcApplication.ckcore.ltClubs[pl.iClubId];
+
+      // If no club ...
+      if (clbGive == null) {
+        // ... and not on transferlist already --> put on transferlist
+        if (!MvcApplication.ckcore.plr.onTransferlist(pl)) MvcApplication.ckcore.tr.putPlayerOnTransferlist(pl, 0);
+      }
+
       for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
         CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
 
@@ -2698,9 +2715,6 @@ namespace CornerkickWebMvc.Controllers
                   transfer.ltOffers.Remove(offer);
                   return Json("Ihr Kreditrahmen ist leider nicht hoch genug", JsonRequestBehavior.AllowGet);
                 }
-
-                CornerkickManager.Club clbGive = null;
-                if (pl.iClubId >= 0) clbGive = MvcApplication.ckcore.ltClubs[pl.iClubId];
 
                 if (iTransferFeeSecret > club.iBalanceSecret) {
                   transfer.ltOffers.Remove(offer);
@@ -2719,7 +2733,7 @@ namespace CornerkickWebMvc.Controllers
                 if (pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club, iTransferIx: iT)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
                     MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   }
