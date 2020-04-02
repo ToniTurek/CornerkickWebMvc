@@ -6125,6 +6125,7 @@ namespace CornerkickWebMvc.Controllers
     public class DatatableWish
     {
       public int iIx { get; set; }
+      public bool bVoted { get; set; } // If user has voted for this wish
       public string sTitle { get; set; }
       public string sDesc { get; set; }
       public string sOwner { get; set; }
@@ -6140,6 +6141,8 @@ namespace CornerkickWebMvc.Controllers
       Models.WishListModel.ltWish = new List<Models.WishListModel.Wish>();
       List<DatatableWish> ltDtWish = new List<DatatableWish>();
 
+      CornerkickManager.User usr = ckUser();
+
       var jss = new System.Web.Script.Serialization.JavaScriptSerializer();
 
       string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
@@ -6152,9 +6155,9 @@ namespace CornerkickWebMvc.Controllers
           DateTime dt = new DateTime();
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].date)) dt = DateTime.ParseExact(Models.WishListModel.ltWish[iW].date, "yyyyMMddHHmm", CultureInfo.InvariantCulture);
 
-          CornerkickManager.User usr = MvcApplication.ckcore.tl.getUserFromId(Models.WishListModel.ltWish[iW].owner);
+          CornerkickManager.User usrOwner = MvcApplication.ckcore.tl.getUserFromId(Models.WishListModel.ltWish[iW].owner);
           string sUsername = "unbekannt";
-          if (usr != null) sUsername = usr.sFirstname + " " + usr.sSurname;
+          if (usrOwner != null) sUsername = usrOwner.sFirstname + " " + usrOwner.sSurname;
 
           if (Models.WishListModel.ltWish[iW].votes == null) Models.WishListModel.ltWish[iW].votes = new List<string>();
 
@@ -6162,7 +6165,10 @@ namespace CornerkickWebMvc.Controllers
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].version)) sVer = Models.WishListModel.ltWish[iW].version;
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].dateRel)) sVer += " (" + DateTime.ParseExact(Models.WishListModel.ltWish[iW].dateRel, "yyyyMMddHHmm", CultureInfo.InvariantCulture) + ")";
 
-          ltDtWish.Add(new DatatableWish() { iIx = iW + 1, sTitle = Models.WishListModel.ltWish[iW].title, sDesc = Models.WishListModel.ltWish[iW].description, sOwner = sUsername, iComplexity = Models.WishListModel.ltWish[iW].complexity, iVotes = Models.WishListModel.ltWish[iW].votes.Count, fRank = Models.WishListModel.ltWish[iW].ranking, sDate = dt.ToString("d", getCi()), fProgress = Models.WishListModel.ltWish[iW].progress, sVerRelease = sVer });
+          bool bVoted = false;
+          if (usr != null) bVoted = Models.WishListModel.ltWish[iW].votes.Contains(usr.id);
+
+          ltDtWish.Add(new DatatableWish() { iIx = iW + 1, sTitle = Models.WishListModel.ltWish[iW].title, sDesc = Models.WishListModel.ltWish[iW].description, sOwner = sUsername, iComplexity = Models.WishListModel.ltWish[iW].complexity, iVotes = Models.WishListModel.ltWish[iW].votes.Count, fRank = Models.WishListModel.ltWish[iW].ranking, sDate = dt.ToString("d", getCi()), fProgress = Models.WishListModel.ltWish[iW].progress, sVerRelease = sVer, bVoted = bVoted });
         }
       }
 

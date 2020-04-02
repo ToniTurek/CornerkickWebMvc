@@ -109,7 +109,8 @@
           { "data": "iComplexity" },
           { "data": "fRank", render: $.fn.dataTable.render.number(',', '.', 2, '') },
           { "data": "fProgress" },
-          { "data": "sVerRelease" }
+          { "data": "sVerRelease" },
+          { "data": "bVoted" }
         ],
         "paging": false,
         "info": false,
@@ -137,7 +138,7 @@
             "className": "dt-left"
           },
           {
-            "targets": 3,
+            "targets": [3, 11],
             "visible": false,
             "searchable": false
           },
@@ -148,6 +149,10 @@
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
           $(nRow).addClass('details-control');
+
+          if (aData.bVoted) {
+            $('td', nRow).css('color', "rgb(0,0,255)"); // --> text color blue
+          }
 
           var divPb = document.createElement("div");
           divPb.style.position = "relative";
@@ -245,7 +250,7 @@
 
 <body>
   <h3>Cornerkick Wunschliste</h3>
-
+  <p>Markiere einen Verbesserungswunsch und vote für ihn! Der Wunsch für den Du abgestimmt hast, ist an der blauer Schrift zu erkennen.</p>
   <div id="divTableWishList" style="position: relative; left: 0px; width: auto">
     <table id="tableWishList" style="position: relative; margin: 0px; width: auto" class="display responsive nowrap">
       <thead>
@@ -261,6 +266,7 @@
           <th>Faktor</th>
           <th>Fortschritt</th>
           <th>Version</th>
+          <th>Voted</th>
         </tr>
       </thead>
       <tbody>
@@ -271,6 +277,7 @@
   </div>
 
   <h4 style="margin-top: 40px">Neuen Wunsch hinzufügen</h4>
+  <p>Hast du einen Verbesserungsvorschlag welcher noch nicht in der Liste aufgeführt ist? Einfach Titel und Beschreibung angeben und hinzufügen!</p>
   <div>
     <label style="width: 100%">
       Titel:
