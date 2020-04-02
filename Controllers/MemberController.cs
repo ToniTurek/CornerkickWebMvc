@@ -5102,10 +5102,10 @@ namespace CornerkickWebMvc.Controllers
         CornerkickManager.Club clubRequest = MvcApplication.ckcore.ltClubs[iTeamId];
         if (clubRequest.user == null) {
           CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clubRequest, md.dt, bPre: false);
-          if ((gdNext.dt - md.dt).TotalDays < 4) return Json("Anfrage für Testspiel abgelehnt. Begründung: Zu nah am nächsten Spiel", JsonRequestBehavior.AllowGet);
+          if (gdNext != null && (gdNext.dt - md.dt).TotalDays < 4) return Json("Anfrage für Testspiel abgelehnt. Begründung: Zu nah am nächsten Spiel", JsonRequestBehavior.AllowGet);
 
           CornerkickGame.Game.Data gdPrev = MvcApplication.ckcore.tl.getNextGame(clubRequest, md.dt, bPre: true);
-          if ((md.dt - gdPrev.dt).TotalDays < 4) return Json("Anfrage für Testspiel abgelehnt. Begründung: Zu kurz nach letztem Spiel", JsonRequestBehavior.AllowGet);
+          if (gdPrev != null && (md.dt - gdPrev.dt).TotalDays < 4) return Json("Anfrage für Testspiel abgelehnt. Begründung: Zu kurz nach letztem Spiel", JsonRequestBehavior.AllowGet);
 
           createTestgame(md);
 
