@@ -119,6 +119,11 @@
         textteamaverage.html("Durchschnittsstärke (-alter): " + teamData.sTeamAveSkill + " (" + teamData.sTeamAveAge + ")");
 
         drawFormation/*.hide()*/.html(result).fadeIn('slow')/*.show()*/;
+
+        for (var iDg = 0; iDg < 11; iDg++) {
+          var divPlayerBox = document.getElementById("divPlayerBox_" + iDg.toString());
+          dragElement(divPlayerBox);
+        }
       } else {
         alert("data hasn't worked!");
       }
@@ -194,7 +199,7 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
   var sBox = "";
 
   sBox +=
-    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
+    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' dragMe="true" style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
       '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
         '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + sNo + '</h2>' +
       '</div>' +
@@ -221,7 +226,7 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
   if (sAge) {
     sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</h2>';
   } else {
-    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</h2>';
+    sBox += '<text class="txtPosition" style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0px; padding: 0px; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</text>';
   }
   sBox +=
         '</div>';
