@@ -527,6 +527,51 @@ namespace CornerkickWebMvc.Controllers
       usr.lti[0] = iDeleteAfter;
     }
 
+    public JsonResult DeskGetNewspaper()
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(null, JsonRequestBehavior.AllowGet);
+      if (usr.ltNews == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Club clb = ckClub();
+
+      List<DatatableNews> ltNews = new List<DatatableNews>();
+
+      byte[] iNewspaperTypes = new byte[] { 1, 2, 3 };
+      for (int iN = 0; iN < usr.ltNews.Count; iN++) {
+        CornerkickManager.Main.News news = usr.ltNews[iN];
+
+        if (news.iType == 1) {
+          string sN = news.sText;
+
+          foreach (CornerkickGame.Player pl in clb.ltPlayer) {
+            if (sN.Contains(pl.sName)) {
+              sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
+              break;
+            }
+          }
+
+          foreach (CornerkickGame.Player pl in clb.ltPlayerJouth) {
+            if (sN.Contains(pl.sName)) {
+              sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
+              break;
+            }
+          }
+
+          DatatableNews dtn = new DatatableNews();
+          dtn.iId = iN;
+          dtn.sDate = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi());
+          dtn.sText = sN;
+          dtn.iType = news.iType;
+          dtn.bOld = news.bRead;
+
+          ltNews.Add(dtn);
+        }
+      }
+
+      return Json(new { aaData = ltNews }, JsonRequestBehavior.AllowGet);
+    }
+
     public ContentResult GetLastGames()
     {
       CornerkickManager.Club club = ckClub();

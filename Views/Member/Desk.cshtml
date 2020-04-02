@@ -32,6 +32,94 @@
     $(document).ready(function () {
       setNews();
 
+      // Get Newspaper
+      $.ajax({
+        url: '/Member/DeskGetNewspaper',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (ltNews) {
+          divNewspaper = document.getElementById("divNewspaper");
+          divNewspaper.innerHtml = ltNews[0].sText;
+        }
+      });
+
+      $.get("/Member/GetLastGames/", function (dataLastGames) {
+        var chart = new CanvasJS.Chart("chartContainerLastGames", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          axisX: {
+            labelFontColor: "white",
+            lineThickness: 0,
+            gridThickness: 1,
+            interval: 1
+          },
+          axisY: {
+            labelFontSize: 16,
+            interval: 1,
+            minimum: -1.2,
+            maximum: +1.2
+          },
+          toolTip: {
+            content: "{z}"
+          },
+          /*legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },*/
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
+              markerColor: "green",
+              legendText: "Liga",
+              dataPoints: dataLastGames[0]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
+              markerColor: "blue",
+              legendText: "Pokal",
+              dataPoints: dataLastGames[1]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
+              markerColor: "rgb(255, 200, 14)",
+              legendText: "Int.",
+              dataPoints: dataLastGames[2]
+            },
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              lineThickness: 0,
+              lineColor: "white",
+              //showInLegend: true,
+              markerSize: 20,
+              markerColor: "rgb(91, 146, 229)",
+              legendText: "Nat.",
+              dataPoints: dataLastGames[4]
+            }
+          ]
+        });
+
+        chart.render();
+      });
+
       $('#iDeleteLog').change(function () {
         $.ajax({
           url: '/Member/SetDeleteLog',
@@ -154,8 +242,13 @@
         <h2>Schreibtisch</h2>
       *@
 
-      <h3>Aktuelle Lage</h3>
+      <div style="position: relative; left: 0px; top: 20px; width: 100%; height: 0px">
+        <div id="divNewspaper" style="position: relative; float: right; width: 200px; height: 283px; border: 1px solid black">
 
+        </div>
+      </div>
+
+      <h3>Aktuelle Lage</h3>
       string sTabellenplatz = Model.sTabellenplatz;
       string sWeatherIcon = "/Content/Icons/Weather/" + Model.iWeather.ToString() + ".gif";
       string[] sWeatherTitleAll = new string[4] { "Sonne", "Bewölkt", "Regen", "Schnee" };
@@ -172,7 +265,6 @@
       <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
 
       <h3>Nächstes Spiel</h3>
-
       string sDt = Model.sDtNextGame;
       if (clb.nextGame != null) {
         sDt = Model.sDtNextGame + " - ";
@@ -204,87 +296,7 @@
   }
 
   <h3>Letzte Spiele</h3>
-
   <div id="chartContainerLastGames" style="height: 160px; width: 100%"></div>
-
-  <script type="text/javascript">
-    $(document).ready(function () {
-      $.get("/Member/GetLastGames/", function (dataLastGames) {
-        var chart = new CanvasJS.Chart("chartContainerLastGames", {
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          axisX: {
-            labelFontColor: "white",
-            lineThickness: 0,
-            gridThickness: 1,
-            interval: 1
-          },
-          axisY: {
-            labelFontSize: 16,
-            interval: 1,
-            minimum: -1.2,
-            maximum: +1.2
-          },
-          toolTip: {
-            content: "{z}"
-          },
-          /*legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },*/
-          data: [
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              lineThickness: 0,
-              lineColor: "white",
-              //showInLegend: true,
-              markerSize: 20,
-              markerColor: "green",
-              legendText: "Liga",
-              dataPoints: dataLastGames[0]
-            },
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              lineThickness: 0,
-              lineColor: "white",
-              //showInLegend: true,
-              markerSize: 20,
-              markerColor: "blue",
-              legendText: "Pokal",
-              dataPoints: dataLastGames[1]
-            },
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              lineThickness: 0,
-              lineColor: "white",
-              //showInLegend: true,
-              markerSize: 20,
-              markerColor: "rgb(255, 200, 14)",
-              legendText: "Int.",
-              dataPoints: dataLastGames[2]
-            },
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              lineThickness: 0,
-              lineColor: "white",
-              //showInLegend: true,
-              markerSize: 20,
-              markerColor: "rgb(91, 146, 229)",
-              legendText: "Nat.",
-              dataPoints: dataLastGames[4]
-            }
-          ]
-        });
-
-        chart.render();
-      });
-    });
-  </script>
 
   <h3>News</h3>
   <div style="position: relative; width: 100%">
