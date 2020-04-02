@@ -392,7 +392,7 @@ namespace CornerkickWebMvc
 
         // retire cpu player
         if (club0.ltPlayer.Count > 500) {
-          ckcore.plr.retirePlayer(club0.ltPlayer[0]);
+          ckcore.plr.retirePlayer(club0.ltPlayer[0], club0);
         }
 
         //checkCpuJouth();
