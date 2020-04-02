@@ -22,7 +22,7 @@
     sSponsorGoogleQuad += '<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>';
 
     var sSponsorGoogleHori = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"><\/script>';
-    sSponsorGoogleHori += '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4643281447734684" data-ad-slot="3762128727" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+    sSponsorGoogleHori += '<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-4643281447734684" data-ad-slot="3762128727"></ins>';
     sSponsorGoogleHori += '<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>';
 
     var sponsorMain = [];
@@ -74,7 +74,7 @@
           if (ltSponsorTmp[i] > 0) {
             divBoard = document.getElementById("divSponsorBoard_" + i.toString());
             divBoard.innerHTML = "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; font-size: 30px; background-color: lightblue\" align=\"center\">" + ltSponsorNames[ltSponsorTmp[i]] + "</div>";
-            divBoard.innerHTML += "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2\">" + sponsorBoards[ltSponsorTmp[i]] + "</div>";
+            divBoard.innerHTML += "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 99\">" + sponsorBoards[ltSponsorTmp[i]] + "</div>";
           }
         }
       }
