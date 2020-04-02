@@ -251,8 +251,8 @@ namespace CornerkickWebMvc.Controllers
               */
 
               // Retire all cpu player
-              while (clubCpu.ltPlayer.Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayer[0]);
-              clubCpu.ltPlayerJouth.Clear();
+              while (clubCpu.ltPlayer     .Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayer     [0], clubCpu);
+              while (clubCpu.ltPlayerJouth.Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayerJouth[0], clubCpu);
 
               clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
 
