@@ -138,6 +138,10 @@
       getBudget(bEdit, -1, true);
 
       $('.tbEintritt').each(function () {
+        $(this).on('change', function (ev) {
+          setEintritt();
+        });
+
         $(this).on('keyup', function (ev) {
           setEintritt();
         });
