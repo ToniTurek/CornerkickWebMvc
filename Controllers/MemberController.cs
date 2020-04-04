@@ -5905,32 +5905,38 @@ namespace CornerkickWebMvc.Controllers
           CornerkickGame.Player.ClubHistory ch = pl.ltClubHistory[iCh];
 
           if (ch.iTransferFee > 0) {
-            // Get name of new club
-            string sClubTakeName = "vereinslos";
-            if (ch.iClubId >= 0) {
-              sClubTakeName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
-              //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
+            if (ch.iClubId < 0 || ch.iClubId >= MvcApplication.ckcore.ltClubs.Count) {
+              ch.iTransferFee = 0;
+              ch.iClubId = -1;
+              continue;
             }
+
+            // Get name of new club
+            string sClubTakeName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
 
             // Get name of old club
-            string sClubGiveName = "vereinslos";
             if (iCh > 0) {
               CornerkickGame.Player.ClubHistory chLast = pl.ltClubHistory[iCh - 1];
-              if (chLast.iClubId >= 0) {
-                sClubGiveName = MvcApplication.ckcore.ltClubs[chLast.iClubId].sName;
-                //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
-              }
-            }
 
-            ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
-              iIx = iT++,
-              sPlayerName = pl.sName,
-              sClubTakeName = sClubTakeName,
-              sClubGiveName = sClubGiveName,
-              sDt = ch.dt.ToString("d", getCi()),
-              iValue = pl.getValueHistory(ch.dt) * 1000,
-              iTransferFee = ch.iTransferFee
-            });
+              // If no last club --> no transfer --> continue
+              if (chLast.iClubId < 0 || chLast.iClubId >= MvcApplication.ckcore.ltClubs.Count) {
+                ch.iTransferFee = 0;
+                chLast.iClubId = -1;
+                continue;
+              }
+
+              string sClubGiveName = MvcApplication.ckcore.ltClubs[chLast.iClubId].sName;
+
+              ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
+                iIx = iT++,
+                sPlayerName = pl.sName,
+                sClubTakeName = sClubTakeName,
+                sClubGiveName = sClubGiveName,
+                sDt = ch.dt.ToString("d", getCi()),
+                iValue = pl.getValueHistory(ch.dt) * 1000,
+                iTransferFee = ch.iTransferFee
+              });
+            }
           }
         }
       }
