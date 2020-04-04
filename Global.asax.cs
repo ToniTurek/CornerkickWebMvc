@@ -38,10 +38,12 @@ namespace CornerkickWebMvc
       public int  iStartHour;
       public bool bEmailCertification;
       public bool bRegisterDuringGame;
+      public bool bLoginPossible;
 
       public Settings()
       {
         iStartHour = -1;
+        bLoginPossible = true;
         bEmailCertification = true;
         bRegisterDuringGame = true;
 #if DEBUG
