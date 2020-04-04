@@ -24,6 +24,7 @@ namespace CornerkickWebMvc.Models
     public int iGameSpeed { get; set; }
     public bool bEmailCertification { get; set; }
     public bool bRegisterDuringGame { get; set; }
+    public bool bLoginPossible { get; set; }
 
     public bool bLogExist { get; set; }
     public bool bAutosaveExist { get; set; }

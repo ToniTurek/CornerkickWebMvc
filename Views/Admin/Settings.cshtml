@@ -36,11 +36,16 @@
     $("#bRegisterDuringGame").change(function () {
       setSettings();
     });
+
+    $("#bLoginPossible").change(function () {
+      setSettings();
+    });
   });
 
   function setSettings() {
     var bEmailCertification = document.getElementById("bEmailCertification").checked;
     var bRegisterDuringGame = document.getElementById("bRegisterDuringGame").checked;
+    var bLoginPossible = document.getElementById("bLoginPossible").checked;
 
     $.ajax({
       url: '/Admin/setSettings',
@@ -48,7 +53,7 @@
       dataType: "JSON",
       cache: false,
       contentType: "application/json; charset=utf-8",
-      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame }
+      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame, bLoginPossible: bLoginPossible }
     });
   }
 
@@ -166,6 +171,11 @@
 <label>
   @Html.CheckBoxFor(m => m.bRegisterDuringGame)
   Register during game
+</label>
+
+<label>
+  @Html.CheckBoxFor(m => m.bLoginPossible)
+  Login possible
 </label>
 
 @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {

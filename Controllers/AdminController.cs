@@ -44,6 +44,7 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.sStartHour = "";
       if (MvcApplication.settings.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.settings.iStartHour.ToString();
       if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      modelAdmin.bLoginPossible      = MvcApplication.settings.bLoginPossible;
       modelAdmin.bEmailCertification = MvcApplication.settings.bEmailCertification;
       modelAdmin.bRegisterDuringGame = MvcApplication.settings.bRegisterDuringGame;
 
@@ -180,10 +181,11 @@ namespace CornerkickWebMvc.Controllers
       return RedirectToAction("Settings");
     }
 
-    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame)
+    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame, bool bLoginPossible)
     {
       MvcApplication.settings.bEmailCertification = bEmailCertification;
       MvcApplication.settings.bRegisterDuringGame = bRegisterDuringGame;
+      MvcApplication.settings.bLoginPossible      = bLoginPossible;
     }
 
     public ActionResult Log(Models.AdminModel modelAdmin)
