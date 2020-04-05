@@ -6260,13 +6260,31 @@ namespace CornerkickWebMvc.Controllers
 
     private void writeWishesToJsonFile(List<Models.WishListModel.Wish> ltWish)
     {
-      Models.WishListModel.WishJson wishJson = new Models.WishListModel.WishJson();
-      wishJson.Wish = ltWish;
-      string sJsonWishes = JsonConvert.SerializeObject(wishJson);
+      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
+
+      // Create backup
+      try {
+        if (System.IO.File.Exists(sFileWl)) System.IO.File.Move(sFileWl, sFileWl + ".bck");
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to create backup of wishlist: " + sFileWl);
+      }
+
+      string sJsonWishes = "";
+      try {
+        Models.WishListModel.WishJson wishJson = new Models.WishListModel.WishJson();
+        wishJson.Wish = ltWish;
+        sJsonWishes = JsonConvert.SerializeObject(wishJson);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to serialize wishlist");
+        return;
+      }
 
       // Write string to file
-      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
-      System.IO.File.WriteAllText(sFileWl, sJsonWishes);
+      try {
+        System.IO.File.WriteAllText(sFileWl, sJsonWishes);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to write wishlist to file: " + sFileWl);
+      }
     }
 
     public ActionResult WishListUpdateWish(int iWishIx, string sComplexity, string sProgress, string sVer, string sDateRel)
