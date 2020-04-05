@@ -4217,6 +4217,8 @@ namespace CornerkickWebMvc.Controllers
         mdClub.sRecordCWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 1));
         mdClub.sRecordCDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 0));
         mdClub.sRecordCDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 1));
+
+        mdClub.sAttrFc = mdClub.club.getAttractionFactor(MvcApplication.ckcore.iSeason).ToString("0.0");
       }
 
       return View(mdClub);
@@ -4235,7 +4237,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Main.Success sucLge = CornerkickManager.Tool.getSuccess(clb, league);
       if (sucLge != null) {
         for (int iS = 0; iS < sucLge.ltCupPlace.Count; iS++) {
-          ltDataPoints.Add(new Models.DataPointGeneral(iS + 1, sucLge.ltCupPlace[iS]));
+          ltDataPoints.Add(new Models.DataPointGeneral(sucLge.ltCupPlace[iS][1], sucLge.ltCupPlace[iS][0]));
         }
       }
 

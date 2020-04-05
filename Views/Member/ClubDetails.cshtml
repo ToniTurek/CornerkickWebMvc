@@ -175,6 +175,10 @@
               <td align="right">Stadion:</td>
               <td align="left">@sStadium</td>
             </tr>
+            <tr>
+              <td align="right">Erfolgsfaktor:</td>
+              <td align="left">@Model.sAttrFc</td>
+            </tr>
           }
         </tbody>
       </table>
@@ -253,15 +257,25 @@
         <p>keine</p>
       } else {
         foreach (CornerkickManager.Main.Success success in Model.club.ltSuccess) {
-          string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
-          //string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
-          string sCupWin = "Gewonnen: " + 0.ToString();
           if (success.cup == null) { continue; }
           if (Math.Abs(success.cup.iId) == 5) { continue; }
 
+          string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
+          string sCupWin = "Gewonnen: " + success.getCupWin().ToString();
+
+          string sAttcFcCup = "";
+          for (int iS = 0; iS < success.ltCupPlace.Count; iS++) {
+            if (iS > 0) {
+              sAttcFcCup += " / ";
+            }
+            sAttcFcCup += CornerkickManager.Club.getAttractionFactor(success.ltCupPlace[iS][0], success.cup.settings.fAttraction, MvcApplication.ckcore.iSeason - success.ltCupPlace[iS][1]).ToString("0.0") + " (" + success.ltCupPlace[iS][1].ToString() + "/" + success.ltCupPlace[iS][0].ToString() + ")";
+          }
+
           <b>@success.cup.sName</b>
-          <p>@sWDD</p>
-          <p>@sCupWin</p>
+          <p>@sWDD<br />@sCupWin</p>
+          if (success.ltCupPlace.Count > 0) {
+            <p>Anteil Erfolgsfaktor (Saison/Pl.):<br />@sAttcFcCup</p>
+          }
         }
       }
     </div>

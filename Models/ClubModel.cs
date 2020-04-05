@@ -26,5 +26,6 @@ namespace CornerkickWebMvc.Models
     public string sRecordCWinA;
     public string sRecordCDefH;
     public string sRecordCDefA;
+    public string sAttrFc { get; set; }
   }
 }
