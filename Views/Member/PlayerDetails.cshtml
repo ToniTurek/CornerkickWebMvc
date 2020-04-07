@@ -38,20 +38,21 @@
   function setName() {
     var tbName = document.getElementById("sName");
 
-    var sNewName = $("#sName").val();
-    $.ajax({
-      url: '/Member/setPlayerName',
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayer: @Model.iPlayer, sName: sNewName },
-      success: function () {
-        tbName.style.backgroundColor = "";
-      },
-      error: function (xhr) {
-        tbName.style.backgroundColor = "yellow";
-        alert(xhr.responseText);
-      }
-    });
+    if (tbName) {
+      $.ajax({
+        url: '/Member/setPlayerName',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: @Model.iPlayer, sName: tbName.value },
+        success: function () {
+          tbName.style.backgroundColor = "";
+        },
+        error: function (xhr) {
+          tbName.style.backgroundColor = "yellow";
+          alert(xhr.responseText);
+        }
+      });
+    }
   }
 
   function setNo() {
