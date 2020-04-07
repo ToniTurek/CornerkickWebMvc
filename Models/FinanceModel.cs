@@ -28,7 +28,7 @@ namespace CornerkickWebMvc.Models
     [Display(Name = "V.I.P.:")]
     public int iEintritt3 { get; set; }
     public int iPriceSeason3 { get; set; }
-
+    public float fSeasonalTicketsMaxFrac { get; set; }
     public int[] iSeasonalTickets { get; set; }
 
     public bool bEditable { get; set; }

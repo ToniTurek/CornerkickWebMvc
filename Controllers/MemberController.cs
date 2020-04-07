@@ -5373,6 +5373,7 @@ namespace CornerkickWebMvc.Controllers
       financeModel.iPriceSeason1 = clb.iAdmissionPriceSeasonal[0];
       financeModel.iPriceSeason2 = clb.iAdmissionPriceSeasonal[1];
       financeModel.iPriceSeason3 = clb.iAdmissionPriceSeasonal[2];
+      financeModel.fSeasonalTicketsMaxFrac = clb.fSeasonalTicketsMaxFrac * 100f;
 
       financeModel.iSeasonalTickets = new int[clb.iSpectatorsSeasonal.Length];
       financeModel.iSeasonalTickets = clb.iSpectatorsSeasonal;
@@ -5531,7 +5532,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult FinanceSetAdmissionPriceSeasonal(int[] iPrice)
+    public JsonResult FinanceSetAdmissionPriceSeasonal(int[] iPrice, float fSeasonalTicketsMaxFrac)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -5539,6 +5540,8 @@ namespace CornerkickWebMvc.Controllers
       clb.iAdmissionPriceSeasonal[0] = iPrice[0];
       clb.iAdmissionPriceSeasonal[1] = iPrice[1];
       clb.iAdmissionPriceSeasonal[2] = iPrice[2];
+
+      clb.fSeasonalTicketsMaxFrac = fSeasonalTicketsMaxFrac / 100f;
 
       return Json(null, JsonRequestBehavior.AllowGet);
     }

@@ -137,6 +137,10 @@
       setEintritt();
       getBudget(bEdit, -1, true);
 
+      iptFracSeasonalTickets = document.getElementById("iptFracSeasonalTickets");
+      iptFracSeasonalTickets.addEventListener("change", setAdmissionPriceSeasonal);
+      iptFracSeasonalTickets.addEventListener("keyup", setAdmissionPriceSeasonal);
+
       $('.tbEintritt').each(function () {
         $(this).on('change', function (ev) {
           setEintritt();
@@ -203,7 +207,7 @@
           type: 'post',
           url: '/Member/FinanceSetAdmissionPriceSeasonal',
           dataType: "json",
-          data: { iPrice: price },
+          data: { iPrice: price, fSeasonalTicketsMaxFrac: iptFracSeasonalTickets.value },
           success: function () {
             //alert("Eintrittspreise geändert");
           }
@@ -310,21 +314,34 @@
 
     <h4 style="margin-top: 40px">Eintrittspreise</h4>
     <div style="position: relative; width: 100%; height: auto; float: left">
-      <div style="position: relative; width: 230px; height: 120px; margin-top: 20px; float: left">
-        @Html.LabelFor(m => m.iEintritt1, new { @class = "col-md-2 control-label", style = "position: absolute; top:  4px" })
-        @Html.TextBoxFor(m => m.iEintritt1, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top:  0px; left: 42%; width: 6%; min-width: 60px; text-align: right", type = "number" })
-        @Html.TextBoxFor(m => m.iPriceSeason1, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top:  0px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
+      <div style="position: relative; width: 220px; height: 170px; float: left">
+        <div style="position: absolute; left: 42%; width: 6%; min-width: 60px; text-align: center">
+          <strong>Einzel:</strong>
+        </div>
+        <div style="position: absolute; right: 0px; width: 8%; min-width: 70px; text-align: center">
+          <strong>Saison:</strong>
+        </div>
 
-        @Html.LabelFor(m => m.iEintritt2, new { @class = "col-md-2 control-label", style = "position: absolute; top: 39px" })
-        @Html.TextBoxFor(m => m.iEintritt2, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 35px; left: 42%; width: 6%; min-width: 60px; text-align: right", type = "number" })
-        @Html.TextBoxFor(m => m.iPriceSeason2, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 35px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
+        @Html.LabelFor(m => m.iEintritt1, new { style = "position: absolute; top: 27px" })
+        @Html.TextBoxFor(m => m.iEintritt1, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 20px; left: 40%; width: 6%; min-width: 60px; text-align: right", type = "number" })
+        @Html.TextBoxFor(m => m.iPriceSeason1, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 20px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
 
-        @Html.LabelFor(m => m.iEintritt3, new { @class = "col-md-2 control-label", style = "position: absolute; top: 74px" })
-        @Html.TextBoxFor(m => m.iEintritt3, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 70px; left: 42%; width: 6%; min-width: 60px; text-align: right", type = "number" })
-        @Html.TextBoxFor(m => m.iPriceSeason3, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 70px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
+        @Html.LabelFor(m => m.iEintritt2, new { style = "position: absolute; top: 62px" })
+        @Html.TextBoxFor(m => m.iEintritt2, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 55px; left: 40%; width: 6%; min-width: 60px; text-align: right", type = "number" })
+        @Html.TextBoxFor(m => m.iPriceSeason2, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 55px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
+
+        @Html.LabelFor(m => m.iEintritt3, new { style = "position: absolute; top: 97px" })
+        @Html.TextBoxFor(m => m.iEintritt3, new { @class = "form-control tbEintritt", autocomplete = "off", style = "position: absolute; top: 90px; left: 40%; width: 6%; min-width: 60px; text-align: right", type = "number" })
+        @Html.TextBoxFor(m => m.iPriceSeason3, new { @class = "form-control tbPriceSeason", autocomplete = "off", style = "position: absolute; top: 90px; right: 0px; width: 8%; min-width: 70px; text-align: right", type = "number" })
+
+        <label style="position: absolute; top: 132px">
+          Max. Anteil Saisontick.:
+        </label>
+        @Html.TextBoxFor(m => m.fSeasonalTicketsMaxFrac, new { @class = "form-control", @id = "iptFracSeasonalTickets", autocomplete = "off", style = "position: absolute; top: 125px; right: 0px; width: 6%; min-width: 60px; text-align: right", type = "number" })
+        <div style="position: absolute; top: 132px; right: -14px"><strong>%</strong></div>
       </div>
 
-      <div id="divChartSpec" style="position: relative; float: right; height: 220px; width: 75%; min-width: 320px"></div>
+      <div id="divChartSpec" style="position: relative; float: right; height: 250px; width: 76%; min-width: 320px"></div>
 
       <div style="position: relative; width: 250px; float: left">
         <p id="lbInSpec" style="position: relative; width: 100%"></p>
