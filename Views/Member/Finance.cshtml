@@ -169,6 +169,10 @@
       }
 
       $('.tbPriceSeason').each(function () {
+        $(this).on('change', function (ev) {
+          setAdmissionPriceSeasonal();
+        });
+
         $(this).on('keyup', function (ev) {
           setAdmissionPriceSeasonal();
         });
