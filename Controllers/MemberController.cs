@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Web;
@@ -4261,14 +4262,14 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
-    private string getClubEmblem(int iClubId, string sStyle = "")
+    private string getClubEmblem(int iClubId, string sStyle = "", bool bTiny = false)
     {
       CornerkickManager.Club clb = null;
       if (iClubId >= 0 && iClubId < MvcApplication.ckcore.ltClubs.Count) clb = MvcApplication.ckcore.ltClubs[iClubId];
 
-      return getClubEmblem(clb, sStyle);
+      return getClubEmblem(clb, sStyle: sStyle, bTiny: bTiny);
     }
-    private string getClubEmblem(CornerkickManager.Club clb, string sStyle = "")
+    private string getClubEmblem(CornerkickManager.Club clb, string sStyle = "", bool bTiny = false)
     {
       string sEmblem = "<img src=\"/Content/Uploads/emblems/";
 
@@ -4276,25 +4277,50 @@ namespace CornerkickWebMvc.Controllers
 
       if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"vereinslos\"/>";
 
-#if DEBUG
-      string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
-      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[clb.iLand] + ".png");
-#else
-      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
-      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[clb.iLand] + ".png");
-#endif
+      string sEmblemFile = "";
+      if (clb.bNation) {
+        sEmblemFile = getClubEmblemPath(clb.iLand, bNation: clb.bNation, bTiny: bTiny);
+        if (bTiny && string.IsNullOrEmpty(sEmblemFile)) sEmblemFile = getClubEmblemPath(clb.iLand, bNation: clb.bNation, bTiny: false);
+      } else {
+        sEmblemFile = getClubEmblemPath(clb.iId,   bNation: clb.bNation, bTiny: bTiny);
+        if (bTiny && string.IsNullOrEmpty(sEmblemFile)) sEmblemFile = getClubEmblemPath(clb.iId,   bNation: clb.bNation, bTiny: false);
+      }
+
       if (clb.bNation) {
         sEmblem = "<img src=\"/Content/Icons/flags/";
         if (System.IO.File.Exists(sEmblemFile)) sEmblem += CornerkickManager.Main.sLandShort[clb.iLand];
         else                                    sEmblem += "0";
+        bTiny = false;
       } else {
-        if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
-        else                                    sEmblem += "0";
+        if (System.IO.File.Exists(sEmblemFile)) {
+          sEmblem += clb.iId.ToString();
+        } else {
+          sEmblem += "0";
+          bTiny = false;
+        }
       }
+
+      if (bTiny) sEmblem += "_tiny";
 
       sEmblem += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + clb.sName + "\"/>";
 
       return sEmblem;
+    }
+    private static string getClubEmblemPath(int iClubId, bool bNation = false, bool bTiny = false)
+    {
+      string sTiny = "";
+      if (bTiny) sTiny = "_tiny";
+#if DEBUG
+      string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", iClubId.ToString() + sTiny + ".png");
+      if (bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[iClubId] + ".png");
+#else
+      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", clb.iId.ToString() + sTiny + ".png");
+      if (bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[iClubId] + ".png");
+#endif
+
+      if (!System.IO.File.Exists(sEmblemFile)) return null;
+
+      return sEmblemFile;
     }
 
     private string getStringRecordGame(CornerkickGame.Game.Data gdRecord)
@@ -4472,7 +4498,22 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
-        string sEmblem = getClubEmblem(tbpl.iId, "width: 12px");
+        // Create tiny emblem file
+        if (string.IsNullOrEmpty(getClubEmblemPath(tbpl.iId, bNation: false, bTiny: true))) {
+          string sEmblemFile = getClubEmblemPath(tbpl.iId, bNation: false, bTiny: false);
+
+          if (!string.IsNullOrEmpty(sEmblemFile)) {
+            const int iEmblemTinyWidth = 24;
+            Image imgEmblem = Image.FromFile(sEmblemFile);
+            int iHeight = (int)(imgEmblem.Height * iEmblemTinyWidth / (double)imgEmblem.Width);
+            Size szEmblemTiny = new Size(iEmblemTinyWidth, iHeight);
+            Image imgEmblemTiny = (Image)(new Bitmap(imgEmblem, szEmblemTiny));
+            string sEmblemTinyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(sEmblemFile), System.IO.Path.GetFileNameWithoutExtension(sEmblemFile)) + "_tiny" + System.IO.Path.GetExtension(sEmblemFile);
+            imgEmblemTiny.Save(sEmblemTinyFile);
+          }
+        }
+
+        string sEmblem = getClubEmblem(tbpl.iId, sStyle: "width: 12px", bTiny: true);
 
         sBox += "<tr " + sStyle + "\">";
         sBox += "<td class=\"first\" bgcolor=\"" + sBgColor + "\" align=\"center\"><b>" + k + "</b></td>";
