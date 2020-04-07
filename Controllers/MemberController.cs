@@ -4314,7 +4314,7 @@ namespace CornerkickWebMvc.Controllers
       string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", iClubId.ToString() + sTiny + ".png");
       if (bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[iClubId] + ".png");
 #else
-      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", clb.iId.ToString() + sTiny + ".png");
+      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", iClubId.ToString() + sTiny + ".png");
       if (bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[iClubId] + ".png");
 #endif
 
