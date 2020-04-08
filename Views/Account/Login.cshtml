@@ -37,7 +37,14 @@
           </div>
           <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-              <input type="submit" value="Anmelden" class="btn btn-default" />
+              @if (MvcApplication.settings.bLoginPossible) {
+                <input type="submit" value="Anmelden" class="btn btn-default" />
+              } else {
+                <input type="submit" value="Anmelden" class="btn btn-default" disabled="disabled" />
+                <p></p>
+                <p><strong style="font-size: 24px; color: red">Wartung / Update</strong></p>
+                <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
+              }
             </div>
           </div>
           <p>
@@ -60,6 +67,68 @@
         </section>
     </div>
 *@
+</div>
+
+<div style="position: relative; margin-top: 60px">
+  <h3>Versionshistorie</h3>
+  <table id="tableNews" style="position: relative; margin: 0px; width: 100%" class="compact">
+    <thead>
+      <tr>
+        <th>Version</th>
+        <th>Datum</th>
+        <th>Beschreibung</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2.8.1</td>
+        <td>08.04.2020</td>
+        <td>
+          <ul>
+            <li>Leere Spieler im Transfermarkt (Option: Alle Spieler) gefixt</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.8.0</td>
+        <td>07.04.2020</td>
+        <td>
+          <ul>
+            <li>Option zum Limitieren von Dauerkartenverkauf implementiert</li>
+            <li>Leistungsverbesserung Liga-Seiten</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.7.0</td>
+        <td>06.04.2020</td>
+        <td>
+          <ul>
+            <li>Verwende länderspezifische Namen für neue Spieler</li>
+            <li>Faktoren Chart Spielerentwicklung skaliert (Summe der einzelnen Faktoren entspricht Gesamtwert)</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.6.0</td>
+        <td>05.04.2020</td>
+        <td>
+          <ul>
+            <li>Berechne und zeige Club Erfolgsfaktor auf Club Seite</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.5.7</td>
+        <td>05.04.2020</td>
+        <td>
+          <ul>
+            <li>Update Kosten Stadion Oberring und Rasenerneuerung</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 @section Scripts {

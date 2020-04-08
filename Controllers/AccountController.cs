@@ -715,6 +715,8 @@ namespace CornerkickWebMvc.Controllers
 
       if (!ModelState.IsValid) return View(model);
 
+      if (!MvcApplication.settings.bLoginPossible) return View(model);
+
       if (MvcApplication.settings.bEmailCertification) {
         // Require the user to have a confirmed email before they can log on.
         var user = await UserManager.FindByNameAsync(model.Email);

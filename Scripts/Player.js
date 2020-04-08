@@ -93,7 +93,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
       input12.min = "1";
       input12.max = "10";
       input12.step = "1";
-      input12.value = contract.iLength.toString();
+      input12.value = "1";
       input12.autocomplete = "off";
       input12.onkeyup = function () { updateContract(iPlayerId, input12, false); };
       div12.appendChild(input12);

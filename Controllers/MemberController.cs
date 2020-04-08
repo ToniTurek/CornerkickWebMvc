@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Web;
@@ -2366,26 +2367,38 @@ namespace CornerkickWebMvc.Controllers
 
       DateTime dt25 = MvcApplication.ckcore.dtDatum.AddYears(-25);
       double fChanceDev    =              CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevInd = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience,               1, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevSkl = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent,                         6f, pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevTal = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday,          1, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevExp = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], 1f,             pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevAge = fChanceDev - CornerkickManager.Player.getChanceDevelopment(         dt25, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      double fChanceDevCch = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      0, iBuilding, fLevel);
-      double fChanceDevBdg = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         0, fLevel);
-      double fChanceDevBns = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining],                               0f, pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double[] fChanceDevFte = new double[8];
+      fChanceDevFte[0] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience,               1, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[1] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent,                         6f, pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[2] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday,          4, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[3] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], 1f,             pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[4] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(         dt25, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[5] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      0, iBuilding, fLevel);
+      fChanceDevFte[6] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining], pl.fIndTraining[pl.iIndTraining], pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         0, fLevel);
+      fChanceDevFte[7] = fChanceDev - CornerkickManager.Player.getChanceDevelopment(pl.dtBirthday, pl.iTalent, pl.iSkill[pl.iIndTraining],                               0f, pl.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+
+      double fChanceDevTot = 0.0;
+      double fChanceDevTotPls = 0.0;
+      int nChanceDevTotPls = 0;
+      for (int iFte = 0; iFte < fChanceDevFte.Length; iFte++) {
+        fChanceDevTot += fChanceDevFte[iFte];
+        if (fChanceDevFte[iFte] > 0.0) {
+          fChanceDevTotPls += fChanceDevFte[iFte];
+          nChanceDevTotPls++;
+        }
+      }
+      for (int iFte = 0; iFte < fChanceDevFte.Length; iFte++) {
+        if (fChanceDevTot > 0.0) {
+          fChanceDevFte[iFte] *= fChanceDev / fChanceDevTot;
+        } else {
+          fChanceDevFte[iFte] *= fChanceDev / -fChanceDevTot;
+          if (fChanceDevFte[iFte] > 0.0) fChanceDevFte[iFte] += (2 * fChanceDev) / nChanceDevTotPls;
+        }
+      }
 
       Models.DataPointGeneral[] dataPoints = new Models.DataPointGeneral[9];
-
-      dataPoints[0] = new Models.DataPointGeneral(0, fChanceDevInd, fChanceDevInd.ToString("0.00%"));
-      dataPoints[1] = new Models.DataPointGeneral(1, fChanceDevSkl, fChanceDevSkl.ToString("0.00%"));
-      dataPoints[2] = new Models.DataPointGeneral(2, fChanceDevTal, fChanceDevTal.ToString("0.00%"));
-      dataPoints[3] = new Models.DataPointGeneral(3, fChanceDevExp, fChanceDevExp.ToString("0.00%"));
-      dataPoints[4] = new Models.DataPointGeneral(4, fChanceDevAge, fChanceDevAge.ToString("0.00%"));
-      dataPoints[5] = new Models.DataPointGeneral(5, fChanceDevCch, fChanceDevCch.ToString("0.00%"));
-      dataPoints[6] = new Models.DataPointGeneral(6, fChanceDevBdg, fChanceDevBdg.ToString("0.00%"));
-      dataPoints[7] = new Models.DataPointGeneral(7, fChanceDevBns, fChanceDevBns.ToString("0.00%"));
-      dataPoints[8] = new Models.DataPointGeneral(8, fChanceDev,    fChanceDev   .ToString("0.00%"));
+      for (int iFte = 0; iFte < fChanceDevFte.Length; iFte++) dataPoints[iFte] = new Models.DataPointGeneral(iFte, fChanceDevFte[iFte], fChanceDevFte[iFte].ToString("0.00%"));
+      dataPoints[fChanceDevFte.Length] = new Models.DataPointGeneral(fChanceDevFte.Length, fChanceDev, fChanceDev.ToString("0.00%"));
 
       return Content(JsonConvert.SerializeObject(dataPoints), "application/json");
     }
@@ -2398,9 +2411,17 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      CornerkickGame.Player plSalary = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
       int iGamesPerSeason = MvcApplication.ckcore.tl.getMatchdays(MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision), club);
 
-      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(MvcApplication.ckcore.ltPlayer[iPlayerId], club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee, bNegotiate: bNegotiate);
+      CornerkickManager.Club clbPlayer = null;
+      if (plSalary.iClubId >= 0) clbPlayer = MvcApplication.ckcore.ltClubs[plSalary.iClubId];
+
+      bool bForceNewContract = false;
+      if (clbPlayer != null) bForceNewContract = club.iId != clbPlayer.iId;
+
+      CornerkickGame.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(plSalary, club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason, iFixedFee, bNegotiate: bNegotiate, bForceNewContract: bForceNewContract);
 
       return Json(contract, JsonRequestBehavior.AllowGet);
     }
@@ -2686,6 +2707,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      CornerkickManager.Club clbGive = null;
+      if (pl.iClubId >= 0) clbGive = MvcApplication.ckcore.ltClubs[pl.iClubId];
+
+      // If no club ...
+      if (clbGive == null) {
+        // ... and not on transferlist already --> put on transferlist
+        if (!MvcApplication.ckcore.plr.onTransferlist(pl)) MvcApplication.ckcore.tr.putPlayerOnTransferlist(pl, 0);
+      }
+
       for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
         CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
 
@@ -2698,9 +2728,6 @@ namespace CornerkickWebMvc.Controllers
                   transfer.ltOffers.Remove(offer);
                   return Json("Ihr Kreditrahmen ist leider nicht hoch genug", JsonRequestBehavior.AllowGet);
                 }
-
-                CornerkickManager.Club clbGive = null;
-                if (pl.iClubId >= 0) clbGive = MvcApplication.ckcore.ltClubs[pl.iClubId];
 
                 if (iTransferFeeSecret > club.iBalanceSecret) {
                   transfer.ltOffers.Remove(offer);
@@ -2719,7 +2746,7 @@ namespace CornerkickWebMvc.Controllers
                 if (pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
-                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club)) {
+                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club, iTransferIx: iT)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
                     MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
                   }
@@ -4203,6 +4230,8 @@ namespace CornerkickWebMvc.Controllers
         mdClub.sRecordCWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 1));
         mdClub.sRecordCDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 0));
         mdClub.sRecordCDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 1));
+
+        mdClub.sAttrFc = mdClub.club.getAttractionFactor(MvcApplication.ckcore.iSeason).ToString("0.0");
       }
 
       return View(mdClub);
@@ -4221,7 +4250,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Main.Success sucLge = CornerkickManager.Tool.getSuccess(clb, league);
       if (sucLge != null) {
         for (int iS = 0; iS < sucLge.ltCupPlace.Count; iS++) {
-          ltDataPoints.Add(new Models.DataPointGeneral(iS + 1, sucLge.ltCupPlace[iS]));
+          ltDataPoints.Add(new Models.DataPointGeneral(sucLge.ltCupPlace[iS][1], sucLge.ltCupPlace[iS][0]));
         }
       }
 
@@ -4233,14 +4262,14 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
-    private string getClubEmblem(int iClubId, string sStyle = "")
+    private string getClubEmblem(int iClubId, string sStyle = "", bool bTiny = false)
     {
       CornerkickManager.Club clb = null;
       if (iClubId >= 0 && iClubId < MvcApplication.ckcore.ltClubs.Count) clb = MvcApplication.ckcore.ltClubs[iClubId];
 
-      return getClubEmblem(clb, sStyle);
+      return getClubEmblem(clb, sStyle: sStyle, bTiny: bTiny);
     }
-    private string getClubEmblem(CornerkickManager.Club clb, string sStyle = "")
+    private string getClubEmblem(CornerkickManager.Club clb, string sStyle = "", bool bTiny = false)
     {
       string sEmblem = "<img src=\"/Content/Uploads/emblems/";
 
@@ -4248,25 +4277,50 @@ namespace CornerkickWebMvc.Controllers
 
       if (clb == null) return sEmblem + "0.png\" alt=\"Wappen\" " + sStyle + " title=\"vereinslos\"/>";
 
-#if DEBUG
-      string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
-      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[clb.iLand] + ".png");
-#else
-      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", clb.iId.ToString() + ".png");
-      if (clb.bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[clb.iLand] + ".png");
-#endif
+      string sEmblemFile = "";
+      if (clb.bNation) {
+        sEmblemFile = getClubEmblemPath(clb.iLand, bNation: clb.bNation, bTiny: bTiny);
+        if (bTiny && string.IsNullOrEmpty(sEmblemFile)) sEmblemFile = getClubEmblemPath(clb.iLand, bNation: clb.bNation, bTiny: false);
+      } else {
+        sEmblemFile = getClubEmblemPath(clb.iId,   bNation: clb.bNation, bTiny: bTiny);
+        if (bTiny && string.IsNullOrEmpty(sEmblemFile)) sEmblemFile = getClubEmblemPath(clb.iId,   bNation: clb.bNation, bTiny: false);
+      }
+
       if (clb.bNation) {
         sEmblem = "<img src=\"/Content/Icons/flags/";
         if (System.IO.File.Exists(sEmblemFile)) sEmblem += CornerkickManager.Main.sLandShort[clb.iLand];
         else                                    sEmblem += "0";
+        bTiny = false;
       } else {
-        if (System.IO.File.Exists(sEmblemFile)) sEmblem += clb.iId.ToString();
-        else                                    sEmblem += "0";
+        if (System.IO.File.Exists(sEmblemFile)) {
+          sEmblem += clb.iId.ToString();
+        } else {
+          sEmblem += "0";
+          bTiny = false;
+        }
       }
+
+      if (bTiny) sEmblem += "_tiny";
 
       sEmblem += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + clb.sName + "\"/>";
 
       return sEmblem;
+    }
+    private static string getClubEmblemPath(int iClubId, bool bNation = false, bool bTiny = false)
+    {
+      string sTiny = "";
+      if (bTiny) sTiny = "_tiny";
+#if DEBUG
+      string sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems", iClubId.ToString() + sTiny + ".png");
+      if (bNation) sEmblemFile = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[iClubId] + ".png");
+#else
+      string sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Uploads", "emblems", iClubId.ToString() + sTiny + ".png");
+      if (bNation) sEmblemFile = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Content", "Icons", "flags", CornerkickManager.Main.sLandShort[iClubId] + ".png");
+#endif
+
+      if (!System.IO.File.Exists(sEmblemFile)) return null;
+
+      return sEmblemFile;
     }
 
     private string getStringRecordGame(CornerkickGame.Game.Data gdRecord)
@@ -4444,7 +4498,22 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
-        string sEmblem = getClubEmblem(tbpl.iId, "width: 12px");
+        // Create tiny emblem file
+        if (string.IsNullOrEmpty(getClubEmblemPath(tbpl.iId, bNation: false, bTiny: true))) {
+          string sEmblemFile = getClubEmblemPath(tbpl.iId, bNation: false, bTiny: false);
+
+          if (!string.IsNullOrEmpty(sEmblemFile)) {
+            const int iEmblemTinyWidth = 24;
+            Image imgEmblem = Image.FromFile(sEmblemFile);
+            int iHeight = (int)(imgEmblem.Height * iEmblemTinyWidth / (double)imgEmblem.Width);
+            Size szEmblemTiny = new Size(iEmblemTinyWidth, iHeight);
+            Image imgEmblemTiny = (Image)(new Bitmap(imgEmblem, szEmblemTiny));
+            string sEmblemTinyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(sEmblemFile), System.IO.Path.GetFileNameWithoutExtension(sEmblemFile)) + "_tiny" + System.IO.Path.GetExtension(sEmblemFile);
+            imgEmblemTiny.Save(sEmblemTinyFile);
+          }
+        }
+
+        string sEmblem = getClubEmblem(tbpl.iId, sStyle: "width: 12px", bTiny: true);
 
         sBox += "<tr " + sStyle + "\">";
         sBox += "<td class=\"first\" bgcolor=\"" + sBgColor + "\" align=\"center\"><b>" + k + "</b></td>";
@@ -5345,6 +5414,7 @@ namespace CornerkickWebMvc.Controllers
       financeModel.iPriceSeason1 = clb.iAdmissionPriceSeasonal[0];
       financeModel.iPriceSeason2 = clb.iAdmissionPriceSeasonal[1];
       financeModel.iPriceSeason3 = clb.iAdmissionPriceSeasonal[2];
+      financeModel.fSeasonalTicketsMaxFrac = clb.fSeasonalTicketsMaxFrac * 100f;
 
       financeModel.iSeasonalTickets = new int[clb.iSpectatorsSeasonal.Length];
       financeModel.iSeasonalTickets = clb.iSpectatorsSeasonal;
@@ -5503,7 +5573,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult FinanceSetAdmissionPriceSeasonal(int[] iPrice)
+    public JsonResult FinanceSetAdmissionPriceSeasonal(int[] iPrice, float fSeasonalTicketsMaxFrac)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -5511,6 +5581,8 @@ namespace CornerkickWebMvc.Controllers
       clb.iAdmissionPriceSeasonal[0] = iPrice[0];
       clb.iAdmissionPriceSeasonal[1] = iPrice[1];
       clb.iAdmissionPriceSeasonal[2] = iPrice[2];
+
+      clb.fSeasonalTicketsMaxFrac = fSeasonalTicketsMaxFrac / 100f;
 
       return Json(null, JsonRequestBehavior.AllowGet);
     }
@@ -5728,7 +5800,7 @@ namespace CornerkickWebMvc.Controllers
 
       statisticModel.sPlayerSkillBest = new string[CornerkickManager.Player.sSkills.Length][];
       for (byte iS = 0; iS < CornerkickManager.Player.sSkills.Length; iS++) {
-        if (iS == 16) continue; // Both foot skill
+        if (iS == CornerkickGame.Player.iIndTrainingIxFoot) continue; // Both foot skill
 
         statisticModel.sPlayerSkillBest[iS] = new string[4]; // Skill name, player name, skill value, club
 
@@ -5891,32 +5963,38 @@ namespace CornerkickWebMvc.Controllers
           CornerkickGame.Player.ClubHistory ch = pl.ltClubHistory[iCh];
 
           if (ch.iTransferFee > 0) {
-            // Get name of new club
-            string sClubTakeName = "vereinslos";
-            if (ch.iClubId >= 0) {
-              sClubTakeName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
-              //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
+            if (ch.iClubId < 0 || ch.iClubId >= MvcApplication.ckcore.ltClubs.Count) {
+              ch.iTransferFee = 0;
+              ch.iClubId = -1;
+              continue;
             }
+
+            // Get name of new club
+            string sClubTakeName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
 
             // Get name of old club
-            string sClubGiveName = "vereinslos";
             if (iCh > 0) {
               CornerkickGame.Player.ClubHistory chLast = pl.ltClubHistory[iCh - 1];
-              if (chLast.iClubId >= 0) {
-                sClubGiveName = MvcApplication.ckcore.ltClubs[chLast.iClubId].sName;
-                //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
-              }
-            }
 
-            ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
-              iIx = iT++,
-              sPlayerName = pl.sName,
-              sClubTakeName = sClubTakeName,
-              sClubGiveName = sClubGiveName,
-              sDt = ch.dt.ToString("d", getCi()),
-              iValue = pl.getValueHistory(ch.dt) * 1000,
-              iTransferFee = ch.iTransferFee
-            });
+              // If no last club --> no transfer --> continue
+              if (chLast.iClubId < 0 || chLast.iClubId >= MvcApplication.ckcore.ltClubs.Count) {
+                ch.iTransferFee = 0;
+                chLast.iClubId = -1;
+                continue;
+              }
+
+              string sClubGiveName = MvcApplication.ckcore.ltClubs[chLast.iClubId].sName;
+
+              ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
+                iIx = iT++,
+                sPlayerName = pl.sName,
+                sClubTakeName = sClubTakeName,
+                sClubGiveName = sClubGiveName,
+                sDt = ch.dt.ToString("d", getCi()),
+                iValue = pl.getValueHistory(ch.dt) * 1000,
+                iTransferFee = ch.iTransferFee
+              });
+            }
           }
         }
       }
@@ -6125,6 +6203,7 @@ namespace CornerkickWebMvc.Controllers
     public class DatatableWish
     {
       public int iIx { get; set; }
+      public bool bVoted { get; set; } // If user has voted for this wish
       public string sTitle { get; set; }
       public string sDesc { get; set; }
       public string sOwner { get; set; }
@@ -6140,6 +6219,8 @@ namespace CornerkickWebMvc.Controllers
       Models.WishListModel.ltWish = new List<Models.WishListModel.Wish>();
       List<DatatableWish> ltDtWish = new List<DatatableWish>();
 
+      CornerkickManager.User usr = ckUser();
+
       var jss = new System.Web.Script.Serialization.JavaScriptSerializer();
 
       string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
@@ -6152,9 +6233,9 @@ namespace CornerkickWebMvc.Controllers
           DateTime dt = new DateTime();
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].date)) dt = DateTime.ParseExact(Models.WishListModel.ltWish[iW].date, "yyyyMMddHHmm", CultureInfo.InvariantCulture);
 
-          CornerkickManager.User usr = MvcApplication.ckcore.tl.getUserFromId(Models.WishListModel.ltWish[iW].owner);
+          CornerkickManager.User usrOwner = MvcApplication.ckcore.tl.getUserFromId(Models.WishListModel.ltWish[iW].owner);
           string sUsername = "unbekannt";
-          if (usr != null) sUsername = usr.sFirstname + " " + usr.sSurname;
+          if (usrOwner != null) sUsername = usrOwner.sFirstname + " " + usrOwner.sSurname;
 
           if (Models.WishListModel.ltWish[iW].votes == null) Models.WishListModel.ltWish[iW].votes = new List<string>();
 
@@ -6162,7 +6243,10 @@ namespace CornerkickWebMvc.Controllers
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].version)) sVer = Models.WishListModel.ltWish[iW].version;
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].dateRel)) sVer += " (" + DateTime.ParseExact(Models.WishListModel.ltWish[iW].dateRel, "yyyyMMddHHmm", CultureInfo.InvariantCulture) + ")";
 
-          ltDtWish.Add(new DatatableWish() { iIx = iW + 1, sTitle = Models.WishListModel.ltWish[iW].title, sDesc = Models.WishListModel.ltWish[iW].description, sOwner = sUsername, iComplexity = Models.WishListModel.ltWish[iW].complexity, iVotes = Models.WishListModel.ltWish[iW].votes.Count, fRank = Models.WishListModel.ltWish[iW].ranking, sDate = dt.ToString("d", getCi()), fProgress = Models.WishListModel.ltWish[iW].progress, sVerRelease = sVer });
+          bool bVoted = false;
+          if (usr != null) bVoted = Models.WishListModel.ltWish[iW].votes.Contains(usr.id);
+
+          ltDtWish.Add(new DatatableWish() { iIx = iW + 1, sTitle = Models.WishListModel.ltWish[iW].title, sDesc = Models.WishListModel.ltWish[iW].description, sOwner = sUsername, iComplexity = Models.WishListModel.ltWish[iW].complexity, iVotes = Models.WishListModel.ltWish[iW].votes.Count, fRank = Models.WishListModel.ltWish[iW].ranking, sDate = dt.ToString("d", getCi()), fProgress = Models.WishListModel.ltWish[iW].progress, sVerRelease = sVer, bVoted = bVoted });
         }
       }
 
@@ -6234,13 +6318,31 @@ namespace CornerkickWebMvc.Controllers
 
     private void writeWishesToJsonFile(List<Models.WishListModel.Wish> ltWish)
     {
-      Models.WishListModel.WishJson wishJson = new Models.WishListModel.WishJson();
-      wishJson.Wish = ltWish;
-      string sJsonWishes = JsonConvert.SerializeObject(wishJson);
+      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
+
+      // Create backup
+      try {
+        if (System.IO.File.Exists(sFileWl)) System.IO.File.Move(sFileWl, sFileWl + ".bck");
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to create backup of wishlist: " + sFileWl);
+      }
+
+      string sJsonWishes = "";
+      try {
+        Models.WishListModel.WishJson wishJson = new Models.WishListModel.WishJson();
+        wishJson.Wish = ltWish;
+        sJsonWishes = JsonConvert.SerializeObject(wishJson);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to serialize wishlist");
+        return;
+      }
 
       // Write string to file
-      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
-      System.IO.File.WriteAllText(sFileWl, sJsonWishes);
+      try {
+        System.IO.File.WriteAllText(sFileWl, sJsonWishes);
+      } catch {
+        MvcApplication.ckcore.tl.writeLog("Unable to write wishlist to file: " + sFileWl);
+      }
     }
 
     public ActionResult WishListUpdateWish(int iWishIx, string sComplexity, string sProgress, string sVer, string sDateRel)

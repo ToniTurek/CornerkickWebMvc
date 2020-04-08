@@ -41,6 +41,12 @@
         if (!bUpDownloads && ltLog[iL].includes("Try to upload file")) {
           continue;
         }
+        if (!bUpDownloads && ltLog[iL].includes("Directory info games:")) {
+          continue;
+        }
+        if (!bUpDownloads && ltLog[iL].includes("File info games length:")) {
+          continue;
+        }
 
         var rowComments = tblLog.insertRow(0);
         var cellComments = rowComments.insertCell(0);

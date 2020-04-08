@@ -38,20 +38,21 @@
   function setName() {
     var tbName = document.getElementById("sName");
 
-    var sNewName = $("#sName").val();
-    $.ajax({
-      url: '/Member/setPlayerName',
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayer: @Model.iPlayer, sName: sNewName },
-      success: function () {
-        tbName.style.backgroundColor = "";
-      },
-      error: function (xhr) {
-        tbName.style.backgroundColor = "yellow";
-        alert(xhr.responseText);
-      }
-    });
+    if (tbName) {
+      $.ajax({
+        url: '/Member/setPlayerName',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: @Model.iPlayer, sName: tbName.value },
+        success: function () {
+          tbName.style.backgroundColor = "";
+        },
+        error: function (xhr) {
+          tbName.style.backgroundColor = "yellow";
+          alert(xhr.responseText);
+        }
+      });
+    }
   }
 
   function setNo() {
@@ -826,7 +827,37 @@
           </tr>
         </thead>
         <tbody>
-         @for (int i = 0; i < player.iSkill.Length; i++) {
+          @{
+            int i = 0;
+          }
+          <tr>
+            <td align="right">@CornerkickManager.Player.sSkills[0]</td>
+            <td align="center">@player.iSkill[0]</td>
+            @{
+              if (Model.bOwnPlayer && !Model.bNation) {
+                var fTraining = player.fSkillTraining[i] + 1.0;
+                <td align="right">@fTraining.ToString("0.0%")</td>
+                <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+              }
+            }
+          </tr>
+          <tr>
+            @{
+              i = 16;
+            }
+            <td align="right">@CornerkickManager.Player.sSkills[i]</td>
+            <td align="center">@player.iSkill[i]</td>
+            @{
+              if (Model.bOwnPlayer && !Model.bNation) {
+                var fTraining = player.fSkillTraining[i] + 1.0;
+                <td align="right">@fTraining.ToString("0.0%")</td>
+                <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+              }
+            }
+          </tr>
+          @for (i = 1; i < player.iSkill.Length - 1; i++) {
             var fTraining = player.fSkillTraining[i] + 1.0;
             <tr>
               <td align="right">@CornerkickManager.Player.sSkills[i]</td>
@@ -854,7 +885,7 @@
           </tr>
         </thead>
         <tbody>
-         @for (byte i = 0; i < player.fExperiencePos.Length; i++) {
+         @for (i = 0; i < player.fExperiencePos.Length; i++) {
             byte j = (byte)(i + 1);
 
             string sColor = "";
