@@ -1182,6 +1182,30 @@ namespace CornerkickWebMvc.Controllers
       return Json("success", JsonRequestBehavior.AllowGet);
     }
 
+    public JsonResult TeamMovePlayerToXY(int iIndexPlayer, int iX, int iY, byte iTactic = 0)
+    {
+      CornerkickManager.Club club = ckClub();
+      if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      if (iIndexPlayer < 0 || iIndexPlayer >= club.ltTactic[0].formation.ptPos.Length) return Json("error", JsonRequestBehavior.AllowGet);
+
+      if (iX <                                        0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iX > MvcApplication.ckcore.game.ptPitch.X / 2) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iY < -MvcApplication.ckcore.game.ptPitch.Y)    return Json(null, JsonRequestBehavior.AllowGet);
+      if (iY > +MvcApplication.ckcore.game.ptPitch.Y)    return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Tactic.Formation frmClub = club.ltTactic[iTactic].formation;
+
+      frmClub.ptPos[iIndexPlayer].X = iX;
+      frmClub.ptPos[iIndexPlayer].Y = iY;
+
+      frmClub.iId = 0;
+
+      updatePlayerOfGame(ckUser().game, club);
+
+      return Json("success", JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult movePlayerRoa(int iIndexPlayer, int iDirection)
     {
       if (iIndexPlayer < 0) return Json("error", JsonRequestBehavior.AllowGet);

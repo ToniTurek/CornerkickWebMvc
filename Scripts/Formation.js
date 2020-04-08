@@ -181,7 +181,7 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
   var sSelectPlayer = "";
   var sZIndex = "";
   if (!bOpponentTeam) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\" ontouchstart=\"selectPlayer(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\" ontouchstart=\"selectPlayer(" + i.toString() + ")\" data-ix=\"" + i.toString() + "\"";
     if (i === iSelectedPlayer) {
       sZIndex = "; z-index: 98";
     }
@@ -214,19 +214,19 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
       '<img src="/Content/Icons/captain.png" title="Kapitän" style="position: absolute; width: 16px; top: 2px; left: 2px"/>';
   }
   sBox +=
-          '<h2 style="position: absolute; text-align: center; width: 100%; margin: 0; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</h2>' +
+          '<text style="position: absolute; top: -4px; text-align: center; width: 100%; margin: 0; padding: 0px; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</text>' +
         '</div>' +
         '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 0%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sPos[iPos] + '</h2>' +
+          '<text style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sPos[iPos] + '</text>' +
         '</div>' +
         '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 25%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sStrength + '</h2>' +
+          '<text style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sStrength + '</text>' +
         '</div>' +
         '<div style="position: absolute; width: 50%; height: 35%; min-height: 8px; bottom: 0px; left: 50%; background-color: ' + color + '">';
   if (sAge) {
-    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</h2>';
+    sBox += '<text style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</text>';
   } else {
-    sBox += '<text class="txtPosition" style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0px; padding: 0px; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</text>';
+    sBox += '<text class="txtPosition" style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0px; padding: 0px; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</text>';
   }
   sBox +=
         '</div>';

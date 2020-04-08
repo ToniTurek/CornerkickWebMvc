@@ -58,6 +58,7 @@
     var iFormation = 0;
     var iSelectedPlayer = 0;
     var bAllowMove = false;
+    var bPreventOnClick = false;
 
     var datatableTeamGlobal;
 
@@ -98,6 +99,8 @@
     }
 
     function selectPlayer(iSelPlayer) {
+      if (bPreventOnClick) return;
+
       if (!e) var e = window.event;
       e.cancelBubble = true;
       if (e.stopPropagation) e.stopPropagation();
@@ -173,18 +176,38 @@
       });
     }
 
-    function movePlayerDrag(iPixX, iPixY) {
+    function getXYfromElement(elmnt, iPixX, iPixY) {
+      var iXY = [];
+
+      var iBoxH = elmnt.offsetHeight;
+      var iBoxW = elmnt.offsetWidth;
+
+      var elmntPar = elmnt.parentElement;
+      var fX = ((elmntPar.offsetHeight - iPixX) - (iBoxH / 2)) / (elmntPar.offsetHeight / 2);
+      var fY = (iPixY + (iBoxW / 2) - (elmntPar.offsetWidth / 2)) / elmntPar.offsetWidth;
+      iXY.push(Math.round(fX * 61));
+      iXY.push(Math.round(fY * 50));
+
+      return iXY;
+    }
+
+    function movePlayerDrag(elmnt, iPixX, iPixY) {
+      var iXY = getXYfromElement(elmnt, iPixX, iPixY);
+      var iPlIx = elmnt.getAttribute('data-ix');
+
       $.ajax({
-        url: '/Member/TeamMovePlayerDrag',
+        url: '/Member/TeamMovePlayerToXY',
         type: "GET",
         dataType: "JSON",
         cache: false,
         contentType: "application/json; charset=utf-8",
-        data: { iIndexPlayer: iSelectedPlayer - 1, iPixX: iPixX, iPixY: iPixY },
+        data: { iIndexPlayer: iPlIx, iX: iXY[0], iY: iXY[1], iTactic: 0 },
         success: function () {
           drawAufstellung(-1, iSelectedPlayer, true);
           datatableTeamGlobal.rows('.selected_tmp').nodes().to$().removeClass('selected_tmp');
           datatableTeamGlobal.rows('.selected')    .nodes().to$().removeClass('selected');
+
+          bPreventOnClick = false;
         }
       });
     }
@@ -498,16 +521,14 @@
     }); // $(document).ready(function () {});
 
     function dragElement(elmnt) {
-      var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      var pos1 = -100, pos2 = -100, pos3 = 0, pos4 = 0;
 
-      var iBoxH = elmnt.offsetHeight;
-      var iBoxW = elmnt.offsetWidth;
-      //var divFieldContainer = document.getElementById("divFieldContainer");
-      //var divDrawFormation = document.getElementById("divDrawFormationContainer");
-      //var iFieldX = divDrawFormation.offsetLeft + divFieldContainer.offsetLeft;
-      //alert(iBoxH + ', ' + iBoxW);
+      var iPixX = 0;
+      var iPixY = 0;
 
       elmnt.onmousedown = dragMouseDown;
+
+      bPreventOnClick = true;
 
       function dragMouseDown(e) {
         e = e || window.event;
@@ -533,21 +554,28 @@
         pos3 = e.clientX;
         pos4 = e.clientY;
 
-        var iPixX = elmnt.offsetTop  - pos2;
-        var iPixY = elmnt.offsetLeft - pos1;
+        iPixX = elmnt.offsetTop  - pos2;
+        iPixY = elmnt.offsetLeft - pos1;
 
         // set the element's new position:
         elmnt.style.top  = iPixX + "px";
         elmnt.style.left = iPixY + "px";
 
-        alert(iBoxW / 2);
-        var iX = ((100 - elmnt.offsetTop) * 122) / 100;
-        var iY = ((50 * elmnt.offsetLeft) / 100) - 25;
-        elmnt.getElementsByClassName("txtPosition")[0].innerHTML = iPixX - (iBoxW / 2) + "/" + iPixY - (iBoxH / 2);
+        var iXY = getXYfromElement(elmnt, iPixX, iPixY);
+        elmnt.getElementsByClassName("txtPosition")[0].innerHTML = iXY[1].toString() + "/" + iXY[0].toString();
       }
 
       function closeDragElement() {
-        movePlayerDrag(elmnt.style.top, elmnt.style.left);
+        if (pos1 < -99) {
+          bPreventOnClick = false;
+          return;
+        }
+        if (pos2 < -99) {
+          bPreventOnClick = false;
+          return;
+        }
+
+        movePlayerDrag(elmnt, iPixX, iPixY);
 
         /* stop moving when mouse button is released:*/
         document.onmouseup   = null;
