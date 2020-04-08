@@ -6265,7 +6265,7 @@ namespace CornerkickWebMvc.Controllers
 
           string sVer = "-";
           if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].version)) sVer = Models.WishListModel.ltWish[iW].version;
-          if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].dateRel)) sVer += " (" + DateTime.ParseExact(Models.WishListModel.ltWish[iW].dateRel, "yyyyMMddHHmm", CultureInfo.InvariantCulture) + ")";
+          if (!string.IsNullOrEmpty(Models.WishListModel.ltWish[iW].dateRel)) sVer += " (" + Models.WishListModel.ltWish[iW].dateRel + ")";
 
           bool bVoted = false;
           if (usr != null) bVoted = Models.WishListModel.ltWish[iW].votes.Contains(usr.id);
@@ -6335,8 +6335,9 @@ namespace CornerkickWebMvc.Controllers
 
         if (wish.votes == null) wish.votes = new List<string>();
 
-        if (wish.complexity <= 0.1) wish.ranking = 0f;
-        else                        wish.ranking = wish.votes.Count / (float)wish.complexity;
+        if      (wish.complexity <= 0.1)   wish.ranking = 0f;
+        else if (wish.progress   >  0.999) wish.ranking = -1f;
+        else                               wish.ranking = wish.votes.Count / (float)wish.complexity;
       }
     }
 
@@ -6384,6 +6385,7 @@ namespace CornerkickWebMvc.Controllers
       if (fProgress >= 0) Models.WishListModel.ltWish[iWishIx - 1].progress   = fProgress;
       if (!string.IsNullOrEmpty(sVer))     Models.WishListModel.ltWish[iWishIx - 1].version = sVer;
       if (!string.IsNullOrEmpty(sDateRel)) Models.WishListModel.ltWish[iWishIx - 1].dateRel = sDateRel;
+      if (fProgress > 0.999f) Models.WishListModel.ltWish[iWishIx - 1].votes.Clear();
 
       calculateWishRating  (Models.WishListModel.ltWish);
       writeWishesToJsonFile(Models.WishListModel.ltWish);
