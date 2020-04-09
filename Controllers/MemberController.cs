@@ -3434,8 +3434,8 @@ namespace CornerkickWebMvc.Controllers
 
       stadionModel.stadionNew = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);
 
-      stadionModel.iSnackbarNew = (byte)(clb.stadium.iSnackbarNew - clb.stadium.iSnackbar);
-      stadionModel.iToiletsNew  = (byte)(clb.stadium.iToiletsNew  - clb.stadium.iToilets);
+      stadionModel.iSnackbarNew = (byte)Math.Max(clb.stadium.iSnackbarNew - clb.stadium.iSnackbar, 0);
+      stadionModel.iToiletsNew  = (byte)Math.Max(clb.stadium.iToiletsNew  - clb.stadium.iToilets,  0);
 
       /*
       stModel.stadionNew = MvcApplication.ckcore.ini.newStadion();
