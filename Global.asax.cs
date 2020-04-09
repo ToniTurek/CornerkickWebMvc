@@ -792,7 +792,7 @@ namespace CornerkickWebMvc
       }
 
       // Upload wishlist
-      as3.uploadFile(Path.Combine(sHomeDir, "wishlist", "wishlist.json"), "wishlist.json");
+      as3.uploadFile(Path.Combine(sHomeDir, "wishlist.json"), "wishlist.json");
 #endif
     }
 
@@ -941,7 +941,7 @@ namespace CornerkickWebMvc
         Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
 
         // Download wishlist
-        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist", "wishlist.json")));
+        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist.json")));
 
         // Download archive cups
         if (!System.IO.Directory.Exists(Path.Combine(sHomeDir, "archive"))) System.IO.Directory.CreateDirectory(Path.Combine(sHomeDir, "archive"));

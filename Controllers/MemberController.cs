@@ -6247,7 +6247,7 @@ namespace CornerkickWebMvc.Controllers
 
       var jss = new System.Web.Script.Serialization.JavaScriptSerializer();
 
-      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
+      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist.json");
       if (System.IO.File.Exists(sFileWl)) {
         Models.WishListModel.WishJson wishJson = jss.Deserialize<Models.WishListModel.WishJson>(System.IO.File.ReadAllText(sFileWl));
 
@@ -6343,13 +6343,27 @@ namespace CornerkickWebMvc.Controllers
 
     private void writeWishesToJsonFile(List<Models.WishListModel.Wish> ltWish)
     {
-      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist", "wishlist.json");
+      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist.json");
 
       // Create backup
       try {
-        if (System.IO.File.Exists(sFileWl)) System.IO.File.Move(sFileWl, sFileWl + ".bck");
+        if (System.IO.File.Exists(sFileWl)) {
+          string sFileWlBck = sFileWl + ".bck";
+
+          // Delete backup file if exist
+          if (System.IO.File.Exists(sFileWlBck)) {
+            try {
+              System.IO.File.Delete(sFileWlBck);
+            } catch {
+              MvcApplication.ckcore.tl.writeLog("Unable to delete wishlist backup file: " + sFileWl, CornerkickManager.Main.sErrorFile);
+            }
+          }
+
+          // Create backup file
+          System.IO.File.Move(sFileWl, sFileWl + ".bck");
+        }
       } catch {
-        MvcApplication.ckcore.tl.writeLog("Unable to create backup of wishlist: " + sFileWl);
+        MvcApplication.ckcore.tl.writeLog("Unable to create backup of wishlist: " + sFileWl, CornerkickManager.Main.sErrorFile);
       }
 
       string sJsonWishes = "";
@@ -6366,7 +6380,7 @@ namespace CornerkickWebMvc.Controllers
       try {
         System.IO.File.WriteAllText(sFileWl, sJsonWishes);
       } catch {
-        MvcApplication.ckcore.tl.writeLog("Unable to write wishlist to file: " + sFileWl);
+        MvcApplication.ckcore.tl.writeLog("Unable to write wishlist to file: " + sFileWl, CornerkickManager.Main.sErrorFile);
       }
     }
 
