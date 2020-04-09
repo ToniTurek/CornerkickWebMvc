@@ -6154,19 +6154,36 @@ namespace CornerkickWebMvc.Controllers
       return Json("Nachricht an " + usrTo.sFirstname + " " + usrTo.sSurname + " gesendet!", JsonRequestBehavior.AllowGet);
     }
 
-    public void MailMarkRead(string sDate, string sFrom)
+    [HttpPost]
+    public JsonResult MailMarkRead(string sDate, string sFrom)
     {
       CornerkickManager.User user = ckUser();
 
       DateTime dtMail = DateTime.Parse(sDate);
 
-      string sMail = getMailFilename(user, dtMail, sFrom);
-      string sMailFull = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", sMail);
-      if (System.IO.File.Exists(sMailFull)) {
-        string[] lines = System.IO.File.ReadAllLines(sMailFull);
-        lines[0] = lines[0].Replace("true", "false");
-        System.IO.File.WriteAllLines(sMailFull, lines);
+      string sFileMail = getMailFilename(user, dtMail, sFrom);
+      string sFileMailFull = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", sFileMail);
+      if (System.IO.File.Exists(sFileMailFull)) {
+        string[] lines = System.IO.File.ReadAllLines(sFileMailFull);
+
+        string[] sFirstLine = lines[0].Split();
+        if (sFirstLine.Length > 3) {
+          bool bRead = false;
+          bool.TryParse(sFirstLine[3], out bRead);
+
+          if (bRead) {
+            lines[0] = lines[0].Replace("true", "false");
+            try {
+              System.IO.File.WriteAllLines(sFileMailFull, lines);
+              return Json(true, JsonRequestBehavior.AllowGet);
+            } catch {
+              return Json(false, JsonRequestBehavior.AllowGet);
+            }
+          }
+        }
       }
+
+      return Json(false, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -6177,18 +6194,14 @@ namespace CornerkickWebMvc.Controllers
 
       DateTime dtMail = DateTime.Parse(sDate);
 
-      /*
-      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
-      System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
-      */
-
       string sMail = getMailFilename(user, dtMail, sFrom);
-      if (System.IO.File.Exists(sMail)) System.IO.File.Delete(sMail);
-      /*
-      foreach (var fileMail in diMail.GetFiles(sMail)) {
-        System.IO.File.Delete(fileMail.Name);
+      if (System.IO.File.Exists(sMail)) {
+        try {
+          System.IO.File.Delete(sMail);
+        } catch {
+          MvcApplication.ckcore.tl.writeLog("Unable to delete mail: " + sMail, CornerkickManager.Main.sErrorFile);
+        }
       }
-      */
 
       return Json(false, JsonRequestBehavior.AllowGet);
     }
@@ -6198,17 +6211,26 @@ namespace CornerkickWebMvc.Controllers
       return System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
     }
 
-    public int countNewMails()
+    public static int MailCountNewMails(CornerkickManager.User usr)
     {
-      CornerkickManager.User user = ckUser();
-      if (user == null) return 0;
+      if (usr == null) return 0;
 
       int iMails = 0;
 
       string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
-      System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
-      foreach (var fileMail in diMail.GetFiles(user.id + "_*.txt")) {
-        
+      if (System.IO.Directory.Exists(sDirMail)) {
+        System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
+
+        foreach (var fileMail in diMail.GetFiles(usr.id + "_*.txt")) {
+          string sContent = System.IO.File.ReadAllText(fileMail.FullName);
+          string[] sContentSplit = sContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+          string sHeader = sContentSplit[0];
+          if (sHeader.Split().Length > 3) {
+            bool bNew = sHeader.Split()[3].Equals("true");
+            if (bNew) iMails++;
+          }
+        }
       }
 
       return iMails;

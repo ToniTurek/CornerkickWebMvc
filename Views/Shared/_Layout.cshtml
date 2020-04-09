@@ -132,15 +132,7 @@
 
           @{
             if (Request.IsAuthenticated && usr != null) {
-              int iMails = 0;
-              if (usr.ltNews != null) {
-                foreach (CornerkickManager.Main.News news in usr.ltNews) {
-                  if (news.iType == 99 && !news.bRead) {
-                    iMails++;
-                  }
-                }
-              }
-
+              int iMails = CornerkickWebMvc.Controllers.MemberController.MailCountNewMails(usr);
               string sMails = "";
               if (iMails > 0) {
                 sMails = " (" + iMails.ToString() + ")";
