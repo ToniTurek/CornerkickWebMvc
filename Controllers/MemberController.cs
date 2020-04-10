@@ -1370,9 +1370,11 @@ namespace CornerkickWebMvc.Controllers
       tD.ltPlayerPos      = new List<byte>  ();
       tD.ltPlayerAveSkill = new List<string>();
       tD.ltPlayerNat      = new List<string>();
+      tD.ltPlayerPortrait = new List<string>();
       tD.ltPlayerSusp     = new List<bool>  ();
       foreach (CornerkickGame.Player pl in tD.ltPlayer) {
         tD.ltPlayerNat.Add(CornerkickManager.Main.sLandShort[pl.iNat1]);
+        tD.ltPlayerPortrait.Add(getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain"));
 
         // Check if player is suspended
         bool bSusp = false;
@@ -1422,6 +1424,7 @@ namespace CornerkickWebMvc.Controllers
         tD.ltPlayerOpp = new List<CornerkickGame.Player>();
         tD.ltPlayerOppPos = new List<byte>();
         tD.ltPlayerOppAveSkill = new List<string>();
+        tD.ltPlayerOppPortrait = new List<string>();
 
         tD.bOppTeam = iClubOpp >= 0;
 
@@ -1441,6 +1444,7 @@ namespace CornerkickWebMvc.Controllers
             float fPlOppAveSkill = CornerkickGame.Tool.getAveSkill(plOpp, 99);
             if (tD.iKibitzer == 3) fPlOppAveSkill = (float)Math.Round(fPlOppAveSkill * 2f) / 2f;
             tD.ltPlayerOppAveSkill.Add(fPlOppAveSkill.ToString("0.0"));
+            tD.ltPlayerOppPortrait.Add(getPlayerPortrait(plOpp, sStyle: "height: 100%; width: 100%; object-fit: contain"));
           }
 
           // Opp. team averages
@@ -1754,9 +1758,11 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [Authorize]
-    public ActionResult PlayerDetails(int i)
+    public ActionResult PlayerDetails(Models.PlayerModel plModel, int i, HttpPostedFileBase file = null)
     {
-      Models.PlayerModel plModel = new Models.PlayerModel();
+      if (file != null) {
+        AccountController.uploadFileAsync(file, "Portraits", i);
+      }
 
       CornerkickManager.User usr = ckUser();
       if (usr == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -1783,6 +1789,7 @@ namespace CornerkickWebMvc.Controllers
       plModel.ltDdlNo = new List<SelectListItem>();
       plModel.iNo = plDetails.iNr;
 
+      plModel.sPortrait = getPlayerPortrait(plDetails, "height: 100%; width: 100%; object-fit: contain");
       plModel.sEmblem = getClubEmblem(plDetails.iClubId, "height: 100%; width: 100%; object-fit: contain");
 
       plModel.sColorJersey = "rgb(" + club.cl[0].R.ToString() + "," + club.cl[0].G.ToString() + "," + club.cl[0].B.ToString() + ")";
@@ -1868,6 +1875,67 @@ namespace CornerkickWebMvc.Controllers
     internal static bool checkColorBW(System.Drawing.Color cl)
     {
       return cl.R + cl.G + cl.B < 300;
+    }
+
+    private static string getPlayerPortrait(CornerkickGame.Player plPortrait, string sStyle = "")
+    {
+      string sPortrait = "<img src=\"/Content/Images/Portraits/";
+
+      if (!string.IsNullOrEmpty(sStyle)) sStyle = " style=\"" + sStyle + "\"";
+
+      if (plPortrait == null) return sPortrait + "0.png\" alt=\"Portrait\" " + sStyle + " title=\"ohne\"/>";
+
+      bool bUserPortrait;
+      string sPortraitFile = getPlayerPortraitFile(plPortrait, out bUserPortrait);
+
+      if (System.IO.File.Exists(sPortraitFile)) {
+        if (bUserPortrait) {
+          sPortrait = "<img src=\"/Content/Uploads/Portraits/" + plPortrait.iId.ToString();
+        } else {
+          sPortrait += getPlayerPortraitId(plPortrait).ToString();
+        }
+      } else {
+        sPortrait += "0";
+      }
+
+      sPortrait += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + plPortrait.sName + "\"/>";
+
+      return sPortrait;
+    }
+    private static string getPlayerPortraitFile(CornerkickGame.Player plPortrait, out bool bUserPortrait)
+    {
+#if DEBUG
+      string sBaseDir = MvcApplication.getHomeDir();
+#else
+      string sBaseDir = System.Web.HttpContext.Current.Server.MapPath("~");
+#endif
+
+      bUserPortrait = true;
+
+      string sPortraitFile = System.IO.Path.Combine(sBaseDir, "Content", "Uploads", "Portraits", plPortrait.iId.ToString() + ".png");
+      if (!System.IO.File.Exists(sPortraitFile)) {
+        sPortraitFile = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits", getPlayerPortraitId(plPortrait).ToString() + ".png");
+        bUserPortrait = false;
+      }
+
+      if (!System.IO.File.Exists(sPortraitFile)) return null;
+
+      return sPortraitFile;
+    }
+
+    private static ushort getPlayerPortraitId(CornerkickGame.Player plPortrait)
+    {
+      byte[] byteArrPortrait = new byte[] { plPortrait.clSkin.R, plPortrait.clSkin.G };
+      return BitConverter.ToUInt16(byteArrPortrait, 0);
+
+      /*
+      string sDirPortrait = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Images", "Portraits");
+
+      if (System.IO.Directory.Exists(sDirPortrait)) {
+        System.IO.DirectoryInfo diPortrait = new System.IO.DirectoryInfo(sDirPortrait);
+
+      }
+      */
     }
 
     public ActionResult setPlayerIndTraining(int iPlayer, int iIndTr)
@@ -4233,7 +4301,7 @@ namespace CornerkickWebMvc.Controllers
     //////////////////////////////////////////////////////////////////////////
     public ActionResult ClubDetails(Models.ClubModel mdClub, int iClub, HttpPostedFileBase file = null)
     {
-      if (file != null) AccountController.uploadFileAsync(file, iClub);
+      if (file != null) AccountController.uploadFileAsync(file, "emblems", iClub);
 
       if (iClub >= 0 && iClub < MvcApplication.ckcore.ltClubs.Count) {
         mdClub.club = MvcApplication.ckcore.ltClubs[iClub];
@@ -4293,7 +4361,7 @@ namespace CornerkickWebMvc.Controllers
 
       return getClubEmblem(clb, sStyle: sStyle, bTiny: bTiny);
     }
-    private string getClubEmblem(CornerkickManager.Club clb, string sStyle = "", bool bTiny = false)
+    private static string getClubEmblem(CornerkickManager.Club clb, string sStyle = "", bool bTiny = false)
     {
       string sEmblem = "<img src=\"/Content/Uploads/emblems/";
 
@@ -6201,6 +6269,8 @@ namespace CornerkickWebMvc.Controllers
         } catch {
           MvcApplication.ckcore.tl.writeLog("Unable to delete mail: " + sMail, CornerkickManager.Main.sErrorFile);
         }
+      } else {
+        MvcApplication.ckcore.tl.writeLog("Mail to delete '" + sMail + "' not found!", CornerkickManager.Main.sErrorFile);
       }
 
       return Json(false, JsonRequestBehavior.AllowGet);

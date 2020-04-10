@@ -435,6 +435,26 @@ namespace CornerkickWebMvc
         ckcore.tl.writeLog(plIvenHoffmann.sName + " C/F/M: " + plIvenHoffmann.fCondition.ToString("0.0%") + "/" + plIvenHoffmann.fFresh.ToString("0.0%") + "/" + plIvenHoffmann.fMoral.ToString("0.0%"), CornerkickManager.Main.sErrorFile);
       }
 
+      // Assign random portrait if none
+      for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
+        CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+
+        if (pl.clSkin.B == 0) {
+          string sDirPortrait = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Images", "Portraits");
+
+          if (System.IO.Directory.Exists(sDirPortrait)) {
+            System.IO.DirectoryInfo diPortrait = new System.IO.DirectoryInfo(sDirPortrait);
+
+            int nPortraitFiles = diPortrait.GetFiles("*.png").Length;
+            ushort iPortraitId = (ushort)random.Next(nPortraitFiles);
+
+            byte[] b = BitConverter.GetBytes(iPortraitId);
+
+            pl.clSkin = System.Drawing.Color.FromArgb(b[0], b[1], 1);
+          }
+        }
+      }
+
       // Beginn of new season
       if (iRetCk == 4) {
         // Draw leagues

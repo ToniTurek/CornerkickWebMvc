@@ -21,6 +21,7 @@ namespace CornerkickWebMvc.Models
     public bool bNation { get; set; }
 
     // Emblem
+    public string sPortrait { get; set; }
     public string sEmblem { get; set; }
 
     public string sColorJersey { get; set; }

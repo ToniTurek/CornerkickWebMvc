@@ -37,7 +37,7 @@
               sNo = (iPl + 1).toString();
             }
 
-            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, teamData.ltPlayerAveSkill[iPl], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[iPl], bMobile, 1.0, null, null, teamData.ltPlayerNat[iPl], iPl === teamData.iCaptainIx, teamData.ltPlayerSusp[iPl]);
+            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, teamData.ltPlayerAveSkill[iPl], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[iPl], bMobile, 1.0, null, null, teamData.ltPlayerNat[iPl], iPl === teamData.iCaptainIx, teamData.ltPlayerSusp[iPl], teamData.ltPlayerPortrait[iPl]);
 
             i = i + 1;
             return i !== 11;
@@ -67,7 +67,7 @@
                   sOppNo = (iPl + 1).toString();
                 }
 
-                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
+                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile, 1.0, null, null, null, false, false, teamData.ltPlayerOppPortrait[iPl]);
 
                 i = i + 1;
                 j = j + 1;
@@ -124,6 +124,20 @@
           var divPlayerBox = document.getElementById("divPlayerBox_" + iDg.toString());
           dragElement(divPlayerBox);
         }
+
+        // Add transparent class to player portraits
+        if (iSelectedPlayer > 0) {
+          var imgPortraits = document.getElementsByName("imgPortrait");
+          for (var iImg = 0; iImg < imgPortraits.length; iImg++) {
+            imgP = imgPortraits[iImg];
+            var iPlIx = parseInt(imgP.getAttribute('data-iIx'));
+            if (iPlIx === iSelectedPlayer - 1) {
+              imgP.className = "";
+            } else {
+              imgP.className = "img-transparent";
+            }
+          }
+        }
       } else {
         alert("data hasn't worked!");
       }
@@ -132,7 +146,7 @@
 }
 
 //function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
-function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended)
+function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended, sPortrait)
 {
   if (!iPos) {
     iPos = 0;
@@ -199,11 +213,28 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
   var sBox = "";
 
   sBox +=
-    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' dragMe="true" style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
-      '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + sNo + '</h2>' +
-      '</div>' +
-      '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black; background-color: ' + color + '">' +
+    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' dragMe="true" style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">';
+  if (sPortrait) {
+    var sImgName = "imgPortrait";
+    if (bOpponentTeam) {
+      sImgName += "Opp";
+    }
+    sBox +=
+      '<div style="position: absolute; top: -100%; left: 2px; width: 25%">';
+    sBox +=
+        '<div name="' + sImgName + '" data-iIx="' + i.toString() + '" style="absolute: relative; width: 100%; border: 2px solid black">' + sPortrait + '</div>';
+    sBox +=
+      '</div>';
+  }
+  sBox +=
+      '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">';
+  sBox +=
+        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + sNo + '</h2>';
+  sBox +=
+      '</div>';
+  sBox +=
+      '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black; background-color: ' + color + '">';
+  sBox +=
         '<div style="position: absolute; width: 100%; height: 65%; top: 0px; left: 0px; background-color: ' + color + '; word-break: break-word; vertical-align: middle">';
   if (sNat) {
     sBox +=

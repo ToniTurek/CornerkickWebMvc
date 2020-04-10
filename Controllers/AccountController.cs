@@ -302,7 +302,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       if (clb != null && fileEmblem != null) {
-        Task<bool> tkUploadEmblem = Task.Run(async () => await uploadFileAsync(fileEmblem, clb.iId));
+        Task<bool> tkUploadEmblem = Task.Run(async () => await uploadFileAsync(fileEmblem, "emblems", clb.iId));
       }
 
 #if DEBUG
@@ -634,7 +634,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public static async Task<bool> uploadFileAsync(HttpPostedFileBase file, int iClub)
+    public static async Task<bool> uploadFileAsync(HttpPostedFileBase file, string sFolder, int iFileId)
     {
 #if DEBUG
       //return false;
@@ -642,7 +642,8 @@ namespace CornerkickWebMvc.Controllers
 
       try {
         if (file != null && file.ContentLength > 0) {
-          string sFileExt = Path.GetExtension(file.FileName);
+          //string sFileExt = Path.GetExtension(file.FileName);
+          string sFileExt = ".png";
 
           // Get base directory
           string sBaseDir = CornerkickManager.Main.sHomeDir;
@@ -651,12 +652,15 @@ namespace CornerkickWebMvc.Controllers
           sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
 #endif
 
-          string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", "emblems", iClub.ToString() + sFileExt);
-          MvcApplication.ckcore.tl.writeLog("Save emblem to '" + sFilenameLocal + "'");
-          file.SaveAs(sFilenameLocal);
+          string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", sFolder, iFileId.ToString() + sFileExt);
+          MvcApplication.ckcore.tl.writeLog("Save file to '" + sFilenameLocal + "'");
+          //file.SaveAs(sFilenameLocal);
+
+          System.Drawing.Image img = System.Drawing.Image.FromFile(file.FileName);
+          img.Save(sFilenameLocal, System.Drawing.Imaging.ImageFormat.Png);
 
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-          as3.uploadFile(sFilenameLocal, "emblems/" + iClub.ToString() + sFileExt, "image/custom");
+          as3.uploadFile(sFilenameLocal, sFolder + "/" + iFileId.ToString() + sFileExt, "image/custom");
         }
 
         return true;
