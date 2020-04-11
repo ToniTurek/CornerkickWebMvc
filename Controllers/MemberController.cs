@@ -6258,8 +6258,9 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult MailMarkRead(string sDate, string sFrom)
     {
       CornerkickManager.User user = ckUser();
-      DateTime dtMail = new DateTime();
-      if (!DateTime.TryParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtMail)) {
+
+      DateTime dtMail;
+      if (!getDateTimeFromMailStr(sDate, out dtMail)) {
         MvcApplication.ckcore.tl.writeLog("Unable to mark email (user: " + user.id + ", date: " + sDate + ") as read", CornerkickManager.Main.sErrorFile);
         return Json(false, JsonRequestBehavior.AllowGet);
       }
@@ -6294,14 +6295,40 @@ namespace CornerkickWebMvc.Controllers
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
+    private bool getDateTimeFromMailStr(string sDate, out DateTime dtMail)
+    {
+      dtMail = new DateTime();
+
+      string[] sDateSplit = sDate.Split();
+
+      if (sDateSplit.Length < 2) return false;
+
+      // First: parse date part of string with user culture info
+      DateTime dtDate = new DateTime();
+      if (!DateTime.TryParse(sDateSplit[0], getCi(), DateTimeStyles.None, out dtDate)) {
+        MvcApplication.ckcore.tl.writeLog("Unable to parse email date: " + sDate, CornerkickManager.Main.sErrorFile);
+        return false;
+      }
+
+      TimeSpan tsTime = new TimeSpan();
+      if (!TimeSpan.TryParseExact(sDateSplit[1], "g", CultureInfo.InvariantCulture, TimeSpanStyles.AssumeNegative, out tsTime)) {
+        MvcApplication.ckcore.tl.writeLog("Unable to parse email time: " + sDate, CornerkickManager.Main.sErrorFile);
+        return false;
+      }
+
+      dtMail = dtDate.Add(tsTime);
+
+      return true;
+    }
+
     [HttpPost]
     public JsonResult MailDeleteTxt(string sDate, string sFrom)
     {
       CornerkickManager.User user = ckUser();
       if (user == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      DateTime dtMail = new DateTime();
-      if (!DateTime.TryParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtMail)) {
+      DateTime dtMail;
+      if (!getDateTimeFromMailStr(sDate, out dtMail)) {
         MvcApplication.ckcore.tl.writeLog("Unable to delete email (user: " + user.id + ", date: " + sDate + ")", CornerkickManager.Main.sErrorFile);
         return Json(false, JsonRequestBehavior.AllowGet);
       }
@@ -6329,9 +6356,7 @@ namespace CornerkickWebMvc.Controllers
     {
       for (int iM = 0; iM < MvcApplication.ltMail.Count; iM++) {
         MvcApplication.Mail mail = MvcApplication.ltMail[iM];
-        if (mail.sIdTo.Equals(user.id) && mail.dt.Equals(dtMail)) {
-          return mail;
-        }
+        if (mail.sIdTo.Equals(user.id) && Math.Abs((mail.dt - dtMail).TotalSeconds) < 1) return mail;
       }
 
       return null;
