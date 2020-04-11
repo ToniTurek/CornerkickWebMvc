@@ -450,9 +450,10 @@ namespace CornerkickWebMvc
         CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
 
         if (pl.clSkin.B == 0) {
-          string sBaseDir = System.Web.HttpContext.Current.Server.MapPath("~");
 #if DEBUG
           string sBaseDir = getHomeDir();
+#else
+          string sBaseDir = System.Web.HttpContext.Current.Server.MapPath("~");
 #endif
           string sDirPortrait = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits");
 
