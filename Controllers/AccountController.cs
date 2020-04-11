@@ -652,7 +652,12 @@ namespace CornerkickWebMvc.Controllers
           sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
 #endif
 
-          string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", sFolder, iFileId.ToString() + sFileExt);
+          string sFileParentDir = Path.Combine(sBaseDir, "Content", "Uploads", sFolder);
+
+          // Create directory if not existing
+          if (!Directory.Exists(sFileParentDir)) Directory.CreateDirectory(sFileParentDir);
+
+          string sFilenameLocal = Path.Combine(sFileParentDir, iFileId.ToString() + sFileExt);
           MvcApplication.ckcore.tl.writeLog("Save file to '" + sFilenameLocal + "'");
           //file.SaveAs(sFilenameLocal);
 

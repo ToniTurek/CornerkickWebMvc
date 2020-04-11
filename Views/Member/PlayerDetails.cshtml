@@ -577,7 +577,7 @@
                             FormMethod.Post,
                             new { enctype = "multipart/form-data", style = "height: 100%" })) {
         <div id="divPortrait" style="position: relative; height: 100%; cursor: pointer" onclick="document.getElementById('fileInput').click();"></div>
-        <input id="fileInput" name="file" type="file" accept="image/png" style="position: absolute; left: 0px; display: none" onchange="this.form.submit();">
+        <input id="fileInput" name="file" type="file" accept="image/*" style="position: absolute; left: 0px; display: none" onchange="this.form.submit();">
       }
     } else {
       <div id="divPortrait" style="position: relative; height: 100%"></div>
