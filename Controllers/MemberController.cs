@@ -6258,7 +6258,11 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult MailMarkRead(string sDate, string sFrom)
     {
       CornerkickManager.User user = ckUser();
-      DateTime dtMail = DateTime.Parse(sDate);
+      DateTime dtMail = new DateTime();
+      if (!DateTime.TryParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtMail)) {
+        MvcApplication.ckcore.tl.writeLog("Unable to mark email (user: " + user.id + ", date: " + sDate + ") as read", CornerkickManager.Main.sErrorFile);
+        return Json(false, JsonRequestBehavior.AllowGet);
+      }
 
       MvcApplication.Mail mail = getMail(user, dtMail);
       if (mail != null) mail.bNew = false;
@@ -6287,7 +6291,7 @@ namespace CornerkickWebMvc.Controllers
       }
       */
 
-      return Json(false, JsonRequestBehavior.AllowGet);
+      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     [HttpPost]
@@ -6296,7 +6300,11 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User user = ckUser();
       if (user == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      DateTime dtMail = DateTime.Parse(sDate);
+      DateTime dtMail = new DateTime();
+      if (!DateTime.TryParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtMail)) {
+        MvcApplication.ckcore.tl.writeLog("Unable to delete email (user: " + user.id + ", date: " + sDate + ")", CornerkickManager.Main.sErrorFile);
+        return Json(false, JsonRequestBehavior.AllowGet);
+      }
 
       MvcApplication.Mail mail = getMail(user, dtMail);
       MvcApplication.ltMail.Remove(mail);
