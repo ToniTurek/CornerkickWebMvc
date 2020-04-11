@@ -440,7 +440,11 @@ namespace CornerkickWebMvc
         CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
 
         if (pl.clSkin.B == 0) {
-          string sDirPortrait = System.IO.Path.Combine(MvcApplication.getHomeDir(), "Content", "Images", "Portraits");
+          string sBaseDir = System.Web.HttpContext.Current.Server.MapPath("~");
+#if DEBUG
+          string sBaseDir = getHomeDir();
+#endif
+          string sDirPortrait = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits");
 
           if (System.IO.Directory.Exists(sDirPortrait)) {
             System.IO.DirectoryInfo diPortrait = new System.IO.DirectoryInfo(sDirPortrait);
@@ -956,6 +960,9 @@ namespace CornerkickWebMvc
 #if _USE_AMAZON_S3
         // Download emblems
         Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, "emblems/", sHomeDir + "/../Content/Uploads/", ".png"));
+
+        // Download portraits
+        Task<bool> tkDownloadPortraits = Task.Run(async () => await downloadFilesAsync(as3, "Portraits/", sHomeDir + "/../Content/Uploads/", ".png"));
 
         // Download mails
         Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
