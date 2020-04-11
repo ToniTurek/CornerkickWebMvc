@@ -71,6 +71,16 @@ namespace CornerkickWebMvc
 
     public static CornerkickManager.Club clubAdmin;
 
+    internal class Mail
+    {
+      internal string sIdFrom { get; set; }
+      internal string sIdTo { get; set; }
+      internal bool bNew { get; set; }
+      internal DateTime dt { get; set; }
+      internal string sText { get; set; }
+    }
+    internal static List<Mail> ltMail;
+
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();
@@ -770,14 +780,14 @@ namespace CornerkickWebMvc
 #endif
 
       // save log dir
-      if (System.IO.Directory.Exists(sHomeDir + "/log")) {
+      if (Directory.Exists(sHomeDir + "/log")) {
         string sFileZipLog = sHomeDir + "/log.zip";
 
 #if !DEBUG
         // Delete existing zip file
-        if (System.IO.File.Exists(sFileZipLog)) {
+        if (File.Exists(sFileZipLog)) {
           try {
-            System.IO.File.Delete(sFileZipLog);
+            File.Delete(sFileZipLog);
           } catch {
           }
         }
@@ -803,18 +813,9 @@ namespace CornerkickWebMvc
 #endif
       }
 
+      saveMails(as3);
 
 #if _USE_AMAZON_S3
-      // Upload mails
-      DirectoryInfo diMails = new DirectoryInfo(Path.Combine(sHomeDir, "mail"));
-      if (diMails.Exists) {
-        FileInfo[] ltMailFiles = diMails.GetFiles("*.txt");
-        foreach (FileInfo fiMail in ltMailFiles) {
-          string sFileMail = Path.Combine(sHomeDir, "mail", fiMail.Name);
-          as3.uploadFile(sFileMail, "mail/" + fiMail.Name);
-        }
-      }
-
       // Upload wishlist
       as3.uploadFile(Path.Combine(sHomeDir, "wishlist.json"), "wishlist.json");
 #endif
@@ -843,6 +844,28 @@ namespace CornerkickWebMvc
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
       as3.uploadFile(sFileSettings, "laststate");
 #endif
+    }
+
+    private static void saveMails(AmazonS3FileTransfer as3 = null)
+    {
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
+      if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
+
+      if (MvcApplication.ltMail == null) return; ;
+
+      foreach (MvcApplication.Mail mail in ltMail) {
+        string sDateTime = mail.dt.ToString("yyyyMMddHHmmss");
+        string sFilenameMail  = mail.sIdTo + "_" + sDateTime + ".txt";
+        string sFilenameMail2 = System.IO.Path.Combine(sDirMail, sFilenameMail);
+
+        using (System.IO.StreamWriter fileMail = new System.IO.StreamWriter(sFilenameMail2)) {
+          string sText = mail.sIdTo + " " + mail.sIdFrom + " " + sDateTime + " " + mail.bNew.ToString() + Environment.NewLine + mail.sText;
+          fileMail.Write(sText);
+          fileMail.Close();
+
+          if (as3 != null) as3.uploadFile(sFilenameMail2, "mail/" + sFilenameMail);
+        }
+      }
     }
 
     internal static bool load()
@@ -965,7 +988,8 @@ namespace CornerkickWebMvc
         Task<bool> tkDownloadPortraits = Task.Run(async () => await downloadFilesAsync(as3, "Portraits/", sHomeDir + "/../Content/Uploads/", ".png"));
 
         // Download mails
-        Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
+        //Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
+        Task<bool> tkDownloadMail = Task.Run(async () => await downloadMails(as3, sHomeDir));
 
         // Download wishlist
         Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist.json")));
@@ -993,12 +1017,67 @@ namespace CornerkickWebMvc
           ckcore.tl.writeLog("ERROR: Unable to download games", CornerkickManager.Main.sErrorFile);
         }
 #endif
+#else
+        readMails();
 #endif
 
         return true;
       }
 
       return false;
+    }
+
+    private static async Task<bool> downloadMails(AmazonS3FileTransfer as3, string sHomeDir)
+    {
+      as3.downloadAllFiles("mail/", sHomeDir, null, ".txt");
+      readMails();
+
+      return true;
+    }
+
+    private static void readMails()
+    {
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
+      if (System.IO.Directory.Exists(sDirMail)) {
+        ltMail = new List<Mail>();
+
+        System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
+
+        foreach (var fileMail in diMail.GetFiles("*.txt")) {
+          string sContent = System.IO.File.ReadAllText(fileMail.FullName);
+          string[] sContentSplit = sContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+          string[] sHeader = sContentSplit[0].Split();
+          if (sHeader.Length < 3) continue;
+
+          string sToId   = sHeader[0];
+          string sFromId = sHeader[1];
+          string sDate   = sHeader[2];
+          bool bNew      = true;
+          if (sHeader.Length > 3) bNew = sHeader[3].Equals("true");
+
+          DateTime dtMail = DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+
+          Mail mail = new Mail();
+          mail.sIdTo = sToId;
+          mail.sIdFrom = sFromId;
+          mail.bNew = bNew;
+          mail.dt = dtMail;
+          mail.sText = "";
+          for (int iL = 1; iL < sContentSplit.Length; iL++) { // For each line of text
+            mail.sText += sContentSplit[iL] + Environment.NewLine;
+          }
+
+          ltMail.Add(mail);
+
+          // Delete mail file after import
+          try {
+            fileMail.Delete();
+          } catch {
+            ckcore.tl.writeLog("Unable to delete mail: " + fileMail.FullName, CornerkickManager.Main.sErrorFile);
+          }
+        }
+      }
     }
 
     private static async Task<bool> downloadFileAsync(AmazonS3FileTransfer as3, string sKey, string sFile)

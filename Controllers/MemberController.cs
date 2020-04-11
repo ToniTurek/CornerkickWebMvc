@@ -6152,11 +6152,32 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.User usr = ckUser();
 
-      List<CornerkickManager.Main.News> ltUserMail = new List<CornerkickManager.Main.News>();
-
       //The table or entity I'm querying
       List<DatatableEntryMail> ltDeMail = new List<DatatableEntryMail>();
 
+      foreach (MvcApplication.Mail mail in MvcApplication.ltMail) {
+        int iIx = 0;
+        if (mail.sIdTo.Equals(usr.id)) {
+          string[] sTextSplit = mail.sText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+          if (sTextSplit.Length < 1) continue;
+
+          string sFrom = "-";
+          if (string.IsNullOrEmpty(mail.sIdFrom)) {
+            sFrom = "Admin";
+          } else {
+            CornerkickManager.User user = MvcApplication.ckcore.tl.getUserFromId(mail.sIdFrom);
+            if (user == null) continue;
+
+            sFrom = user.sFirstname + " " + user.sSurname;
+            sFrom += " (" + user.club.sName + ")";
+          }
+
+          ltDeMail.Add(new DatatableEntryMail { iIndex = iIx, sFromId = mail.sIdFrom, sFrom = sFrom, sDt = mail.dt.ToString("d", getCi()) + " " + mail.dt.ToString("HH:mm:ss"), sFirstLine = sTextSplit[0], sText = mail.sText, bNew = mail.bNew });
+
+          iIx++;
+        }
+      }
+      /*
       string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       if (System.IO.Directory.Exists(sDirMail)) {
         System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
@@ -6191,6 +6212,7 @@ namespace CornerkickWebMvc.Controllers
           iIx++;
         }
       }
+      */
 
       return Json(new { aaData = ltDeMail.ToArray() }, JsonRequestBehavior.AllowGet);
     }
@@ -6204,12 +6226,21 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = ckUser();
       CornerkickManager.User usrTo = MvcApplication.ckcore.ltUser[iTo];
 
-      //MvcApplication.ckcore.sendNews(usrTo.id, sText, iType: 99, iId: 0, dt: System.DateTime.Now, sFromId: usr.id);
-
+      /*
       string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
+      */
 
-      // Write text mail
+      MvcApplication.Mail mail = new MvcApplication.Mail();
+      mail.dt = DateTime.Now;
+      mail.bNew = true;
+      mail.sIdTo = usrTo.id;
+      mail.sIdFrom = usr.id;
+      mail.sText = sText;
+
+      if (MvcApplication.ltMail == null) MvcApplication.ltMail = new List<MvcApplication.Mail>();
+      MvcApplication.ltMail.Add(mail);
+      /*
       string sDateNow = DateTime.Now.ToString("yyyyMMddHHmmss");
       string sFilenameMail = usrTo.id + "_" + sDateNow + ".txt";
       using (System.IO.StreamWriter fileMail = new System.IO.StreamWriter(System.IO.Path.Combine(sDirMail, sFilenameMail))) {
@@ -6218,6 +6249,7 @@ namespace CornerkickWebMvc.Controllers
         fileMail.Write(sText);
         fileMail.Close();
       }
+      */
 
       return Json("Nachricht an " + usrTo.sFirstname + " " + usrTo.sSurname + " gesendet!", JsonRequestBehavior.AllowGet);
     }
@@ -6226,10 +6258,13 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult MailMarkRead(string sDate, string sFrom)
     {
       CornerkickManager.User user = ckUser();
-
       DateTime dtMail = DateTime.Parse(sDate);
 
-      string sFileMail = getMailFilename(user, dtMail, sFrom);
+      MvcApplication.Mail mail = getMail(user, dtMail);
+      if (mail != null) mail.bNew = false;
+
+      /*
+      string sFileMail = getMailFilename(user, dtMail);
       string sFileMailFull = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", sFileMail);
       if (System.IO.File.Exists(sFileMailFull)) {
         string[] lines = System.IO.File.ReadAllLines(sFileMailFull);
@@ -6250,6 +6285,7 @@ namespace CornerkickWebMvc.Controllers
           }
         }
       }
+      */
 
       return Json(false, JsonRequestBehavior.AllowGet);
     }
@@ -6262,7 +6298,11 @@ namespace CornerkickWebMvc.Controllers
 
       DateTime dtMail = DateTime.Parse(sDate);
 
-      string sMail = getMailFilename(user, dtMail, sFrom);
+      MvcApplication.Mail mail = getMail(user, dtMail);
+      MvcApplication.ltMail.Remove(mail);
+
+      /*
+      string sMail = getMailFilename(user, dtMail);
       if (System.IO.File.Exists(sMail)) {
         try {
           System.IO.File.Delete(sMail);
@@ -6272,11 +6312,24 @@ namespace CornerkickWebMvc.Controllers
       } else {
         MvcApplication.ckcore.tl.writeLog("Mail to delete '" + sMail + "' not found!", CornerkickManager.Main.sErrorFile);
       }
+      */
 
       return Json(false, JsonRequestBehavior.AllowGet);
     }
 
-    private static string getMailFilename(CornerkickManager.User user, DateTime dtMail, string sFrom)
+    private static MvcApplication.Mail getMail(CornerkickManager.User user, DateTime dtMail)
+    {
+      for (int iM = 0; iM < MvcApplication.ltMail.Count; iM++) {
+        MvcApplication.Mail mail = MvcApplication.ltMail[iM];
+        if (mail.sIdTo.Equals(user.id) && mail.dt.Equals(dtMail)) {
+          return mail;
+        }
+      }
+
+      return null;
+    }
+
+    private static string getMailFilename(CornerkickManager.User user, DateTime dtMail)
     {
       return System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
     }
@@ -6284,9 +6337,16 @@ namespace CornerkickWebMvc.Controllers
     public static int MailCountNewMails(CornerkickManager.User usr)
     {
       if (usr == null) return 0;
+      if (MvcApplication.ltMail == null) return 0;
 
       int iMails = 0;
 
+      for (int iM = 0; iM < MvcApplication.ltMail.Count; iM++) {
+        MvcApplication.Mail mail = MvcApplication.ltMail[iM];
+        if (mail.sIdTo.Equals(usr.id) && mail.bNew) iMails++;
+      }
+
+      /*
       string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
       if (System.IO.Directory.Exists(sDirMail)) {
         System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
@@ -6302,6 +6362,7 @@ namespace CornerkickWebMvc.Controllers
           }
         }
       }
+      */
 
       return iMails;
     }
