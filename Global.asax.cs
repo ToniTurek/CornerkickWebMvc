@@ -431,13 +431,14 @@ namespace CornerkickWebMvc
         if (clb.user != null) continue;
 
         for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-          clb.ltPlayer[iP].fCondition = 1.0f;
-          clb.ltPlayer[iP].fFresh     = 1.0f;
+          clb.ltPlayer[iP].fCondition = 0.90f;
+          clb.ltPlayer[iP].fFresh     = 0.95f;
         }
       }
 
       // Jan no injury
-      ckcore.ltPlayer[101].injury = null;
+      CornerkickGame.Player plJan = ckcore.ltPlayer[101];
+      plJan.injury = null;
 
       // Player reset?
       CornerkickGame.Player plIvenHoffmann = ckcore.ltPlayer[163];
