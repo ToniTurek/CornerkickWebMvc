@@ -1374,7 +1374,7 @@ namespace CornerkickWebMvc.Controllers
       tD.ltPlayerSusp     = new List<bool>  ();
       foreach (CornerkickGame.Player pl in tD.ltPlayer) {
         tD.ltPlayerNat.Add(CornerkickManager.Main.sLandShort[pl.iNat1]);
-        tD.ltPlayerPortrait.Add(getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain"));
+        tD.ltPlayerPortrait.Add(getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true));
 
         // Check if player is suspended
         bool bSusp = false;
@@ -1444,7 +1444,7 @@ namespace CornerkickWebMvc.Controllers
             float fPlOppAveSkill = CornerkickGame.Tool.getAveSkill(plOpp, 99);
             if (tD.iKibitzer == 3) fPlOppAveSkill = (float)Math.Round(fPlOppAveSkill * 2f) / 2f;
             tD.ltPlayerOppAveSkill.Add(fPlOppAveSkill.ToString("0.0"));
-            tD.ltPlayerOppPortrait.Add(getPlayerPortrait(plOpp, sStyle: "height: 100%; width: 100%; object-fit: contain"));
+            tD.ltPlayerOppPortrait.Add(getPlayerPortrait(plOpp, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true));
           }
 
           // Opp. team averages
@@ -1877,7 +1877,7 @@ namespace CornerkickWebMvc.Controllers
       return cl.R + cl.G + cl.B < 300;
     }
 
-    private static string getPlayerPortrait(CornerkickGame.Player plPortrait, string sStyle = "")
+    private static string getPlayerPortrait(CornerkickGame.Player plPortrait, string sStyle = "", bool bSmall = false)
     {
       string sPortrait = "<img src=\"/Content/Images/Portraits/";
 
@@ -1886,7 +1886,8 @@ namespace CornerkickWebMvc.Controllers
       if (plPortrait == null) return sPortrait + "0.png\" alt=\"Portrait\" " + sStyle + " title=\"ohne\"/>";
 
       bool bUserPortrait;
-      string sPortraitFile = getPlayerPortraitFile(plPortrait, out bUserPortrait);
+      bool bSmallOk;
+      string sPortraitFile = getPlayerPortraitFile(plPortrait, out bUserPortrait, out bSmallOk, bSmall);
 
       if (System.IO.File.Exists(sPortraitFile)) {
         if (bUserPortrait) {
@@ -1894,6 +1895,8 @@ namespace CornerkickWebMvc.Controllers
         } else {
           sPortrait += getPlayerPortraitId(plPortrait).ToString();
         }
+
+        if (bSmall && bSmallOk) sPortrait += "s";
       } else {
         sPortrait += "0";
       }
@@ -1902,25 +1905,69 @@ namespace CornerkickWebMvc.Controllers
 
       return sPortrait;
     }
-    private static string getPlayerPortraitFile(CornerkickGame.Player plPortrait, out bool bUserPortrait)
+    private static string getPlayerPortraitFile(CornerkickGame.Player plPortrait, out bool bUserPortrait, out bool bSmallOk, bool bSmall = false)
     {
 #if DEBUG
       string sBaseDir = MvcApplication.getHomeDir();
 #else
       string sBaseDir = System.Web.HttpContext.Current.Server.MapPath("~");
 #endif
+      string sPortraitDir = System.IO.Path.Combine(sBaseDir, "Content", "Uploads", "Portraits");
+      string sPortraitFile = "";
 
       bUserPortrait = true;
+      bSmallOk = false;
 
-      string sPortraitFile = System.IO.Path.Combine(sBaseDir, "Content", "Uploads", "Portraits", plPortrait.iId.ToString() + ".png");
-      if (!System.IO.File.Exists(sPortraitFile)) {
-        sPortraitFile = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits", getPlayerPortraitId(plPortrait).ToString() + ".png");
-        bUserPortrait = false;
+      // First: try user uploaded portraits
+      for (byte i = 0; i < 2; i++) { // If bSmall --> try both
+        sPortraitFile = System.IO.Path.Combine(sPortraitDir, plPortrait.iId.ToString());
+
+        // Create small image
+        if (bSmall) resizeImage(sPortraitFile + ".png", 100, "s");
+
+        if (bSmall && i == 0) sPortraitFile += "s";
+        sPortraitFile += ".png";
+
+        if (System.IO.File.Exists(sPortraitFile)) {
+          if (bSmall && i == 0) bSmallOk = true;
+          return sPortraitFile;
+        }
       }
 
-      if (!System.IO.File.Exists(sPortraitFile)) return null;
+      // Second: try default portraits
+      for (byte i = 0; i < 2; i++) { // If bSmall --> try both
+        sPortraitFile = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits", getPlayerPortraitId(plPortrait).ToString());
 
-      return sPortraitFile;
+        // Create small image
+        if (bSmall) resizeImage(sPortraitFile + ".png", 100, "s");
+
+        if (bSmall && i == 0) sPortraitFile += "s";
+        sPortraitFile += ".png";
+
+        bUserPortrait = false;
+
+        if (System.IO.File.Exists(sPortraitFile)) {
+          if (bSmall && i == 0) bSmallOk = true;
+          return sPortraitFile;
+        }
+      }
+
+      return null;
+    }
+
+    private static void resizeImage(string sImageFileDatum, int iNewImageWidth, string sNewImageAppendix)
+    {
+      if (string.IsNullOrEmpty(sImageFileDatum)) return;
+      if (!System.IO.File.Exists(sImageFileDatum)) return;
+
+      string sNewImageFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(sImageFileDatum), System.IO.Path.GetFileNameWithoutExtension(sImageFileDatum)) + sNewImageAppendix + System.IO.Path.GetExtension(sImageFileDatum);
+      if (System.IO.File.Exists(sNewImageFile)) return; // Return if file already exist
+
+      Image imgEmblem = Image.FromFile(sImageFileDatum);
+      int iHeight = (int)(imgEmblem.Height * iNewImageWidth / (double)imgEmblem.Width);
+      Size szEmblemTiny = new Size(iNewImageWidth, iHeight);
+      Image imgEmblemTiny = (Image)(new Bitmap(imgEmblem, szEmblemTiny));
+      imgEmblemTiny.Save(sNewImageFile);
     }
 
     private static ushort getPlayerPortraitId(CornerkickGame.Player plPortrait)
@@ -4595,13 +4642,7 @@ namespace CornerkickWebMvc.Controllers
           string sEmblemFile = getClubEmblemPath(tbpl.iId, bNation: false, bTiny: false);
 
           if (!string.IsNullOrEmpty(sEmblemFile)) {
-            const int iEmblemTinyWidth = 24;
-            Image imgEmblem = Image.FromFile(sEmblemFile);
-            int iHeight = (int)(imgEmblem.Height * iEmblemTinyWidth / (double)imgEmblem.Width);
-            Size szEmblemTiny = new Size(iEmblemTinyWidth, iHeight);
-            Image imgEmblemTiny = (Image)(new Bitmap(imgEmblem, szEmblemTiny));
-            string sEmblemTinyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(sEmblemFile), System.IO.Path.GetFileNameWithoutExtension(sEmblemFile)) + "_tiny" + System.IO.Path.GetExtension(sEmblemFile);
-            imgEmblemTiny.Save(sEmblemTinyFile);
+            resizeImage(sEmblemFile, 24, "_tiny");
           }
         }
 
