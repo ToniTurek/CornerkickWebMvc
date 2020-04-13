@@ -426,13 +426,15 @@ namespace CornerkickWebMvc
       int iRetCk = ckcore.next();
 
       // Reset CPU player
-      for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
-        CornerkickManager.Club clb = ckcore.ltClubs[iC];
-        if (clb.user != null) continue;
+      if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(15, 0, 0))) {
+        for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clb = ckcore.ltClubs[iC];
+          if (clb.user != null) continue;
 
-        for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-          clb.ltPlayer[iP].fCondition = 0.90f;
-          clb.ltPlayer[iP].fFresh     = 0.95f;
+          for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
+            clb.ltPlayer[iP].fCondition = 0.80f;
+            clb.ltPlayer[iP].fFresh     = 0.95f;
+          }
         }
       }
 
