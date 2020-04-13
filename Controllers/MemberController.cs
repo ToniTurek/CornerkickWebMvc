@@ -5941,6 +5941,8 @@ namespace CornerkickWebMvc.Controllers
         float fSkillBest = 0f;
 
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
+          if (pl.checkRetired()) continue;
+
           // Get position role
           byte iPos = 0;
           for (byte jPos = 1; jPos <= pl.fExperiencePos.Length; jPos++) {
@@ -5961,7 +5963,9 @@ namespace CornerkickWebMvc.Controllers
         if (plSkillBest != null) {
           statisticModel.sPlayerSkillBest[iS][1] = plSkillBest.sName;
           statisticModel.sPlayerSkillBest[iS][2] = fSkillBest.ToString("0.000");
-          statisticModel.sPlayerSkillBest[iS][3] = MvcApplication.ckcore.ltClubs[plSkillBest.iClubId].sName;
+          string sClubName = "vereinslos";
+          if (plSkillBest.iClubId >= 0) sClubName = MvcApplication.ckcore.ltClubs[plSkillBest.iClubId].sName;
+          statisticModel.sPlayerSkillBest[iS][3] = sClubName;
         }
       }
 
