@@ -220,7 +220,7 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
       sImgName += "Opp";
     }
     sBox +=
-      '<div style="position: absolute; top: -100%; left: 2px; width: 25%">';
+      '<div style="position: absolute; top: -120%; left: 2px; width: 25%">';
     sBox +=
         '<div name="' + sImgName + '" data-iIx="' + i.toString() + '" style="absolute: relative; width: 100%; border: 2px solid black">' + sPortrait + '</div>';
     sBox +=
