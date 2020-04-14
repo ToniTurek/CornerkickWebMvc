@@ -694,7 +694,8 @@ namespace CornerkickWebMvc.Controllers
 
         for (int i = 0; i < clb.ltTrainingHist.Count; i++) {
           CornerkickManager.Main.TrainingHistory trHist = clb.ltTrainingHist[i];
-          if (trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-7)) > 0) {
+          if (trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-7)) >  0 &&
+              trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum)             <= 0) {
             long iDate = convertDateTimeToTimestamp(trHist.dt);
             dataPoints[0][j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j]));
           }
@@ -733,7 +734,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Add training if none for the next 7 days
         for (int iD = 0; iD < 7; iD++) {
-          List<CornerkickManager.Main.Training.Unit> ltTrUnitsToday = CornerkickManager.Main.Training.getTrainingUnitsToday(ltTrUnits, MvcApplication.ckcore.dtDatum.AddDays(iD));
+          List<CornerkickManager.Main.Training.Unit> ltTrUnitsToday = CornerkickManager.Main.Training.getTrainingUnitsToday(ltTrUnits, clb.ltTrainingHist, MvcApplication.ckcore.dtDatum.AddDays(iD));
 
           if (ltTrUnitsToday == null) {
             ltTrUnits.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(iD).Add(tsTraining[0]), iType = 0 });
@@ -5519,7 +5520,9 @@ namespace CornerkickWebMvc.Controllers
 
     private static long convertDateTimeToTimestamp(DateTime dt)
     {
-      return (dt.Ticks - 621355968000000000) / 10000;
+      var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+      //return (long)(dt - origin).TotalSeconds;
+      return (dt.AddHours(-2).Ticks - 621355968000000000) / 10000;
     }
 
     //////////////////////////////////////////////////////////////////////////
