@@ -433,7 +433,7 @@ namespace CornerkickWebMvc
 
           for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
             clb.ltPlayer[iP].fCondition = 0.80f;
-            clb.ltPlayer[iP].fFresh     = 0.95f;
+            clb.ltPlayer[iP].fFresh     = 0.92f;
           }
         }
       }
