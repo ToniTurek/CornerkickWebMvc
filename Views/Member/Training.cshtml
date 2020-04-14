@@ -86,6 +86,7 @@
       });
     });
 
+    var sTrainingTimes = ["9:30", "12:00", "16:30"];
     var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel", "Fussballtennis", "Kopfballpendel", "Yoga", "Elfmeterschießen"];
     var dateOptions = { weekday: 'short', month: '2-digit', day: '2-digit' };
     function plotTrainingPlan(iWeek) {
@@ -117,7 +118,7 @@
 
             //var date = moment(ltTu[0][iIxDay].dt).toDate();
             var cell0 = row.insertCell();
-            cell0.innerHTML = (iIxDay + 1).toString() + ".";
+            cell0.innerHTML = sTrainingTimes[iIxDay];
             cell0.style.textAlign = "right";
             cell0.style.fontWeight = 'bold';
 
@@ -139,7 +140,7 @@
               }
 
               sct.classList.add('form-control');
-              sct.style.width = "130px";
+              sct.style.width = "126px";
               if (ltTu[iD][iIxDay].iType < 0) {
                 sct.disabled = true;
               } else {
