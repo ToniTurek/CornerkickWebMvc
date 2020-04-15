@@ -4361,16 +4361,6 @@ namespace CornerkickWebMvc.Controllers
           mdClub.bEmblemEditable = mdClub.sEmblem.StartsWith("<img src=\"/Content/Uploads/emblems/0.png");
         }
 
-        mdClub.sRecordLWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 0));
-        mdClub.sRecordLWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, +1, 1));
-        mdClub.sRecordLDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, -1, 0));
-        mdClub.sRecordLDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 1, -1, 1));
-
-        mdClub.sRecordCWinH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 0));
-        mdClub.sRecordCWinA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, +1, 1));
-        mdClub.sRecordCDefH = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 0));
-        mdClub.sRecordCDefA = getStringRecordGame(MvcApplication.ckcore.ui.getRecordGame(mdClub.club, 2, -1, 1));
-
         mdClub.sAttrFc = mdClub.club.getAttractionFactor(MvcApplication.ckcore.iSeason).ToString("0.0");
       }
 
@@ -4379,6 +4369,8 @@ namespace CornerkickWebMvc.Controllers
 
     public ContentResult ClubDetailsGetPlaceHistory(int iClubId)
     {
+      if (iClubId < 0) return Content(null, "application/json");
+
       CornerkickManager.Club clb = MvcApplication.ckcore.ltClubs[iClubId];
 
       List<Models.DataPointGeneral> ltDataPoints = new List<Models.DataPointGeneral>();
@@ -4463,13 +4455,53 @@ namespace CornerkickWebMvc.Controllers
       return sEmblemFile;
     }
 
-    private string getStringRecordGame(CornerkickGame.Game.Data gdRecord)
+    public static string getStringRecordGame(System.Security.Principal.IPrincipal User, int iGameType, sbyte iWDD, byte iHA)
     {
+      CornerkickManager.Club clb = ckClubStatic(User);
+
+      CornerkickGame.Game.Data gdRecord = MvcApplication.ckcore.ui.getRecordGame(clb, iGameType, iWDD, iHA);
+
       if (gdRecord != null) {
-        return gdRecord.team[0].iGoals.ToString() + ":" + gdRecord.team[1].iGoals.ToString() + " - " + gdRecord.team[0].sTeam + " vs. " + gdRecord.team[1].sTeam + ", " + gdRecord.dt.ToString("d", getCi());
+        string sTeamH = gdRecord.team[0].sTeam;
+        string sTeamA = gdRecord.team[1].sTeam;
+
+        if (string.IsNullOrEmpty(sTeamH) && gdRecord.team[0].iTeamId >= 0) sTeamH = MvcApplication.ckcore.ltClubs[gdRecord.team[0].iTeamId].sName;
+        if (string.IsNullOrEmpty(sTeamA) && gdRecord.team[1].iTeamId >= 0) sTeamA = MvcApplication.ckcore.ltClubs[gdRecord.team[1].iTeamId].sName;
+
+        string sTeamOpp = sTeamA;
+        if (clb.iId == gdRecord.team[1].iTeamId) sTeamOpp = sTeamH;
+
+        return gdRecord.team[0].iGoals.ToString() + ":" + gdRecord.team[1].iGoals.ToString() + " vs. " + sTeamOpp + ", " + gdRecord.dt.ToString("d", getCiStatic(User));
       }
 
       return "-";
+    }
+
+    public ContentResult ClubGetAttrFtr(int iClubId)
+    {
+      if (iClubId < 0) return Content(null, "application/json");
+
+      CornerkickManager.Club clb = MvcApplication.ckcore.ltClubs[iClubId];
+      if (clb == null) return Content(null, "application/json");
+
+      int[] iLtCupIds = new int[] { 1, 2, 3, 4, 5 };
+      List<Models.DataPointGeneral>[] ltDataPoints = new List<Models.DataPointGeneral>[iLtCupIds.Length];
+
+      for (int iSuc = 0; iSuc < clb.ltSuccess.Count; iSuc++) {
+        CornerkickManager.Main.Success suc = CornerkickManager.Tool.getSuccess(clb, MvcApplication.ckcore.tl.getCup(iLtCupIds[iSuc]));
+
+        ltDataPoints[iSuc] = new List<Models.DataPointGeneral>();
+
+        for (int iS = 1; iS < MvcApplication.ckcore.iSeason; iS++) {
+          List<float> ltAttractionFactorCup = new List<float>();
+          float fAttrF = CornerkickManager.Club.getAttractionFactor(suc, MvcApplication.ckcore.iSeason, iSeasonSelected: iS);
+          if (fAttrF > 0) ltDataPoints[iSuc].Add(new Models.DataPointGeneral(iS, fAttrF));
+        }
+      }
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
     //////////////////////////////////////////////////////////////////////////

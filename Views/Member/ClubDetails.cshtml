@@ -18,6 +18,7 @@
       divEmblem.innerHTML += sEmblemImg;
 
       plotPlaceHistory();
+      plotAttrFactor();
     });
 
     function plotPlaceHistory() {
@@ -61,11 +62,120 @@
         }
       });
     }
+
+    function plotAttrFactor() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/ClubGetAttrFtr',
+        dataType: "json",
+        data: { iClubId: @Model.club.iId },
+        success: function (dataAttrFtr) {
+          var chartAttrFtr = new CanvasJS.Chart("divChartAttrFtr", {
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            title: {
+              text: "Erfolgsfaktor",
+              fontSize: 16
+            },
+            toolTip: {
+              shared: true,
+              contentFormatter: function (e) {
+                var content = "";
+                var fAttrFtrSeasonTotal = 0.0;
+
+                // For each cup
+                for (var i = 0; i < e.entries.length; i++) {
+                  fAttrFtrSeasonTotal += e.entries[i].dataPoint.y;
+                  content += "<strong>" + e.entries[i].dataSeries.name + ":</strong> " + e.entries[i].dataPoint.y.toFixed(1);
+                  content += "<br/>";
+                }
+
+                // Total for season
+                content += "<hr style='margin: 2px'><strong>Total:</strong> " + fAttrFtrSeasonTotal.toFixed(1);
+                content += "<br/>";
+
+                return content;
+              }
+            },
+            axisX: {
+              title: "Saison",
+              gridThickness: 1,
+              interval: 1
+            },
+            axisY: {
+              valueFormatString: "0.0"
+            },
+            legend: {
+              horizontalAlign: "center", // left, center, right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "stackedColumn",
+                color: "green",
+                name: "Liga",
+                indexLabel: "{y}",
+                indexLabelFontColor: "#EEEEEE",
+                indexLabelPlacement: "inside",
+                yValueFormatString: "0.0",
+                dataPoints: dataAttrFtr[0]
+              },
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "stackedColumn",
+                color: "blue",
+                name: "Pokal",
+                indexLabel: "{y}",
+                indexLabelFontColor: "#EEEEEE",
+                indexLabelPlacement: "inside",
+                yValueFormatString: "0.0",
+                dataPoints: dataAttrFtr[1]
+              },
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "stackedColumn",
+                color: "rgb(255, 200, 14)",
+                name: "Gold-Cup",
+                indexLabel: "{y}",
+                indexLabelFontColor: "#EEEEEE",
+                indexLabelPlacement: "inside",
+                yValueFormatString: "0.0",
+                dataPoints: dataAttrFtr[2]
+              },
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "stackedColumn",
+                color: "rgb(91, 146, 229)",
+                name: "Silver-Cup",
+                indexLabel: "{y}",
+                indexLabelFontColor: "#EEEEEE",
+                indexLabelPlacement: "inside",
+                yValueFormatString: "0.0",
+                dataPoints: dataAttrFtr[3]
+              },
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "stackedColumn",
+                indexLabel: "{y}",
+                name: "Testspiele",
+                indexLabelFontColor: "#EEEEEE",
+                indexLabelPlacement: "inside",
+                yValueFormatString: "0.0",
+                dataPoints: dataAttrFtr[4]
+              }
+            ]
+          });
+
+          chartAttrFtr.render();
+        }
+      });
+    }
   </script>
 </head>
-<body>
-  <h2>@Model.club.sName</h2>
 
+<body>
   @{
     string sUser = "Computer";
     if (Model.club.user != null) {
@@ -88,13 +198,18 @@
     string sAveAge = fAve[4].ToString("0.0");
 
     string sStadium = "-";
+    string sStadiumSeats = "";
     if (!Model.club.bNation) {
-      sStadium = Model.club.stadium.sName + " (" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
+      sStadium = Model.club.stadium.sName;
+      sStadiumSeats = "(" + Model.club.stadium.getSeats().ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
     }
   }
 
+
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
-    <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; text-align: center; border: 1px solid black; z-index: 99">
+    <h2>@Model.club.sName</h2>
+
+    <div id="divEmblemClub" style="position: absolute; width: 10%; top: 0px; right: 0px; text-align: center; border: 1px solid black; z-index: 99">
       @if (Model.bEmblemEditable) {
         using (Html.BeginForm("ClubDetails",
                               "Member",
@@ -111,9 +226,11 @@
         }
       }
     </div>
+  </div>
 
-    <h4>Allgemeines</h4>
-    <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
+  <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
+    <div style="position: relative; width: 40%; min-width: 320px; float: left">
+      <h4>Allgemeines</h4>
       <table cellpadding="3" style="width: auto">
         <tbody>
           <tr>
@@ -173,7 +290,7 @@
             </tr>
             <tr>
               <td align="right">Stadion:</td>
-              <td align="left">@sStadium</td>
+              <td align="left">@sStadium<br />@sStadiumSeats</td>
             </tr>
             <tr>
               <td align="right">Erfolgsfaktor:</td>
@@ -184,81 +301,18 @@
       </table>
     </div>
 
-    <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-      <h4>Rekorde</h4>
-      <table cellpadding="1" style="width: auto">
-        <tbody>
-          @if (Model.club.bNation) {
-            <tr>
-              <td align="right">Höchster Heimsieg:</td>
-              <td align="left">@Model.sRecordLWinH</td>
-            </tr>
-            <tr>
-              <td align="right">Höchster Auswärtssieg:</td>
-              <td align="left">@Model.sRecordLWinA</td>
-            </tr>
-            <tr>
-              <td align="right">Höchste Heimniederlage:</td>
-              <td align="left">@Model.sRecordLDefH</td>
-            </tr>
-            <tr>
-              <td align="right">Höchste Auswärtsniederlage:</td>
-              <td align="left">@Model.sRecordLDefA</td>
-            </tr>
-          } else {
-            <tr>
-              <td align="right">Höchster Heimsieg Liga:</td>
-              <td align="left">@Model.sRecordLWinH</td>
-            </tr>
-            <tr>
-              <td align="right">Höchster Auswärtssieg Liga:</td>
-              <td align="left">@Model.sRecordLWinA</td>
-            </tr>
-            <tr>
-              <td align="right">Höchste Heimniederlage Liga:</td>
-              <td align="left">@Model.sRecordLDefH</td>
-            </tr>
-            <tr>
-              <td align="right">Höchste Auswärtsniederlage Liga:</td>
-              <td align="left">@Model.sRecordLDefA</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td align="right">Höchster Heimsieg Pokal:</td>
-              <td align="left">@Model.sRecordCWinH</td>
-            </tr>
-            <tr>
-              <td align="right">Höchster Auswärtssieg Pokal:</td>
-              <td align="left">@Model.sRecordCWinA</td>
-            </tr>
-            <tr>
-              <td align="right">Höchste Heimniederlage Pokal:</td>
-              <td align="left">@Model.sRecordCDefH</td>
-            </tr>
-            <tr>
-              <td align="right">Höchste Auswärtsniederlage Pokal:</td>
-              <td align="left">@Model.sRecordCDefA</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <div style="position: relative; height: 440px; width: 60%; min-width: 320px; margin-bottom: 10px; float: left">
+      <h4>Tabellenplatzentwicklung</h4>
+      <div id="divChartPlaceHistory" style="position: relative; height: 400px; width: 100%"></div>
     </div>
 
-    <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
-      <h4>Erfolge</h4>
+    <h4>Erfolge</h4>
+    <div style="position: relative; width: 40%; min-width: 320px; float: left">
       @if (Model.club.ltSuccess.Count == 0) {
         <p>keine</p>
       } else {
         foreach (CornerkickManager.Main.Success success in Model.club.ltSuccess) {
           if (success.cup == null) { continue; }
-          if (Math.Abs(success.cup.iId) == 5) { continue; }
 
           string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
           string sCupWin = "Gewonnen: " + success.getCupWin().ToString();
@@ -271,14 +325,22 @@
             sAttcFcCup += CornerkickManager.Club.getAttractionFactor(success.ltCupPlace[iS][0], success.cup.settings.fAttraction, MvcApplication.ckcore.iSeason - success.ltCupPlace[iS][1]).ToString("0.0") + " (" + success.ltCupPlace[iS][1].ToString() + "/" + success.ltCupPlace[iS][0].ToString() + ")";
           }
 
-          <b>@success.cup.sName</b>
+          <b>@success.cup.sName:</b>
           <p>@sWDD<br />@sCupWin</p>
+
+          <p style="margin: 0">Höchster Sieg    (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, +1, 0)</p>
+          <p style="margin: 0">Höchster Sieg    (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, +1, 1)</p>
+          <p style="margin: 0">Höchste Niederl. (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, -1, 0)</p>
+          <p>Höchste Niederl. (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, -1, 1)</p>
+
           if (success.ltCupPlace.Count > 0) {
             <p>Anteil Erfolgsfaktor (Saison/Pl.):<br />@sAttcFcCup</p>
           }
         }
       }
     </div>
+
+    <div id="divChartAttrFtr" style="height: 400px; width: 60%; min-width: 320px; margin-top: 10px; float: left"></div>
 
     @if (Model.club.bNation) {
       <h4>Aktueller Kader</h4>
@@ -295,9 +357,6 @@
         </table>
       </div>
     }
-
-    <h4>Tabellenplatzentwicklung</h4>
-    <div id="divChartPlaceHistory" style="position: relative; height: 400px; width: 100%; margin-bottom: 10px; float: left"></div>
   </div>
 </body>
 </html>
