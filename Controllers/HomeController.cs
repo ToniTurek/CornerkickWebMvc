@@ -34,22 +34,22 @@ namespace CornerkickWebMvc.Controllers
       ViewBag.Message = "Cornerkick User Manual";
 
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, MvcApplication.iNations[0], 0);
-      mdUm.sAfLeague = league.settings.fAttraction.ToString("0.00");
+      if (league != null) mdUm.sAfLeague = league.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, MvcApplication.iNations[0]);
-      mdUm.sAfCup = cup.settings.fAttraction.ToString("0.00");
+      if (cup != null) mdUm.sAfCup = cup.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-      mdUm.sAfCupGold = cupGold.settings.fAttraction.ToString("0.00");
+      if (cupGold != null) mdUm.sAfCupGold = cupGold.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-      mdUm.sAfCupSilver = cupSilver.settings.fAttraction.ToString("0.00");
+      if (cupSilver != null) mdUm.sAfCupSilver = cupSilver.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
-      mdUm.sAfWc = cupWc.settings.fAttraction.ToString("0.00");
+      if (cupWc != null) mdUm.sAfWc = cupWc.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup tg = MvcApplication.ckcore.tl.getCup(5);
-      mdUm.sAfTg = tg.settings.fAttraction.ToString("0.00");
+      if (tg != null) mdUm.sAfTg = tg.settings.fAttraction.ToString("0.00");
 
       return View(mdUm);
     }
