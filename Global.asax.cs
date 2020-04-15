@@ -451,25 +451,29 @@ namespace CornerkickWebMvc
       // Assign random portrait if none
       for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
         CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+        if (pl == null) continue;
 
-        if (pl.clSkin.B == 0) {
+        try {
+          if (pl.clSkin.B == 0) {
 #if DEBUG
-          string sBaseDir = getHomeDir();
+            string sBaseDir = getHomeDir();
 #else
-          string sBaseDir = System.Web.HttpContext.Current.Server.MapPath("~");
+            string sBaseDir = Directory.GetParent(CornerkickManager.Main.sHomeDir).FullName;
 #endif
-          string sDirPortrait = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits");
+            string sDirPortrait = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits");
 
-          if (System.IO.Directory.Exists(sDirPortrait)) {
-            System.IO.DirectoryInfo diPortrait = new System.IO.DirectoryInfo(sDirPortrait);
+            if (System.IO.Directory.Exists(sDirPortrait)) {
+              System.IO.DirectoryInfo diPortrait = new System.IO.DirectoryInfo(sDirPortrait);
 
-            int nPortraitFiles = diPortrait.GetFiles("*.png").Length;
-            ushort iPortraitId = (ushort)random.Next(nPortraitFiles);
+              int nPortraitFiles = diPortrait.GetFiles("*.png").Length;
+              ushort iPortraitId = (ushort)random.Next(nPortraitFiles);
 
-            byte[] b = BitConverter.GetBytes(iPortraitId);
+              byte[] b = BitConverter.GetBytes(iPortraitId);
 
-            pl.clSkin = System.Drawing.Color.FromArgb(b[0], b[1], 1);
+              pl.clSkin = System.Drawing.Color.FromArgb(b[0], b[1], 1);
+            }
           }
+        } catch {
         }
       }
 
@@ -958,6 +962,7 @@ namespace CornerkickWebMvc
 
             NumberStyles style = NumberStyles.Number | NumberStyles.AllowDecimalPoint;
             fInterval = double.Parse(sStateFileContent[0], style, CultureInfo.InvariantCulture);
+            ckcore.tl.writeLog("Set calendar interval to " + fInterval.ToString("0.000") + "s");
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
@@ -970,6 +975,7 @@ namespace CornerkickWebMvc
 
               int iGameSpeed = 0; // Calendar interval [s]
               int.TryParse(sStateFileContent[3], out iGameSpeed);
+              ckcore.tl.writeLog("Set game speed to " + iGameSpeed.ToString() + "ms");
 
               // Perform calendar steps in background
               Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
