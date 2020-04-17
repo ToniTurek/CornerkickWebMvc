@@ -3570,6 +3570,8 @@ namespace CornerkickWebMvc.Controllers
 
       // Stadium name editable
       stadionModel.bEditable = (MvcApplication.ckcore.dtDatum - usr.dtClubStart).TotalHours < 24;
+      stadionModel.bEditable = stadionModel.bEditable || (stadionModel.sName.StartsWith("Team_") && stadionModel.sName.EndsWith(" Stadion"));
+      stadionModel.bEditable = stadionModel.bEditable || stadionModel.sName.Equals(clb.sName + " Stadion");
 
       return View(stadionModel);
     }
