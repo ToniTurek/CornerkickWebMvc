@@ -1039,6 +1039,8 @@ namespace CornerkickWebMvc
         return true;
       }
 
+      settings.bLoginPossible = false; // If error while loading --> disable user login
+
       return false;
     }
 
