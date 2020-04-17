@@ -3546,6 +3546,7 @@ namespace CornerkickWebMvc.Controllers
 
       stadionModel.bOberring = bStadiumGetTopring(clb);
 
+      if (clb.stadium.iVideoDaysConstruct == 0) clb.stadium.iVideoNew = clb.stadium.iVideo;
       stadionModel.iVideo = clb.stadium.iVideoNew;
 
       stadionModel.stadionNew = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);

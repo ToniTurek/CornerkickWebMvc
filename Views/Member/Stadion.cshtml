@@ -283,28 +283,31 @@
           $("#txtVideo").text("Aktuell: " + sCurrent[0][0]);
           if (sCurrent[0][2] != "0") {
             $("#txtVideoNew").text("Ausbau zu: " + sCurrent[0][1] + " (noch " + sCurrent[0][2] + "d)");
+            $("#txtVideoNew").css("display", "block");
             $("#pbVideo").progressbar("value", parseFloat(sCurrent[0][3].replace("%", "").replace(",", ".")));
             $("#pbVideo").css("display", "block");
             $("#tbVideo").css("display", "none");
             $("#bnBuildVideo").css("display", "none");
-            $("#ddlVideo").css("display", "none");
+            $("#divVideo").css("display", "none");
           }
 
-          $("#txtSnackbar").text("Imbissbuden - Aktuell: " + sCurrent[1][0]);
+          $("#txtSnackbar").text("Aktuell: " + sCurrent[1][0]);
           if (sCurrent[1][2] != "0") {
             $("#txtSnackbarNew").text("Ausbau zu: " + sCurrent[1][1] + " (noch " + sCurrent[1][2] + "d)");
+            $("#txtSnackbarNew").css("display", "block");
             $("#pbSnackbar").progressbar("value", parseFloat(sCurrent[1][3].replace("%", "").replace(",", ".")));
             $("#pbSnackbar").css("display", "block");
-            $("#tbSnackbar").css("display", "none");
+            $("#divSnackbar").css("display", "none");
             $("#bnBuildSnackbar").css("display", "none");
           }
 
-          $("#txtToilets").text("Toiletten - Aktuell: " + sCurrent[2][0]);
+          $("#txtToilets").text("Aktuell: " + sCurrent[2][0]);
           if (sCurrent[2][2] != "0") {
             $("#txtToiletsNew").text("Ausbau zu: " + sCurrent[2][1] + " (noch " + sCurrent[2][2] + "d)");
+            $("#txtToiletsNew").css("display", "block");
             $("#pbToilets").progressbar("value", parseFloat(sCurrent[2][3].replace("%", "").replace(",", ".")));
             $("#pbToilets").css("display", "block");
-            $("#tbToilets").css("display", "none");
+            $("#divToilets").css("display", "none");
             $("#bnBuildToilets").css("display", "none");
           }
         }
@@ -584,7 +587,7 @@
       if (Model.stadion != null) {
         <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
         
-        <div style="position: relative; width: 100%">
+        <div style="position: relative; width: 100%; margin-bottom: 20px">
           <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
           <div id="pbTopring" style="position: absolute; width: 100%; top: 28px"></div>
         </div>
@@ -601,8 +604,8 @@
         }
 
         if (bShow) {
-          <div style="position: relative; float: left; width: 100%; height: auto; margin-bottom: 20px">
-            <h3 style="position: relative">Stadionausbau</h3>
+          <div style="position: relative; float: left; width: 100%; margin-bottom: 20px">
+            <h4 style="position: relative">Stadionausbau</h4>
             <table class="tStat" style="position: relative; width: auto" border="1" cellpadding="3" summary="Stadionausbau">
               <tr>
                 <th style="text-align:center">Name</th>
@@ -638,30 +641,41 @@
           </div>
         }
 
-        <h3 style="position: relative; margin-top: 20px">Stadionextras</h3>
-        <div style="position: relative; width: 100%; height: auto; margin-bottom: 10px">
-          <div style="position: relative; float: left; width: 320px; height: 132px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
-            <text style="position: relative; width: 308px; font-size: 18px">Anzeigetafel</text>
+        <div style="position: relative; width: 100%; margin-bottom: 10px; float: left">
+          <h3 style="position: relative">Stadionextras</h3>
+          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+            <strong style="position: relative; width: 308px; font-size: 18px">Anzeigetafel</strong>
             <p id="txtVideo" style="position: relative; width: 308px; margin: 0; font-size: 18px"></p>
-            <p id="txtVideoNew" style="position: relative; width: 308px; margin: 0"></p>
+            <p id="txtVideoNew" style="position: relative; width: 308px; margin-top: 4px; margin-bottom: 2px; font-size: 16px; display: none"></p>
             <div id="pbVideo" style="position: relative; width: 308px"><div id="plVideo" class="progress-label"></div></div>
-            @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "ddlVideo", @style = "float: left; width: 308px; min-width: 308px; margin-right: 2%" })
+            <div id="divVideo" style="position: relative; width: 100%; height: 36px">
+              <text style="position: absolute; left: 0px; top: 6px; width: 40px; font-size: 16px">Neu:</text>
+              @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "ddlVideo", @style = "position: absolute; width: 268px; min-width: 268px; left: 40px" })
+            </div>
             <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 49%; min-width: 308px">Kosten: 0</button>
           </div>
 
-          <div style="position: relative; float: left; width: 320px; height: 108px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
-            <text id="txtSnackbar" style="position: relative; width: 308px; font-size: 18px"></text>
-            <p id="txtSnackbarNew" style="position: relative; width: 308px; margin: 0"></p>
+          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+            <strong style="position: relative; width: 308px; font-size: 18px">Imbissbuden</strong>
+            <p id="txtSnackbar" style="position: relative; width: 308px; margin: 0; font-size: 18px"></p>
+            <p id="txtSnackbarNew" style="position: relative; width: 308px; margin-top: 4px; margin-bottom: 2px; font-size: 16px; display: none"></p>
             <div id="pbSnackbar" style="position: relative; width: 308px"><div id="plSnackbar" class="progress-label"></div></div>
-            @Html.EditorFor(Model => Model.iSnackbarNew, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: relative; width: 308px; min-width: 308px; text-align: right", id = "tbSnackbar", autocomplete = "off", min = "0" } })
+            <div id="divSnackbar" style="position: relative; width: 100%; height: 36px">
+              <text style="position: absolute; left: 0px; top: 6px; width: 40px; font-size: 16px">Neu:</text>
+              @Html.EditorFor(Model => Model.iSnackbarNew, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: absolute; width: 268px; left: 40px; text-align: right", id = "tbSnackbar", autocomplete = "off", min = "0" } })
+            </div>
             <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 308px">Kosten: 0</button>
           </div>
 
-          <div style="position: relative; float: left; width: 320px; height: 108px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
-            <text id="txtToilets" style="position: relative; width: 308px; font-size: 18px"></text>
-            <p id="txtToiletsNew" style="position: relative; width: 308px; margin: 0"></p>
+          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+            <strong style="position: relative; width: 308px; font-size: 18px">Toiletten</strong>
+            <p id="txtToilets" style="position: relative; width: 308px; margin: 0; font-size: 18px"></p>
+            <p id="txtToiletsNew" style="position: relative; width: 308px; margin-top: 4px; margin-bottom: 2px; font-size: 16px; display: none"></p>
             <div id="pbToilets" style="position: relative; width: 308px"><div id="plToilets" class="progress-label"></div></div>
-            @Html.EditorFor(Model => Model.iToiletsNew, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: relative; width: 308px; min-width: 308px; text-align: right", id = "tbToilets", autocomplete = "off", min = "0" } })
+            <div id="divToilets" style="position: relative; width: 100%; height: 36px">
+              <text style="position: absolute; left: 0px; top: 6px; width: 40px; font-size: 16px">Neu:</text>
+              @Html.EditorFor(Model => Model.iToiletsNew, new { htmlAttributes = new { @class = "form-control", @type = "number", @style = "position: relative; width: 268px; left: 40px; text-align: right", id = "tbToilets", autocomplete = "off", min = "0" } })
+            </div>
             <button type="submit" id="bnBuildToilets" class="btn btn-default" style="width: 308px">Kosten: 0</button>
           </div>
         </div>
