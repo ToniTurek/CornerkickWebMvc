@@ -53,6 +53,10 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.nUser   = MvcApplication.ckcore.ltUser  .Count;
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
 
+      modelAdmin.dtCkCurrent = MvcApplication.ckcore.dtDatum;
+      modelAdmin.dtCkApproach = MvcApplication.getCkApproachDate();
+      modelAdmin.fIntervalAveToApproachTarget = MvcApplication.getIntervalAve();
+
       // Files
       string sHomeDir = getHomeDir();
       modelAdmin.bLogExist = System.IO.File.Exists(sHomeDir + "/log/ck.log");

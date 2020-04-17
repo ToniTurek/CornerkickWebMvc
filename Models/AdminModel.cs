@@ -18,6 +18,10 @@ namespace CornerkickWebMvc.Models
     public int nUser { get; set; }
     public int nPlayer { get; set; }
 
+    public DateTime dtCkCurrent { get; set; }
+    public DateTime dtCkApproach { get; set; }
+    public double fIntervalAveToApproachTarget { get; set; }
+
     // Settings
     public double fCalendarInterval { get; set; }
     public string sStartHour { get; set; }

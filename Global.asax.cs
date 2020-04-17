@@ -337,6 +337,68 @@ namespace CornerkickWebMvc
       }
     }
 
+    internal static int getStepsFromTargetToApproach()
+    {
+      return (int)((getCkTargetDate() - getCkApproachDate()).TotalMinutes / 15.0);
+    }
+
+    internal static DateTime getCkTargetDate()
+    {
+      DateTime dtCkTarget = ckcore.dtDatum.Date.Add(new TimeSpan(15, 30, 0));
+      while ((int)dtCkTarget.DayOfWeek != 6) dtCkTarget = dtCkTarget.AddDays(1);
+      return dtCkTarget;
+    }
+
+    static TimeSpan tsTarget = new TimeSpan(18, 30, 0); // Target system time
+    internal static DateTime getCkApproachDate()
+    {
+      double fDayRel = getDayRelBetweenNowAndTarget();
+
+      // Get target ck date
+      DateTime dtCkTarget = getCkTargetDate();
+
+      return dtCkTarget.AddDays(-fDayRel * 7);
+    }
+
+    internal static double getDayRelBetweenNowAndTarget()
+    {
+      double fDayRel = (tsTarget - DateTime.UtcNow.TimeOfDay).TotalDays;
+      if (fDayRel < 0) fDayRel += 1.0;
+
+      return fDayRel;
+    }
+
+    internal static int getDeltaStepsBetweenNowAndApproach()
+    {
+      DateTime dtCkApproach = getCkApproachDate();
+      return (int)((dtCkApproach - ckcore.dtDatum).TotalMinutes / 15.0);
+    }
+
+    internal static int getDeltaStepsBetweenNowAndTarget()
+    {
+      DateTime dtCkTarget = getCkTargetDate();
+      return (int)((dtCkTarget - ckcore.dtDatum).TotalMinutes / 15.0);
+    }
+
+    internal static double getIntervalForOneWeek()
+    {
+      // Capital letters = Real-time
+      //     MIN * S  * H   /  qu  * h  * d
+      return (60 * 60 * 24) / (4.0 * 24 * 7);
+    }
+
+    internal static double getIntervalAve()
+    {
+      double fDayRel = getDayRelBetweenNowAndTarget();
+      int iStepsDelta = getDeltaStepsBetweenNowAndTarget();
+      return (fDayRel * 24 * 60 * 60) / iStepsDelta;
+    }
+
+    internal static TimeSpan getApproachTime()
+    {
+      return tsTarget.Add(TimeSpan.FromSeconds(getStepsFromTargetToApproach() * getIntervalForOneWeek()));
+    }
+
     private static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
       // Disable save timer (not needed if calendar timer is on)
@@ -963,6 +1025,7 @@ namespace CornerkickWebMvc
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
+            //double fInterval = getIntervalAve(); // Calendar interval [s]
             double fInterval = 0.0; // Calendar interval [s]
 
             NumberStyles style = NumberStyles.Number | NumberStyles.AllowDecimalPoint;
