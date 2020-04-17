@@ -880,7 +880,12 @@ namespace CornerkickWebMvc.Controllers
 
       if (user != null && user.ltFormations != null) {
         for (int i = 0; i < user.ltFormations.Count; i++) {
-          team.ltsFormations.Add(new SelectListItem { Text     = (MvcApplication.ckcore.ltFormationen.Count + i + 1).ToString() + " - " + user.ltFormations[i].sName,
+          // Reset id of user formations
+          CornerkickGame.Tactic.Formation frmUser = user.ltFormations[i];
+          frmUser.iId = MvcApplication.ckcore.ltFormationen.Count + i + 1;
+          user.ltFormations[i] = frmUser;
+
+          team.ltsFormations.Add(new SelectListItem { Text     = (MvcApplication.ckcore.ltFormationen.Count + i + 1).ToString() + " - " + frmUser.sName,
                                                       Value    = (MvcApplication.ckcore.ltFormationen.Count + i + 1).ToString(),
                                                       Selected = (MvcApplication.ckcore.ltFormationen.Count + i + 1) == club.ltTactic[0].formation.iId
                                                     }
@@ -973,7 +978,7 @@ namespace CornerkickWebMvc.Controllers
             if (user.game.player[iHA][jPosMax].bPlayed) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in has already played
             if (user.game.iSubstitutionsLeft[iHA] == 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... no subs left
             if (!club.bNation && CornerkickManager.Player.atNationalTeam(user.game.player[iHA][jPosMax], MvcApplication.ckcore.ltClubs)) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player in is at national team
-            if (user.game.data.iGameType >                                              0 &&
+            if (user.game.data.iGameType >                                                  0 &&
                 user.game.data.iGameType <= user.game.player[iHA][jPosMin].iSuspension.Length &&
                 user.game.player[iHA][jPosMin].iSuspension[user.game.data.iGameType - 1] > 0) return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet); // ... player out is suspended
 
@@ -3190,8 +3195,7 @@ namespace CornerkickWebMvc.Controllers
         clb.ltTactic[iTactic].fPassLeft  = fTaktik;
         if (clb.ltTactic[iTactic].fPassLeft + clb.ltTactic[iTactic].fPassRight > 1f) clb.ltTactic[iTactic].fPassRight = (float)Math.Round(1f - clb.ltTactic[iTactic].fPassLeft,  2);
         fRet = clb.ltTactic[iTactic].fPassRight;
-      }
-      else if (iTaktik == 8) {
+      } else if (iTaktik == 8) {
         clb.ltTactic[iTactic].fPassRight = fTaktik;
         if (clb.ltTactic[iTactic].fPassLeft + clb.ltTactic[iTactic].fPassRight > 1f) clb.ltTactic[iTactic].fPassLeft  = (float)Math.Round(1f - clb.ltTactic[iTactic].fPassRight, 2);
         fRet = clb.ltTactic[iTactic].fPassLeft;
