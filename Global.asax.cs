@@ -423,7 +423,12 @@ namespace CornerkickWebMvc
       }
 
       // Do next step
-      int iRetCk = ckcore.next();
+      int iRetCk = 0;
+      try {
+        iRetCk = ckcore.next();
+      } catch {
+        ckcore.tl.writeLog("performCalendarStep(): Error in ck next()", CornerkickManager.Main.sErrorFile);
+      }
 
       // Reset CPU player
       if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(15, 0, 0))) {
@@ -1115,10 +1120,14 @@ namespace CornerkickWebMvc
       if (nSteps > 0) {
         ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
         for (int iS = 0; iS < nSteps; iS++) {
-          bool bBreak = !performCalendarStep(false);
-          if (bBreak) {
-            bCalendarRunning = false;
-            break;
+          try {
+            bool bBreak = !performCalendarStep(false);
+            if (bBreak) {
+              bCalendarRunning = false;
+              break;
+            }
+          } catch {
+            ckcore.tl.writeLog("performCalendarStepsAsync(): Error in performCalendarStep() at step: " + iS.ToString(), CornerkickManager.Main.sErrorFile);
           }
         }
       }
