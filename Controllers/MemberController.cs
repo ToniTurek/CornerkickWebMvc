@@ -4496,13 +4496,25 @@ namespace CornerkickWebMvc.Controllers
 
       for (int iSuc = 0; iSuc < clb.ltSuccess.Count; iSuc++) {
         CornerkickManager.Main.Success suc = CornerkickManager.Tool.getSuccess(clb, MvcApplication.ckcore.tl.getCup(iLtCupIds[iSuc]));
+        if (suc == null) continue;
 
         ltDataPoints[iSuc] = new List<Models.DataPointGeneral>();
 
         for (int iS = 1; iS < MvcApplication.ckcore.iSeason; iS++) {
           List<float> ltAttractionFactorCup = new List<float>();
           float fAttrF = CornerkickManager.Club.getAttractionFactor(suc, MvcApplication.ckcore.iSeason, iSeasonSelected: iS);
-          if (fAttrF > 0) ltDataPoints[iSuc].Add(new Models.DataPointGeneral(iS, fAttrF));
+
+          if (fAttrF > 0) {
+            string sCupPlace = "";
+            for (int iCP = 0; iCP < suc.ltCupPlace.Count; iCP++) {
+              if (suc.ltCupPlace[iCP][1] == iS) {
+                sCupPlace = " (" + suc.ltCupPlace[iCP][0].ToString() + ". Platz)";
+                break;
+              }
+            }
+
+            ltDataPoints[iSuc].Add(new Models.DataPointGeneral(iS, fAttrF, z: sCupPlace));
+          }
         }
       }
 

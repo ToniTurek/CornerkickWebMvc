@@ -86,7 +86,7 @@
                 // For each cup
                 for (var i = 0; i < e.entries.length; i++) {
                   fAttrFtrSeasonTotal += e.entries[i].dataPoint.y;
-                  content += "<strong>" + e.entries[i].dataSeries.name + ":</strong> " + e.entries[i].dataPoint.y.toFixed(1);
+                  content += "<strong>" + e.entries[i].dataSeries.name + ":</strong> " + e.entries[i].dataPoint.y.toFixed(1) + e.entries[i].dataPoint.z;
                   content += "<br/>";
                 }
 
@@ -209,23 +209,19 @@
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
     <h2>@Model.club.sName</h2>
 
-    <div id="divEmblemClub" style="position: absolute; width: 10%; top: 0px; right: 0px; text-align: center; border: 1px solid black; z-index: 99">
-      @if (Model.bEmblemEditable) {
-        using (Html.BeginForm("ClubDetails",
-                              "Member",
-                              new { iClub = Model.club.iId },
-                              FormMethod.Post,
-                              new { enctype = "multipart/form-data" })) {
-          <div style="position: absolute; padding-top: 10px; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.9)">
-            <label>
-              Wappen auswählen
-              <input name="file" type="file" size="10" accept="image/png" style="position: absolute; left: -40px;">
-            </label>
-            <input type="submit" class="btn btn-default" style="position: absolute; left: 0px; top: 77px; width: 100%" value="hochladen" />
-          </div>
-        }
+    @if (Model.bEmblemEditable) {
+      using (Html.BeginForm("ClubDetails",
+                            "Member",
+                            new { iClub = Model.club.iId },
+                            FormMethod.Post,
+                            new { enctype = "multipart/form-data" })) {
+
+        <div id="divEmblemClub" style="position: absolute; width: 10%; top: 0px; right: 0px; text-align: center; border-style: outset; border-width: 3px; border-color: lightgray; z-index: 99; cursor: pointer" onclick="document.getElementById('fileInput').click();"></div>
+        <input id="fileInput" name="file" type="file" accept="image/*" style="display: none" onchange="this.form.submit();">
       }
-    </div>
+    } else {
+      <div id="divEmblemClub" style="position: absolute; width: 10%; top: 0px; right: 0px; text-align: center; border-style: outset; border-width: 3px; border-color: lightgray; z-index: 99"></div>
+    }
   </div>
 
   <div style="position: relative; width: 100%; float: left; margin-bottom: 20px">
