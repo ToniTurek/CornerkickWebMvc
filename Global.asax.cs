@@ -976,14 +976,20 @@ namespace CornerkickWebMvc
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (fInterval / 60f));
 
-              ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
+              if (nSteps > 0) {
+                ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
 
-              int iGameSpeed = 0; // Calendar interval [s]
-              int.TryParse(sStateFileContent[3], out iGameSpeed);
-              ckcore.tl.writeLog("Set game speed to " + iGameSpeed.ToString() + "ms");
+                int iGameSpeed = 0; // Calendar interval [s]
+                int.TryParse(sStateFileContent[3], out iGameSpeed);
+                ckcore.tl.writeLog("Set game speed to " + iGameSpeed.ToString() + "ms");
 
-              // Perform calendar steps in background
-              Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
+                // Perform calendar steps in background
+                Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
+              } else {
+                timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
+                timerCkCalender.Enabled = bCalendarRunning;
+                ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
+              }
             }
 
             if (sStateFileContent.Length > 5) {
