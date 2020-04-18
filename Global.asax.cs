@@ -492,6 +492,8 @@ namespace CornerkickWebMvc
         ckcore.tl.writeLog("performCalendarStep(): Error in ck next()", CornerkickManager.Main.sErrorFile);
       }
 
+      checkPlayerReset();
+
       // Reset CPU player
       if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(15, 0, 0))) {
         for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
@@ -508,12 +510,6 @@ namespace CornerkickWebMvc
       // Jan no injury
       CornerkickGame.Player plJan = ckcore.ltPlayer[101];
       plJan.injury = null;
-
-      // Player reset?
-      CornerkickGame.Player plIvenHoffmann = ckcore.ltPlayer[163];
-      if (plIvenHoffmann.fMoral < 1.001 && plIvenHoffmann.fCondition > 0.999 && plIvenHoffmann.fFresh > 0.999) {
-        ckcore.tl.writeLog(plIvenHoffmann.sName + " C/F/M: " + plIvenHoffmann.fCondition.ToString("0.0%") + "/" + plIvenHoffmann.fFresh.ToString("0.0%") + "/" + plIvenHoffmann.fMoral.ToString("0.0%"), CornerkickManager.Main.sErrorFile);
-      }
 
       // Assign random portrait if none
       for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
@@ -723,6 +719,15 @@ namespace CornerkickWebMvc
       }
 
       return bReturn;
+    }
+
+    private static void checkPlayerReset()
+    {
+      foreach (CornerkickGame.Player pl in ckcore.ltPlayer) {
+        if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && pl.iClubId == 3) {
+          ckcore.tl.writeLog("Reset of player: " + pl.sName, CornerkickManager.Main.sErrorFile);
+        }
+      }
     }
 
     private static int countCpuPlayerOnTransferlist()
@@ -991,6 +996,8 @@ namespace CornerkickWebMvc
       // Load ck state
       if (ckcore.io.load(sFileLoad)) {
         ckcore.tl.writeLog("File " + sFileLoad + " loaded.");
+
+        checkPlayerReset();
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
