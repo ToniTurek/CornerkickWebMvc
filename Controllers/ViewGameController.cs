@@ -93,6 +93,7 @@ namespace CornerkickWebMvc.Controllers
 
       List<FileInfo> fiGames = getFileInfoGames(clubUser);
 
+      // Insert past games into dropdownmenu
       foreach (FileInfo ckg in fiGames) {
         DateTime dtGame;
         int iTeamIdH;
@@ -114,12 +115,13 @@ namespace CornerkickWebMvc.Controllers
         string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
         try {
           user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
-        } catch {
-          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", CornerkickManager.Main.sErrorFile);
+        } catch (Exception e) {
+          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
         }
       }
 
       // Insert next games
+      /*
       List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clubUser, MvcApplication.ckcore.dtDatum);
       for (byte j = 0; j < ltGdNextGames.Count; j++) {
         CornerkickGame.Game.Data gd = ltGdNextGames[j];
@@ -128,6 +130,7 @@ namespace CornerkickWebMvc.Controllers
           Value = (-j - 1).ToString()
         });
       }
+      */
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
       view.ddlDuels  = new List<SelectListItem>(view.ddlHeatmap);
