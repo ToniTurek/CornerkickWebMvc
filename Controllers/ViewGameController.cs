@@ -154,7 +154,7 @@ namespace CornerkickWebMvc.Controllers
 
         int iG = 0;
         foreach (FileInfo ckg in ltCkgFiles) {
-          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
+          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('x');
           if (sFilenameData.Length < 3) continue;
 
           DateTime dtGame = new DateTime();
@@ -177,14 +177,14 @@ namespace CornerkickWebMvc.Controllers
       iTeamIdH = -1;
       iTeamIdA = -1;
 
-      string[] sFilenameData = Path.GetFileNameWithoutExtension(fiGame.Name).Split('_');
+      string[] sFilenameData = Path.GetFileNameWithoutExtension(fiGame.Name).Split('x');
       if (sFilenameData.Length < 3) return null;
 
       // Date/Time
-      if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) return null;
+      if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd_HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) return null;
 
       // Team names
-      string[] sFilenameDataTeamIds = sFilenameData[2].Split('-');
+      string[] sFilenameDataTeamIds = sFilenameData[2].Split('_');
       if (!int.TryParse(sFilenameDataTeamIds[0], out iTeamIdH)) return null;
       if (!int.TryParse(sFilenameDataTeamIds[1], out iTeamIdA)) return null;
 
@@ -217,6 +217,7 @@ namespace CornerkickWebMvc.Controllers
       view.sColorJerseyA = new string[4] { "white", "red",  "red",  "white" };
 
       if (game == null) {
+        view.gD = new Models.ViewGameModel.gameData();
         view.gD.iGoalsH = -1;
         view.gD.iGoalsA = -1;
 
@@ -275,6 +276,7 @@ namespace CornerkickWebMvc.Controllers
       // Add player to heatmap
       for (byte iHA = 0; iHA < 2; iHA++) {
         for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
+          if (game.player[iHA][iPl] == null) continue;
           view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.data.nPlStart) + iPl).ToString() });
         }
       }
@@ -364,6 +366,7 @@ namespace CornerkickWebMvc.Controllers
           if (iState < 0) pl = user.game.player[iHA][iP];
           else            pl = state.player[iHA][iP];
 
+          if (pl == null) continue;
           if (string.IsNullOrEmpty(pl.sName)) continue;
 
           if      (pl.bYellowCard)                              gPlayer.iCard = 1;

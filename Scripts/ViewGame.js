@@ -264,6 +264,10 @@ function drawPlayer(gLoc) {
 
   var player = [];
   for (iP = 0; iP < 11; iP++) {
+    if (!gLoc.ltPlayer[iP +  0]) {
+      continue;
+    }
+
     // Player Home
     var divPlH = document.createElement("div");
     divPlH.id = "divPlayerH_" + iP.toString();
@@ -304,6 +308,10 @@ function drawPlayer(gLoc) {
   }
 
   for (iP = 0; iP < 11; iP++) {
+    if (!gLoc.ltPlayer[iP + 11]) {
+      continue;
+    }
+
     // Player Away
     var divPlA = document.createElement("div");
     divPlA.id = "divPlayerA_" + iP.toString();
@@ -357,6 +365,10 @@ function updatePlayer(player, gLoc, bShowLookAt) {
   for (iP = 0; iP < 22; iP++) {
     var pl = gLoc.ltPlayer[iP];
 
+    if (!pl) {
+      continue;
+    }
+
     if (pl.iCard < 2) { // if not red card
       var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
       var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
@@ -398,6 +410,10 @@ function updatePlayer(player, gLoc, bShowLookAt) {
 function changePlayerJerseyColor(iHA, cl1, cl2) {
   if (iHA === 0) {
     for (iP = 0; iP < 11; iP++) {
+      if (!playerGlobal[iP]) {
+        continue;
+      }
+
       playerGlobal[iP].style.backgroundColor = cl1;
       if (iP === 0) {
         playerGlobal[iP].style.borderColor = "rgb(57,255,20)";
@@ -407,6 +423,10 @@ function changePlayerJerseyColor(iHA, cl1, cl2) {
     }
   } else if (iHA === 1) {
     for (iP = 11; iP < 22; iP++) {
+      if (!playerGlobal[iP]) {
+        continue;
+      }
+
       playerGlobal[iP].style.backgroundColor = cl1;
       if (iP === 11) {
         playerGlobal[iP].style.borderColor = "rgb(243,243,21)";
