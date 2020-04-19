@@ -727,7 +727,7 @@ namespace CornerkickWebMvc
         if (pl == null) continue;
 
         try {
-          if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && pl.iClubId == 3) {
+          if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && CornerkickManager.Player.ownPlayer(ckcore.ltClubs[3], pl, 1)) {
             ckcore.tl.writeLog("Reset of player: " + pl.sName, CornerkickManager.Main.sErrorFile);
           }
         } catch {
