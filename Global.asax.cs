@@ -488,8 +488,8 @@ namespace CornerkickWebMvc
       int iRetCk = 0;
       try {
         iRetCk = ckcore.next();
-      } catch {
-        ckcore.tl.writeLog("performCalendarStep(): Error in ck next()", CornerkickManager.Main.sErrorFile);
+      } catch (Exception e) {
+        ckcore.tl.writeLog("performCalendarStep(): Error in ck next()" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
       }
 
       checkPlayerReset();
@@ -724,8 +724,13 @@ namespace CornerkickWebMvc
     private static void checkPlayerReset()
     {
       foreach (CornerkickGame.Player pl in ckcore.ltPlayer) {
-        if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && pl.iClubId == 3) {
-          ckcore.tl.writeLog("Reset of player: " + pl.sName, CornerkickManager.Main.sErrorFile);
+        if (pl == null) continue;
+
+        try {
+          if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && pl.iClubId == 3) {
+            ckcore.tl.writeLog("Reset of player: " + pl.sName, CornerkickManager.Main.sErrorFile);
+          }
+        } catch {
         }
       }
     }
@@ -1204,8 +1209,8 @@ namespace CornerkickWebMvc
               bCalendarRunning = false;
               break;
             }
-          } catch {
-            ckcore.tl.writeLog("performCalendarStepsAsync(): Error in performCalendarStep() at step: " + iS.ToString(), CornerkickManager.Main.sErrorFile);
+          } catch (Exception e) {
+            ckcore.tl.writeLog("performCalendarStepsAsync(): Error in performCalendarStep() at step: " + iS.ToString() + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
           }
         }
       }
