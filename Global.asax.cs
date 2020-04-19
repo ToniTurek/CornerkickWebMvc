@@ -1120,7 +1120,9 @@ namespace CornerkickWebMvc
         return true;
       }
 
-      settings.bLoginPossible = false; // If error while loading --> disable user login
+      // If error while loading ...
+      timerSave.Enabled = false; // ... do not overwrite the file
+      settings.bLoginPossible = false; // ... disable user login
 
       return false;
     }
