@@ -751,64 +751,152 @@ function plotStatistics(jState = -1) {
       $('#tableTeamViewGame').DataTable().ajax.reload();
 
       // Charts
-      if (gD.ltF && gD.ltM) {
-        var i = 0;
-        var j = 0;
-        for (i = 0; i < gD.ltF.length; ++i) {
-          if (!ltF[i]) {
-            ltF[i] = [];
-          }
-          if (!ltM[i]) {
-            ltM[i] = [];
-          }
+      try {
+        if (gD.ltF && gD.ltM) {
+          var i = 0;
+          var j = 0;
+          for (i = 0; i < gD.ltF.length; ++i) {
+            if (!ltF[i]) {
+              ltF[i] = [];
+            }
+            if (!ltM[i]) {
+              ltM[i] = [];
+            }
 
-          if (gD.ltF[i]) {
-            if (gD.ltF[i].length > 0) {
-              if (jState === -1) {
-                for (k = 0; k < gD.ltF[i].length; ++k) {
-                  ltF[i].push(gD.ltF[i][k]);
-                }
-              } else {
-                ltF[i].length = 0;
-
-                for (j = 0; j < iState; ++j) {
-                  if (j >= gD.ltF[i].length) {
-                    break;
+            if (gD.ltF[i]) {
+              if (gD.ltF[i].length > 0) {
+                if (jState === -1) {
+                  for (k = 0; k < gD.ltF[i].length; ++k) {
+                    ltF[i].push(gD.ltF[i][k]);
                   }
+                } else {
+                  ltF[i].length = 0;
 
-                  ltF[i].push(gD.ltF[i][j]);
+                  for (j = 0; j < iState; ++j) {
+                    if (j >= gD.ltF[i].length) {
+                      break;
+                    }
+
+                    ltF[i].push(gD.ltF[i][j]);
+                  }
+                }
+              }
+            }
+
+            if (gD.ltM[i]) {
+              if (gD.ltM[i].length > 0) {
+                if (jState === -1) {
+                  for (k = 0; k < gD.ltM[i].length; ++k) {
+                    ltM[i].push(gD.ltM[i][k]);
+                  }
+                } else {
+                  ltM[i].length = 0;
+
+                  for (j = 0; j < iState; ++j) {
+                    if (j >= gD.ltM[i].length) {
+                      break;
+                    }
+
+                    ltM[i].push(gD.ltM[i][j]);
+                  }
                 }
               }
             }
           }
 
-          if (gD.ltM[i]) {
-            if (gD.ltM[i].length > 0) {
-              if (jState === -1) {
-                for (k = 0; k < gD.ltM[i].length; ++k) {
-                  ltM[i].push(gD.ltM[i][k]);
-                }
-              } else {
-                ltM[i].length = 0;
-
-                for (j = 0; j < iState; ++j) {
-                  if (j >= gD.ltM[i].length) {
-                    break;
-                  }
-
-                  ltM[i].push(gD.ltM[i][j]);
-                }
-              }
-            }
-          }
+          chartF.render();
+          chartM.render();
         }
-
-        chartF.render();
-        chartM.render();
+      } catch (e) {
+        gD.ltF = null;
+        gD.ltM = null;
       }
-
+      
       //if (document.getElementById("myCheck").checked) {
-      if ($('#dialogPlAction').dialog('isOpen')) {
+      if (document.getElementById("bShowChances").checked) {
+        var chartPlAction = new CanvasJS.Chart("divPlActionChart", {
+          backgroundColor: "transparent",
+          animationEnabled: false,
+          theme: "theme2",//theme1
+          toolTip: {
+            shared: true,
+            //textAlign: right,
+            contentFormatter: function (e) {
+              var content = "";
+
+              // For each cup
+              for (var i = 0; i < e.entries.length; i++) {
+                content += "<strong>" + e.entries[i].dataSeries.name + ":</strong> " + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%";
+                content += "<br/>";
+              }
+
+              content += "<strong>Entscheidung:</strong> " + (gD.fPlActionRnd * 100).toFixed(1) + "%";
+              content += "<br/>";
+
+              return content;
+            }
+          },
+          axisX: {
+            title: "",
+            tickLength: 0,
+            margin: 0,
+            lineThickness: 0,
+            valueFormatString: " " //comment this to show numeric values
+          },
+          axisY: {
+            interval: 100,
+            title: "",
+            tickLength: 0,
+            lineThickness: 0,
+            margin: 0,
+            valueFormatString: " ", //comment this to show numeric values
+            stripLines: [{
+              value: gD.fPlActionRnd * 100.0,
+              thickness: 3
+            }]
+          },
+          data: [
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "red",
+              name: "Schuss",
+              dataPoints: [
+                { y: gD.fPlAction[0] }
+              ]
+            },
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "blue",
+              name: "Pass",
+              dataPoints: [
+                { y: gD.fPlAction[1] }
+              ]
+            },
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "yellow",
+              name: "Dribbling",
+              dataPoints: [
+                { y: gD.fPlAction[2] }
+              ]
+            },
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "yellow",
+              name: "Warten",
+              dataPoints: [
+                { y: gD.fPlAction[3] }
+              ]
+            }
+          ]
+        });
+
+        chartPlAction.render();
+
         $("#txtPlActionShoot").html((gD.fPlAction[0] * 100).toFixed(1) + '%');
         $("#txtPlActionPass" ).html((gD.fPlAction[1] * 100).toFixed(1) + '%');
         $("#txtPlActionGo"   ).html((gD.fPlAction[2] * 100).toFixed(1) + '%');
