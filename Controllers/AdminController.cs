@@ -282,7 +282,7 @@ namespace CornerkickWebMvc.Controllers
       // then get files
       //return Json(d.GetFiles("*").ToArray(), JsonRequestBehavior.AllowGet);
       foreach (FileInfo fi in d.GetFiles("*")) {
-        sContent += fi.Name + '\n';
+        sContent += fi.Name + " (" + fi.Length.ToString() + "b)\n";
       }
 
       return Json(sContent, JsonRequestBehavior.AllowGet);
