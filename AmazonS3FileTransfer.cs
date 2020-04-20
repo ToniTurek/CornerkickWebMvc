@@ -32,6 +32,9 @@ namespace CornerkickWebMvc
       return;
 
 #endif
+
+      if (!File.Exists(sFile)) return;
+
       //var credentials = new Amazon.Runtime.StoredProfileAWSCredentials("ckAwsProfile");
 
       //var client = new AmazonS3Client(bucketRegion);
