@@ -153,7 +153,8 @@ namespace CornerkickWebMvc.Controllers
           //if ((int)dtTmp.DayOfWeek == 0) break;
 
           // ... do training
-          CornerkickManager.Player.doTraining(ref pl, 2, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
+          CornerkickManager.Player.Training training = CornerkickManager.Player.getTraining(iType, MvcApplication.ckcore.plr.ltTraining);
+          CornerkickManager.Player.doTraining(ref pl, training, MvcApplication.ckcore.plr.ltTraining, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
         }
 
         // ... add training data to dataPoints

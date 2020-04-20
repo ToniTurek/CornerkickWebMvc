@@ -1071,7 +1071,6 @@
     <Content Include="Resources\position_names.txt" />
     <Content Include="Resources\skill_names.txt" />
     <Content Include="Resources\trainingcamps.txt" />
-    <Content Include="Resources\training_names.txt" />
     <Content Include="Scripts\autoNumeric\autoNumeric-min.js" />
     <Content Include="Scripts\autoNumeric\autoNumeric.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -1302,6 +1301,7 @@
     <Content Include="App_Data\Resources\sponsor.json" />
     <Content Include="Views\Member\Contracts.cshtml" />
     <Content Include="Views\Member\WishList.cshtml" />
+    <Content Include="Resources\training.json" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
