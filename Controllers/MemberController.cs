@@ -6057,6 +6057,7 @@ namespace CornerkickWebMvc.Controllers
         byte iPos = CornerkickGame.Tool.getBasisPos(iPosExact);
 
         foreach (CornerkickGame.Player pl in MvcApplication.ckcore.ltPlayer) {
+          if (pl.bRetire) continue;
           if (bJouth && pl.getAge(MvcApplication.ckcore.dtDatum) > 18f) continue;
           if (iNat >= 0 && pl.iNat1 != iNat) continue;
 
