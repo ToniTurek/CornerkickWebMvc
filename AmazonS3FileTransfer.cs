@@ -63,7 +63,8 @@ namespace CornerkickWebMvc
         };
 
         try {
-         PutObjectResponse response = client.PutObject(putRequest);
+          PutObjectResponse response = client.PutObject(putRequest);
+          MvcApplication.ckcore.tl.writeLog("Status code: " + response.HttpStatusCode.ToString());
           //using (S3Response r = client.PutObject(putRequest)) { }
         } catch (AmazonS3Exception amazonS3Exception) {
           MvcApplication.ckcore.tl.writeLog("ERROR! S3 PutObjectResponse Exception Message: " + amazonS3Exception.Message, CornerkickManager.Main.sErrorFile);
