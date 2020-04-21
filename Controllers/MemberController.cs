@@ -6636,9 +6636,9 @@ namespace CornerkickWebMvc.Controllers
     {
       string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist.json");
 
-      // Create backup
-      try {
-        if (System.IO.File.Exists(sFileWl)) {
+      if (System.IO.File.Exists(sFileWl)) {
+        // Create backup
+        try {
           string sFileWlBck = sFileWl + ".bck";
 
           // Delete backup file if exist
@@ -6646,15 +6646,22 @@ namespace CornerkickWebMvc.Controllers
             try {
               System.IO.File.Delete(sFileWlBck);
             } catch {
-              MvcApplication.ckcore.tl.writeLog("Unable to delete wishlist backup file: " + sFileWl, CornerkickManager.Main.sErrorFile);
+              MvcApplication.ckcore.tl.writeLog("Unable to delete wishlist backup file: " + sFileWlBck, CornerkickManager.Main.sErrorFile);
             }
           }
 
           // Create backup file
           System.IO.File.Move(sFileWl, sFileWl + ".bck");
+        } catch {
+          MvcApplication.ckcore.tl.writeLog("Unable to create backup of wishlist: " + sFileWl, CornerkickManager.Main.sErrorFile);
         }
-      } catch {
-        MvcApplication.ckcore.tl.writeLog("Unable to create backup of wishlist: " + sFileWl, CornerkickManager.Main.sErrorFile);
+
+        // Delete current wishlist file
+        try {
+          System.IO.File.Delete(sFileWl);
+        } catch {
+          MvcApplication.ckcore.tl.writeLog("Unable to delete wishlist file: " + sFileWl, CornerkickManager.Main.sErrorFile);
+        }
       }
 
       string sJsonWishes = "";
@@ -6670,8 +6677,8 @@ namespace CornerkickWebMvc.Controllers
       // Write string to file
       try {
         System.IO.File.WriteAllText(sFileWl, sJsonWishes);
-      } catch {
-        MvcApplication.ckcore.tl.writeLog("Unable to write wishlist to file: " + sFileWl, CornerkickManager.Main.sErrorFile);
+      } catch (Exception e) {
+        MvcApplication.ckcore.tl.writeLog("Unable to write wishlist to file: " + sFileWl + Environment.NewLine + e.Message, CornerkickManager.Main.sErrorFile);
       }
     }
 
