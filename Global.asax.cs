@@ -444,7 +444,7 @@ namespace CornerkickWebMvc
       if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0) {
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
-        CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0);
+        CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0, iNat: iNations[random.Next(iNations.Length)]);
         ckcore.tr.putPlayerOnTransferlist(plNew, 0);
 
         // Player jouth
