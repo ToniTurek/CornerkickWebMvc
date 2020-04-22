@@ -1,4 +1,4 @@
-﻿function drawLine(ax, ay, bx, by, sColor, iWidth, izIndex, sBorderStyle) {
+﻿function drawLine(ax, ay, bx, by, sColor, sTitle, iWidth, izIndex, sBorderStyle) {
   //alert(ax + ", " + ay + ", " + bx + ", " + by + ", " + sColor);
 
   if (!sColor) {
@@ -53,7 +53,7 @@
     style += ";z-index:" + izIndex.toString();
   }
 
-  return "<div style='" + style + "'></div>";
+  return "<div class=\"tooltipShoot\" style='" + style + "' title='" + sTitle + "'></div>";
 }
 
 function convertPosToPix(iX0, iY0, iX1, iY1, div, bHorizontal) {

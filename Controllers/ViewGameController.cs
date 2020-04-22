@@ -806,6 +806,35 @@ namespace CornerkickWebMvc.Controllers
       if (iHA   >= 0 && plShoot.iHA    != iHA)   return ltDrawLine;
       if (iPlIx >= 0 && plShoot.iIndex != iPlIx) return ltDrawLine;
 
+      string sTitle = "";
+      if (state.shoot.fChanceOnGoal > 0f) {
+        sTitle += "<div align=\"right\">";
+
+        if (state.shoot.iResult > 1 && state.shoot.iResult < 5) sTitle += "<strong>";
+        sTitle += "Gehalten: " + 0.ToString("0.0%") + " .. " + state.shoot.fChanceKeeperSave.ToString("0.0%");
+        if (state.shoot.iResult > 1 && state.shoot.iResult < 5) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        if (state.shoot.iResult == 1) sTitle += "<strong>";
+        sTitle += "Tor: " + state.shoot.fChanceKeeperSave.ToString("0.0%") + " .. " + state.shoot.fChanceOnGoal.ToString("0.0%");
+        if (state.shoot.iResult == 1) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        if (state.shoot.iResult == 5 || state.shoot.iResult == 6) sTitle += "<strong>";
+        sTitle += "Alu: " + state.shoot.fChanceOnGoal.ToString("0.0%") + " .. " + (state.shoot.fChanceOnGoal + state.shoot.fChancePostBar).ToString("0.0%");
+        if (state.shoot.iResult == 5 || state.shoot.iResult == 6) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        if (state.shoot.iResult == 0) sTitle += "<strong>";
+        sTitle += "Daneben: " + (state.shoot.fChanceOnGoal + state.shoot.fChancePostBar).ToString("0.0%") + " .. " + 1.ToString("0.0%");
+        if (state.shoot.iResult == 0) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        sTitle += "<strong>Ergebnis: " + state.shoot.fRnd.ToString("0.0%") + "</strong>";
+
+        sTitle += "</div>";
+      }
+
       Models.ViewGameModel.drawLine drawLine = new Models.ViewGameModel.drawLine();
 
       drawLine.X0 = plShoot.ptPos.X;
@@ -816,6 +845,7 @@ namespace CornerkickWebMvc.Controllers
         drawLine.X1 = plKeeper.ptPos.X;
         drawLine.Y1 = plKeeper.ptPos.Y;
         drawLine.sColor = "yellow";
+        drawLine.sTitle = sTitle;
 
         ltDrawLine.Add(drawLine);
 
@@ -826,6 +856,7 @@ namespace CornerkickWebMvc.Controllers
         drawLine.X1 = (1 - state.shoot.iHA) * game.ptPitch.X;
         drawLine.Y1 = -2;
         drawLine.sColor = "yellow";
+        drawLine.sTitle = sTitle;
 
         ltDrawLine.Add(drawLine);
 
@@ -836,6 +867,7 @@ namespace CornerkickWebMvc.Controllers
         drawLine.X1 = (1 - state.shoot.iHA) * game.ptPitch.X;
         drawLine.Y1 = 0;
         drawLine.sColor = "yellow";
+        drawLine.sTitle = sTitle;
 
         ltDrawLine.Add(drawLine);
 
@@ -848,6 +880,8 @@ namespace CornerkickWebMvc.Controllers
       if      (state.shoot.iResult == 1)                             drawLine.sColor = "red";
       else if (state.shoot.iResult == 0 || state.shoot.iResult == 7) drawLine.sColor = "cyan";
       else                                                           drawLine.sColor = "yellow";
+
+      drawLine.sTitle = sTitle;
 
       ltDrawLine.Add(drawLine);
 
@@ -885,8 +919,26 @@ namespace CornerkickWebMvc.Controllers
 
       if (iPlIx >= 0 && plDef.iIndex != iPlIx && plOff.iIndex != iPlIx) return "";
 
-      string sDuelDesc = MvcApplication.ckcore.ui.getMinuteString(state.duel.tsMinute, false) +
-                         " - " + state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
+      string sDuelDesc = MvcApplication.ckcore.ui.getMinuteString(state.duel.tsMinute, false) + " Min.: " +
+                         state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
+      sDuelDesc += "<br/>";
+
+      if (state.duel.iResult > 1) sDuelDesc += "<strong>";
+      sDuelDesc += "Foul: " + 0.ToString("0.0%") + " .. " + state.duel.fChanceFoul.ToString("0.0%");
+      if (state.duel.iResult > 1) sDuelDesc += "</strong>";
+      sDuelDesc += "<br/>";
+
+      if (state.duel.iResult == 1) sDuelDesc += "<strong>";
+      sDuelDesc += "Def.: " + state.duel.fChanceFoul.ToString("0.0%") + " .. " + (state.duel.fChanceFoul + state.duel.fChanceWinDef).ToString("0.0%");
+      if (state.duel.iResult == 1) sDuelDesc += "</strong>";
+      sDuelDesc += "<br/>";
+
+      if (state.duel.iResult == 0) sDuelDesc += "<strong>";
+      sDuelDesc += "Off.: " + (state.duel.fChanceFoul + state.duel.fChanceWinDef).ToString("0.0%").PadLeft(5) + " .. 100.0%";
+      if (state.duel.iResult == 0) sDuelDesc += "</strong>";
+      sDuelDesc += "<br/>";
+
+      sDuelDesc += "<strong>Ergebnis: " + state.duel.fRnd.ToString("0.0%") + "</strong>";
 
       string sDefOff = "off";
       if (iHA >= 0 && iHA != state.duel.plOff.iHA) sDefOff = "def";
@@ -902,7 +954,11 @@ namespace CornerkickWebMvc.Controllers
         else if (state.duel.iResult == 5) sImg = "rCard";
       }
 
-      return "<img src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; z-index: 99\" title=\"" + sDuelDesc + "\" />";
+      string sDuelIcon = "<div style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; z-index: 99\">";
+      sDuelIcon += "<img class=\"tooltipDuel\" src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: relative; width: 12px\" title=\"" + sDuelDesc + "\"/>";
+      sDuelIcon += "</div>";
+
+      return sDuelIcon;
     }
 
     public Models.ViewGameModel.gameData getAllGameData(Models.ViewGameModel view, int iState = -1)

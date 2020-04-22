@@ -137,6 +137,7 @@ namespace CornerkickWebMvc.Models
       public int X1 { get; set; }
       public int Y1 { get; set; }
       public string sColor { get; set; }
+      public string sTitle { get; set; }
     }
 
     public ViewGameModel()

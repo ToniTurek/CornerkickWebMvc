@@ -735,10 +735,6 @@
 
     function openDialogChances(bChecked) {
       document.getElementById("bShowChances").checked = bChecked;
-
-      if (bChecked) {
-        $("#dialogPlAction").dialog("open");
-      }
     }
 
     function setView() {
@@ -869,7 +865,7 @@
 </head>
 
 <body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
-  <input type="hidden" id="bShowChances" name="bShowChances" value="0">
+  <input type="hidden" id="bShowChances" name="bShowChances" checked="checked">
 
   @if (Model.game == null || (Model.game != null && Model.game.data.bFinished)) {
     <div id="divOptions" style="position: relative; left: 0px; width: 100%; height: 40px">
@@ -1060,9 +1056,9 @@
     <div id="divOptionsPos" style="position: absolute; top: 164px; left: 100px; width: 140px; height: auto">
       @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
     </div>
-    <label style="position: absolute; top: 210px">
+    <label style="position: absolute; top: 210px; cursor: pointer">
       Chancen:
-      <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="openDialogChances(this.checked)" value="0">
+      <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="openDialogChances(this.checked)" checked="checked">
     </label>
   </div>
 

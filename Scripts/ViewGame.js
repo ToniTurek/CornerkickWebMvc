@@ -530,7 +530,7 @@ function plotStatistics(jState = -1) {
           iX1 = ( drawLineShoot.X1       * iDivWidthPix ) / 122;
           iY1 = ((drawLineShoot.Y1 + 25) * iDivHeightPix) /  50;
 
-          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, 1, 20)).appendTo('#drawHeatmap');
+          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, drawLineShoot.sTitle, 1, 20)).appendTo('#drawHeatmap');
         });
       }
 
@@ -546,13 +546,25 @@ function plotStatistics(jState = -1) {
           iX1 = (drawLinePass.X1 * iDivWidthPix) / 122;
           iY1 = ((drawLinePass.Y1 + 25) * iDivHeightPix) / 50;
 
-          $(drawLine(iX0, iY0, iX1, iY1, drawLinePass.sColor, 2, 20, "dashed")).appendTo('#drawHeatmap');
+          $(drawLine(iX0, iY0, iX1, iY1, drawLinePass.sColor, "", 2, 20, "dashed")).appendTo('#drawHeatmap');
         });
       }
 
       if (gD.sCard) {
         $(gD.sCard).appendTo('#drawHeatmap');
       }
+
+      $(".tooltipDuel").tooltip({
+        content: function () {
+          return "<div align=\"right\">" + this.getAttribute("title") + "</div>";
+        }
+      });
+
+      $(".tooltipShoot").tooltip({
+        content: function () {
+          return this.getAttribute("title");
+        }
+      });
 
       // Bar statistics
       var dataH = gD.fDataH;
@@ -812,18 +824,17 @@ function plotStatistics(jState = -1) {
           theme: "theme2",//theme1
           toolTip: {
             shared: true,
-            //textAlign: right,
+            borderColor: "black",
             contentFormatter: function (e) {
-              var content = "";
+              var content = "<table>";
 
               // For each cup
               for (var i = 0; i < e.entries.length; i++) {
-                content += "<strong>" + e.entries[i].dataSeries.name + ":</strong> " + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%";
-                content += "<br/>";
+                content += "<tr><td style=\"text-align:right\"><strong>" + e.entries[i].dataSeries.name + ":</strong></td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
               }
 
-              content += "<strong>Entscheidung:</strong> " + (gD.fPlActionRnd * 100).toFixed(1) + "%";
-              content += "<br/>";
+              content += "<tr><td style=\"text-align:right\"><strong>Entscheidung:</strong></td><td style=\"text-align:right\">" + (gD.fPlActionRnd * 100).toFixed(1) + "%</td>";
+              content += "</table>";
 
               return content;
             }
@@ -844,7 +855,8 @@ function plotStatistics(jState = -1) {
             valueFormatString: " ", //comment this to show numeric values
             stripLines: [{
               value: gD.fPlActionRnd * 100.0,
-              thickness: 3
+              color: "black",
+              thickness: 2
             }]
           },
           data: [
@@ -878,7 +890,7 @@ function plotStatistics(jState = -1) {
             {
               // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
               type: "stackedBar100",
-              color: "yellow",
+              color: "grey",
               name: "Warten",
               dataPoints: [
                 { y: gD.fPlAction[3] }
@@ -888,12 +900,6 @@ function plotStatistics(jState = -1) {
         });
 
         chartPlAction.render();
-
-        $("#txtPlActionShoot").html((gD.fPlAction[0] * 100).toFixed(1) + '%');
-        $("#txtPlActionPass" ).html((gD.fPlAction[1] * 100).toFixed(1) + '%');
-        $("#txtPlActionGo"   ).html((gD.fPlAction[2] * 100).toFixed(1) + '%');
-        $("#txtPlActionWait" ).html((gD.fPlAction[3] * 100).toFixed(1) + '%');
-        $("#txtPlActionRnd"  ).html((gD.fPlActionRnd * 100).toFixed(1) + '%');
       }
     } // success function
   }); // ajax
