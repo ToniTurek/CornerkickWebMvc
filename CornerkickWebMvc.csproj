@@ -345,14 +345,75 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\Resources\cup_round_names.txt" />
-    <Content Include="App_Data\Resources\nations.txt" />
-    <Content Include="App_Data\Resources\player_names.txt" />
-    <Content Include="App_Data\Resources\player_surnames.txt" />
-    <Content Include="App_Data\Resources\position_names.txt" />
-    <Content Include="App_Data\Resources\skill_names.txt" />
-    <Content Include="App_Data\Resources\trainingcamps.txt" />
-    <Content Include="App_Data\Resources\training_names.txt" />
+    <Content Include="App_Data\Resources\cup_round_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_ARG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_BRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_ENG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_ESP.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_FRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_GER.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_ITA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_names_NED.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_ARG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_BRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_ENG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_ESP.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_FRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_GER.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_ITA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\Names\player_surnames_NED.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\nations.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\position_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\skill_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\trainingcamps.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -1295,13 +1356,24 @@
     <Content Include="Resources\injury_names.json" />
     <Content Include="Resources\news.json" />
     <Content Include="Resources\sponsor.json" />
-    <Content Include="App_Data\Resources\doping.json" />
-    <Content Include="App_Data\Resources\injury_names.json" />
-    <Content Include="App_Data\Resources\news.json" />
-    <Content Include="App_Data\Resources\sponsor.json" />
+    <Content Include="App_Data\Resources\doping.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\injury_names.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\news.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\sponsor.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Member\Contracts.cshtml" />
     <Content Include="Views\Member\WishList.cshtml" />
     <Content Include="Resources\training.json" />
+    <Content Include="App_Data\Resources\training.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
