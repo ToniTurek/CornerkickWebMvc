@@ -508,6 +508,10 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die FÃ
     for (int iT = 0; iT < MvcApplication.ckcore.plr.ltTraining.Count; iT++) {
       CornerkickManager.Player.Training tr = MvcApplication.ckcore.plr.ltTraining[iT];
 
+      if (tr.iId < 0) {
+        continue;
+      }
+
       string[] sTr = new string[3];
       int[] iMulti = new int[3];
       if (tr.fCondi > 0) { // Type: Kondition
@@ -536,47 +540,47 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die FÃ
         }
       }
       string[] sTrInd = new string[14];
-      if (iT == 3) { // Speed
+      if (tr.iId == 3) { // Speed
         sTrInd[0] = "++"; // Speed
         sTrInd[1] = "++"; // Acceleration
-      } else if (iT == 4) { // Duel
+      } else if (tr.iId == 4) { // Duel
         sTrInd[3] = "++"; // Duel off.
         sTrInd[4] = "++"; // Duel def.
-      } else if (iT == 5) { // 5 vs. 2
+      } else if (tr.iId == 5) { // 5 vs. 2
         sTrInd[5] = "++"; // Low pass
         sTrInd[2] = "++"; // Technic
-      } else if (iT == 6) { // Shoots
+      } else if (tr.iId == 6) { // Shoots
         sTrInd[7] = "++"; // Shoots
         sTrInd[11] = "++"; // Reaction
         sTrInd[12] = "++"; // Jump
-      } else if (iT == 7) { // Flanken/Abschluss
+      } else if (tr.iId == 7) { // Flanken/Abschluss
         sTrInd[6] = "+"; // High pass
         sTrInd[8] = "+"; // Header
         sTrInd[11] = "+"; // Reaction
         sTrInd[12] = "+"; // Jump
         sTrInd[13] = "+"; // Catch
-      } else if (iT == 8) { // Standards
+      } else if (tr.iId == 8) { // Standards
         sTrInd[8] = "+"; // Header
         sTrInd[9] = "+"; // Free-kick
         sTrInd[10] = "+"; // Penalty
         sTrInd[11] = "+"; // Reaction
         sTrInd[12] = "+"; // Jump
         sTrInd[13] = "+"; // Catch
-      } else if (iT == 9) { // Trainings game
+      } else if (tr.iId == 9) { // Trainings game
         sTrInd[2] = "+"; // Technic
         sTrInd[3] = "+"; // Duel off.
         sTrInd[4] = "+"; // Duel def.
         sTrInd[5] = "+"; // Low pass
         sTrInd[6] = "+"; // High pass
-      } else if (iT == 10) { // Soccer-tennis
+      } else if (tr.iId == 10) { // Soccer-tennis
         sTrInd[2] = "+"; // Technic
         sTrInd[8] = "+"; // Header
-      } else if (iT == 11) { // Header
+      } else if (tr.iId == 11) { // Header
         sTrInd[8] = "+++"; // Header
-      } else if (iT == 12) { // Yoga
+      } else if (tr.iId == 12) { // Yoga
         sTrInd[2] = "+"; // Technic
         sTrInd[11] = "+"; // Reaction
-      } else if (iT == 13) { // Penalty kickout
+      } else if (tr.iId == 13) { // Penalty kickout
         sTrInd[10] = "+++"; // Penalty
       }
 
