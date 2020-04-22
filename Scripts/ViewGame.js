@@ -80,16 +80,11 @@ function drawGame(iState, iGameSpeed) {
 
 var iB = 0;
 function drawGame2(gLoc, iState, iGameSpeed) {
-  //var drawGameDiv = $("#divDrawGame");
-  var iPositionsValue = $('#ddlPositions').val();
+  var iPositionsValue = parseInt(document.getElementById("ddlPositions").value);
 
-  //drawGameDiv.html('');
-
-  if (iPositionsValue >= 0) {
-    updatePlayer(playerGlobal, gLoc, iPositionsValue == 0);
-    updateBallPos(imgBall, divBallTarget, gLoc.gBall, iGameSpeed);
-    printComments(gLoc);
-  }
+  updatePlayer(playerGlobal, gLoc, iPositionsValue === 0);
+  updateBallPos(imgBall, divBallTarget, gLoc.gBall, iGameSpeed);
+  printComments(gLoc);
 
   if (iState < 0 && gLoc.bFinished) {
     iState = -2;
@@ -357,6 +352,8 @@ function drawPlayer(gLoc) {
 function updatePlayer(player, gLoc, bShowLookAt) {
   if (gLoc.ltPlayer.length < 1) return;
 
+  var iPositionsValue = parseInt(document.getElementById("ddlPositions").value);
+
   var fLookAtSize = 0.3;
 
   var iP = 0;
@@ -369,41 +366,36 @@ function updatePlayer(player, gLoc, bShowLookAt) {
       continue;
     }
 
-    if (pl.iCard < 2) { // if not red card
-      var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
-      var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
-
-      var sXh = ((100 *  fXh       ) - 1.0).toString();
-      var sYh = ((100 * (fYh + 0.5)) - 1.5).toString();
-
-      if (bShowLookAt) {
-        divLookAt = player[iP].children[1];
-        var fLftH = ((1.0 - Math.cos(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
-        divLookAt.style.left = ((fLftH - (fLookAtSize / 2)) * 100).toString() + '%';
-        var fTopH = ((1.0 - Math.sin(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
-        divLookAt.style.top  = ((fTopH - (fLookAtSize / 2)) * 100).toString() + '%';
-      } else {
-        divLookAt.style.display = "none";
-      }
-
-      player[iP].style.left = sXh + '%';
-      player[iP].style.top  = sYh + '%';
-
-      /*
-      if (cbTargetPos) {
-        if (cbTargetPos.checked && gLoc.ltPlayer[iP + 11].ptPosTarget.X > 0) {
-          iX0 = (fXa * iDivWidthPix);
-          iY0 = ((fYa + 0.5) * iDivHeightPix);
-          iX1 = (gLoc.ltPlayer[iP + 11].ptPosTarget.X * iDivWidthPix) / 122;
-          iY1 = ((gLoc.ltPlayer[iP + 11].ptPosTarget.Y + 25) * iDivHeightPix) / 50;
-
-          sBox += drawline(iX0, iY0, iX1, iY1, "black");
-        }
-      }
-      */
-    } else {
+    if (pl.iCard > 1) { // if red card
       player[iP].style.display = "none";
+      continue;
     }
+
+    if (iPositionsValue < 0) {
+      player[iP].style.display = "none";
+      continue;
+    }
+
+    var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
+    var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
+
+    var sXh = ((100 *  fXh       ) - 1.0).toString();
+    var sYh = ((100 * (fYh + 0.5)) - 1.5).toString();
+
+    if (bShowLookAt) {
+      divLookAt = player[iP].children[1];
+      var fLftH = ((1.0 - Math.cos(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
+      divLookAt.style.left = ((fLftH - (fLookAtSize / 2)) * 100).toString() + '%';
+      var fTopH = ((1.0 - Math.sin(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
+      divLookAt.style.top  = ((fTopH - (fLookAtSize / 2)) * 100).toString() + '%';
+    } else {
+      divLookAt.style.display = "none";
+    }
+
+    player[iP].style.left = sXh + '%';
+    player[iP].style.top = sYh + '%';
+
+    player[iP].style.display = "block";
   }
 }
 
