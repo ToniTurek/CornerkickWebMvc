@@ -5187,6 +5187,23 @@ namespace CornerkickWebMvc.Controllers
           }
         }
 
+        // Events
+        foreach (CornerkickManager.Club.Event ev in club.ltEvent) {
+          if (ev.dt.Date.Equals(dt)) {
+            ltEvents.Add(new Models.DiaryEvent {
+              iID = ltEvents.Count,
+              sTitle = CornerkickManager.Club.sEventNames[ev.iId],
+              sDescription = CornerkickManager.Club.sEventNames[ev.iId],
+              sStartDate = ev.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = ev.dt.AddMinutes(60).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sColor = "rgb(200, 200, 200)",
+              sTextColor = "rgb(0, 0, 0)",
+              bEditable = false,
+              bAllDay = false
+            });
+          }
+        }
+
         // Future training
         foreach (CornerkickManager.Main.TrainingPlan.Unit tu in club.training.ltUnit) {
           if (tu.dt.Date.Equals(dt) && tu.iType > 0 && !bCampTravelDay) {
@@ -5597,6 +5614,28 @@ namespace CornerkickWebMvc.Controllers
       var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
       //return (long)(dt - origin).TotalSeconds;
       return (dt.AddHours(-2).Ticks - 621355968000000000) / 10000;
+    }
+
+    public JsonResult CalendarAddTeamEvent(int iEventId, string sStart, int iH, int iM)
+    {
+      string sReturn = "Error";
+
+      DateTime dtStart = new DateTime();
+      if (!DateTime.TryParse(sStart, out dtStart)) return Json("Not a valid start date format!", JsonRequestBehavior.AllowGet);
+      dtStart = dtStart.Date.AddHours(iH).AddMinutes(iM);
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(sReturn, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Club.Event ev = new CornerkickManager.Club.Event();
+      ev.iId = (byte)iEventId;
+      ev.dt = dtStart;
+      ev.iMax = 2;
+      clb.ltEvent.Add(ev);
+
+      if (iEventId == 1) sReturn = "Sie haben die Krisensitzung anberaumt.";
+
+      return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
