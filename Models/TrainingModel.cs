@@ -11,10 +11,7 @@ namespace CornerkickWebMvc.Models
   public class TrainingModel
   {
     public CornerkickManager.Main.TrainingPlan.Unit[][] ltTu { get; set; }
-
-    public TrainingModel()
-    {
-    }
+    public int[] iTrainingCount { get; set; }
   }
 
   //DataContract for Serializing Data - required to serve in JSON format

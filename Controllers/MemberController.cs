@@ -3361,6 +3361,21 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdTraining);
 
+      mdTraining.iTrainingCount = new int[MvcApplication.ckcore.plr.ltTraining.Count];
+
+      foreach (CornerkickManager.Main.TrainingHistory th in clb.ltTrainingHist) {
+        bool bFound = false;
+        foreach (TimeSpan tsTr in tsTraining) {
+          if (tsTr.Equals(th.dt.TimeOfDay)) {
+            bFound = true;
+            break;
+          }
+        }
+        if (!bFound) continue;
+
+        if (th.iType >= 0) mdTraining.iTrainingCount[th.iType]++;
+      }
+
       return View(mdTraining);
     }
 
