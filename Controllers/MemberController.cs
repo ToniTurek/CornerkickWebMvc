@@ -5188,14 +5188,14 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Events
-        foreach (CornerkickManager.Club.Event ev in club.ltEvent) {
-          if (ev.dt.Date.Equals(dt)) {
+        foreach (CornerkickManager.Club.Event.Item ei in club.ltEvent) {
+          if (ei.dt.Date.Equals(dt)) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
-              sTitle = CornerkickManager.Club.sEventNames[ev.iId],
-              sDescription = CornerkickManager.Club.sEventNames[ev.iId],
-              sStartDate = ev.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
-              sEndDate = ev.dt.AddMinutes(60).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sTitle = ei.ev.sName,
+              sDescription = ei.ev.sName,
+              sStartDate = ei.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = ei.dt.AddMinutes(60).ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(200, 200, 200)",
               sTextColor = "rgb(0, 0, 0)",
               bEditable = false,
@@ -5627,11 +5627,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(sReturn, JsonRequestBehavior.AllowGet);
 
-      CornerkickManager.Club.Event ev = new CornerkickManager.Club.Event();
-      ev.iId = (byte)iEventId;
-      ev.dt = dtStart;
-      ev.iMax = 2;
-      clb.ltEvent.Add(ev);
+      CornerkickManager.Club.Event.Item evi = new CornerkickManager.Club.Event.Item();
+      evi.ev = MvcApplication.ckcore.tl.getEvent((byte)iEventId);
+      evi.dt = dtStart;
+      clb.ltEvent.Add(evi);
 
       if (iEventId == 1) sReturn = "Sie haben die Krisensitzung anberaumt.";
 

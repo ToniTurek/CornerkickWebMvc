@@ -203,9 +203,10 @@ namespace CornerkickWebMvc.Controllers
         // ... add fresh
         dataPoints[0].Add(new Models.DataPointGeneral(iS, pl     .fFresh));
         dataPoints[1].Add(new Models.DataPointGeneral(iS, plNoAcc.fFresh));
-        dataPoints[2].Add(new Models.DataPointGeneral(iS, CornerkickGame.AI.getFreshPlayerMoveLimit(pl.fSteps, fTcPower)));
+        if (CornerkickGame.AI.getFreshPlayerMoveLimit(pl.fSteps, pl.fFresh, fTcPower) < 1f) dataPoints[2].Add(new Models.DataPointGeneral(iS, 1f));
+        else                                                                                dataPoints[2].Add(new Models.DataPointGeneral(iS, 0f));
 
-        pl     .fSteps -= 1f;
+        pl.fSteps -= 1f;
         plNoAcc.fSteps -= 1f;
 
         pl     .iStepsCurr++;
