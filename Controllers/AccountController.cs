@@ -758,9 +758,21 @@ namespace CornerkickWebMvc.Controllers
 
           iniCk();
 
+          string sNoLoginMailList = ConfigurationManager.AppSettings["ckNoLoginMail"];
+          bool bNoLoginMail = false;
+
 #if !DEBUG
+          if (!string.IsNullOrEmpty(sNoLoginMailList)) {
+            foreach (string sNoMail in sNoLoginMailList.Split(';')) {
+              if (sNoMail.Equals(model.Email, StringComparison.CurrentCultureIgnoreCase)) {
+                bNoLoginMail = true;
+                break;
+              }
+            }
+          }
+
           // Send mail to admin
-          if (!model.Email.Equals("s.jan@web.de")) {
+          if (!bNoLoginMail) {
             try {
               await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
             } catch {
