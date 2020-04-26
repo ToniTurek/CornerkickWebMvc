@@ -3427,6 +3427,7 @@ namespace CornerkickWebMvc.Controllers
 
       mdTraining.iTrainingCount = new int[MvcApplication.ckcore.plr.ltTraining.Count];
 
+      int nTrTotal = 0;
       foreach (CornerkickManager.Main.TrainingHistory th in clb.ltTrainingHist) {
         bool bFound = false;
         foreach (TimeSpan tsTr in tsTraining) {
@@ -3437,7 +3438,15 @@ namespace CornerkickWebMvc.Controllers
         }
         if (!bFound) continue;
 
-        if (th.iType >= 0) mdTraining.iTrainingCount[th.iType]++;
+        if (th.iType >= 0) {
+          mdTraining.iTrainingCount[th.iType]++;
+          nTrTotal++;
+        }
+      }
+
+      mdTraining.sTrainingCountRel = new string[mdTraining.iTrainingCount.Length];
+      for (int iT = 0; iT < mdTraining.iTrainingCount.Length; iT++) {
+        mdTraining.sTrainingCountRel[iT] = (mdTraining.iTrainingCount[iT] / (float)nTrTotal).ToString("0.0%");
       }
 
       return View(mdTraining);

@@ -307,11 +307,12 @@
         <table border="1" cellpadding="4">
           <thead>
             <tr>
-              <th style="font-size: 18px; color: red; text-align: center" colspan="2">Konditionelles Training</th>
+              <th style="font-size: 18px; color: red; text-align: center; border-color: black" colspan="3">Konditionelles Training</th>
             </tr>
             <tr>
               <th style="text-align: center">Type</th>
               <th style="text-align: center">Anzahl</th>
+              <th style="text-align: center">Anteil</th>
             </tr>
           </thead>
           <tbody>
@@ -321,6 +322,7 @@
                   <tr>
                     <td style="text-align: center">@tr.sName</td>
                     <td style="text-align: center">@Model.iTrainingCount[tr.iId].ToString()</td>
+                    <td style="text-align: right">@Model.sTrainingCountRel[tr.iId]</td>
                   </tr>
                 }
               }
@@ -333,11 +335,12 @@
         <table border="1" cellpadding="4">
           <thead>
             <tr>
-              <th style="font-size: 18px; color: green; text-align: center" colspan="2">Regeneratives Training</th>
+              <th style="font-size: 18px; color: green; text-align: center; border-color: black" colspan="3">Regeneratives Training</th>
             </tr>
             <tr>
               <th style="text-align: center">Type</th>
               <th style="text-align: center">Anzahl</th>
+              <th style="text-align: center">Anteil</th>
             </tr>
           </thead>
           <tbody>
@@ -347,6 +350,7 @@
                   <tr>
                     <td style="text-align: center">@tr.sName</td>
                     <td style="text-align: center">@Model.iTrainingCount[tr.iId].ToString()</td>
+                    <td style="text-align: right">@Model.sTrainingCountRel[tr.iId]</td>
                   </tr>
                 }
               }
