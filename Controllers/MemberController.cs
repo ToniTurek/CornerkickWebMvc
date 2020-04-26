@@ -1783,9 +1783,13 @@ namespace CornerkickWebMvc.Controllers
       plModel.iPlayerIndTr = plDetails.iIndTraining;
 
       plModel.bOwnPlayer = CornerkickManager.Player.ownPlayer(club, plDetails);
+
+      CornerkickManager.Club clbPlayer = null;
       if (plDetails.iClubId >= 0 && plDetails.iClubId < MvcApplication.ckcore.ltClubs.Count) {
-        plModel.bJouth = MvcApplication.ckcore.ltClubs[plDetails.iClubId].ltPlayerJouth.IndexOf(plDetails) >= 0;
+        clbPlayer = MvcApplication.ckcore.ltClubs[plDetails.iClubId];
+        plModel.bJouth = CornerkickManager.Player.ownPlayer(clbPlayer, plDetails, 2);
         plModel.bJouthBelow16 = plDetails.getAge(MvcApplication.ckcore.dtDatum) < 16;
+        plModel.bJouthWithContract = plModel.bJouth && plDetails.contract.iSalary != CornerkickManager.Finance.iPlayerJouthSalary;
       }
 
       plModel.bNation = club.bNation;
@@ -2086,6 +2090,30 @@ namespace CornerkickWebMvc.Controllers
                      "                   Kosten: " + dp.iCost.ToString("N0", getCi()) + " €";
 
       return Json(sDesc, JsonRequestBehavior.AllowGet);
+    }
+
+    public ActionResult PlayerDetailsMoveIntoProTeam(int iPlayerId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      string sReturn = "Error";
+      if (pl.iClubId >= 0 && pl.iClubId < MvcApplication.ckcore.ltClubs.Count) {
+        CornerkickManager.Club clb = MvcApplication.ckcore.ltClubs[pl.iClubId];
+
+        for (int iPlJ = 0; iPlJ < clb.ltPlayerJouth.Count; iPlJ++) {
+          CornerkickGame.Player plJ = clb.ltPlayerJouth[iPlJ];
+          if (plJ.iId == pl.iId) {
+            if ((int)plJ.getAge(MvcApplication.ckcore.dtDatum) < 16) return Json("Error: Spieler zu jung für Profivertrag", JsonRequestBehavior.AllowGet);
+
+            clb.ltPlayerJouth.RemoveAt(iPlJ);
+            clb.ltPlayer.Add(plJ);
+
+            return Json("Sie haben den Jugendspieler " + pl.sName + " in ihr Profiteam übernommen.", JsonRequestBehavior.AllowGet);
+          }
+        }
+      }
+
+      return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult PlayerDetailsGetCFM(int iPlId)

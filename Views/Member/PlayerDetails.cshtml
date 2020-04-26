@@ -11,6 +11,7 @@
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
+  <script type="text/javascript" src="~/Scripts/dialog.js"></script>
 </head>
 
 @{
@@ -179,7 +180,11 @@
     });
 
     $("#bnContract").click(function () {
-      getContractDialog(document.body, @Model.iPlayer, false);
+      if ($("#bnContract").text() === "In Profikader übernehmen") {
+        getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
+      } else {
+        getContractDialog(document.body, @Model.iPlayer, false);
+      }
     });
 
     $("#bnPutOnTakeFromTransfer").click(function () {
@@ -323,6 +328,23 @@
       success: function (response) {
         alert(response);
         window.location.reload(true);
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
+  }
+
+  function moveIntoProTeam() {
+    $.ajax({
+      url: "/Member/PlayerDetailsMoveIntoProTeam",
+      type: 'POST',
+      traditional: true,
+      data: { iPlayerId: @Model.iPlayer },
+      dataType: "json",
+      success: function (response) {
+        alert(response);
       },
       error: function (xhr) {
         debugger;
@@ -570,7 +592,7 @@
   }
 
   <div style="position: absolute; top: 20px; height: 128px; right: 0px; border-style: outset; border-width: 3px; border-color: lightgray">
-   @if (Model.bOwnPlayer) {
+    @if (Model.bOwnPlayer) {
       using (Html.BeginForm("PlayerDetails",
                             "Member",
                             new { i = Model.iPlayer },
@@ -669,8 +691,6 @@
                   @{
                     string sDauer = player.contract.iLength.ToString() + " Jahre";
                     if (Model.bJouth) {
-                      sDauer = "Jugendspieler";
-                    } else if (player.contract.iLength < 2) {
                       sDauer = "Saisonende";
                     }
                   }
@@ -802,7 +822,9 @@
         @{
           if (Model.bOwnPlayer) {
             string sExtendContract = "Vertrag verlängern";
-            if (Model.bJouth) {
+            if (Model.bJouthWithContract) {
+              sExtendContract = "In Profikader übernehmen";
+            } else if (Model.bJouth) {
               sExtendContract = "Profivertrag aushandeln";
             }
 
