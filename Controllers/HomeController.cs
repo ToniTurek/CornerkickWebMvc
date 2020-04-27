@@ -136,14 +136,14 @@ namespace CornerkickWebMvc.Controllers
 
       // Trainings camp
       CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
-      if (iCamp >= 0 && iCamp < mnUm.tcp.ltCamps.Count) {
-        camp.camp = mnUm.tcp.ltCamps[iCamp];
+      if (iCamp >= 0 && iCamp < MvcApplication.ckcore.tcp.ltCamps.Count) {
+        camp.camp = MvcApplication.ckcore.tcp.ltCamps[iCamp];
         camp.dtArrival   = mnUm.dtDatum.AddDays(-1);
         camp.dtDeparture = mnUm.dtDatum.AddDays(+8);
       }
 
       // Doping
-      if (iDoping >= 0 && iDoping < mnUm.ltDoping.Count) pl.doDoping(mnUm.ltDoping[iDoping]);
+      if (iDoping >= 0 && iDoping < MvcApplication.ckcore.ltDoping.Count) pl.doDoping(MvcApplication.ckcore.ltDoping[iDoping]);
 
       // For the next 7 days ...
       for (byte iD = 0; iD < 7; iD++) {
