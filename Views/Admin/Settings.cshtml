@@ -36,11 +36,16 @@
     $("#bRegisterDuringGame").change(function () {
       setSettings();
     });
+
+    $("#bLoginPossible").change(function () {
+      setSettings();
+    });
   });
 
   function setSettings() {
     var bEmailCertification = document.getElementById("bEmailCertification").checked;
     var bRegisterDuringGame = document.getElementById("bRegisterDuringGame").checked;
+    var bLoginPossible = document.getElementById("bLoginPossible").checked;
 
     $.ajax({
       url: '/Admin/setSettings',
@@ -48,7 +53,7 @@
       dataType: "JSON",
       cache: false,
       contentType: "application/json; charset=utf-8",
-      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame }
+      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame, bLoginPossible: bLoginPossible }
     });
   }
 
@@ -157,6 +162,9 @@
 <text>No. of Teams: @Model.nClubs<br></text>
 <text>No. of User: @Model.nUser<br></text>
 <text>No. of Player: @Model.nPlayer<br></text>
+<text>Current ck date: @Model.dtCkCurrent<br></text>
+<text>Approach ck date: @Model.dtCkApproach<br></text>
+<text>Approach interval: @Model.fIntervalAveToApproachTarget.ToString("0.000000")<br></text>
 
 <label>
   @Html.CheckBoxFor(m => m.bEmailCertification)
@@ -166,6 +174,11 @@
 <label>
   @Html.CheckBoxFor(m => m.bRegisterDuringGame)
   Register during game
+</label>
+
+<label>
+  @Html.CheckBoxFor(m => m.bLoginPossible)
+  Login possible
 </label>
 
 @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {

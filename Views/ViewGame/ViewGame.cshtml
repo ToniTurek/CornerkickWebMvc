@@ -733,8 +733,14 @@
       }
     }
 
-    function openDialogChances() {
-      $("#dialogPlAction").dialog("open");
+    function openDialogChances(bChecked) {
+      if (bChecked) {
+        document.getElementById("divPlActionChart").style.display = "block";
+      } else {
+        document.getElementById("divPlActionChart").style.display = "none";
+      }
+
+      document.getElementById("bShowChances").checked = bChecked;
     }
 
     function setView() {
@@ -865,8 +871,9 @@
 </head>
 
 <body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
+  <input type="hidden" id="bShowChances" name="bShowChances">
 
- @if (Model.game == null || (Model.game != null && Model.game.data.bFinished)) {
+  @if (Model.game == null || (Model.game != null && Model.game.data.bFinished)) {
     <div id="divOptions" style="position: relative; left: 0px; width: 100%; height: 40px">
       @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 165px" })
     </div>
@@ -910,9 +917,9 @@
     </div>
   </div>
 
- @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
+  @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
     <div id="divOptions" style="position: relative; float: left; left: 0px; width: 100%; height: 40px; margin-top: 2px">
-     @if ((Model.game != null && Model.game.data.bFinished)) {
+      @if ((Model.game != null && Model.game.data.bFinished)) {
         <div style="position: relative; float: right; width: 35%; min-width: 320px; height: 40px">
           <button type="submit" id="bnStart" class="btn btn-default" style="position: absolute; left: 3%; width: 13%; height: auto">|<</button>
           <button type="submit" id="bnBackFast" class="btn btn-default" style="position: absolute; left: 17%; width: 13%; height: auto"><<</button>
@@ -924,7 +931,7 @@
         </div>
       }
 
-     @if (Model.bAdmin) {
+      @if (Model.bAdmin) {
         <div id="divAdminOptions" style="position: absolute; top: 0px; left: 40%; width: 20%; text-align: center">
           <a href="#" id="aAdminOptions" style="color:#000aaa">Admin</a>
         </div>
@@ -975,6 +982,8 @@
         </div>
       }
     }
+
+    <div id="divPlActionChart" style="left: 0px; width: 100%; height: 8%; min-height: 10px; bottom: 3%; position: absolute; background-color: transparent; display: none"></div>
   </div>
 
   <div id="divComments" style="width: 100%; height: auto; float: left">
@@ -1053,33 +1062,10 @@
     <div id="divOptionsPos" style="position: absolute; top: 164px; left: 100px; width: 140px; height: auto">
       @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
     </div>
-    <label style="position: absolute; top: 210px">
+    <label style="position: absolute; top: 210px; cursor: pointer">
       Chancen:
-      <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="if (this.checked) { openDialogChances() }" value="0">
+      <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="openDialogChances(this.checked)">
     </label>
-  </div>
-
-  <div id="dialogPlAction" title="Chancen" style="text-align: right">
-    <p>
-      Schuss:
-      <txt id="txtPlActionShoot"></txt>
-    </p>
-    <p>
-      Pass:
-      <txt id="txtPlActionPass"></txt>
-    </p>
-    <p>
-      Dribbling:
-      <txt id="txtPlActionGo"></txt>
-    </p>
-    <p>
-      Warten:
-      <txt id="txtPlActionWait"></txt>
-    </p>
-    <p>
-      Entscheidung:
-      <txt id="txtPlActionRnd"></txt>
-    </p>
   </div>
 
   <div id="dialogAdminOptions" title="Admin Optionen">

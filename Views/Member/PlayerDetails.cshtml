@@ -11,6 +11,7 @@
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
+  <script type="text/javascript" src="~/Scripts/dialog.js"></script>
 </head>
 
 @{
@@ -18,6 +19,16 @@
   ViewBag.Title = player.sName;
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<style>
+  .ui-tabs .ui-state-active {
+    background: @Model.sColorJersey;
+    border-color: @Model.sColorJerseyNo;
+  }
+  .ui-tabs-nav .ui-state-active a {
+      color: @Model.sColorJerseyNo;
+  }
+</style>
 
 <script>
   var iCpt = 0;
@@ -30,7 +41,6 @@
       data: { iPlayer: @Model.iPlayer, iIndTr: iInd },
       success: function (iIndTr) {
         plotChanceDevelopment();
-        //alert(iInd);
       }
     });
   }
@@ -38,20 +48,21 @@
   function setName() {
     var tbName = document.getElementById("sName");
 
-    var sNewName = $("#sName").val();
-    $.ajax({
-      url: '/Member/setPlayerName',
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayer: @Model.iPlayer, sName: sNewName },
-      success: function () {
-        tbName.style.backgroundColor = "";
-      },
-      error: function (xhr) {
-        tbName.style.backgroundColor = "yellow";
-        alert(xhr.responseText);
-      }
-    });
+    if (tbName) {
+      $.ajax({
+        url: '/Member/setPlayerName',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: @Model.iPlayer, sName: tbName.value },
+        success: function () {
+          tbName.style.backgroundColor = "";
+        },
+        error: function (xhr) {
+          tbName.style.backgroundColor = "yellow";
+          alert(xhr.responseText);
+        }
+      });
+    }
   }
 
   function setNo() {
@@ -95,14 +106,32 @@
   }
 
   $(document).ready(function () {
-    document.getElementById("divEmblem").style.backgroundImage = '';
+    // Set club emblem
+    var divEmblemClub = document.getElementById("divEmblemClub");
     var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
-    $("#divEmblemClub").html(sEmblemImg);
+    divEmblemClub.innerHTML = sEmblemImg;
+
+    // Set player portrait emblem
+    var divPortrait = document.getElementById("divPortrait");
+    var sPortraitImg = @Html.Raw(Json.Encode(Model.sPortrait));
+    divPortrait.innerHTML = sPortraitImg;
+
+    $("#tabs").tabs({
+      activate: function (event, ui) {
+        var iTabActive = $(this).tabs('option', 'active');
+
+        if (iTabActive == 0) {
+          plotCFM();
+        } else if (iTabActive == 1) {
+          plotChanceDevelopment();
+        } else if (iTabActive == 2) {
+          plotPlayerDevelopment();
+          drawStatistic(0);
+        }
+      }
+    });
 
     plotCFM();
-    plotPlayerDevelopment();
-    drawStatistic(0);
-    plotChanceDevelopment();
 
     $('#tableClubHistory').DataTable({
       "ajax": {
@@ -151,7 +180,11 @@
     });
 
     $("#bnContract").click(function () {
-      getContractDialog(document.body, @Model.iPlayer, false);
+      if ($("#bnContract").text() === "In Profikader übernehmen") {
+        getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
+      } else {
+        getContractDialog(document.body, @Model.iPlayer, false);
+      }
     });
 
     $("#bnPutOnTakeFromTransfer").click(function () {
@@ -303,6 +336,23 @@
     });
   }
 
+  function moveIntoProTeam() {
+    $.ajax({
+      url: "/Member/PlayerDetailsMoveIntoProTeam",
+      type: 'POST',
+      traditional: true,
+      data: { iPlayerId: @Model.iPlayer },
+      dataType: "json",
+      success: function (response) {
+        alert(response);
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
+  }
+
   function plotCFM() {
     $.ajax({
       type: 'post',
@@ -435,9 +485,6 @@
           colorSet: "customColorSet1",
           animationEnabled: true,
           theme: "theme2",//theme1
-          title: {
-            text: "Chancen Entwicklung",
-          },
           axisX: {
             gridThickness: 1,
             interval: 1
@@ -480,8 +527,29 @@
   }
 </script>
 
-<div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
-  <div id="divEmblemClub" style="position: absolute; width: 10%; right: 0px; border: 1px solid black"></div>
+<div style="position: relative; width: 100%; height: 100%; min-height: 500px; margin-bottom: 20px; float: left">
+  @if (Model.iPlIdPrev >= 0 || Model.iPlIdNext >= 0) {
+    <div style="position: relative; width: 100%; height: 20px">
+      @{
+        string sPlPrevName = "";
+        if (Model.iPlIdPrev >= 0) {
+          sPlPrevName = "<<   " + MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].sName;
+          <div style="position: absolute; left:  0%; width: 49%">
+            @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
+          </div>
+        }
+
+        string sPlNextName = "";
+        if (Model.iPlIdNext >= 0) {
+          sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].sName + "   >>";
+
+          <div style="position: absolute; left: 50%; width: 49%; text-align: right">
+            @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
+          </div>
+        }
+      }
+    </div>
+  }
 
   @{
     string sTalent = (player.iTalent + 1).ToString();
@@ -490,415 +558,472 @@
       sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
     }
 
-    if (Model.iPlIdPrev >= 0 || Model.iPlIdNext >= 0) {
-      <div style="position: relative; width: 100%; height: 20px">
-        @{
-          string sPlPrevName = "";
-          if (Model.iPlIdPrev >= 0) {
-            sPlPrevName = MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].sName;
-            <div style="position: absolute; left:  0%; width: 49%">
-              @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
-            </div>
-          }
-
-          string sPlNextName = "";
-          if (Model.iPlIdNext >= 0) {
-            sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].sName;
-
-            <div style="position: absolute; left: 50%; width: 49%">
-              @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
-            </div>
-          }
-        }
-      </div>
-    }
-
     <div style="position: relative; width: 100%; margin-top: 4px">
-     @if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
+      @if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
         <div class="form-group">
-          @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()" })
+          @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()", @style = "width:190px" })
         </div>
       } else {
         string sPlName = player.sName;
-        <div style="position: relative; width: 100%; height: 94px">
+        <div style="position: relative; width: 100%; height: 84px">
          @if (!Model.bJouth) {
             string sPlNo = player.iNr.ToString();
-            <div style="position: absolute; width: 96px; height: 84px; text-align: center; background-color: @Model.sColorJersey">
+            <div style="position: absolute; width: 96px; height: 100%; text-align: center; background-color: @Model.sColorJersey">
               <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
-              <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
+              
+              @if (Model.bOwnPlayer && (player.iNr < 1 || Model.bEditable)) {
+                <div style="position: absolute; top: 18px; left: 22px; width: 100%; text-align: left">
+                  @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @onchange = "setNo()", id = "iDdlINo", @style = "width: 70px; height: 50px; font-size: 42px; color: " + Model.sColorJerseyNo + "; background-color: transparent" })
+                </div>
+              } else {
+                <div>
+                  <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
+                </div>
+              }
             </div>
           }
-          <text style="position: absolute; top: 16px; left: 100px; font-size: 36px">@sPlName</text>
+        </div>
+
+        <div style="position: relative; width: 100%">
+          <text style="font-size: 28px">@sPlName</text>
         </div>
       }
     </div>
-
-    if (Model.bOwnPlayer && (player.iNr < 1 || Model.bEditable) && !Model.bJouth) {
-      <div class="form-group" style="height: 30px">
-        @Html.LabelFor(m => m.iNo, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-          @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @class = "form-control", @onchange = "setNo()", id = "iDdlINo", @style = "width:70px" })
-        </div>
-      </div>
-    }
   }
 
-  <div style="position: relative; width: 100%; height: auto">
-    <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
-      <h4>Allgemeine Daten</h4>
-      <table cellpadding="1" style="width: 100%">
-        <tbody>
-          <tr>
-            <td align="right">Verein:</td>
-            <td align="right">@sClub</td>
-          </tr>
-          <tr>
-            <td align="right">Geburtsdatum:</td>
-            <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@((int)player.getAge(MvcApplication.ckcore.dtDatum)))</td>
-          </tr>
-          <tr>
-            <td align="right">Körpergröße/-gewicht:</td>
-            <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
-          </tr>
-          <tr>
-            <td align="right">Positionen:</td>
-            <td align="right">@CornerkickManager.Player.getStrPos(player)</td>
-          </tr>
-          <tr>
-            <td align="right">Stärke (bereinigt):</td>
-            <td align="right">@CornerkickGame.Tool.getAveSkill(player, 0).ToString("0.0") (@CornerkickGame.Tool.getAveSkill(player, 0, true).ToString("0.0"))</td>
-          </tr>
-          <tr>
-            <td align="right">Talent:</td>
-            <td align="right">@sTalent</td>
-          </tr>
-          <tr>
-            <td align="right">Fuß (links/rechts):</td>
-            @{
-              if (player.fFootL > 0.99 && player.fFootR > 0.99) {
-                <td align="right">beidfüßig</td>
-              } else {
-                <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
-              }
-            }
-          </tr>
-          <tr>
-            @{
-              string sVerletzung = "keine";
-              if (player.injury != null) {
-                sVerletzung = "Noch " + player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.injury.iType][player.injury.iType2];
-              }
-            }
-            <td align="right">Verletzung:</td>
-            <td align="right">@sVerletzung</td>
-          </tr>
-         @if (player.contract != null && player.contract.iLength > 0) {
-            <tr>
-              <td align="right">Gehalt:</td>
-              <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
-            </tr>
-            if (!Model.bJouth) {
-              <tr>
-                <td align="right">Auflaufprämie:</td>
-                <td align="right">@player.contract.iPlay.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
-              </tr>
-              <tr>
-                <td align="right">Torprämie:</td>
-                <td align="right">@player.contract.iGoal.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
-              </tr>
-              <tr>
-                <td align="right">Fixe Ablöse:</td>
-                <td align="right">@player.contract.iFixTransferFee.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
-              </tr>
-            }
-            <tr>
-              @{
-                string sDauer = player.contract.iLength.ToString() + " Jahre";
-                if (Model.bJouth) {
-                  sDauer = "Jugendspieler";
-                } else if (player.contract.iLength < 2) {
-                  sDauer = "Saisonende";
-                }
-              }
-              <td align="right">Laufzeit:</td>
-              <td align="right">@sDauer</td>
-            </tr>
-          }
-          <tr>
-            @{
-              string sVal = (player.getValue(MvcApplication.ckcore.dtDatum) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";
-            }
-            <td align="right">Marktwert:</td>
-            <td align="right">@sVal</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
-      <h4>Charakter</h4>
-      <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
-        <tbody>
-          <tr>
-            <td align="right">Führungspersönlichkeit:</td>
-            <td align="right">@player.character.fLeader.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Schußhäufigkeit:</td>
-            <td align="right">@player.character.fShoot.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Teamplayer:</td>
-            <td align="right">@player.character.fPass.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Dribbler:</td>
-            <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Flexibilität:</td>
-            <td align="right">@player.character.fFlexibel.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Robustheit:</td>
-            <td align="right">@player.character.fRobustness.ToString("0.0%")</td>
-          </tr>
-          <tr>
-            <td align="right">Gemüt:</td>
-            <td align="right">@((2 - player.character.fCholeric).ToString("0.0%"))</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
-        <tbody>
-          <tr>
-            <td align="right"><ins>Sperren:</ins></td>
-          </tr>
-          @{
-            if (player.iSuspension[0] + player.iSuspension[1] + player.iSuspension[4] == 0) {
-              <tr>
-                <td align="right">keine</td>
-              </tr>
-            } else {
-              if (player.iSuspension[0] > 0) {
-                string sSp = "Liga: " + player.iSuspension[0].ToString() + " Spiele";
-                <tr>
-                  <td align="right">@sSp</td>
-                </tr>
-              }
-              if (player.iSuspension[1] > 0) {
-                string sSp = "Pokal: " + player.iSuspension[1].ToString() + " Spiele";
-                <tr>
-                  <td align="right">@sSp</td>
-                </tr>
-              }
-              if (player.iSuspension[2] + player.iSuspension[3] > 0) {
-                string sSp = "Int: " + (player.iSuspension[2] + player.iSuspension[3]).ToString() + " Spiele";
-                <tr>
-                  <td align="right">@sSp</td>
-                </tr>
-              }
-              if (player.iSuspension[4] > 0) {
-                string sSp = "Testspiele: " + player.iSuspension[4].ToString() + " Spiele";
-                <tr>
-                  <td align="right">@sSp</td>
-                </tr>
-              }
-              if (player.iSuspension[6] > 0) {
-                string sSp = "Nat: " + player.iSuspension[6].ToString() + " Spiele";
-                <tr>
-                  <td align="right">@sSp</td>
-                </tr>
-              }
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div style="position: relative; width: 40px; height: auto; float: left; text-align: right">
-      @if (Model.bCaptain) {
-        <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
-      } else if (Model.bCaptain2) {
-        <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+  <div style="position: absolute; top: 20px; height: 128px; right: 0px; border-style: outset; border-width: 3px; border-color: lightgray">
+    @if (Model.bOwnPlayer) {
+      using (Html.BeginForm("PlayerDetails",
+                            "Member",
+                            new { i = Model.iPlayer },
+                            FormMethod.Post,
+                            new { enctype = "multipart/form-data", style = "height: 100%" })) {
+        <div id="divPortrait" style="position: relative; height: 100%; cursor: pointer" onclick="document.getElementById('fileInput').click();"></div>
+        <input id="fileInput" name="file" type="file" accept="image/*" style="position: absolute; left: 0px; display: none" onchange="this.form.submit();">
       }
-
-      @{
-        string sNat = CornerkickManager.Main.sLandShort[player.iNat1];
-
-        if (string.IsNullOrEmpty(sNat)) {
-          <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
-        } else {
-          string sFlag = "/Content/Icons/flags/" + sNat + ".png";
-          <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
-        }
-      }
-    </div>
-
-   @if (Model.bOwnPlayer && !Model.bNation) {
-      <div id="divChartCFM" style="position: relative; height: 310px; width: 300px; margin-left: 10px; margin-bottom: 10px; float: left"></div>
+    } else {
+      <div id="divPortrait" style="position: relative; height: 100%"></div>
     }
   </div>
 
-  <div style="position: relative; width: 100%; height: 100%; float: left">
-    @{
-      if (Model.bOwnPlayer) {
-        string sExtendContract = "Vertrag verlängern";
-        if (Model.bJouth) {
-          sExtendContract = "Profivertrag aushandeln";
-        }
+  <div id="tabs" style="position: absolute; width: 100%; top: 154px">
+    <ul>
+      <li><a href="#tabs-1">Überblick</a></li>
+      <li><a href="#tabs-2">Fähigkeiten</a></li>
+      <li><a href="#tabs-3">Statistik</a></li>
+    </ul>
 
-        <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px; text-align: center">
-         @if (!Model.bNation) {
-           @* Extend player contract *@
-            if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
-              <button type="submit" id="bnContract" class="btn btn-default" style="width: 100%; margin-bottom: 4px">@sExtendContract</button>
-            }
+    <div id="tabs-1" style="overflow: hidden">
+      <div style="position: absolute; width: 10%; right: 10px">
+        <h4>Verein</h4>
+        <div id="divEmblemClub" style="position: relative; width: 100%; border-style: outset; border-width: 3px; border-color: lightgray"></div>
+      </div>
 
-           @* Put on / take from transferlist *@
-            if (MvcApplication.ckcore.plr.onTransferlist(player)) {
-              <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Von Transferliste nehmen</button>
+      <div style="position: relative; width: 100%; height: auto">
+        <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
+          <h4>Allgemeine Daten</h4>
+          <table cellpadding="1" style="width: 100%">
+            <tbody>
+              <tr>
+                <td align="right">Verein:</td>
+                <td align="right">@sClub</td>
+              </tr>
+              <tr>
+                <td align="right">Geburtsdatum:</td>
+                <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@((int)player.getAge(MvcApplication.ckcore.dtDatum)))</td>
+              </tr>
+              <tr>
+                <td align="right">Körpergröße/-gewicht:</td>
+                <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
+              </tr>
+              <tr>
+                <td align="right">Positionen:</td>
+                <td align="right">@CornerkickManager.Player.getStrPos(player)</td>
+              </tr>
+              <tr>
+                <td align="right">Stärke (bereinigt):</td>
+                <td align="right">@CornerkickGame.Tool.getAveSkill(player, 0).ToString("0.0") (@CornerkickGame.Tool.getAveSkill(player, 0, true).ToString("0.0"))</td>
+              </tr>
+              <tr>
+                <td align="right">Talent:</td>
+                <td align="right">@sTalent</td>
+              </tr>
+              <tr>
+                <td align="right">Fuß (links/rechts):</td>
+                @{
+                  if (player.fFootL > 0.99 && player.fFootR > 0.99) {
+                    <td align="right">beidfüßig</td>
+                  } else {
+                    <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+                  }
+                }
+              </tr>
+              <tr>
+                @{
+                  string sVerletzung = "keine";
+                  if (player.injury != null) {
+                    sVerletzung = "Noch " + player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.injury.iType][player.injury.iType2];
+                  }
+                }
+                <td align="right">Verletzung:</td>
+                <td align="right">@sVerletzung</td>
+              </tr>
+              @if (player.contract != null && player.contract.iLength > 0) {
+                <tr>
+                  <td align="right">Gehalt:</td>
+                  <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                </tr>
+                if (!Model.bJouth) {
+                  <tr>
+                    <td align="right">Auflaufprämie:</td>
+                    <td align="right">@player.contract.iPlay.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Torprämie:</td>
+                    <td align="right">@player.contract.iGoal.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Fixe Ablöse:</td>
+                    <td align="right">@player.contract.iFixTransferFee.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                  </tr>
+                }
+                <tr>
+                  @{
+                    string sDauer = player.contract.iLength.ToString() + " Jahre";
+                    if (Model.bJouth) {
+                      sDauer = "Saisonende";
+                    }
+                  }
+                  <td align="right">Laufzeit:</td>
+                  <td align="right">@sDauer</td>
+                </tr>
+              }
+              <tr>
+                @{
+                  string sVal = (player.getValue(MvcApplication.ckcore.dtDatum) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";
+                }
+                <td align="right">Marktwert:</td>
+                <td align="right">@sVal</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+          <h4>Charakter</h4>
+          <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
+            <tbody>
+              <tr>
+                <td align="right">Führungspersönlichkeit:</td>
+                <td align="right">@player.character.fLeader.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Schußhäufigkeit:</td>
+                <td align="right">@player.character.fShoot.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Teamplayer:</td>
+                <td align="right">@player.character.fPass.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Dribbler:</td>
+                <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Flexibilität:</td>
+                <td align="right">@player.character.fFlexibel.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Robustheit:</td>
+                <td align="right">@player.character.fRobustness.ToString("0.0%")</td>
+              </tr>
+              <tr>
+                <td align="right">Gemüt:</td>
+                <td align="right">@((2 - player.character.fCholeric).ToString("0.0%"))</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table cellpadding="1" style="width: 100%; margin-top: 20px; margin-bottom: 6px">
+            <tbody>
+              <tr>
+                <td align="right"><ins>Sperren:</ins></td>
+              </tr>
+              @{
+                if (player.iSuspension[0] + player.iSuspension[1] + player.iSuspension[4] == 0) {
+                  <tr>
+                    <td align="right">keine</td>
+                  </tr>
+                } else {
+                  if (player.iSuspension[0] > 0) {
+                    string sSp = "Liga: " + player.iSuspension[0].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[1] > 0) {
+                    string sSp = "Pokal: " + player.iSuspension[1].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[2] + player.iSuspension[3] > 0) {
+                    string sSp = "Int: " + (player.iSuspension[2] + player.iSuspension[3]).ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[4] > 0) {
+                    string sSp = "Testspiele: " + player.iSuspension[4].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                  if (player.iSuspension[6] > 0) {
+                    string sSp = "Nat: " + player.iSuspension[6].ToString() + " Spiele";
+                    <tr>
+                      <td align="right">@sSp</td>
+                    </tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div style="position: relative; width: 40px; height: auto; margin-right: 10px; float: left; text-align: right">
+          @if (Model.bCaptain) {
+            <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+          } else if (Model.bCaptain2) {
+            <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+          }
+
+          @{
+            string sNat = CornerkickManager.Main.sLandShort[player.iNat1];
+
+            if (string.IsNullOrEmpty(sNat)) {
+              <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
             } else {
-              <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 100%; margin-bottom: 8px">Auf Transferliste setzen</button>
-            }
-         }
-
-         @if (!Model.bJouth) {
-            if (!Model.bCaptain) {
-              <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Kapitän machen</button>
-            }
-
-            if (!Model.bCaptain2) {
-              <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 100%; margin-bottom: 4px">Zum Vize-Kapitän machen</button>
-            }
-
-            if (!Model.bNation) {
-              <button type="submit" id="bnDoping" class="btn btn-default" style="width: 100%; margin-top: 4px">Spieler dopen</button>
+              string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+              <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
             }
           }
         </div>
-      }
-    }
 
-    <div id="divChartDevelopment" style="position: relative; height: 220px; width: 50%; min-width: 320px; margin-bottom: 10px; float: left"></div>
-  </div>
+        @if (Model.bOwnPlayer && !Model.bNation) {
+          <div style="position: relative; height: 340px; width: 300px; margin-bottom: 10px; float: left">
+            <h4>Konstitution</h4>
+            <div id="divChartCFM" style="position: relative; width: 100%; height: 310px"></div>
+          </div>
+        }
+      </div>
 
-  <div id="divTableClubHistory" style="position: relative; float: left; width: auto; margin-top: 10px; margin-bottom: 10px">
-    <h4>Vereinshistorie</h4>
-    <table id="tableClubHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Datum</th>
-          <th>Verein</th>
-          <th>Ablöse [€]</th>
-          <th>Marktwert [€]</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!---Data and tags are dynamically generated--->
-      </tbody>
-    </table>
-  </div>
-
-  <div style="position: relative; width: 100%; float: left; margin-top: 10px">
-    <h4>Fähigkeiten / Statistik</h4>
-   @if (Model.bOwnPlayer && !Model.bNation) {
-      <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 60%; min-width: 320px; margin-left: 0px; margin-bottom: 10px; float: left"></div>
-    }
-  </div>
-
-  <div style="position: relative; width: 100%; float: left; margin-top: 10px">
-    <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
-      <table border="1" cellpadding="4" style="width: auto">
-        <thead>
-          <tr>
-            <th style="text-align:center">Fähigkeit</th>
-            <th>Wert</th>
-            @{
-              if (Model.bOwnPlayer && !Model.bNation) {
-                <th>Training</th>
-                <th>Ind.</th>
-                <th>Bonus</th>
-              }
+      <div style="position: relative; width: 100%; height: 100%; float: left">
+        @{
+          if (Model.bOwnPlayer) {
+            string sExtendContract = "Vertrag verlängern";
+            if (Model.bJouthWithContract) {
+              sExtendContract = "In Profikader übernehmen";
+            } else if (Model.bJouth) {
+              sExtendContract = "Profivertrag aushandeln";
             }
-          </tr>
-        </thead>
-        <tbody>
-         @for (int i = 0; i < player.iSkill.Length; i++) {
-            var fTraining = player.fSkillTraining[i] + 1.0;
-            <tr>
-              <td align="right">@CornerkickManager.Player.sSkills[i]</td>
-              <td align="center">@player.iSkill[i]</td>
-              @{
-                if (Model.bOwnPlayer && !Model.bNation) {
-                  <td align="right">@fTraining.ToString("0.0%")</td>
-                  <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                  <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+
+            <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px">
+              <h4>Optionen</h4>
+
+              @if (!Model.bNation) {
+                @* Extend player contract *@
+                if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
+                  <button type="submit" id="bnContract" class="btn btn-default" style="width: 90%; margin-bottom: 4px">@sExtendContract</button>
+                }
+
+                @* Put on / take from transferlist *@
+                if (MvcApplication.ckcore.plr.onTransferlist(player)) {
+                  <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Von Transferliste nehmen</button>
+                } else {
+                  <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Auf Transferliste setzen</button>
                 }
               }
-            </tr>
+
+              @if (!Model.bJouth) {
+                if (!Model.bCaptain) {
+                  <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Kapitän machen</button>
+                }
+
+                if (!Model.bCaptain2) {
+                  <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Vize-Kapitän machen</button>
+                }
+
+                if (!Model.bNation) {
+                  <button type="submit" id="bnDoping" class="btn btn-default" style="width: 90%; margin-top: 4px">Spieler dopen</button>
+                }
+              }
+            </div>
           }
-        </tbody>
-      </table>
+        }
+      </div>
     </div>
 
-    <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 2%; margin-right: 2%">
-      <table border="1" cellpadding="4" style="width: auto">
-        <thead>
-          <tr>
-            <th style="text-align:center">Position</th>
-            <th style="text-align:center">Wert</th>
-            <th style="text-align:center">Stärke</th>
-          </tr>
-        </thead>
-        <tbody>
-         @for (byte i = 0; i < player.fExperiencePos.Length; i++) {
-            byte j = (byte)(i + 1);
+    <div id="tabs-2" style="overflow: hidden">
+      <div style="position: relative; width: 100%">
+        @{
+          int i = 0;
+        }
+        <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
+          <h4>Positionen</h4>
+          <table border="1" cellpadding="4" style="width: auto">
+            <thead>
+              <tr>
+                <th style="text-align:center">Position</th>
+                <th style="text-align:center">Wert</th>
+                <th style="text-align:center">Stärke</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (i = 0; i < player.fExperiencePos.Length; i++) {
+                byte j = (byte)(i + 1);
 
-            string sColor = "";
-            string sBold = "";
-            if (player.fExperiencePos[i] > 0.99) {
-              sBold = "style=font-weight:bold";
-            } else if (player.fExperiencePos[i] > 0.8) {
-              sColor = "style=color:blue";
-            }
-            <tr @sBold>
-              <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
-              <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
-              <td align="center">@CornerkickGame.Tool.getAveSkill(player, j).ToString("0.0")</td>
-            </tr>
+                string sColor = "";
+                string sBold = "";
+                if (player.fExperiencePos[i] > 0.99) {
+                  sBold = "style=font-weight:bold";
+                } else if (player.fExperiencePos[i] > 0.8) {
+                  sColor = "style=color:blue";
+                }
+                <tr @sBold>
+                  <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
+                  <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
+                  <td align="center">@CornerkickGame.Tool.getAveSkill(player, j).ToString("0.0")</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
+          <h4>Individuelle Fähigkeiten</h4>
+          @{
+            i = 0;
           }
-        </tbody>
-      </table>
+
+          <table border="1" cellpadding="4" style="width: auto">
+            <thead>
+              <tr>
+                <th style="text-align:center">Fähigkeit</th>
+                <th>Wert</th>
+                @{
+                  if (Model.bOwnPlayer && !Model.bNation) {
+                    <th>Training</th>
+                    <th>Ind.</th>
+                    <th>Bonus</th>
+                  }
+                }
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td align="right">@CornerkickManager.Player.sSkills[0]</td>
+                <td align="center">@player.iSkill[0]</td>
+                @{
+                  if (Model.bOwnPlayer && !Model.bNation) {
+                    var fTraining = player.fSkillTraining[i] + 1.0;
+                    <td align="right">@fTraining.ToString("0.0%")</td>
+                    <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                    <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                  }
+                }
+              </tr>
+              <tr>
+                @{
+                  i = 16;
+                }
+                <td align="right">@CornerkickManager.Player.sSkills[i]</td>
+                <td align="center">@player.iSkill[i]</td>
+                @{
+                  if (Model.bOwnPlayer && !Model.bNation) {
+                    var fTraining = player.fSkillTraining[i] + 1.0;
+                    <td align="right">@fTraining.ToString("0.0%")</td>
+                    <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                    <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                  }
+                }
+              </tr>
+              @for (i = 1; i < player.iSkill.Length - 1; i++) {
+                var fTraining = player.fSkillTraining[i] + 1.0;
+                <tr>
+                  <td align="right">@CornerkickManager.Player.sSkills[i]</td>
+                  <td align="center">@player.iSkill[i]</td>
+                  @{
+                    if (Model.bOwnPlayer && !Model.bNation) {
+                      <td align="right">@fTraining.ToString("0.0%")</td>
+                      <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                      <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                    }
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      @if (Model.bOwnPlayer && !Model.bNation) {
+        <h4>Entwicklungschancen</h4>
+        <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 50%; min-width: 320px; margin-top: 10px; margin-bottom: 10px; float: left"></div>
+      }
     </div>
 
-   @if (!Model.bJouth) {
-      <div style="position: relative; width: auto; height: auto; float: left">
-        <table id="tblStatistic" border="1" cellpadding="4" style="width: auto">
+    <div id="tabs-3" style="overflow: hidden">
+      <div style="position: relative; width: 100%; height: 380px">
+        <h4>Spielerentwicklung</h4>
+        <div id="divChartDevelopment" style="position: relative; height: 320px; width: 100%"></div>
+      </div>
+
+      <div id="divTableClubHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">
+        <h4>Vereinshistorie</h4>
+        <table id="tableClubHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
           <thead>
             <tr>
-              <th align="center">
-                <label>
-                  Saison
-                  <input name="rBStatistic" id="rBStatisticSeason" onchange="drawStatistic(0)" type="radio" checked="checked" value="0">
-                </label>
-                <label>
-                  Total
-                  <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
-                </label>
-              </th>
-              <th style="text-align:center">Liga</th>
-              <th style="text-align:center">Pokal</th>
-              <th style="text-align:center">Int.</th>
-              <th style="text-align:center">Nat.</th>
+              <th>#</th>
+              <th>Datum</th>
+              <th>Verein</th>
+              <th>Ablöse [€]</th>
+              <th>Marktwert [€]</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!---Data and tags are dynamically generated--->
+          </tbody>
         </table>
       </div>
-    }
+
+      @if (!Model.bJouth) {
+        <div style="position: relative; width: auto; height: auto; float: left">
+          <h4>Spielstatistiken</h4>
+          <table id="tblStatistic" border="1" cellpadding="4" style="width: auto">
+            <thead>
+              <tr>
+                <th align="center">
+                  <label>
+                    Saison
+                    <input name="rBStatistic" id="rBStatisticSeason" onchange="drawStatistic(0)" type="radio" checked="checked" value="0">
+                  </label>
+                  <label>
+                    Total
+                    <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
+                  </label>
+                </th>
+                <th style="text-align:center">Liga</th>
+                <th style="text-align:center">Pokal</th>
+                <th style="text-align:center">Int.</th>
+                <th style="text-align:center">Nat.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      }
+    </div>
   </div>
 </div>
 

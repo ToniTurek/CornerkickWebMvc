@@ -48,6 +48,7 @@ namespace CornerkickWebMvc.Models
       public List<string> ltPlayerTeamname { get; set; }
       public List<string> ltPlayerAge      { get; set; }
       public List<string> ltPlayerNat      { get; set; }
+      public List<string> ltPlayerPortrait { get; set; }
       public List<bool>   ltPlayerSusp     { get; set; } // List of suspended player
       public string sTeamAveSkill { get; set; }
       public string sTeamAveAge { get; set; }
@@ -59,6 +60,7 @@ namespace CornerkickWebMvc.Models
       public CornerkickGame.Tactic.Formation formationOpp { get; set; }
       public List<byte> ltPlayerOppPos { get; set; }
       public List<string> ltPlayerOppAveSkill { get; set; }
+      public List<string> ltPlayerOppPortrait { get; set; }
       public string sTeamOppAveSkill { get; set; }
       public string sTeamOppAveAge { get; set; }
 

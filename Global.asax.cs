@@ -38,10 +38,12 @@ namespace CornerkickWebMvc
       public int  iStartHour;
       public bool bEmailCertification;
       public bool bRegisterDuringGame;
+      public bool bLoginPossible;
 
       public Settings()
       {
         iStartHour = -1;
+        bLoginPossible = true;
         bEmailCertification = true;
         bRegisterDuringGame = true;
 #if DEBUG
@@ -68,6 +70,16 @@ namespace CornerkickWebMvc
     static DateTime dtLoadCk = new DateTime(); // The ck DateTime when game was (re-)started
 
     public static CornerkickManager.Club clubAdmin;
+
+    internal class Mail
+    {
+      internal string sIdFrom { get; set; }
+      internal string sIdTo { get; set; }
+      internal bool bNew { get; set; }
+      internal DateTime dt { get; set; }
+      internal string sText { get; set; }
+    }
+    internal static List<Mail> ltMail;
 
     protected void Application_Start()
     {
@@ -325,6 +337,68 @@ namespace CornerkickWebMvc
       }
     }
 
+    internal static int getStepsFromTargetToApproach()
+    {
+      return (int)((getCkTargetDate() - getCkApproachDate()).TotalMinutes / 15.0);
+    }
+
+    internal static DateTime getCkTargetDate()
+    {
+      DateTime dtCkTarget = ckcore.dtDatum.Date.Add(new TimeSpan(15, 30, 0));
+      while ((int)dtCkTarget.DayOfWeek != 6) dtCkTarget = dtCkTarget.AddDays(1);
+      return dtCkTarget;
+    }
+
+    static TimeSpan tsTarget = new TimeSpan(18, 30, 0); // Target system time
+    internal static DateTime getCkApproachDate()
+    {
+      double fDayRel = getDayRelBetweenNowAndTarget();
+
+      // Get target ck date
+      DateTime dtCkTarget = getCkTargetDate();
+
+      return dtCkTarget.AddDays(-fDayRel * 7);
+    }
+
+    internal static double getDayRelBetweenNowAndTarget()
+    {
+      double fDayRel = (tsTarget - DateTime.UtcNow.TimeOfDay).TotalDays;
+      if (fDayRel < 0) fDayRel += 1.0;
+
+      return fDayRel;
+    }
+
+    internal static int getDeltaStepsBetweenNowAndApproach()
+    {
+      DateTime dtCkApproach = getCkApproachDate();
+      return (int)((dtCkApproach - ckcore.dtDatum).TotalMinutes / 15.0);
+    }
+
+    internal static int getDeltaStepsBetweenNowAndTarget()
+    {
+      DateTime dtCkTarget = getCkTargetDate();
+      return (int)((dtCkTarget - ckcore.dtDatum).TotalMinutes / 15.0);
+    }
+
+    internal static double getIntervalForOneWeek()
+    {
+      // Capital letters = Real-time
+      //     MIN * S  * H   /  qu  * h  * d
+      return (60 * 60 * 24) / (4.0 * 24 * 7);
+    }
+
+    internal static double getIntervalAve()
+    {
+      double fDayRel = getDayRelBetweenNowAndTarget();
+      int iStepsDelta = getDeltaStepsBetweenNowAndTarget();
+      return (fDayRel * 24 * 60 * 60) / iStepsDelta;
+    }
+
+    internal static TimeSpan getApproachTime()
+    {
+      return tsTarget.Add(TimeSpan.FromSeconds(getStepsFromTargetToApproach() * getIntervalForOneWeek()));
+    }
+
     private static void timerCkCalender_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
       // Disable save timer (not needed if calendar timer is on)
@@ -370,7 +444,7 @@ namespace CornerkickWebMvc
       if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0) {
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
-        CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0);
+        CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0, iNat: iNations[random.Next(iNations.Length)]);
         ckcore.tr.putPlayerOnTransferlist(plNew, 0);
 
         // Player jouth
@@ -411,26 +485,59 @@ namespace CornerkickWebMvc
       }
 
       // Do next step
-      int iRetCk = ckcore.next();
+      int iRetCk = 0;
+      try {
+        iRetCk = ckcore.next();
+      } catch (Exception e) {
+        ckcore.tl.writeLog("performCalendarStep(): Error in ck next()" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
+      }
+
+      checkPlayerReset();
 
       // Reset CPU player
-      for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
-        CornerkickManager.Club clb = ckcore.ltClubs[iC];
-        if (clb.user != null) continue;
+      if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(15, 0, 0))) {
+        for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clb = ckcore.ltClubs[iC];
+          if (clb.user != null) continue;
 
-        for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-          clb.ltPlayer[iP].fCondition = 1.0f;
-          clb.ltPlayer[iP].fFresh     = 1.0f;
+          for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
+            clb.ltPlayer[iP].fCondition = 0.75f;
+            clb.ltPlayer[iP].fFresh     = 0.92f;
+          }
         }
       }
 
       // Jan no injury
-      ckcore.ltPlayer[101].injury = null;
+      CornerkickGame.Player plJan = ckcore.ltPlayer[101];
+      plJan.injury = null;
 
-      // Player reset?
-      CornerkickGame.Player plIvenHoffmann = ckcore.ltPlayer[163];
-      if (plIvenHoffmann.fMoral < 1.001 && plIvenHoffmann.fCondition > 0.999 && plIvenHoffmann.fFresh > 0.999) {
-        ckcore.tl.writeLog(plIvenHoffmann.sName + " C/F/M: " + plIvenHoffmann.fCondition.ToString("0.0%") + "/" + plIvenHoffmann.fFresh.ToString("0.0%") + "/" + plIvenHoffmann.fMoral.ToString("0.0%"), CornerkickManager.Main.sErrorFile);
+      // Assign random portrait if none
+      for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
+        CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+        if (pl == null) continue;
+
+        try {
+          if (pl.clSkin.B == 0) {
+#if DEBUG
+            string sBaseDir = getHomeDir();
+#else
+            string sBaseDir = Directory.GetParent(CornerkickManager.Main.sHomeDir).FullName;
+#endif
+            string sDirPortrait = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits");
+
+            if (System.IO.Directory.Exists(sDirPortrait)) {
+              System.IO.DirectoryInfo diPortrait = new System.IO.DirectoryInfo(sDirPortrait);
+
+              int nPortraitFiles = diPortrait.GetFiles("*.png").Length;
+              ushort iPortraitId = (ushort)random.Next(nPortraitFiles);
+
+              byte[] b = BitConverter.GetBytes(iPortraitId);
+
+              pl.clSkin = System.Drawing.Color.FromArgb(b[0], b[1], 1);
+            }
+          }
+        } catch {
+        }
       }
 
       // Beginn of new season
@@ -614,6 +721,20 @@ namespace CornerkickWebMvc
       return bReturn;
     }
 
+    private static void checkPlayerReset()
+    {
+      foreach (CornerkickGame.Player pl in ckcore.ltPlayer) {
+        if (pl == null) continue;
+
+        try {
+          if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && CornerkickManager.Player.ownPlayer(ckcore.ltClubs[3], pl, 1)) {
+            ckcore.tl.writeLog("Reset of player: " + pl.sName, CornerkickManager.Main.sErrorFile);
+          }
+        } catch {
+        }
+      }
+    }
+
     private static int countCpuPlayerOnTransferlist()
     {
       int nPl = 0;
@@ -744,14 +865,14 @@ namespace CornerkickWebMvc
 #endif
 
       // save log dir
-      if (System.IO.Directory.Exists(sHomeDir + "/log")) {
+      if (Directory.Exists(sHomeDir + "/log")) {
         string sFileZipLog = sHomeDir + "/log.zip";
 
 #if !DEBUG
         // Delete existing zip file
-        if (System.IO.File.Exists(sFileZipLog)) {
+        if (File.Exists(sFileZipLog)) {
           try {
-            System.IO.File.Delete(sFileZipLog);
+            File.Delete(sFileZipLog);
           } catch {
           }
         }
@@ -777,20 +898,11 @@ namespace CornerkickWebMvc
 #endif
       }
 
+      saveMails(as3);
 
 #if _USE_AMAZON_S3
-      // Upload mails
-      DirectoryInfo diMails = new DirectoryInfo(Path.Combine(sHomeDir, "mail"));
-      if (diMails.Exists) {
-        FileInfo[] ltMailFiles = diMails.GetFiles("*.txt");
-        foreach (FileInfo fiMail in ltMailFiles) {
-          string sFileMail = Path.Combine(sHomeDir, "mail", fiMail.Name);
-          as3.uploadFile(sFileMail, "mail/" + fiMail.Name);
-        }
-      }
-
       // Upload wishlist
-      as3.uploadFile(Path.Combine(sHomeDir, "wishlist", "wishlist.json"), "wishlist.json");
+      as3.uploadFile(Path.Combine(sHomeDir, "wishlist.json"), "wishlist.json");
 #endif
     }
 
@@ -817,6 +929,28 @@ namespace CornerkickWebMvc
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
       as3.uploadFile(sFileSettings, "laststate");
 #endif
+    }
+
+    private static void saveMails(AmazonS3FileTransfer as3 = null)
+    {
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
+      if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
+
+      if (MvcApplication.ltMail == null) return; ;
+
+      foreach (MvcApplication.Mail mail in ltMail) {
+        string sDateTime = mail.dt.ToString("yyyyMMddHHmmss");
+        string sFilenameMail  = mail.sIdTo + "_" + sDateTime + ".txt";
+        string sFilenameMail2 = System.IO.Path.Combine(sDirMail, sFilenameMail);
+
+        using (System.IO.StreamWriter fileMail = new System.IO.StreamWriter(sFilenameMail2)) {
+          string sText = mail.sIdTo + " " + mail.sIdFrom + " " + sDateTime + " " + mail.bNew.ToString() + Environment.NewLine + mail.sText;
+          fileMail.Write(sText);
+          fileMail.Close();
+
+          if (as3 != null) as3.uploadFile(sFilenameMail2, "mail/" + sFilenameMail);
+        }
+      }
     }
 
     internal static bool load()
@@ -868,6 +1002,8 @@ namespace CornerkickWebMvc
       if (ckcore.io.load(sFileLoad)) {
         ckcore.tl.writeLog("File " + sFileLoad + " loaded.");
 
+        checkPlayerReset();
+
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
 
@@ -901,10 +1037,12 @@ namespace CornerkickWebMvc
 
           DateTime dtLast = new DateTime();
           if (sStateFileContent.Length > 3) {
+            //double fInterval = getIntervalAve(); // Calendar interval [s]
             double fInterval = 0.0; // Calendar interval [s]
 
             NumberStyles style = NumberStyles.Number | NumberStyles.AllowDecimalPoint;
             fInterval = double.Parse(sStateFileContent[0], style, CultureInfo.InvariantCulture);
+            ckcore.tl.writeLog("Set calendar interval to " + fInterval.ToString("0.000") + "s");
 
             bool bCalendarRunning = false;
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
@@ -913,13 +1051,20 @@ namespace CornerkickWebMvc
               double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
               int nSteps = (int)(fTotalMin / (fInterval / 60f));
 
-              ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
+              if (nSteps > 0) {
+                ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
 
-              int iGameSpeed = 0; // Calendar interval [s]
-              int.TryParse(sStateFileContent[3], out iGameSpeed);
+                int iGameSpeed = 0; // Calendar interval [s]
+                int.TryParse(sStateFileContent[3], out iGameSpeed);
+                ckcore.tl.writeLog("Set game speed to " + iGameSpeed.ToString() + "ms");
 
-              // Perform calendar steps in background
-              Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
+                // Perform calendar steps in background
+                Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
+              } else {
+                timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
+                timerCkCalender.Enabled = bCalendarRunning;
+                ckcore.tl.writeLog("Calendar Interval set to " + timerCkCalender.Interval.ToString() + " ms");
+              }
             }
 
             if (sStateFileContent.Length > 5) {
@@ -935,11 +1080,15 @@ namespace CornerkickWebMvc
         // Download emblems
         Task<bool> tkDownloadEmblems = Task.Run(async () => await downloadFilesAsync(as3, "emblems/", sHomeDir + "/../Content/Uploads/", ".png"));
 
+        // Download portraits
+        Task<bool> tkDownloadPortraits = Task.Run(async () => await downloadFilesAsync(as3, "Portraits/", sHomeDir + "/../Content/Uploads/", ".png"));
+
         // Download mails
-        Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
+        //Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
+        Task<bool> tkDownloadMail = Task.Run(async () => await downloadMails(as3, sHomeDir));
 
         // Download wishlist
-        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist", "wishlist.json")));
+        Task<bool> tkDownloadWl = Task.Run(async () => await downloadFileAsync(as3, "wishlist.json", Path.Combine(sHomeDir, "wishlist.json")));
 
         // Download archive cups
         if (!System.IO.Directory.Exists(Path.Combine(sHomeDir, "archive"))) System.IO.Directory.CreateDirectory(Path.Combine(sHomeDir, "archive"));
@@ -964,12 +1113,71 @@ namespace CornerkickWebMvc
           ckcore.tl.writeLog("ERROR: Unable to download games", CornerkickManager.Main.sErrorFile);
         }
 #endif
+#else
+        readMails();
 #endif
 
         return true;
       }
 
+      // If error while loading ...
+      timerSave.Enabled = false; // ... do not overwrite the file
+      settings.bLoginPossible = false; // ... disable user login
+
       return false;
+    }
+
+    private static async Task<bool> downloadMails(AmazonS3FileTransfer as3, string sHomeDir)
+    {
+      as3.downloadAllFiles("mail/", sHomeDir, null, ".txt");
+      readMails();
+
+      return true;
+    }
+
+    private static void readMails()
+    {
+      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
+      if (System.IO.Directory.Exists(sDirMail)) {
+        ltMail = new List<Mail>();
+
+        System.IO.DirectoryInfo diMail = new System.IO.DirectoryInfo(sDirMail);
+
+        foreach (var fileMail in diMail.GetFiles("*.txt")) {
+          string sContent = System.IO.File.ReadAllText(fileMail.FullName);
+          string[] sContentSplit = sContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+          string[] sHeader = sContentSplit[0].Split();
+          if (sHeader.Length < 3) continue;
+
+          string sToId   = sHeader[0];
+          string sFromId = sHeader[1];
+          string sDate   = sHeader[2];
+          bool bNew      = true;
+          if (sHeader.Length > 3) bNew = sHeader[3].Equals("true");
+
+          DateTime dtMail = DateTime.ParseExact(sDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+
+          Mail mail = new Mail();
+          mail.sIdTo = sToId;
+          mail.sIdFrom = sFromId;
+          mail.bNew = bNew;
+          mail.dt = dtMail;
+          mail.sText = "";
+          for (int iL = 1; iL < sContentSplit.Length; iL++) { // For each line of text
+            mail.sText += sContentSplit[iL] + Environment.NewLine;
+          }
+
+          ltMail.Add(mail);
+
+          // Delete mail file after import
+          try {
+            fileMail.Delete();
+          } catch {
+            ckcore.tl.writeLog("Unable to delete mail: " + fileMail.FullName, CornerkickManager.Main.sErrorFile);
+          }
+        }
+      }
     }
 
     private static async Task<bool> downloadFileAsync(AmazonS3FileTransfer as3, string sKey, string sFile)
@@ -997,10 +1205,14 @@ namespace CornerkickWebMvc
       if (nSteps > 0) {
         ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
         for (int iS = 0; iS < nSteps; iS++) {
-          bool bBreak = !performCalendarStep(false);
-          if (bBreak) {
-            bCalendarRunning = false;
-            break;
+          try {
+            bool bBreak = !performCalendarStep(false);
+            if (bBreak) {
+              bCalendarRunning = false;
+              break;
+            }
+          } catch (Exception e) {
+            ckcore.tl.writeLog("performCalendarStepsAsync(): Error in performCalendarStep() at step: " + iS.ToString() + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
           }
         }
       }

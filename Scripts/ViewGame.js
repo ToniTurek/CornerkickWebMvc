@@ -80,16 +80,11 @@ function drawGame(iState, iGameSpeed) {
 
 var iB = 0;
 function drawGame2(gLoc, iState, iGameSpeed) {
-  //var drawGameDiv = $("#divDrawGame");
-  var iPositionsValue = $('#ddlPositions').val();
+  var iPositionsValue = parseInt(document.getElementById("ddlPositions").value);
 
-  //drawGameDiv.html('');
-
-  if (iPositionsValue >= 0) {
-    updatePlayer(playerGlobal, gLoc, iPositionsValue == 0);
-    updateBallPos(imgBall, divBallTarget, gLoc.gBall, iGameSpeed);
-    printComments(gLoc);
-  }
+  updatePlayer(playerGlobal, gLoc, iPositionsValue === 0);
+  updateBallPos(imgBall, divBallTarget, gLoc.gBall, iGameSpeed);
+  printComments(gLoc);
 
   if (iState < 0 && gLoc.bFinished) {
     iState = -2;
@@ -264,6 +259,10 @@ function drawPlayer(gLoc) {
 
   var player = [];
   for (iP = 0; iP < 11; iP++) {
+    if (!gLoc.ltPlayer[iP +  0]) {
+      continue;
+    }
+
     // Player Home
     var divPlH = document.createElement("div");
     divPlH.id = "divPlayerH_" + iP.toString();
@@ -304,6 +303,10 @@ function drawPlayer(gLoc) {
   }
 
   for (iP = 0; iP < 11; iP++) {
+    if (!gLoc.ltPlayer[iP + 11]) {
+      continue;
+    }
+
     // Player Away
     var divPlA = document.createElement("div");
     divPlA.id = "divPlayerA_" + iP.toString();
@@ -349,6 +352,8 @@ function drawPlayer(gLoc) {
 function updatePlayer(player, gLoc, bShowLookAt) {
   if (gLoc.ltPlayer.length < 1) return;
 
+  var iPositionsValue = parseInt(document.getElementById("ddlPositions").value);
+
   var fLookAtSize = 0.3;
 
   var iP = 0;
@@ -357,47 +362,50 @@ function updatePlayer(player, gLoc, bShowLookAt) {
   for (iP = 0; iP < 22; iP++) {
     var pl = gLoc.ltPlayer[iP];
 
-    if (pl.iCard < 2) { // if not red card
-      var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
-      var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
-
-      var sXh = ((100 *  fXh       ) - 1.0).toString();
-      var sYh = ((100 * (fYh + 0.5)) - 1.5).toString();
-
-      if (bShowLookAt) {
-        divLookAt = player[iP].children[1];
-        var fLftH = ((1.0 - Math.cos(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
-        divLookAt.style.left = ((fLftH - (fLookAtSize / 2)) * 100).toString() + '%';
-        var fTopH = ((1.0 - Math.sin(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
-        divLookAt.style.top  = ((fTopH - (fLookAtSize / 2)) * 100).toString() + '%';
-      } else {
-        divLookAt.style.display = "none";
-      }
-
-      player[iP].style.left = sXh + '%';
-      player[iP].style.top  = sYh + '%';
-
-      /*
-      if (cbTargetPos) {
-        if (cbTargetPos.checked && gLoc.ltPlayer[iP + 11].ptPosTarget.X > 0) {
-          iX0 = (fXa * iDivWidthPix);
-          iY0 = ((fYa + 0.5) * iDivHeightPix);
-          iX1 = (gLoc.ltPlayer[iP + 11].ptPosTarget.X * iDivWidthPix) / 122;
-          iY1 = ((gLoc.ltPlayer[iP + 11].ptPosTarget.Y + 25) * iDivHeightPix) / 50;
-
-          sBox += drawline(iX0, iY0, iX1, iY1, "black");
-        }
-      }
-      */
-    } else {
-      player[iP].style.display = "none";
+    if (!pl) {
+      continue;
     }
+
+    if (pl.iCard > 1) { // if red card
+      player[iP].style.display = "none";
+      continue;
+    }
+
+    if (iPositionsValue < 0) {
+      player[iP].style.display = "none";
+      continue;
+    }
+
+    var fXh = gLoc.ltPlayer[iP +  0].ptPos.X / 122.0;
+    var fYh = gLoc.ltPlayer[iP +  0].ptPos.Y /  50.0;
+
+    var sXh = ((100 *  fXh       ) - 1.0).toString();
+    var sYh = ((100 * (fYh + 0.5)) - 1.5).toString();
+
+    if (bShowLookAt) {
+      divLookAt = player[iP].children[1];
+      var fLftH = ((1.0 - Math.cos(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
+      divLookAt.style.left = ((fLftH - (fLookAtSize / 2)) * 100).toString() + '%';
+      var fTopH = ((1.0 - Math.sin(pl.iLookAt * 60 * Math.PI / 180.0)) / 2);
+      divLookAt.style.top  = ((fTopH - (fLookAtSize / 2)) * 100).toString() + '%';
+    } else {
+      divLookAt.style.display = "none";
+    }
+
+    player[iP].style.left = sXh + '%';
+    player[iP].style.top = sYh + '%';
+
+    player[iP].style.display = "block";
   }
 }
 
 function changePlayerJerseyColor(iHA, cl1, cl2) {
   if (iHA === 0) {
     for (iP = 0; iP < 11; iP++) {
+      if (!playerGlobal[iP]) {
+        continue;
+      }
+
       playerGlobal[iP].style.backgroundColor = cl1;
       if (iP === 0) {
         playerGlobal[iP].style.borderColor = "rgb(57,255,20)";
@@ -407,6 +415,10 @@ function changePlayerJerseyColor(iHA, cl1, cl2) {
     }
   } else if (iHA === 1) {
     for (iP = 11; iP < 22; iP++) {
+      if (!playerGlobal[iP]) {
+        continue;
+      }
+
       playerGlobal[iP].style.backgroundColor = cl1;
       if (iP === 11) {
         playerGlobal[iP].style.borderColor = "rgb(243,243,21)";
@@ -518,7 +530,7 @@ function plotStatistics(jState = -1) {
           iX1 = ( drawLineShoot.X1       * iDivWidthPix ) / 122;
           iY1 = ((drawLineShoot.Y1 + 25) * iDivHeightPix) /  50;
 
-          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, 1, 20)).appendTo('#drawHeatmap');
+          $(drawLine(iX0, iY0, iX1, iY1, drawLineShoot.sColor, drawLineShoot.sTitle, 1, 20)).appendTo('#drawHeatmap');
         });
       }
 
@@ -534,13 +546,25 @@ function plotStatistics(jState = -1) {
           iX1 = (drawLinePass.X1 * iDivWidthPix) / 122;
           iY1 = ((drawLinePass.Y1 + 25) * iDivHeightPix) / 50;
 
-          $(drawLine(iX0, iY0, iX1, iY1, drawLinePass.sColor, 2, 20, "dashed")).appendTo('#drawHeatmap');
+          $(drawLine(iX0, iY0, iX1, iY1, drawLinePass.sColor, "", 2, 20, "dashed")).appendTo('#drawHeatmap');
         });
       }
 
       if (gD.sCard) {
         $(gD.sCard).appendTo('#drawHeatmap');
       }
+
+      $(".tooltipDuel").tooltip({
+        content: function () {
+          return "<div align=\"right\">" + this.getAttribute("title") + "</div>";
+        }
+      });
+
+      $(".tooltipShoot").tooltip({
+        content: function () {
+          return this.getAttribute("title");
+        }
+      });
 
       // Bar statistics
       var dataH = gD.fDataH;
@@ -731,69 +755,151 @@ function plotStatistics(jState = -1) {
       $('#tableTeamViewGame').DataTable().ajax.reload();
 
       // Charts
-      if (gD.ltF && gD.ltM) {
-        var i = 0;
-        var j = 0;
-        for (i = 0; i < gD.ltF.length; ++i) {
-          if (!ltF[i]) {
-            ltF[i] = [];
-          }
-          if (!ltM[i]) {
-            ltM[i] = [];
-          }
+      try {
+        if (gD.ltF && gD.ltM) {
+          var i = 0;
+          var j = 0;
+          for (i = 0; i < gD.ltF.length; ++i) {
+            if (!ltF[i]) {
+              ltF[i] = [];
+            }
+            if (!ltM[i]) {
+              ltM[i] = [];
+            }
 
-          if (gD.ltF[i]) {
-            if (gD.ltF[i].length > 0) {
-              if (jState === -1) {
-                for (k = 0; k < gD.ltF[i].length; ++k) {
-                  ltF[i].push(gD.ltF[i][k]);
-                }
-              } else {
-                ltF[i].length = 0;
-
-                for (j = 0; j < iState; ++j) {
-                  if (j >= gD.ltF[i].length) {
-                    break;
+            if (gD.ltF[i]) {
+              if (gD.ltF[i].length > 0) {
+                if (jState === -1) {
+                  for (k = 0; k < gD.ltF[i].length; ++k) {
+                    ltF[i].push(gD.ltF[i][k]);
                   }
+                } else {
+                  ltF[i].length = 0;
 
-                  ltF[i].push(gD.ltF[i][j]);
+                  for (j = 0; j < iState; ++j) {
+                    if (j >= gD.ltF[i].length) {
+                      break;
+                    }
+
+                    ltF[i].push(gD.ltF[i][j]);
+                  }
+                }
+              }
+            }
+
+            if (gD.ltM[i]) {
+              if (gD.ltM[i].length > 0) {
+                if (jState === -1) {
+                  for (k = 0; k < gD.ltM[i].length; ++k) {
+                    ltM[i].push(gD.ltM[i][k]);
+                  }
+                } else {
+                  ltM[i].length = 0;
+
+                  for (j = 0; j < iState; ++j) {
+                    if (j >= gD.ltM[i].length) {
+                      break;
+                    }
+
+                    ltM[i].push(gD.ltM[i][j]);
+                  }
                 }
               }
             }
           }
 
-          if (gD.ltM[i]) {
-            if (gD.ltM[i].length > 0) {
-              if (jState === -1) {
-                for (k = 0; k < gD.ltM[i].length; ++k) {
-                  ltM[i].push(gD.ltM[i][k]);
-                }
-              } else {
-                ltM[i].length = 0;
-
-                for (j = 0; j < iState; ++j) {
-                  if (j >= gD.ltM[i].length) {
-                    break;
-                  }
-
-                  ltM[i].push(gD.ltM[i][j]);
-                }
-              }
-            }
-          }
+          chartF.render();
+          chartM.render();
         }
-
-        chartF.render();
-        chartM.render();
+      } catch (e) {
+        gD.ltF = null;
+        gD.ltM = null;
       }
-
+      
       //if (document.getElementById("myCheck").checked) {
-      if ($('#dialogPlAction').dialog('isOpen')) {
-        $("#txtPlActionShoot").html((gD.fPlAction[0] * 100).toFixed(1) + '%');
-        $("#txtPlActionPass" ).html((gD.fPlAction[1] * 100).toFixed(1) + '%');
-        $("#txtPlActionGo"   ).html((gD.fPlAction[2] * 100).toFixed(1) + '%');
-        $("#txtPlActionWait" ).html((gD.fPlAction[3] * 100).toFixed(1) + '%');
-        $("#txtPlActionRnd"  ).html((gD.fPlActionRnd * 100).toFixed(1) + '%');
+      if (document.getElementById("bShowChances").checked) {
+        var chartPlAction = new CanvasJS.Chart("divPlActionChart", {
+          backgroundColor: "transparent",
+          animationEnabled: false,
+          theme: "theme2",//theme1
+          toolTip: {
+            shared: true,
+            borderColor: "black",
+            contentFormatter: function (e) {
+              var content = "<table>";
+
+              // For each cup
+              for (var i = 0; i < e.entries.length; i++) {
+                content += "<tr><td style=\"text-align:right\"><strong>" + e.entries[i].dataSeries.name + ":</strong></td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
+              }
+
+              content += "<tr><td style=\"text-align:right\"><strong>Entscheidung:</strong></td><td style=\"text-align:right\">" + (gD.fPlActionRnd * 100).toFixed(1) + "%</td>";
+              content += "</table>";
+
+              return content;
+            }
+          },
+          axisX: {
+            title: "",
+            tickLength: 0,
+            margin: 0,
+            lineThickness: 0,
+            valueFormatString: " " //comment this to show numeric values
+          },
+          axisY: {
+            interval: 100,
+            title: "",
+            tickLength: 0,
+            lineThickness: 0,
+            margin: 0,
+            valueFormatString: " ", //comment this to show numeric values
+            stripLines: [{
+              value: gD.fPlActionRnd * 100.0,
+              color: "black",
+              thickness: 2
+            }]
+          },
+          data: [
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "red",
+              name: "Schuss",
+              dataPoints: [
+                { y: gD.fPlAction[0] }
+              ]
+            },
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "blue",
+              name: "Pass",
+              dataPoints: [
+                { y: gD.fPlAction[1] }
+              ]
+            },
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "yellow",
+              name: "Dribbling",
+              dataPoints: [
+                { y: gD.fPlAction[2] }
+              ]
+            },
+            {
+              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+              type: "stackedBar100",
+              color: "grey",
+              name: "Warten",
+              dataPoints: [
+                { y: gD.fPlAction[3] }
+              ]
+            }
+          ]
+        });
+
+        chartPlAction.render();
       }
     } // success function
   }); // ajax

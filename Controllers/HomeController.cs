@@ -34,22 +34,22 @@ namespace CornerkickWebMvc.Controllers
       ViewBag.Message = "Cornerkick User Manual";
 
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, MvcApplication.iNations[0], 0);
-      mdUm.sAfLeague = league.settings.fAttraction.ToString("0.00");
+      if (league != null) mdUm.sAfLeague = league.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, MvcApplication.iNations[0]);
-      mdUm.sAfCup = cup.settings.fAttraction.ToString("0.00");
+      if (cup != null) mdUm.sAfCup = cup.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-      mdUm.sAfCupGold = cupGold.settings.fAttraction.ToString("0.00");
+      if (cupGold != null) mdUm.sAfCupGold = cupGold.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-      mdUm.sAfCupSilver = cupSilver.settings.fAttraction.ToString("0.00");
+      if (cupSilver != null) mdUm.sAfCupSilver = cupSilver.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
-      mdUm.sAfWc = cupWc.settings.fAttraction.ToString("0.00");
+      if (cupWc != null) mdUm.sAfWc = cupWc.settings.fAttraction.ToString("0.00");
 
       CornerkickManager.Cup tg = MvcApplication.ckcore.tl.getCup(5);
-      mdUm.sAfTg = tg.settings.fAttraction.ToString("0.00");
+      if (tg != null) mdUm.sAfTg = tg.settings.fAttraction.ToString("0.00");
 
       return View(mdUm);
     }
@@ -136,14 +136,14 @@ namespace CornerkickWebMvc.Controllers
 
       // Trainings camp
       CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
-      if (iCamp >= 0 && iCamp < mnUm.tcp.ltCamps.Count) {
-        camp.camp = mnUm.tcp.ltCamps[iCamp];
+      if (iCamp >= 0 && iCamp < MvcApplication.ckcore.tcp.ltCamps.Count) {
+        camp.camp = MvcApplication.ckcore.tcp.ltCamps[iCamp];
         camp.dtArrival   = mnUm.dtDatum.AddDays(-1);
         camp.dtDeparture = mnUm.dtDatum.AddDays(+8);
       }
 
       // Doping
-      if (iDoping >= 0 && iDoping < mnUm.ltDoping.Count) pl.doDoping(mnUm.ltDoping[iDoping]);
+      if (iDoping >= 0 && iDoping < MvcApplication.ckcore.ltDoping.Count) pl.doDoping(MvcApplication.ckcore.ltDoping[iDoping]);
 
       // For the next 7 days ...
       for (byte iD = 0; iD < 7; iD++) {
@@ -153,7 +153,8 @@ namespace CornerkickWebMvc.Controllers
           //if ((int)dtTmp.DayOfWeek == 0) break;
 
           // ... do training
-          CornerkickManager.Player.doTraining(ref pl, 2, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
+          CornerkickManager.Player.Training training = CornerkickManager.Player.getTraining(iType, MvcApplication.ckcore.plr.ltTraining);
+          CornerkickManager.Player.doTraining(ref pl, training, MvcApplication.ckcore.plr.ltTraining, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
         }
 
         // ... add training data to dataPoints
@@ -202,9 +203,10 @@ namespace CornerkickWebMvc.Controllers
         // ... add fresh
         dataPoints[0].Add(new Models.DataPointGeneral(iS, pl     .fFresh));
         dataPoints[1].Add(new Models.DataPointGeneral(iS, plNoAcc.fFresh));
-        dataPoints[2].Add(new Models.DataPointGeneral(iS, CornerkickGame.AI.getFreshPlayerMoveLimit(pl.fSteps, fTcPower)));
+        if (CornerkickGame.AI.getFreshPlayerMoveLimit(pl.fSteps, pl.fFresh, fTcPower) < 1f) dataPoints[2].Add(new Models.DataPointGeneral(iS, 1f));
+        else                                                                                dataPoints[2].Add(new Models.DataPointGeneral(iS, 0f));
 
-        pl     .fSteps -= 1f;
+        pl.fSteps -= 1f;
         plNoAcc.fSteps -= 1f;
 
         pl     .iStepsCurr++;

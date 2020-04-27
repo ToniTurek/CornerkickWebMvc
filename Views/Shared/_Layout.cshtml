@@ -65,6 +65,7 @@
       height: 600px;
     }
   </style>
+
   <script type="text/javascript">
     $(document).ready(function () {
       var sEmblemImg = $('#divDataEmblem').data('name');
@@ -131,15 +132,7 @@
 
           @{
             if (Request.IsAuthenticated && usr != null) {
-              int iMails = 0;
-              if (usr.ltNews != null) {
-                foreach (CornerkickManager.Main.News news in usr.ltNews) {
-                  if (news.iType == 99 && !news.bRead) {
-                    iMails++;
-                  }
-                }
-              }
-
+              int iMails = CornerkickWebMvc.Controllers.MemberController.MailCountNewMails(usr);
               string sMails = "";
               if (iMails > 0) {
                 sMails = " (" + iMails.ToString() + ")";
@@ -162,6 +155,7 @@
                 <li>
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Verein</a>
                   <ul class="dropdown-menu">
+                    <li>@Html.ActionLink("Übersicht", "ClubDetails", "Member", new { iClub = clb.iId }, null)</li>
                     <li>@Html.ActionLink("Finanzen", "Finance", "Member")</li>
                     <li>@Html.ActionLink("Sponsoren", "Sponsor", "Member")</li>
                     <li>@Html.ActionLink("Personal", "Personal", "Member")</li>
@@ -239,6 +233,14 @@
                     </div>
                   </div>
                 }
+              }
+            }
+
+            @{
+              if (!MvcApplication.settings.bLoginPossible) {
+                <div class="" style="position: relative; width: 100%; margin-top: 6px; margin-bottom: 6px; height: auto; text-align: center; background-color: yellow; border: 2px solid red">
+                  <strong style="font-size: 24px; color: red">ACHTUNG! DEMNÄCHST FINDET EIN UPDATE STATT. BITTE LOGGEN SIE SICH AUS!</strong>
+                </div>
               }
             }
             @*

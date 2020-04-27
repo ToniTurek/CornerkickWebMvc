@@ -37,7 +37,7 @@
               sNo = (iPl + 1).toString();
             }
 
-            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, teamData.ltPlayerAveSkill[iPl], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[iPl], bMobile, 1.0, null, null, teamData.ltPlayerNat[iPl], iPl === teamData.iCaptainIx, teamData.ltPlayerSusp[iPl]);
+            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, teamData.ltPlayerAveSkill[iPl], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[iPl], bMobile, 1.0, null, null, teamData.ltPlayerNat[iPl], iPl === teamData.iCaptainIx, teamData.ltPlayerSusp[iPl], teamData.ltPlayerPortrait[iPl]);
 
             i = i + 1;
             return i !== 11;
@@ -67,7 +67,7 @@
                   sOppNo = (iPl + 1).toString();
                 }
 
-                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile);
+                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile, 1.0, null, null, null, false, false, teamData.ltPlayerOppPortrait[iPl]);
 
                 i = i + 1;
                 j = j + 1;
@@ -119,6 +119,25 @@
         textteamaverage.html("Durchschnittsstärke (-alter): " + teamData.sTeamAveSkill + " (" + teamData.sTeamAveAge + ")");
 
         drawFormation/*.hide()*/.html(result).fadeIn('slow')/*.show()*/;
+
+        for (var iDg = 0; iDg < 11; iDg++) {
+          var divPlayerBox = document.getElementById("divPlayerBox_" + iDg.toString());
+          dragElement(divPlayerBox);
+        }
+
+        // Add transparent class to player portraits
+        if (iSelectedPlayer > 0) {
+          var imgPortraits = document.getElementsByName("imgPortrait");
+          for (var iImg = 0; iImg < imgPortraits.length; iImg++) {
+            imgP = imgPortraits[iImg];
+            var iPlIx = parseInt(imgP.getAttribute('data-iIx'));
+            if (iPlIx === iSelectedPlayer - 1) {
+              imgP.className = "";
+            } else {
+              imgP.className = "img-transparent";
+            }
+          }
+        }
       } else {
         alert("data hasn't worked!");
       }
@@ -127,7 +146,7 @@
 }
 
 //function getBoxFormation(player, i, sName, sNo, sStrength, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended) {
-function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended)
+function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponentTeam, iSelectedPlayer, iPos, bMobile, fScale, sTeamname, sAge, sNat, bCaptain, bSuspended, sPortrait)
 {
   if (!iPos) {
     iPos = 0;
@@ -176,7 +195,7 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
   var sSelectPlayer = "";
   var sZIndex = "";
   if (!bOpponentTeam) {
-    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\" ontouchstart=\"selectPlayer(" + i.toString() + ")\"";
+    sSelectPlayer = " onclick=\"javascript: selectPlayer(" + i.toString() + ")\" ontouchstart=\"selectPlayer(" + i.toString() + ")\" data-ix=\"" + i.toString() + "\"";
     if (i === iSelectedPlayer) {
       sZIndex = "; z-index: 98";
     }
@@ -194,11 +213,28 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
   var sBox = "";
 
   sBox +=
-    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">' +
-      '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">' +
-        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + sNo + '</h2>' +
-      '</div>' +
-      '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black; background-color: ' + color + '">' +
+    '<div class="divPlayerBox" id="divPlayerBox_' + i.toString() + '"' + sSelectPlayer + ' dragMe="true" style="position: absolute; width: ' + fWidth.toString() + '%; min-width: 100px; height: ' + fHeightBox.toString() + '%; min-height: 26px; top: ' + iTop.toString() + '%; left: ' + iLeft.toString() + '%; cursor: pointer; -webkit-box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3); box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, .3)' + sZIndex + '">';
+  if (sPortrait) {
+    var sImgName = "imgPortrait";
+    if (bOpponentTeam) {
+      sImgName += "Opp";
+    }
+    sBox +=
+      '<div style="position: absolute; bottom: 100%; left: 2px; width: 25%">';
+    sBox +=
+        '<div name="' + sImgName + '" data-iIx="' + i.toString() + '" style="absolute: relative; width: 100%; border: 2px solid black">' + sPortrait + '</div>';
+    sBox +=
+      '</div>';
+  }
+  sBox +=
+      '<div style="position: absolute; width: 25%; height: 100%; background-color: ' + color2 + '">';
+  sBox +=
+        '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 1.6).toString() + '%; color: white">' + sNo + '</h2>';
+  sBox +=
+      '</div>';
+  sBox +=
+      '<div style="position: absolute; width: 75%; height: 100%; left: 25%; border: 2px solid black; background-color: ' + color + '">';
+  sBox +=
         '<div style="position: absolute; width: 100%; height: 65%; top: 0px; left: 0px; background-color: ' + color + '; word-break: break-word; vertical-align: middle">';
   if (sNat) {
     sBox +=
@@ -209,19 +245,19 @@ function getBoxFormation(i, ptPos, sName, sNo, sStrength, bYellowCard, bOpponent
       '<img src="/Content/Icons/captain.png" title="Kapitän" style="position: absolute; width: 16px; top: 2px; left: 2px"/>';
   }
   sBox +=
-          '<h2 style="position: absolute; text-align: center; width: 100%; margin: 0; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</h2>' +
+          '<text style="position: absolute; top: -4px; text-align: center; width: 100%; margin: 0; padding: 0px; font-size: ' + iTextSize.toString() + '%; color: black">' + sName + '</text>' +
         '</div>' +
         '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 0%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sPos[iPos] + '</h2>' +
+          '<text style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sPos[iPos] + '</text>' +
         '</div>' +
         '<div style="position: absolute; width: 25%; height: 35%; min-height: 8px; bottom: 0px; left: 25%; background-color: ' + color + '">' +
-          '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sStrength + '</h2>' +
+          '<text style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sStrength + '</text>' +
         '</div>' +
         '<div style="position: absolute; width: 50%; height: 35%; min-height: 8px; bottom: 0px; left: 50%; background-color: ' + color + '">';
   if (sAge) {
-    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</h2>';
+    sBox += '<text style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + sAge + '</text>';
   } else {
-    sBox += '<h2 style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</h2>';
+    sBox += '<text class="txtPosition" style="position: absolute; top: -2px; text-align: center; vertical-align: middle; width: 100%; margin: 0px; padding: 0px; font-size: ' + (iTextSize * 0.6).toString() + '%; color: black">' + ptPos.Y.toString() + '/' + ptPos.X.toString() + '</text>';
   }
   sBox +=
         '</div>';

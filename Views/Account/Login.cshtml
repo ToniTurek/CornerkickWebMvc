@@ -37,7 +37,14 @@
           </div>
           <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-              <input type="submit" value="Anmelden" class="btn btn-default" />
+              @if (MvcApplication.settings.bLoginPossible) {
+                <input type="submit" value="Anmelden" class="btn btn-default" />
+              } else {
+                <input type="submit" value="Anmelden" class="btn btn-default" disabled="disabled" />
+                <p></p>
+                <p><strong style="font-size: 24px; color: red">Wartung / Update</strong></p>
+                <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
+              }
             </div>
           </div>
           <p>
@@ -60,6 +67,130 @@
         </section>
     </div>
 *@
+</div>
+
+<div style="position: relative; margin-top: 60px">
+  <h3>Versionshistorie</h3>
+  <table id="tableNews" style="position: relative; margin: 0px; width: auto" cellpadding="2">
+    <thead>
+      <tr>
+        <th style="text-align: center">Version</th>
+        <th style="text-align: center">Datum</th>
+        <th>Beschreibung</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2.13.0</td>
+        <td>23.04.2020</td>
+        <td>
+          <ul>
+            <li>Ereignisse ("Krisensitzung") hinzugefügt</li>
+            <li>Tabelle Anzahl bisherige Trainings hinzugefügt</li>
+            <li>Taktikseite überarbeitet</li>
+            <li>Personalkosten überarbeitet</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.12.0</td>
+        <td>22.04.2020</td>
+        <td>
+          <ul>
+            <li>Zeige Wahrscheinlichkeiten im Livespiel</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.11.0</td>
+        <td>15.04.2020</td>
+        <td>
+          <ul>
+            <li>Vereinsseite überarbeitet</li>
+            <li>Einige fixes</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.10.0</td>
+        <td>10.04.2020</td>
+        <td>
+          <ul>
+            <li>Spielerportraits implementiert</li>
+            <li>Spielerprämien (Auflauf-/ Torprämie) werden mit Cup-Prioritätsfaktor multipliziert ausbezahlt</li>
+            <li>Konditionsabnahme bei Verletzung reduziert</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.9.2</td>
+        <td>09.04.2020</td>
+        <td>
+          <ul>
+            <li>Spielerseite überarbeitet</li>
+            <li>Mail System gefixt</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.9.0</td>
+        <td>08.04.2020</td>
+        <td>
+          <ul>
+            <li>Aufstellung per drag&amp;drop möglich</li>
+            <li>Unterteilung Spielerseite in Reiter</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.8.1</td>
+        <td>08.04.2020</td>
+        <td>
+          <ul>
+            <li>Leere Spieler im Transfermarkt (Option: Alle Spieler) gefixt</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.8.0</td>
+        <td>07.04.2020</td>
+        <td>
+          <ul>
+            <li>Option zum Limitieren von Dauerkartenverkauf implementiert</li>
+            <li>Leistungsverbesserung Liga-Seiten</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.7.0</td>
+        <td>06.04.2020</td>
+        <td>
+          <ul>
+            <li>Verwende länderspezifische Namen für neue Spieler</li>
+            <li>Faktoren Chart Spielerentwicklung skaliert (Summe der einzelnen Faktoren entspricht Gesamtwert)</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.6.0</td>
+        <td>05.04.2020</td>
+        <td>
+          <ul>
+            <li>Berechne und zeige Club Erfolgsfaktor auf Club Seite</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2.5.7</td>
+        <td>05.04.2020</td>
+        <td>
+          <ul>
+            <li>Update Kosten Stadion Oberring und Rasenerneuerung</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 @section Scripts {

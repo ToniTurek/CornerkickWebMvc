@@ -22,6 +22,7 @@
       for (iE = 0; iE < ltErr.length; ++iE) {
         var rowComments = tblErr.insertRow(0);
         var cellComments = rowComments.insertCell(0);
+        cellComments.style.whiteSpace = "nowrap";
         cellComments.innerHTML = ltErr[iE];
       }
     });
@@ -41,9 +42,16 @@
         if (!bUpDownloads && ltLog[iL].includes("Try to upload file")) {
           continue;
         }
+        if (!bUpDownloads && ltLog[iL].includes("Directory info games:")) {
+          continue;
+        }
+        if (!bUpDownloads && ltLog[iL].includes("File info games length:")) {
+          continue;
+        }
 
         var rowComments = tblLog.insertRow(0);
         var cellComments = rowComments.insertCell(0);
+        cellComments.style.whiteSpace = "nowrap";
         cellComments.innerHTML = ltLog[iL];
       }
     }
@@ -61,13 +69,13 @@
         Down-/Upload logs
       </label>
     </div>
-    <table id="tblLog" style="width: 100%; height: auto">
-      <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+    <table id="tblLog" style="width: 100%">
+      <tbody style="display: block; border: 1px solid black; height: 300px; overflow: scroll"></tbody>
     </table>
 
     <h3>Error</h3>
-    <table id="tblErr" style="width: 100%; height: auto">
-      <tbody style="display: block; border: 1px solid black; height: 300px; overflow-y: scroll"></tbody>
+    <table id="tblErr" style="width: 100%">
+      <tbody style="display: block; border: 1px solid black; height: 300px; overflow: scroll"></tbody>
     </table>
   </div>
 </body>

@@ -45,9 +45,6 @@
         var chartFAve = new CanvasJS.Chart("chartContainerFAve", {
           animationEnabled: true,
           theme: "theme2",//theme1
-          title: {
-            text: "Trainingsbonus"
-          },
           axisX: {
             gridThickness: 1,
             interval: 1
@@ -86,6 +83,7 @@
       });
     });
 
+    var sTrainingTimes = ["9:30", "12:00", "16:30"];
     var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel", "Fussballtennis", "Kopfballpendel", "Yoga", "Elfmeterschießen"];
     var dateOptions = { weekday: 'short', month: '2-digit', day: '2-digit' };
     function plotTrainingPlan(iWeek) {
@@ -117,7 +115,7 @@
 
             //var date = moment(ltTu[0][iIxDay].dt).toDate();
             var cell0 = row.insertCell();
-            cell0.innerHTML = (iIxDay + 1).toString() + ".";
+            cell0.innerHTML = sTrainingTimes[iIxDay];
             cell0.style.textAlign = "right";
             cell0.style.fontWeight = 'bold';
 
@@ -139,7 +137,7 @@
               }
 
               sct.classList.add('form-control');
-              sct.style.width = "130px";
+              sct.style.width = "126px";
               if (ltTu[iD][iIxDay].iType < 0) {
                 sct.disabled = true;
               } else {
@@ -196,9 +194,6 @@
           var chart = new CanvasJS.Chart("chartContainer", {
             animationEnabled: bAnimate,
             theme: "theme2",//theme1
-            title: {
-              text: "Mannschaftsentwicklung"
-            },
             axisX: {
               gridThickness: 1,
               interval: 1,
@@ -223,6 +218,7 @@
                 showInLegend: true,
                 legendText: "Kondition",
                 xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[0][0]
               },
@@ -232,6 +228,7 @@
                 showInLegend: true,
                 legendText: "Frische",
                 xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[0][1]
               },
@@ -241,6 +238,7 @@
                 showInLegend: true,
                 legendText: "Moral",
                 xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[0][2]
               },
@@ -251,6 +249,7 @@
                 lineThickness: 1,
                 showInLegend: false,
                 xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[1][0]
               },
@@ -261,6 +260,7 @@
                 lineThickness: 1,
                 showInLegend: false,
                 xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[1][1]
               },
@@ -271,6 +271,7 @@
                 lineThickness: 1,
                 showInLegend: false,
                 xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
                 dataPoints: dataKFM[1][2]
               }
@@ -285,34 +286,102 @@
 </head>
 
 <body>
-  <h2>Training</h2>
+  <div style="height: 1800px">
+    <h3>Trainingsplan</h3>
 
-  <div style="position: relative; width: 1000px; height: auto; margin-bottom: 20px">
-    <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: relative; width: 49%; left: 0px">vorherige Woche</button>
-    <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: relative; width: 49%; right: 0px">nächste Woche</button>
-    <table id="tblTrainingPlan" border="1" cellpadding="4" style="position: relative; width: 100%; margin-top: 6px">
-      <tbody></tbody>
-    </table>
-    <button type="submit" id="bnCopyWeek" class="btn btn-default" onclick="copyWeek()" style="position: relative; width: 100%; margin-top: 4px">Trainingswoche bis Saisonende fortführen</button>
-  </div>
+    <div style="position: relative; width: 1000px; height: auto; margin-bottom: 20px">
+      <div style="position: relative; width: 100%; height: 32px">
+        <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: absolute; width: 49%; left:  0px"><< vorherige Woche</button>
+        <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: absolute; width: 49%; right: 0px">nächste Woche >></button>
+      </div>
+      <table id="tblTrainingPlan" border="1" cellpadding="4" style="position: relative; width: 100%; margin-top: 6px">
+        <tbody></tbody>
+      </table>
+      <button type="submit" id="bnCopyWeek" class="btn btn-default" onclick="copyWeek()" style="position: relative; width: 100%; margin-top: 4px">Trainingswoche bis Saisonende fortführen</button>
+    </div>
 
-  <div style="position: relative; width: 100%">
-    <div id="chartContainer" style="height: 400px; width: 100%"></div>
+    <div style="position: relative; float: left">
+      <h3>Bisherige Trainings</h3>
 
-    <label style="position: absolute; top: 0px; right: 0px; background-color: white">
-      <input type="checkbox" id="cbPlotExpected" name="cbPlotExpected" value="0" onclick="plotTrainingDevelopment(true)" style="margin-left: 4px">
-      Vorschau
-    </label>
-    <select name="Camp" id="selectCamp" onchange="plotTrainingDevelopment(false)" style="position: absolute; top: 20px; right: 0px; width: 80px; background-color: white; display: none">
-      <option value="0">aus</option>
-      @{
-        foreach (CornerkickManager.TrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
-          <option value="@camp.iId.ToString()">@camp.sName</option>
+      <div style="position: relative; float: left; margin-right: 10px; margin-bottom: 10px">
+        <table border="1" cellpadding="4">
+          <thead>
+            <tr>
+              <th style="font-size: 18px; color: red; text-align: center; border-color: black" colspan="3">Konditionelles Training</th>
+            </tr>
+            <tr>
+              <th style="text-align: center">Type</th>
+              <th style="text-align: center">Anzahl</th>
+              <th style="text-align: center">Anteil</th>
+            </tr>
+          </thead>
+          <tbody>
+            @{
+              foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
+                if (tr.iId >= 0 && tr.fCondi > 0f) {
+                  <tr>
+                    <td style="text-align: center">@tr.sName</td>
+                    <td style="text-align: center">@Model.iTrainingCount[tr.iId].ToString()</td>
+                    <td style="text-align: right">@Model.sTrainingCountRel[tr.iId]</td>
+                  </tr>
+                }
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div style="position: relative; float: left; margin-bottom: 10px">
+        <table border="1" cellpadding="4">
+          <thead>
+            <tr>
+              <th style="font-size: 18px; color: green; text-align: center; border-color: black" colspan="3">Regeneratives Training</th>
+            </tr>
+            <tr>
+              <th style="text-align: center">Type</th>
+              <th style="text-align: center">Anzahl</th>
+              <th style="text-align: center">Anteil</th>
+            </tr>
+          </thead>
+          <tbody>
+            @{
+              foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
+                if (tr.iId >= 0 && tr.fCondi < 0f) {
+                  <tr>
+                    <td style="text-align: center">@tr.sName</td>
+                    <td style="text-align: center">@Model.iTrainingCount[tr.iId].ToString()</td>
+                    <td style="text-align: right">@Model.sTrainingCountRel[tr.iId]</td>
+                  </tr>
+                }
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="position: relative; width: 100%; float: left">
+      <h3>Mannschaftsentwicklung</h3>
+      <div id="chartContainer" style="height: 400px; width: 100%"></div>
+
+      <label style="position: absolute; top: 0px; right: 0px; background-color: white">
+        <input type="checkbox" id="cbPlotExpected" name="cbPlotExpected" value="0" onclick="plotTrainingDevelopment(true)" style="margin-left: 4px">
+        Vorschau
+      </label>
+      <select name="Camp" id="selectCamp" onchange="plotTrainingDevelopment(false)" style="position: absolute; top: 20px; right: 0px; width: 80px; background-color: white; display: none">
+        <option value="0">aus</option>
+        @{
+          foreach (CornerkickManager.TrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
+            <option value="@camp.iId.ToString()">@camp.sName</option>
+          }
         }
-      }
-    </select>
-  </div>
+      </select>
+    </div>
 
-  <div id="chartContainerFAve" style="height: 400px; width: 100%; margin-top: 60px"></div>
+    <div style="height: 400px; width: 100%; margin-top: 30px; float: left">
+      <h3>Trainingsbonus</h3>
+      <div id="chartContainerFAve" style="height: 100%; width: 100%"></div>
+    </div>
+  </div>
 </body>
 </html>

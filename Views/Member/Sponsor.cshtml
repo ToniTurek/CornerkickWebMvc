@@ -22,13 +22,13 @@
     sSponsorGoogleQuad += '<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>';
 
     var sSponsorGoogleHori = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"><\/script>';
-    sSponsorGoogleHori += '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4643281447734684" data-ad-slot="3762128727" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+    sSponsorGoogleHori += '<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-4643281447734684" data-ad-slot="3762128727"></ins>';
     sSponsorGoogleHori += '<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>';
 
     var sponsorMain = [];
     sponsorMain.push('');
     sponsorMain.push('<img src="/Content/Images/sponsors/1a.png" style="position: relative; width: 100%; height: 100%"/>');
-    sponsorMain.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=12&l=ez&f=ifr&linkID=af710bb1d1484bd029e76eeada862979&t=cornerkick03-21&tracking_id=cornerkick03-21" width="300" height="250" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
+    sponsorMain.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=12&l=ez&f=ifr&linkID=d5ebb8fa873668bed850be56f679e95f&t=jansuhrmann-21&tracking_id=jansuhrmann-21" width="300" height="250" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
     sponsorMain.push(sSponsorGoogleQuad);
 
     var sponsorBoards = [];
@@ -36,7 +36,7 @@
     sponsorBoards.push('<img src="/Content/Images/sponsors/1.png" style="position: relative; width: 100%; height: 100%"/>');
     //var iB = 1;
     while (sponsorBoards.length < 10) {
-      sponsorBoards.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=288&l=ez&f=ifr&linkID=304dbf1425f3596b252609b0812b5e4b&t=cornerkick03-21&tracking_id=cornerkick03-21" width="320" height="50" scrolling="no" border="0" marginwidth="0" style="border:none" frameborder="0"></iframe>');
+      sponsorBoards.push('<iframe src="https://rcm-eu.amazon-adsystem.com/e/cm?o=3&p=288&l=ez&f=ifr&linkID=ef9597846255dc4701dbda9de06ee3fc&t=jansuhrmann-21&tracking_id=jansuhrmann-21" width="320" height="50" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe>');
       sponsorBoards.push(sSponsorGoogleHori);
       //iB++;
     }
@@ -74,7 +74,7 @@
           if (ltSponsorTmp[i] > 0) {
             divBoard = document.getElementById("divSponsorBoard_" + i.toString());
             divBoard.innerHTML = "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; font-size: 30px; background-color: lightblue\" align=\"center\">" + ltSponsorNames[ltSponsorTmp[i]] + "</div>";
-            divBoard.innerHTML += "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2\">" + sponsorBoards[ltSponsorTmp[i]] + "</div>";
+            divBoard.innerHTML += "<div style=\"position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 99\">" + sponsorBoards[ltSponsorTmp[i]] + "</div>";
           }
         }
       }

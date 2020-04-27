@@ -36,6 +36,7 @@
     // Radio
     var rbTestgame = document.getElementById("rbTestgame");
     var rbCamp     = document.getElementById("rbTrainingscamp");
+    var rbEvent    = document.getElementById("rbEvent");
 
     // Calendar
     var dtStart;
@@ -66,9 +67,11 @@
               dtStart = start;
 
               // Set options from click
-              document.getElementById('selectH').value = start.format("H");
-              document.getElementById('selectM').value = start.format("m");
-
+              document.getElementById('selectH')     .value = start.format("H");
+              document.getElementById('selectM')     .value = start.format("m");
+              document.getElementById('selectEventH').value = start.format("H");
+              document.getElementById('selectEventM').value = start.format("m");
+              
               $("#dialogOptions").dialog("open");
             } else if (iCompare === -2) {
               alert("Keine Aktion am Spieltag möglich!");
@@ -159,6 +162,8 @@
                   alert(xhr);
                 }
               });
+            } else if (rbEvent.checked) {
+              $("#dlgEvent").dialog("open");
             }
           },
           Cancel: function () {
@@ -250,6 +255,40 @@
 
     $('#ddlTrainingscampDays').on('change', function (ev) {
       setSelectedCamp();
+    });
+
+    $(function () {
+      $("#dlgEvent").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            var dateEvent = new Date(dtStart);
+
+            $.ajax({
+              url: "/Member/CalendarAddTeamEvent",
+              type: 'POST',
+              traditional: true,
+              data: { iEventId: document.getElementById("selectEvent").value, sStart: dateEvent.toISOString(), iH: $("#selectEventH").val(), iM: $("#selectEventM").val() },
+              dataType: "json",
+              success: function (response) {
+                alert(response);
+                calendar.fullCalendar('refetchEvents');
+              },
+              error: function (xhr) {
+                debugger;
+                alert(xhr);
+              }
+            });
+
+            calendar.fullCalendar('unselect');
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
     });
 
     $("#bnAcceptTestgame").click(function () {
@@ -369,13 +408,17 @@
 <button type="submit" id="bnDeclineTestgame" class="btn btn-default" style="width: 49%">Anfrage ablehnen</button>
 
 <div id="dialogOptions" title="Was wollen Sie machen?">
-  <label>
+  <label style="cursor: pointer">
     <input type="radio" name="rbOptions" id="rbTestgame" value="1" checked="checked">
     Testspiel vereinbaren
   </label>
-  <label>
+  <label style="cursor: pointer">
     <input type="radio" name="rbOptions" id="rbTrainingscamp" value="2">
     Trainingslager planen
+  </label>
+  <label style="cursor: pointer">
+    <input type="radio" name="rbOptions" id="rbEvent" value="3">
+    Ereignis planen
   </label>
 </div>
 
@@ -421,4 +464,28 @@
   <div style="position: relative; margin-top: 16px">
     <text id="txtCost">Gesamtkosten:</text>
   </div>
+</div>
+
+<div id="dlgEvent" title="Ereignis">
+  <text>Beginn Ereignis:</text>
+  <select name="H" id="selectEventH">
+    @{
+      for (int iH = 0; iH < 24; iH++) {
+        <option value="@iH.ToString()">@iH.ToString("D2")</option>
+      }
+    }
+  </select>
+  <select name="M" id="selectEventM">
+    @{
+      for (int iM = 0; iM < 60; iM += 15) {
+        <option value="@iM.ToString()">@iM.ToString("D2")</option>
+      }
+    }
+  </select>
+
+  <p>Wählen Sie Ihr geplantes Ereignis:</p>
+
+  <select name="Event" id="selectEvent">
+    <option value="1">Krisensitzung</option>
+  </select>
 </div>

@@ -18,12 +18,17 @@ namespace CornerkickWebMvc.Models
     public int nUser { get; set; }
     public int nPlayer { get; set; }
 
+    public DateTime dtCkCurrent { get; set; }
+    public DateTime dtCkApproach { get; set; }
+    public double fIntervalAveToApproachTarget { get; set; }
+
     // Settings
     public double fCalendarInterval { get; set; }
     public string sStartHour { get; set; }
     public int iGameSpeed { get; set; }
     public bool bEmailCertification { get; set; }
     public bool bRegisterDuringGame { get; set; }
+    public bool bLoginPossible { get; set; }
 
     public bool bLogExist { get; set; }
     public bool bAutosaveExist { get; set; }

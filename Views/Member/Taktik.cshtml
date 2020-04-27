@@ -132,7 +132,8 @@
         step: 10,
         orientation: "vertical",
         slide: function (event, ui) {
-          $("#inputAusrichtung").val(ui.value + "%");
+          document.getElementById("inputAusrichtung").value = getValueString(ui.value);
+
           $.ajax({
             url: '/Member/setTaktik',
             type: "GET",
@@ -154,6 +155,7 @@
         orientation: "vertical",
         slide: function (event, ui) {
           $("#inputDistOffence").val(-ui.value);
+
           $.ajax({
             url: '/Member/setTaktik',
             type: "GET",
@@ -173,7 +175,7 @@
         max: +100,
         step: 10,
         slide: function (event, ui) {
-          $("#inputEinsatz").val(ui.value + "%");
+          document.getElementById("inputEinsatz").value = getValueString(ui.value);
 
           $.ajax({
             url: '/Member/setTaktik',
@@ -195,7 +197,7 @@
         step: 10,
         orientation: "vertical",
         slide: function (event, ui) {
-          $("#inputSchussentf").val(ui.value + "%");
+          document.getElementById("inputSchussentf").value = getValueString(-ui.value);
 
           $.ajax({
             url: '/Member/setTaktik',
@@ -216,7 +218,7 @@
         max: +100,
         step: 10,
         slide: function (event, ui) {
-          $("#inputZweikampf").val(ui.value + "%");
+          document.getElementById("inputZweikampf").value = getValueString(ui.value);
 
           $.ajax({
             url: '/Member/setTaktik',
@@ -237,7 +239,7 @@
         max: +100,
         step: 10,
         slide: function (event, ui) {
-          $("#inputPassRisk").val(ui.value + "%");
+          document.getElementById("inputPassRisk").value = getValueString(ui.value);
 
           $.ajax({
             url: '/Member/setTaktik',
@@ -258,7 +260,7 @@
         max: +100,
         step: 10,
         slide: function (event, ui) {
-          $("#inputPassLength").val(ui.value + "%");
+          document.getElementById("inputPassLength").value = getValueString(ui.value);
 
           $.ajax({
             url: '/Member/setTaktik',
@@ -279,7 +281,7 @@
         max: +100,
         step: 10,
         slide: function (event, ui) {
-          $("#inputPassFreq").val(ui.value + "%");
+          document.getElementById("inputPassFreq").value = getValueString(ui.value);
 
           $.ajax({
             url: '/Member/setTaktik',
@@ -363,24 +365,37 @@
       createAutoSubs(0);
 
       setView();
-    });
+    }); // $(document).ready
 
     $(window).resize(function () {
       setView();
     });
 
     function setInputs() {
-      $("#inputAusrichtung").val($("#slider-Ausrichtung").slider("value") + "%");
+      document.getElementById("inputAusrichtung").value = getValueString($("#slider-Ausrichtung").slider("value"));
+
       $("#inputDistOffence").val(-($("#slider-DistOffence").slider("value")));
-      $("#inputEinsatz")    .val($("#slider-Einsatz")    .slider("value") + "%");
-      $("#inputSchussentf") .val($("#slider-Schussentf") .slider("value") + "%");
-      $("#inputZweikampf")  .val($("#slider-Zweikampf")  .slider("value") + "%");
-      $("#inputPassRisk")   .val($("#slider-PassRisk")   .slider("value") + "%");
-      $("#inputPassLength") .val($("#slider-PassLength") .slider("value") + "%");
-      $("#inputPassFreq")   .val($("#slider-PassFreq")   .slider("value") + "%");
-      $("#inputLeft")       .val($("#slider-left")       .slider("value") + "%");
-      $("#inputRight")      .val($("#slider-right")      .slider("value") + "%");
-      $("#inputMid")        .val($("#slider-mid")        .slider("value") + "%");
+
+      document.getElementById("inputEinsatz").value = getValueString($("#slider-Einsatz").slider("value"));
+      document.getElementById("inputSchussentf").value = getValueString(-$("#slider-Schussentf").slider("value"));
+      document.getElementById("inputZweikampf").value = getValueString($("#slider-Zweikampf").slider("value"));
+      document.getElementById("inputPassRisk").value = getValueString($("#slider-PassRisk").slider("value"));
+      document.getElementById("inputPassLength").value = getValueString($("#slider-PassLength").slider("value"));
+      document.getElementById("inputPassFreq").value = getValueString($("#slider-PassFreq").slider("value"));
+
+      $("#inputLeft")       .val( $("#slider-left")       .slider("value") + "%");
+      $("#inputRight")      .val( $("#slider-right")      .slider("value") + "%");
+      $("#inputMid")        .val( $("#slider-mid")        .slider("value") + "%");
+    }
+
+    function getValueString(sSliderValue) {
+      var sValue = "";
+      if (parseInt(sSliderValue) > 0) sValue += '+';
+      else if (parseInt(sSliderValue) == 0) sValue += ' ';
+
+      sValue += sSliderValue.toString() + "%";
+
+      return sValue;
     }
 
     function setStandards(iStd) {
@@ -497,19 +512,19 @@
         divTcSubs.style.left = "10px";
       }
       else {
-        divTcOrientation.style.top = "12%";
+        divTcOrientation.style.top = "11%";
         divTcOffsiteDistOffence.style.top = "20%";
         divTcShootDist.style.left = "58%";
         divTcShootDist.style.transform = "rotate(-23deg)";
-        divTcPassLeft.style.top = "12%";
-        divTcPassRight.style.top = "12%";
-        divTcPassMid.style.top = "12%";
+        divTcPassLeft.style.top = "13%";
+        divTcPassRight.style.top = "13%";
+        divTcPassMid.style.top = "13%";
 
-        divTcPower.style.top = "52%";
-        divTcDuel.style.top = "58%";
-        divTcPassLength.style.top = "52%";
-        divTcPassRisk.style.top = "58%";
-        divTcPassFreq.style.top = "64%";
+        divTcPower.style.top = "53%";
+        divTcDuel.style.top = "60%";
+        divTcPassLength.style.top = "53%";
+        divTcPassRisk.style.top = "60%";
+        divTcPassFreq.style.top = "67%";
 
         divTcPower.style.left = "5%";
         divTcDuel.style.left = "5%";
@@ -517,9 +532,9 @@
         divTcPassRisk.style.left = "55%";
         divTcPassFreq.style.left = "55%";
 
-        divTcOffsite.style.top = "64%";
+        divTcOffsite.style.top = "67%";
 
-        divTcSubs.style.top = "73%";
+        divTcSubs.style.top = "75%";
         divTcSubs.style.left = "20%";
       }
     }
@@ -528,7 +543,6 @@
 
 <body>
   <fieldset>
-    <h3>Taktik</h3>
     <div style="position: relative; width: 100%; height: 100%; min-height: 800px">
       <div style="position: relative; width: 100%; height: 70px">
         <div style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
@@ -551,59 +565,43 @@
         <img style="position: relative; width: 100%" src="~/Content/Images/tactic.png" />
 
         <div id="tactic" style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
-          <div id="divTcOrientation" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 12%; left: 33%">
-            <p>
-              <input type="text" id="inputAusrichtung" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
-            <div id="slider-Ausrichtung" style="position: relative; float: left; height: 100%"></div>
+          <div id="divTcOrientation" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 33%">
+            <input type="text" id="inputAusrichtung" readonly style="position: absolute; border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 37px; width: 44px; left: -6px">
+            <div id="slider-Ausrichtung" style="position: absolute; top: 20px; float: left; height: 100%"></div>
           </div>
 
           <div id="divTcOffsiteDistOffence" style="position: absolute; width: 0%; height: 10%; min-height: 300px; min-height: 100px; top: 20%; left: 18%">
-            <p>
-              <input type="text" id="inputDistOffence" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+            <input type="text" id="inputDistOffence" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
             <div id="slider-DistOffence" style="position: relative; float: left; height: 100%"></div>
           </div>
 
           <div id="divTcShootDist" style="position: absolute; width: 0%; height: 25%; min-height: 300px; top: 2%; left: 58%; transform:rotate(-23deg)">
-            <p>
-              <input type="text" id="inputSchussentf" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
-            <div id="slider-Schussentf" style="position: relative; float: left; height: 100%"></div>
+            <input type="text" id="inputSchussentf" readonly style="position: absolute; border: 0; color:#f6931f; font-weight: bold; text-align: left; background-color: transparent; float: left; width: 44px; left: -6px">
+            <div id="slider-Schussentf" style="position: absolute; top: 20px; float: left; height: 100%"></div>
           </div>
 
-          <div id="divTcPassLeft" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 12%; left: 5%">
-            <p>
-              <input type="text" id="inputLeft" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+          <div id="divTcPassLeft" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 5%">
+            <input type="text" id="inputLeft" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
             <div id="slider-left" style="position: relative; float: left; height: 100%"></div>
           </div>
 
-          <div id="divTcPassRight" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 12%; right: 5%">
-            <p>
-              <input type="text" id="inputRight" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: right; float: right; width: 37px; right: 0px">
-            </p>
+          <div id="divTcPassRight" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; right: 5%">
+            <input type="text" id="inputRight" readonly style="border: 0; color:#f6931f; font-weight: bold; text-align: right; float: right; width: 37px; right: 0px">
             <div id="slider-right" style="position: relative; float: right; height: 100%; right: 0px"></div>
           </div>
 
-          <div id="divTcPassMid" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 12%; left: 50%">
-            <p>
-              <input type="text" id="inputMid" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+          <div id="divTcPassMid" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 50%">
+            <input type="text" id="inputMid" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 37px; left: 0px">
             <div id="slider-mid" style="position: relative; float: left; height: 100%"></div>
           </div>
 
           <div id="divTcPower" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 5%">
-            <p>
-              <input type="text" id="inputEinsatz" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+            <input type="text" id="inputEinsatz" readonly style="border:0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
             <div id="slider-Einsatz" style="position: relative; float: left"></div>
           </div>
 
           <div id="divTcDuel" style="position: absolute; width: 40%; min-width: 300px; top: 58%; left: 5%">
-            <p>
-              <input type="text" id="inputZweikampf" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+            <input type="text" id="inputZweikampf" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
             <div id="slider-Zweikampf" style="position: relative; float: left"></div>
           </div>
 
@@ -615,25 +613,19 @@
           </div>
 
           <div id="divTcPassLength" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 55%">
-            <p>
-              <input type="text" id="inputPassLength" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+            <input type="text" id="inputPassLength" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; background-color: transparent; float: left; width: 46px; left: 0px">
             <div id="slider-PassLength" style="position: relative; float: left"></div>
           </div>
           <div id="divTcPassRisk" style="position: absolute; width: 40%; min-width: 300px; top: 58%; left: 55%">
-            <p>
-              <input type="text" id="inputPassRisk" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+            <input type="text" id="inputPassRisk" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
             <div id="slider-PassRisk" style="position: relative; float: left"></div>
           </div>
           <div id="divTcPassFreq" style="position: absolute; width: 40%; min-width: 300px; top: 64%; left: 55%">
-            <p>
-              <input type="text" id="inputPassFreq" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            </p>
+            <input type="text" id="inputPassFreq" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
             <div id="slider-PassFreq" style="position: relative; float: left"></div>
           </div>
 
-          <div id="divTcSubs" style="position: absolute; width: 60%; min-width: 300px; top: 73%; left: 20%; text-align: center">
+          <div id="divTcSubs" style="position: absolute; width: 60%; min-width: 300px; top: 80%; left: 20%; text-align: center">
             @for (byte i = 0; i < 3; i++) {
               var htmlAttributesEditorFor = new Dictionary<string, object>
               {

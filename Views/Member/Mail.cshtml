@@ -75,15 +75,16 @@
           bnReply.disabled = true;
           bnDelete.disabled = true;
         } else {
+          var tr = $(this);
           tblMail.$('tr.selected').removeClass('selected');
-          $(this).addClass('selected');
+          tr.addClass('selected');
 
           var data = tblMail.row('.selected').data();
           if (data) {
             tbNewMail.value = data.sText;
 
             if (data.sFromId) {
-              bnReply.disabled = false;
+              bnReply .disabled = false;
               bnDelete.disabled = false;
             }
 
@@ -93,7 +94,7 @@
               dataType: "json",
               data: { sDate: data.sDt, sFrom: data.sFromId },
               success: function () {
-                tblMail.ajax.reload();
+                tr.children("td").css({ "font-weight": "normal" });
               }
             });
           }
@@ -160,12 +161,14 @@
               dataType: "json",
               data: { sDate: data.sDt, sFrom: data.sFromId },
               success: function () {
-                /*
+                tbNewMail = document.getElementById("tbNewMail");
+
                 tblMail.ajax.reload();
                 tbNewMail.value = "";
                 bnSend.disabled = true;
                 bnReply.disabled = true;
                 bnDelete.disabled = true;
+                /*
                 */
               }
             });
@@ -187,7 +190,7 @@
 </head>
 
 <h2>Postfach</h2>
-<table id="tblMail" cellspacing="0" style="width: auto; max-width: 100%; left: 0px" class="display responsive nowrap">
+<table id="tblMail" cellspacing="0" style="width: auto; max-width: 100%; left: 0px; cursor: pointer" class="display responsive nowrap">
   <thead>
     <tr>
       <th>#</th>

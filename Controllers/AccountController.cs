@@ -302,7 +302,7 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       if (clb != null && fileEmblem != null) {
-        Task<bool> tkUploadEmblem = Task.Run(async () => await uploadFileAsync(fileEmblem, clb.iId));
+        Task<bool> tkUploadEmblem = Task.Run(async () => await uploadFileAsync(fileEmblem, "emblems", clb.iId));
       }
 
 #if DEBUG
@@ -382,12 +382,12 @@ namespace CornerkickWebMvc.Controllers
       clb.ltTactic[0].formation = MvcApplication.ckcore.ltFormationen[7];
 
 #if DEBUG
-      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 2 });
-      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 3 });
-      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 4 });
-      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 6 });
-      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 9 });
-      clb.training.ltUnit.Add(new CornerkickManager.Main.Training.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 1 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.TrainingPlan.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 2 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.TrainingPlan.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 3 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.TrainingPlan.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 4 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.TrainingPlan.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 6 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.TrainingPlan.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 9 });
+      clb.training.ltUnit.Add(new CornerkickManager.Main.TrainingPlan.Unit() { dt = MvcApplication.ckcore.dtDatum.Date.AddDays(1).Add(new TimeSpan(9, 30, 0)), iType = 1 });
 #endif
 
       for (byte iB = 0; iB < 3; iB++) {
@@ -408,7 +408,7 @@ namespace CornerkickWebMvc.Controllers
       clb.staff = new CornerkickManager.Main.Staff();
 
       // Clear training
-      clb.training = new CornerkickManager.Main.Training();
+      clb.training = new CornerkickManager.Main.TrainingPlan();
 
       // Clear captain
       clb.iCaptainId = new int[3] { -1, -1, -1 };
@@ -634,7 +634,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public static async Task<bool> uploadFileAsync(HttpPostedFileBase file, int iClub)
+    public static async Task<bool> uploadFileAsync(HttpPostedFileBase file, string sFolder, int iFileId)
     {
 #if DEBUG
       //return false;
@@ -643,6 +643,7 @@ namespace CornerkickWebMvc.Controllers
       try {
         if (file != null && file.ContentLength > 0) {
           string sFileExt = Path.GetExtension(file.FileName);
+          //string sFileExt = ".png";
 
           // Get base directory
           string sBaseDir = CornerkickManager.Main.sHomeDir;
@@ -651,12 +652,22 @@ namespace CornerkickWebMvc.Controllers
           sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
 #endif
 
-          string sFilenameLocal = Path.Combine(sBaseDir, "Content", "Uploads", "emblems", iClub.ToString() + sFileExt);
-          MvcApplication.ckcore.tl.writeLog("Save emblem to '" + sFilenameLocal + "'");
+          string sFileParentDir = Path.Combine(sBaseDir, "Content", "Uploads", sFolder);
+
+          // Create directory if not existing
+          if (!Directory.Exists(sFileParentDir)) Directory.CreateDirectory(sFileParentDir);
+
+          string sFilenameLocal = Path.Combine(sFileParentDir, iFileId.ToString() + sFileExt);
+          MvcApplication.ckcore.tl.writeLog("Save file to '" + sFilenameLocal + "'");
           file.SaveAs(sFilenameLocal);
 
+          if (!Path.GetExtension(file.FileName).Equals(".png")) {
+            System.Drawing.Image img = System.Drawing.Image.FromFile(sFilenameLocal);
+            img.Save(Path.Combine(sFileParentDir, iFileId.ToString() + ".png"), System.Drawing.Imaging.ImageFormat.Png);
+          }
+
           AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
-          as3.uploadFile(sFilenameLocal, "emblems/" + iClub.ToString() + sFileExt, "image/custom");
+          as3.uploadFile(sFilenameLocal, sFolder + "/" + iFileId.ToString() + ".png", "image/custom");
         }
 
         return true;
@@ -715,6 +726,8 @@ namespace CornerkickWebMvc.Controllers
 
       if (!ModelState.IsValid) return View(model);
 
+      if (!MvcApplication.settings.bLoginPossible) return View(model);
+
       if (MvcApplication.settings.bEmailCertification) {
         // Require the user to have a confirmed email before they can log on.
         var user = await UserManager.FindByNameAsync(model.Email);
@@ -745,9 +758,21 @@ namespace CornerkickWebMvc.Controllers
 
           iniCk();
 
+          string sNoLoginMailList = ConfigurationManager.AppSettings["ckNoLoginMail"];
+          bool bNoLoginMail = false;
+
 #if !DEBUG
+          if (!string.IsNullOrEmpty(sNoLoginMailList)) {
+            foreach (string sNoMail in sNoLoginMailList.Split(';')) {
+              if (sNoMail.Equals(model.Email, StringComparison.CurrentCultureIgnoreCase)) {
+                bNoLoginMail = true;
+                break;
+              }
+            }
+          }
+
           // Send mail to admin
-          if (!model.Email.Equals("s.jan@web.de")) {
+          if (!bNoLoginMail) {
             try {
               await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "User login: " + model.Email, model.Email + " has logged in");
             } catch {

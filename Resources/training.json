@@ -1,0 +1,210 @@
+{
+  "training":
+    [
+      {
+        "id": -1,
+        "name": "Nachtruhe",
+        "condi":  0.0,
+        "fresh": +7.5,
+        "moral": +0.0,
+        "injuryrisk": 0.0,
+        "skillbonus":
+          [
+          ]
+      },
+      {
+        "id": 0,
+        "name": "Frei",
+        "condi": -2.0,
+        "fresh": +5.0,
+        "moral": +1.0,
+        "injuryrisk": 0.0,
+        "skillbonus":
+          [
+          ]
+      },
+      {
+        "id": 1,
+        "name": "Regeneration",
+        "condi":  -1.2,
+        "fresh": +20.0,
+        "moral":   0.0,
+        "injuryrisk": 0.0,
+        "skillbonus":
+          [
+          ]
+      },
+      {
+        "id": 2,
+        "name": "Kondition",
+        "condi": +0.80,
+        "fresh": -3.50,
+        "moral": -1.00,
+        "injuryrisk": 0.002,
+        "skillbonus":
+          [
+          ]
+      },
+      {
+        "id": 3,
+        "name": "Spritzigkeit",
+        "condi": +0.83,
+        "fresh": -1.75,
+        "moral": -0.70,
+        "injuryrisk": 0.003,
+        "skillbonus":
+          [
+            { "skill":  0, "bonus": 0.01, "exclude": 0 },
+            { "skill": 16, "bonus": 0.01, "exclude": 0 }
+          ]
+      },
+      {
+        "id": 4,
+        "name": "Zweikämpfe",
+        "condi": +0.86,
+        "fresh": -1.72,
+        "moral": -0.50,
+        "injuryrisk": 0.003,
+        "skillbonus":
+          [
+            { "skill": 2, "bonus": 0.01, "exclude": 0 },
+            { "skill": 3, "bonus": 0.01, "exclude": 0 }
+          ]
+      },
+      {
+        "id": 5,
+        "name": "5 gegen 2",
+        "condi": +0.88,
+        "fresh": -1.50,
+        "moral": -0.40,
+        "injuryrisk": 0.001,
+        "skillbonus":
+          [
+            { "skill": 1, "bonus": 0.01, "exclude": 0 },
+            { "skill": 4, "bonus": 0.01, "exclude": 0 },
+            { "skill": 5, "bonus": 0.01, "exclude": 0 }
+          ]
+      },
+      {
+        "id": 6,
+        "name": "Torschüsse",
+        "condi": -0.4,
+        "fresh": -1.5,
+        "moral": -0.2,
+        "injuryrisk": 0.001,
+        "skillbonus":
+          [
+            { "skill":  8, "bonus": 0.01, "exclude": 2 },
+            { "skill":  9, "bonus": 0.01, "exclude": 2 },
+            { "skill": 13, "bonus": 0.01, "exclude": 1 },
+            { "skill": 14, "bonus": 0.01, "exclude": 1 }
+          ]
+      },
+      {
+        "id": 7,
+        "name": "Flanken/Abschluss",
+        "condi": -0.4,
+        "fresh": -1.5,
+        "moral": -0.3,
+        "injuryrisk": 0.001,
+        "skillbonus":
+          [
+            { "skill":  6, "bonus": 0.010, "exclude": 2 },
+            { "skill":  7, "bonus": 0.010, "exclude": 2 },
+            { "skill": 10, "bonus": 0.010, "exclude": 2 },
+            { "skill": 13, "bonus": 0.003, "exclude": 1 },
+            { "skill": 14, "bonus": 0.003, "exclude": 1 },
+            { "skill": 15, "bonus": 0.010, "exclude": 1 }
+          ]
+      },
+      {
+        "id": 8,
+        "name": "Standardsituationen",
+        "condi": -0.4,
+        "fresh": -1.5,
+        "moral": -0.3,
+        "injuryrisk": 0.0005,
+        "skillbonus":
+          [
+            { "skill": 10, "bonus": 0.010, "exclude": 2 },
+            { "skill": 11, "bonus": 0.010, "exclude": 2 },
+            { "skill": 12, "bonus": 0.010, "exclude": 2 },
+            { "skill": 13, "bonus": 0.003, "exclude": 1 },
+            { "skill": 14, "bonus": 0.003, "exclude": 1 },
+            { "skill": 15, "bonus": 0.003, "exclude": 1 }
+          ]
+      },
+      {
+        "id": 9,
+        "name": "Trainingsspiel",
+        "condi": +0.86,
+        "fresh": -1.75,
+        "moral": -0.30,
+        "injuryrisk": 0.003,
+        "skillbonus":
+          [
+            { "skill":  1, "bonus": 0.003, "exclude": 0 },
+            { "skill":  2, "bonus": 0.003, "exclude": 0 },
+            { "skill":  3, "bonus": 0.003, "exclude": 0 },
+            { "skill":  4, "bonus": 0.003, "exclude": 0 },
+            { "skill":  5, "bonus": 0.003, "exclude": 0 },
+            { "skill":  6, "bonus": 0.003, "exclude": 0 },
+            { "skill":  7, "bonus": 0.003, "exclude": 0 },
+            { "skill": 10, "bonus": 0.003, "exclude": 0 }
+          ]
+      },
+      {
+        "id": 10,
+        "name": "Fussballtennis",
+        "condi": -0.2,
+        "fresh": -2.0,
+        "moral": -0.2,
+        "injuryrisk": 0.001,
+        "skillbonus":
+          [
+            { "skill":  1, "bonus": 0.010, "exclude": 0 },
+            { "skill": 10, "bonus": 0.003, "exclude": 0 }
+          ]
+      },
+      {
+        "id": 11,
+        "name": "Kopfballpendel",
+        "condi": -0.2,
+        "fresh": -2.0,
+        "moral": -0.4,
+        "injuryrisk": 0.001,
+        "skillbonus":
+          [
+            { "skill": 10, "bonus": 0.03, "exclude": 0 }
+          ]
+      },
+      {
+        "id": 12,
+        "name": "Yoga",
+        "condi":  -1.2,
+        "fresh": +10.0,
+        "moral":  +0.3,
+        "injuryrisk": 0.0,
+        "skillbonus":
+          [
+            { "skill":  1, "bonus": 0.003, "exclude": 2 },
+            { "skill": 13, "bonus": 0.003, "exclude": 1 }
+          ]
+      },
+      {
+        "id": 13,
+        "name": "Elfmeterschießen",
+        "condi": -0.6,
+        "fresh": -0.5,
+        "moral": -0.2,
+        "injuryrisk": 0.0005,
+        "skillbonus":
+          [
+            { "skill": 12, "bonus": 0.030, "exclude": 2 },
+            { "skill": 13, "bonus": 0.010, "exclude": 1 },
+            { "skill": 14, "bonus": 0.003, "exclude": 1 }
+          ]
+      }
+    ]
+}
+

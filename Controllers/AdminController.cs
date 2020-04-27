@@ -44,6 +44,7 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.sStartHour = "";
       if (MvcApplication.settings.iStartHour >= 0) modelAdmin.sStartHour = MvcApplication.settings.iStartHour.ToString();
       if (MvcApplication.ckcore.ltUser.Count > 0 && MvcApplication.ckcore.ltUser[0].nextGame != null) modelAdmin.iGameSpeed = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
+      modelAdmin.bLoginPossible      = MvcApplication.settings.bLoginPossible;
       modelAdmin.bEmailCertification = MvcApplication.settings.bEmailCertification;
       modelAdmin.bRegisterDuringGame = MvcApplication.settings.bRegisterDuringGame;
 
@@ -51,6 +52,10 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.nClubs  = MvcApplication.ckcore.ltClubs .Count;
       modelAdmin.nUser   = MvcApplication.ckcore.ltUser  .Count;
       modelAdmin.nPlayer = MvcApplication.ckcore.ltPlayer.Count;
+
+      modelAdmin.dtCkCurrent = MvcApplication.ckcore.dtDatum;
+      modelAdmin.dtCkApproach = MvcApplication.getCkApproachDate();
+      modelAdmin.fIntervalAveToApproachTarget = MvcApplication.getIntervalAve();
 
       // Files
       string sHomeDir = getHomeDir();
@@ -180,10 +185,11 @@ namespace CornerkickWebMvc.Controllers
       return RedirectToAction("Settings");
     }
 
-    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame)
+    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame, bool bLoginPossible)
     {
       MvcApplication.settings.bEmailCertification = bEmailCertification;
       MvcApplication.settings.bRegisterDuringGame = bRegisterDuringGame;
+      MvcApplication.settings.bLoginPossible      = bLoginPossible;
     }
 
     public ActionResult Log(Models.AdminModel modelAdmin)
@@ -276,7 +282,7 @@ namespace CornerkickWebMvc.Controllers
       // then get files
       //return Json(d.GetFiles("*").ToArray(), JsonRequestBehavior.AllowGet);
       foreach (FileInfo fi in d.GetFiles("*")) {
-        sContent += fi.Name + '\n';
+        sContent += fi.Name + " (" + fi.Length.ToString() + "b)\n";
       }
 
       return Json(sContent, JsonRequestBehavior.AllowGet);

@@ -18,9 +18,11 @@ namespace CornerkickWebMvc.Models
     public bool bOwnPlayer { get; set; }
     public bool bJouth { get; set; }
     public bool bJouthBelow16 { get; set; }
+    public bool bJouthWithContract { get; set; }
     public bool bNation { get; set; }
 
     // Emblem
+    public string sPortrait { get; set; }
     public string sEmblem { get; set; }
 
     public string sColorJersey { get; set; }

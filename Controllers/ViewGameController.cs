@@ -93,6 +93,7 @@ namespace CornerkickWebMvc.Controllers
 
       List<FileInfo> fiGames = getFileInfoGames(clubUser);
 
+      // Insert past games into dropdownmenu
       foreach (FileInfo ckg in fiGames) {
         DateTime dtGame;
         int iTeamIdH;
@@ -114,12 +115,13 @@ namespace CornerkickWebMvc.Controllers
         string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
         try {
           user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
-        } catch {
-          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", CornerkickManager.Main.sErrorFile);
+        } catch (Exception e) {
+          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
         }
       }
 
       // Insert next games
+      /*
       List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clubUser, MvcApplication.ckcore.dtDatum);
       for (byte j = 0; j < ltGdNextGames.Count; j++) {
         CornerkickGame.Game.Data gd = ltGdNextGames[j];
@@ -128,6 +130,7 @@ namespace CornerkickWebMvc.Controllers
           Value = (-j - 1).ToString()
         });
       }
+      */
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
       view.ddlDuels  = new List<SelectListItem>(view.ddlHeatmap);
@@ -151,7 +154,7 @@ namespace CornerkickWebMvc.Controllers
 
         int iG = 0;
         foreach (FileInfo ckg in ltCkgFiles) {
-          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
+          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('x');
           if (sFilenameData.Length < 3) continue;
 
           DateTime dtGame = new DateTime();
@@ -174,14 +177,14 @@ namespace CornerkickWebMvc.Controllers
       iTeamIdH = -1;
       iTeamIdA = -1;
 
-      string[] sFilenameData = Path.GetFileNameWithoutExtension(fiGame.Name).Split('_');
+      string[] sFilenameData = Path.GetFileNameWithoutExtension(fiGame.Name).Split('x');
       if (sFilenameData.Length < 3) return null;
 
       // Date/Time
-      if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) return null;
+      if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd_HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) return null;
 
       // Team names
-      string[] sFilenameDataTeamIds = sFilenameData[2].Split('-');
+      string[] sFilenameDataTeamIds = sFilenameData[2].Split('_');
       if (!int.TryParse(sFilenameDataTeamIds[0], out iTeamIdH)) return null;
       if (!int.TryParse(sFilenameDataTeamIds[1], out iTeamIdA)) return null;
 
@@ -214,6 +217,7 @@ namespace CornerkickWebMvc.Controllers
       view.sColorJerseyA = new string[4] { "white", "red",  "red",  "white" };
 
       if (game == null) {
+        view.gD = new Models.ViewGameModel.gameData();
         view.gD.iGoalsH = -1;
         view.gD.iGoalsA = -1;
 
@@ -272,6 +276,7 @@ namespace CornerkickWebMvc.Controllers
       // Add player to heatmap
       for (byte iHA = 0; iHA < 2; iHA++) {
         for (byte iPl = 0; iPl < game.data.nPlStart; iPl++) {
+          if (game.player[iHA][iPl] == null) continue;
           view.ddlHeatmap.Add(new SelectListItem { Text = "(" + sHA[iHA] + ") " + game.player[iHA][iPl].sName + " - " + game.player[iHA][iPl].iNr, Value = (2 + (iHA * game.data.nPlStart) + iPl).ToString() });
         }
       }
@@ -361,6 +366,7 @@ namespace CornerkickWebMvc.Controllers
           if (iState < 0) pl = user.game.player[iHA][iP];
           else            pl = state.player[iHA][iP];
 
+          if (pl == null) continue;
           if (string.IsNullOrEmpty(pl.sName)) continue;
 
           if      (pl.bYellowCard)                              gPlayer.iCard = 1;
@@ -800,16 +806,46 @@ namespace CornerkickWebMvc.Controllers
       if (iHA   >= 0 && plShoot.iHA    != iHA)   return ltDrawLine;
       if (iPlIx >= 0 && plShoot.iIndex != iPlIx) return ltDrawLine;
 
+      string sTitle = "";
+      if (state.shoot.fChanceOnGoal > 0f) {
+        sTitle += "<div align=\"right\">";
+
+        if (state.shoot.iResult > 1 && state.shoot.iResult < 5) sTitle += "<strong>";
+        sTitle += "Gehalten: " + 0.ToString("0.0%") + " .. " + state.shoot.fChanceKeeperSave.ToString("0.0%");
+        if (state.shoot.iResult > 1 && state.shoot.iResult < 5) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        if (state.shoot.iResult == 1) sTitle += "<strong>";
+        sTitle += "Tor: " + state.shoot.fChanceKeeperSave.ToString("0.0%") + " .. " + state.shoot.fChanceOnGoal.ToString("0.0%");
+        if (state.shoot.iResult == 1) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        if (state.shoot.iResult == 5 || state.shoot.iResult == 6) sTitle += "<strong>";
+        sTitle += "Alu: " + state.shoot.fChanceOnGoal.ToString("0.0%") + " .. " + (state.shoot.fChanceOnGoal + state.shoot.fChancePostBar).ToString("0.0%");
+        if (state.shoot.iResult == 5 || state.shoot.iResult == 6) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        if (state.shoot.iResult == 0) sTitle += "<strong>";
+        sTitle += "Daneben: " + (state.shoot.fChanceOnGoal + state.shoot.fChancePostBar).ToString("0.0%") + " .. " + 1.ToString("0.0%");
+        if (state.shoot.iResult == 0) sTitle += "</strong>";
+        sTitle += "<br/>";
+
+        sTitle += "<strong>Ergebnis: " + state.shoot.fRnd.ToString("0.0%") + "</strong>";
+
+        sTitle += "</div>";
+      }
+
       Models.ViewGameModel.drawLine drawLine = new Models.ViewGameModel.drawLine();
 
       drawLine.X0 = plShoot.ptPos.X;
       drawLine.Y0 = plShoot.ptPos.Y;
       if (state.shoot.iResult == 3) { // keeper
-        CornerkickGame.Player plKeeper = CornerkickGame.Tool.getKeeper(game.player[plShoot.iHA], game.iSuspensionIx, game.tc[plShoot.iHA].formation, game.ptPitch, game.data.nPlStart);
+        CornerkickGame.Player plKeeper = CornerkickGame.Tool.getKeeper(game.player[1 - plShoot.iHA], game.iSuspensionIx, game.tc[plShoot.iHA].formation, game.ptPitch, game.data.nPlStart);
 
         drawLine.X1 = plKeeper.ptPos.X;
         drawLine.Y1 = plKeeper.ptPos.Y;
         drawLine.sColor = "yellow";
+        drawLine.sTitle = sTitle;
 
         ltDrawLine.Add(drawLine);
 
@@ -820,6 +856,7 @@ namespace CornerkickWebMvc.Controllers
         drawLine.X1 = (1 - state.shoot.iHA) * game.ptPitch.X;
         drawLine.Y1 = -2;
         drawLine.sColor = "yellow";
+        drawLine.sTitle = sTitle;
 
         ltDrawLine.Add(drawLine);
 
@@ -830,6 +867,7 @@ namespace CornerkickWebMvc.Controllers
         drawLine.X1 = (1 - state.shoot.iHA) * game.ptPitch.X;
         drawLine.Y1 = 0;
         drawLine.sColor = "yellow";
+        drawLine.sTitle = sTitle;
 
         ltDrawLine.Add(drawLine);
 
@@ -842,6 +880,8 @@ namespace CornerkickWebMvc.Controllers
       if      (state.shoot.iResult == 1)                             drawLine.sColor = "red";
       else if (state.shoot.iResult == 0 || state.shoot.iResult == 7) drawLine.sColor = "cyan";
       else                                                           drawLine.sColor = "yellow";
+
+      drawLine.sTitle = sTitle;
 
       ltDrawLine.Add(drawLine);
 
@@ -879,8 +919,26 @@ namespace CornerkickWebMvc.Controllers
 
       if (iPlIx >= 0 && plDef.iIndex != iPlIx && plOff.iIndex != iPlIx) return "";
 
-      string sDuelDesc = MvcApplication.ckcore.ui.getMinuteString(state.duel.tsMinute, false) +
-                         " - " + state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
+      string sDuelDesc = MvcApplication.ckcore.ui.getMinuteString(state.duel.tsMinute, false) + " Min.: " +
+                         state.duel.plDef.sName + " vs. " + state.duel.plOff.sName;
+      sDuelDesc += "<br/>";
+
+      if (state.duel.iResult > 1) sDuelDesc += "<strong>";
+      sDuelDesc += "Foul: " + 0.ToString("0.0%") + " .. " + state.duel.fChanceFoul.ToString("0.0%");
+      if (state.duel.iResult > 1) sDuelDesc += "</strong>";
+      sDuelDesc += "<br/>";
+
+      if (state.duel.iResult == 1) sDuelDesc += "<strong>";
+      sDuelDesc += "Def.: " + state.duel.fChanceFoul.ToString("0.0%") + " .. " + (state.duel.fChanceFoul + state.duel.fChanceWinDef).ToString("0.0%");
+      if (state.duel.iResult == 1) sDuelDesc += "</strong>";
+      sDuelDesc += "<br/>";
+
+      if (state.duel.iResult == 0) sDuelDesc += "<strong>";
+      sDuelDesc += "Off.: " + (state.duel.fChanceFoul + state.duel.fChanceWinDef).ToString("0.0%").PadLeft(5) + " .. 100.0%";
+      if (state.duel.iResult == 0) sDuelDesc += "</strong>";
+      sDuelDesc += "<br/>";
+
+      sDuelDesc += "<strong>Ergebnis: " + state.duel.fRnd.ToString("0.0%") + "</strong>";
 
       string sDefOff = "off";
       if (iHA >= 0 && iHA != state.duel.plOff.iHA) sDefOff = "def";
@@ -896,7 +954,11 @@ namespace CornerkickWebMvc.Controllers
         else if (state.duel.iResult == 5) sImg = "rCard";
       }
 
-      return "<img src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; width: 12px; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; z-index: 99\" title=\"" + sDuelDesc + "\" />";
+      string sDuelIcon = "<div style=\"position: absolute; top: " + ((plDef.ptPos.Y + game.ptPitch.Y) / (float)(2 * game.ptPitch.Y)).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; left: " + (plDef.ptPos.X / (float)game.ptPitch.X).ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; z-index: 99\">";
+      sDuelIcon += "<img class=\"tooltipDuel\" src=\"/Content/Icons/" + sImg + ".png\" alt=\"Karte\" style=\"position: relative; width: 12px\" title=\"" + sDuelDesc + "\"/>";
+      sDuelIcon += "</div>";
+
+      return sDuelIcon;
     }
 
     public Models.ViewGameModel.gameData getAllGameData(Models.ViewGameModel view, int iState = -1)
