@@ -431,6 +431,7 @@ namespace CornerkickWebMvc.Controllers
       public string sDate { get; set; }
       public string sText { get; set; }
       public bool   bOld { get; set; }
+      public string sHeader { get; set; }
     }
 
     public JsonResult DeskGetNews()
@@ -528,49 +529,62 @@ namespace CornerkickWebMvc.Controllers
       usr.lti[0] = iDeleteAfter;
     }
 
-    public JsonResult DeskGetNewspaper()
+    public ContentResult DeskGetNewspaper()
     {
       CornerkickManager.User usr = ckUser();
-      if (usr == null) return Json(null, JsonRequestBehavior.AllowGet);
-      if (usr.ltNews == null) return Json(null, JsonRequestBehavior.AllowGet);
+      if (usr == null) return Content(null, "application/json");
+      if (usr.ltNews == null) return Content(null, "application/json");
 
       CornerkickManager.Club clb = ckClub();
 
       List<DatatableNews> ltNews = new List<DatatableNews>();
 
-      byte[] iNewspaperTypes = new byte[] { 1, 2, 3 };
-      for (int iN = 0; iN < usr.ltNews.Count; iN++) {
-        CornerkickManager.Main.News news = usr.ltNews[iN];
-
-        if (news.iType == 1) {
-          string sN = news.sText;
-
-          foreach (CornerkickGame.Player pl in clb.ltPlayer) {
-            if (sN.Contains(pl.sName)) {
-              sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
-              break;
-            }
-          }
-
-          foreach (CornerkickGame.Player pl in clb.ltPlayerJouth) {
-            if (sN.Contains(pl.sName)) {
-              sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
-              break;
-            }
-          }
-
-          DatatableNews dtn = new DatatableNews();
-          dtn.iId = iN;
-          dtn.sDate = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi());
-          dtn.sText = sN;
-          dtn.iType = news.iType;
-          dtn.bOld = news.bRead;
-
-          ltNews.Add(dtn);
-        }
+      List<CornerkickManager.Main.News> ltCkNews = new List<CornerkickManager.Main.News>(usr.ltNews);
+      foreach (CornerkickManager.Main.News news0 in MvcApplication.ckcore.ltUser[0].ltNews) {
+        if (news0.iType == 200) ltCkNews.Add(news0);
       }
 
-      return Json(new { aaData = ltNews }, JsonRequestBehavior.AllowGet);
+      try {
+        byte[] iNewspaperTypes = new byte[] { CornerkickManager.Main.iNewsTypeNewYear, CornerkickManager.Main.iNewsTypeCupWin, 200 };
+        for (int iN = 0; iN < ltCkNews.Count; iN++) {
+          CornerkickManager.Main.News news = ltCkNews[iN];
+
+          if (iNewspaperTypes.Contains(news.iType)) {
+            string sN = news.sText;
+
+            foreach (CornerkickGame.Player pl in clb.ltPlayer) {
+              if (sN.Contains(pl.sName)) {
+                sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
+                break;
+              }
+            }
+
+            foreach (CornerkickGame.Player pl in clb.ltPlayerJouth) {
+              if (sN.Contains(pl.sName)) {
+                sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
+                break;
+              }
+            }
+
+            DatatableNews dtn = new DatatableNews();
+            dtn.iId = news.iId;
+            dtn.sDate = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi());
+            dtn.sText = sN;
+            dtn.iType = news.iType;
+            dtn.sHeader = news.sFromId;
+
+            ltNews.Add(dtn);
+          }
+        }
+      } catch (Exception e) {
+        Console.WriteLine(e.Message);
+      }
+
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(ltNews.ToArray(), _jsonSetting), "application/json");
+      //return Json(new { aaData = ltNews.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
     public ContentResult GetLastGames()
@@ -2921,9 +2935,22 @@ namespace CornerkickWebMvc.Controllers
         return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
       } else {
         if (MvcApplication.ckcore.tr.putPlayerOnTransferlist(iPlayerId, 0) == 2) {
-          return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " kann in dieser Saison den Verein nicht mehr wechslen", JsonRequestBehavior.AllowGet);
+          return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " kann in dieser Saison den Verein nicht mehr wechseln", JsonRequestBehavior.AllowGet);
         }
 
+        string sNewsPaper1 = pl.sName + " steht zum Verkauf!";
+
+        string sNewsPaper2 = "Nach übereinstimmenden Medienberichten stehen die Zeichen zwischen ";
+        CornerkickManager.Club clbPlayer = null;
+        if (pl.iClubId >= 0 && pl.iClubId < MvcApplication.ckcore.ltClubs.Count) clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
+        if (clbPlayer != null) {
+          sNewsPaper2 = "Nach übereinstimmenden Medienberichten stehen die Zeichen zwischen ";
+          sNewsPaper2 += clbPlayer.sName;
+          sNewsPaper2 += " und " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ") auf Abschied.";
+          //sNewsPaper2 += " Die kolportierte Ablösesumme soll bei ca. " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. liegen";
+        }
+        MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
+        
         return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
       }
 

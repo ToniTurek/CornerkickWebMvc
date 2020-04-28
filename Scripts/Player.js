@@ -467,6 +467,34 @@ function setMoodText(fMood) {
   }
 }
 
+function getPortrait(iPlayerId, sStyle) {
+  var sImg = '';
+
+  //sImg += ' onerror="if (this.src!=/Content/Images/Portraits/0.png) this.src=/Content/Images/Portraits/0.png;"';
+  sImg += '<object data="/Content/Uploads/Portraits/' + iPlayerId.toString() + '.png"';
+  sImg += ' style="';
+  if (sStyle) {
+    sImg += sStyle;
+  } else {
+    sImg += 'width: 64px';
+  }
+  sImg += '"/>';
+
+  sImg += '<img src="/Content/Images/Portraits/0.png"';
+
+  sImg += ' style="';
+  if (sStyle) {
+    sImg += sStyle;
+  } else {
+    sImg += 'width: 64px';
+  }
+  sImg += '"/>';
+
+  sImg += '</object>';
+
+  return sImg;
+}
+
 function getNatIcon(sNat, sStyle) {
   var sIcon = '<img src="/Content/Icons/flags/';
 
