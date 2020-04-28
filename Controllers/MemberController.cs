@@ -541,15 +541,15 @@ namespace CornerkickWebMvc.Controllers
 
       List<CornerkickManager.Main.News> ltCkNews = new List<CornerkickManager.Main.News>(usr.ltNews);
       foreach (CornerkickManager.Main.News news0 in MvcApplication.ckcore.ltUser[0].ltNews) {
-        if (news0.iType == 200) ltCkNews.Add(news0);
+        if (news0.iType >= 200) ltCkNews.Add(news0);
       }
 
       try {
-        byte[] iNewspaperTypes = new byte[] { CornerkickManager.Main.iNewsTypeNewYear, CornerkickManager.Main.iNewsTypeCupWin, 200 };
-        for (int iN = 0; iN < ltCkNews.Count; iN++) {
+        byte[] iNewspaperTypes = new byte[] { CornerkickManager.Main.iNewsTypeNewYear, CornerkickManager.Main.iNewsTypeCupWin };
+        for (int iN = ltCkNews.Count - 1; iN >= 0; iN--) {
           CornerkickManager.Main.News news = ltCkNews[iN];
 
-          if (iNewspaperTypes.Contains(news.iType)) {
+          if (iNewspaperTypes.Contains(news.iType) || news.iType >= 200) {
             string sN = news.sText;
 
             foreach (CornerkickGame.Player pl in clb.ltPlayer) {
@@ -2938,23 +2938,36 @@ namespace CornerkickWebMvc.Controllers
           return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " kann in dieser Saison den Verein nicht mehr wechseln", JsonRequestBehavior.AllowGet);
         }
 
-        string sNewsPaper1 = pl.sName + " steht zum Verkauf!";
+        if (checkIfTop10Player(pl)) {
+          string sNewsPaper1 = pl.sName + " steht zum Verkauf!";
 
-        string sNewsPaper2 = "Nach übereinstimmenden Medienberichten stehen die Zeichen zwischen ";
-        CornerkickManager.Club clbPlayer = null;
-        if (pl.iClubId >= 0 && pl.iClubId < MvcApplication.ckcore.ltClubs.Count) clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
-        if (clbPlayer != null) {
-          sNewsPaper2 = "Nach übereinstimmenden Medienberichten stehen die Zeichen zwischen ";
-          sNewsPaper2 += clbPlayer.sName;
-          sNewsPaper2 += " und " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ") auf Abschied.";
-          //sNewsPaper2 += " Die kolportierte Ablösesumme soll bei ca. " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. liegen";
+          string sNewsPaper2 = "";
+          CornerkickManager.Club clbPlayer = null;
+          if (pl.iClubId >= 0 && pl.iClubId < MvcApplication.ckcore.ltClubs.Count) clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
+          if (clbPlayer != null) {
+            sNewsPaper2 = "Nach übereinstimmenden Medienberichten stehen die Zeichen zwischen ";
+            sNewsPaper2 += clbPlayer.sName;
+            sNewsPaper2 += " und " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. MW) auf Abschied.";
+            //sNewsPaper2 += " Die kolportierte Ablösesumme soll bei ca. " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. liegen";
+          }
+          MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
         }
-        MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
         
         return Json("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt", JsonRequestBehavior.AllowGet);
       }
 
       return Json(null, JsonRequestBehavior.AllowGet);
+    }
+
+    private bool checkIfTop10Player(CornerkickGame.Player pl)
+    {
+      for (byte iPos = 1; iPos <= 11; iPos++) {
+        foreach (CornerkickGame.Player plB in MvcApplication.ckcore.getBestPlayer(iPlCount: 10, iPos: iPos)) {
+          if (pl.iId == plB.iId) return true;
+        }
+      }
+
+      return false;
     }
 
     [HttpPost]
@@ -3032,6 +3045,8 @@ namespace CornerkickWebMvc.Controllers
                   if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club, iTransferIx: iT)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " verpflichtet.";
                     MvcApplication.ckcore.sendNews(clbGive.user, "Ihr Spieler " + pl.sName + " wechselt mit sofortiger Wirkung für die festgeschriebene Ablöse von " + offer.iFee.ToString("N0", getCi()) + " zu " + club.sName, iType: CornerkickManager.Main.iNewsTypePlayerTransferOfferAccept, iId: iPlayerId);
+
+                    createNewspaperPlayerTransfer(pl, club, pl.contract.iFixTransferFee);
                   }
                   break;
                 }
@@ -3049,6 +3064,12 @@ namespace CornerkickWebMvc.Controllers
                 if (clbGive != null) {
                   MvcApplication.ckcore.sendNews(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", iType: CornerkickManager.Main.iNewsTypePlayerTransferNewOffer, iId: iPlayerId);
                   sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.sName + " erfolgreich abgegeben.";
+
+                  if (checkIfTop10Player(pl)) {
+                    string sNewsPaper1 = club.sName + " vor Verpflichtung von " + pl.sName;
+                    string sNewsPaper2 = "Angeblich steht " + club.sName + " kurz vor der Verpflichtung von " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. MW).";
+                    MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
+                  }
                 }
 
                 pl.character.fMoney += 0.05f;
@@ -3063,14 +3084,34 @@ namespace CornerkickWebMvc.Controllers
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
 
+    private void createNewspaperPlayerTransfer(CornerkickGame.Player pl, CornerkickManager.Club clbTake, int iTransferFee)
+    {
+      if (pl == null) return;
+      if (clbTake == null) return;
+
+      // Create news
+      if (checkIfTop10Player(pl)) {
+        string sNewsPaper1 = pl.sName + " bei " + clbTake.sName + " vorgestellt";
+        string sNewsPaper2 = "Auf der heutigen Pressekonferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablösesumme soll angeblich bei " + (iTransferFee / 1000000).ToString() + " mio. liegen.";
+        MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
+      }
+    }
+
     [HttpPost]
     public JsonResult AcceptTransferOffer(int iPlayerId, int iClubId)
     {
       string sReturn = "Error";
 
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
       CornerkickManager.Club clubTake = MvcApplication.ckcore.ltClubs[iClubId];
+      CornerkickManager.Transfer.Offer offer = MvcApplication.ckcore.tr.getOffer(pl, clubTake);
+
       if (MvcApplication.ckcore.tr.transferPlayer(ckClub(), iPlayerId, clubTake)) {
-        sReturn = "Sie haben das Transferangebot für dem Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
+        // Create news
+        createNewspaperPlayerTransfer(pl, clubTake, offer.iFee);
+
+        sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.sName + " angenommen. Er wechselt mit sofortiger Wirkung zu " + clubTake.sName;
       }
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);

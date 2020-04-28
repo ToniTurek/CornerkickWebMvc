@@ -171,6 +171,25 @@
     }
 
     function setNewspaper() {
+      var divNewspaper = document.getElementById("divNewspaper");
+
+      var sFrontPageWidth = "100px";
+      var sFrontPageHeight = "141px";
+      var sFrontPageFontSize = "13px";
+      var sHeaderFontSize = "22px";
+      var sTextFontSize = "14px";
+      if ($(window).width() < 400) {
+        divNewspaper.style.width = "320px";
+        divNewspaper.style.height = "226px";
+
+        sFrontPageWidth = "80px";
+        sFrontPageHeight = "113px";
+        sFrontPageFontSize = "11px";
+
+        sHeaderFontSize = "16px";
+        sTextFontSize = "12px";
+      };
+
       // Get Newspaper
       $.ajax({
         url: '/Member/DeskGetNewspaper',
@@ -179,10 +198,32 @@
         cache: false,
         contentType: "application/json; charset=utf-8",
         success: function (ltNews) {
-          divNewspaper = document.getElementById("divNewspaper");
+          // Create front page
+          if (ltNews.length > 0) {
+            var divFp = document.createElement('div');
+            divFp.className = "divNewspaperPage";
+            divFp.id = "divNewspaperPage_0";
+            divFp.style.position = "absolute";
+            divFp.style.right = "0px";
+            divFp.style.width = sFrontPageWidth;
+            divFp.style.height = sFrontPageHeight;
+            divFp.style.backgroundColor = "white";
+            divFp.style.border = "1px solid black";
+            divFp.style.cursor = "pointer";
+            divFp.style.textAlign = "center";
+            divFp.style.fontSize = sFrontPageFontSize;
+            divFp.style.fontFamily = "Times New Roman";
+            divFp.style.clear = "both";
+            divFp.innerHTML = '<b data-ipage="0"><br/>CORNERKICK ANZEIGER</b>';
+            divFp.addEventListener("click", switchNewspaperPage);
+            divFp.setAttribute('data-ipage', 0);
+            divNewspaper.appendChild(divFp);
+          }
 
           for (var iN = 0; iN < ltNews.length; iN++) {
-            var sTextSplit = ltNews[iN].sText.split('#');
+            var news = ltNews[iN];
+
+            var sTextSplit = news.sText.split('#');
             if (sTextSplit.length < 2) {
               continue;
             }
@@ -192,7 +233,7 @@
 
             var div0 = document.createElement('div');
             div0.className = "divNewspaperPage";
-            div0.id = "divNewspaperPage_" + iN.toString();
+            div0.id = "divNewspaperPage_" + (iN + 1).toString();
             div0.style.position = "absolute";
             div0.style.right = "0px";
             div0.style.width = "50%";
@@ -200,56 +241,65 @@
             div0.style.backgroundColor = "white";
             div0.style.border = "1px solid black";
             div0.style.cursor = "pointer";
+            div0.style.fontFamily = "Times New Roman";
             div0.addEventListener("click", switchNewspaperPage);
-            div0.setAttribute('data-ipage', iN);
-            if (iN > 0) {
-              div0.style.display = "none";
-            }
+            div0.setAttribute('data-ipage', iN + 1);
+            div0.style.display = "none";
 
             var div1 = document.createElement('div');
             div1.style.position = "relative";
-            div1.style.top = "4%";
+            div1.style.top = "20px";
             div1.style.left = "4%";
             div1.style.width = "92%";
-            div1.style.cursor = "pointer";
             div1.style.textAlign = "center";
-            div1.setAttribute('data-ipage', iN);
-            div1.style.fontSize = "20px";
-            div1.innerHTML = '<b>' + sHeader + '</b>';
+            //div1.style.border = "1px solid green";
+            div1.setAttribute('data-ipage', iN + 1);
+            div1.style.fontSize = sHeaderFontSize;
+            div1.style.lineHeight = "1.2";
+            div1.innerHTML = '<b data-ipage="' + (iN + 1).toString() + '">' + sHeader + '</b>';
             div0.appendChild(div1);
 
             var div2 = document.createElement('div');
             div2.style.position = "relative";
             div2.style.left = "4%";
-            div2.style.marginTop = "8%";
+            div2.style.marginTop = "12%";
             div2.style.width = "92%";
-            div2.setAttribute('data-ipage', iN);
+            //div2.style.border = "1px solid red";
+            div2.setAttribute('data-ipage', iN + 1);
 
             var div21 = document.createElement('div');
             div21.style.position = "relative";
             div21.style.width = "30%";
             div21.style.float = "right";
             div21.style.clear = "both";
-            div21.innerHTML = getPortrait(ltNews[iN].iId, "width: 100%");
-            div21.setAttribute('data-ipage', iN);
+            div21.innerHTML = getPortrait(news.iId, "width: 100%");
+            div21.setAttribute('data-ipage', iN + 1);
             div2.appendChild(div21);
 
             var div22 = document.createElement('div');
             div22.style.position = "relative";
             div22.style.textAlign = "left";
-            div22.style.fontSize = "14px";
+            div22.style.fontSize = sTextFontSize;
+            //div22.style.lineHeight = "1.2";
             div22.innerHTML = sText;
-            div22.setAttribute('data-ipage', iN);
+            div22.setAttribute('data-ipage', iN + 1);
             div2.appendChild(div22);
             div0.appendChild(div2);
+
+            var divDt = document.createElement('div');
+            divDt.style.position = "absolute";
+            divDt.style.left = "4px";
+            divDt.style.top = "2px";
+            divDt.style.fontSize = "12px";
+            divDt.innerText = news.sDate;
+            div0.appendChild(divDt);
 
             var divNb = document.createElement('div');
             divNb.style.position = "absolute";
             divNb.style.right = "4px";
             divNb.style.bottom = "2px";
-            divNb.style.width = "10";
             divNb.style.fontSize = "12px";
-            divNb.innerText = (iN + 1).toString() + "/" + ltNews.length.toString();
+            divNb.innerText = (iN + 2).toString() + "/" + (ltNews.length + 1).toString();
             div0.appendChild(divNb);
 
             divNewspaper.appendChild(div0);
@@ -296,18 +346,6 @@
           pagePre2.style.display = "block";
         }
       }
-
-      /*
-      var pages = document.getElementsByClassName('divNewspaperPage');
-      for (var i = 0; i < pages.length; ++i) {
-        var page = pages[i];
-        if (i % 2 == 0) {
-          page.style.left = "0px";
-        } else {
-          page.style.right = "0px";
-        }
-      }
-      */
     }
   </script>
 </head>
@@ -425,7 +463,7 @@
     @*
     <div id="divNewspaper" style="position: absolute; top: 10px; right: 0px; width: 600px; height: 424px"></div>
     *@
-    <div id="divNewspaper" style="position: absolute; top: 10px; right: 0px; width: 400px; height: 283px"></div>
+    <div id="divNewspaper" style="position: absolute; top: 0px; right: 0px; width: 400px; height: 283px"></div>
 
     <h3>News</h3>
     <div style="position: relative; width: 100%">
