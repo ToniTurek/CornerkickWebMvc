@@ -214,6 +214,10 @@
             divFp.style.fontSize = sFrontPageFontSize;
             divFp.style.fontFamily = "Times New Roman";
             divFp.style.clear = "both";
+            divFp.style.backgroundImage = 'url("/Content/Images/ck.png")';
+            divFp.style.backgroundRepeat = 'no-repeat';
+            //divFp.style.backgroundPosition = "bottom";
+            //divFp.style.backgroundSize = '100%';
             divFp.innerHTML = '<b data-ipage="0"><br/>CORNERKICK ANZEIGER</b>';
             divFp.addEventListener("click", switchNewspaperPage);
             divFp.setAttribute('data-ipage', 0);
@@ -327,9 +331,14 @@
         var pagePost1 = document.getElementById('divNewspaperPage_' + (iPageNo + 1).toString());
         var pagePost2 = document.getElementById('divNewspaperPage_' + (iPageNo + 2).toString());
         if (pagePost1 != null) {
-          pagePost1.style.left = "0px";
+          if (iPageNo + 1 === pages.length - 1) { // If last page --> show on right site
+            pagePost1.style.right = "0px";
+          } else {
+            pagePost1.style.left = "0px";
+          }
           pagePost1.style.display = "block";
         }
+
         if (pagePost2 != null) {
           pagePost2.style.right = "0px";
           pagePost2.style.display = "block";
@@ -341,6 +350,7 @@
           pagePre1.style.right = "0px";
           pagePre1.style.display = "block";
         }
+
         if (pagePre2 != null) {
           pagePre2.style.left = "0px";
           pagePre2.style.display = "block";
