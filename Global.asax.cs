@@ -795,6 +795,20 @@ namespace CornerkickWebMvc
       AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
 #endif
 
+      // Clear CPU user news before saving
+      for (int iN = 0; iN < ckcore.ltUser[0].ltNews.Count; iN++) {
+        if (ckcore.ltUser[0].ltNews[iN].iId < 200) {
+          ckcore.ltUser[0].ltNews.RemoveAt(iN);
+          iN--;
+          continue;
+        }
+        if ((ckcore.dtDatum - ckcore.ltUser[0].ltNews[iN].dt).TotalDays > 7) {
+          ckcore.ltUser[0].ltNews.RemoveAt(iN);
+          iN--;
+          continue;
+        }
+      }
+
       // Clear CPU clubs before saving
       foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
         if (clb.user == null) {

@@ -14,6 +14,7 @@
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Player.js"></script>
 
   <script>
     function getNewsIcon(iType) {
@@ -31,184 +32,8 @@
 
     $(document).ready(function () {
       setNews();
+      setNewspaper();
 
-      $('#iDeleteLog').change(function () {
-        $.ajax({
-          url: '/Member/SetDeleteLog',
-          type: "GET",
-          dataType: "JSON",
-          cache: false,
-          contentType: "application/json; charset=utf-8",
-          data: { iDeleteAfter: $(this).val() }
-        });
-      });
-    });
-
-    function setNews() {
-      $('#tableNews').DataTable({
-        "ajax": {
-          "url": '@Url.Action("DeskGetNews", "Member")',
-          "type": 'GET',
-          "dataType": "JSON",
-          "cache": false,
-          "contentType": "application/json; charset=utf-8"
-        },
-        "columns": [
-          { "data": "iId" },
-          {
-            "data": "iType",
-            "render": function (iType, type, row) {
-              return getNewsIcon(iType);
-            }
-          },
-          { "data": "sDate" },
-          { "data": "sText" },
-          { "data": "bOld" }
-        ],
-        "paging": false,
-        "info": false,
-        "responsive": false,
-        "searching": false,
-        "order": [[0, "desc"]],
-        "language": {
-          "emptyTable": "Keine News"
-        },
-        "columnDefs": [
-          {
-            "targets": [0, 4], // ID, bOld
-            "orderable": false,
-            "visible": false,
-            "searchable": false
-          },
-          {
-            "targets": [1, 2],
-            "className": "dt-center"
-          }
-        ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-          if (aData.bOld) {
-            $('td', nRow).css('color', "gray");
-          }
-        }
-      });
-    }
-  </script>
-</head>
-
-<body>
-  @{
-    CornerkickManager.Club clb = Model.club;
-
-    if (clb != null) {
-      bool bTraining = false;
-      if (clb.training.ltUnit != null) {
-        foreach (CornerkickManager.Main.TrainingPlan.Unit tu in clb.training.ltUnit) {
-          if (tu.iType > 0) {
-            bTraining = true;
-            break;
-          }
-        }
-      }
-
-      if (!bTraining) {
-        <div style="position: relative; width: 100%; text-align: center">
-          @Html.ActionLink("ACHTUNG: Sie haben für die nächste Woche noch kein Training eingestellt!", "Training", "Member", null, new { @style = "color:red" })
-        </div>
-      }
-
-      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
-        if (clb.staff.iCoTrainer     == 0 &&
-            clb.staff.iCondiTrainer  == 0 &&
-            clb.staff.iPhysio        == 0 &&
-            clb.staff.iMentalTrainer == 0 &&
-            clb.staff.iDoctor        == 0 &&
-            clb.staff.iJouthTrainer  == 0 &&
-            clb.staff.iJouthScouting == 0 &&
-            clb.staff.iKibitzer      == 0) {
-          <div style="position: relative; width: 100%; text-align: center">
-            @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
-          </div>
-        }
-
-        if (Model.user.budget.iInSpec == 0) {
-          <div style="position: relative; width: 100%; text-align: center">
-            @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
-          </div>
-        }
-      }
-
-      if (clb.iCaptainId != null) {
-        if (clb.iCaptainId[0] < 0) {
-          <div style="position: relative; width: 100%; text-align: center">
-            @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
-          </div>
-        }
-      }
-
-      if (!Model.bEmblemExist) {
-        <div style="position: relative; width: 100%; text-align: center">
-          @Html.ActionLink("Sie haben noch kein Wappen für Ihren Verein ausgewählt", "ClubDetails", "Member", new { iClub = clb.iId }, new { @style = "color:orange" })
-        </div>
-      }
-      @*
-        <h2>Schreibtisch</h2>
-      *@
-
-      <h3>Aktuelle Lage</h3>
-
-      string sTabellenplatz = Model.sTabellenplatz;
-      string sWeatherIcon = "/Content/Icons/Weather/" + Model.iWeather.ToString() + ".gif";
-      string[] sWeatherTitleAll = new string[4] { "Sonne", "Bewölkt", "Regen", "Schnee" };
-      string sWeatherTitle = sWeatherTitleAll[Model.iWeather];
-
-      <text>Wetter:</text>
-      <img src=@sWeatherIcon alt="Wetter" style="position: relative; top: 0px; left: 10px; width: 20px" title=@sWeatherTitle>
-      <p></p>
-      if (!Model.club.bNation) {
-        <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
-        <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
-      }
-      <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
-      <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
-
-      <h3>Nächstes Spiel</h3>
-
-      string sDt = Model.sDtNextGame;
-      if (clb.nextGame != null) {
-        sDt = Model.sDtNextGame + " - ";
-
-        if (clb.nextGame.iGameType == 99) {
-          sDt += "Saisonende";
-        } else {
-          sDt += clb.nextGame.team[0].sTeam + " vs. " + clb.nextGame.team[1].sTeam;
-          if (clb.nextGame.iGameType == 1) {
-            sDt += " (Liga)";
-          } else if (clb.nextGame.iGameType == 2) {
-            sDt += " (Pokal)";
-          } else if (clb.nextGame.iGameType == 3) {
-            sDt += " (Gold-Cup)";
-          } else if (clb.nextGame.iGameType == 4) {
-            sDt += " (Silver-Cup)";
-          } else if (clb.nextGame.iGameType == 5) {
-            sDt += " (Testspiel)";
-          } else if (clb.nextGame.iGameType == 7) {
-            sDt += " (WM)";
-          }
-        }
-
-        @Html.ActionLink(@sDt, "PreviewGame", "Member", new { i = "0" }, new { target = "" })
-      } else {
-        <p>@sDt</p>
-      }
-    }
-  }
-
-  <h3>Letzte Spiele</h3>
-
-  <div id="chartContainerLastGames" style="height: 160px; width: 100%"></div>
-
-  <script type="text/javascript">
-    $(document).ready(function () {
       $.get("/Member/GetLastGames/", function (dataLastGames) {
         var chart = new CanvasJS.Chart("chartContainerLastGames", {
           animationEnabled: true,
@@ -283,33 +108,388 @@
 
         chart.render();
       });
+
+      $('#iDeleteLog').change(function () {
+        $.ajax({
+          url: '/Member/SetDeleteLog',
+          type: "GET",
+          dataType: "JSON",
+          cache: false,
+          contentType: "application/json; charset=utf-8",
+          data: { iDeleteAfter: $(this).val() }
+        });
+      });
     });
+
+    function setNews() {
+      $('#tableNews').DataTable({
+        "ajax": {
+          "url": '@Url.Action("DeskGetNews", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "iId" },
+          {
+            "data": "iType",
+            "render": function (iType, type, row) {
+              return getNewsIcon(iType);
+            }
+          },
+          { "data": "sDate" },
+          { "data": "sText" },
+          { "data": "bOld" }
+        ],
+        "paging": false,
+        "info": false,
+        "responsive": false,
+        "searching": false,
+        "order": [[0, "desc"]],
+        "language": {
+          "emptyTable": "Keine News"
+        },
+        "columnDefs": [
+          {
+            "targets": [0, 4], // ID, bOld
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          {
+            "targets": [1, 2],
+            "className": "dt-center"
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.bOld) {
+            $('td', nRow).css('color', "gray");
+          }
+        }
+      });
+    }
+
+    function setNewspaper() {
+      var divNewspaper = document.getElementById("divNewspaper");
+
+      var sFrontPageWidth = "100px";
+      var sFrontPageHeight = "141px";
+      var sFrontPageFontSize = "13px";
+      var sHeaderFontSize = "22px";
+      var sTextFontSize = "14px";
+      if ($(window).width() < 400) {
+        divNewspaper.style.width = "320px";
+        divNewspaper.style.height = "226px";
+
+        sFrontPageWidth = "80px";
+        sFrontPageHeight = "113px";
+        sFrontPageFontSize = "11px";
+
+        sHeaderFontSize = "16px";
+        sTextFontSize = "12px";
+      };
+
+      // Get Newspaper
+      $.ajax({
+        url: '/Member/DeskGetNewspaper',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (ltNews) {
+          // Create front page
+          if (ltNews.length > 0) {
+            var divFp = document.createElement('div');
+            divFp.className = "divNewspaperPage";
+            divFp.id = "divNewspaperPage_0";
+            divFp.style.position = "absolute";
+            divFp.style.right = "0px";
+            divFp.style.width = sFrontPageWidth;
+            divFp.style.height = sFrontPageHeight;
+            divFp.style.backgroundColor = "white";
+            divFp.style.border = "1px solid black";
+            divFp.style.cursor = "pointer";
+            divFp.style.textAlign = "center";
+            divFp.style.fontSize = sFrontPageFontSize;
+            divFp.style.fontFamily = "Times New Roman";
+            divFp.style.clear = "both";
+            divFp.innerHTML = '<b data-ipage="0"><br/>CORNERKICK ANZEIGER</b>';
+            divFp.addEventListener("click", switchNewspaperPage);
+            divFp.setAttribute('data-ipage', 0);
+            divNewspaper.appendChild(divFp);
+          }
+
+          for (var iN = 0; iN < ltNews.length; iN++) {
+            var news = ltNews[iN];
+
+            var sTextSplit = news.sText.split('#');
+            if (sTextSplit.length < 2) {
+              continue;
+            }
+
+            var sHeader = sTextSplit[0];
+            var sText = sTextSplit[1];
+
+            var div0 = document.createElement('div');
+            div0.className = "divNewspaperPage";
+            div0.id = "divNewspaperPage_" + (iN + 1).toString();
+            div0.style.position = "absolute";
+            div0.style.right = "0px";
+            div0.style.width = "50%";
+            div0.style.height = "100%";
+            div0.style.backgroundColor = "white";
+            div0.style.border = "1px solid black";
+            div0.style.cursor = "pointer";
+            div0.style.fontFamily = "Times New Roman";
+            div0.addEventListener("click", switchNewspaperPage);
+            div0.setAttribute('data-ipage', iN + 1);
+            div0.style.display = "none";
+
+            var div1 = document.createElement('div');
+            div1.style.position = "relative";
+            div1.style.top = "20px";
+            div1.style.left = "4%";
+            div1.style.width = "92%";
+            div1.style.textAlign = "center";
+            //div1.style.border = "1px solid green";
+            div1.setAttribute('data-ipage', iN + 1);
+            div1.style.fontSize = sHeaderFontSize;
+            div1.style.lineHeight = "1.2";
+            div1.innerHTML = '<b data-ipage="' + (iN + 1).toString() + '">' + sHeader + '</b>';
+            div0.appendChild(div1);
+
+            var div2 = document.createElement('div');
+            div2.style.position = "relative";
+            div2.style.left = "4%";
+            div2.style.marginTop = "12%";
+            div2.style.width = "92%";
+            //div2.style.border = "1px solid red";
+            div2.setAttribute('data-ipage', iN + 1);
+
+            var div21 = document.createElement('div');
+            div21.style.position = "relative";
+            div21.style.width = "30%";
+            div21.style.float = "right";
+            div21.style.clear = "both";
+            div21.innerHTML = getPortrait(news.iId, "width: 100%");
+            div21.setAttribute('data-ipage', iN + 1);
+            div2.appendChild(div21);
+
+            var div22 = document.createElement('div');
+            div22.style.position = "relative";
+            div22.style.textAlign = "left";
+            div22.style.fontSize = sTextFontSize;
+            //div22.style.lineHeight = "1.2";
+            div22.innerHTML = sText;
+            div22.setAttribute('data-ipage', iN + 1);
+            div2.appendChild(div22);
+            div0.appendChild(div2);
+
+            var divDt = document.createElement('div');
+            divDt.style.position = "absolute";
+            divDt.style.left = "4px";
+            divDt.style.top = "2px";
+            divDt.style.fontSize = "12px";
+            divDt.innerText = news.sDate;
+            div0.appendChild(divDt);
+
+            var divNb = document.createElement('div');
+            divNb.style.position = "absolute";
+            divNb.style.right = "4px";
+            divNb.style.bottom = "2px";
+            divNb.style.fontSize = "12px";
+            divNb.innerText = (iN + 2).toString() + "/" + (ltNews.length + 1).toString();
+            div0.appendChild(divNb);
+
+            divNewspaper.appendChild(div0);
+          }
+        }
+      });
+    }
+
+    var iNewspaperPage = 0;
+    function switchNewspaperPage(e) {
+      // Get current page number
+      var iPageNo = parseInt(e.target.getAttribute('data-ipage'));
+      var pages = document.getElementsByClassName('divNewspaperPage');
+
+      if (iPageNo === pages.length - 1 && iPageNo % 2 === 0) {
+        return;
+      }
+
+      // First, hide all pages
+      for (var i = 0; i < pages.length; ++i) {
+        pages[i].style.display = "none";
+      }
+
+      if (iPageNo % 2 === 0) {
+        var pagePost1 = document.getElementById('divNewspaperPage_' + (iPageNo + 1).toString());
+        var pagePost2 = document.getElementById('divNewspaperPage_' + (iPageNo + 2).toString());
+        if (pagePost1 != null) {
+          pagePost1.style.left = "0px";
+          pagePost1.style.display = "block";
+        }
+        if (pagePost2 != null) {
+          pagePost2.style.right = "0px";
+          pagePost2.style.display = "block";
+        }
+      } else {
+        var pagePre1 = document.getElementById('divNewspaperPage_' + (iPageNo - 1).toString());
+        var pagePre2 = document.getElementById('divNewspaperPage_' + (iPageNo - 2).toString());
+        if (pagePre1 != null) {
+          pagePre1.style.right = "0px";
+          pagePre1.style.display = "block";
+        }
+        if (pagePre2 != null) {
+          pagePre2.style.left = "0px";
+          pagePre2.style.display = "block";
+        }
+      }
+    }
   </script>
+</head>
 
-  <h3>News</h3>
+<body>
   <div style="position: relative; width: 100%">
-    <div style="position: absolute; top: -32px; right: 0px">
-      <label>
-        löschen nach:
-        @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-horizontal", @style = "width: 84px; text-align: right" })
-      </label>
-    </div>
+    @{
+      CornerkickManager.Club clb = Model.club;
 
-    <div id="tableDivNews" style="position: relative; left: 0px; width: 100%">
-      <table id="tableNews" style="position: relative; margin: 0px; width: 100%" class="compact">
-        <thead style="display:none">
-          <tr>
-            <th>#</th>
-            <th>Type</th>
-            <th>Date</th>
-            <th>Text</th>
-            <th>Old</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!---Data and tags are dynamically generated--->
-        </tbody>
-      </table>
+      if (clb != null) {
+        bool bTraining = false;
+        if (clb.training.ltUnit != null) {
+          foreach (CornerkickManager.Main.TrainingPlan.Unit tu in clb.training.ltUnit) {
+            if (tu.iType > 0) {
+              bTraining = true;
+              break;
+            }
+          }
+        }
+
+        if (!bTraining) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("ACHTUNG: Sie haben für die nächste Woche noch kein Training eingestellt!", "Training", "Member", null, new { @style = "color:red" })
+          </div>
+        }
+
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
+          if (clb.staff.iCoTrainer == 0 &&
+              clb.staff.iCondiTrainer == 0 &&
+              clb.staff.iPhysio == 0 &&
+              clb.staff.iMentalTrainer == 0 &&
+              clb.staff.iDoctor == 0 &&
+              clb.staff.iJouthTrainer == 0 &&
+              clb.staff.iJouthScouting == 0 &&
+              clb.staff.iKibitzer == 0) {
+            <div style="position: relative; width: 100%; text-align: center">
+              @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
+            </div>
+          }
+
+          if (Model.user.budget.iInSpec == 0) {
+            <div style="position: relative; width: 100%; text-align: center">
+              @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
+            </div>
+          }
+        }
+
+        if (clb.iCaptainId != null) {
+          if (clb.iCaptainId[0] < 0) {
+            <div style="position: relative; width: 100%; text-align: center">
+              @Html.ActionLink("ACHTUNG: Sie haben noch keinen Kapitän benannt!", "Team", "Member", null, new { @style = "color:red" })
+            </div>
+          }
+        }
+
+        if (!Model.bEmblemExist) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("Sie haben noch kein Wappen für Ihren Verein ausgewählt", "ClubDetails", "Member", new { iClub = clb.iId }, new { @style = "color:orange" })
+          </div>
+        }
+        @*
+        <h2>Schreibtisch</h2>
+        *@
+
+        <h3>Aktuelle Lage</h3>
+        string sTabellenplatz = Model.sTabellenplatz;
+        string sWeatherIcon = "/Content/Icons/Weather/" + Model.iWeather.ToString() + ".gif";
+        string[] sWeatherTitleAll = new string[4] { "Sonne", "Bewölkt", "Regen", "Schnee" };
+        string sWeatherTitle = sWeatherTitleAll[Model.iWeather];
+
+        <text>Wetter:</text>
+        <img src=@sWeatherIcon alt="Wetter" style="position: relative; top: 0px; left: 10px; width: 20px" title=@sWeatherTitle>
+        <p></p>
+        if (!Model.club.bNation) {
+          <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
+          <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
+        }
+        <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
+        <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>
+
+        <h3>Nächstes Spiel</h3>
+        string sDt = Model.sDtNextGame;
+        if (clb.nextGame != null) {
+          sDt = Model.sDtNextGame + " - ";
+
+          if (clb.nextGame.iGameType == 99) {
+            sDt += "Saisonende";
+          } else {
+            sDt += clb.nextGame.team[0].sTeam + " vs. " + clb.nextGame.team[1].sTeam;
+            if (clb.nextGame.iGameType == 1) {
+              sDt += " (Liga)";
+            } else if (clb.nextGame.iGameType == 2) {
+              sDt += " (Pokal)";
+            } else if (clb.nextGame.iGameType == 3) {
+              sDt += " (Gold-Cup)";
+            } else if (clb.nextGame.iGameType == 4) {
+              sDt += " (Silver-Cup)";
+            } else if (clb.nextGame.iGameType == 5) {
+              sDt += " (Testspiel)";
+            } else if (clb.nextGame.iGameType == 7) {
+              sDt += " (WM)";
+            }
+          }
+
+          @Html.ActionLink(@sDt, "PreviewGame", "Member", new { i = "0" }, new { target = "" })
+        } else {
+          <p>@sDt</p>
+        }
+      }
+    }
+
+    <h3>Letzte Spiele</h3>
+    <div id="chartContainerLastGames" style="height: 160px; width: 100%"></div>
+
+    @*
+    <div id="divNewspaper" style="position: absolute; top: 10px; right: 0px; width: 600px; height: 424px"></div>
+    *@
+    <div id="divNewspaper" style="position: absolute; top: 0px; right: 0px; width: 400px; height: 283px"></div>
+
+    <h3>News</h3>
+    <div style="position: relative; width: 100%">
+      <div style="position: absolute; top: -32px; right: 0px">
+        <label>
+          löschen nach:
+          @Html.DropDownListFor(m => m.iDeleteLog, Model.ddlDeleteLog, new { @class = "form-horizontal", @style = "width: 84px; text-align: right" })
+        </label>
+      </div>
+
+      <div id="tableDivNews" style="position: relative; left: 0px; width: 100%">
+        <table id="tableNews" style="position: relative; margin: 0px; width: 100%" class="compact">
+          <thead style="display:none">
+            <tr>
+              <th>#</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Text</th>
+              <th>Old</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!---Data and tags are dynamically generated--->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </body>
