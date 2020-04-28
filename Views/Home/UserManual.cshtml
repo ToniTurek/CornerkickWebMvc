@@ -16,7 +16,7 @@
   <style>
     .ckLink {
       position: relative;
-      top: -42px;
+      top: -52px;
       width: 0px;
       height: 0px;
     }
@@ -238,6 +238,25 @@
   </li>
   <li>
     <a href="#h2Calendar">Kalender</a>
+    <ol type="a">
+      <li>
+        <a href="#h3CalendarTestgame">Testspiele</a>
+      </li>
+      <li>
+        <a href="#h3CalendarTrainingscamp">Trainingslager</a>
+      </li>
+      <li>
+        <a href="#h3CalendarEvents">Ereignisse</a>
+        <ul>
+          <li>
+            <a href="#h4CalendarEventsTeammeeting">Krisensitzung</a>
+          </li>
+          <li>
+            <a href="#h4CalendarEventsChristmasParty">Weihnachtsfeier</a>
+          </li>
+        </ul>
+      </li>
+    </ol>
   </li>
   <li>
     <a href="#h2Team">Mannschaft</a>
@@ -403,8 +422,10 @@ Der Prioritätsfaktor eines Wettbewerbs beeinflußt die Moraländerungen durch e
 <h2><span id="h2Calendar" class="ckLink"></span>Kalender</h2>
 <h3><span id="h3CalendarTestgame" class="ckLink"></span>Testspiele</h3>
 <h3><span id="h3CalendarTrainingscamp" class="ckLink"></span>Trainingslager</h3>
+
 <h3><span id="h3CalendarEvents" class="ckLink"></span>Ereignisse</h3>
 Um ein Ereignis durchzuführen, musst du in der Kalenderansicht auf das gewünschte Datum klicken, dann "Ereignis" auswählen, das gewünschte Ereignis wählen und bestätigen.<br />
+
 <h4><span id="h4CalendarEventsTeammeeting" class="ckLink"></span>Krisensitzung</h4>
 Dies geschieht bei einer Krisensitzung:<br />
 <ul>
@@ -420,6 +441,18 @@ Dies geschieht bei einer Krisensitzung:<br />
 </ul>
 Beispiel: Spieler A hat nur noch eine Moral von 80%. Bei nach einer Krisensitzung erhält er zunächst (100% - 80%)/2 = 10% Moral und anschließend zusätzlich 5%. Er hat nach der Krisensitzung also eine Moral von 95%.<br /><br />
 Bemerke: Krisensitzungen haben nur zwei Mal pro Saison einen Effekt.
+
+<h4><span id="h4CalendarEventsChristmasParty" class="ckLink"></span>Weihnachtsfeier</h4>
+Dies geschieht bei einer Weihnachtsfeier:<br />
+<ul>
+  <li>
+    Alle Spieler gewinnen 4% Moral
+  </li>
+  <li>
+    Alle Spieler verlieren 2% Frische
+  </li>
+</ul>
+Bemerke: Eine Weihnachtsfeier hat nur ein Mal pro Saison und nur im Dezember einen Effekt.
 
 <h2><span id="h2Team" class="ckLink"></span>Mannschaft</h2>
 <h3><span id="h3Team" class="ckLink"></span>Aufstellung</h3>

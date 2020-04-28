@@ -5818,7 +5818,8 @@ namespace CornerkickWebMvc.Controllers
       evi.dt = dtStart;
       clb.ltEvent.Add(evi);
 
-      if (iEventId == 1) sReturn = "Sie haben die Krisensitzung anberaumt.";
+      if      (iEventId == 1) sReturn = "Sie haben die Krisensitzung anberaumt.";
+      else if (iEventId == 2) sReturn = "Sie haben die Weihnachtsfeier gebucht.";
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
