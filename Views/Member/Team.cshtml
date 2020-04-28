@@ -358,6 +358,7 @@
       });
 
       $("#rbOffence").on('change', function (ev) {
+        bPreventOnClick = false;
         drawAufstellung(iFormation, 0, true);
       });
 
