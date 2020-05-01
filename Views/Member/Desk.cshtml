@@ -173,22 +173,18 @@
     function setNewspaper() {
       var divNewspaper = document.getElementById("divNewspaper");
 
-      var sFrontPageWidth = "100px";
-      var sFrontPageHeight = "141px";
+      var sSizeFp = getNewspaperFrontpageSize();
       var sFrontPageFontSize = "13px";
       var sHeaderFontSize = "22px";
       var sTextFontSize = "14px";
       if ($(window).width() < 400) {
-        divNewspaper.style.width = "320px";
-        divNewspaper.style.height = "226px";
-
-        sFrontPageWidth = "80px";
-        sFrontPageHeight = "113px";
         sFrontPageFontSize = "11px";
-
         sHeaderFontSize = "16px";
         sTextFontSize = "12px";
-      };
+      }
+
+      divNewspaper.style.width = sSizeFp[0];
+      divNewspaper.style.height = sSizeFp[1];
 
       // Get Newspaper
       $.ajax({
@@ -205,8 +201,8 @@
             divFp.id = "divNewspaperPage_0";
             divFp.style.position = "absolute";
             divFp.style.right = "0px";
-            divFp.style.width = sFrontPageWidth;
-            divFp.style.height = sFrontPageHeight;
+            divFp.style.width = sSizeFp[0];
+            divFp.style.height = sSizeFp[1];
             divFp.style.backgroundColor = "white";
             divFp.style.border = "1px solid black";
             divFp.style.cursor = "pointer";
@@ -221,6 +217,18 @@
             divFp.innerHTML = '<b data-ipage="0"><br/>CORNERKICK ANZEIGER</b>';
             divFp.addEventListener("click", switchNewspaperPage);
             divFp.setAttribute('data-ipage', 0);
+
+            var divFp2 = document.createElement('div');
+            divFp2.style.position = "absolute";
+            divFp2.style.top = "0px";
+            divFp2.style.left = "0px";
+            divFp2.style.width = "100%";
+            divFp2.style.textAlign = "right";
+            divFp2.style.fontSize = sFrontPageFontSize;
+            divFp2.setAttribute('data-ipage', 0);
+            divFp2.innerHTML = ltNews[0].sDate.split(' ')[0];
+
+            divFp.appendChild(divFp2);
             divNewspaper.appendChild(divFp);
           }
 
@@ -312,14 +320,37 @@
       });
     }
 
+    function getNewspaperFrontpageSize() {
+      var sSize = [];
+
+      sSize.push("100px");
+      sSize.push("141px");
+      if ($(window).width() < 400) {
+        sSize[0] = "80px";
+        sSize[1] = "113px";
+      }
+
+      return sSize;
+    }
+
     var iNewspaperPage = 0;
     function switchNewspaperPage(e) {
+      var divNewspaper = document.getElementById("divNewspaper");
+
       // Get current page number
       var iPageNo = parseInt(e.target.getAttribute('data-ipage'));
       var pages = document.getElementsByClassName('divNewspaperPage');
 
       if (iPageNo === pages.length - 1 && iPageNo % 2 === 0) {
         return;
+      }
+
+      if ($(window).width() < 400) {
+        divNewspaper.style.width = "320px";
+        divNewspaper.style.height = "226px";
+      } else {
+        divNewspaper.style.width = "400px";
+        divNewspaper.style.height = "283px";
       }
 
       // First, hide all pages
@@ -349,6 +380,11 @@
         if (pagePre1 != null) {
           pagePre1.style.right = "0px";
           pagePre1.style.display = "block";
+          if (iPageNo - 1 === 0) {
+            var sSizeFp = getNewspaperFrontpageSize();
+            divNewspaper.style.width = sSizeFp[0];
+            divNewspaper.style.height = sSizeFp[1];
+          }
         }
 
         if (pagePre2 != null) {
@@ -473,7 +509,7 @@
     @*
     <div id="divNewspaper" style="position: absolute; top: 10px; right: 0px; width: 600px; height: 424px"></div>
     *@
-    <div id="divNewspaper" style="position: absolute; top: 0px; right: 0px; width: 400px; height: 283px"></div>
+    <div id="divNewspaper" style="position: absolute; top: 0px; right: 0px"></div>
 
     <h3>News</h3>
     <div style="position: relative; width: 100%">
