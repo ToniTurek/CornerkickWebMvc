@@ -501,8 +501,9 @@ namespace CornerkickWebMvc
           if (clb.user != null) continue;
 
           for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-            clb.ltPlayer[iP].fCondition = 0.75f;
+            clb.ltPlayer[iP].fCondition = 0.80f;
             clb.ltPlayer[iP].fFresh     = 0.92f;
+            clb.ltPlayer[iP].fMoral     = Math.Max(clb.ltPlayer[iP].fMoral, 0.95f);
           }
         }
       }
