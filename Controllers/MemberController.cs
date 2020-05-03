@@ -2173,6 +2173,14 @@ namespace CornerkickWebMvc.Controllers
             clb.ltPlayerJouth.RemoveAt(iPlJ);
             clb.ltPlayer.Add(plJ);
 
+            // Add club history to player
+            pl.ltClubHistory.Add(new CornerkickGame.Player.ClubHistory() {
+              iClubId = clb.iId,
+              dt = MvcApplication.ckcore.dtDatum,
+              iTransferFee = 0,
+              bJouth = false
+            });
+
             return Json("Sie haben den Jugendspieler " + pl.sName + " in ihr Profiteam übernommen.", JsonRequestBehavior.AllowGet);
           }
         }
@@ -2246,6 +2254,7 @@ namespace CornerkickWebMvc.Controllers
             sClubName = MvcApplication.ckcore.ltClubs[ch.iClubId].sName;
             //<td align="center">@Html.ActionLink(MvcApplication.ckcore.ltClubs[ch.iClubId].sName, "ClubDetails", "Member", new { i = ch.iClubId }, new { target = "" })</td>
           }
+          if (ch.bJouth) sClubName += " (Jugend)";
 
           ltDeClubHistory.Add(new Models.PlayerModel.DatatableEntryClubHistory {
             iIx = iCh,
@@ -2792,6 +2801,14 @@ namespace CornerkickWebMvc.Controllers
 
               clb.ltPlayerJouth.RemoveAt(iPlJ);
               clb.ltPlayer.Add(plJ);
+
+              // Add club history to player
+              plContract.ltClubHistory.Add(new CornerkickGame.Player.ClubHistory() {
+                iClubId = clb.iId,
+                dt = MvcApplication.ckcore.dtDatum,
+                iTransferFee = 0,
+                bJouth = false
+              });
 
               sReturn = "Der Jugendspieler " + plContract.sName + " hat ihr Angebot angenommen und gehört ab sofort dem Profikader an.";
 
