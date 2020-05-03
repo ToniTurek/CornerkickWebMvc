@@ -180,7 +180,9 @@
     });
 
     $("#bnContract").click(function () {
-      if ($("#bnContract").text() === "In Profikader übernehmen") {
+      if (@Html.Raw(Json.Encode(player.bRetire))) {
+        alert("Der Spieler beendet seine Karriere zum Ende der Saison.");
+      } else if ($("#bnContract").text() === "In Profikader übernehmen") {
         getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
       } else {
         getContractDialog(document.body, @Model.iPlayer, false);
@@ -690,8 +692,12 @@
                 <tr>
                   @{
                     string sDauer = player.contract.iLength.ToString() + " Jahre";
-                    if (Model.bJouth) {
+                    if (player.contract.iLength == 1) {
                       sDauer = "Saisonende";
+                    }
+
+                    if (player.bRetire) {
+                      sDauer += " (beendet Karriere)";
                     }
                   }
                   <td align="right">Laufzeit:</td>
