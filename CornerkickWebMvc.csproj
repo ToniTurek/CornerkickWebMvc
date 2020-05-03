@@ -1374,6 +1374,9 @@
     <Content Include="App_Data\Resources\training.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="App_Data\save\games\.gitignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1459,7 +1462,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\mail\" />
-    <Folder Include="App_Data\save\games\" />
     <Folder Include="Content\Uploads\Portraits\" />
     <Folder Include="Views\MemberPages\" />
   </ItemGroup>
