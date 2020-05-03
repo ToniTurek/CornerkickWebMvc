@@ -6684,6 +6684,10 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.Mail mail = getMail(user, dtMail);
       MvcApplication.ltMail.Remove(mail);
 
+      // Delete mail from Amazon S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+      as3.deleteFile("mail/" + getMailFilename(user, dtMail, bFullPath: false));
+
       /*
       string sMail = getMailFilename(user, dtMail);
       if (System.IO.File.Exists(sMail)) {
@@ -6710,9 +6714,12 @@ namespace CornerkickWebMvc.Controllers
       return null;
     }
 
-    private static string getMailFilename(CornerkickManager.User user, DateTime dtMail)
+    private static string getMailFilename(CornerkickManager.User user, DateTime dtMail, bool bFullPath = true)
     {
-      return System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt");
+      string sFilename = user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt";
+      if (!bFullPath) return sFilename;
+
+      return System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", sFilename);
     }
 
     public static int MailCountNewMails(CornerkickManager.User usr)
