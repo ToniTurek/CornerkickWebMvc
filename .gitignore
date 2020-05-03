@@ -5,7 +5,6 @@ CornerkickAll.sln
 *.ckx
 Content/Uploads/*
 bin
-save
 log/*
 mail/*
 wishlist/*
