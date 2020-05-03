@@ -746,7 +746,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Content("", "application/json");
 
-      CornerkickManager.Main.TrainingHistory trHistCurrent = new CornerkickManager.Main.TrainingHistory();
+      CornerkickGame.Player.TrainingHistory trHistCurrent = new CornerkickGame.Player.TrainingHistory();
       trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
       trHistCurrent.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb);
 
@@ -758,7 +758,7 @@ namespace CornerkickWebMvc.Controllers
         dataPoints[0][j] = new List<Models.DataPointGeneral>();
 
         for (int i = 0; i < clb.ltTrainingHist.Count; i++) {
-          CornerkickManager.Main.TrainingHistory trHist = clb.ltTrainingHist[i];
+          CornerkickGame.Player.TrainingHistory trHist = clb.ltTrainingHist[i];
           if (trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-7)) >  0 &&
               trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum)             <= 0) {
             long iDate = convertDateTimeToTimestamp(trHist.dt);
@@ -858,7 +858,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // ... get training history data
-          CornerkickManager.Main.TrainingHistory trHistExp = new CornerkickManager.Main.TrainingHistory();
+          CornerkickGame.Player.TrainingHistory trHistExp = new CornerkickGame.Player.TrainingHistory();
           trHistExp.dt   = tu.dt;
           trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation);
 
@@ -3547,7 +3547,7 @@ namespace CornerkickWebMvc.Controllers
       mdTraining.iTrainingCount = new int[MvcApplication.ckcore.plr.ltTraining.Count];
 
       int nTrTotal = 0;
-      foreach (CornerkickManager.Main.TrainingHistory th in clb.ltTrainingHist) {
+      foreach (CornerkickGame.Player.TrainingHistory th in clb.ltTrainingHist) {
         bool bFound = false;
         foreach (TimeSpan tsTr in tsTraining) {
           if (tsTr.Equals(th.dt.TimeOfDay)) {
@@ -3583,7 +3583,7 @@ namespace CornerkickWebMvc.Controllers
       for (int iD = 0; iD < ltTu.Length; iD++) { // Loop until Saturday
         ltTu[iD] = new CornerkickManager.Main.TrainingPlan.Unit[3];
 
-        foreach (CornerkickManager.Main.TrainingHistory th in clb.ltTrainingHist) {
+        foreach (CornerkickGame.Player.TrainingHistory th in clb.ltTrainingHist) {
           if (th.dt.Date.Equals(dtSunday.AddDays(iD))) {
             int iIxTimeOfDay = 0; // 1st training
             if      (th.dt.Hour >= tsTraining[2].Hours) iIxTimeOfDay = 2; // 3rd training
@@ -5416,7 +5416,7 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Past trainings
-        foreach (CornerkickManager.Main.TrainingHistory th in club.ltTrainingHist) {
+        foreach (CornerkickGame.Player.TrainingHistory th in club.ltTrainingHist) {
           if (th.dt.Date.Equals(dt) && th.iType > 1) {
             string sTrainingName = CornerkickManager.Player.getTraining(th.iType, MvcApplication.ckcore.plr.ltTraining).sName;
 
