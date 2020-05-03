@@ -550,7 +550,13 @@ namespace CornerkickWebMvc.Controllers
           CornerkickManager.Main.News news = ltCkNews[iN];
 
           if (iNewspaperTypes.Contains(news.iType) || news.iType >= 200) {
+            if ((MvcApplication.ckcore.dtDatum - news.dt).TotalDays > 7) continue;
+
             string sN = news.sText;
+
+            if (news.iType == CornerkickManager.Main.iNewsTypeCupWin) {
+              sN = "Was für ein Erfolg!#" + sN;
+            }
 
             foreach (CornerkickGame.Player pl in clb.ltPlayer) {
               if (sN.Contains(pl.sName)) {

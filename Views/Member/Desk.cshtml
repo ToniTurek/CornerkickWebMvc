@@ -284,7 +284,11 @@
             div21.style.width = "30%";
             div21.style.float = "right";
             div21.style.clear = "both";
-            div21.innerHTML = getPortrait(news.iId, "width: 100%");
+            if (news.iType === 71) {
+              div21.innerHTML = getClubEmblem(news.iId);
+            } else {
+              div21.innerHTML = getPortrait(news.iId, "width: 100%");
+            }
             div21.setAttribute('data-ipage', iN + 1);
             div2.appendChild(div21);
 
@@ -318,6 +322,14 @@
           }
         }
       });
+    }
+
+    function getClubEmblem(iId) {
+      var sIcon = '<img src="/Content/Uploads/emblems/';
+
+      sIcon += iId.toString() + '.png" title="emblem" style="width: 100%"/>';
+
+      return sIcon;
     }
 
     function getNewspaperFrontpageSize() {
