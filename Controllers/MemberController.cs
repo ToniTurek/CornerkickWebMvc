@@ -2260,6 +2260,36 @@ namespace CornerkickWebMvc.Controllers
       return Json(new { aaData = ltDeClubHistory.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
+    public ActionResult PlayerDetailsGetInjuryHistoryTable(int iPlayerId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      //The table or entity I'm querying
+      List<Models.PlayerModel.DatatableEntryInjuryHistory> ltDeInjuryHistory = new List<Models.PlayerModel.DatatableEntryInjuryHistory>();
+
+      if (pl.ltInjuryHistory != null) {
+        for (int iIh = 0; iIh < pl.ltInjuryHistory.Count; iIh++) {
+          CornerkickGame.Player.InjuryHistory ih = pl.ltInjuryHistory[iIh];
+
+          // Remove corrupt entry
+          if (ih.injury == null) {
+            pl.ltInjuryHistory.RemoveAt(iIh);
+            iIh--;
+            continue;
+          }
+
+          ltDeInjuryHistory.Add(new Models.PlayerModel.DatatableEntryInjuryHistory {
+            iIx = iIh,
+            sDt = ih.dt.ToString("d", getCi()),
+            sInjuryName = CornerkickManager.Main.ltInjury[ih.injury.iType][ih.injury.iType2],
+            iInjuryLength = (int)ih.injury.fLengthMax
+          });
+        }
+      }
+
+      return Json(new { aaData = ltDeInjuryHistory.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult PlayerDetailsGetStatistic(int iPlayer, bool bSeason = true)
     {
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];

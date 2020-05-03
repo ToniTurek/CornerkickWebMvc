@@ -58,5 +58,13 @@ namespace CornerkickWebMvc.Models
       public int iValue { get; set; }
       public int iTransferFee { get; set; }
     }
+
+    public class DatatableEntryInjuryHistory
+    {
+      public int iIx { get; set; }
+      public string sDt { get; set; }
+      public string sInjuryName { get; set; }
+      public int iInjuryLength { get; set; }
+    }
   }
 }

@@ -179,6 +179,48 @@
       select: false
     });
 
+    $('#tableInjuryHistory').DataTable({
+      "ajax": {
+        "url": '@Url.Action("PlayerDetailsGetInjuryHistoryTable", "Member")',
+        "type": 'GET',
+        "dataType": "JSON",
+        "cache": false,
+        "contentType": "application/json; charset=utf-8",
+        "data": function (d) {
+          d.iPlayerId = @Model.iPlayer;
+        }
+      },
+      "language": {
+        "emptyTable": "Bisher keine Verletzungen"
+      },
+      "columns": [
+        { "data": "iIx" },
+        { "data": "sDt" },
+        { "data": "sInjuryName" },
+        { "data": "iInjuryLength" }
+      ],
+      rowReorder: {
+        dataSrc: 'iIx'
+      },
+      "pageLength": 10,
+      "paging": false,
+      "info": false,
+      "responsive": false,
+      "searching": false,
+      "columnDefs": [
+        { "targets": [0], "orderSequence": ["desc", "asc"] },
+        {
+          "targets": [0], // iIx
+          "orderable": false,
+          "visible": false,
+          "searchable": false
+        },
+        { "targets": [1, 2], "className": "dt-center" },
+        { "targets": 3, "className": "dt-right" }
+      ],
+      select: false
+    });
+
     $("#bnContract").click(function () {
       if (@Html.Raw(Json.Encode(player.bRetire))) {
         alert("Der Spieler beendet seine Karriere zum Ende der Saison.");
@@ -995,6 +1037,23 @@
               <th>Verein</th>
               <th>Ablöse [€]</th>
               <th>Marktwert [€]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!---Data and tags are dynamically generated--->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="divTableInjuryHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">
+        <h4>Verletzungshistorie</h4>
+        <table id="tableInjuryHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Datum</th>
+              <th>Verletzung</th>
+              <th>Dauer [d]</th>
             </tr>
           </thead>
           <tbody>
