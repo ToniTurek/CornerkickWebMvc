@@ -537,7 +537,7 @@ Folgende taktische Einstellungen stehen zur Verfügung:
 <div id="h3Training" class="ckLink"></div>
 <h3>Mannschaftstraining</h3>
 <p>Durch das Mannschaftstraining kann zum einen die körperliche Verfassung der Spieler (<a href="#uPlayerCondi">Kondition</a> und <a href="#uPlayerFresh">Frische</a>) gesteuert werden, zum anderen werden die <a href="#h3PlayerSkills">individuellen Fähigkeiten</a> der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.</p>
-Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die Fähigkeiten der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:
+Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die Fähigkeiten der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:<br />(Verl.risiko: Verletzungsrisiko pro Tag)
 <table style="width: auto" border="1" cellpadding="3">
   <tr>
     <th style="text-align:center">Art</th>
@@ -558,6 +558,7 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
     <th style="text-align:center">Reaktion</th>
     <th style="text-align:center">Sprungk.</th>
     <th style="text-align:center">Balls.</th>
+    <th style="text-align:center">Verl.risiko</th>
   </tr>
   @{
     for (int iT = 0; iT < MvcApplication.ckcore.plr.ltTraining.Count; iT++) {
@@ -579,10 +580,11 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
         iMulti[2] = (int)Math.Round(Math.Abs(tr.fMoral) * 5);
       }
 
-      string[] sStyle = new string[3] { "color: green", "color: green", "color: green" };
+      string[] sStyle = new string[] { "color: green", "color: green", "color: green", "color: green" };
+      float[] fTr = new float[] { tr.fCondi, tr.fFresh, tr.fMoral };
       for (byte j = 0; j < sTr.Length; j++) {
         char cPM = '+';
-        if (tr.fCondi < 0f) {
+        if (fTr[j] < 0f) {
           cPM = '-';
           sStyle[j] = "font-weight:bold; color: red";
         }
@@ -594,6 +596,13 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
           sStyle[j] = "color: black";
         }
       }
+
+      if (tr.fInjuryRisk > 0.0015) {
+        sStyle[3] = "color: red";
+      } else if (tr.fInjuryRisk > 0.0005) {
+        sStyle[3] = "color: orange";
+      }
+
       string[] sTrInd = new string[14];
       if (tr.iId == 3) { // Speed
         sTrInd[0] = "++"; // Speed
@@ -658,6 +667,7 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
         <td align="center" style="color: green; border-color: black">@sTrInd[11]</td>
         <td align="center" style="color: green; border-color: black">@sTrInd[12]</td>
         <td align="center" style="color: green; border-color: black">@sTrInd[13]</td>
+        <td align="center" style="@sStyle[3]; border-color: black">@tr.fInjuryRisk.ToString("0.00%")</td>
       </tr>
     }
   }
@@ -891,7 +901,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       Nun kann ein eigenes Angebot für das Jahresgehalt sowie Spiel- und Torprämie angegeben und über die Schaltfläche "verhandelt" dem Spieler übermittelt werden (c). Sofern der angebotene Vertrag nicht zu weit von den Vorstellungen des Spielers entfernt ist, wird dieser sich mit seinem Angebot annähern.<br />
-      Dieser Schritt kann wiederholt werden, jedoch sinkt jeden Mal die Verhandlungsbereitschaft des Spielers. Fällt diese unter 0% bricht der Spieler die Verhandlungen ab und ist an einem neuen Vertrag nicht mehr interessiert.
+      Dieser Schritt kann wiederholt werden, jedoch sinkt jeden Mal die Verhandlungsbereitschaft des Spielers. Fällt diese unter 0% bricht der Spieler die Verhandlungen ab und ist an einem neuen Vertrag nicht mehr interessiert. Es dauert nun 10 Tage, bis die Verhandlungen wieder aufgenommen werden können.
     </li>
     <li>
       Ist der Manager mit dem Vertragsforderungen des Spielers zufrieden, kann er diesem über die Schaltfläche "Bestätigen" zustimmen (d).
@@ -1013,20 +1023,20 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
   </ul>
   Um ein Gebäude bauen zu können, muss jedoch zunächst ein Grundstück erworben werden. Die Kosten für jedes neue Grundstück erhöhen sich um 50% zum vorherigen.
+
+  <h2><span id="h2PreviewGame" class="ckLink"></span>Spielvorschau</h2>
+  Die Spielvorschau lässt sich vom Hauptmenü über den link unter "Nächstes Spiel" öffnen. Dort sind alle Details zum nächsten Spiel zusammengefasst.<br />
+  Zudem kann hier der Schiedsrichter des nächsten Spiels mit <a href="#h4SecretMoney">Schwarzgeld</a> bestochen werden. Abhängig von der Summe die Sie ihm bezahlen (und der Summe die Ihr Gegner im bezahlt), wird er bis zu maximal 20% Fehlentscheidungen (bei einer Bestechungssumme von 100.000€) zu Ihren Gunsten treffen.
+
+  <h2><span id="h2Office" class="ckLink"></span>Büro</h2>
+  <h3><span id="h3Transfer" class="ckLink"></span>Transfermarkt</h3>
+  Auf dem Transfermarkt können neue Spieler für deine Mannschaft verpflichtet werden. Benutze die Filter, um einen interessanten Spieler zu finden. Um ihn zu verpflichten, musst du zunächst einen <a href="#h3PlayerContract">Vertrag mit ihm aushandeln</a>. Besitzt der Spieler eine fixe Ablöse oder ist er vereinslos, wechselt er nun direkt zu deinem Verein. Ansonsten musst du dem bisherigen Verein des Spielers eine Ablösesumme anbieten.<br /><br />
+  Ein eigener Spieler kann über die Option "Auf Transferliste setzen" in der Spieleransicht zum Verkauf angeboten werden. Über eingegangene Angebote für deinen Spieler wirst du im Neuigkeiten-Bereich informiert.
+
+  <h3><span id="h3Livegame" class="ckLink"></span>Live-Spiel</h3>
+  Findet gerade ein Spiel statt, kannst du es dir hier anschauen. Durch einen klick auf (3) kannst du die Trikotfarben wechslen. Über die links 'Aufstellung/Taktik' (2a) kannst du dein Team anpassen und Auswechslungen vornehmen und über den link 'home' (2b) kommst du zurück in den Startbildschirm.<br />
+  <img src="~/Content/Images/user_manual/Game2.png" width="600" /> <br />
+  Ist gerade kein Spiel im Gange, kannst du vergangene Spiele über das Menü (1) auswählen und analysieren. Dazu stehen dir verschiedene Optionen zur Verfügung: Mit den Schaltflächen
+  <img src="~/Content/Images/user_manual/LiveGame_options.png" width="200" /> kannst du dir jede Spielsituation noch einmal anschauen (5). Mit einem klick auf die Symbole über bzw. unter der timeline (4) kommst du direkt in die jeweilige Spielsituation<br />
+  Über den link 'Optionen' (2c) kannst du spezielle Darstellungsoptionen wie heatmap, Schüsse und Pässe aktivieren.<br />
 </div>
-
-<div id="h2PreviewGame" class="ckLink"></div>
-<h2>Spielvorschau</h2>
-Die Spielvorschau lässt sich vom Hauptmenü über den link unter "Nächstes Spiel" öffnen. Dort sind alle Details zum nächsten Spiel zusammengefasst.<br />
-Zudem kann hier der Schiedsrichter des nächsten Spiels mit <a href="#h4SecretMoney">Schwarzgeld</a> bestochen werden. Abhängig von der Summe die Sie ihm bezahlen (und der Summe die Ihr Gegner im bezahlt), wird er bis zu maximal 20% Fehlentscheidungen (bei einer Bestechungssumme von 100.000€) zu Ihren Gunsten treffen.
-
-<h2><span id="h2Office" class="ckLink"></span>Büro</h2>
-<h3><span id="h3Transfer" class="ckLink"></span>Transfermarkt</h3>
-Auf dem Transfermarkt können neue Spieler für deine Mannschaft verpflichtet werden. Benutze die Filter, um einen interessanten Spieler zu finden. Um ihn zu verpflichten, musst du zunächst einen <a href="#h3PlayerContract">Vertrag mit ihm aushandeln</a>. Besitzt der Spieler eine fixe Ablöse oder ist er vereinslos, wechselt er nun direkt zu deinem Verein. Ansonsten musst du dem bisherigen Verein des Spielers eine Ablösesumme anbieten.
-
-<h3><span id="h3Livegame" class="ckLink"></span>Live-Spiel</h3>
-Findet gerade ein Spiel statt, kannst du es dir hier anschauen. Durch einen klick auf (3) kannst du die Trikotfarben wechslen. Über die links 'Aufstellung/Taktik' (2a) kannst du dein Team anpassen und Auswechslungen vornehmen und über den link 'home' (2b) kommst du zurück in den Startbildschirm.<br />
-<img src="~/Content/Images/user_manual/Game2.png" width="600" /> <br />
-Ist gerade kein Spiel im Gange, kannst du vergangene Spiele über das Menü (1) auswählen und analysieren. Dazu stehen dir verschiedene Optionen zur Verfügung: Mit den Schaltflächen
-<img src="~/Content/Images/user_manual/LiveGame_options.png" width="200" /> kannst du dir jede Spielsituation noch einmal anschauen (5). Mit einem klick auf die Symbole über bzw. unter der timeline (4) kommst du direkt in die jeweilige Spielsituation<br />
-Über den link 'Optionen' (2c) kannst du spezielle Darstellungsoptionen wie heatmap, Schüsse und Pässe aktivieren.<br />
