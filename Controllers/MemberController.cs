@@ -1769,7 +1769,7 @@ namespace CornerkickWebMvc.Controllers
       return View(mdContracts);
     }
 
-    public ActionResult ContractsGetTableTeam()
+    public ActionResult ContractsGetTableTeam(bool bNextSeason)
     {
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -1778,8 +1778,9 @@ namespace CornerkickWebMvc.Controllers
       if (club.nextGame != null) iGameType = club.nextGame.iGameType;
 
       //The table or entity I'm querying
-      Models.ContractsModel.DatatableEntry[] query = new Models.ContractsModel.DatatableEntry[club.ltPlayer.Count + club.ltPlayerJouth.Count];
+      List<Models.ContractsModel.DatatableEntry> query = new List<Models.ContractsModel.DatatableEntry>();
 
+      bool bJouth = false;
       int iIx = 0;
       foreach (List<CornerkickGame.Player> ltPlayerTeam in new List<CornerkickGame.Player>[] { club.ltPlayer, club.ltPlayerJouth }) {
         // Update player numbers if nation
@@ -1790,6 +1791,8 @@ namespace CornerkickWebMvc.Controllers
         List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType, nPlStart: 0);
 
         for (int i = 0; i < ltPlayerTeam.Count; i++) {
+          if (bNextSeason && ltPlayerTeam[i].contract.iLength == 1) continue;
+
           string sName = ltLV[i][2];
           int iId = -1;
           int.TryParse(ltLV[i][0], out iId);
@@ -1797,16 +1800,18 @@ namespace CornerkickWebMvc.Controllers
           int iNat = int.Parse(ltLV[i][12]);
           string sNat = CornerkickManager.Main.sLandShort[iNat];
 
-          int iVal    = int.Parse(ltLV[i][ 9].Replace(".", ""));
-          int iSal    = int.Parse(ltLV[i][10].Replace(".", ""));
-          int iPlay   = int.Parse(ltLV[i][22].Replace(".", ""));
-          int iGoal   = int.Parse(ltLV[i][23].Replace(".", ""));
+          int iVal  = int.Parse(ltLV[i][ 9].Replace(".", ""));
+          int iSal  = int.Parse(ltLV[i][10].Replace(".", ""));
+          int iPlay = int.Parse(ltLV[i][22].Replace(".", ""));
+          int iGoal = int.Parse(ltLV[i][23].Replace(".", ""));
 
           string sNb = ltLV[i][1];
-          if (iIx > club.ltPlayer.Count) sNb = "-";
+          if (bJouth) sNb = "-";
 
-          //Hard coded data here that I want to replace with query results
-          query[iIx++] = new Models.ContractsModel.DatatableEntry {
+          int iContractLength = int.Parse(ltLV[i][11]);
+          if (bNextSeason) iContractLength--;
+
+          query.Add(new Models.ContractsModel.DatatableEntry {
             sID = ltLV[i][0],
             sNb = sNb,
             sName = sName,
@@ -1814,7 +1819,7 @@ namespace CornerkickWebMvc.Controllers
             sSkill = ltLV[i][4],
             iValue = iVal,
             iSalary = iSal,
-            sLength = ltLV[i][11],
+            iLength = iContractLength,
             sNat = sNat,
             sAge = ltLV[i][14],
             sTalent = ltLV[i][15],
@@ -1822,8 +1827,39 @@ namespace CornerkickWebMvc.Controllers
             iBonusPlay = iPlay,
             iBonusGoal = iGoal,
             sFixTransferFee = ltLV[i][24],
-            bJouth = iIx > club.ltPlayer.Count
-          };
+            bJouth = bJouth
+          });
+        }
+
+        bJouth = true;
+      }
+
+      if (bNextSeason) {
+        //DateTime dtSeasonStartNext = MvcApplication.ckcore.dtSeasonStart.AddYears(1);
+
+        foreach (CornerkickGame.Player plNext in MvcApplication.ckcore.ltPlayer) {
+          if (plNext.contractNext != null) {
+            if (plNext.contractNext.iClubId == club.iId) {
+              query.Add(new Models.ContractsModel.DatatableEntry {
+                sID = plNext.iId.ToString(),
+                sNb = "-",
+                sName = plNext.sName + " *",
+                sPosition = CornerkickManager.Player.getStrPos(plNext),
+                sSkill = CornerkickGame.Tool.getAveSkill(plNext).ToString("0.0"),
+                iValue = plNext.getValue(MvcApplication.ckcore.dtDatum),
+                iSalary = plNext.contractNext.iSalary,
+                iLength = plNext.contractNext.iLength,
+                sNat = CornerkickManager.Main.sLandShort[plNext.iNat1],
+                sAge = ((int)plNext.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
+                sTalent = plNext.iTalent.ToString(),
+                sSkillIdeal = CornerkickGame.Tool.getAveSkill(plNext, bIdeal: true).ToString("0.0"),
+                iBonusPlay = plNext.contractNext.iPlay,
+                iBonusGoal = plNext.contractNext.iGoal,
+                sFixTransferFee = plNext.contractNext.iFixTransferFee.ToString(),
+                bJouth = bJouth
+              });
+            }
+          }
         }
       }
 

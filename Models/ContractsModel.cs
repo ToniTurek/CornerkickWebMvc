@@ -22,7 +22,7 @@ namespace CornerkickWebMvc.Models
       public int iBonusPlay { get; set; }
       public int iBonusGoal { get; set; }
       public string sFixTransferFee { get; set; }
-      public string sLength { get; set; }
+      public int iLength { get; set; }
       public string sNat { get; set; }
       public bool bJouth { get; set; }
     }

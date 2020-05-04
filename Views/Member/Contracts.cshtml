@@ -19,7 +19,9 @@
           "url": '@Url.Action("ContractsGetTableTeam", "Member")',
           "type": 'GET',
           "dataType": "JSON",
-          "cache": false,
+          "data": function (d) {
+            d.bNextSeason = document.getElementById('rbSeasonNext').checked;
+          },
           "contentType": "application/json; charset=utf-8"
         },
         "columns": [
@@ -52,7 +54,7 @@
             "data": "iBonusGoal",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
-          { "data": "sLength" },
+          { "data": "iLength" },
           { "data": "sFixTransferFee" },
           {
             "data": "sNat",
@@ -118,47 +120,72 @@
     }
 
     $(document).ready(function () {
-      drawDatatableContracts();
+      var tblContracts = drawDatatableContracts();
+
+      document.getElementById("rbSeasonCurrent").addEventListener("change", function () { updateDatatable(tblContracts); });
+      document.getElementById("rbSeasonNext").addEventListener("change", function () { updateDatatable(tblContracts); });
     }); // $(document).ready(function () {});
+
+    function updateDatatable(tbl) {
+      tbl.ajax.reload();
+    }
   </script>
 </head>
 
-<h3>Spielerverträge</h3>
-<div class="dataTables_wrapper">
-  <table id="tableTeamContracts" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nr</th>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Stärke</th>
-        <th>St. ber.</th>
-        <th>Alter</th>
-        <th>Tal.</th>
-        <th>Marktwert [€]</th>
-        <th>Gehalt [€/a]</th>
-        <th>Auflaufpr. [€]</th>
-        <th>Torprämie [€]</th>
-        <th>Lz [a]</th>
-        <th>Fixe Ablöse [€]</th>
-        <th>Nat.</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!---Data and tags are dynamically generated--->
-    </tbody>
-    <tfoot>
-      <tr>
-        <th colspan="8" style="text-align:right">Summe:</th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    </tfoot>
-  </table>
+<div style="position: relative; width: 100%">
+  <h3>Spielerverträge</h3>
+
+  <div align="center" style="position: absolute; width: 204px; height: 24px; top: 0px; right: 0px; background-color: white; white-space: nowrap; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px; z-index: 99">
+    <form>
+      <fieldset>
+        <label style="cursor: pointer">
+          <input type="radio" id="rbSeasonCurrent" name="rbSeason" value="0" checked>
+          Aktuell
+        </label>
+        <label style="cursor: pointer">
+          <input type="radio" id="rbSeasonNext" name="rbSeason" value="1">
+          Nächste Saison
+        </label>
+      </fieldset>
+    </form>
+  </div>
+
+  <div class="dataTables_wrapper">
+    <table id="tableTeamContracts" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nr</th>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Stärke</th>
+          <th>St. ber.</th>
+          <th>Alter</th>
+          <th>Tal.</th>
+          <th>Marktwert [€]</th>
+          <th>Gehalt [€/a]</th>
+          <th>Auflaufpr. [€]</th>
+          <th>Torprämie [€]</th>
+          <th>Lz [a]</th>
+          <th>Fixe Ablöse [€]</th>
+          <th>Nat.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="8" style="text-align:right">Summe:</th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </div>
