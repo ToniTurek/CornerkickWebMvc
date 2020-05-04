@@ -3027,26 +3027,6 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult TakeFromTransferList(int iPlayerId)
-    {
-      if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
-      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
-
-      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
-
-      for (int iT = 0; iT < MvcApplication.ckcore.ltTransfer.Count; iT++) {
-        CornerkickManager.Transfer.Item transfer = MvcApplication.ckcore.ltTransfer[iT];
-
-        if (transfer.player == pl) {
-          MvcApplication.ckcore.ltTransfer.RemoveAt(iT);
-          break;
-        }
-      }
-
-      return Json("Der Spieler " + pl.sName + " wurde von der Transferliste genommen", JsonRequestBehavior.AllowGet);
-    }
-
-    [HttpPost]
     public JsonResult MakeTransferOffer(int iPlayerId, int iTransferFee, int iTransferFeeSecret)
     {
       if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
