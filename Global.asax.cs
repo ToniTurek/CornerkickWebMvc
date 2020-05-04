@@ -829,8 +829,8 @@ namespace CornerkickWebMvc
       bool bSaveOk = false;
       try {
         bSaveOk = ckcore.io.save(sFileSave2);
-      } catch {
-        ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2, CornerkickManager.Main.sErrorFile);
+      } catch (Exception e) {
+        ckcore.tl.writeLog("ERROR: could not save to file " + sFileSave2 + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
       }
 
       // Upload save
@@ -867,10 +867,10 @@ namespace CornerkickWebMvc
         foreach (FileInfo ckg in ltCkgFiles) {
           DateTime dtGame;
 
-          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('_');
+          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('x');
           if (sFilenameData.Length < 3) continue;
 
-          if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd-HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) continue;
+          if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd_HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) continue;
           if (dtGame.CompareTo(dtLoadCk) < 0) continue; // If game was already present when ck was started
 
           string sFileGameSave = Path.Combine(sHomeDir, "save", "games", ckg.Name);
