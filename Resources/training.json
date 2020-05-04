@@ -18,7 +18,7 @@
         "condi": -2.0,
         "fresh": +5.0,
         "moral": +1.0,
-        "injuryrisk": 0.0,
+        "injuryrisk": 0.0001,
         "skillbonus":
           [
           ]
@@ -29,7 +29,7 @@
         "condi":  -1.2,
         "fresh": +20.0,
         "moral":   0.0,
-        "injuryrisk": 0.0,
+        "injuryrisk": 0.0001,
         "skillbonus":
           [
           ]
@@ -184,7 +184,7 @@
         "condi":  -1.2,
         "fresh": +10.0,
         "moral":  +0.3,
-        "injuryrisk": 0.0,
+        "injuryrisk": 0.0002,
         "skillbonus":
           [
             { "skill":  1, "bonus": 0.003, "exclude": 2 },
@@ -197,7 +197,7 @@
         "condi": -0.6,
         "fresh": -0.5,
         "moral": -0.2,
-        "injuryrisk": 0.0005,
+        "injuryrisk": 0.0003,
         "skillbonus":
           [
             { "skill": 12, "bonus": 0.030, "exclude": 2 },
