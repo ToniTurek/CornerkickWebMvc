@@ -2816,7 +2816,10 @@ namespace CornerkickWebMvc.Controllers
             }
           }
         }
-      } else { // new contract
+
+        // Remove hidden entry from transfer list
+        MvcApplication.ckcore.tr.removePlayerFromTransferlist(plContract);
+      } else { // New contract
         if (iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
 
         // Create new offer
