@@ -418,7 +418,7 @@ namespace CornerkickWebMvc
     {
       // Reset home dir
       string sHomeDir = getHomeDir();
-      if (!sHomeDir.Equals(CornerkickManager.Main.sHomeDir)) {
+      if (sHomeDir != null && !sHomeDir.Equals(CornerkickManager.Main.sHomeDir)) {
         ckcore.tl.writeLog("Reset ck home dir from " + CornerkickManager.Main.sHomeDir + " to " + sHomeDir);
         CornerkickManager.Main.sHomeDir = sHomeDir;
       }
@@ -775,8 +775,8 @@ namespace CornerkickWebMvc
       // Don't save if calendar to fast
       if (timerCkCalender.Interval < 10000 && !bForce) return;
 
-      string sHomeDir = CornerkickManager.Main.sHomeDir;
-      if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = getHomeDir();
+      string sHomeDir = getHomeDir();
+      if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = CornerkickManager.Main.sHomeDir;
 
 #if DEBUG
       sHomeDir = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc";
@@ -978,6 +978,7 @@ namespace CornerkickWebMvc
     internal static bool load()
     {
       string sHomeDir = getHomeDir();
+      if (string.IsNullOrEmpty(sHomeDir)) return false;
 
       string sFileLoad = Path.Combine(sHomeDir, "save", sFilenameSave);
 
@@ -1293,7 +1294,7 @@ namespace CornerkickWebMvc
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #else
 
-      if (HttpContext.Current == null) return "./App_Data";
+      if (HttpContext.Current == null) return null;
 
 #if _DEPLOY_ON_APPHB
       return Path.Combine(HttpContext.Current.Server.MapPath("~"), "App_Data");
