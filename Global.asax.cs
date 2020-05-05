@@ -760,7 +760,7 @@ namespace CornerkickWebMvc
 
     internal static async Task<bool> saveAsync(System.Timers.Timer timerCkCalender, bool bForce = false)
     {
-      save(timerCkCalender, bForce);
+      save(timerCkCalender, bForce: bForce);
       return true;
     }
     internal static void save(System.Timers.Timer timerCkCalender, bool bForce = false)
@@ -900,14 +900,14 @@ namespace CornerkickWebMvc
           bcontr.uploadBlob("blobLog", sFileZipLog);
 #endif
 #if _USE_AMAZON_S3
-          as3.uploadFile(sFileZipLog, "ckLog", "application/zip");
+          as3.uploadFile(sFileZipLog, "ckLog_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"), "application/zip");
 #endif
-        } catch {
+        } catch (Exception e) {
 #if _USE_BLOB
           ckcore.tl.writeLog("ERROR: could not upload log.zip file to blob", ckcore.sErrorFile);
 #endif
 #if _USE_AMAZON_S3
-          ckcore.tl.writeLog("ERROR: could not upload log.zip file to amazon s3", CornerkickManager.Main.sErrorFile);
+          ckcore.tl.writeLog("ERROR: could not upload log.zip file to amazon s3" + Environment.NewLine + e.Message, CornerkickManager.Main.sErrorFile);
 #endif
         }
 #endif
@@ -1006,7 +1006,7 @@ namespace CornerkickWebMvc
       }
 
       // Download log async
-      Task<bool> tkDownloadLog = Task.Run(async () => await downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip"));
+      //Task<bool> tkDownloadLog = Task.Run(async () => await downloadFileAsync(as3, "ckLog", sHomeDir + "/log.zip"));
 
       // Download Google ads.txt async
       Task<bool> tkDownloadAds = Task.Run(async () => await downloadFileAsync(as3, "ads.txt", Path.Combine(sHomeDir, "..", "ads.txt")));
@@ -1099,7 +1099,6 @@ namespace CornerkickWebMvc
         Task<bool> tkDownloadPortraits = Task.Run(async () => await downloadFilesAsync(as3, "Portraits/", sHomeDir + "/../Content/Uploads/", ".png"));
 
         // Download mails
-        //Task<bool> tkDownloadMail = Task.Run(async () => await downloadFilesAsync(as3, "mail/", sHomeDir, ".txt"));
         Task<bool> tkDownloadMail = Task.Run(async () => await downloadMails(as3, sHomeDir));
 
         // Download wishlist
