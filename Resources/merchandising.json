@@ -1,0 +1,40 @@
+{
+  "merchandising":
+    [
+      {
+        "id": 1,
+        "name": "Vereinstrikot",
+        "price": 40,
+        "sellfactor": 1.0,
+        "quantityfactor": 100
+      },
+      {
+        "id": 2,
+        "name": "Vereinsschal",
+        "price": 20,
+        "sellfactor": 1.0,
+        "quantityfactor": 200
+      },
+      {
+        "id": 3,
+        "name": "Bedruckte Tasse",
+        "price": 10,
+        "sellfactor": 0.5,
+        "quantityfactor": 500
+      },
+      {
+        "id": 4,
+        "name": "Kugelschreiber",
+        "price": 2,
+        "sellfactor": 0.5,
+        "quantityfactor": 10000
+      },
+      {
+        "id": 5,
+        "name": "Pullover",
+        "price": 45,
+        "sellfactor": 0.3,
+        "quantityfactor": 100
+      }
+    ]
+}

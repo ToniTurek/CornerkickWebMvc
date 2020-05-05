@@ -4800,6 +4800,11 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
+    public ActionResult Merchandising(Models.MerchandisingModel mdMerchandising)
+    {
+      return View(mdMerchandising);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// League
