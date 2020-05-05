@@ -1179,8 +1179,10 @@ namespace CornerkickWebMvc.Controllers
         int iNat = int.Parse(ltLV[i][12]);
         string sNat = CornerkickManager.Main.sLandShort[iNat];
 
-        int iVal = int.Parse(ltLV[i][ 9].Replace(".", ""));
-        int iSal = int.Parse(ltLV[i][10].Replace(".", ""));
+        int iVal = 0;
+        int.TryParse(ltLV[i][ 9].Replace(".", ""), out iVal);
+        int iSal = 0;
+        int.TryParse(ltLV[i][10].Replace(".", ""), out iSal);
 
         //Hard coded data here that I want to replace with query results
         query[i] = new DatatableEntryTeam { iIndex = i + 1, sID = ltLV[i][0], sNr = ltLV[i][1], sNull = "", sName = sName, sPosition = ltLV[i][3], sStaerke = ltLV[i][4], sKondi = ltLV[i][5], sFrische = ltLV[i][6], sMoral = ltLV[i][7], sErf = ltLV[i][8], iMarktwert = iVal, iGehalt = iSal, sLz = ltLV[i][11], sNat = sNat, sForm = ltLV[i][13], sAlter = ltLV[i][14], sTalent = ltLV[i][15], bSubstituted = ltLV[i][16] == "ausg", sLeader = ltLV[i][19], sStaerkeIdeal = ltLV[i][17], iSuspended = iSusp, sCaptain = ltLV[i][20], sGrade = ltLV[i][21], bAtNationalTeam = ltLV[i][1].StartsWith("-") };
