@@ -416,6 +416,13 @@ namespace CornerkickWebMvc
 
     internal static bool performCalendarStep(bool bSave = true)
     {
+      // Reset home dir
+      string sHomeDir = getHomeDir();
+      if (!sHomeDir.Equals(CornerkickManager.Main.sHomeDir)) {
+        ckcore.tl.writeLog("Reset ck home dir from " + CornerkickManager.Main.sHomeDir + " to " + sHomeDir);
+        CornerkickManager.Main.sHomeDir = sHomeDir;
+      }
+
       if (ckcore.ltUser.Count == 0) return true;
 
       if (settings.iStartHour >= 0 && settings.iStartHour <= 24) {
