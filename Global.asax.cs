@@ -581,7 +581,7 @@ namespace CornerkickWebMvc
           CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, 0);
           if (league == null) continue;
 
-          List<CornerkickManager.Tool.TableItem> ltTbl = CornerkickManager.Tool.getLeagueTable(league);
+          List<CornerkickManager.Cup.TableItem> ltTbl = league.getTable();
 
           // ... to Gold Cup
           for (byte jL = 0; jL < 4; jL++) {
@@ -701,8 +701,8 @@ namespace CornerkickWebMvc
             if (league.ltMatchdays == null) continue;
             if (league.ltMatchdays.Count < 2) continue;
 
-            List<CornerkickManager.Tool.TableItem> tbl = CornerkickManager.Tool.getLeagueTable(league);
-            foreach (CornerkickManager.Tool.TableItem item in tbl) {
+            List<CornerkickManager.Cup.TableItem> tbl = league.getTable();
+            foreach (CornerkickManager.Cup.TableItem item in tbl) {
               if (item.club.user != null) {
                 if (ckcore.ltUser.IndexOf(item.club.user) == 0) continue; // If main CPU user
 
