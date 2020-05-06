@@ -318,6 +318,7 @@
     <Compile Include="Models\JouthModel.cs" />
     <Compile Include="Models\LeagueModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MerchandisingModel.cs" />
     <Compile Include="Models\PersonalModel.cs" />
     <Compile Include="Models\PlayerModel.cs" />
     <Compile Include="Models\PreviewGameModel.cs" />
@@ -1377,6 +1378,7 @@
     <Content Include="App_Data\save\games\.gitignore">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\Member\Merchandising.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
