@@ -505,14 +505,22 @@
               <tbody>
                 @for (int i = Model.ltAccount.Count - 1; i >= 0; i--) {
                   CornerkickManager.Finance.Account kto = Model.ltAccount[i];
+
                   string sUmsatz = "0";
                   if (kto.iValue != 0) { sUmsatz = kto.iValue.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)); }
+                  string sStyle = "color: ";
+                  if (kto.iValue < 0) {
+                    sStyle += "red";
+                  } else {
+                    sStyle += "green";
+                  }
+
                   string sKontostand = "0";
                   if (kto.iBalance != 0) { sKontostand = kto.iBalance.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)); }
                   <tr>
                     <td align="center">@kto.dt.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
                     <td align="center">@kto.sSubject</td>
-                    <td align="right">@sUmsatz</td>
+                    <td align="right" style="@sStyle; border-color: black">@sUmsatz</td>
                     <td align="right">@sKontostand</td>
                   </tr>
                 }
