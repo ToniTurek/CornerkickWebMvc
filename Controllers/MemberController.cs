@@ -4805,6 +4805,70 @@ namespace CornerkickWebMvc.Controllers
       return View(mdMerchandising);
     }
 
+    public JsonResult MerchandisingGetItems()
+    {
+      List<Models.MerchandisingModel.DatatableMerchandising> ltDtItems = new List<Models.MerchandisingModel.DatatableMerchandising>();
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      int iIx = 0;
+      foreach (CornerkickManager.Merchandising.Item mi in MvcApplication.ckcore.ltMerchandising) {
+        Models.MerchandisingModel.DatatableMerchandising dtm = new Models.MerchandisingModel.DatatableMerchandising();
+
+        CornerkickManager.Club.MerchandisingItem cmi = clb.getMerchandisingItem(mi);
+
+        dtm.iIx = iIx++;
+        dtm.iId = mi.iId;
+        dtm.sName = mi.sName;
+        dtm.sPriceBasic = mi.fPriceBuy.ToString("0.00");
+        dtm.sPriceBuy = dtm.sPriceBasic;
+        if (cmi != null) {
+          dtm.iPresent = cmi.iPresent;
+          dtm.iSold = cmi.iSold;
+          dtm.fPriceSell = cmi.fPrice;
+        }
+
+        ltDtItems.Add(dtm);
+      }
+
+      return Json(new { aaData = ltDtItems }, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult getMerchandisingPrice(int iItemId, int iAmount)
+    {
+      CornerkickManager.Merchandising.Item mi = CornerkickManager.Merchandising.getItem(iItemId, MvcApplication.ckcore.ltMerchandising);
+      if (mi == null) return Json("0.00", JsonRequestBehavior.AllowGet);
+
+      return Json(mi.getPrice(iAmount).ToString("0.00"), JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult buyMerchandisingItem(int iItemId, int iAmount, float fPrice)
+    {
+      CornerkickManager.Merchandising.Item mi = CornerkickManager.Merchandising.getItem(iItemId, MvcApplication.ckcore.ltMerchandising);
+      if (mi == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.buyMerchandisingItem(mi, iAmount, fPrice);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult setMerchandisingItemPrice(int iItemId, float fPrice)
+    {
+      CornerkickManager.Merchandising.Item mi = CornerkickManager.Merchandising.getItem(iItemId, MvcApplication.ckcore.ltMerchandising);
+      if (mi == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.setMerchandisingItemPrice(mi, fPrice);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// League

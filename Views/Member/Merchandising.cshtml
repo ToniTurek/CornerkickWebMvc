@@ -1,9 +1,192 @@
 ﻿@model CornerkickWebMvc.Models.MerchandisingModel
 
 @{
-    ViewBag.Title = "Merchandising";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Merchandising";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<html style="height: 100%; min-height: 100%">
+<head>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
 
-<h2>Merchandising</h2>
+  <script>
+    var oTable;
 
+    $(document).ready(function () {
+      oTable = setTableItems();
+    }); // $(document).ready
+
+    function setTableItems() {
+      return $('#tableItems').DataTable({
+        "ajax": {
+          "url": '@Url.Action("MerchandisingGetItems", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "iIx" },
+          { "data": "iId" },
+          { "data": "sName" },
+          { "data": "iPresent" },
+          { "data": "sPriceBasic" },
+          { "data": null },
+          { "data": "sPriceBuy" },
+          { "data": null },
+          { "data": "sPriceSell" },
+          { "data": "iSold" }
+        ],
+        "paging": false,
+        "info": false,
+        "searching": false,
+        "order": [[0, "asc"]],
+        "language": {
+          "emptyTable": "Keine Artikel verfügbar"
+        },
+        "columnDefs": [
+          {
+            "targets": [0, 1],
+            "visible": false,
+            "orderable": false,
+            "searchable": false
+          },
+          {
+            "targets": [2, 5, 8],
+            "className": "dt-center"
+          },
+          {
+            "targets": [3, 4, 6, 7, 9],
+            "className": "dt-right"
+          },
+          {
+            "targets": [7, 8],
+            "defaultContent": '',
+            "orderable": false,
+            "searchable": false,
+            "data": null
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          $(nRow).addClass('details-control');
+
+          var itAmount = document.createElement("input");
+          itAmount.style.width = "80px";
+          itAmount.style.textAlign = "right";
+          itAmount.value = 0;
+          itAmount.addEventListener("keyup", function () {
+            getPrice(aData.iId, this.value, $("td:eq(4)", nRow));
+          });
+          $('td:eq(3)', nRow).html(itAmount);
+
+          var itPrice = document.createElement("input");
+          itPrice.style.width = "60px";
+          itPrice.style.textAlign = "right";
+          itPrice.value = aData.fPriceSell;
+          itPrice.addEventListener("keyup", function () {
+            setPrice(aData.iId, this.value);
+          });
+          $('td:eq(6)', nRow).html(itPrice);
+
+          var bnBuy = document.createElement("button");
+          bnBuy.style.width = "80px";
+          bnBuy.innerText = "kaufen";
+          bnBuy.className = "btn btn-default";
+          bnBuy.addEventListener("click", function () {
+            buyItem(aData.iId, itAmount.value, itPrice.value);
+          });
+          $('td:eq(5)', nRow).html(bnBuy);
+
+          return nRow;
+        }
+      });
+    }
+
+    function getPrice(iItemId, iAmount, cell) {
+      $.ajax({
+        url: '/Member/getMerchandisingPrice',
+        type: "GET",
+        dataType: "JSON",
+        data: { iItemId: iItemId, iAmount: iAmount },
+        success: function (sPrice) {
+          cell.text(sPrice);
+        },
+        error: function (xhr) {
+          alert(xhr.responseText);
+        }
+      });
+    }
+
+    function setPrice(iItemId, fPrice) {
+      $.ajax({
+        url: '/Member/setMerchandisingItemPrice',
+        type: "GET",
+        dataType: "JSON",
+        data: { iItemId: iItemId, fPrice: fPrice },
+        success: function (bReturn) {
+          //
+        },
+        error: function (xhr) {
+          alert(xhr.responseText);
+        }
+      });
+    }
+
+    function buyItem(iItemId, iAmount, fPrice) {
+      $.ajax({
+        url: '/Member/buyMerchandisingItem',
+        type: "POST",
+        dataType: "JSON",
+        data: { iItemId: iItemId, iAmount: iAmount, fPrice: fPrice },
+        success: function (bReturn) {
+          if (bReturn) {
+            oTable.ajax.reload();
+          }
+        },
+        error: function (xhr) {
+          alert(xhr.responseText);
+        }
+      });
+    }
+  </script>
+</head>
+
+<body style="width: 100%">
+  <div>
+    <h3>Merchandising</h3>
+    @*
+    <label style="margin-left: 10px">
+      Artikel:
+      @Html.DropDownListFor(m => m.iItem, Model.sliMerchandisingItems, new { @class = "form-horizontal", @onchange = "update(this)", id = "sliMerchandisingItems" })
+    </label>
+    *@
+
+    <div id="divTableItems" style="position: relative; left: 0px; width: auto">
+      <table id="tableItems" style="position: relative; margin: 0px; width: auto" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>id</th>
+            <th>Artikel</th>
+            <th>Lager</th>
+            <th>Grundpreis</th>
+            <th>Menge</th>
+            <th>Einkaufspreis</th>
+            <th></th>
+            <th>Verkaufspreis</th>
+            <th>verkauft</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
