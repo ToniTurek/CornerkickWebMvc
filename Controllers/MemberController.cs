@@ -4826,6 +4826,7 @@ namespace CornerkickWebMvc.Controllers
         dtm.sName = mi.sName;
         dtm.sPriceBasic = mi.fPriceBuy.ToString("0.00");
         dtm.sPriceBuy = dtm.sPriceBasic;
+        dtm.fPriceSell = mi.fPriceBuy;
         if (cmi != null) {
           dtm.iPresent = cmi.iPresent;
           dtm.iSold = cmi.iSold;
@@ -4843,10 +4844,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Merchandising.Item mi = CornerkickManager.Merchandising.getItem(iItemId, MvcApplication.ckcore.ltMerchandising);
       if (mi == null) return Json("0.00", JsonRequestBehavior.AllowGet);
 
-      return Json(mi.getPrice(iAmount).ToString("0.00"), JsonRequestBehavior.AllowGet);
+      return Json(mi.getPrice(iAmount), JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult buyMerchandisingItem(int iItemId, int iAmount, float fPrice)
+    public JsonResult buyMerchandisingItem(int iItemId, int iAmount, string sPriceBuy, float fPriceSell)
     {
       CornerkickManager.Merchandising.Item mi = CornerkickManager.Merchandising.getItem(iItemId, MvcApplication.ckcore.ltMerchandising);
       if (mi == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -4854,7 +4855,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      clb.buyMerchandisingItem(mi, iAmount, fPrice);
+      float fPriceBuy = 0f;
+      if (!float.TryParse(sPriceBuy, NumberStyles.Currency, CultureInfo.InvariantCulture, out fPriceBuy)) return Json(false, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Merchandising.buyMerchandisingItem(clb, mi, iAmount, fPriceBuy, fPriceSell, MvcApplication.ckcore.dtDatum);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

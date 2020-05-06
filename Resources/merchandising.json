@@ -6,35 +6,35 @@
         "name": "Vereinstrikot",
         "price": 40.0,
         "sellfactor": 1.0,
-        "quantityfactor": 100
+        "quantityfactor": 1000
       },
       {
         "id": 2,
         "name": "Vereinsschal",
         "price": 20.0,
         "sellfactor": 1.0,
-        "quantityfactor": 200
+        "quantityfactor": 2000
       },
       {
         "id": 3,
         "name": "Bedruckte Tasse",
         "price": 10.0,
         "sellfactor": 0.5,
-        "quantityfactor": 500
+        "quantityfactor": 5000
       },
       {
         "id": 4,
         "name": "Kugelschreiber",
         "price": 0.5,
         "sellfactor": 0.5,
-        "quantityfactor": 10000
+        "quantityfactor": 100000
       },
       {
         "id": 5,
         "name": "Pullover",
         "price": 45.0,
         "sellfactor": 0.3,
-        "quantityfactor": 100
+        "quantityfactor": 1000
       }
     ]
 }

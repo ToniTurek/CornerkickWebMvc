@@ -7,12 +7,11 @@
 <html style="height: 100%; min-height: 100%">
 <head>
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
-  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
-  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
 
   <script>
     var oTable;
@@ -39,6 +38,7 @@
           { "data": null },
           { "data": "sPriceBuy" },
           { "data": null },
+          { "data": null },
           { "data": "sPriceSell" },
           { "data": "iSold" }
         ],
@@ -57,15 +57,20 @@
             "searchable": false
           },
           {
-            "targets": [2, 5, 8],
+            "targets": [2, 5, 9],
             "className": "dt-center"
           },
           {
-            "targets": [3, 4, 6, 7, 9],
+            "targets": [3, 4, 6, 7, 8, 10],
             "className": "dt-right"
           },
           {
-            "targets": [7, 8],
+            "targets": 7,
+            "defaultContent": '0.00',
+            "data": null
+          },
+          {
+            "targets": [8, 9],
             "defaultContent": '',
             "orderable": false,
             "searchable": false,
@@ -76,45 +81,64 @@
           $(nRow).addClass('details-control');
 
           var itAmount = document.createElement("input");
+          //itAmount.className = "itAutoNumeric";
+          itAmount.type = "number";
           itAmount.style.width = "80px";
           itAmount.style.textAlign = "right";
           itAmount.value = 0;
-          itAmount.addEventListener("keyup", function () {
-            getPrice(aData.iId, this.value, $("td:eq(4)", nRow));
-          });
-          $('td:eq(3)', nRow).html(itAmount);
 
           var itPrice = document.createElement("input");
+          itPrice.type = "number";
           itPrice.style.width = "60px";
           itPrice.style.textAlign = "right";
           itPrice.value = aData.fPriceSell;
-          itPrice.addEventListener("keyup", function () {
-            setPrice(aData.iId, this.value);
-          });
-          $('td:eq(6)', nRow).html(itPrice);
 
           var bnBuy = document.createElement("button");
           bnBuy.style.width = "80px";
           bnBuy.innerText = "kaufen";
           bnBuy.className = "btn btn-default";
-          bnBuy.addEventListener("click", function () {
-            buyItem(aData.iId, itAmount.value, itPrice.value);
+          bnBuy.disabled = true;
+
+          itAmount.addEventListener("keyup", function () {
+            if (this.value) {
+              this.style.backgroundColor = "white";
+              getPrice(aData.iId, parseInt(this.value), $("td:eq(4)", nRow), $("td:eq(5)", nRow), bnBuy);
+            } else {
+              this.style.backgroundColor = "red";
+            }
           });
-          $('td:eq(5)', nRow).html(bnBuy);
+          $('td:eq(3)', nRow).html(itAmount);
+
+          itPrice.addEventListener("keyup", function () {
+            if (this.value) {
+              this.style.backgroundColor = "white";
+              setPrice(aData.iId, this.value);
+            } else {
+              this.style.backgroundColor = "red";
+            }
+          });
+          $('td:eq(7)', nRow).html(itPrice);
+
+          bnBuy.addEventListener("click", function () {
+            buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(4)", nRow).text(), parseFloat(itPrice.value));
+          });
+          $('td:eq(6)', nRow).html(bnBuy);
 
           return nRow;
         }
       });
     }
 
-    function getPrice(iItemId, iAmount, cell) {
+    function getPrice(iItemId, iAmount, cell1, cell2, bnBuy) {
       $.ajax({
         url: '/Member/getMerchandisingPrice',
         type: "GET",
         dataType: "JSON",
         data: { iItemId: iItemId, iAmount: iAmount },
-        success: function (sPrice) {
-          cell.text(sPrice);
+        success: function (fPrice) {
+          cell1.text(fPrice.toFixed(2));
+          cell2.text((fPrice * iAmount).toFixed(2));
+          bnBuy.disabled = iAmount === 0;
         },
         error: function (xhr) {
           alert(xhr.responseText);
@@ -137,12 +161,12 @@
       });
     }
 
-    function buyItem(iItemId, iAmount, fPrice) {
+    function buyItem(iItemId, iAmount, sPriceBuy, fPriceSell) {
       $.ajax({
         url: '/Member/buyMerchandisingItem',
         type: "POST",
         dataType: "JSON",
-        data: { iItemId: iItemId, iAmount: iAmount, fPrice: fPrice },
+        data: { iItemId: iItemId, iAmount: iAmount, sPriceBuy: sPriceBuy, fPriceSell: fPriceSell },
         success: function (bReturn) {
           if (bReturn) {
             oTable.ajax.reload();
@@ -160,10 +184,10 @@
   <div>
     <h3>Merchandising</h3>
     @*
-    <label style="margin-left: 10px">
-      Artikel:
-      @Html.DropDownListFor(m => m.iItem, Model.sliMerchandisingItems, new { @class = "form-horizontal", @onchange = "update(this)", id = "sliMerchandisingItems" })
-    </label>
+      <label style="margin-left: 10px">
+        Artikel:
+        @Html.DropDownListFor(m => m.iItem, Model.sliMerchandisingItems, new { @class = "form-horizontal", @onchange = "update(this)", id = "sliMerchandisingItems" })
+      </label>
     *@
 
     <div id="divTableItems" style="position: relative; left: 0px; width: auto">
@@ -176,7 +200,8 @@
             <th>Lager</th>
             <th>Grundpreis</th>
             <th>Menge</th>
-            <th>Einkaufspreis</th>
+            <th>Preis/Stück</th>
+            <th>Gesamtpreis</th>
             <th></th>
             <th>Verkaufspreis</th>
             <th>verkauft</th>
