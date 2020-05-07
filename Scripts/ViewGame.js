@@ -818,91 +818,95 @@ function plotStatistics(jState = -1) {
       
       //if (document.getElementById("myCheck").checked) {
       if (document.getElementById("bShowChances").checked) {
-        var chartPlAction = new CanvasJS.Chart("divPlActionChart", {
-          backgroundColor: "transparent",
-          animationEnabled: false,
-          theme: "theme2",//theme1
-          toolTip: {
-            shared: true,
-            borderColor: "black",
-            contentFormatter: function (e) {
-              var content = "<table>";
-
-              // For each cup
-              for (var i = 0; i < e.entries.length; i++) {
-                content += "<tr><td style=\"text-align:right\"><strong>" + e.entries[i].dataSeries.name + ":</strong></td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
-              }
-
-              content += "<tr><td style=\"text-align:right\"><strong>Entscheidung:</strong></td><td style=\"text-align:right\">" + (gD.fPlActionRnd * 100).toFixed(1) + "%</td>";
-              content += "</table>";
-
-              return content;
-            }
-          },
-          axisX: {
-            title: "",
-            tickLength: 0,
-            margin: 0,
-            lineThickness: 0,
-            valueFormatString: " " //comment this to show numeric values
-          },
-          axisY: {
-            interval: 100,
-            title: "",
-            tickLength: 0,
-            lineThickness: 0,
-            margin: 0,
-            valueFormatString: " ", //comment this to show numeric values
-            stripLines: [{
-              value: gD.fPlActionRnd * 100.0,
-              color: "black",
-              thickness: 2
-            }]
-          },
-          data: [
-            {
-              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
-              type: "stackedBar100",
-              color: "red",
-              name: "Schuss",
-              dataPoints: [
-                { y: gD.fPlAction[0] }
-              ]
-            },
-            {
-              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
-              type: "stackedBar100",
-              color: "blue",
-              name: "Pass",
-              dataPoints: [
-                { y: gD.fPlAction[1] }
-              ]
-            },
-            {
-              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
-              type: "stackedBar100",
-              color: "yellow",
-              name: "Dribbling",
-              dataPoints: [
-                { y: gD.fPlAction[2] }
-              ]
-            },
-            {
-              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
-              type: "stackedBar100",
-              color: "grey",
-              name: "Warten",
-              dataPoints: [
-                { y: gD.fPlAction[3] }
-              ]
-            }
-          ]
-        });
-
-        chartPlAction.render();
+        drawPlayerChances(gD.fPlAction, gD.fPlActionRnd);
       }
     } // success function
   }); // ajax
+}
+
+function drawPlayerChances(fPlAction, fPlActionRnd) {
+  var chartPlAction = new CanvasJS.Chart("divPlActionChart", {
+    backgroundColor: "transparent",
+    animationEnabled: false,
+    theme: "theme2",//theme1
+    toolTip: {
+      shared: true,
+      borderColor: "black",
+      contentFormatter: function (e) {
+        var content = "<table>";
+
+        // For each cup
+        for (var i = 0; i < e.entries.length; i++) {
+          content += "<tr><td style=\"text-align:right\"><strong>" + e.entries[i].dataSeries.name + ":</strong></td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
+        }
+
+        content += "<tr><td style=\"text-align:right\"><strong>Entscheidung:</strong></td><td style=\"text-align:right\">" + (gD.fPlActionRnd * 100).toFixed(1) + "%</td>";
+        content += "</table>";
+
+        return content;
+      }
+    },
+    axisX: {
+      title: "",
+      tickLength: 0,
+      margin: 0,
+      lineThickness: 0,
+      valueFormatString: " " //comment this to show numeric values
+    },
+    axisY: {
+      interval: 100,
+      title: "",
+      tickLength: 0,
+      lineThickness: 0,
+      margin: 0,
+      valueFormatString: " ", //comment this to show numeric values
+      stripLines: [{
+        value: fPlActionRnd * 100.0,
+        color: "black",
+        thickness: 2
+      }]
+    },
+    data: [
+      {
+        // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+        type: "stackedBar100",
+        color: "red",
+        name: "Schuss",
+        dataPoints: [
+          { y: fPlAction[0] }
+        ]
+      },
+      {
+        // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+        type: "stackedBar100",
+        color: "blue",
+        name: "Pass",
+        dataPoints: [
+          { y: fPlAction[1] }
+        ]
+      },
+      {
+        // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+        type: "stackedBar100",
+        color: "yellow",
+        name: "Dribbling",
+        dataPoints: [
+          { y: fPlAction[2] }
+        ]
+      },
+      {
+        // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+        type: "stackedBar100",
+        color: "grey",
+        name: "Warten",
+        dataPoints: [
+          { y: fPlAction[3] }
+        ]
+      }
+    ]
+  });
+
+  chartPlAction.render();
 }
 
 async function play(iState) {

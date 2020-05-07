@@ -288,6 +288,27 @@
         });
       });
 
+      $("#slrAdminShootDist").slider({
+        range: "min",
+        value: 0,
+        min: -100,
+        max: +100,
+        step: 10,
+        slide: function (event, ui) {
+          document.getElementById("itShootDist").value = -ui.value;
+
+          $.ajax({
+            url: '/ViewGame/AdminSetTaktik',
+            type: "GET",
+            dataType: "JSON",
+            data: { iTaktik: 2, fTaktik: -parseFloat(ui.value) / 100 },
+            success: function (fTaktik) {
+              getPlayerChancesAdmin();
+            }
+          });
+        }
+      });
+
       // List team
       oTable = $('#tableTeamViewGame').DataTable({
         "ajax": {
@@ -641,7 +662,7 @@
 
       $("#dialogAdminOptions").dialog({
         autoOpen: false,
-        height: 240,
+        height: 440,
         width: 280
       });
 
@@ -731,6 +752,17 @@
           }
         });
       }
+    }
+
+    function getPlayerChancesAdmin() {
+      $.ajax({
+        url: '/ViewGame/AdminGetPlayerChances',
+        type: "GET",
+        dataType: "JSON",
+        success: function (fPlAction) {
+          drawPlayerChances(fPlAction, 0);
+        }
+      });
     }
 
     function openDialogChances(bChecked) {
@@ -1122,6 +1154,11 @@
       <input id="inputAdminSetPosX" style="width: 40px" type="text" value="61" data-val="true" autocomplete="off">
       <input id="inputAdminSetPosY" style="width: 40px" type="text" value="0" data-val="true" autocomplete="off">
       <button type="submit" id="bnAdminSetPos" style="width: 40px; height: auto">set</button>
+    </div>
+
+    <div id="divTcShootDist" style="position: relative; width: 100%">
+      <input type="text" id="itShootDist" readonly style="position: absolute; border: 0; font-weight: bold; text-align: left; background-color: transparent; width: 100%">
+      <div id="slrAdminShootDist" style="position: absolute; top: 20px; float: left; height: 100%"></div>
     </div>
   </div>
 </body>
