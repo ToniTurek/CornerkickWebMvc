@@ -3272,43 +3272,47 @@ namespace CornerkickWebMvc.Controllers
                                                                                                        ltPlayer: ltPlayer,
                                                                                                        bFixTransferFee: bFixTransferFee,
                                                                                                        iNation: iNation)) {
-        string sClub = "vereinslos";
-        if (transfer.player.iClubId >= 0) {
-          sClub = MvcApplication.ckcore.ltClubs[transfer.player.iClubId].sName;
+        try {
+          string sClub = "vereinslos";
+          if (transfer.player.iClubId >= 0) {
+            sClub = MvcApplication.ckcore.ltClubs[transfer.player.iClubId].sName;
+          }
+
+          int iOffer = 0;
+          int iFixtransferfee = 0;
+          CornerkickManager.Club clubUser = ckClub();
+          if (clubUser.iId > 0 && transfer.player.contract != null) {
+            if      (MvcApplication.ckcore.tr.negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
+            else if (MvcApplication.ckcore.tr.alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
+            else if (CornerkickManager.Player.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
+            else if (transfer.player.iClubId >= 0 && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
+
+            iFixtransferfee = transfer.player.contract.iFixTransferFee;
+          }
+
+          string sDatePutOnTl = "-";
+          if (transfer.dt.Year > 1) sDatePutOnTl = transfer.dt.ToString("d", getCi());
+
+          ltDeTransfer.Add(new Models.DatatableEntryTransfer {
+            playerId = transfer.player.iId,
+            empty = "",
+            iOffer = iOffer,
+            index = (iTr + 1).ToString(),
+            datum = sDatePutOnTl,
+            name = transfer.player.sName,
+            position = CornerkickManager.Player.getStrPos(transfer.player),
+            strength      = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false).ToString("0.0"),
+            strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true) .ToString("0.0"),
+            age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
+            talent = (transfer.player.iTalent + 1).ToString(),
+            mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
+            fixtransferfee = iFixtransferfee,
+            club = sClub,
+            nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1]
+          });
+        } catch (Exception e) {
+          MvcApplication.ckcore.tl.writeLog("Error in getTableTransfer(), iTr: " + iTr.ToString() + Environment.NewLine + e.Message + Environment.NewLine + e.Source + Environment.NewLine + e.Data + Environment.NewLine + e.StackTrace, CornerkickManager.Main.sErrorFile);
         }
-
-        int iOffer = 0;
-        int iFixtransferfee = 0;
-        CornerkickManager.Club clubUser = ckClub();
-        if (clubUser.iId > 0 && transfer.player.contract != null) {
-          if      (MvcApplication.ckcore.tr.negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
-          else if (MvcApplication.ckcore.tr.alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
-          else if (CornerkickManager.Player.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
-          else if (transfer.player.iClubId >= 0 && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
-
-          iFixtransferfee = transfer.player.contract.iFixTransferFee;
-        }
-
-        string sDatePutOnTl = "-";
-        if (transfer.dt.Year > 1) sDatePutOnTl = transfer.dt.ToString("d", getCi());
-
-        ltDeTransfer.Add(new Models.DatatableEntryTransfer {
-          playerId = transfer.player.iId,
-          empty = "",
-          iOffer = iOffer,
-          index = (iTr + 1).ToString(),
-          datum = sDatePutOnTl,
-          name = transfer.player.sName,
-          position = CornerkickManager.Player.getStrPos(transfer.player),
-          strength      = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false).ToString("0.0"),
-          strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true) .ToString("0.0"),
-          age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
-          talent = (transfer.player.iTalent + 1).ToString(),
-          mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
-          fixtransferfee = iFixtransferfee,
-          club = sClub,
-          nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1]
-        });
 
         iTr++;
       }
