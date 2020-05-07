@@ -13,6 +13,8 @@ namespace CornerkickWebMvc.Models
     public int iItem { get; set; }
     public List<SelectListItem> sliMerchandisingItems { get; set; }
 
+    public CornerkickManager.Merchandising.Marketer marketer { get; set; }
+
     public class DatatableMerchandising
     {
       public int iIx { get; set; }

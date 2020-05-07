@@ -4805,6 +4805,11 @@ namespace CornerkickWebMvc.Controllers
 
     public ActionResult Merchandising(Models.MerchandisingModel mdMerchandising)
     {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(mdMerchandising);
+
+      mdMerchandising.marketer = clb.merchMarketer.marketer;
+
       return View(mdMerchandising);
     }
 
