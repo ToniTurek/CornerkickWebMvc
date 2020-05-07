@@ -309,9 +309,11 @@ namespace CornerkickWebMvc.Controllers
       if (iU == 0) {
 #endif
       string sWelcomeMsg = usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!";
-      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  2, usr.club.iId);
+      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  3, usr.club.iId);
       string sWelcomeMsg2 = "Schauen Sie sich die Anleitung um mehr über die Funktionsweise von Cornerkick zu erfahren.";
-      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg2, 2, usr.club.iId);
+      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg2, 3, usr.club.iId);
+      string sNewspaper = "Herzlich Willkommen!#" + usr.sFirstname + " " + usr.sSurname + " steigt als neuer Manager bei " + clb.sName + " ein.";
+      MvcApplication.ckcore.sendNews(usr, sNewspaper, 203);
 #if DEBUG
       }
       }
