@@ -4808,9 +4808,15 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdMerchandising);
 
-      mdMerchandising.marketer = clb.merchMarketer.marketer;
+      mdMerchandising.marketer = clb.merchMarketer;
+      if (clb.merchMarketer == null) mdMerchandising.sMarketerMoney = getMerchandisingMarketerOffer(clb).ToString("N0", getCi()) + " €";
+      else                           mdMerchandising.sMarketerMoney = clb.merchMarketer.iMoney.ToString("N0", getCi()) + " €";
 
       return View(mdMerchandising);
+    }
+    private int getMerchandisingMarketerOffer(CornerkickManager.Club clb)
+    {
+      return (int)(clb.getAttractionFactor(MvcApplication.ckcore.iSeason) * 1000);
     }
 
     public JsonResult MerchandisingGetItems()
@@ -4877,6 +4883,18 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       clb.setMerchandisingItemPrice(mi, fPrice);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult MerchandisingTakeMarketer()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.merchMarketer = new CornerkickManager.Club.MerchandisingMarketer();
+      clb.merchMarketer.marketer = MvcApplication.ckcore.ltMerchandisingMarketer[0];
+      clb.merchMarketer.iMoney = getMerchandisingMarketerOffer(clb);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

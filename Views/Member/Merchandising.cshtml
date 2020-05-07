@@ -177,17 +177,52 @@
         }
       });
     }
+
+    function takeMarketer() {
+      $.ajax({
+        url: '/Member/MerchandisingTakeMarketer',
+        type: "POST",
+        dataType: "JSON",
+        success: function (bReturn) {
+          if (bReturn) {
+            window.location.reload(true);
+          }
+        },
+        error: function (xhr) {
+          alert(xhr.responseText);
+        }
+      });
+    }
   </script>
 </head>
 
 <body style="width: 100%">
   <div>
     <h3>Vermarkter</h3>
+
+    <table id="tableMarketer" style="position: relative; width: auto; font-size: 16px" cellpadding="6" border="1">
+      <tbody>
+        <tr>
+          @{
+            if (Model.marketer == null) {
+              <td><b>@MvcApplication.ckcore.ltMerchandisingMarketer[0].sName</b></td>
+              <td>Angebot: @Model.sMarketerMoney</td>
+              <td><button class="btn btn-default" style="width: 100px" onclick="takeMarketer()">annehmen</button></td>
+            } else {
+              <td><b>@Model.marketer.marketer.sName</b></td>
+              <td>Bezahlt: @Model.sMarketerMoney</td>
+            }
+          }
+        </tr>
+        <!---Data and tags are dynamically generated--->
+      </tbody>
+    </table>
+
     @*
-      <label style="margin-left: 10px">
-        Artikel:
-        @Html.DropDownListFor(m => m.iItem, Model.sliMerchandisingItems, new { @class = "form-horizontal", @onchange = "update(this)", id = "sliMerchandisingItems" })
-      </label>
+    <label style="margin-left: 10px">
+      Artikel:
+      @Html.DropDownListFor(m => m.iItem, Model.sliMerchandisingItems, new { @class = "form-horizontal", @onchange = "update(this)", id = "sliMerchandisingItems" })
+    </label>
     *@
 
     <h3>Artikel</h3>
