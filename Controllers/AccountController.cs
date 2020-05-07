@@ -947,12 +947,7 @@ namespace CornerkickWebMvc.Controllers
             // END Initialize dummy club
           } else { // no admin
             if (MvcApplication.settings.bEmailCertification) {
-              // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
-              // E-Mail-Nachricht mit diesem Link senden
-              string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
-              var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
-              MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
-              await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+              sendActivationLinkAsync(appUser.Id);
 
               // Uncomment to debug locally
               // TempData["ViewBagLink"] = callbackUrl;
@@ -990,6 +985,16 @@ namespace CornerkickWebMvc.Controllers
 
       // Wurde dieser Punkt erreicht, ist ein Fehler aufgetreten; Formular erneut anzeigen.
       return View(model);
+    }
+
+    private async void sendActivationLinkAsync(string sAppUserId)
+    {
+      // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
+      // E-Mail-Nachricht mit diesem Link senden
+      string code = await UserManager.GenerateEmailConfirmationTokenAsync(sAppUserId);
+      var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = sAppUserId, code = code }, protocol: Request.Url.Scheme);
+      MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
+      await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
     }
 
     [AllowAnonymous]
