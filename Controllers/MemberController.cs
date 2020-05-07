@@ -554,7 +554,10 @@ namespace CornerkickWebMvc.Controllers
 
             string sN = news.sText;
 
-            if (news.iType == CornerkickManager.Main.iNewsTypeCupWin) {
+            if (news.iType == CornerkickManager.Main.iNewsTypeNewYear) {
+              sN = MvcApplication.ckcore.dtDatum.Year.ToString() + "!#" + sN;
+              news.iId = -1;
+            } else if (news.iType == CornerkickManager.Main.iNewsTypeCupWin) {
               sN = "Was für ein Erfolg!#" + sN;
             }
 
