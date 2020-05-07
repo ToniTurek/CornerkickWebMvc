@@ -832,6 +832,7 @@ namespace CornerkickWebMvc.Controllers
 
     //
     // GET: /Account/Register
+    [HttpGet]
     [AllowAnonymous]
     public ActionResult Register(RegisterViewModel mdRegister)
     {
@@ -882,7 +883,7 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Register(RegisterViewModel model, bool b = false)
+    public async Task<ActionResult> RegisterUser(RegisterViewModel model)
     {
       // Check emblem
       if (model.fileEmblem != null) {
