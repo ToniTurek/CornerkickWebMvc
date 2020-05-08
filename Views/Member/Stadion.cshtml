@@ -655,7 +655,13 @@
             <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 49%; min-width: 308px">Kosten: 0</button>
           </div>
 
-          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+          <div id="divSnackbarContainer" style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+            @{
+              if (Model.iSnackbarReq > Model.stadion.iSnackbar) {
+                string sInfo = "Ihre Fans verlangen bei ausverkauftem Stadion min. " + Model.iSnackbarReq.ToString() + " Imbissbuden";
+                <img title="@sInfo" style="position: absolute; top: 6px; right: 6px; width: 30px; z-index: 99" src="/Content/Icons/attention.png">
+              }
+            }
             <strong style="position: relative; width: 308px; font-size: 18px">Imbissbuden</strong>
             <p id="txtSnackbar" style="position: relative; width: 308px; margin: 0; font-size: 18px"></p>
             <p id="txtSnackbarNew" style="position: relative; width: 308px; margin-top: 4px; margin-bottom: 2px; font-size: 16px; display: none"></p>
@@ -667,7 +673,13 @@
             <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 308px">Kosten: 0</button>
           </div>
 
-          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+          <div id="divToiletsContainer" style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+            @{
+              if (Model.iToiletsReq > Model.stadion.iToilets) {
+                string sInfo = "Ihre Fans verlangen bei ausverkauftem Stadion min. " + Model.iToiletsReq.ToString() + " Toiletten";
+                <img title="@sInfo" style="position: absolute; top: 6px; right: 6px; width: 30px; z-index: 99" src="/Content/Icons/attention.png">
+              }
+            }
             <strong style="position: relative; width: 308px; font-size: 18px">Toiletten</strong>
             <p id="txtToilets" style="position: relative; width: 308px; margin: 0; font-size: 18px"></p>
             <p id="txtToiletsNew" style="position: relative; width: 308px; margin-top: 4px; margin-bottom: 2px; font-size: 16px; display: none"></p>

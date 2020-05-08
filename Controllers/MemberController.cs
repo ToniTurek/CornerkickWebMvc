@@ -3844,6 +3844,9 @@ namespace CornerkickWebMvc.Controllers
       stadionModel.iSnackbarNew = (byte)Math.Max(clb.stadium.iSnackbarNew - clb.stadium.iSnackbar, 0);
       stadionModel.iToiletsNew  = (byte)Math.Max(clb.stadium.iToiletsNew  - clb.stadium.iToilets,  0);
 
+      stadionModel.iSnackbarReq = (byte)CornerkickManager.UI.getRequiredFeature(clb, 0);
+      stadionModel.iToiletsReq  = (byte)CornerkickManager.UI.getRequiredFeature(clb, 1);
+
       /*
       stModel.stadionNew = MvcApplication.ckcore.ini.newStadion();
       for (int i = 0; i < stModel.stadionNew.iPlaetze.Length; i++) {
@@ -4392,6 +4395,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].sName = clb.stadium.iCarpark.ToString();
       bdgsAll[iType].sNameNext = clb.stadium.iCarparkNew.ToString();
       bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
+      bdgsAll[iType].iLevelReq = CornerkickManager.UI.getRequiredFeature(clb, 2);
       if (clb.stadium.iCarparkNew > clb.stadium.iCarpark) {
         bdgsAll[iType].nDaysConstruct = clb.stadium.iCarparkDaysConstruct;
       } else {
@@ -4409,6 +4413,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].sName = clb.stadium.iTicketcounter.ToString();
       bdgsAll[iType].sNameNext = clb.stadium.iTicketcounterNew.ToString();
       bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
+      bdgsAll[iType].iLevelReq = CornerkickManager.UI.getRequiredFeature(clb, 3);
       if (clb.stadium.iTicketcounterNew > clb.stadium.iTicketcounter) {
         bdgsAll[iType].nDaysConstruct = clb.stadium.iTicketcounterDaysConstruct;
       } else {

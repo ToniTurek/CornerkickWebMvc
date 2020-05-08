@@ -66,6 +66,17 @@
           div1.appendChild(pCurr);
         }
 
+        if (building.iLevelReq > building.iLevel) {
+          var imgWarning = document.createElement("image");
+          imgWarning.style.position = "absolute";
+          imgWarning.style.right = "20px";
+          imgWarning.style.top = "20px";
+          imgWarning.style.width = "30px";
+          imgWarning.src = "/Content/Icons/attention.png";
+          imgWarning.title = "Ihre Fans verlangen bei ausverkauftem Stadion min. " + building.iLevelReq.toString() + " " + building.sCategory;
+          div1.appendChild(imgWarning);
+        }
+
         if (building.nDaysConstruct > 0) {
           var pNext = document.createElement("p");
           pNext.innerHTML = "Ausbau zu: " + building.sNameNext + " (noch " + building.nDaysConstruct.toString() + " Tage)";

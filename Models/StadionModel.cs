@@ -27,6 +27,8 @@ namespace CornerkickWebMvc.Models
     public byte iVideo { get; set; }
     public byte iSnackbarNew { get; set; }
     public byte iToiletsNew { get; set; }
+    public byte iSnackbarReq { get; set; }
+    public byte iToiletsReq { get; set; }
 
     public StadionModel()
     {

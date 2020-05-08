@@ -34,12 +34,15 @@ namespace CornerkickWebMvc.Models
 
     public int iCarpark { get; set; }
     public int iCarparkNew { get; set; }
+    public int iCarparkReq { get; set; } // Required level
 
     public int iCounter { get; set; }
     public int iCounterNew { get; set; }
+    public int iCounterReq { get; set; } // Required level
 
     public int iFanshop { get; set; }
     public int iFanshopNew { get; set; }
+    public int iFanshopReq { get; set; } // Required level
 
     public class Buildings
     {
@@ -53,6 +56,7 @@ namespace CornerkickWebMvc.Models
     {
       public string sCategory { get; set; }
       public int iLevel { get; set; }
+      public int iLevelReq { get; set; } // Required level
       public byte iType { get; set; }
       public string sName { get; set; }
       public string sNameNext { get; set; }
