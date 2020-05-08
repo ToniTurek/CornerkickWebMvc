@@ -1380,6 +1380,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Member\Merchandising.cshtml" />
+    <Content Include="App_Data\Resources\merchandising.json" />
+    <Content Include="Resources\merchandising.json" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
