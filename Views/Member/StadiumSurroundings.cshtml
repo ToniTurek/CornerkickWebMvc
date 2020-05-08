@@ -89,50 +89,11 @@
           divPb1.innerHTML = fProgress.toFixed(1) + '%';
           divPb.appendChild(divPb1);
           div1.appendChild(divPb);
-        } else {
+        } else { // No construction
           var btn = document.createElement("button");
 
           if (building.iType > 5) {
-            var divNew = document.createElement("div");
-            divNew.style.position = "relative";
-            divNew.style.width = "50%";
-            divNew.style.left = "25%";
-            divNew.style.height = "40px";
-
-            var txtNew = document.createElement("text");
-            txtNew.innerText = "Neu:";
-            txtNew.style.position = "absolute";
-            txtNew.style.textAlign = "right";
-            txtNew.style.top = "6px";
-            txtNew.style.left = "0px";
-            txtNew.style.width = "48%";
-            txtNew.style.fontSize = "16px";
-            divNew.appendChild(txtNew);
-
-            var iptNew = document.createElement("input");
-            iptNew.className = "form-control";
-            iptNew.style.position = "absolute";
-            iptNew.style.top = "0px";
-            iptNew.style.width = "48%";
-            iptNew.style.left = "52%";
-            iptNew.style.height = "auto";
-            iptNew.style.fontSize = "16px";
-            iptNew.value = 1;
-            iptNew.addEventListener("keyup", function () {
-              $.ajax({
-                url: '/Member/StadiumSurrGetSurrTypeNumber',
-                type: "post",
-                dataType: "JSON",
-                data: { iType: building.iType, iNew: getIntFromString(iptNew.value), iCurrent: getIntFromString(building.sName) },
-                success: function (bdg) {
-                  setBuildingBtn(btn, bdg);
-                }
-              });
-            });
-            building.sNameNext = (getIntFromString(building.sName) + getIntFromString(iptNew.value)).toString();
-            divNew.appendChild(iptNew);
-
-            div1.appendChild(divNew);
+            div1.appendChild(getNumberInputDiv(btn, building));
           }
 
           btn.type = "submit";
@@ -163,7 +124,13 @@
               opt.innerHTML = ltBuildingsFree[iBdgFree].sCategory;
               sct.appendChild(opt);
             }
-            sct.addEventListener("change", function () { setBuildingBtn(btn, ltBuildingsFree[sct.value]); });
+            sct.addEventListener("change", function () {
+              if (ltBuildingsFree[this.value].iType > 5) {
+                div1.appendChild(getNumberInputDiv(btn, ltBuildingsFree[this.value]));
+              }
+
+              setBuildingBtn(btn, ltBuildingsFree[this.value]);
+            });
             div1.appendChild(sct);
           }
 
@@ -180,6 +147,49 @@
       btn.innerHTML = "Ausbau zu " + building.sNameNext + ":<br>" + building.sCostConstructNext + " € / " + building.nDaysConstructTotal.toString() + " Tage";
       btn.setAttribute('data-itype',  building.iType);
       btn.setAttribute('data-ilevel', building.iLevel + 1);
+    }
+
+    function getNumberInputDiv(btn, building) {
+      var divNew = document.createElement("div");
+      divNew.style.position = "relative";
+      divNew.style.width = "50%";
+      divNew.style.left = "25%";
+      divNew.style.height = "40px";
+
+      var txtNew = document.createElement("text");
+      txtNew.innerText = "Neu:";
+      txtNew.style.position = "absolute";
+      txtNew.style.textAlign = "right";
+      txtNew.style.top = "6px";
+      txtNew.style.left = "0px";
+      txtNew.style.width = "48%";
+      txtNew.style.fontSize = "16px";
+      divNew.appendChild(txtNew);
+
+      var iptNew = document.createElement("input");
+      iptNew.className = "form-control";
+      iptNew.style.position = "absolute";
+      iptNew.style.top = "0px";
+      iptNew.style.width = "48%";
+      iptNew.style.left = "52%";
+      iptNew.style.height = "auto";
+      iptNew.style.fontSize = "16px";
+      iptNew.value = 1;
+      iptNew.addEventListener("keyup", function () {
+        $.ajax({
+          url: '/Member/StadiumSurrGetSurrTypeNumber',
+          type: "post",
+          dataType: "JSON",
+          data: { iType: building.iType, iNew: getIntFromString(iptNew.value), iCurrent: getIntFromString(building.sName) },
+          success: function (bdg) {
+            setBuildingBtn(btn, bdg);
+          }
+        });
+      });
+      building.sNameNext = (getIntFromString(building.sName) + getIntFromString(iptNew.value)).toString();
+      divNew.appendChild(iptNew);
+
+      return divNew;
     }
 
     function getGroundStadium() {

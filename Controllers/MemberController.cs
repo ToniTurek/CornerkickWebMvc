@@ -4422,6 +4422,7 @@ namespace CornerkickWebMvc.Controllers
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildFanshop(clb)[1];
       } else {
         iCostDays = CornerkickManager.Stadium.getCostDaysBuildFanshop(clb.buildings.bgFanshop.iLevel + 1, clb.buildings.bgFanshop.iLevel);
+        bdgsAll[iType].sNameNext = (clb.buildings.bgFanshop.iLevel + 1).ToString();
         bdgsAll[iType].sCostConstructNext = iCostDays[0].ToString("N0", getCi());
         bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
         bdgsAll[iType].bDispoOk = MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb);
