@@ -221,6 +221,7 @@
                 <td>Bezahlt: @Model.sMarketerMoney</td>
               }
             }
+            <td>Laufzeit: Saisonende</td>
           </tr>
           <!---Data and tags are dynamically generated--->
         </tbody>
@@ -235,10 +236,13 @@
     *@
 
     @{
+      if (Model.marketer != null) {
+        <p><b>Sie das Merchandising einem Vermarkter überlassen</b></p>
+      }
       string sClassDisabled = "";
       if (!Model.bFanshopsAvailable) {
         sClassDisabled = " class=disabledDiv";
-        <b>Sie benötigen mindestens einen <a href="/Member/StadiumSurroundings">Fanshop</a> um Ihr Merchandising selbst zu vermarkten</b>
+        <p><b>Sie benötigen mindestens einen <a href="/Member/StadiumSurroundings">Fanshop</a> um Ihr Merchandising selbst zu vermarkten</b></p>
       }
     }
     <div id="divTableItems" style="position: relative" @sClassDisabled>

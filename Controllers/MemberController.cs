@@ -4921,6 +4921,8 @@ namespace CornerkickWebMvc.Controllers
       clb.merchMarketer.marketer = MvcApplication.ckcore.ltMerchandisingMarketer[0];
       clb.merchMarketer.iMoney = getMerchandisingMarketerOffer(clb);
 
+      CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, clb.merchMarketer.iMoney, "Einnahmen Merchandising Vermarkter", CornerkickManager.Finance.iTransferralTypeInMerchandising);
+
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
@@ -6090,27 +6092,29 @@ namespace CornerkickWebMvc.Controllers
       }
 
       long[][] iBudget = new long[2][];
-      iBudget[0] = new long[13]; // Plan
-      iBudget[1] = new long[13]; // Real
+      iBudget[0] = new long[15]; // Plan
+      iBudget[1] = new long[15]; // Real
 
       for (byte i = 0; i < 2; i++) {
-        iBudget[i][0] = bd[i].iInSpec;
-        iBudget[i][1] = bd[i].iInBonusCup;
-        iBudget[i][2] = bd[i].iInBonusSponsor;
-        iBudget[i][3] = bd[i].iInTransfer;
-        iBudget[i][4] = bd[i].iPaySalary;
-        iBudget[i][5] = bd[i].iPayStaff;
-        iBudget[i][6] = bd[i].iPayTransfer;
-        iBudget[i][7] = bd[i].iPayStadium;
-        iBudget[i][8] = bd[i].iPayTravel;
-        iBudget[i][9] = bd[i].iPayInterest;
+        iBudget[i][ 0] = bd[i].iInSpec;
+        iBudget[i][ 1] = bd[i].iInBonusCup;
+        iBudget[i][ 2] = bd[i].iInBonusSponsor;
+        iBudget[i][ 3] = bd[i].iInTransfer;
+        iBudget[i][ 4] = bd[i].iInMerchandising;
+        iBudget[i][ 5] = bd[i].iPaySalary;
+        iBudget[i][ 6] = bd[i].iPayStaff;
+        iBudget[i][ 7] = bd[i].iPayTransfer;
+        iBudget[i][ 8] = bd[i].iPayStadium;
+        iBudget[i][ 9] = bd[i].iPayTravel;
+        iBudget[i][10] = bd[i].iPayInterest;
+        iBudget[i][11] = bd[i].iPayMerchandising;
 
         long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
         long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);
-        iBudget[i][10] = iInTotal;
-        iBudget[i][11] = iPayTotal;
+        iBudget[i][12] = iInTotal;
+        iBudget[i][13] = iPayTotal;
 
-        iBudget[i][12] = iInTotal - iPayTotal;
+        iBudget[i][14] = iInTotal - iPayTotal;
       }
 
       return Json(iBudget, JsonRequestBehavior.AllowGet);

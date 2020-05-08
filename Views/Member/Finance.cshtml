@@ -31,18 +31,20 @@
           if (bEdit) {
             if (bSet) {
               var inputIn = "<input class=\"form-control tbBudgetIn\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
-              document.getElementById('tdInSpecPlan')        .innerHTML = inputIn  + iBudget[0][0] + ">";
-              document.getElementById('tdInBonusCupPlan')    .innerHTML = inputIn  + iBudget[0][1] + ">";
-              document.getElementById('tdInBonusSponsorPlan').innerHTML = inputIn  + iBudget[0][2] + ">";
-              document.getElementById('tdInTransferPlan')    .innerHTML = inputIn  + iBudget[0][3] + ">";
+              document.getElementById('tdInSpecPlan')         .innerHTML = inputIn + iBudget[0][0] + ">";
+              document.getElementById('tdInBonusCupPlan')     .innerHTML = inputIn + iBudget[0][1] + ">";
+              document.getElementById('tdInBonusSponsorPlan') .innerHTML = inputIn + iBudget[0][2] + ">";
+              document.getElementById('tdInTransferPlan')     .innerHTML = inputIn + iBudget[0][3] + ">";
+              document.getElementById('tdInMerchandisingPlan').innerHTML = inputIn + iBudget[0][4] + ">";
 
               var inputPay = "<input class=\"form-control tbBudgetPay\" style=\"text-align: right\" type=\"tel\" autocomplete=\"off\" onkeyup=\"setBudget()\" value=";
-              document.getElementById('tdPaySalaryPlan')     .innerHTML = inputPay + iBudget[0][4] + ">";
-              document.getElementById('tdPayStaffPlan')      .innerHTML = inputPay + iBudget[0][5] + ">";
-              document.getElementById('tdPayTransferPlan')   .innerHTML = inputPay + iBudget[0][6] + ">";
-              document.getElementById('tdPayStadiumPlan')    .innerHTML = inputPay + iBudget[0][7] + ">";
-              document.getElementById('tdPayTravelPlan')     .innerHTML = inputPay + iBudget[0][8] + ">";
-              document.getElementById('tdPayInterestPlan')   .innerHTML = inputPay + iBudget[0][9] + ">";
+              document.getElementById('tdPaySalaryPlan')       .innerHTML = inputPay + iBudget[0][ 5] + ">";
+              document.getElementById('tdPayStaffPlan')        .innerHTML = inputPay + iBudget[0][ 6] + ">";
+              document.getElementById('tdPayTransferPlan')     .innerHTML = inputPay + iBudget[0][ 7] + ">";
+              document.getElementById('tdPayStadiumPlan')      .innerHTML = inputPay + iBudget[0][ 8] + ">";
+              document.getElementById('tdPayTravelPlan')       .innerHTML = inputPay + iBudget[0][ 9] + ">";
+              document.getElementById('tdPayInterestPlan')     .innerHTML = inputPay + iBudget[0][10] + ">";
+              document.getElementById('tdPayMerchandisingPlan').innerHTML = inputPay + iBudget[0][11] + ">";
             }
 
             // Set thousand separator to text boxes
@@ -62,46 +64,50 @@
               });
             });
           } else {
-            document.getElementById('tdInSpecPlan')        .innerHTML = iBudget[0][0].toLocaleString();
-            document.getElementById('tdInBonusCupPlan')    .innerHTML = iBudget[0][1].toLocaleString();
-            document.getElementById('tdInBonusSponsorPlan').innerHTML = iBudget[0][2].toLocaleString();
-            document.getElementById('tdInTransferPlan')    .innerHTML = iBudget[0][3].toLocaleString();
-            document.getElementById('tdPaySalaryPlan')     .innerHTML = iBudget[0][4].toLocaleString();
-            document.getElementById('tdPayStaffPlan')      .innerHTML = iBudget[0][5].toLocaleString();
-            document.getElementById('tdPayTransferPlan')   .innerHTML = iBudget[0][6].toLocaleString();
-            document.getElementById('tdPayStadiumPlan')    .innerHTML = iBudget[0][7].toLocaleString();
-            document.getElementById('tdPayTravelPlan')     .innerHTML = iBudget[0][8].toLocaleString();
-            document.getElementById('tdPayInterestPlan')   .innerHTML = iBudget[0][9].toLocaleString();
+            document.getElementById('tdInSpecPlan')          .innerHTML = iBudget[0][ 0].toLocaleString();
+            document.getElementById('tdInBonusCupPlan')      .innerHTML = iBudget[0][ 1].toLocaleString();
+            document.getElementById('tdInBonusSponsorPlan')  .innerHTML = iBudget[0][ 2].toLocaleString();
+            document.getElementById('tdInTransferPlan')      .innerHTML = iBudget[0][ 3].toLocaleString();
+            document.getElementById('tdInMerchandisingPlan') .innerHTML = iBudget[0][ 4].toLocaleString();
+            document.getElementById('tdPaySalaryPlan')       .innerHTML = iBudget[0][ 5].toLocaleString();
+            document.getElementById('tdPayStaffPlan')        .innerHTML = iBudget[0][ 6].toLocaleString();
+            document.getElementById('tdPayTransferPlan')     .innerHTML = iBudget[0][ 7].toLocaleString();
+            document.getElementById('tdPayStadiumPlan')      .innerHTML = iBudget[0][ 8].toLocaleString();
+            document.getElementById('tdPayTravelPlan')       .innerHTML = iBudget[0][ 9].toLocaleString();
+            document.getElementById('tdPayInterestPlan')     .innerHTML = iBudget[0][10].toLocaleString();
+            document.getElementById('tdPayMerchandisingPlan').innerHTML = iBudget[0][11].toLocaleString();
           };
 
           // Real
-          document.getElementById('tdInSpecReal')        .innerHTML = iBudget[1][0].toLocaleString();
-          document.getElementById('tdInBonusCupReal')    .innerHTML = iBudget[1][1].toLocaleString();
-          document.getElementById('tdInBonusSponsorReal').innerHTML = iBudget[1][2].toLocaleString();
-          document.getElementById('tdInTransferReal')    .innerHTML = iBudget[1][3].toLocaleString();
-          document.getElementById('tdPaySalaryReal')     .innerHTML = iBudget[1][4].toLocaleString();
-          document.getElementById('tdPayStaffReal')      .innerHTML = iBudget[1][5].toLocaleString();
-          document.getElementById('tdPayTransferReal')   .innerHTML = iBudget[1][6].toLocaleString();
-          document.getElementById('tdPayStadiumReal')    .innerHTML = iBudget[1][7].toLocaleString();
-          document.getElementById('tdPayTravelReal')     .innerHTML = iBudget[1][8].toLocaleString();
-          document.getElementById('tdPayInterestReal')   .innerHTML = iBudget[1][9].toLocaleString();
+          document.getElementById('tdInSpecReal')          .innerHTML = iBudget[1][ 0].toLocaleString();
+          document.getElementById('tdInBonusCupReal')      .innerHTML = iBudget[1][ 1].toLocaleString();
+          document.getElementById('tdInBonusSponsorReal')  .innerHTML = iBudget[1][ 2].toLocaleString();
+          document.getElementById('tdInTransferReal')      .innerHTML = iBudget[1][ 3].toLocaleString();
+          document.getElementById('tdInMerchandisingReal') .innerHTML = iBudget[1][ 4].toLocaleString();
+          document.getElementById('tdPaySalaryReal')       .innerHTML = iBudget[1][ 5].toLocaleString();
+          document.getElementById('tdPayStaffReal')        .innerHTML = iBudget[1][ 6].toLocaleString();
+          document.getElementById('tdPayTransferReal')     .innerHTML = iBudget[1][ 7].toLocaleString();
+          document.getElementById('tdPayStadiumReal')      .innerHTML = iBudget[1][ 8].toLocaleString();
+          document.getElementById('tdPayTravelReal')       .innerHTML = iBudget[1][ 9].toLocaleString();
+          document.getElementById('tdPayInterestReal')     .innerHTML = iBudget[1][10].toLocaleString();
+          document.getElementById('tdPayMerchandisingReal').innerHTML = iBudget[1][11].toLocaleString();
 
           // Total
-          document.getElementById('tdTotalInPlan') .innerHTML = iBudget[0][10].toLocaleString();
-          document.getElementById('tdTotalInReal') .innerHTML = iBudget[1][10].toLocaleString();
-          document.getElementById('tdTotalPayPlan').innerHTML = iBudget[0][11].toLocaleString();
-          document.getElementById('tdTotalPayReal').innerHTML = iBudget[1][11].toLocaleString();
+          document.getElementById('tdTotalInPlan') .innerHTML = iBudget[0][12].toLocaleString();
+          document.getElementById('tdTotalInReal') .innerHTML = iBudget[1][12].toLocaleString();
+          document.getElementById('tdTotalPayPlan').innerHTML = iBudget[0][13].toLocaleString();
+          document.getElementById('tdTotalPayReal').innerHTML = iBudget[1][13].toLocaleString();
 
           // Summary
           for (var i = 0; i < 2; i++) {
-            if (iBudget[i][12] < 0) {
-              iBudget[i][12] = iBudget[i][12].toLocaleString().fontcolor("red");
+            if (iBudget[i][14] < 0) {
+              iBudget[i][14] = iBudget[i][14].toLocaleString().fontcolor("red");
             } else {
-              iBudget[i][12] = iBudget[i][12].toLocaleString().fontcolor("green");
+              iBudget[i][14] = iBudget[i][14].toLocaleString().fontcolor("green");
             }
           }
-          document.getElementById('tdSumPlan').innerHTML = iBudget[0][12];
-          document.getElementById('tdSumCurr').innerHTML = iBudget[1][12];
+          document.getElementById('tdSumPlan').innerHTML = iBudget[0][14];
+          document.getElementById('tdSumCurr').innerHTML = iBudget[1][14];
           document.getElementById('tdSumPlan').style.fontWeight = "bold"
           document.getElementById('tdSumCurr').style.fontWeight = "bold"
         }
@@ -390,6 +396,11 @@
               <td id="tdInBonusSponsorReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
+              <td align="right">Merchandising</td>
+              <td id="tdInMerchandisingPlan" style="width:20%" align="right">0</td>
+              <td id="tdInMerchandisingReal" style="width:20%" align="right">0</td>
+            </tr>
+            <tr>
               <td align="right">Transfer</td>
               <td id="tdInTransferPlan" style="width:20%" align="right">0</td>
               <td id="tdInTransferReal" style="width:20%" align="right">0</td>
@@ -427,14 +438,19 @@
               <td id="tdPayStaffReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
-              <td align="right">Transfer</td>
-              <td id="tdPayTransferPlan" style="width:20%" align="right">0</td>
-              <td id="tdPayTransferReal" style="width:20%" align="right">0</td>
-            </tr>
-            <tr>
               <td align="right">Stadion</td>
               <td id="tdPayStadiumPlan" style="width:20%" align="right">0</td>
               <td id="tdPayStadiumReal" style="width:20%" align="right">0</td>
+            </tr>
+            <tr>
+              <td align="right">Merchandising</td>
+              <td id="tdPayMerchandisingPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayMerchandisingReal" style="width:20%" align="right">0</td>
+            </tr>
+            <tr>
+              <td align="right">Transfer</td>
+              <td id="tdPayTransferPlan" style="width:20%" align="right">0</td>
+              <td id="tdPayTransferReal" style="width:20%" align="right">0</td>
             </tr>
             <tr>
               <td align="right">Reisekosten</td>
