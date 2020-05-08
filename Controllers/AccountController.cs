@@ -309,9 +309,11 @@ namespace CornerkickWebMvc.Controllers
       if (iU == 0) {
 #endif
       string sWelcomeMsg = usr.sFirstname + " " + usr.sSurname + ", herzlich Willkommen bei Ihrem neuen Verein " + clb.sName + "!";
-      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  2, usr.club.iId);
+      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  3, usr.club.iId);
       string sWelcomeMsg2 = "Schauen Sie sich die Anleitung um mehr über die Funktionsweise von Cornerkick zu erfahren.";
-      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg2, 2, usr.club.iId);
+      MvcApplication.ckcore.sendNews(usr, sWelcomeMsg2, 3, usr.club.iId);
+      string sNewspaper = "Herzlich Willkommen!#" + usr.sFirstname + " " + usr.sSurname + " steigt als neuer Manager bei " + clb.sName + " ein.";
+      MvcApplication.ckcore.sendNews(usr, sNewspaper, 203);
 #if DEBUG
       }
       }
@@ -832,6 +834,7 @@ namespace CornerkickWebMvc.Controllers
 
     //
     // GET: /Account/Register
+    [HttpGet]
     [AllowAnonymous]
     public ActionResult Register(RegisterViewModel mdRegister)
     {
@@ -882,7 +885,7 @@ namespace CornerkickWebMvc.Controllers
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Register(RegisterViewModel model, bool b = false)
+    public async Task<ActionResult> RegisterUser(RegisterViewModel model)
     {
       // Check emblem
       if (model.fileEmblem != null) {
@@ -946,12 +949,7 @@ namespace CornerkickWebMvc.Controllers
             // END Initialize dummy club
           } else { // no admin
             if (MvcApplication.settings.bEmailCertification) {
-              // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
-              // E-Mail-Nachricht mit diesem Link senden
-              string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUser.Id);
-              var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, code = code }, protocol: Request.Url.Scheme);
-              MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
-              await UserManager.SendEmailAsync(appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+              sendActivationLinkAsync(appUser.Id);
 
               // Uncomment to debug locally
               // TempData["ViewBagLink"] = callbackUrl;
@@ -989,6 +987,16 @@ namespace CornerkickWebMvc.Controllers
 
       // Wurde dieser Punkt erreicht, ist ein Fehler aufgetreten; Formular erneut anzeigen.
       return View(model);
+    }
+
+    private async void sendActivationLinkAsync(string sAppUserId)
+    {
+      // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
+      // E-Mail-Nachricht mit diesem Link senden
+      string code = await UserManager.GenerateEmailConfirmationTokenAsync(sAppUserId);
+      var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = sAppUserId, code = code }, protocol: Request.Url.Scheme);
+      MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
+      await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
     }
 
     [AllowAnonymous]

@@ -1157,5 +1157,54 @@ namespace CornerkickWebMvc.Controllers
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
+    public ActionResult AdminSetTaktik(int iTaktik, float fTaktik)
+    {
+      float fRet = 0f;
+      byte iTactic = 0;
+
+      CornerkickManager.User usrAdmin = ckUser();
+
+      CornerkickGame.Tactic tc = usrAdmin.game.data.team[0].ltTactic[iTactic];
+      if      (iTaktik == 0) tc.fOrientation = fTaktik;
+      else if (iTaktik == 1) tc.fPower       = fTaktik;
+      else if (iTaktik == 2) tc.fShootFreq   = fTaktik;
+      else if (iTaktik == 3) tc.fAggressive  = fTaktik;
+      else if (iTaktik == 4) tc.fPassRisk    = fTaktik;
+      else if (iTaktik == 5) tc.fPassLength  = fTaktik;
+      else if (iTaktik == 6) tc.fPassFreq    = fTaktik;
+      else if (iTaktik == 7) {
+        tc.fPassLeft = fTaktik;
+        if (tc.fPassLeft + tc.fPassRight > 1f) tc.fPassRight = (float)Math.Round(1f - tc.fPassLeft,  2);
+        fRet = tc.fPassRight;
+      } else if (iTaktik == 8) {
+        tc.fPassRight = fTaktik;
+        if (tc.fPassLeft + tc.fPassRight > 1f) tc.fPassLeft  = (float)Math.Round(1f - tc.fPassRight, 2);
+        fRet = tc.fPassLeft;
+      } else if (iTaktik == 9) tc.iAngriffAbseits = (int)Math.Round(fTaktik);
+
+      // Set tactic of current game
+      if (usrAdmin.game != null) {
+        usrAdmin.game.data.team[0].ltTactic[iTactic] = tc;
+        usrAdmin.game.data.team[1].ltTactic[iTactic] = tc;
+        usrAdmin.game.tc[0] = tc;
+        usrAdmin.game.tc[1] = tc;
+      }
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult AdminGetPlayerChances()
+    {
+      CornerkickManager.User usrAdmin = ckUser();
+
+      if (usrAdmin.game != null) {
+        float[] fPlAction;
+        sbyte iAction = usrAdmin.game.ai.getPlayerAction(usrAdmin.game.ball.plAtBall, out fPlAction);
+
+        return Json(fPlAction, JsonRequestBehavior.AllowGet);
+      }
+
+      return Json(null, JsonRequestBehavior.AllowGet);
+    }
   }
 }
