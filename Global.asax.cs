@@ -1076,8 +1076,9 @@ namespace CornerkickWebMvc
             bool.TryParse(sStateFileContent[1], out bCalendarRunning);
 
             if (fInterval > 10.0 && bCalendarRunning && DateTime.TryParse(sStateFileContent[2], out dtLast)) {
-              double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
-              int nSteps = (int)(fTotalMin / (fInterval / 60f));
+              //double fTotalMin = (DateTime.Now - dtLast).TotalMinutes;
+              //int nSteps = (int)(fTotalMin / (fInterval / 60f));
+              int nSteps = getDeltaStepsBetweenNowAndApproach();
 
               if (nSteps > 0) {
                 ckcore.tl.writeLog("Last step was at " + dtLast.ToString("s", CultureInfo.InvariantCulture) + " (now: " + DateTime.Now.ToString("s", CultureInfo.InvariantCulture) + ")");
@@ -1087,7 +1088,7 @@ namespace CornerkickWebMvc
                 ckcore.tl.writeLog("Set game speed to " + iGameSpeed.ToString() + "ms");
 
                 // Perform calendar steps in background
-                Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(nSteps, iGameSpeed, fInterval, bCalendarRunning));
+                Task<bool> tkPerformCalendarSteps = Task.Run(async () => await performCalendarStepsAsync(iGameSpeed, fInterval, bCalendarRunning));
               } else {
                 timerCkCalender.Interval = fInterval * 1000.0; // Convert [s] to [ms]
                 timerCkCalender.Enabled = bCalendarRunning;
@@ -1219,7 +1220,7 @@ namespace CornerkickWebMvc
       return true;
     }
 
-    private static async Task<bool> performCalendarStepsAsync(int nSteps, int iGameSpeed, double fInterval, bool bCalendarRunning)
+    private static async Task<bool> performCalendarStepsAsync(int iGameSpeed, double fInterval, bool bCalendarRunning)
     {
       // Create stopwatch
       System.Diagnostics.Stopwatch swCalSteps = new System.Diagnostics.Stopwatch();
@@ -1229,9 +1230,13 @@ namespace CornerkickWebMvc
 
       Controllers.AdminController.setGameSpeedToAllUsers(0);
 
+      int nSteps = getDeltaStepsBetweenNowAndApproach();
+
       if (nSteps > 0) {
-        ckcore.tl.writeLog("Performing " + nSteps.ToString() + " calendar steps");
-        for (int iS = 0; iS < nSteps; iS++) {
+        ckcore.tl.writeLog("Performing approx. " + nSteps.ToString() + " calendar steps");
+
+        int iS = 0;
+        while (getCkApproachDate().CompareTo(ckcore.dtDatum) > 0) {
           try {
             bool bBreak = !performCalendarStep(false);
             if (bBreak) {
@@ -1241,6 +1246,8 @@ namespace CornerkickWebMvc
           } catch (Exception e) {
             ckcore.tl.writeLog("performCalendarStepsAsync(): Error in performCalendarStep() at step: " + iS.ToString() + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
           }
+
+          iS++;
         }
       }
 
