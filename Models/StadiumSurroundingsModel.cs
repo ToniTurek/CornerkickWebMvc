@@ -34,8 +34,12 @@ namespace CornerkickWebMvc.Models
 
     public int iCarpark { get; set; }
     public int iCarparkNew { get; set; }
+
     public int iCounter { get; set; }
     public int iCounterNew { get; set; }
+
+    public int iFanshop { get; set; }
+    public int iFanshopNew { get; set; }
 
     public class Buildings
     {

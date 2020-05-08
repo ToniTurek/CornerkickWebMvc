@@ -13,6 +13,13 @@
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
 
+  <style>
+    .disabledDiv {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+  </style>
+
   <script>
     var oTable;
 
@@ -198,25 +205,27 @@
 
 <body style="width: 100%">
   <div>
-    <h3>Vermarkter</h3>
+    <div style="position: relative; margin-bottom: 40px">
+      <h3>Vermarkter</h3>
 
-    <table id="tableMarketer" style="position: relative; width: auto; font-size: 16px" cellpadding="6" border="1">
-      <tbody>
-        <tr>
-          @{
-            if (Model.marketer == null) {
-              <td><b>@MvcApplication.ckcore.ltMerchandisingMarketer[0].sName</b></td>
-              <td>Angebot: @Model.sMarketerMoney</td>
-              <td><button class="btn btn-default" style="width: 100px" onclick="takeMarketer()">annehmen</button></td>
-            } else {
-              <td><b>@Model.marketer.marketer.sName</b></td>
-              <td>Bezahlt: @Model.sMarketerMoney</td>
+      <table id="tableMarketer" style="position: relative; font-size: 16px" cellpadding="6" border="1">
+        <tbody>
+          <tr>
+            @{
+              if (Model.marketer == null) {
+                <td><b>@MvcApplication.ckcore.ltMerchandisingMarketer[0].sName</b></td>
+                <td>Angebot: @Model.sMarketerMoney</td>
+                <td><button class="btn btn-default" style="width: 100px" onclick="takeMarketer()">annehmen</button></td>
+              } else {
+                <td><b>@Model.marketer.marketer.sName</b></td>
+                <td>Bezahlt: @Model.sMarketerMoney</td>
+              }
             }
-          }
-        </tr>
-        <!---Data and tags are dynamically generated--->
-      </tbody>
-    </table>
+          </tr>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
 
     @*
     <label style="margin-left: 10px">
@@ -225,8 +234,15 @@
     </label>
     *@
 
-    <h3>Artikel</h3>
-    <div id="divTableItems" style="position: relative; left: 0px; width: auto">
+    @{
+      string sClassDisabled = "";
+      if (!Model.bFanshopsAvailable) {
+        sClassDisabled = " class=disabledDiv";
+        <b>Sie benötigen mindestens einen <a href="/Member/StadiumSurroundings">Fanshop</a> um Ihr Merchandising selbst zu vermarkten</b>
+      }
+    }
+    <div id="divTableItems" style="position: relative" @sClassDisabled>
+      <h3>Artikel</h3>
       <table id="tableItems" style="position: relative; margin: 0px; width: auto" class="display responsive nowrap">
         <thead>
           <tr>

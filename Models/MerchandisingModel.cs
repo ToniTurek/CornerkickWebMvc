@@ -16,6 +16,8 @@ namespace CornerkickWebMvc.Models
     public CornerkickManager.Club.MerchandisingMarketer marketer { get; set; }
     public string sMarketerMoney { get; set; }
 
+    public bool bFanshopsAvailable { get; set; }
+
     public class DatatableMerchandising
     {
       public int iIx { get; set; }

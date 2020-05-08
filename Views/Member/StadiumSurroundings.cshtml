@@ -120,7 +120,7 @@
             iptNew.value = 1;
             iptNew.addEventListener("keyup", function () {
               $.ajax({
-                url: '/Member/StadiumSurrGetCarparkTicketCounter',
+                url: '/Member/StadiumSurrGetSurrTypeNumber',
                 type: "post",
                 dataType: "JSON",
                 data: { iType: building.iType, iNew: getIntFromString(iptNew.value), iCurrent: getIntFromString(building.sName) },
