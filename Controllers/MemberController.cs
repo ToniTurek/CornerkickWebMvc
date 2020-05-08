@@ -4839,7 +4839,9 @@ namespace CornerkickWebMvc.Controllers
     }
     private int getMerchandisingMarketerOffer(CornerkickManager.Club clb)
     {
-      return (int)(clb.getAttractionFactor(MvcApplication.ckcore.iSeason) * 1000);
+      double fSeasonFrac = (MvcApplication.ckcore.dtSeasonEnd - MvcApplication.ckcore.dtDatum).TotalDays / (MvcApplication.ckcore.dtSeasonEnd - MvcApplication.ckcore.dtSeasonStart).TotalDays;
+
+      return (int)(Math.Max(clb.getAttractionFactor(MvcApplication.ckcore.iSeason), 500) * fSeasonFrac) * 5000;
     }
 
     public JsonResult MerchandisingGetItems()
