@@ -345,7 +345,12 @@ namespace CornerkickWebMvc
     internal static DateTime getCkTargetDate()
     {
       DateTime dtCkTarget = ckcore.dtDatum.Date.Add(new TimeSpan(15, 30, 0));
+
+      // If saturday and after target time --> add one day
+      if ((int)ckcore.dtDatum.DayOfWeek == 6 && ckcore.dtDatum.TimeOfDay.CompareTo(new TimeSpan(15, 30, 0)) > 0) dtCkTarget = dtCkTarget.AddDays(1);
+
       while ((int)dtCkTarget.DayOfWeek != 6) dtCkTarget = dtCkTarget.AddDays(1);
+
       return dtCkTarget;
     }
 
