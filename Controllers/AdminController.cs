@@ -47,8 +47,9 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.bLoginPossible      = MvcApplication.settings.bLoginPossible;
       modelAdmin.bEmailCertification = MvcApplication.settings.bEmailCertification;
       modelAdmin.bRegisterDuringGame = MvcApplication.settings.bRegisterDuringGame;
-      modelAdmin.sHomeDir   = MvcApplication.getHomeDir();
-      modelAdmin.sHomeDirCk = CornerkickManager.Main.sHomeDir;
+      modelAdmin.sHomeDir    = MvcApplication.getHomeDir();
+      modelAdmin.sHomeDirCk  = CornerkickManager.Main.sHomeDir;
+      modelAdmin.sHomeDirCk2 = MvcApplication.ckcore.settings.sHomeDir;
 
       // Statistics
       modelAdmin.nClubs  = MvcApplication.ckcore.ltClubs .Count;
