@@ -762,10 +762,21 @@ namespace CornerkickWebMvc.Controllers
 
         for (int i = 0; i < clb.ltTrainingHist.Count; i++) {
           CornerkickGame.Player.TrainingHistory trHist = clb.ltTrainingHist[i];
+
           if (trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum.AddDays(-7)) >  0 &&
               trHist.dt.CompareTo(MvcApplication.ckcore.dtDatum)             <= 0) {
             long iDate = convertDateTimeToTimestamp(trHist.dt);
-            dataPoints[0][j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j]));
+
+            string sTrainingName = "";
+            if (tsTraining.Contains(trHist.dt.TimeOfDay)) {
+              CornerkickManager.Player.Training tr = CornerkickManager.Player.getTraining(trHist.iType, MvcApplication.ckcore.plr.ltTraining);
+              sTrainingName = tr.sName + " (Start)";
+            } else if (tsTraining.Contains(trHist.dt.AddMinutes(-90).TimeOfDay) && i > 0) {
+              CornerkickManager.Player.Training trLast = CornerkickManager.Player.getTraining(clb.ltTrainingHist[i - 1].iType, MvcApplication.ckcore.plr.ltTraining);
+              sTrainingName = trLast.sName + " (Ende)";
+            }
+
+            dataPoints[0][j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j], z: sTrainingName));
           }
         }
 
@@ -852,7 +863,7 @@ namespace CornerkickWebMvc.Controllers
                                                 clb.buildings.bgSpa.iLevel,
                                                 tu.dt,
                                                 usr,
-                                                iTrainingPerDay: 1,
+                                                iTrainingPerDay: 3,
                                                 ltPlayerTeam: ltPlayerTrExp,
                                                 campBooking: camp,
                                                 bJouth: false,
@@ -864,11 +875,13 @@ namespace CornerkickWebMvc.Controllers
           CornerkickGame.Player.TrainingHistory trHistExp = new CornerkickGame.Player.TrainingHistory();
           trHistExp.dt   = tu.dt;
           trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation);
+          trHistExp.iType = tu.iType;
 
           // ... add training history data to dataPoints
           for (byte j = 0; j < dataPoints[1].Length; j++) {
             long iDate = convertDateTimeToTimestamp(trHistExp.dt);
-            dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j]));
+            CornerkickManager.Player.Training tr = CornerkickManager.Player.getTraining(trHistExp.iType, MvcApplication.ckcore.plr.ltTraining);
+            dataPoints[1][j].Add(new Models.DataPointGeneral(iDate, trHistExp.fKFM[j], z: tr.sName));
           }
         }
       }

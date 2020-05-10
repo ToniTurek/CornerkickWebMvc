@@ -194,6 +194,32 @@
           var chart = new CanvasJS.Chart("chartContainer", {
             animationEnabled: bAnimate,
             theme: "theme2",//theme1
+            toolTip: {
+              shared: true,
+              borderColor: "black",
+              contentFormatter: function (e) {
+                var content = "";
+
+                // Date
+                var dateOptions = { day: 'numeric', weekday: 'short', month: 'numeric', hour: "numeric", minute: "2-digit" };
+                var d = new Date();
+                d.setTime(e.entries[0].dataPoint.x);
+                content += "<div style=\"width: 100%; text-align: center\"><u>" + d.toLocaleString(undefined, dateOptions) + "</u></div>";
+
+                // CFM
+                content += "<table>";
+                // For each type
+                for (var i = 0; i < e.entries.length; i++) {
+                  content += "<tr><td style=\"text-align:right; color:" + e.entries[i].dataSeries.color + "\">" + e.entries[i].dataSeries.name + ":</td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
+                }
+                content += "</table>";
+
+                // Training type
+                content += "<div style=\"width: 100%; text-align: center\">" + e.entries[0].dataPoint.z + "</div>";
+
+                return content;
+              }
+            },
             axisX: {
               gridThickness: 1,
               interval: 1,
@@ -217,6 +243,7 @@
                 color: "blue",
                 showInLegend: true,
                 legendText: "Kondition",
+                name: "Kondition",
                 xValueType: "dateTime",
                 xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
@@ -227,6 +254,7 @@
                 color: "green",
                 showInLegend: true,
                 legendText: "Frische",
+                name: "Frische",
                 xValueType: "dateTime",
                 xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
@@ -237,6 +265,7 @@
                 color: "red",
                 showInLegend: true,
                 legendText: "Moral",
+                name: "Moral",
                 xValueType: "dateTime",
                 xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
@@ -248,6 +277,7 @@
                 lineDashType: "dash",
                 lineThickness: 1,
                 showInLegend: false,
+                name: "Kondition",
                 xValueType: "dateTime",
                 xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
@@ -259,6 +289,7 @@
                 lineDashType: "dash",
                 lineThickness: 1,
                 showInLegend: false,
+                name: "Frische",
                 xValueType: "dateTime",
                 xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
@@ -270,6 +301,7 @@
                 lineDashType: "dash",
                 lineThickness: 1,
                 showInLegend: false,
+                name: "Moral",
                 xValueType: "dateTime",
                 xValueFormatString: "DD MMM HH:mm",
                 yValueFormatString: "0.0%",
@@ -307,7 +339,7 @@
         <table border="1" cellpadding="4">
           <thead>
             <tr>
-              <th style="font-size: 18px; color: red; text-align: center; border-color: black" colspan="3">Konditionelles Training</th>
+              <th style="font-size: 18px; color: blue; text-align: center; border-color: black" colspan="3">Konditionelles Training</th>
             </tr>
             <tr>
               <th style="text-align: center">Type</th>
