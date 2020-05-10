@@ -561,18 +561,10 @@ namespace CornerkickWebMvc.Controllers
               sN = "Was für ein Erfolg!#" + sN;
             }
 
-            foreach (CornerkickGame.Player pl in clb.ltPlayer) {
-              if (sN.Contains(pl.sName)) {
-                sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
-                break;
-              }
-            }
-
-            foreach (CornerkickGame.Player pl in clb.ltPlayerJouth) {
-              if (sN.Contains(pl.sName)) {
-                sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
-                break;
-              }
+            CornerkickGame.Player pl = null;
+            if (news.iType == 200 && news.iId >= 0 && news.iId < MvcApplication.ckcore.ltPlayer.Count) {
+              pl = MvcApplication.ckcore.ltPlayer[news.iId];
+              if (pl != null) sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
             }
 
             DatatableNews dtn = new DatatableNews();
