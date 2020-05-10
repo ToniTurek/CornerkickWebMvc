@@ -126,6 +126,7 @@
           plotChanceDevelopment();
         } else if (iTabActive == 2) {
           plotPlayerDevelopment();
+          plotTrainingDevelopment(@Model.iPlayer);
           drawStatistic(0);
         }
       }
@@ -561,6 +562,101 @@
                 { label: "Ind. Tr.",  x: 7, y: dataCFM[0].y },
                 { label: "Total",     x: 8, y: dataCFM[8].y }
               ]
+            }
+          ]
+        });
+
+        chartCFM.render();
+      }
+    });
+  }
+
+  function plotTrainingDevelopment(iPlayerId) {
+    $.ajax({
+      type: 'post',
+      url: '/Member/GetPlayerTrainingHistotyData',
+      dataType: "json",
+      data: { iPlayerId: iPlayerId },
+      success: function (dataCFM) {
+        var chartCFM = new CanvasJS.Chart("divChartTrainingHistory", {
+          animationEnabled: true,
+          theme: "theme2",//theme1
+          toolTip: {
+            shared: true,
+            borderColor: "black",
+            contentFormatter: function (e) {
+              var content = "";
+
+              // Date
+              var dateOptions = { day: 'numeric', weekday: 'short', month: 'numeric', hour: "numeric", minute: "2-digit" };
+              var d = new Date();
+              d.setTime(e.entries[0].dataPoint.x);
+              content += "<div style=\"width: 100%; text-align: center\"><u>" + d.toLocaleString(undefined, dateOptions) + "</u></div>";
+
+              // CFM
+              content += "<table>";
+              // For each type
+              for (var i = 0; i < e.entries.length; i++) {
+                content += "<tr><td style=\"text-align:right; color:" + e.entries[i].dataSeries.color + "\">" + e.entries[i].dataSeries.name + ":</td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
+              }
+              content += "</table>";
+
+              // Training type
+              content += "<div style=\"width: 100%; text-align: center\">" + e.entries[0].dataPoint.z + "</div>";
+
+              return content;
+            }
+          },
+          axisX: {
+            gridThickness: 1,
+            interval: 1,
+            intervalType: "day",
+            valueFormatString: "DDD DD MMM",
+            labelAngle: -20
+          },
+          axisY: {
+            valueFormatString: "0.0%",
+            includeZero: false
+          },
+          legend: {
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          data: [
+            {
+              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+              type: "line",
+              color: "blue",
+              showInLegend: true,
+              legendText: "Kondition",
+              name: "Kondition",
+              xValueType: "dateTime",
+              xValueFormatString: "DD MMM HH:mm",
+              yValueFormatString: "0.0%",
+              dataPoints: dataCFM[0]
+            },
+            {
+              type: "line",
+              color: "green",
+              showInLegend: true,
+              legendText: "Frische",
+              name: "Frische",
+              xValueType: "dateTime",
+              xValueFormatString: "DD MMM HH:mm",
+              yValueFormatString: "0.0%",
+              dataPoints: dataCFM[1]
+            },
+            {
+              type: "line",
+              color: "red",
+              showInLegend: true,
+              legendText: "Moral",
+              name: "Moral",
+              xValueType: "dateTime",
+              xValueFormatString: "DD MMM HH:mm",
+              yValueFormatString: "0.0%",
+              dataPoints: dataCFM[2]
             }
           ]
         });
@@ -1025,6 +1121,11 @@
       <div style="position: relative; width: 100%; height: 380px">
         <h4>Spielerentwicklung</h4>
         <div id="divChartDevelopment" style="position: relative; height: 320px; width: 100%"></div>
+      </div>
+
+      <div style="position: relative; width: 100%; height: 380px">
+        <h4>Trainingshistorie</h4>
+        <div id="divChartTrainingHistory" style="position: relative; height: 320px; width: 100%"></div>
       </div>
 
       <div id="divTableClubHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">

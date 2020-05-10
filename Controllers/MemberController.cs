@@ -2353,6 +2353,40 @@ namespace CornerkickWebMvc.Controllers
       return Json(new { aaData = ltDeInjuryHistory.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
+    public ContentResult GetPlayerTrainingHistotyData(int iPlayerId)
+    {
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      CornerkickGame.Player.TrainingHistory trHistCurrent = new CornerkickGame.Player.TrainingHistory();
+      trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
+      trHistCurrent.fKFM = new float[] { pl.fCondition, pl.fFresh, pl.fMoral, 0f, 0f };
+
+      List<Models.DataPointGeneral>[] dataPoints = new List<Models.DataPointGeneral>[3];
+
+      for (byte j = 0; j < dataPoints.Length; j++) {
+        dataPoints[j] = new List<Models.DataPointGeneral>();
+
+        for (int i = 0; i < pl.ltTrainingHistory.Count; i++) {
+          CornerkickGame.Player.TrainingHistory trHist = pl.ltTrainingHistory[i];
+
+          long iDate = convertDateTimeToTimestamp(trHist.dt);
+
+          CornerkickManager.Player.Training tr = CornerkickManager.Player.getTraining(trHist.iType, MvcApplication.ckcore.plr.ltTraining);
+          //string sTrainingName = "";
+          //if (tr.iId >= 0) sTrainingName = tr.sName;
+          //dataPoints[j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j], z: sTrainingName));
+          dataPoints[j].Add(new Models.DataPointGeneral(iDate, trHist.fKFM[j], z: tr.sName));
+        }
+
+        long iDateCurrent = convertDateTimeToTimestamp(trHistCurrent.dt);
+        dataPoints[j].Add(new Models.DataPointGeneral(iDateCurrent, trHistCurrent.fKFM[j]));
+      }
+
+      JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+
+      return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
     public JsonResult PlayerDetailsGetStatistic(int iPlayer, bool bSeason = true)
     {
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
