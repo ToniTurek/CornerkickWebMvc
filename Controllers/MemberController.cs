@@ -613,7 +613,7 @@ namespace CornerkickWebMvc.Controllers
 
         string sDesc = gs.dt.ToString("d", getCi()) + "</br>";
         if (clubH != null && clubA != null) sDesc += clubH.sName + " - " + clubA.sName + "</br>";
-        sDesc += MvcApplication.ckcore.ui.getResultString(gs);
+        sDesc += CornerkickManager.UI.getResultString(gs);
 
         int iGameType = 0;
         if      (gs.iGameType == 2) iGameType = 1;
@@ -5208,7 +5208,7 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td style=\"white-space: nowrap\" align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"\">" + sClubNameA + "</a></td>";
 
         if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
-          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";
+          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
         } else {
           sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
         }
@@ -5371,7 +5371,7 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td style=\"white-space: nowrap\" align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"\">" + sClubNameA + "</a></td>";
 
         if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
-          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + MvcApplication.ckcore.ui.getResultString(gd) + "</td>";
+          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
         } else {
           sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
         }
@@ -5714,7 +5714,7 @@ namespace CornerkickWebMvc.Controllers
                   if (iIdH >= 0 && iIdH < MvcApplication.ckcore.ltClubs.Count) sH = MvcApplication.ckcore.ltClubs[iIdH].sName;
                   if (iIdA >= 0 && iIdA < MvcApplication.ckcore.ltClubs.Count) sA = MvcApplication.ckcore.ltClubs[iIdA].sName;
 
-                  string sRes = MvcApplication.ckcore.ui.getResultString(gd);
+                  string sRes = CornerkickManager.UI.getResultString(gd);
 
                   string sTitle = " " + cup.sName;
                   string sColor = "rgb(200, 0, 200)";
