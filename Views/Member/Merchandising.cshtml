@@ -236,10 +236,11 @@
     *@
 
     @{
+      string sClassDisabled = "";
       if (Model.marketer != null) {
+        sClassDisabled = " class=disabledDiv";
         <p><b>Sie das Merchandising einem Vermarkter überlassen</b></p>
       }
-      string sClassDisabled = "";
       if (!Model.bFanshopsAvailable) {
         sClassDisabled = " class=disabledDiv";
         <p><b>Sie benötigen mindestens einen <a href="/Member/StadiumSurroundings">Fanshop</a> um Ihr Merchandising selbst zu vermarkten</b></p>
