@@ -4427,7 +4427,7 @@ namespace CornerkickWebMvc.Controllers
       else                                                                                                                                   buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark(clb.stadium.iCarparkNew, clb.stadium.iCarpark, usr);
+      iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark(clb.stadium.iCarpark + 1, clb.stadium.iCarpark, usr);
       bdgsAll[iType].sCategory = CornerkickManager.Stadium.sCarparkName;
       bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iCarpark;
@@ -4445,7 +4445,7 @@ namespace CornerkickWebMvc.Controllers
       else                                                         buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(clb.stadium.iTicketcounterNew, clb.stadium.iTicketcounter, usr);
+      iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(clb.stadium.iTicketcounter + 1, clb.stadium.iTicketcounter, usr);
       bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTicketcounterName;
       bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iTicketcounter;
@@ -4505,7 +4505,7 @@ namespace CornerkickWebMvc.Controllers
       int[] iCostDays = new int[2];
       if      (iType == 6) iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark      (clb.stadium.iCarpark       + iNew, clb.stadium.iCarpark,       usr);
       else if (iType == 7) iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(clb.stadium.iTicketcounter + iNew, clb.stadium.iTicketcounter, usr);
-      else if (iType == 8) iCostDays = CornerkickManager.Stadium.getCostDaysBuildBuilding        (clb, iType, iNew);
+      else if (iType == 8) iCostDays = CornerkickManager.Stadium.getCostDaysBuildBuilding        (clb, iType, clb.buildings.bgFanshop.iLevel + iNew);
 
       bdg.sCostConstructNext  = iCostDays[0].ToString("N0", getCi());
       bdg.nDaysConstructTotal = iCostDays[1];
