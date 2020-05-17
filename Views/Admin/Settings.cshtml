@@ -40,12 +40,17 @@
     $("#bLoginPossible").change(function () {
       setSettings();
     });
+
+    $("#bMaintenance").change(function () {
+      setSettings();
+    });
   });
 
   function setSettings() {
     var bEmailCertification = document.getElementById("bEmailCertification").checked;
     var bRegisterDuringGame = document.getElementById("bRegisterDuringGame").checked;
     var bLoginPossible = document.getElementById("bLoginPossible").checked;
+    var bMaintenance = document.getElementById("bMaintenance").checked;
 
     $.ajax({
       url: '/Admin/setSettings',
@@ -53,7 +58,7 @@
       dataType: "JSON",
       cache: false,
       contentType: "application/json; charset=utf-8",
-      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame, bLoginPossible: bLoginPossible }
+      data: { bEmailCertification: bEmailCertification, bRegisterDuringGame: bRegisterDuringGame, bLoginPossible: bLoginPossible, bMaintenance: bMaintenance }
     });
   }
 
@@ -179,6 +184,11 @@
 <label>
   @Html.CheckBoxFor(m => m.bLoginPossible)
   Login possible
+</label>
+
+<label>
+  @Html.CheckBoxFor(m => m.bMaintenance)
+  Maintenance
 </label>
 
 @using (Html.BeginForm("RestartCk", "Admin", FormMethod.Post)) {

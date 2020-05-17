@@ -37,13 +37,18 @@
           </div>
           <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-              @if (MvcApplication.settings.bLoginPossible) {
-                <input type="submit" value="Anmelden" class="btn btn-default" />
-              } else {
+              @if (MvcApplication.settings.bMaintenance) {
                 <input type="submit" value="Anmelden" class="btn btn-default" disabled="disabled" />
                 <p></p>
-                <p><strong style="font-size: 24px; color: red">Wartung / Update</strong></p>
+                <p><strong style="font-size: 24px; color: red">Wartung</strong></p>
                 <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
+              } else if (!MvcApplication.settings.bLoginPossible) {
+                <input type="submit" value="Anmelden" class="btn btn-default" disabled="disabled" />
+                <p></p>
+                <p><strong style="font-size: 24px; color: red">Update</strong></p>
+                <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
+              } else {
+                <input type="submit" value="Anmelden" class="btn btn-default" />
               }
             </div>
           </div>

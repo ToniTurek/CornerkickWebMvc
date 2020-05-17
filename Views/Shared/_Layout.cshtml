@@ -238,9 +238,13 @@
             }
 
             @{
-              if (!MvcApplication.settings.bLoginPossible) {
+              if (MvcApplication.settings.bMaintenance || !MvcApplication.settings.bLoginPossible) {
+                string sMsg = "ACHTUNG! ";
+                if (MvcApplication.settings.bMaintenance) { sMsg += "PROGRAMM INSTABIL."; }
+                else if (!MvcApplication.settings.bLoginPossible) { sMsg += "DEMNÄCHST FINDET EIN UPDATE STATT."; }
+                sMsg += " BITTE LOGGEN SIE SICH AUS!";
                 <div class="" style="position: relative; width: 100%; margin-top: 6px; margin-bottom: 6px; height: auto; text-align: center; background-color: yellow; border: 2px solid red">
-                  <strong style="font-size: 24px; color: red">ACHTUNG! DEMNÄCHST FINDET EIN UPDATE STATT. BITTE LOGGEN SIE SICH AUS!</strong>
+                  <strong style="font-size: 24px; color: red">@sMsg</strong>
                 </div>
               }
             }

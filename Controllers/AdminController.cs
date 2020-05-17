@@ -188,11 +188,12 @@ namespace CornerkickWebMvc.Controllers
       return RedirectToAction("Settings");
     }
 
-    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame, bool bLoginPossible)
+    public void setSettings(bool bEmailCertification, bool bRegisterDuringGame, bool bLoginPossible, bool bMaintenance)
     {
       MvcApplication.settings.bEmailCertification = bEmailCertification;
       MvcApplication.settings.bRegisterDuringGame = bRegisterDuringGame;
       MvcApplication.settings.bLoginPossible      = bLoginPossible;
+      MvcApplication.settings.bMaintenance        = bMaintenance;
     }
 
     public ActionResult Log(Models.AdminModel modelAdmin)

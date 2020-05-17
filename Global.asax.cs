@@ -39,6 +39,7 @@ namespace CornerkickWebMvc
       public bool bEmailCertification;
       public bool bRegisterDuringGame;
       public bool bLoginPossible;
+      public bool bMaintenance;
 
       public Settings()
       {
@@ -949,6 +950,8 @@ namespace CornerkickWebMvc
         fileSettings.WriteLine(settings.bEmailCertification.ToString());
         fileSettings.WriteLine(settings.bRegisterDuringGame.ToString());
 
+        fileSettings.WriteLine(settings.bMaintenance.ToString());
+
         fileSettings.Close();
       }
 
@@ -1100,6 +1103,8 @@ namespace CornerkickWebMvc
               bool.TryParse(sStateFileContent[4], out settings.bEmailCertification);
               bool.TryParse(sStateFileContent[5], out settings.bRegisterDuringGame);
             }
+
+            if (sStateFileContent.Length > 6) bool.TryParse(sStateFileContent[6], out settings.bMaintenance);
           }
         } else {
           ckcore.tl.writeLog("laststate file '" + sFileLastState + "' does not exist");
