@@ -4912,7 +4912,7 @@ namespace CornerkickWebMvc.Controllers
         dtm.iIx = iIx++;
         dtm.iId = mi.iId;
         dtm.sName = mi.sName;
-        dtm.sPriceBasic = mi.fPriceBuy.ToString("0.00");
+        dtm.sPriceBasic = mi.fPriceBuy.ToString("0.00") + " €";
         dtm.sPriceBuy = dtm.sPriceBasic;
         dtm.fPriceSell = mi.fPriceBuy;
         if (cmi != null) {
@@ -4943,6 +4943,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      sPriceBuy = sPriceBuy.Replace("€", "").Trim();
       float fPriceBuy = 0f;
       if (!float.TryParse(sPriceBuy, NumberStyles.Currency, CultureInfo.InvariantCulture, out fPriceBuy)) return Json(false, JsonRequestBehavior.AllowGet);
 

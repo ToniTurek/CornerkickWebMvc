@@ -42,7 +42,7 @@
           { "data": "sName" },
           {
             "data": "iPresent",
-            render: $.fn.dataTable.render.number('.', ',', 0, '')
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
           { "data": "sPriceBasic" },
           { "data": null },
@@ -50,7 +50,10 @@
           { "data": null },
           { "data": null },
           { "data": "sPriceSell" },
-          { "data": "iSold" }
+          {
+            "data": "iSold",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          }
         ],
         "paging": false,
         "info": false,
@@ -97,13 +100,21 @@
           itAmount.style.textAlign = "right";
           itAmount.value = 0;
 
+          var divPriceSell = document.createElement("div");
+          divPriceSell.style.width = "100%";
+          divPriceSell.align = "center";
           var itPrice = document.createElement("input");
           itPrice.type = "number";
           itPrice.step = "0.1";
           itPrice.min = "0.1";
-          itPrice.style.width = "60px";
+          itPrice.style.width = "65px";
           itPrice.style.textAlign = "right";
           itPrice.value = aData.fPriceSell;
+          divPriceSell.appendChild(itPrice);
+          var txtPrice = document.createElement("txt");
+          txtPrice.style.right = "0px";
+          txtPrice.innerText = " €";
+          divPriceSell.appendChild(txtPrice);
 
           var bnBuy = document.createElement("button");
           bnBuy.style.width = "80px";
@@ -129,7 +140,7 @@
               this.style.backgroundColor = "red";
             }
           });
-          $('td:eq(7)', nRow).html(itPrice);
+          $('td:eq(7)', nRow).html(divPriceSell);
 
           bnBuy.addEventListener("click", function () {
             buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(4)", nRow).text(), parseFloat(itPrice.value));
@@ -148,8 +159,8 @@
         dataType: "JSON",
         data: { iItemId: iItemId, iAmount: iAmount },
         success: function (fPrice) {
-          cell1.text(fPrice.toFixed(2));
-          cell2.text((fPrice * iAmount).toLocaleString());
+          cell1.text(fPrice.toFixed(2) + " €");
+          cell2.text((fPrice * iAmount).toLocaleString() + " €");
           bnBuy.disabled = iAmount === 0;
         },
         error: function (xhr) {
