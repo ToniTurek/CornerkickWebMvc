@@ -643,7 +643,7 @@
 
         <div style="position: relative; width: 100%; margin-bottom: 10px; float: left">
           <h3 style="position: relative">Stadionextras</h3>
-          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+          <div style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black; background-color: white">
             <strong style="position: relative; width: 308px; font-size: 18px">Anzeigetafel</strong>
             <p id="txtVideo" style="position: relative; width: 308px; margin: 0; font-size: 18px"></p>
             <p id="txtVideoNew" style="position: relative; width: 308px; margin-top: 4px; margin-bottom: 2px; font-size: 16px; display: none"></p>
@@ -655,7 +655,7 @@
             <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 49%; min-width: 308px">Kosten: 0</button>
           </div>
 
-          <div id="divSnackbarContainer" style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+          <div id="divSnackbarContainer" style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black; background-color: white">
             @{
               if (Model.iSnackbarReq > Model.stadion.iSnackbar) {
                 string sInfo = "Ihre Fans verlangen bei ausverkauftem Stadion min. " + Model.iSnackbarReq.ToString() + " Imbissbuden";
@@ -673,7 +673,7 @@
             <button type="submit" id="bnBuildSnackbar" class="btn btn-default" style="width: 308px">Kosten: 0</button>
           </div>
 
-          <div id="divToiletsContainer" style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black">
+          <div id="divToiletsContainer" style="position: relative; float: left; width: 320px; height: 134px; margin-right: 10px; margin-bottom: 10px; padding: 6px; border: 1px solid black; background-color: white">
             @{
               if (Model.iToiletsReq > Model.stadion.iToilets) {
                 string sInfo = "Ihre Fans verlangen bei ausverkauftem Stadion min. " + Model.iToiletsReq.ToString() + " Toiletten";
