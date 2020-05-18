@@ -5246,6 +5246,47 @@ namespace CornerkickWebMvc.Controllers
       return Json(sBox, JsonRequestBehavior.AllowGet);
     }
 
+    public class DatatableScorer
+    {
+      public int iIx { get; set; }
+      public int iId { get; set; }
+      public string sPlName { get; set; }
+      public string sClubName { get; set; }
+      public int iGoals { get; set; }
+      public int iAssists { get; set; }
+      public int iScorer { get; set; }
+      public bool bBold { get; set; }
+    }
+    public JsonResult GetScorerTable(byte iGameType, int iLand, int iDivision)
+    {
+      List<DatatableScorer> ltDtScorer = new List<DatatableScorer>();
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      List<CornerkickManager.UI.Scorer> ltScorer = MvcApplication.ckcore.ui.getScorer(iGameType, iLand: iLand, iDivision: iDivision, bNation: iGameType == 7);
+
+      int iIx = 0;
+      foreach (CornerkickManager.UI.Scorer sc in ltScorer) {
+        DatatableScorer dts = new DatatableScorer();
+        dts.iIx = iIx + 1;
+        dts.iId = sc.iId;
+        dts.sPlName = sc.sName;
+        dts.sClubName = sc.sTeam;
+        dts.iGoals = sc.iGoals;
+        dts.iAssists = sc.iAssists;
+        dts.iScorer = sc.iGoals + sc.iAssists;
+
+        if (CornerkickManager.Player.ownPlayer(clb, MvcApplication.ckcore.ltPlayer[sc.iId])) dts.bBold = true;
+
+        ltDtScorer.Add(dts);
+
+        iIx++;
+      }
+
+      return Json(new { aaData = ltDtScorer }, JsonRequestBehavior.AllowGet);
+    }
+
     public ContentResult GetLeaguePlaceHistory(int iSeason = 0)
     {
       CornerkickManager.Club club = ckClub();

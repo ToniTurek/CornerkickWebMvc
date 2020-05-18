@@ -7,12 +7,18 @@
 
 <html style="height: 100%; min-height: 100%">
 <head>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
   <script type="text/javascript" src="~/Scripts/League.js"></script>
 
   <script>
+    var oTableScorer;
+
     $(document).ready(function () {
       changeLand(0);
 
@@ -139,7 +145,26 @@
       <div id="chartContainerPlaceHist" style="height: 400px; width: 100%"></div>
     </div>
 
-    <div id="divLeagueScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+    <div id="divLeagueScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left">
+      <h4>Torschützen</h4>
+      <table id="tblLeagueScorer" style="position: relative" cellpadding="0" border="0" class="display responsive nowrap compact">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>id</th>
+            <th>Spieler</th>
+            <th>Verein</th>
+            <th>T.</th>
+            <th>Vl.</th>
+            <th>Sc.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 </html>

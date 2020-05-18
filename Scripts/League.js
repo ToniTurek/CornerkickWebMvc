@@ -33,8 +33,7 @@ function setLeague2(iDivision) {
   var iSeason = $('#ddlSeason').val();
   var iLand = $('#ddlLand').val();
   var iMd = $('#ddlMatchday').val();
-  var divDrawTable    = $("#tableDivLeague");
-  var divLeagueScorer = $("#divLeagueScorer");
+  var divDrawTable = $("#tableDivLeague");
 
   var iHA = 0;
   if (document.getElementById("rbTableH").checked) {
@@ -43,8 +42,7 @@ function setLeague2(iDivision) {
     iHA = 2;
   }
 
-  divDrawTable   .html('');
-  divLeagueScorer.html('');
+  divDrawTable.html('');
 
   $.ajax({
     url: '/Member/setLeague',
@@ -67,14 +65,64 @@ function setLeague2(iDivision) {
     }
   });
 
-  $.ajax({
-    url: '/Member/LeagueCupGetScorer',
-    type: "GET",
-    dataType: "JSON",
-    data: { iGameType: 1, iLand: iLand, iDivision: iDivision },
-    success: function (sText) {
-      if (sText) {
-        divLeagueScorer.html(getScorerTable(sText)).show();
+  if (oTableScorer) {
+    oTableScorer.ajax.reload();
+  } else {
+    oTableScorer = setTableScorer($('#tblLeagueScorer'), 1, document.getElementById('ddlLand'), 0);
+  }
+}
+
+function setTableScorer(tbl, iGameType, ddlLand, iDivision) {
+  return tbl.DataTable({
+    "ajax": {
+      "url": '/Member/GetScorerTable',
+      "type": 'GET',
+      "dataType": "JSON",
+      "data": function (d) {
+        d.iGameType = iGameType;
+        d.iLand = ddlLand.value;
+        d.iDivision = iDivision;
+      },
+      "cache": false,
+      "contentType": "application/json; charset=utf-8"
+    },
+    "columns": [
+      { "data": "iIx" },
+      { "data": "iId" },
+      { "data": "sPlName" },
+      { "data": "sClubName" },
+      { "data": "iGoals" },
+      { "data": "iAssists" },
+      { "data": "iScorer" },
+      { "data": "bBold" }
+    ],
+    "paging": false,
+    "info": false,
+    "searching": false,
+    "order": [[4, "desc"]],
+    "language": {
+      "emptyTable": "keine Torschützen"
+    },
+    "columnDefs": [
+      {
+        "targets": [1, 7],
+        "visible": false,
+        "orderable": false,
+        "searchable": false
+      },
+      {
+        "targets": [0, 2],
+        "orderable": false,
+        "searchable": false
+      },
+      {
+        "targets": [0, 4, 5, 6],
+        "className": "dt-right"
+      }
+    ],
+    "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+      if (aData.bBold) {
+        $('td', nRow).css("font-weight", "bold");
       }
     }
   });
