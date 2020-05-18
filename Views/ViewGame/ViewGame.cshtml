@@ -63,14 +63,14 @@
     var bAdminStop = true;
 
     var ltF = [];
-    var ltM = [];
+    //var ltM = [];
     var chartF;
-    var chartM;
+    //var chartM;
 
     var i = 0;
     for (i = 0; i < 11; ++i) {
       ltF[i] = [];
-      ltM[i] = [];
+      //ltM[i] = [];
     }
   </script>
 
@@ -533,6 +533,7 @@
 
       //chartF.render();
 
+      /*
       chartM = new CanvasJS.Chart("chartContainerM", {
         colorSet: "colorSet3",
         animationEnabled: false,
@@ -646,6 +647,7 @@
           dataPoints: ltM[10]
         }]
       });
+      */
 
       // Dialogs
       $("#dialogOptions").dialog({
@@ -790,7 +792,7 @@
       var divComments = document.getElementById("divComments");
       var divTableViewGame = document.getElementById("divTableViewGame");
       var divChartContainerF = document.getElementById("chartContainerF");
-      var divChartContainerM = document.getElementById("chartContainerM");
+      //var divChartContainerM = document.getElementById("chartContainerM");
 
       var fWidth = $(window).width();
       if (fWidth < 960 && $(window).height() < fWidth) {
@@ -863,10 +865,12 @@
         divChartContainerF.style.position = "absolute";
         divChartContainerF.style.top = fTableY.toString() + "px";
 
+        /*
         var fFY = divChartContainerF.offsetTop + divChartContainerF.offsetHeight;
         divChartContainerM.style.left = "0px";
         divChartContainerM.style.position = "absolute";
         divChartContainerM.style.top = fFY.toString() + "px";
+        */
       }
       else {
         divHeader.style.display = 'block';
@@ -1071,7 +1075,9 @@
   </div>
 
   <div id="chartContainerF" style="position: relative; float: left; height: 300px; width: 100%; margin-top: 10px"></div>
-  <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
+  @*
+    <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
+  *@
 
   <div id="dialogOptions" title="Optionen">
     <b id="txtOptionsHeatmap" style="position: absolute; top: 10px">Heatmap:</b>

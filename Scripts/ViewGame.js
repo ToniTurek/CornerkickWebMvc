@@ -754,54 +754,35 @@ function plotStatistics(jState = -1) {
       // Update team table
       $('#tableTeamViewGame').DataTable().ajax.reload();
 
+      /////////////////////////////////////////////////////////////////
       // Charts
+      /////////////////////////////////////////////////////////////////
+      // Plot fresh
       try {
-        if (gD.ltF && gD.ltM) {
-          var i = 0;
-          var j = 0;
-          for (i = 0; i < gD.ltF.length; ++i) {
-            if (!ltF[i]) {
-              ltF[i] = [];
-            }
-            if (!ltM[i]) {
-              ltM[i] = [];
+        if (gD.ltF) {
+          var iF = 0;
+
+          for (iF = 0; iF < gD.ltF.length; ++iF) {
+            if (!ltF[iF]) {
+              ltF[iF] = [];
             }
 
-            if (gD.ltF[i]) {
-              if (gD.ltF[i].length > 0) {
+            if (gD.ltF[iF]) {
+              if (gD.ltF[iF].length > 0) {
                 if (jState === -1) {
-                  for (k = 0; k < gD.ltF[i].length; ++k) {
-                    ltF[i].push(gD.ltF[i][k]);
+                  for (k = 0; k < gD.ltF[iF].length; ++k) {
+                    ltF[iF].push(gD.ltF[iF][k]);
                   }
                 } else {
-                  ltF[i].length = 0;
+                  ltF[iF].length = 0;
 
-                  for (j = 0; j < iState; ++j) {
-                    if (j >= gD.ltF[i].length) {
+                  var jF = 0;
+                  for (jF = 0; jF < iState; ++jF) {
+                    if (jF >= gD.ltF[iF].length) {
                       break;
                     }
 
-                    ltF[i].push(gD.ltF[i][j]);
-                  }
-                }
-              }
-            }
-
-            if (gD.ltM[i]) {
-              if (gD.ltM[i].length > 0) {
-                if (jState === -1) {
-                  for (k = 0; k < gD.ltM[i].length; ++k) {
-                    ltM[i].push(gD.ltM[i][k]);
-                  }
-                } else {
-                  ltM[i].length = 0;
-
-                  for (j = 0; j < iState; ++j) {
-                    if (j >= gD.ltM[i].length) {
-                      break;
-                    }
-
-                    ltM[i].push(gD.ltM[i][j]);
+                    ltF[iF].push(gD.ltF[iF][jF]);
                   }
                 }
               }
@@ -809,13 +790,51 @@ function plotStatistics(jState = -1) {
           }
 
           chartF.render();
-          chartM.render();
         }
       } catch (e) {
         gD.ltF = null;
+      }
+
+      // Plot moral
+      /*
+      try {
+        if (gD.ltM) {
+          var iM = 0;
+
+          for (iM = 0; iM < gD.ltM.length; ++iM) {
+            if (!ltM[iM]) {
+              ltM[iM] = [];
+            }
+
+            if (gD.ltM[iM]) {
+              if (gD.ltM[iM].length > 0) {
+                if (jState === -1) {
+                  for (k = 0; k < gD.ltM[iM].length; ++k) {
+                    ltM[iM].push(gD.ltM[iM][k]);
+                  }
+                } else {
+                  ltM[iM].length = 0;
+
+                  var jM = 0;
+                  for (jM = 0; jM < iState; ++jM) {
+                    if (jM >= gD.ltM[iM].length) {
+                      break;
+                    }
+
+                    ltM[iM].push(gD.ltM[iM][jM]);
+                  }
+                }
+              }
+            }
+          }
+
+          chartM.render();
+        }
+      } catch (e) {
         gD.ltM = null;
       }
-      
+      */
+
       //if (document.getElementById("myCheck").checked) {
       if (document.getElementById("bShowChances").checked) {
         drawPlayerChances(gD.fPlAction, gD.fPlActionRnd);

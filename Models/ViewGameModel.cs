@@ -126,7 +126,7 @@ namespace CornerkickWebMvc.Models
       public string sAdminChanceGoal { get; set; }
 
       public List<Models.DataPointGeneral>[] ltF { get; set; }
-      public List<Models.DataPointGeneral>[] ltM { get; set; }
+      //public List<Models.DataPointGeneral>[] ltM { get; set; }
     }
     public gameData gD;
 

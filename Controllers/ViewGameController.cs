@@ -1,4 +1,5 @@
 ﻿#define _AI2
+//#define _PLOT_MORAL
 
 using System;
 using System.Collections.Generic;
@@ -468,8 +469,10 @@ namespace CornerkickWebMvc.Controllers
       gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
 
+#if _PLOT_MORAL
       gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
+#endif
 
       if (gD.nStates == 0) {
         gD = getAllGameData(view);
@@ -596,17 +599,21 @@ namespace CornerkickWebMvc.Controllers
           for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
         }
 
+#if _PLOT_MORAL
         if (gD.ltM == null || iState == -1) {
           gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
           for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
         }
+#endif
 
         for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
           gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFresh));
         }
+#if _PLOT_MORAL
         for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) {
           gD.ltM[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fMoral));
         }
+#endif
       }
 
       // Set counter of performed state
@@ -979,8 +986,10 @@ namespace CornerkickWebMvc.Controllers
       // initialize chart values
       gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
+#if _PLOT_MORAL
       gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
+#endif
 
       gD.iShoots       = new int[2];
       gD.iShootsOnGoal = new int[2];
