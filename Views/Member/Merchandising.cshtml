@@ -40,7 +40,10 @@
           { "data": "iIx" },
           { "data": "iId" },
           { "data": "sName" },
-          { "data": "iPresent" },
+          {
+            "data": "iPresent",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "sPriceBasic" },
           { "data": null },
           { "data": "sPriceBuy" },
@@ -96,6 +99,8 @@
 
           var itPrice = document.createElement("input");
           itPrice.type = "number";
+          itPrice.step = "0.1";
+          itPrice.min = "0.1";
           itPrice.style.width = "60px";
           itPrice.style.textAlign = "right";
           itPrice.value = aData.fPriceSell;
@@ -144,7 +149,7 @@
         data: { iItemId: iItemId, iAmount: iAmount },
         success: function (fPrice) {
           cell1.text(fPrice.toFixed(2));
-          cell2.text((fPrice * iAmount).toFixed(2));
+          cell2.text((fPrice * iAmount).toLocaleString());
           bnBuy.disabled = iAmount === 0;
         },
         error: function (xhr) {
