@@ -4427,7 +4427,7 @@ namespace CornerkickWebMvc.Controllers
       else                                                                                                                                   buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark(clb.stadium.iCarpark + 1, clb.stadium.iCarpark, usr);
+      iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark(Math.Max(clb.stadium.iCarpark + 1, clb.stadium.iCarparkNew), clb.stadium.iCarpark, usr);
       bdgsAll[iType].sCategory = CornerkickManager.Stadium.sCarparkName;
       bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iCarpark;
@@ -4445,7 +4445,7 @@ namespace CornerkickWebMvc.Controllers
       else                                                         buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(clb.stadium.iTicketcounter + 1, clb.stadium.iTicketcounter, usr);
+      iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(Math.Max(clb.stadium.iTicketcounter + 1, clb.stadium.iTicketcounterNew), clb.stadium.iTicketcounter, usr);
       bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTicketcounterName;
       bdgsAll[iType].iType = iType;
       bdgsAll[iType].iLevel = clb.stadium.iTicketcounter;
