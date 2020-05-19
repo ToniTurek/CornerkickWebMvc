@@ -424,9 +424,9 @@ namespace CornerkickWebMvc
     {
       // Reset home dir
       string sHomeDir = getHomeDir();
-      if (sHomeDir != null && !sHomeDir.Equals(CornerkickManager.Main.sHomeDir)) {
-        ckcore.tl.writeLog("Reset ck home dir from " + CornerkickManager.Main.sHomeDir + " to " + sHomeDir);
-        CornerkickManager.Main.sHomeDir = sHomeDir;
+      if (sHomeDir != null && !sHomeDir.Equals(ckcore.settings.sHomeDir)) {
+        ckcore.tl.writeLog("Reset ck home dir from " + ckcore.settings.sHomeDir + " to " + sHomeDir);
+        ckcore.settings.sHomeDir = sHomeDir;
       }
 
       if (ckcore.ltUser.Count == 0) return true;
@@ -782,7 +782,7 @@ namespace CornerkickWebMvc
       if (timerCkCalender.Interval < 10000 && !bForce) return;
 
       string sHomeDir = getHomeDir();
-      if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = CornerkickManager.Main.sHomeDir;
+      if (string.IsNullOrEmpty(sHomeDir)) sHomeDir = ckcore.settings.sHomeDir;
 
 #if DEBUG
       sHomeDir = "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc";
@@ -963,7 +963,7 @@ namespace CornerkickWebMvc
 
     private static void saveMails(AmazonS3FileTransfer as3 = null)
     {
-      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
+      string sDirMail = System.IO.Path.Combine(ckcore.settings.sHomeDir, "mail");
       if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
 
       if (MvcApplication.ltMail == null) return; ;
@@ -1170,7 +1170,7 @@ namespace CornerkickWebMvc
 
     private static void readMails()
     {
-      string sDirMail = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail");
+      string sDirMail = System.IO.Path.Combine(ckcore.settings.sHomeDir, "mail");
       if (System.IO.Directory.Exists(sDirMail)) {
         ltMail = new List<Mail>();
 

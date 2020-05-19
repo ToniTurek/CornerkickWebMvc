@@ -48,8 +48,7 @@ namespace CornerkickWebMvc.Controllers
       modelAdmin.bEmailCertification = MvcApplication.settings.bEmailCertification;
       modelAdmin.bRegisterDuringGame = MvcApplication.settings.bRegisterDuringGame;
       modelAdmin.sHomeDir    = MvcApplication.getHomeDir();
-      modelAdmin.sHomeDirCk  = CornerkickManager.Main.sHomeDir;
-      modelAdmin.sHomeDirCk2 = MvcApplication.ckcore.settings.sHomeDir;
+      modelAdmin.sHomeDirCk = MvcApplication.ckcore.settings.sHomeDir;
 
       // Statistics
       modelAdmin.nClubs  = MvcApplication.ckcore.ltClubs .Count;
@@ -108,7 +107,7 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.timerCkCalender.Enabled = true;
 
       // Save last state
-      MvcApplication.saveLaststate(CornerkickManager.Main.sHomeDir);
+      MvcApplication.saveLaststate(MvcApplication.ckcore.settings.sHomeDir);
 
       return RedirectToAction("Settings");
     }
@@ -126,7 +125,7 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.timerSave.Enabled = true;
 
       // Save last state
-      MvcApplication.saveLaststate(CornerkickManager.Main.sHomeDir);
+      MvcApplication.saveLaststate(MvcApplication.ckcore.settings.sHomeDir);
 
       return RedirectToAction("Settings");
       //return View("Settings", "");

@@ -7016,7 +7016,7 @@ namespace CornerkickWebMvc.Controllers
       string sFilename = user.id + "_" + dtMail.ToString("yyyyMMddHHmmss") + ".txt";
       if (!bFullPath) return sFilename;
 
-      return System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "mail", sFilename);
+      return System.IO.Path.Combine(MvcApplication.ckcore.settings.sHomeDir, "mail", sFilename);
     }
 
     public static int MailCountNewMails(CornerkickManager.User usr)
@@ -7085,7 +7085,7 @@ namespace CornerkickWebMvc.Controllers
 
       var jss = new System.Web.Script.Serialization.JavaScriptSerializer();
 
-      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist.json");
+      string sFileWl = System.IO.Path.Combine(MvcApplication.ckcore.settings.sHomeDir, "wishlist.json");
       if (System.IO.File.Exists(sFileWl)) {
         Models.WishListModel.WishJson wishJson = jss.Deserialize<Models.WishListModel.WishJson>(System.IO.File.ReadAllText(sFileWl));
 
@@ -7181,7 +7181,7 @@ namespace CornerkickWebMvc.Controllers
 
     private void writeWishesToJsonFile(List<Models.WishListModel.Wish> ltWish)
     {
-      string sFileWl = System.IO.Path.Combine(CornerkickManager.Main.sHomeDir, "wishlist.json");
+      string sFileWl = System.IO.Path.Combine(MvcApplication.ckcore.settings.sHomeDir, "wishlist.json");
 
       if (System.IO.File.Exists(sFileWl)) {
         // Create backup

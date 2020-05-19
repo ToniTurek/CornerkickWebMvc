@@ -648,7 +648,7 @@ namespace CornerkickWebMvc.Controllers
           //string sFileExt = ".png";
 
           // Get base directory
-          string sBaseDir = CornerkickManager.Main.sHomeDir;
+          string sBaseDir = MvcApplication.ckcore.settings.sHomeDir;
           if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
 #if !DEBUG
           sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;
@@ -1311,7 +1311,7 @@ namespace CornerkickWebMvc.Controllers
             usr.club.user = null;
 
             // Delete emblem
-            string sBaseDir = CornerkickManager.Main.sHomeDir;
+            string sBaseDir = MvcApplication.ckcore.settings.sHomeDir;
             if (string.IsNullOrEmpty(sBaseDir)) sBaseDir = MvcApplication.getHomeDir();
 #if !DEBUG
             sBaseDir = System.IO.Directory.GetParent(sBaseDir).FullName;

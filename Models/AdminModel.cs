@@ -19,7 +19,6 @@ namespace CornerkickWebMvc.Models
     public int nPlayer { get; set; }
     public string sHomeDir { get; set; }
     public string sHomeDirCk { get; set; }
-    public string sHomeDirCk2 { get; set; }
 
     public DateTime dtCkCurrent { get; set; }
     public DateTime dtCkApproach { get; set; }
