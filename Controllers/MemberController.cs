@@ -6361,6 +6361,14 @@ namespace CornerkickWebMvc.Controllers
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
+    public JsonResult GetBalance()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      return Json(new int[2] { clb.iBalance, clb.iBalanceSecret }, JsonRequestBehavior.AllowGet);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// Sponsor

@@ -8,7 +8,9 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script type="text/javascript" src="~/Scripts/Finance.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
+
   <style>
     .myPb {
       height: 14px;
@@ -293,18 +295,21 @@
     }
 
     function buildBuilding(btn) {
-      var iType  = btn.getAttribute('data-itype');
+      var iType = btn.getAttribute('data-itype');
       var iLevel = btn.getAttribute('data-ilevel');
 
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildBuilding',
-        dataType: "json",
-        data: { iType: iType, iLevel: iLevel },
-        success: function (sMessage) {
-          alert(sMessage);
-          window.location.reload(true);
-        }
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        $.ajax({
+          type: 'post',
+          url: '/Member/StadiumBuildBuilding',
+          dataType: "json",
+          data: { iType: iType, iLevel: iLevel },
+          success: function (sMessage) {
+            alert(sMessage);
+            getCurrentBuildings();
+            updateBalance(iBalance[0]);
+          }
+        });
       });
     }
   </script>

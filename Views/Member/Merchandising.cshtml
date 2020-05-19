@@ -12,6 +12,7 @@
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/autoNumeric/autoNumeric-min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Finance.js"></script>
 
   <style>
     .disabledDiv {
@@ -185,19 +186,22 @@
     }
 
     function buyItem(iItemId, iAmount, sPriceBuy, fPriceSell) {
-      $.ajax({
-        url: '/Member/buyMerchandisingItem',
-        type: "POST",
-        dataType: "JSON",
-        data: { iItemId: iItemId, iAmount: iAmount, sPriceBuy: sPriceBuy, fPriceSell: fPriceSell },
-        success: function (bReturn) {
-          if (bReturn) {
-            oTable.ajax.reload();
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        $.ajax({
+          url: '/Member/buyMerchandisingItem',
+          type: "POST",
+          dataType: "JSON",
+          data: { iItemId: iItemId, iAmount: iAmount, sPriceBuy: sPriceBuy, fPriceSell: fPriceSell },
+          success: function (bReturn) {
+            if (bReturn) {
+              oTable.ajax.reload();
+              updateBalance(iBalance[0]);
+            }
+          },
+          error: function (xhr) {
+            alert(xhr.responseText);
           }
-        },
-        error: function (xhr) {
-          alert(xhr.responseText);
-        }
+        });
       });
     }
 

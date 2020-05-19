@@ -21,6 +21,7 @@
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
+  <script type="text/javascript" src="~/Scripts/Finance.js"></script>
 
   <style>
     .disabledDivTransfer {
@@ -148,7 +149,7 @@
             }
 
             d.iClubId = iClubId;
-            
+
             d.iNation = $('#ddlFilterNation').val();
           }
         },
@@ -471,22 +472,25 @@
             var iFee    = getIntFromString($("#tbTransferFee")      .val());
             var iFeeSec = getIntFromString($("#tbTransferFeeSecret").val());
 
-            $.ajax({
-              url: "/Member/MakeTransferOffer",
-              type: 'POST',
-              traditional: true,
-              data: { iPlayerId: iId, iTransferFee: iFee, iTransferFeeSecret: iFeeSec },
-              dataType: "json",
-              success: function (response) {
-                alert(response);
+            $.when(getBalanceAjax()).done(function (iBalance) {
+              $.ajax({
+                url: "/Member/MakeTransferOffer",
+                type: 'POST',
+                traditional: true,
+                data: { iPlayerId: iId, iTransferFee: iFee, iTransferFeeSecret: iFeeSec },
+                dataType: "json",
+                success: function (response) {
+                  alert(response);
 
-                jTable.ajax.reload();
-                //window.location.reload(true);
-              },
-              error: function (xhr) {
-                debugger;
-                alert(xhr.error);
-              }
+                  jTable.ajax.reload();
+                  updateBalance(iBalance[0]);
+                  //window.location.reload(true);
+                },
+                error: function (xhr) {
+                  debugger;
+                  alert(xhr.error);
+                }
+              });
             });
 
             $(this).dialog("close");

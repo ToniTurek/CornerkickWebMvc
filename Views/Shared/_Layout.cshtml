@@ -198,7 +198,7 @@
             </div>
 
             <div style="position: relative; width: 100%; height: 22px; background-color: white; border: 2px solid rgb(31, 158, 69)">
-              <div style="position: absolute; height: 0px; width: 210px; left: 4px; text-align: left">
+              <div style="position: absolute; height: 20px; width: 210px; left: 4px; text-align: left">
                 @{
                   string sCkTime = MvcApplication.ckcore.dtDatum.ToString("ddd", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("d", ci) + ", " + MvcApplication.ckcore.dtDatum.ToString("t", ci);
                   if (!MvcApplication.timerCkCalender.Enabled) {
@@ -209,7 +209,7 @@
               </div>
               @{
                 if (clb != null && !clb.bNation) {
-                  <div style="position: absolute; height: 0px; width: 50%; right: 4px; text-align: right">
+                  <div style="position: absolute; height: 20px; width: 50%; right: 4px; text-align: right">
                     @{
                       string sCash = "0";
                       if (clb != null) {
@@ -217,7 +217,7 @@
                         if (clb.iBalanceSecret != 0) { sCash += " (" + clb.iBalanceSecret.ToString("#,#", ci) + ")"; }
                       }
                     }
-                    @Html.ActionLink(sCash + " €", "Finance", "Member")
+                    @Html.ActionLink(sCash + " €", "Finance", "Member", null, new { id = "txtBalance" })
                   </div>
                 }
               }
