@@ -535,7 +535,7 @@ namespace CornerkickWebMvc
 #if DEBUG
             string sBaseDir = getHomeDir();
 #else
-            string sBaseDir = Directory.GetParent(CornerkickManager.Main.sHomeDir).FullName;
+            string sBaseDir = Directory.GetParent(ckcore.settings.sHomeDir).FullName;
 #endif
             string sDirPortrait = System.IO.Path.Combine(sBaseDir, "Content", "Images", "Portraits");
 
