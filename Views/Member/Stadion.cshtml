@@ -159,6 +159,7 @@
         success: function (bTopring) {
           if (bTopring) {
             document.getElementById("imgStadium").src = "/Content/Images/stadium/stadion_L.jpg";
+            document.getElementById("divTopring").style.display = "none";
           } else {
             document.getElementById("imgStadium").src = "/Content/Images/stadium/stadion_S.png";
           }
@@ -484,18 +485,22 @@
           if (Model.iSeats != null) {
             float[,] sLoc = new float[Model.iSeats.Length, 2];
 
-            sLoc[0, 0] = 0.31f; sLoc[0, 1] = 0.75f;       // A
+            float fShiftY = 0f;
+            if (Model.bOberring) {
+              fShiftY = 0.03f;
+            }
+            sLoc[0, 0] = 0.31f; sLoc[0, 1] = 0.75f + fShiftY;       // A
             sLoc[1, 0] = 0.50f; sLoc[1, 1] = sLoc[0, 1]; // B
             sLoc[2, 0] = 1 - sLoc[0, 0]; sLoc[2, 1] = sLoc[0, 1]; // C
-            sLoc[3, 0] = 0.83f; sLoc[3, 1] = 0.55f;       // D
-            sLoc[4, 0] = sLoc[3, 0]; sLoc[4, 1] = 0.32f;       // E
-            sLoc[5, 0] = sLoc[2, 0]; sLoc[5, 1] = 0.14f;       // F
+            sLoc[3, 0] = 0.83f; sLoc[3, 1] = 0.55f + fShiftY;       // D
+            sLoc[4, 0] = sLoc[3, 0]; sLoc[4, 1] = 0.32f + fShiftY;       // E
+            sLoc[5, 0] = sLoc[2, 0]; sLoc[5, 1] = 0.14f + fShiftY;       // F
             sLoc[6, 0] = sLoc[1, 0]; sLoc[6, 1] = sLoc[5, 1]; // G
             sLoc[7, 0] = sLoc[0, 0]; sLoc[7, 1] = sLoc[5, 1]; // H
             sLoc[8, 0] = 1 - sLoc[3, 0]; sLoc[8, 1] = sLoc[4, 1]; // I
             sLoc[9, 0] = sLoc[8, 0]; sLoc[9, 1] = sLoc[3, 1]; // J
 
-            sLoc[10, 0] = sLoc[0, 0]; sLoc[10, 1] = 0.89f;       // A1
+            sLoc[10, 0] = sLoc[0, 0]; sLoc[10, 1] = 0.9f;       // A1
             sLoc[11, 0] = sLoc[1, 0]; sLoc[11, 1] = sLoc[10, 1]; // B1
             sLoc[12, 0] = sLoc[2, 0]; sLoc[12, 1] = sLoc[10, 1]; // C1
             sLoc[13, 0] = 0.92f; sLoc[13, 1] = sLoc[3, 1]; // D1
@@ -587,7 +592,7 @@
       if (Model.stadion != null) {
         <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
         
-        <div style="position: relative; width: 100%; margin-bottom: 20px">
+        <div id="divTopring" style="position: relative; width: 100%; margin-bottom: 20px">
           <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>
           <div id="pbTopring" style="position: absolute; width: 100%; top: 28px"></div>
         </div>
