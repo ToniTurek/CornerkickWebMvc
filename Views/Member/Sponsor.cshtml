@@ -7,12 +7,13 @@
 
 <head>
   <meta charset="UTF-8">
-  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
-  <script src="~/Scripts/jQuery-1.12.4.js" type="text/javascript"></script>
-  <script src="~/Scripts/DataTables/jquery.dataTables.min.js" type="text/javascript"></script>
-  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Finance.js"></script>
 
   <script type="text/javascript">
     var bMobile = false;
@@ -150,20 +151,33 @@
       });
 
       $('#bnTake').click(function () {
-        var data = jTable.row('.selected').data();
+        var rowSel = jTable.row('.selected');
+        var data = rowSel.data();
+
         if (data) {
           var iIndex = data[0];
+
           //table.row('.selected').remove().draw(false);
-          $.ajax({
-            type: 'post',
-            url: '/Member/SponsorSet',
-            dataType: "json",
-            data: { iSponsorIndex: iIndex },
-            success: function (sCash) {
-              //$("#bnBuild").text("Kosten: " + iKosten);
-              alert("Ihr aktuelles Guthaben hat sich um " + sCash + "€ erhöht.");
-              window.location.reload(true);
-            }
+          $.when(getBalanceAjax()).done(function (iBalance) {
+            $.ajax({
+              type: 'post',
+              url: '/Member/SponsorSet',
+              dataType: "json",
+              data: { iSponsorIndex: iIndex },
+              success: function (sCash) {
+                /*
+                var audioCash = new Audio("/Content/Sounds/cash.wav");
+                audioCash.play();
+                */
+
+                //jTable.ajax.reload();
+                bnTakeMain.style.display = "none";
+                //$(rowSel).css("font-weight", "bold");
+                updateBalance(iBalance[0]);
+
+                alert("Ihr aktuelles Guthaben hat sich um " + sCash + "€ erhöht.");
+              }
+            });
           });
         }
       });
