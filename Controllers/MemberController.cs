@@ -1901,6 +1901,10 @@ namespace CornerkickWebMvc.Controllers
         plModel.bJouth = CornerkickManager.Player.ownPlayer(clbPlayer, plDetails, 2);
         plModel.bJouthBelow16 = plDetails.getAge(MvcApplication.ckcore.dtDatum) < 16;
         plModel.bJouthWithContract = plModel.bJouth && plDetails.contract.iSalary != CornerkickManager.Finance.iPlayerJouthSalary;
+
+        plModel.sColorJersey = "rgb(" + clbPlayer.cl[0].R.ToString() + "," + clbPlayer.cl[0].G.ToString() + "," + clbPlayer.cl[0].B.ToString() + ")";
+        System.Drawing.Color clJerseyNo = getColorBW(clbPlayer);
+        plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")";
       }
 
       plModel.bNation = club.bNation;
@@ -1914,10 +1918,6 @@ namespace CornerkickWebMvc.Controllers
 
       plModel.sPortrait = getPlayerPortrait(plDetails, "height: 100%; width: 100%; object-fit: contain");
       plModel.sEmblem = getClubEmblem(plDetails.iClubId, "height: 100%; width: 100%; object-fit: contain");
-
-      plModel.sColorJersey = "rgb(" + club.cl[0].R.ToString() + "," + club.cl[0].G.ToString() + "," + club.cl[0].B.ToString() + ")";
-      System.Drawing.Color clJerseyNo = getColorBW(club);
-      plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")"; 
 
       List<int> ltNoExist = new List<int>();
       foreach (CornerkickGame.Player pl in club.ltPlayer) {
