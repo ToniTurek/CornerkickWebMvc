@@ -1,4 +1,12 @@
 ﻿function setMatchdayCupGold(iSaison, iMd, iGroup) {
+  // Show/hide group ddl
+  var lbGroupsCupGold = document.getElementById("lbGroupsCupGold");
+  if (iMd > 5) {
+    lbGroupsCupGold.style.display = "none";
+  } else {
+    lbGroupsCupGold.style.display = "inline";
+  }
+
   $.ajax({
     url: '/Member/setCupGold',
     type: "GET",

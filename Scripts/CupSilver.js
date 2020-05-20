@@ -1,4 +1,12 @@
 ﻿function setMatchdayCupSilver(iSaison, iMd, iGroup) {
+  // Show/hide group ddl
+  var lbGroupsCupSilver = document.getElementById("lbGroupsCupSilver");
+  if (iMd > 5) {
+    lbGroupsCupSilver.style.display = "none";
+  } else {
+    lbGroupsCupSilver.style.display = "inline";
+  }
+
   $.ajax({
     url: '/Member/setCupSilver',
     type: "GET",

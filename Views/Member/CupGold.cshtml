@@ -33,19 +33,19 @@
 </head>
 
 <body style="height: 100%; min-height: 100%">
-  <label>
+  <label style="margin-right: 10px">
     Saison:
     @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupGold" })
   </label>
 
-  <label style="margin-left: 10px">
-    Gruppe:
-    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupGold" })
-  </label>
-
-  <label style="margin-left: 10px">
+  <label style="margin-right: 10px">
     Spieltag:
     @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupGold" })
+  </label>
+
+  <label id="lbGroupsCupGold">
+    Gruppe:
+    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupGold" })
   </label>
 
   <div id="tableDivCupGoldTeams"></div>

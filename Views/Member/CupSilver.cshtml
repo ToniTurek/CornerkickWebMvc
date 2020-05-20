@@ -15,6 +15,7 @@
   <script>
     $(document).ready(function () {
       var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
+
       setMatchdayCupSilver(-1, iMatchday, 0);
 
       $("#ddlSeasonCupSilver").change(function () {
@@ -33,19 +34,19 @@
 </head>
 
 <body style="height: 100%; min-height: 100%">
-  <label>
+  <label style="margin-right: 10px">
     Saison:
     @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupSilver" })
   </label>
 
-  <label style="margin-left: 10px">
-    Gruppe:
-    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupSilver" })
-  </label>
-
-  <label style="margin-left: 10px">
+  <label style="margin-right: 10px">
     Spieltag:
     @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupSilver" })
+  </label>
+
+  <label id="lbGroupsCupSilver">
+    Gruppe:
+    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupSilver" })
   </label>
 
   <div id="tableDivCupSilverTeams"></div>
