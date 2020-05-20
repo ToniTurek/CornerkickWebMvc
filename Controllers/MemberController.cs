@@ -5475,6 +5475,8 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Cup cupGold = getCup(iSaison, 3);
 
+      if (!cupGold.checkCupGroupPhase(iMatchday)) iGroup = -1;
+
       return Json(getCupTeams(cupGold, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
 
@@ -5503,6 +5505,8 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Cup cupSilver = getCup(iSaison, 4);
 
+      if (!cupSilver.checkCupGroupPhase(iMatchday)) iGroup = -1;
+
       return Json(getCupTeams(cupSilver, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
 
@@ -5521,6 +5525,8 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult setCupWc(int iSaison, int iMatchday, int iGroup)
     {
       CornerkickManager.Cup cupWc = getCup(iSaison, 7);
+
+      if (!cupWc.checkCupGroupPhase(iMatchday)) iGroup = -1;
 
       return Json(getCupTeams(cupWc, iMatchday, iGroup), JsonRequestBehavior.AllowGet);
     }
