@@ -1124,7 +1124,7 @@
       </div>
 
       @{
-        if (Model.bOwnPlayer) {
+        if (Model.bOwnPlayer && !Model.bJouth) {
           <div style="position: relative; width: 100%; height: 380px">
             <h4>Trainingshistorie</h4>
             <div id="divChartTrainingHistory" style="position: relative; height: 320px; width: 100%"></div>
