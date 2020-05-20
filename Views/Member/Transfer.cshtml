@@ -504,20 +504,25 @@
       // Accept Transfer offer
       $("#bnAcceptOffer").click(function () {
         if (iAcceptClubId >= 0 && iAcceptPlId >= 0) {
-          $.ajax({
-            url: "/Member/AcceptTransferOffer",
-            type: 'POST',
-            traditional: true,
-            data: { iPlayerId: iAcceptPlId, iClubId: iAcceptClubId },
-            dataType: "json",
-            success: function (response) {
-              alert(response);
-              window.location.reload(true);
-            },
-            error: function (xhr) {
-              debugger;
-              alert(xhr.error);
-            }
+          $.when(getBalanceAjax()).done(function (iBalance) {
+            $.ajax({
+              url: "/Member/AcceptTransferOffer",
+              type: 'POST',
+              traditional: true,
+              data: { iPlayerId: iAcceptPlId, iClubId: iAcceptClubId },
+              dataType: "json",
+              success: function (response) {
+                alert(response);
+
+                jTable.ajax.reload();
+                updateBalance(iBalance[0]);
+                //window.location.reload(true);
+              },
+              error: function (xhr) {
+                debugger;
+                alert(xhr.error);
+              }
+            });
           });
         }
       });
