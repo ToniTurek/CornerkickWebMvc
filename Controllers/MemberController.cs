@@ -2336,7 +2336,7 @@ namespace CornerkickWebMvc.Controllers
           ltDeInjuryHistory.Add(new Models.PlayerModel.DatatableEntryInjuryHistory {
             iIx = iIh,
             sDt = ih.dt.ToString("d", getCi()),
-            sInjuryName = CornerkickManager.Main.ltInjury[ih.injury.iType][ih.injury.iType2],
+            sInjuryName = CornerkickManager.Main.ltInjury[ih.injury.iType][Math.Max((int)ih.injury.iType2, 0)],
             iInjuryLength = (int)ih.injury.fLengthMax
           });
         }
