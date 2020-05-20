@@ -4112,10 +4112,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Stadium stadion = clb.stadium.Clone();
-      stadion.iVideoNew = iLevel;
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.iVideo = iLevel;
 
-      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Bau der Anzeigentafel wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -4149,10 +4149,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Stadium stadion = clb.stadium.Clone();
-      stadion.iSnackbarNew = (byte)(stadion.iSnackbar + iBuildNew);
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.iSnackbar = (byte)(stadiumNew.iSnackbar + iBuildNew);
 
-      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Ausbau der Imbissbuden wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
@@ -4186,10 +4186,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Stadium stadion = clb.stadium.Clone();
-      stadion.iToiletsNew = (byte)(clb.stadium.iToilets + iBuildNew);
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.iToilets = (byte)(clb.stadium.iToilets + iBuildNew);
 
-      MvcApplication.ckcore.ui.buildStadium(ref clb, stadion);
+      MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Ausbau der Toiletten wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
