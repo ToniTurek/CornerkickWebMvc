@@ -5053,7 +5053,7 @@ namespace CornerkickWebMvc.Controllers
         // Get current matchday
         iMd = MvcApplication.ckcore.tl.getMatchday(iLand, iDivision, MvcApplication.ckcore.dtDatum, 1);
 
-        // Increment matchday match is if today or tomorrow
+        // Increment matchday if match is today or tomorrow
         CornerkickManager.Club clb = ckClub();
         if (clb != null) {
           CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 1);
@@ -5348,17 +5348,6 @@ namespace CornerkickWebMvc.Controllers
         ltMd[iMd] += ";" + CornerkickManager.Main.sCupRound[nRound - iMd - 1];
       }
 
-      /*
-      // Spieltage zu Dropdown Menü hinzufügen
-      if (cup.ltMatchdays[0].ltGameData != null) {
-        int nRound = cup.getKoRound(cup.ltClubs[0].Count);
-        while (cupModel.ltDdlSpTg.Count < nRound) {
-          int iMd = cupModel.ltDdlSpTg.Count + 1;
-          cupModel.ltDdlSpTg.Add(new SelectListItem { Text = CornerkickManager.Main.sCupRound[nRound - iMd], Value = iMd.ToString() });
-        }
-      }
-      */
-
       return Json(ltMd, JsonRequestBehavior.AllowGet);
     }
 
@@ -5430,11 +5419,9 @@ namespace CornerkickWebMvc.Controllers
       // Get current matchday
       int iMd = cup.getMatchday(MvcApplication.ckcore.dtDatum);
 
-      CornerkickManager.Club clb = ckClub();
-      if (clb != null) {
-        // Increment matchday match is if today or tomorrow
-        CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clb, MvcApplication.ckcore.dtDatum, iGameType: 2);
-        if (gdNext != null && (gdNext.dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
+      // Increment matchday if next match is today or tomorrow
+      if (iMd + 1 < cup.ltMatchdays.Count) {
+        if ((cup.ltMatchdays[iMd + 1].dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) iMd++;
       }
 
       // Limit to 1
@@ -5458,14 +5445,19 @@ namespace CornerkickWebMvc.Controllers
       cupGoldModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-      cupGoldModel.iMatchday = Math.Min(cupGold.getMatchday(MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count - 1);
+      cupGoldModel.iMatchday = Math.Min(cupGold.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupGold.ltMatchdays.Count - 1);
 
       cupGoldModel.ddlMatchday = new List<SelectListItem>();
-      for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 1); iMd++) {
+      for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 2); iMd++) {
         string sText = (iMd + 1).ToString();
         if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
         cupGoldModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+      }
+
+      // Increment matchday if next match is today or tomorrow
+      if (cupGoldModel.iMatchday + 1 < cupGold.ltMatchdays.Count) {
+        if ((cupGold.ltMatchdays[cupGoldModel.iMatchday + 1].dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) cupGoldModel.iMatchday++;
       }
 
       return View(cupGoldModel);
@@ -5488,14 +5480,19 @@ namespace CornerkickWebMvc.Controllers
       cupSilverModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-      cupSilverModel.iMatchday = Math.Min(cupSilver.getMatchday(MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count - 1);
+      cupSilverModel.iMatchday = Math.Min(cupSilver.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupSilver.ltMatchdays.Count - 1);
 
       cupSilverModel.ddlMatchday = new List<SelectListItem>();
-      for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 1); iMd++) {
+      for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 2); iMd++) {
         string sText = (iMd + 1).ToString();
         if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
         cupSilverModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+      }
+
+      // Increment matchday if next match is today or tomorrow
+      if (cupSilverModel.iMatchday + 1 < cupSilver.ltMatchdays.Count) {
+        if ((cupSilver.ltMatchdays[cupSilverModel.iMatchday + 1].dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) cupSilverModel.iMatchday++;
       }
 
       return View(cupSilverModel);
@@ -5517,7 +5514,12 @@ namespace CornerkickWebMvc.Controllers
       cupWcModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
-      cupWcModel.iMatchday = Math.Min(cupWc.getMatchday(MvcApplication.ckcore.dtDatum), cupWc.ltMatchdays.Count - 1);
+      cupWcModel.iMatchday = Math.Min(cupWc.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupWc.ltMatchdays.Count - 1);
+
+      // Increment matchday if next match is today or tomorrow
+      if (cupWcModel.iMatchday + 1 < cupWc.ltMatchdays.Count) {
+        if ((cupWc.ltMatchdays[cupWcModel.iMatchday + 1].dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) cupWcModel.iMatchday++;
+      }
 
       return View(cupWcModel);
     }
