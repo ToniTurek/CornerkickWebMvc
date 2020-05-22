@@ -457,9 +457,10 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
 
       Models.ViewGameModel.gameData gD = getGameData(club.iId);
+      sbyte iStandard = 0;
 
       if (user.game == null) {
-        setGameData(ref gD, null, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
+        setGameData(ref gD, null, user, club, out iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
         return Json(gD, JsonRequestBehavior.AllowGet);
       }
 
@@ -490,7 +491,7 @@ namespace CornerkickWebMvc.Controllers
         for (int i = gD.iLastStatePerformed; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, user, club, i);
       }
 
-      setGameData(ref gD, gameData, user, club, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
+      setGameData(ref gD, gameData, user, club, out user.game.iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
 
       return Json(gD, JsonRequestBehavior.AllowGet);
     }
@@ -620,8 +621,10 @@ namespace CornerkickWebMvc.Controllers
       gD.iLastStatePerformed = iState;
     }
 
-    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, out sbyte iStandard, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
+      iStandard = 0;
+
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
@@ -639,6 +642,8 @@ namespace CornerkickWebMvc.Controllers
       gD.nStates = gameData.ltState.Count;
 
       gD.tsMinute = state.tsMinute;
+
+      iStandard = state.iStandard;
 
       gD.ltDrawLineShoot = new List<Models.ViewGameModel.drawLine>();
       gD.ltDrawLinePass  = new List<Models.ViewGameModel.drawLine>();
