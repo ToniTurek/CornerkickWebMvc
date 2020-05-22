@@ -854,12 +854,12 @@ function drawPlayerChances(fPlAction, fPlActionRnd) {
       contentFormatter: function (e) {
         var content = "<table>";
 
-        // For each cup
+        // For each chance type
         for (var i = 0; i < e.entries.length; i++) {
           content += "<tr><td style=\"text-align:right\"><strong>" + e.entries[i].dataSeries.name + ":</strong></td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
         }
 
-        content += "<tr><td style=\"text-align:right\"><strong>Entscheidung:</strong></td><td style=\"text-align:right\">" + (gD.fPlActionRnd * 100).toFixed(1) + "%</td>";
+        content += "<tr><td style=\"text-align:right\"><strong>Entscheidung:</strong></td><td style=\"text-align:right\">" + (fPlActionRnd * 100).toFixed(1) + "%</td>";
         content += "</table>";
 
         return content;
