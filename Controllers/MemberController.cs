@@ -6271,15 +6271,13 @@ namespace CornerkickWebMvc.Controllers
           int iSpecTotal = gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2];
           if (iSpecTotal > 0) {
             string sInfo0 = gd.dt.ToString("d", getCi()) + sCupName + "</br>" +
-                            (gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]).ToString("N0", getCi()) + " (" + gd.iSpectators[0].ToString("N0", getCi()) + "/" + gd.iSpectators[1].ToString("N0", getCi()) + "/" + gd.iSpectators[2].ToString("N0", getCi()) + ")" + "</br>" +
-                            gd.team[1].sTeam;
+                            (gd.iSpectators[0] + gd.iSpectators[1] + gd.iSpectators[2]).ToString("N0", getCi()) + " (" + gd.iSpectators[0].ToString("N0", getCi()) + "/" + gd.iSpectators[1].ToString("N0", getCi()) + "/" + gd.iSpectators[2].ToString("N0", getCi()) + ")";
             dataPoints[0].Add(new Models.DataPointGeneral(i, iSpecTotal, sInfo0));
           }
 
           int iStadiumSeats = Math.Max(gd.stadium.getSeats(), iSpecTotal);
           if (iStadiumSeats > 0) {
-            string sInfo1 = gd.dt.ToString("d", getCi()) + "</br>" +
-                            gd.stadium.getSeats().ToString("N0", getCi()) + " (" + gd.stadium.getSeats(0).ToString("N0", getCi()) + "/" + gd.stadium.getSeats(1).ToString("N0", getCi()) + "/" + gd.stadium.getSeats(2).ToString("N0", getCi()) + ")" + "</br>" +
+            string sInfo1 = gd.stadium.getSeats().ToString("N0", getCi()) + " (" + gd.stadium.getSeats(0).ToString("N0", getCi()) + "/" + gd.stadium.getSeats(1).ToString("N0", getCi()) + "/" + gd.stadium.getSeats(2).ToString("N0", getCi()) + ")</br>" +
                             gd.team[1].sTeam;
             dataPoints[1].Add(new Models.DataPointGeneral(i, iStadiumSeats, sInfo1));
           }
