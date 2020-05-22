@@ -69,13 +69,21 @@
         }
 
         if (building.iLevelReq > building.iLevel) {
-          var imgWarning = document.createElement("image");
+          var imgWarning = document.createElement("img");
           imgWarning.style.position = "absolute";
           imgWarning.style.right = "20px";
           imgWarning.style.top = "20px";
           imgWarning.style.width = "30px";
           imgWarning.src = "/Content/Icons/attention.png";
-          imgWarning.title = "Ihre Fans verlangen bei ausverkauftem Stadion min. " + building.iLevelReq.toString() + " " + building.sCategory;
+          var sInfo = "Ihre Fans verlangen bei ausverkauftem Stadion min. ";
+          if (building.iType === 8) {
+            sInfo = "Ihre Fans wünschen sich min. ";
+          }
+          sInfo += building.iLevelReq.toString() + " " + building.sCategory;
+          if (building.iType === 8) {
+            sInfo += "s";
+          }
+          imgWarning.title = sInfo;
           div1.appendChild(imgWarning);
         }
 

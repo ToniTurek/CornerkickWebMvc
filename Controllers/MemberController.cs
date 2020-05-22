@@ -4467,6 +4467,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].sCategory = clb.buildings.bgFanshop.sName;
       bdgsAll[iType].iLevel = clb.buildings.bgFanshop.iLevel;
       bdgsAll[iType].sName = clb.buildings.bgFanshop.iLevel.ToString();
+      bdgsAll[iType].iLevelReq = CornerkickManager.UI.getRequiredFeature(clb, 4, iCustomers: (int)clb.getAttractionFactor(MvcApplication.ckcore.iSeason));
       if (clb.buildings.bgFanshop.ctn != null && clb.buildings.bgFanshop.ctn.iLevelNew > clb.buildings.bgFanshop.iLevel) {
         bdgsAll[iType].sNameNext = clb.buildings.bgFanshop.ctn.iLevelNew.ToString();
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgFanshop.ctn.fDaysConstruct;
