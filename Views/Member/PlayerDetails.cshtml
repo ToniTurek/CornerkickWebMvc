@@ -372,7 +372,18 @@
       data: { iPlayerId: iPlayerId, iC: iC },
       success: function (response) {
         alert(response);
-        window.location.reload(true);
+
+        var bnCaptain  = document.getElementById("bnCaptain");
+        var bnCaptain2 = document.getElementById("bnCaptain2");
+        if (iC === 0) {
+          if (bnCaptain)  { bnCaptain .style.display = "none"; }
+          if (bnCaptain2) { bnCaptain2.style.display = "block"; }
+        } else if (iC === 1) {
+          if (bnCaptain)  { bnCaptain .style.display = "block"; }
+          if (bnCaptain2) { bnCaptain2.style.display = "none"; }
+        }
+
+        plotCFM();
       },
       error: function (xhr) {
         debugger;
