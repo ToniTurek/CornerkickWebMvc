@@ -3086,7 +3086,7 @@ namespace CornerkickWebMvc.Controllers
     private bool checkIfTop10Player(CornerkickGame.Player pl)
     {
       for (byte iPos = 1; iPos <= 11; iPos++) {
-        foreach (CornerkickGame.Player plB in MvcApplication.ckcore.getBestPlayer(iPlCount: 10, iPos: iPos)) {
+        foreach (CornerkickGame.Player plB in MvcApplication.ckcore.getBestPlayer(iPlCount: 10, iPos: iPos, fAgeMax: pl.getAge(MvcApplication.ckcore.dtDatum))) {
           if (pl.iId == plB.iId) return true;
         }
       }
