@@ -19,98 +19,98 @@
         "id": 3,
         "name": "Käppi",
         "price": 10.0,
-        "sellfactor": 0.5,
+        "sellfactor": 0.75,
         "quantityfactor": 5000
       },
       {
         "id": 4,
         "name": "T-Shirt",
         "price": 12.5,
-        "sellfactor": 0.3,
+        "sellfactor": 0.65,
         "quantityfactor": 3000
       },
       {
         "id": 5,
         "name": "Pullover",
         "price": 40.0,
-        "sellfactor": 0.5,
+        "sellfactor": 0.75,
         "quantityfactor": 1000
       },
       {
         "id": 6,
         "name": "Socken",
         "price": 15.0,
-        "sellfactor": 0.4,
+        "sellfactor": 0.7,
         "quantityfactor": 2500
       },
       {
         "id": 7,
         "name": "Schweißband",
         "price": 4.0,
-        "sellfactor": 0.4,
+        "sellfactor": 0.7,
         "quantityfactor": 12000
       },
       {
         "id": 8,
         "name": "Bedruckte Tasse",
         "price": 5.0,
-        "sellfactor": 0.6,
+        "sellfactor": 0.8,
         "quantityfactor": 10000
       },
       {
         "id": 9,
         "name": "Kugelschreiber",
         "price": 0.5,
-        "sellfactor": 0.5,
+        "sellfactor": 0.75,
         "quantityfactor": 100000
       },
       {
         "id": 10,
         "name": "Fußball",
         "price": 50.0,
-        "sellfactor": 0.5,
+        "sellfactor": 0.75,
         "quantityfactor": 1000
       },
       {
         "id": 11,
         "name": "Bettwäsche",
         "price": 60.0,
-        "sellfactor": 0.5,
+        "sellfactor": 0.75,
         "quantityfactor": 750
       },
       {
         "id": 12,
         "name": "Handtuch",
         "price": 25.0,
-        "sellfactor": 0.5,
+        "sellfactor": 0.75,
         "quantityfactor": 2000
       },
       {
         "id": 13,
         "name": "Bademantel",
         "price": 35.0,
-        "sellfactor": 0.2,
+        "sellfactor": 0.6,
         "quantityfactor": 1250
       },
       {
         "id": 14,
         "name": "Sonnenbrille",
         "price": 15.0,
-        "sellfactor": 0.2,
+        "sellfactor": 0.6,
         "quantityfactor": 2500
       },
       {
         "id": 15,
         "name": "Krawatte",
         "price": 20.0,
-        "sellfactor": 0.1,
+        "sellfactor": 0.5,
         "quantityfactor": 2000
       },
       {
         "id": 16,
         "name": "Babystrampler",
         "price": 10.0,
-        "sellfactor": 0.1,
+        "sellfactor": 0.5,
         "quantityfactor": 2500
       }
     ]
