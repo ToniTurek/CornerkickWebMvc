@@ -2219,6 +2219,9 @@ namespace CornerkickWebMvc.Controllers
             clb.ltPlayerJouth.RemoveAt(iPlJ);
             clb.ltPlayer.Add(plJ);
 
+            // Reset jersey number
+            plJ.iNr = 0;
+
             // Add club history to player
             pl.ltClubHistory.Add(new CornerkickGame.Player.ClubHistory() {
               iClubId = clb.iId,
@@ -2997,23 +3000,6 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return View(jouth);
-    }
-
-    [HttpPost]
-    public JsonResult TakeJouth(int iJouthID)
-    {
-      if (iJouthID < 0) return Json("", JsonRequestBehavior.AllowGet);
-
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
-
-      CornerkickGame.Player plJ = MvcApplication.ckcore.ltPlayer[iJouthID];
-      clb.ltPlayerJouth.Remove(plJ);
-      clb.ltPlayer     .Add   (plJ);
-
-      plJ.contract = MvcApplication.ckcore.plr.getContract(plJ, 2, MvcApplication.ckcore.fz.iMoneyTotal());
-
-      return Json("", JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
