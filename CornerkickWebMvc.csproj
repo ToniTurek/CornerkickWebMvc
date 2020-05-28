@@ -694,9 +694,10 @@
     <Content Include="Content\Icons\news\doping.png" />
     <Content Include="Content\Icons\news\info.png" />
     <Content Include="Content\Icons\news\stadium.png" />
-    <Content Include="Content\Icons\news\star.ico" />
     <Content Include="Content\Icons\plus.png" />
     <Content Include="Content\Icons\rCard.png" />
+    <Content Include="Content\Icons\star.ico" />
+    <Content Include="Content\Icons\star_empty.png" />
     <Content Include="Content\Icons\sub.png" />
     <Content Include="Content\Icons\weather\0.gif" />
     <Content Include="Content\Icons\weather\1.gif" />
