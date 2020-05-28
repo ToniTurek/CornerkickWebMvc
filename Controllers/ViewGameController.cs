@@ -110,6 +110,11 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      // Admin livegame
+      if (AccountController.checkUserIsAdmin(User)) {
+        view.ddlGames.Insert(0, new SelectListItem { Text = "Livespiel", Value = "" });
+      }
+
       if (view.ddlGames.Count > 0) view.ddlGames[0].Selected = true;
 
       if (user.game == null && fiGames.Count > 0) {
