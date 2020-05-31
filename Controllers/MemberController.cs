@@ -5349,6 +5349,7 @@ namespace CornerkickWebMvc.Controllers
       string sBox = "";
 
       iMatchday = Math.Min(iMatchday, cup.ltMatchdays.Count - 1);
+      iMatchday = Math.Max(iMatchday, 0);
       CornerkickManager.Cup.Matchday md = cup.ltMatchdays[iMatchday];
 
       if (md.ltGameData == null || md.ltGameData.Count == 0) {
