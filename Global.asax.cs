@@ -505,8 +505,6 @@ namespace CornerkickWebMvc
         ckcore.tl.writeLog("performCalendarStep(): Error in ck next()" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
       }
 
-      checkPlayerReset();
-
       // Reset CPU player
       if (ckcore.dtDatum.TimeOfDay.Equals(new TimeSpan(15, 0, 0))) {
         for (int iC = 0; iC < ckcore.ltClubs.Count; iC++) {
@@ -733,20 +731,6 @@ namespace CornerkickWebMvc
       }
 
       return bReturn;
-    }
-
-    private static void checkPlayerReset()
-    {
-      foreach (CornerkickGame.Player pl in ckcore.ltPlayer) {
-        if (pl == null) continue;
-
-        try {
-          if (pl.fCondition > 0.999 && pl.fFresh > 0.999 && pl.fMoral < 1.001 && !pl.bRetire && !string.IsNullOrEmpty(pl.sName) && CornerkickManager.Player.ownPlayer(ckcore.ltClubs[3], pl, 1)) {
-            ckcore.tl.writeLog("Reset of player: " + pl.sName, CornerkickManager.Main.sErrorFile);
-          }
-        } catch {
-        }
-      }
     }
 
     private static int countCpuPlayerOnTransferlist()
@@ -1033,10 +1017,16 @@ namespace CornerkickWebMvc
       if (ckcore.io.load(sFileLoad)) {
         ckcore.tl.writeLog("File " + sFileLoad + " loaded.");
 
-        checkPlayerReset();
-
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
+
+        // Reset player moral if NaN
+        for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
+          if (float.IsNaN(ckcore.ltPlayer[iPl].fMoral)) {
+            ckcore.ltPlayer[iPl].fMoral = 1f;
+            ckcore.tl.writeLog("Reset moral (NaN) of player " + ckcore.ltPlayer[iPl].sName, CornerkickManager.Main.sErrorFile);
+          }
+        }
 
         // Delete past trainings from club
         for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
