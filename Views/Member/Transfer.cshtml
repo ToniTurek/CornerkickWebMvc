@@ -198,17 +198,23 @@
           },
           { "data": "club", "className": "dt-center" },
           { "data": "position", "className": "dt-center" },
-          { "data": "strength", "className": "dt-center" },
-          { "data": "strengthIdeal", "className": "dt-center" },
+          {
+            "data": "strength", "className": "dt-center",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          },
+          {
+            "data": "strengthIdeal", "className": "dt-center",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          },
           { "data": "age", "className": "dt-center" },
           { "data": "talent", "className": "dt-center" },
           {
             "data": "mw", "className": "dt-right",
-            render: $.fn.dataTable.render.number('.', ',', 0, '')
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
           {
             "data": "fixtransferfee", "className": "dt-right",
-            render: $.fn.dataTable.render.number('.', ',', 0, '')
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
           {
             "data": "nat",
