@@ -1446,18 +1446,21 @@ namespace CornerkickWebMvc.Controllers
       setModelLtPlayer(usr);
 
       Models.TeamModels.TeamData tD = new Models.TeamModels.TeamData();
-      //return Json(Models.TeamModels.ltPlayer, JsonRequestBehavior.AllowGet);
 
-      tD.ltPlayer = Models.TeamModels.ltPlayer;
+      tD.ltPlayer2 = new List<Models.TeamModels.Player>();
+
       tD.formation = club.ltTactic[0].formation;
-      tD.ltPlayerPos      = new List<byte>  ();
-      tD.ltPlayerAveSkill = new List<string>();
-      tD.ltPlayerNat      = new List<string>();
-      tD.ltPlayerPortrait = new List<string>();
-      tD.ltPlayerSusp     = new List<bool>  ();
-      foreach (CornerkickGame.Player pl in tD.ltPlayer) {
-        tD.ltPlayerNat.Add(CornerkickManager.Main.sLandShort[pl.iNat1]);
-        tD.ltPlayerPortrait.Add(getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true));
+
+      int iP = 0;
+      foreach (CornerkickGame.Player pl in Models.TeamModels.ltPlayer) {
+        if (pl == null) continue;
+
+        Models.TeamModels.Player pl2 = new Models.TeamModels.Player();
+
+        pl2.sName = pl.sName;
+        pl2.iNb = pl.iNr;
+        pl2.sNat = CornerkickManager.Main.sLandShort[pl.iNat1];
+        pl2.sPortrait = getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true);
 
         // Check if player is suspended
         bool bSusp = false;
@@ -1467,22 +1470,26 @@ namespace CornerkickWebMvc.Controllers
 
         if (iSuspIx >= 0 && iSuspIx < pl.iSuspension.Length) bSusp = pl.iSuspension[iSuspIx] > 0;
 
-        tD.ltPlayerSusp.Add(bSusp);
-      }
+        pl2.bSusp = bSusp;
 
-      int iP = 0;
-      foreach (System.Drawing.Point ptPos in tD.formation.ptPos) {
-        tD.ltPlayerPos     .Add(CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)));
-        tD.ltPlayerAveSkill.Add(CornerkickGame.Tool.getAveSkill(tD.ltPlayer[iP], CornerkickGame.Tool.getPosRole(ptPos, MvcApplication.ckcore.game.ptPitch)).ToString("0.0"));
+        pl2.iIxManMarking = pl.iIxManMarking;
+
+        if (tD.formation.ptPos.Length > iP) {
+          pl2.iPos = CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(tD.formation.ptPos[iP], MvcApplication.ckcore.game.ptPitch));
+          pl2.sSkillAve = CornerkickGame.Tool.getAveSkill(pl, CornerkickGame.Tool.getPosRole(tD.formation.ptPos[iP], MvcApplication.ckcore.game.ptPitch)).ToString("0.0");
+        }
+
+        tD.ltPlayer2.Add(pl2);
+
         iP++;
       }
 
-      tD.sDivPlayer = TeamGetPlayerOffence(tD.ltPlayer, club, bMobile);
+      tD.sDivPlayer = TeamGetPlayerOffence(Models.TeamModels.ltPlayer, club, bMobile);
 
       if (iSP >= 0) {
-        tD.plSelected = tD.ltPlayer[iSP];
+        tD.plSelected = Models.TeamModels.ltPlayer[iSP];
         tD.fIndOrientation = tD.formation.fIndOrientation[iSP];
-        if (tD.fIndOrientation < -1f) tD.fIndOrientation = CornerkickGame.Tool.getPlayerIndividualOrientationDefault(tD.ltPlayerPos[iSP]);
+        if (tD.fIndOrientation < -1f) tD.fIndOrientation = CornerkickGame.Tool.getPlayerIndividualOrientationDefault(tD.ltPlayer2[iSP].iPos);
 
         tD.sDivRoa               = TeamGetPlayerRadiusOfAction(iSP, club);
         tD.fIndOrientationMinMax = TeamGetIndOrientationMinMax(iSP, club);
@@ -1497,6 +1504,7 @@ namespace CornerkickWebMvc.Controllers
 
       tD.bNation = club.bNation;
 
+      // Opponent team
       if (club.nextGame != null) {
         if (club.bNation) tD.iKibitzer = 3;
         else              tD.iKibitzer = club.staff.iKibitzer;
@@ -1504,10 +1512,7 @@ namespace CornerkickWebMvc.Controllers
         int iClubOpp = club.nextGame.team[1].iTeamId;
         if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
 
-        tD.ltPlayerOpp = new List<CornerkickGame.Player>();
-        tD.ltPlayerOppPos = new List<byte>();
-        tD.ltPlayerOppAveSkill = new List<string>();
-        tD.ltPlayerOppPortrait = new List<string>();
+        tD.ltPlayerOpp2 = new List<Models.TeamModels.Player>();
 
         tD.bOppTeam = iClubOpp >= 0;
 
@@ -1520,14 +1525,24 @@ namespace CornerkickWebMvc.Controllers
             if (iPl >= clubOpp.ltPlayer.Count) break;
 
             CornerkickGame.Player plOpp = clubOpp.ltPlayer[iPl];
+            if (plOpp == null) continue;
 
-            tD.ltPlayerOpp.Add(plOpp);
-            tD.ltPlayerOppPos.Add(CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(tD.formationOpp.ptPos[iPl], MvcApplication.ckcore.game.ptPitch)));
+            Models.TeamModels.Player plOpp2 = new Models.TeamModels.Player();
+
+            plOpp2.sName = plOpp.sName;
+            plOpp2.iNb = plOpp.iNr;
+            plOpp2.sNat = CornerkickManager.Main.sLandShort[plOpp.iNat1];
+            plOpp2.sPortrait = getPlayerPortrait(plOpp, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true);
+
+            if (tD.formationOpp.ptPos.Length > iPl) {
+              plOpp2.iPos = CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(tD.formationOpp.ptPos[iPl], MvcApplication.ckcore.game.ptPitch));
+            }
 
             float fPlOppAveSkill = CornerkickGame.Tool.getAveSkill(plOpp, 99);
             if (tD.iKibitzer == 3) fPlOppAveSkill = (float)Math.Round(fPlOppAveSkill * 2f) / 2f;
-            tD.ltPlayerOppAveSkill.Add(fPlOppAveSkill.ToString("0.0"));
-            tD.ltPlayerOppPortrait.Add(getPlayerPortrait(plOpp, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true));
+            plOpp2.sSkillAve = fPlOppAveSkill.ToString("0.0");
+
+            tD.ltPlayerOpp2.Add(plOpp2);
           }
 
           // Opp. team averages
@@ -6577,23 +6592,16 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult StatisticGetBest11(int iNat, int iF, bool bJouth = false)
     {
       Models.TeamModels.TeamData tD = new Models.TeamModels.TeamData();
-      tD.ltPlayer         = new List<CornerkickGame.Player>();
-      tD.ltPlayerAveSkill = new List<string>();
-      tD.ltPlayerPos      = new List<byte>  ();
-      tD.ltPlayerTeamname = new List<string>();
-      tD.ltPlayerAge      = new List<string>();
-      tD.ltPlayerNat      = new List<string>();
+      tD.ltPlayer2        = new List<Models.TeamModels.Player>();
 
       tD.formation = MvcApplication.ckcore.ltFormationen[iF];
 
+      List<CornerkickGame.Player> ltPlayerBest = new List<CornerkickGame.Player>();
+
       for (byte iP = 0; iP < 11; iP++) {
         float fStrength = 0f;
-        tD.ltPlayer        .Add(null);
-        tD.ltPlayerPos     .Add(0);
-        tD.ltPlayerAveSkill.Add(null);
-        tD.ltPlayerTeamname.Add("vereinslos");
-        tD.ltPlayerAge     .Add(null);
-        tD.ltPlayerNat     .Add(null);
+        tD.ltPlayer2.Add(null);
+        ltPlayerBest.Add(null);
 
         byte iPosExact = CornerkickGame.Tool.getPosRole(MvcApplication.ckcore.ltFormationen[iF].ptPos[iP], MvcApplication.ckcore.game.ptPitch);
         byte iPos = CornerkickGame.Tool.getBasisPos(iPosExact);
@@ -6611,7 +6619,7 @@ namespace CornerkickWebMvc.Controllers
           // Check if same player already in same role
           if (iPos > 0) {
             bool bSame = false;
-            foreach (CornerkickGame.Player plSame in tD.ltPlayer) {
+            foreach (CornerkickGame.Player plSame in ltPlayerBest) {
               if (plSame != null && plSame.iId == pl.iId && plSame.fExperiencePos[iPos - 1] > 0.999) {
                 bSame = true;
                 break;
@@ -6622,25 +6630,25 @@ namespace CornerkickWebMvc.Controllers
 
           float fStrengthTmp = CornerkickGame.Tool.getAveSkill(pl, iPos);
           if (fStrengthTmp > fStrength) {
-            tD.ltPlayer[iP] = pl.Clone(true);
+            //tD.ltPlayer[iP] = pl.Clone(true);
 
             //tD.ltPlayer        [iP].ptPosDefault = MvcApplication.ckcore.ltFormationen[iF].ptPos[iP];
-            tD.ltPlayer        [iP].iNr = (byte)(iP + 1);
-            tD.ltPlayerAveSkill[iP] = fStrengthTmp.ToString("0.0");
+            tD.ltPlayer2[iP].iNb = (byte)(iP + 1);
+            tD.ltPlayer2[iP].sSkillAve = fStrengthTmp.ToString("0.0");
 
             fStrength = fStrengthTmp;
-          }
-        }
 
-        tD.ltPlayerPos[iP] = iPos;
-        if (tD.ltPlayer[iP] != null) {
-          if (tD.ltPlayer[iP].iClubId >= 0) tD.ltPlayerTeamname[iP] = MvcApplication.ckcore.ltClubs[tD.ltPlayer[iP].iClubId].sName;
-          tD.ltPlayerAge[iP] = tD.ltPlayer[iP].getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
-          tD.ltPlayerNat[iP] = CornerkickManager.Main.sLandShort[tD.ltPlayer[iP].iNat1];
+            tD.ltPlayer2[iP].iPos = iPos;
+            if (pl.iClubId >= 0) tD.ltPlayer2[iP].sTeamname = MvcApplication.ckcore.ltClubs[pl.iClubId].sName;
+            tD.ltPlayer2[iP].sAge = pl.getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
+            tD.ltPlayer2[iP].sNat = CornerkickManager.Main.sLandShort[pl.iNat1];
+
+            ltPlayerBest[iP] = pl;
+          }
         }
       }
 
-      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(tD.ltPlayer, tD.formation, 11);
+      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(ltPlayerBest, tD.formation, 11);
       tD.fTeamAveStrength = fTeamAve11[3];
       tD.fTeamAveAge      = fTeamAve11[4];
 

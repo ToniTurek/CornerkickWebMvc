@@ -22,22 +22,20 @@
 
         if (document.getElementById("rbDefence").checked) {
           // Defence view
-          $.each(teamData.ltPlayer, function (iPl, player) {
-            if (teamData.ltPlayerOpp !== null) {
-              if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp.length) {
-                plOpp = teamData.ltPlayerOpp[player.iIxManMarking];
-
+          $.each(teamData.ltPlayer2, function (iPl, player) {
+            if (teamData.ltPlayerOpp2 !== null) {
+              if (player.iIxManMarking >= 0 && player.iIxManMarking < teamData.ltPlayerOpp2.length) {
                 var iPos = convertPosToPix(teamData.formation.ptPos[iPl].Y, 122 - teamData.formation.ptPos[iPl].X, -teamData.formationOpp.ptPos[player.iIxManMarking].Y, teamData.formationOpp.ptPos[player.iIxManMarking].X, document.getElementById("drawFormation"), false);
                 result += drawLine(iPos[0], iPos[1], iPos[2], iPos[3], "orange", 2);
               }
             }
 
-            var sNo = player.iNr.toString();
+            var sNo = player.iNb.toString();
             if (teamData.bNation) {
               sNo = (iPl + 1).toString();
             }
 
-            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, teamData.ltPlayerAveSkill[iPl], player.bYellowCard, false, iSelectedPlayer - 1, teamData.ltPlayerPos[iPl], bMobile, 1.0, null, null, teamData.ltPlayerNat[iPl], iPl === teamData.iCaptainIx, teamData.ltPlayerSusp[iPl], teamData.ltPlayerPortrait[iPl]);
+            result += getBoxFormation(iPl, teamData.formation.ptPos[iPl], player.sName, sNo, player.sSkillAve, player.bYellowCard, false, iSelectedPlayer - 1, player.iPos, bMobile, 1.0, null, null, player.sNat, iPl === teamData.iCaptainIx, player.bSusp, player.sPortrait);
 
             i = i + 1;
             return i !== 11;
@@ -46,10 +44,10 @@
           if (teamData.bOppTeam) {
             if (teamData.iKibitzer === 0) {
               result += '<div style="position: absolute; width: 90%; height: 50%; left: 5%; text-align: center"><p style="position: absolute; top: 40%; width: 100%; color: white; font-size: 150%">Stellen Sie einen <a style="color: white" href="/Member/Personal">Spielbeobachter</a> ein, wenn Sie mehr über Ihren nächsten Gegner erfahren wollen!</p></div>';
-            } else if (teamData.ltPlayerOpp) {
+            } else if (teamData.ltPlayerOpp2) {
               // opponent player
               var j = 0;
-              $.each(teamData.ltPlayerOpp, function (iPl, playerOpp) {
+              $.each(teamData.ltPlayerOpp2, function (iPl, playerOpp) {
                 var sPlayerOppName = "";
                 var sPlayerOppAveSkill = "";
                 var sPlayerOppPos = "";
@@ -57,17 +55,19 @@
                   sPlayerOppName = playerOpp.sName;
 
                   if (teamData.iKibitzer > 2) {
-                    sPlayerOppAveSkill = teamData.ltPlayerOppAveSkill[iPl];
-                    sPlayerOppPos = teamData.ltPlayerOppPos[iPl];
+                    sPlayerOppAveSkill = playerOpp.sSkillAve;
+                    sPlayerOppPos = playerOpp.iPos;
                   }
                 }
 
-                var sOppNo = playerOpp.iNr.toString();
+                var sOppNo = playerOpp.iNb.toString();
+                var sNatOpp = null;
                 if (teamData.bNation) {
                   sOppNo = (iPl + 1).toString();
+                  sNatOpp = playerOpp.sNat;
                 }
 
-                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile, 1.0, null, null, null, false, false, teamData.ltPlayerOppPortrait[iPl]);
+                result += getBoxFormation(i, teamData.formationOpp.ptPos[iPl], sPlayerOppName, sOppNo, sPlayerOppAveSkill, playerOpp.bYellowCard, true, iSelectedPlayer - 1, sPlayerOppPos, bMobile, 1.0, null, null, sNatOpp, false, false, playerOpp.sPortrait);
 
                 i = i + 1;
                 j = j + 1;
@@ -141,6 +141,10 @@
       } else {
         alert("data hasn't worked!");
       }
+    },
+    error: function (xhr, ajaxOptions, thrownError) {
+      alert(xhr.responseText);
+      alert(thrownError);
     }
   });
 }

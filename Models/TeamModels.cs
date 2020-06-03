@@ -38,29 +38,35 @@ namespace CornerkickWebMvc.Models
 
     public TeamData tD;
 
+    public class Player
+    {
+      public int iId { get; set; }
+      public byte iPos { get; set; }
+      public string sName { get; set; }
+      public string sSkillAve { get; set; }
+      public string sTeamname { get; set; }
+      public string sAge { get; set; }
+      public string sNat { get; set; }
+      public string sPortrait { get; set; }
+      public bool bSusp { get; set; }
+      public bool bYellowCard { get; set; }
+      public sbyte iIxManMarking { get; set; }
+      public byte iNb { get; set; }
+    }
+
     public struct TeamData
     {
       // Player details
-      public List<CornerkickGame.Player> ltPlayer { get; set; }
+      public List<Player> ltPlayer2 { get; set; }
       public CornerkickGame.Tactic.Formation formation { get; set; }
-      public List<byte> ltPlayerPos { get; set; }
-      public List<string> ltPlayerAveSkill { get; set; }
-      public List<string> ltPlayerTeamname { get; set; }
-      public List<string> ltPlayerAge      { get; set; }
-      public List<string> ltPlayerNat      { get; set; }
-      public List<string> ltPlayerPortrait { get; set; }
-      public List<bool>   ltPlayerSusp     { get; set; } // List of suspended player
       public string sTeamAveSkill { get; set; }
       public string sTeamAveAge { get; set; }
 
       // Opponent player details
       public byte iKibitzer { get; set; }
       public bool bOppTeam { get; set; } // Opponent team exist
-      public List<CornerkickGame.Player> ltPlayerOpp { get; set; }
+      public List<Player> ltPlayerOpp2 { get; set; }
       public CornerkickGame.Tactic.Formation formationOpp { get; set; }
-      public List<byte> ltPlayerOppPos { get; set; }
-      public List<string> ltPlayerOppAveSkill { get; set; }
-      public List<string> ltPlayerOppPortrait { get; set; }
       public string sTeamOppAveSkill { get; set; }
       public string sTeamOppAveAge { get; set; }
 
