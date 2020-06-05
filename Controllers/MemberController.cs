@@ -3284,7 +3284,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(bNominate, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9, int iNation = -1)
+    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, bool bEndingContract, int iClubId = -9, int iNation = -1)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
@@ -3314,6 +3314,7 @@ namespace CornerkickWebMvc.Controllers
                                                                                                        bJouth: bJouth,
                                                                                                        ltPlayer: ltPlayer,
                                                                                                        bFixTransferFee: bFixTransferFee,
+                                                                                                       bEndingContract: bEndingContract,
                                                                                                        iNation: iNation)) {
         try {
           string sClub = "vereinslos";
