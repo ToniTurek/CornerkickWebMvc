@@ -6519,7 +6519,7 @@ namespace CornerkickWebMvc.Controllers
         statisticModel.ltsFormations.Add(new SelectListItem {
                                            Text = (i + 1).ToString() + " - " + MvcApplication.ckcore.ltFormationen[i].sName,
                                            Value = i.ToString(),
-                                           Selected = i == 9
+                                           Selected = i == 19
                                          }
         );
       }

@@ -152,7 +152,7 @@
             var drawFormation = $("#drawFormation");
 
             $.each(teamData.ltPlayer2, function (i, pl2) {
-              result += getBoxFormation(i, teamData.formation.ptPos[i], pl2.sName, (i + 1).toString(), pl2.sSkillAve, false, false, -1, pl2.iPos, bMobile, 0.5, pl2.sTeamname, pl2.sAge, pl2.sNat);
+              result += getBoxFormation(i, teamData.formation.ptPos[i], pl2.sName, (i + 1).toString(), pl2.sSkillAve, false, false, -1, pl2.iPos, bMobile, 0.5, pl2.sTeamname, pl2.sAge, pl2.sNat, false, false, pl2.sPortrait);
 
               return i !== 11;
             });
@@ -183,15 +183,15 @@
       <div style="position: absolute; margin-left: 5%; width: 90%; height: 94%; top: 0px; left: 0%">
         <div id="drawFormation" style="position: absolute; width: 100%; height: 100%; top: 0%; left: 0%"></div>
       </div>
-      <div align="center" style="position: absolute; top: 2px; width: 100%">
-        <div style="position: relative; width: 180px; height: 30px; top: -25px; background-color: white; white-space: nowrap; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+      <div align="center" style="position: absolute; top: -25px; width: 100%">
+        <div style="position: relative; width: 140px; height: 26px; background-color: white; white-space: nowrap; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
           <form>
             <fieldset>
-              <label style="font-size:140%; color: black; margin-right: 4%">
+              <label style="font-size:120%; color: black; margin-right: 4%">
                 <input type="radio" id="rbProfi" name="rbProfiJouth" value="0" checked>
                 Profis
               </label>
-              <label style="font-size:140%; color: black">
+              <label style="font-size:120%; color: black">
                 <input type="radio" id="rbJouth" name="rbProfiJouth" value="1">
                 U18
               </label>
