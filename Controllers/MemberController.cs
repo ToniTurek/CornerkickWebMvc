@@ -1488,8 +1488,11 @@ namespace CornerkickWebMvc.Controllers
 
       if (iSP >= 0) {
         tD.plSelected = Models.TeamModels.ltPlayer[iSP];
-        tD.fIndOrientation = tD.formation.fIndOrientation[iSP];
-        if (tD.fIndOrientation < -1f) tD.fIndOrientation = CornerkickGame.Tool.getPlayerIndividualOrientationDefault(tD.ltPlayer2[iSP].iPos);
+
+        if (iSP < tD.formation.fIndOrientation.Length) {
+          tD.fIndOrientation = tD.formation.fIndOrientation[iSP];
+          if (tD.fIndOrientation < -1f) tD.fIndOrientation = CornerkickGame.Tool.getPlayerIndividualOrientationDefault(tD.ltPlayer2[iSP].iPos);
+        }
 
         tD.sDivRoa               = TeamGetPlayerRadiusOfAction(iSP, club);
         tD.fIndOrientationMinMax = TeamGetIndOrientationMinMax(iSP, club);
