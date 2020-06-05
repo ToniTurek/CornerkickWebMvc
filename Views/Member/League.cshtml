@@ -17,6 +17,7 @@
   <script type="text/javascript" src="~/Scripts/League.js"></script>
 
   <script>
+    var oTableLeague;
     var oTableScorer;
 
     $(document).ready(function () {
@@ -24,15 +25,15 @@
 
       // Radio-buttons league
       $("#rbTableTotal").on('change', function (ev) {
-        setLeague2(0);
+        setLeague2();
       });
 
       $("#rbTableH").on('change', function (ev) {
-        setLeague2(0);
+        setLeague2();
       });
 
       $("#rbTableA").on('change', function (ev) {
-        setLeague2(0);
+        setLeague2();
       });
     });
 
@@ -108,7 +109,7 @@
 
     <label>
       Spieltag:
-      <select id="ddlMatchday" onchange="setLeague2(0)"></select>
+      <select id="ddlMatchday" onchange="setLeague2()"></select>
     </label>
 
     <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">
@@ -136,7 +137,32 @@
             </fieldset>
           </form>
         </div>
-        <div id="tableDivLeague" style="position: relative; width: 100%"></div>
+
+        <div id="tableDivLeague" style="position: relative; width: 100%">
+          <table id="tblLeague" style="position: relative" cellpadding="0" border="0" class="display responsive nowrap compact">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>#</th>
+                <th></th>
+                <th></th>
+                <th>Verein</th>
+                <th>Sp</th>
+                <th>g</th>
+                <th>u</th>
+                <th>v</th>
+                <th>Tore</th>
+                <th>+/-</th>
+                <th>Pkte.</th>
+                <th>bgcl</th>
+                <th>bold</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!---Data and tags are dynamically generated--->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 

@@ -20,7 +20,7 @@
         data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision },
         success: function (iMd) {
           document.getElementById("ddlMatchday").value = iMd;
-          setLeague2(iDivision);
+          setLeague2();
         }
       });
     }
@@ -29,47 +29,132 @@
   plotLeaguePlaceGraph(iSeason);
 }
 
-function setLeague2(iDivision) {
-  var iSeason = $('#ddlSeason').val();
-  var iLand = $('#ddlLand').val();
-  var iMd = $('#ddlMatchday').val();
-  var divDrawTable = $("#tableDivLeague");
+function setLeague2() {
+  var ddlSeason = document.getElementById("ddlSeason");
+  var ddlLand = document.getElementById("ddlLand");
+  var ddlMatchday = document.getElementById("ddlMatchday");
+  var rbTableH = document.getElementById("rbTableH");
+  var rbTableA = document.getElementById("rbTableA");
+  var iDivision = 0;
 
-  var iHA = 0;
-  if (document.getElementById("rbTableH").checked) {
-    iHA = 1;
-  } else if (document.getElementById("rbTableA").checked) {
-    iHA = 2;
-  }
-
-  divDrawTable.html('');
-
+  // Teams
   $.ajax({
-    url: '/Member/setLeague',
+    url: '/Member/setLeagueTeams',
     type: "GET",
     dataType: "JSON",
-    data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision, iMatchday: iMd, iHA: iHA },
-    success: function (sTable) {
-      var sBox = drawTable(sTable);
-      divDrawTable.html(sBox).show();
-
-      $.ajax({
-        url: '/Member/setLeagueTeams',
-        type: "GET",
-        dataType: "JSON",
-        data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision, iMatchday: iMd },
-        success: function (sTeams) {
-          actionDrawTeams(sTeams);
-        }
-      });
+    data: { iSeason: ddlSeason.value, iLand: ddlLand.value, iDivision: iDivision, iMatchday: ddlMatchday.value },
+    success: function (sTeams) {
+      actionDrawTeams(sTeams);
     }
   });
 
+  // Table
+  if (oTableLeague) {
+    oTableLeague.ajax.reload();
+  } else {
+    oTableLeague = setTableLeague($("#tblLeague"), ddlSeason, ddlLand, iDivision, ddlMatchday, rbTableH, rbTableA);
+  }
+
+  // Scorer table
   if (oTableScorer) {
     oTableScorer.ajax.reload();
   } else {
     oTableScorer = setTableScorer($('#tblLeagueScorer'), 1, document.getElementById('ddlLand'), 0);
   }
+}
+
+function setTableLeague(tblLeague, ddlSeason, ddlLand, iDivision, ddlMatchday, rbTableH, rbTableA) {
+  return tblLeague.DataTable({
+    "ajax": {
+      "url": '/Member/getTableDatatable',
+      "type": 'GET',
+      "dataType": "JSON",
+      "data": function (d) {
+        d.iSeason = ddlSeason.value;
+        d.iType = 1;
+        d.iLand = ddlLand.value;
+        d.iDivision = iDivision;
+        d.iMatchday = ddlMatchday.value;
+        d.iGroup = -1;
+        d.bH = rbTableH.checked;
+        d.bA = rbTableA.checked;
+        d.iColor1 = 1;
+        d.iColor2 = 4;
+        d.iColor3 = 8;
+        d.iColor4 = -1;
+      },
+      "cache": false,
+      "contentType": "application/json; charset=utf-8"
+    },
+    "columns": [
+      { "data": "iId" },
+      { "data": "iPl" },
+      {
+        "data": "iPlLast",
+        "render": function (iPlLast, type, row) {
+          if (iPlLast === 0) {
+            return "-";
+          }
+          return iPlLast;
+        }
+      },
+      { "data": "sEmblem" },
+      { "data": "sClubName" },
+      { "data": "iGames" },
+      { "data": "iWin" },
+      { "data": "iDraw" },
+      { "data": "iDefeat" },
+      { "data": "sGoals" },
+      { "data": "iGoalsDiff" },
+      { "data": "iPoints" },
+      { "data": "sBgColor" },
+      { "data": "bBold" }
+    ],
+    "paging": false,
+    "info": false,
+    "searching": false,
+    "order": [[1, "asc"]],
+    "language": {
+      "emptyTable": "keine Vereine"
+    },
+    "columnDefs": [
+      {
+        "targets": [0, 12, 13],
+        "visible": false,
+        "orderable": false,
+        "searchable": false
+      },
+      {
+        "targets": [2, 9],
+        "orderable": false,
+        "className": "dt-center"
+      },
+      {
+        "targets": [3, 11],
+        "orderable": false,
+        "className": "dt-right"
+      },
+      {
+        "targets": [1, 5, 6, 7, 8, 10],
+        "className": "dt-right"
+      }
+    ],
+    "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+      $('td', nRow).eq(0).css("background-color", aData.sBgColor);
+
+      if (aData.bBold) {
+        $('td', nRow).css("font-weight", "bold");
+      }
+
+      if (aData.iPlLast > 0) {
+        if (aData.iPlLast < aData.iPl) {
+          $('td', nRow).eq(1).css("color", "red");
+        } else if (aData.iPlLast > aData.iPl) {
+          $('td', nRow).eq(1).css("color", "green");
+        }
+      }
+    }
+  });
 }
 
 function setTableScorer(tbl, iGameType, ddlLand, iDivision) {
@@ -159,36 +244,6 @@ function drawTeams(sTeams) {
     sBox += '<h4>Teilnehmer</h4>';
     sBox += sTeams;
   }
-
-  return sBox;
-}
-
-function drawTable(sTable) {
-  var sBox = '';
-
-  if (!sTable) {
-    return sBox;
-  }
-
-  sBox += "<table id=\"tableLeague\" style=\"width: 100%\">";
-  sBox += "<tr>";
-  sBox += "<th colspan=\"2\">Pl.</th>";
-  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-  sBox += "<th>Verein</th>";
-  sBox += "<th style=\"text-align:right; width: 3%\">&nbsp;</th>";
-  sBox += "<th style=\"text-align:right\">Sp.</th>";
-  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-  sBox += "<th style=\"text-align:right\">g.</th>";
-  sBox += "<th style=\"text-align:right\">u.</th>";
-  sBox += "<th style=\"text-align:right\">v.</th>";
-  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-  sBox += "<th style=\"text-align:center\">Tore</th>";
-  sBox += "<th style=\"text-align:right\">Diff.</th>";
-  sBox += "<th style=\"text-align:center; width: 3%\">&nbsp;</th>";
-  sBox += "<th style=\"text-align:right\"> Pkte.</th>";
-  sBox += "</tr>";
-  sBox += sTable;
-  sBox += "</table>";
 
   return sBox;
 }

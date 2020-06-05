@@ -5102,16 +5102,7 @@ namespace CornerkickWebMvc.Controllers
       return cup;
     }
 
-    public JsonResult setLeague(Models.LeagueModels mlLeague, int iSeason, int iLand, byte iDivision, int iMatchday, byte iHA)
-    {
-      CornerkickManager.Club clb = ckClub();
-      CornerkickManager.Cup league = getCup(iSeason, 1, iLand, iDivision);
-
-      string sBox = getTable(league, iMatchday, -1, iHA, clb, 1, 4, 8, -1);
-
-      return Json(sBox, JsonRequestBehavior.AllowGet);
-    }
-
+    // DEPRECATED, use getTableDatatable() instead
     private string getTable(CornerkickManager.Cup cup, int iMatchday, sbyte iGroup = -1, byte iHA = 0, CornerkickManager.Club clubUser = null, int iColor1 = 0, int iColor2 = 0, int iColor3 = 0, int iColor4 = 0)
     {
       List<CornerkickManager.Cup.TableItem> ltTblLast = cup.getTable(iMatchday - 1, iHA, iGroup);
@@ -5182,6 +5173,93 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return sBox;
+    }
+
+    public class DatatableTableLeague
+    {
+      public int iId { get; set; }
+      public int iPl { get; set; }
+      public int iPlLast { get; set; }
+      public bool bBold { get; set; }
+      public string sBgColor { get; set; }
+      public string sEmblem { get; set; }
+      public string sClubName { get; set; }
+      public int iGames { get; set; }
+      public int iWin { get; set; }
+      public int iDraw { get; set; }
+      public int iDefeat { get; set; }
+      public string sGoals { get; set; }
+      public int iGoalsDiff { get; set; }
+      public int iPoints { get; set; }
+    }
+    public JsonResult getTableDatatable(int iSeason, int iType, int iLand, byte iDivision, int iMatchday, sbyte iGroup = -1, bool bH = false, bool bA = false, int iColor1 = 0, int iColor2 = 0, int iColor3 = 0, int iColor4 = 0)
+    {
+      List<DatatableTableLeague> ltDtTable = new List<DatatableTableLeague>();
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Cup cup = getCup(iSeason, 1, iLand, iDivision);
+
+      byte iHA = 0;
+      if (bH) iHA = 1;
+      else if (bA) iHA = 2;
+      List<CornerkickManager.Cup.TableItem> ltTblLast = cup.getTable(iMatchday - 1, iHA, iGroup);
+      List<CornerkickManager.Cup.TableItem> ltTbl     = cup.getTable(iMatchday,     iHA, iGroup);
+
+      for (var i = 0; i < ltTbl.Count; i++) {
+        CornerkickManager.Cup.TableItem tbpl = ltTbl[i];
+        DatatableTableLeague dtL = new DatatableTableLeague();
+
+        string sBgColor = "white";
+        if      (iColor1 > 0 && i < iColor1) sBgColor = "#ffffcc";
+        else if (iColor2 > 0 && i < iColor2) sBgColor = "#ccffcc";
+        else if (iColor3 > 0 && i < iColor3) sBgColor = "#cce5ff";
+        else if (iColor4 > 0 && i < iColor4) sBgColor = "#ffcccc";
+        else if (iColor1 < 0 && i >= ltTbl.Count + iColor1) sBgColor = "#ffffcc";
+        else if (iColor2 < 0 && i >= ltTbl.Count + iColor2) sBgColor = "#ccffcc";
+        else if (iColor3 < 0 && i >= ltTbl.Count + iColor3) sBgColor = "#cce5ff";
+        else if (iColor4 < 0 && i >= ltTbl.Count + iColor4) sBgColor = "#ffcccc";
+        dtL.sBgColor = sBgColor;
+
+        var k = i + 1;
+
+        dtL.iPl = i + 1;
+        for (var iLast = 0; iLast < ltTblLast.Count; iLast++) {
+          if (ltTblLast[iLast].iId == tbpl.iId) {
+            if (i != iLast) {
+              dtL.iPlLast = iLast + 1;
+            }
+            break;
+          }
+        }
+
+        // Create tiny emblem file
+        if (string.IsNullOrEmpty(getClubEmblemPath(tbpl.iId, bNation: false, bTiny: true))) {
+          string sEmblemFile = getClubEmblemPath(tbpl.iId, bNation: false, bTiny: false);
+
+          if (!string.IsNullOrEmpty(sEmblemFile)) {
+            resizeImage(sEmblemFile, 48, "_tiny");
+          }
+        }
+
+        dtL.sEmblem = getClubEmblem(tbpl.iId, sStyle: "width: 24px", bTiny: true);
+        dtL.sClubName = "<a href=\"/Member/ClubDetails?iClub=" + tbpl.iId.ToString() + "\" target=\"\">" + tbpl.sName + "</a>";
+        dtL.iGames = tbpl.iGUV[0] + tbpl.iGUV[1] + tbpl.iGUV[2];
+        dtL.iWin    = tbpl.iGUV[0];
+        dtL.iDraw   = tbpl.iGUV[1];
+        dtL.iDefeat = tbpl.iGUV[2];
+        dtL.sGoals = tbpl.iGoals.ToString() + ":" + tbpl.iGoalsOpp.ToString();
+        dtL.iGoalsDiff = tbpl.iGoals - tbpl.iGoalsOpp;
+        dtL.iPoints = tbpl.iPoints;
+
+        dtL.bBold = false;
+        if (clb != null && tbpl.iId == clb.iId) dtL.bBold = true;
+
+        ltDtTable.Add(dtL);
+      }
+
+      return Json(new { aaData = ltDtTable }, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult setLeagueTeams(int iSeason, int iLand, byte iDivision, int iMatchday)
