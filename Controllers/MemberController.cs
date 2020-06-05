@@ -4852,17 +4852,16 @@ namespace CornerkickWebMvc.Controllers
       int[] iLtCupIds = new int[] { 1, 2, 3, 4, 5 };
       List<Models.DataPointGeneral>[] ltDataPoints = new List<Models.DataPointGeneral>[iLtCupIds.Length];
 
-      for (int iSuc = 0; iSuc < clb.ltSuccess.Count; iSuc++) {
-        CornerkickManager.Main.Success suc = CornerkickManager.Tool.getSuccess(clb, MvcApplication.ckcore.tl.getCup(iLtCupIds[iSuc]));
-        if (suc == null) continue;
+      for (int iC = 0; iC < iLtCupIds.Length; iC++) {
+        ltDataPoints[iC] = new List<Models.DataPointGeneral>();
 
-        ltDataPoints[iSuc] = new List<Models.DataPointGeneral>();
+        CornerkickManager.Main.Success suc = CornerkickManager.Tool.getSuccess(clb, MvcApplication.ckcore.tl.getCup(iLtCupIds[iC]));
 
-        for (int iS = 1; iS < MvcApplication.ckcore.iSeason; iS++) {
+        for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
           List<float> ltAttractionFactorCup = new List<float>();
-          float fAttrF = CornerkickManager.Club.getAttractionFactor(suc, MvcApplication.ckcore.iSeason, iSeasonSelected: iS);
+          float fAttrF = clb.getAttractionFactor(suc, MvcApplication.ckcore.iSeason, iSeasonSelected: iS, ltCups: MvcApplication.ckcore.ltCups, dtNow: MvcApplication.ckcore.dtDatum);
 
-          if (fAttrF > 0) {
+          if (fAttrF > 0f) {
             string sCupPlace = "";
             for (int iCP = 0; iCP < suc.ltCupPlace.Count; iCP++) {
               if (suc.ltCupPlace[iCP][1] == iS) {
@@ -4871,7 +4870,7 @@ namespace CornerkickWebMvc.Controllers
               }
             }
 
-            ltDataPoints[iSuc].Add(new Models.DataPointGeneral(iS, fAttrF, z: sCupPlace));
+            ltDataPoints[iC].Add(new Models.DataPointGeneral(iS, fAttrF, z: sCupPlace));
           }
         }
       }

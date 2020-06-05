@@ -83,16 +83,17 @@
                 var content = "";
                 var fAttrFtrSeasonTotal = 0.0;
 
+                var content = "<table>";
                 // For each cup
                 for (var i = 0; i < e.entries.length; i++) {
                   fAttrFtrSeasonTotal += e.entries[i].dataPoint.y;
-                  content += "<strong>" + e.entries[i].dataSeries.name + ":</strong> " + e.entries[i].dataPoint.y.toFixed(1) + e.entries[i].dataPoint.z;
-                  content += "<br/>";
+                  content += "<tr><td style=\"text-align:right\"><strong style=\"color:" + e.entries[i].dataSeries.color + "\">" + e.entries[i].dataSeries.name + ":</strong></td><td style=\"text-align:right\">" + e.entries[i].dataPoint.y.toFixed(1) + "</td><td style=\"text-align:right;padding-left:4px\">" + e.entries[i].dataPoint.z + "</td>";
                 }
 
                 // Total for season
-                content += "<hr style='margin: 2px'><strong>Total:</strong> " + fAttrFtrSeasonTotal.toFixed(1);
-                content += "<br/>";
+                content += "<tr><td style=\"text-align:right\"><strong>Total:</strong></td><td style=\"text-align:right\">" + fAttrFtrSeasonTotal.toFixed(1) + "</td><td></td>";
+
+                content += "</table>";
 
                 return content;
               }
@@ -147,7 +148,7 @@
               {
                 // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
                 type: "stackedColumn",
-                color: "rgb(91, 146, 229)",
+                color: "rgb(192, 192, 192)",
                 name: "Silver-Cup",
                 indexLabel: "{y}",
                 indexLabelFontColor: "#EEEEEE",
@@ -331,9 +332,11 @@
           <p style="margin: 0">Höchste Niederl. (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, -1, 0)</p>
           <p>Höchste Niederl. (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, -1, 1)</p>
 
+          @*
           if (success.ltCupPlace.Count > 0) {
             <p>Anteil Erfolgsfaktor (Saison/Pl.):<br />@sAttcFcCup</p>
           }
+          *@
         }
       }
     </div>
