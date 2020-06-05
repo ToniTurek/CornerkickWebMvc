@@ -6633,18 +6633,22 @@ namespace CornerkickWebMvc.Controllers
 
           float fStrengthTmp = CornerkickGame.Tool.getAveSkill(pl, iPos);
           if (fStrengthTmp > fStrength) {
-            //tD.ltPlayer[iP] = pl.Clone(true);
+            if (tD.ltPlayer2[iP] == null) tD.ltPlayer2[iP] = new Models.TeamModels.Player();
 
-            //tD.ltPlayer        [iP].ptPosDefault = MvcApplication.ckcore.ltFormationen[iF].ptPos[iP];
+            tD.ltPlayer2[iP].sName = pl.sName;
             tD.ltPlayer2[iP].iNb = (byte)(iP + 1);
-            tD.ltPlayer2[iP].sSkillAve = fStrengthTmp.ToString("0.0");
+            tD.ltPlayer2[iP].sNat = CornerkickManager.Main.sLandShort[pl.iNat1];
+            tD.ltPlayer2[iP].sPortrait = getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true);
+            tD.ltPlayer2[iP].iPos = iPos;
+
+            if (tD.formation.ptPos.Length > iP) {
+              tD.ltPlayer2[iP].sSkillAve = fStrengthTmp.ToString("0.0");
+            }
 
             fStrength = fStrengthTmp;
 
-            tD.ltPlayer2[iP].iPos = iPos;
             if (pl.iClubId >= 0) tD.ltPlayer2[iP].sTeamname = MvcApplication.ckcore.ltClubs[pl.iClubId].sName;
             tD.ltPlayer2[iP].sAge = pl.getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
-            tD.ltPlayer2[iP].sNat = CornerkickManager.Main.sLandShort[pl.iNat1];
 
             ltPlayerBest[iP] = pl;
           }

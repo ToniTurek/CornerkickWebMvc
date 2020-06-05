@@ -151,8 +151,8 @@
             var result = "";
             var drawFormation = $("#drawFormation");
 
-            $.each(teamData.ltPlayer, function (i, player) {
-              result += getBoxFormation(i, teamData.formation.ptPos[i], player.sName, player.iNr.toString(), teamData.ltPlayerAveSkill[i], false, false, -1, teamData.ltPlayerPos[i], bMobile, 0.5, teamData.ltPlayerTeamname[i], teamData.ltPlayerAge[i], teamData.ltPlayerNat[i]);
+            $.each(teamData.ltPlayer2, function (i, pl2) {
+              result += getBoxFormation(i, teamData.formation.ptPos[i], pl2.sName, (i + 1).toString(), pl2.sSkillAve, false, false, -1, pl2.iPos, bMobile, 0.5, pl2.sTeamname, pl2.sAge, pl2.sNat);
 
               return i !== 11;
             });
