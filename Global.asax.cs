@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.1.16";
+    public const string sVersion = "3.1.17";
 
     public class Settings
     {
@@ -450,14 +450,44 @@ namespace CornerkickWebMvc
 
       // Put player from cpu club on transferlist if too many
       const int iClubCpuPlayerMax = 25;
+      const int iClubCpuPlayerMin = 16;
       for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
         CornerkickManager.Club clbCpu = ckcore.ltClubs[iC];
-
         if (clbCpu.user != null) continue;
+        if (clbCpu.bNation) continue;
 
         ckcore.doFormation(iC);
+
         for (int iP = iClubCpuPlayerMax; iP < clbCpu.ltPlayer.Count; iP++) {
+          CornerkickManager.Club clbCpuTake = null;
+
+          // Find cpu club with to few players
+          for (int jC = 1; jC < ckcore.ltClubs.Count; jC++) {
+            if (iC == jC) continue;
+
+            CornerkickManager.Club clbCpuTakeTmp = ckcore.ltClubs[jC];
+            if (clbCpuTakeTmp.user != null) continue;
+            if (clbCpuTakeTmp.bNation) continue;
+
+            if (clbCpuTakeTmp.ltPlayer.Count < iClubCpuPlayerMin) {
+              clbCpuTake = clbCpuTakeTmp;
+              break;
+            }
+          }
+
           ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
+
+          if (clbCpuTake != null) {
+            ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[iP], clbCpuTake);
+          }
+          /*
+          int jP = iP;
+          while (ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[jP], 0) != 1 && jP > 0) jP--;
+
+          if (clbCpuTake != null) {
+            ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[jP], clbCpuTake);
+          }
+          */
         }
       }
 
