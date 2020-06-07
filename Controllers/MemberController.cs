@@ -5638,32 +5638,7 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Calendar(Models.CalendarModels cal)
     {
-      /*
-      if (cal.sCal == null) cal.sCal = new List<string>();
-      cal.sCal.Add("Kalender 1");
-      cal.sCal.Add("Kalender 2");
-      cal.sCal.Add("Kalender 3");
-      ViewData["sCal"] = cal.sCal;
-      */
-
       cal.iClubId = ckClub().iId;
-
-      cal.ltTestgames = new List<Models.Testgame>();
-      foreach (CornerkickManager.Cup cup in MvcApplication.ckcore.ltCups) {
-        if (cup.iId == -5) {
-          foreach (CornerkickManager.Cup.Matchday md in cup.ltMatchdays) {
-            foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
-              if (gd.team[1].iTeamId == ckClub().iId) {
-                Models.Testgame tg = new Models.Testgame();
-                tg.dt = md.dt;
-                tg.iTeamHome = gd.team[0].iTeamId;
-                tg.iTeamAway = gd.team[1].iTeamId;
-                cal.ltTestgames.Add(tg);
-              }
-            }
-          }
-        }
-      }
 
       cal.ddlTestgameClubs = new List<SelectListItem>();
       foreach (CornerkickManager.Club clbTg in MvcApplication.ckcore.ltClubs) {
@@ -5676,6 +5651,48 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return View(cal);
+    }
+
+    public class DatatableTestGames
+    {
+      public string sDateIso { get; set; }
+      public string sDate { get; set; }
+      public string sTeamH { get; set; }
+      public string sTeamA { get; set; }
+    }
+    public JsonResult CalendarGetTestgamesDatatable()
+    {
+      List<DatatableTestGames> ltDtTestgames = new List<DatatableTestGames>();
+
+      List<Models.Testgame> ltTestgames = new List<Models.Testgame>();
+      foreach (CornerkickManager.Cup cup in MvcApplication.ckcore.ltCups) {
+        if (cup.iId == -5) {
+          foreach (CornerkickManager.Cup.Matchday md in cup.ltMatchdays) {
+            foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
+              if (gd.team[1].iTeamId == ckClub().iId) {
+                Models.Testgame tg = new Models.Testgame();
+                tg.dt = md.dt;
+                tg.iTeamHome = gd.team[0].iTeamId;
+                tg.iTeamAway = gd.team[1].iTeamId;
+                ltTestgames.Add(tg);
+              }
+            }
+          }
+        }
+      }
+
+      foreach (CornerkickWebMvc.Models.Testgame tg in ltTestgames) {
+        DatatableTestGames dtTestgames = new DatatableTestGames();
+
+        dtTestgames.sDate    = tg.dt.ToString("dd.MM.yyyy HH:mm");
+        dtTestgames.sDateIso = tg.dt.ToString("yyyy-MM-ddTHH:mm");
+        dtTestgames.sTeamH = MvcApplication.ckcore.ltClubs[tg.iTeamHome].sName;
+        dtTestgames.sTeamA = MvcApplication.ckcore.ltClubs[tg.iTeamAway].sName;
+
+        ltDtTestgames.Add(dtTestgames);
+      }
+
+      return Json(new { aaData = ltDtTestgames }, JsonRequestBehavior.AllowGet);
     }
 
     public List<Models.DiaryEvent> getCalendarEvents()

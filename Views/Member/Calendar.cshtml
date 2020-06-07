@@ -82,6 +82,13 @@
     });
 
     var jTable = $('#tableTestgames').DataTable({
+      "ajax": {
+        "url": '@Url.Action("CalendarGetTestgamesDatatable", "Member")',
+        "type": 'GET',
+        "dataType": "JSON",
+        "cache": false,
+        "contentType": "application/json; charset=utf-8"
+      },
       "pageLength": 50,
       "paging": false,
       "info": false,
@@ -90,9 +97,15 @@
       "language": {
         "emptyTable": "Keine Testspielanfragen"
       },
-      columnDefs: [
+      "columns": [
+        { "data": "sDateIso" },
+        { "data": "sDate" },
+        { "data": "sTeamH" },
+        { "data": "sTeamA" }
+      ],
+      "columnDefs": [
         {
-          targets: 0,
+          "targets": 0,
           "visible": false,
           "searchable": false
         }
@@ -293,16 +306,16 @@
 
     $("#bnAcceptTestgame").click(function () {
       var data = jTable.row('.selected').data();
-      if (data) {
-        var sDate = data[0];
 
+      if (data) {
         $.ajax({
           type: 'post',
           url: '/Member/AcceptTestgame',
           dataType: "json",
-          data: { sDateTestgame: sDate },
+          data: { sDateTestgame: data.sDateIso },
           success: function () {
-            window.location.reload(true);
+            jTable.ajax.reload();
+            calendar.fullCalendar('refetchEvents');
           },
           error: function (xhr) {
             alert(xhr.responseJSON.message);
@@ -313,16 +326,16 @@
 
     $("#bnDeclineTestgame").click(function () {
       var data = jTable.row('.selected').data();
-      if (data) {
-        var sDate = data[0];
 
+      if (data) {
         $.ajax({
           type: 'post',
           url: '/Member/DeclineTestgame',
           dataType: "json",
-          data: { sDateTestgame: sDate },
+          data: { sDateTestgame: data.sDateIso },
           success: function () {
-            window.location.reload(true);
+            jTable.ajax.reload();
+            calendar.fullCalendar('refetchEvents');
           }
         });
       }
@@ -389,18 +402,6 @@
     </tr>
   </thead>
   <tbody>
-    @{
-      foreach (CornerkickWebMvc.Models.Testgame tg in Model.ltTestgames) {
-        string sDate = tg.dt.ToString("dd.MM.yyyy HH:mm");
-        string sDateIso = tg.dt.ToString("yyyy-MM-ddTHH:mm");
-        <tr>
-          <td align="center">@sDateIso</td>
-          <td align="center">@sDate</td>
-          <td align="center">@MvcApplication.ckcore.ltClubs[tg.iTeamHome].sName</td>
-          <td align="center">@MvcApplication.ckcore.ltClubs[tg.iTeamAway].sName</td>
-        </tr>
-      }
-    }
   </tbody>
 </table>
 
