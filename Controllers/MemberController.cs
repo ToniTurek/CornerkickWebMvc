@@ -5709,16 +5709,18 @@ namespace CornerkickWebMvc.Controllers
       DateTime dt = MvcApplication.ckcore.dtSeasonStart.Date;
       while (dt.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         // Night
-        ltEvents.Add(new Models.DiaryEvent {
-          iID = ltEvents.Count,
-          sTitle = "Nachtruhe",
-          sDescription = "Nachtruhe",
-          sStartDate = dt.Add(new TimeSpan(23, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
-          sEndDate = dt.AddDays(1).Add(new TimeSpan(7, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
-          sColor = "rgb(0, 0, 140)",
-          bEditable = false,
-          bAllDay = false
-        });
+        if (!dt.Date.Equals(MvcApplication.ckcore.dtSeasonEnd.Date)) { // Always but not on day of season end
+          ltEvents.Add(new Models.DiaryEvent {
+            iID = ltEvents.Count,
+            sTitle = "Nachtruhe",
+            sDescription = "Nachtruhe",
+            sStartDate = dt.Add(new TimeSpan(23, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
+            sEndDate = dt.AddDays(1).Add(new TimeSpan(7, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
+            sColor = "rgb(0, 0, 140)",
+            bEditable = false,
+            bAllDay = false
+          });
+        }
 
         // New Year
         if (dt.Day == 1 && dt.Month == 1) {
@@ -5929,6 +5931,18 @@ namespace CornerkickWebMvc.Controllers
         dt = dt.AddDays(1);
         iDay++;
       }
+
+      // End of season
+      ltEvents.Add(new Models.DiaryEvent {
+        iID = ltEvents.Count,
+        sTitle = "Saisonende",
+        sDescription = "Saisonende",
+        sStartDate = MvcApplication.ckcore.dtSeasonEnd.ToString("yyyy-MM-ddTHH:mm:ss"),
+        sEndDate = MvcApplication.ckcore.dtSeasonEnd.Date.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss"),
+        sColor = "rgb(0, 0, 0)",
+        bEditable = false,
+        bAllDay = false
+      });
 
       return ltEvents;
     }
