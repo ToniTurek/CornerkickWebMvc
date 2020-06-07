@@ -33,8 +33,6 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ddlTestgameClubs { get; set; }
     public string[] sTestgameClub { get; set; }
 
-    public List<Testgame> ltTestgames { get; set; }
-
     public CornerkickManager.TrainingCamp.Camp camp { get; set; }
   }
 

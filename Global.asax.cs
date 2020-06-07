@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.1.16";
+    public const string sVersion = "3.1.17";
 
     public class Settings
     {
@@ -100,7 +100,14 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true, iTrainingsPerDay: 3, iTrainingsPerDayMax: 3);
+      // Create new cornerkick manager instance
+      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir,
+                                          bContinuingTime: true,
+                                          iTrainingsPerDay: 3,
+                                          iTrainingsPerDayMax: 3,
+                                          bPlayerTransferOnlyOncePerSeason: true,
+                                          iWriteGamesToDisk: 0,
+                                          fMoralMin: 0.4f);
 
       ckcore.tl.writeLog("WebMvc START");
 
@@ -443,14 +450,44 @@ namespace CornerkickWebMvc
 
       // Put player from cpu club on transferlist if too many
       const int iClubCpuPlayerMax = 25;
+      const int iClubCpuPlayerMin = 16;
       for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
         CornerkickManager.Club clbCpu = ckcore.ltClubs[iC];
-
         if (clbCpu.user != null) continue;
+        if (clbCpu.bNation) continue;
 
         ckcore.doFormation(iC);
+
         for (int iP = iClubCpuPlayerMax; iP < clbCpu.ltPlayer.Count; iP++) {
+          CornerkickManager.Club clbCpuTake = null;
+
+          // Find cpu club with to few players
+          for (int jC = 1; jC < ckcore.ltClubs.Count; jC++) {
+            if (iC == jC) continue;
+
+            CornerkickManager.Club clbCpuTakeTmp = ckcore.ltClubs[jC];
+            if (clbCpuTakeTmp.user != null) continue;
+            if (clbCpuTakeTmp.bNation) continue;
+
+            if (clbCpuTakeTmp.ltPlayer.Count < iClubCpuPlayerMin) {
+              clbCpuTake = clbCpuTakeTmp;
+              break;
+            }
+          }
+
           ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
+
+          if (clbCpuTake != null) {
+            ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[iP], clbCpuTake);
+          }
+          /*
+          int jP = iP;
+          while (ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[jP], 0) != 1 && jP > 0) jP--;
+
+          if (clbCpuTake != null) {
+            ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[jP], clbCpuTake);
+          }
+          */
         }
       }
 
@@ -517,6 +554,25 @@ namespace CornerkickWebMvc
             clb.ltPlayer[iP].fFresh     = 0.92f;
             clb.ltPlayer[iP].fMoral     = Math.Max(clb.ltPlayer[iP].fMoral, 0.95f);
           }
+        }
+      }
+
+      // Reset player moral if ...
+      for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
+        CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+        string sClubName = "vereinslos";
+        if (pl.iClubId >= 0 && pl.iClubId < ckcore.ltClubs.Count) sClubName = ckcore.ltClubs[pl.iClubId].sName;
+
+        // ... NaN
+        if (float.IsNaN(pl.fMoral)) {
+          pl.fMoral = 1f;
+          ckcore.tl.writeLog("Reset moral (NaN) of player " + pl.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
+        }
+
+        // ... below minimum
+        if (pl.fMoral < ckcore.settings.fMoralMin) {
+          ckcore.tl.writeLog("Reset moral (" + pl.fMoral.ToString("0.0%") + ") of player " + pl.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
+          pl.fMoral = ckcore.settings.fMoralMin;
         }
       }
 
@@ -714,8 +770,6 @@ namespace CornerkickWebMvc
                 CornerkickManager.Club nat = CornerkickManager.Tool.getNation(league.iId2, ckcore.ltClubs);
                 if (nat == null) continue;
 
-                // Add all player of that nation
-                //nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
                 nat.user = item.club.user;
                 item.club.user.nation = nat;
 
@@ -727,6 +781,15 @@ namespace CornerkickWebMvc
                 break;
               }
             }
+          }
+
+          foreach (int iNat in iNations) {
+            CornerkickManager.Club nat = CornerkickManager.Tool.getNation(iNat, ckcore.ltClubs);
+            if (nat == null) continue;
+            if (nat.user != null) continue;
+
+            // Add all player of that nation
+            nat.ltPlayer = ckcore.getBestPlayer(iNat, iPlCount: nPlayerNat);
           }
         }
       }
@@ -1020,14 +1083,6 @@ namespace CornerkickWebMvc
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
-
-        // Reset player moral if NaN
-        for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
-          if (float.IsNaN(ckcore.ltPlayer[iPl].fMoral)) {
-            ckcore.ltPlayer[iPl].fMoral = 1f;
-            ckcore.tl.writeLog("Reset moral (NaN) of player " + ckcore.ltPlayer[iPl].sName, CornerkickManager.Main.sErrorFile);
-          }
-        }
 
         // Delete past trainings from club
         for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
