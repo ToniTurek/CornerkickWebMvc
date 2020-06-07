@@ -714,8 +714,6 @@ namespace CornerkickWebMvc
                 CornerkickManager.Club nat = CornerkickManager.Tool.getNation(league.iId2, ckcore.ltClubs);
                 if (nat == null) continue;
 
-                // Add all player of that nation
-                //nat.ltPlayer = ckcore.getBestPlayer(league.iId2);
                 nat.user = item.club.user;
                 item.club.user.nation = nat;
 
@@ -727,6 +725,15 @@ namespace CornerkickWebMvc
                 break;
               }
             }
+          }
+
+          foreach (int iNat in iNations) {
+            CornerkickManager.Club nat = CornerkickManager.Tool.getNation(iNat, ckcore.ltClubs);
+            if (nat == null) continue;
+            if (nat.user != null) continue;
+
+            // Add all player of that nation
+            nat.ltPlayer = ckcore.getBestPlayer(iNat, iPlCount: nPlayerNat);
           }
         }
       }
