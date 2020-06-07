@@ -520,6 +520,25 @@ namespace CornerkickWebMvc
         }
       }
 
+      // Reset player moral if ...
+      for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
+        CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+        string sClubName = "vereinslos";
+        if (pl.iClubId >= 0 && pl.iClubId < ckcore.ltClubs.Count) sClubName = ckcore.ltClubs[pl.iClubId].sName;
+
+        // ... NaN
+        if (float.IsNaN(pl.fMoral)) {
+          pl.fMoral = 1f;
+          ckcore.tl.writeLog("Reset moral (NaN) of player " + pl.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
+        }
+
+        // ... below minimum
+        if (pl.fMoral < ckcore.settings.fMoralMin) {
+          ckcore.tl.writeLog("Reset moral (" + pl.fMoral.ToString("0.0%") + ") of player " + pl.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
+          pl.fMoral = ckcore.settings.fMoralMin;
+        }
+      }
+
       // Jan no injury
       CornerkickGame.Player plJan = ckcore.ltPlayer[101];
       plJan.injury = null;
@@ -1027,14 +1046,6 @@ namespace CornerkickWebMvc
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
-
-        // Reset player moral if NaN
-        for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
-          if (float.IsNaN(ckcore.ltPlayer[iPl].fMoral)) {
-            ckcore.ltPlayer[iPl].fMoral = 1f;
-            ckcore.tl.writeLog("Reset moral (NaN) of player " + ckcore.ltPlayer[iPl].sName, CornerkickManager.Main.sErrorFile);
-          }
-        }
 
         // Delete past trainings from club
         for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
