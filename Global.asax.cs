@@ -100,7 +100,14 @@ namespace CornerkickWebMvc
     {
       string sHomeDir = getHomeDir();
 
-      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir, bContinuingTime: true, iTrainingsPerDay: 3, iTrainingsPerDayMax: 3);
+      // Create new cornerkick manager instance
+      ckcore = new CornerkickManager.Main(sHomeDir: sHomeDir,
+                                          bContinuingTime: true,
+                                          iTrainingsPerDay: 3,
+                                          iTrainingsPerDayMax: 3,
+                                          bPlayerTransferOnlyOncePerSeason: true,
+                                          iWriteGamesToDisk: 0,
+                                          fMoralMin: 0.4f);
 
       ckcore.tl.writeLog("WebMvc START");
 
