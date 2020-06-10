@@ -566,7 +566,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // Equalize player age
-      while (fAlter > 25.5f * club.ltPlayer.Count) {
+      while (fAlter > 24.0f * club.ltPlayer.Count) {
         CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (pl.getAge(MvcApplication.ckcore.dtDatum) > 22) {
@@ -580,7 +580,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      while (fAlter < 25.5f * club.ltPlayer.Count) {
+      while (fAlter < 24.0f * club.ltPlayer.Count) {
         CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (pl.getAge(MvcApplication.ckcore.dtDatum) < 30) {
@@ -595,10 +595,10 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // Equalize factor of player (age - 10) * talent 
-      // --> (25.5 - 10) * 4.5 = 69.75
+      // --> (24.0 - 10) * 4.5 = 63.0
       int iBreak = 0;
       float fAgeTalent = getAgeTalent(club);
-      while (fAgeTalent > 70.75 || fAgeTalent < 68.75) {
+      while (fAgeTalent > 64.0 || fAgeTalent < 62.0) {
         CornerkickGame.Player pl1 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
         CornerkickGame.Player pl2 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
