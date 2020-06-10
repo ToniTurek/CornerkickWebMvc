@@ -315,7 +315,7 @@
 
         int iSp = 0;
         foreach (CornerkickManager.Finance.Sponsor spon in Model.ltSponsorOffers) {
-          if (spon.bMain && spon.iId > 0 && spon.iId < MvcApplication.ckcore.fz.ltSponsoren.Count) {
+          if (spon.iType == 0 && spon.iId > 0 && spon.iId < MvcApplication.ckcore.fz.ltSponsoren.Count) {
             <tr>
               <td>@iSp</td>
               <td>@spon.iId</td>

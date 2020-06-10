@@ -6577,7 +6577,7 @@ namespace CornerkickWebMvc.Controllers
 
           if (bOffer) iSpOffer++;
 
-          if (spon.bMain) continue;
+          if (spon.iType != 1) continue;
 
           Models.DatatableEntrySponsorBoard deSponsorBoard = new Models.DatatableEntrySponsorBoard();
           deSponsorBoard.bOffer = bOffer;

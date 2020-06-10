@@ -445,7 +445,7 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Finance.Sponsor sponUser = MvcApplication.ckcore.fz.newSponsor();
 
-      sponUser.bMain = true;
+      sponUser.iType = 0;
       sponUser.iId = 1;
       sponUser.iYears = 1;
       sponUser.iGeldJahr     = 15000000; // 15 mio.
