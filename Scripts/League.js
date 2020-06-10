@@ -1,6 +1,7 @@
-﻿function changeLand(iDivision) {
+﻿function changeLand() {
   var iSeason = $('#ddlSeason').val();
   var iLand = $('#ddlLand').val();
+  var iDivision = $('#ddlDivision').val();
 
   $.ajax({
     url: '/Member/getDdlMatchdays',
@@ -32,17 +33,17 @@
 function setLeague2() {
   var ddlSeason = document.getElementById("ddlSeason");
   var ddlLand = document.getElementById("ddlLand");
+  var ddlDivision = document.getElementById("ddlDivision");
   var ddlMatchday = document.getElementById("ddlMatchday");
   var rbTableH = document.getElementById("rbTableH");
   var rbTableA = document.getElementById("rbTableA");
-  var iDivision = 0;
 
   // Teams
   $.ajax({
     url: '/Member/setLeagueTeams',
     type: "GET",
     dataType: "JSON",
-    data: { iSeason: ddlSeason.value, iLand: ddlLand.value, iDivision: iDivision, iMatchday: ddlMatchday.value },
+    data: { iSeason: ddlSeason.value, iLand: ddlLand.value, iDivision: ddlDivision.value, iMatchday: ddlMatchday.value },
     success: function (sTeams) {
       actionDrawTeams(sTeams);
     }
@@ -52,7 +53,7 @@ function setLeague2() {
   if (oTableLeague) {
     oTableLeague.ajax.reload();
   } else {
-    oTableLeague = getTableDatatable($("#tblLeague"), ddlSeason, ddlLand, iDivision, ddlMatchday, rbTableH, rbTableA);
+    oTableLeague = getTableDatatable($("#tblLeague"), ddlSeason, ddlLand, ddlDivision, ddlMatchday, rbTableH, rbTableA);
   }
 
   // Scorer table
@@ -63,7 +64,7 @@ function setLeague2() {
   }
 }
 
-function getTableDatatable(tblLeague, ddlSeason, ddlLand, iDivision, ddlMatchday, rbTableH, rbTableA) {
+function getTableDatatable(tblLeague, ddlSeason, ddlLand, ddlDivision, ddlMatchday, rbTableH, rbTableA) {
   return tblLeague.DataTable({
     "ajax": {
       "url": '/Member/getTableDatatable',
@@ -73,7 +74,7 @@ function getTableDatatable(tblLeague, ddlSeason, ddlLand, iDivision, ddlMatchday
         d.iSeason = ddlSeason.value;
         d.iType = 1;
         d.iLand = ddlLand.value;
-        d.iDivision = iDivision;
+        d.iDivision = ddlDivision.value;
         d.iMatchday = ddlMatchday.value;
         d.iGroup = -1;
         d.bH = rbTableH.checked;

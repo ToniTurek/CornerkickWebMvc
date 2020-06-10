@@ -21,7 +21,7 @@
     var oTableScorer;
 
     $(document).ready(function () {
-      changeLand(0);
+      changeLand();
 
       // Radio-buttons league
       $("#rbTableTotal").on('change', function (ev) {
@@ -88,23 +88,20 @@
 </head>
 
 <body style="height: 100%; min-height: 100%">
-  @{
-    var sLand = "";
-    if (Model.iLand >= 0 && Model.iLand < CornerkickManager.Main.sLand.Length) {
-      sLand = CornerkickManager.Main.sLand[Model.iLand];
-    }
-    var sLiga = (Model.iSpKl + 1).ToString();
-  }
-
   <div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
     <label style="margin-right: 10px">
       Saison:
-      @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", @onchange = "changeLand(0)", id = "ddlSeason" })
+      @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlSeason" })
     </label>
 
     <label style="margin-right: 10px">
       Land:
-      @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand(0)", id = "ddlLand" })
+      @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlLand" })
+    </label>
+
+    <label>
+      Liga:
+      @Html.DropDownListFor(m => m.iDivision, Model.ddlDivision, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlDivision" })
     </label>
 
     <label>

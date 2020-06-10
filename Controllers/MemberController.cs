@@ -5024,12 +5024,12 @@ namespace CornerkickWebMvc.Controllers
       if (clb != null) {
         mlLeague.iClubId = clb.iId;
         mlLeague.iLand   = clb.iLand;
-        mlLeague.iSpKl   = clb.iDivision;
+        mlLeague.iDivision = clb.iDivision;
       }
 
       iSeasonGlobal = MvcApplication.ckcore.iSeason;
 
-      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, mlLeague.iLand, mlLeague.iSpKl);
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, mlLeague.iLand, mlLeague.iDivision);
       if (league == null) return View(mlLeague);
 
       int iMd = league.getMatchday(MvcApplication.ckcore.dtDatum);
@@ -5041,6 +5041,9 @@ namespace CornerkickWebMvc.Controllers
       foreach (int iLand in MvcApplication.iNations) {
         mlLeague.ddlLand.Add(new SelectListItem { Text = CornerkickManager.Main.sLand[iLand], Value = iLand.ToString() });
       }
+
+      mlLeague.ddlDivision.Add(new SelectListItem { Text = "1", Value = "0" });
+      if (clb.iLand == MvcApplication.iNations[0]) mlLeague.ddlDivision.Add(new SelectListItem { Text = "2", Value = "1" });
 
       mlLeague.ddlSeason = getDdlSeason();
       mlLeague.iSeason = MvcApplication.ckcore.iSeason;
@@ -5292,6 +5295,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clbUser = ckClub();
 
       CornerkickManager.Cup league = getCup(iSeason, 1, iLand, iDivision);
+
+      if (iMatchday > league.ltMatchdays.Count) return Json("", JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Cup.Matchday md = new CornerkickManager.Cup.Matchday();
       md.ltGameData = new List<CornerkickGame.Game.Data>();

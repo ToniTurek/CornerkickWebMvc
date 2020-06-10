@@ -214,7 +214,14 @@ namespace CornerkickWebMvc.Controllers
 
       if (registerViewModel != null) {
         iLand     = registerViewModel.Land;
-        iDivision = registerViewModel.Liga;
+        //iDivision = registerViewModel.Liga;
+      }
+
+      for (int iD = 2; iD >= 0; iD--) {
+        if (MvcApplication.ckcore.tl.getCup(1, iLand, iD) != null) {
+          iDivision = iD;
+          break;
+        }
       }
 
       if (iLand     < 0) return;
@@ -455,7 +462,7 @@ namespace CornerkickWebMvc.Controllers
       return sponUser;
     }
 
-    private void addPlayerToClub(ref CornerkickManager.Club club)
+    internal void addPlayerToClub(ref CornerkickManager.Club club, int iSkillChange = 0)
     {
       int   iSpeed  = 0;
       int   iTalent = 0;
@@ -468,6 +475,12 @@ namespace CornerkickWebMvc.Controllers
 #if DEBUG
           pl.fFresh = 1f;
 #endif
+
+          // Change player skill
+          for (int iS = 1; iS < pl.iSkill.Length; iS++) {
+            pl.iSkill[iS] = (byte)(pl.iSkill[iS] + iSkillChange);
+          }
+
           pl.contract = MvcApplication.ckcore.plr.getContract(pl, (byte)rnd.Next(1, 4));
 
           pl.iNr = (byte)(iPos + (11 * iPl));
@@ -847,7 +860,8 @@ namespace CornerkickWebMvc.Controllers
         if (clb.user == null) return Json(true, JsonRequestBehavior.AllowGet);
       }
       */
-      mdRegister.ddlDivision.Add(new SelectListItem { Text = "Liga 1", Value = "0", Selected = true });
+      mdRegister.ddlDivision.Add(new SelectListItem { Text = "Liga 2", Value = "1", Selected = true });
+      mdRegister.Liga = 1;
 
       // Add clubs to ddl in register view (need to be relocated if multiple leagues are available)
       mdRegister.ltClubs = new List<SelectListItem>();

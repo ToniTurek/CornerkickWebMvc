@@ -208,7 +208,9 @@ namespace CornerkickWebMvc
 
       int iC = 0;
       while (league.ltClubs[0].Count < nLeagueSize) {
-        CornerkickManager.Club clb = accountController.createClub("Team_" + CornerkickManager.Main.sLand[league.iId2] + "_" + (iC + 1).ToString(), (byte)league.iId2, 0);
+        CornerkickManager.Club clb = accountController.createClub("Team_" + CornerkickManager.Main.sLand[league.iId2] + "_" + (iC + (league.iId3 * nLeagueSize) + 1).ToString(), (byte)league.iId2, (byte)league.iId3);
+        accountController.addPlayerToClub(ref clb, iSkillChange: -1);
+
         ckcore.ltClubs.Add(clb);
 
         cup   .ltClubs[0].Add(clb);
@@ -492,7 +494,7 @@ namespace CornerkickWebMvc
       }
 
       // Check if new jouth player and put on transferlist
-      if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0) {
+      if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Second == 0) {
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
         CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0, iNat: iNations[random.Next(iNations.Length)]);
@@ -611,11 +613,30 @@ namespace CornerkickWebMvc
 
       // Beginn of new season
       if (iRetCk == 4) {
+        if (ckcore.tl.getCup(1, iNations[0], 1) == null) {
+          // Create league
+          CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
+          league.iId = 1;
+          league.iId2 = iNations[0];
+          league.iId3 = 1;
+          league.sName = "2. Liga " + CornerkickManager.Main.sLand[iNations[0]];
+          league.settings.fAttraction = 0.75f;
+          //league.settings.dtStart = ckcore.tl.getCup(1, iNations[0], 0).ltMatchdays[0].dt;
+          //league.settings.dtEnd   = ckcore.tl.getCup(1, iNations[0], 0).ltMatchdays[ckcore.tl.getCup(1, iNations[0], 0).ltMatchdays.Count - 1].dt;
+          ckcore.ltCups.Insert(2, league);
+
+          fillLeaguesWithCpuClubs(league, ckcore.tl.getCup(2, iNations[0]));
+
+          ckcore.calcMatchdays();
+        }
+
         // Draw leagues
         foreach (int iN in iNations) {
-          CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, 0);
-          if (league == null) continue;
-          ckcore.drawCup(league);
+          for (int iDiv = 0; iDiv < 2; iDiv++) {
+            CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, iDiv);
+            if (league == null) continue;
+            ckcore.drawCup(league);
+          }
         }
 
         // Draw gold/silver cup
