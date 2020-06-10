@@ -6333,8 +6333,8 @@ namespace CornerkickWebMvc.Controllers
       }
 
       long[][] iBudget = new long[2][];
-      iBudget[0] = new long[15]; // Plan
-      iBudget[1] = new long[15]; // Real
+      iBudget[0] = new long[17]; // Plan
+      iBudget[1] = new long[17]; // Real
 
       for (byte i = 0; i < 2; i++) {
         iBudget[i][ 0] = bd[i].iInSpec;
@@ -6342,20 +6342,22 @@ namespace CornerkickWebMvc.Controllers
         iBudget[i][ 2] = bd[i].iInBonusSponsor;
         iBudget[i][ 3] = bd[i].iInTransfer;
         iBudget[i][ 4] = bd[i].iInMerchandising;
-        iBudget[i][ 5] = bd[i].iPaySalary;
-        iBudget[i][ 6] = bd[i].iPayStaff;
-        iBudget[i][ 7] = bd[i].iPayTransfer;
-        iBudget[i][ 8] = bd[i].iPayStadium;
-        iBudget[i][ 9] = bd[i].iPayTravel;
-        iBudget[i][10] = bd[i].iPayInterest;
-        iBudget[i][11] = bd[i].iPayMerchandising;
+        iBudget[i][ 5] = bd[i].iInMisc;
+        iBudget[i][ 6] = bd[i].iPaySalary;
+        iBudget[i][ 7] = bd[i].iPayStaff;
+        iBudget[i][ 8] = bd[i].iPayTransfer;
+        iBudget[i][ 9] = bd[i].iPayStadium;
+        iBudget[i][10] = bd[i].iPayTravel;
+        iBudget[i][11] = bd[i].iPayInterest;
+        iBudget[i][12] = bd[i].iPayMerchandising;
+        iBudget[i][13] = bd[i].iPayMisc;
 
         long iInTotal  = MvcApplication.ckcore.fz.getBudgetInTotal (bd[i]);
         long iPayTotal = MvcApplication.ckcore.fz.getBudgetPayTotal(bd[i]);
-        iBudget[i][12] = iInTotal;
-        iBudget[i][13] = iPayTotal;
+        iBudget[i][14] = iInTotal;
+        iBudget[i][15] = iPayTotal;
 
-        iBudget[i][14] = iInTotal - iPayTotal;
+        iBudget[i][16] = iInTotal - iPayTotal;
       }
 
       return Json(iBudget, JsonRequestBehavior.AllowGet);
@@ -6470,18 +6472,23 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User user = ckUser();
 
       if (iBudgetIn  != null) {
-        user.budget.iInSpec         = iBudgetIn[0];
-        user.budget.iInBonusCup     = iBudgetIn[1];
-        user.budget.iInBonusSponsor = iBudgetIn[2];
-        user.budget.iInTransfer     = iBudgetIn[3];
+        user.budget.iInSpec          = iBudgetIn[0];
+        user.budget.iInBonusCup      = iBudgetIn[1];
+        user.budget.iInBonusSponsor  = iBudgetIn[2];
+        user.budget.iInMerchandising = iBudgetIn[3];
+        user.budget.iInTransfer      = iBudgetIn[4];
+        user.budget.iInMisc          = iBudgetIn[5];
       }
 
       if (iBudgetPay != null) {
-        user.budget.iPaySalary   = iBudgetPay[0];
-        user.budget.iPayStaff    = iBudgetPay[1];
-        user.budget.iPayTransfer = iBudgetPay[2];
-        user.budget.iPayStadium  = iBudgetPay[3];
-        user.budget.iPayInterest = iBudgetPay[4];
+        user.budget.iPaySalary        = iBudgetPay[0];
+        user.budget.iPayStaff         = iBudgetPay[1];
+        user.budget.iPayStadium       = iBudgetPay[2];
+        user.budget.iPayMerchandising = iBudgetPay[3];
+        user.budget.iPayTransfer      = iBudgetPay[4];
+        user.budget.iPayTravel        = iBudgetPay[5];
+        user.budget.iPayInterest      = iBudgetPay[6];
+        user.budget.iPayMisc          = iBudgetPay[7];
       }
 
       return Json(true, JsonRequestBehavior.AllowGet);
