@@ -17,6 +17,44 @@
   <script type="text/javascript">
     $(document).ready(function () {
       $('#tableJouth').DataTable({
+        "ajax": {
+          "url": '@Url.Action("JouthGetDatatable", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "iId" },
+          { "data": "fAge" },
+          {
+            "data": "sName",
+            "render": function (data, type, row) {
+              return '@Html.ActionLink("name", "PlayerDetails", "Member", new { i = "id" }, new { target = "" })'.replace("name", data).replace("id", row.iId);
+            }
+          },
+          {
+            "data": "fAge",
+            "className": "dt-center",
+            "render": function (fAge, type, row) {
+              return parseInt(fAge).toString();
+            }
+          },
+          { "data": "sPos" },
+          {
+            "data": "fSkillAve",
+            "className": "dt-center",
+            "render": $.fn.dataTable.render.number(',', '.', 1, '')
+          },
+          { "data": "iTalent" },
+          {
+            "data": "sNat",
+            "className": "dt-center",
+            "render": function (sNat, type, row) {
+              return getNatIcon(sNat);
+            }
+          }
+        ],
         "pageLength": 50,
         "paging": false,
         "info": false,
@@ -25,20 +63,64 @@
         "language": {
           "emptyTable": "Keine Jugendspieler"
         },
-        "order": [[5, "desc"]],
-        columnDefs: [
+        "order": [[3, "desc"]],
+        "columnDefs": [
           {
             "targets": 0,
             "visible": false,
             "searchable": false
           },
+          { "targets": [2, 3, 4, 5, 6], "className": "dt-center" },
           {
-            "targets": 6,
+            "targets": 1,
+            "className": "dt-center",
+            "orderable": false,
+            "render": function (fAge, type, row) {
+              if (fAge > 17) {
+                return "A";
+              } else if (fAge > 15) {
+                return "B";
+              } else if (fAge > 13) {
+                return "C";
+              } else if (fAge > 11) {
+                return "D";
+              } else {
+                return "E";
+              }
+            }
+          },
+          {
+            "targets": 3,
+            "className": "dt-center",
+            "render": function (fAge, type, row) {
+              return parseInt(fAge).toString();
+            }
+          },
+          {
+            "targets": 7,
             "render": function (sNat, type, row) {
               return getNatIcon(sNat);
             }
           }
-        ]
+        ],
+        "fnRowCallback": function (nRow, aData, iRowIx) {
+          var clFt = "black";
+          var clBg = "yellow";
+
+          if (aData.fAge > 17) {
+            clBg = "LightGrey";
+          } else if (aData.fAge > 15) {
+            clBg = "PowderBlue";
+          } else if (aData.fAge > 13) {
+            clBg = "Yellow";
+          } else if (aData.fAge > 11) {
+            clBg = "PaleGreen";
+          } else {
+            clBg = "pink";
+          }
+
+          $('td', nRow).eq(0).css({ "color": clFt, "background-color": clBg, "font-weight": "bold" });
+        }
       });
     });
   </script>
@@ -50,27 +132,15 @@
   <thead>
     <tr>
       <th>ID</th>
+      <th>Kl.</th>
       <th>Name</th>
+      <th>Alter</th>
       <th>Position</th>
       <th>Stärke</th>
       <th>Talent</th>
-      <th>Alter</th>
       <th>Nat.</th>
     </tr>
   </thead>
   <tbody>
-    @{
-      foreach (CornerkickGame.Player plJouth in CornerkickWebMvc.Models.JouthModel.ltPlayerJouth) {
-        <tr>
-          <td align="center">@plJouth.iId</td>
-          <td align="center">@Html.ActionLink(plJouth.sName, "PlayerDetails", "Member", new { i = plJouth.iId }, new { target = "" })</td>
-          <td align="center">@CornerkickManager.Player.getStrPos(plJouth)</td>
-          <td align="center">@CornerkickGame.Tool.getAveSkill(plJouth).ToString("0.0")</td>
-          <td align="center">@(plJouth.iTalent + 1)</td>
-          <td align="center">@((int)plJouth.getAge(MvcApplication.ckcore.dtDatum))</td>
-          <td align="center">@CornerkickManager.Main.sLandShort[plJouth.iNat1]</td>
-        </tr>
-      }
-    }
   </tbody>
 </table>

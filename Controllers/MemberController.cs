@@ -3020,6 +3020,30 @@ namespace CornerkickWebMvc.Controllers
       return View(jouth);
     }
 
+    public JsonResult JouthGetDatatable()
+    {
+      List<Models.JouthModel.DatatableJouth> ltDtJouth = new List<Models.JouthModel.DatatableJouth>();
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      foreach (CornerkickGame.Player plJ in clb.ltPlayerJouth) {
+        Models.JouthModel.DatatableJouth dtJouth = new Models.JouthModel.DatatableJouth();
+
+        dtJouth.iId = plJ.iId;
+        dtJouth.sName = plJ.sName;
+        dtJouth.fAge = plJ.getAge(MvcApplication.ckcore.dtDatum);
+        dtJouth.sPos = CornerkickManager.Player.getStrPos(plJ);
+        dtJouth.fSkillAve = CornerkickGame.Tool.getAveSkill(plJ);
+        dtJouth.iTalent = plJ.iTalent + 1;
+        dtJouth.sNat = CornerkickManager.Main.sLandShort[plJ.iNat1];
+
+        ltDtJouth.Add(dtJouth);
+      }
+
+      return Json(new { aaData = ltDtJouth }, JsonRequestBehavior.AllowGet);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// Transfer
