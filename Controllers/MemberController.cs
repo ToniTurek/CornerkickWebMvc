@@ -4904,6 +4904,7 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(ltDataPoints, _jsonSetting), "application/json");
     }
 
+    [Authorize]
     public ActionResult Merchandising(Models.MerchandisingModel mdMerchandising)
     {
       CornerkickManager.Club clb = ckClub();
