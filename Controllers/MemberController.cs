@@ -6682,9 +6682,13 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clbUser = ckClub();
 
       int iLand = 0;
-      if (clbUser != null) iLand = clbUser.iLand;
+      int iDivision = 0;
+      if (clbUser != null) {
+        iLand = clbUser.iLand;
+        iDivision = clbUser.iDivision;
+      }
 
-      statisticModel.iLeague = iLand;
+      statisticModel.sCupId = iLand.ToString() + ":" + iDivision.ToString();
       for (int iC = 0; iC < MvcApplication.ckcore.ltCups.Count; iC++) {
         CornerkickManager.Cup cup = MvcApplication.ckcore.ltCups[iC];
 
@@ -6692,9 +6696,9 @@ namespace CornerkickWebMvc.Controllers
 
         statisticModel.ddlLeagues.Add(new SelectListItem {
                                         Text = cup.sName,
-                                        Value = cup.iId2.ToString(),
-                                        Selected = iLand == cup.iId2
-                                      }
+                                        Value = cup.iId2.ToString() + ":" + cup.iId3.ToString(),
+                                        Selected = iLand == cup.iId2 && iDivision == cup.iId3
+        }
         );
       }
 
@@ -6809,16 +6813,28 @@ namespace CornerkickWebMvc.Controllers
       return Json(tD, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult StatisticGetTableTeams(int iLand = -1)
+    public ActionResult StatisticGetTableTeams(string sCupId)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTeams> ltDeTeams = new List<Models.DatatableEntryTeams>();
+
+      int iLand = -1;
+      int iDivision = -1;
+
+      if (!string.IsNullOrEmpty(sCupId)) {
+        string[] sCupIdSplit = sCupId.Split(':');
+        if (sCupIdSplit.Length > 1) {
+          iLand = int.Parse(sCupIdSplit[0]);
+          iDivision = int.Parse(sCupIdSplit[1]);
+        }
+      }
 
       int iC = 0;
       foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
         if (clb.iLand < 0) continue;
         if (clb.bNation) continue;
         if (iLand >= 0 && iLand != clb.iLand) continue;
+        if (iDivision >= 0 && iDivision != clb.iDivision) continue;
 
         float[] fAve = MvcApplication.ckcore.tl.getTeamAve(clb, bTeamValue: true);
         string sSkill = fAve[3].ToString("0.0");

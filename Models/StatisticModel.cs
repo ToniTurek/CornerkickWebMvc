@@ -14,7 +14,7 @@ namespace CornerkickWebMvc.Models
     public string sFormation { get; set; }
     public List<SelectListItem> ltsFormations { get; set; }
 
-    public int iLeague { get; set; }
+    public string sCupId { get; set; }
     public List<SelectListItem> ddlLeagues { get; set; }
 
     public string[][] sPlayerSkillBest { get; set; }

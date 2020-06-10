@@ -20,6 +20,7 @@
     $(document).ready(function () {
       var ddlStatNations   = $('#ddlStatNations');
       var ddlStatFormation = $('#ddlStatFormation');
+      var ddlStatLeagues = document.getElementById("ddlStatLeagues");
 
       $("#rbProfi").on('change', function (ev) {
         drawBest11();
@@ -44,7 +45,7 @@
           "url": '@Url.Action("StatisticGetTableTeams", "Member")',
           "type": 'POST',
           "data": function (d) {
-            d.iLand = $('#ddlStatLeagues').val();
+            d.sCupId = ddlStatLeagues.value;
           }
         },
         "searching": true,
@@ -235,9 +236,8 @@
 
   <div style="position: relative">
     <h3 style="position: relative; margin-top: 30px">Mannschaftsübersicht</h3>
-    <div style="position: relative; width: 160px; height: auto; z-index: 99">
-      <b class="left">Liga:</b>
-      @Html.DropDownListFor(m => m.iLeague, Model.ddlLeagues, new { @Id = "ddlStatLeagues", @class = "form-control" })
+    <div style="position: relative; width: 180px; height: auto; z-index: 99">
+      @Html.DropDownListFor(m => m.sCupId, Model.ddlLeagues, new { @Id = "ddlStatLeagues", @class = "form-control" })
     </div>
 
     <div style="position: relative; width: 100%; top: -30px">
