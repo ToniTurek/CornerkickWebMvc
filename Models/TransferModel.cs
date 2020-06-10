@@ -9,6 +9,8 @@ namespace CornerkickWebMvc.Models
 {
   public class TransferModel
   {
+    public bool bTransferlistOpen { get; set; }
+
     [Display(Name = "Laufzeit [a]:")]
     public int iContractYears { get; set; }
     [Display(Name = "Gebotenes Gehalt:")]

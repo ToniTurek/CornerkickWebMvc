@@ -3057,6 +3057,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdTransfer);
 
+      mdTransfer.bTransferlistOpen = MvcApplication.ckcore.dtDatum.Date.CompareTo(MvcApplication.ckcore.dtSeasonStart.Date) > 0;
+
       mdTransfer.iContractYears = 1;
 
       mdTransfer.bNation = clb.bNation;

@@ -411,7 +411,9 @@
                 }
               }
             });
-          } else {
+          } else if (!@Html.Raw(Json.Encode(Model.bTransferlistOpen))) {
+            alert("Die Transferliste ist aktuell geschlossen.");
+          } else  {
             getContractDialog(document.body, iIdPl, true);
           }
         }
