@@ -42,11 +42,10 @@
 
       var div1 = document.createElement("div");
       div1.style.position = "absolute";
-      div1.style.top = "0px";
-      div1.style.left = "0px";
-      div1.style.width = "100%";
-      div1.style.height = "100%";
-      div1.style.padding = "28px";
+      div1.style.top = "10%";
+      div1.style.left = "8%";
+      div1.style.width = "84%";
+      div1.style.height = "80%";
       div1.style.textAlign = "center";
 
       if (building) {
@@ -71,8 +70,8 @@
         if (building.iLevelReq > building.iLevel) {
           var imgWarning = document.createElement("img");
           imgWarning.style.position = "absolute";
-          imgWarning.style.right = "20px";
-          imgWarning.style.top = "20px";
+          imgWarning.style.right = "0px";
+          imgWarning.style.top = "0px";
           imgWarning.style.width = "30px";
           imgWarning.src = "/Content/Icons/attention.png";
           var sInfo = "Ihre Fans verlangen bei ausverkauftem Stadion min. ";
@@ -139,12 +138,15 @@
             sct.style.height = "auto";
             sct.style.marginBottom = "4px";
             sct.style.fontSize = "16px";
+
+            // Add remaining building types to select menu
             for (var iBdgFree = 0; iBdgFree < ltBuildingsFree.length; iBdgFree++) {
               var opt = document.createElement("option");
               opt.value = iBdgFree;
               opt.innerHTML = ltBuildingsFree[iBdgFree].sCategory;
               sct.appendChild(opt);
             }
+
             sct.addEventListener("change", function () {
               if (ltBuildingsFree[this.value].iType > 5) {
                 div1.appendChild(getNumberInputDiv(btn, ltBuildingsFree[this.value]));
@@ -152,11 +154,44 @@
 
               setBuildingBtn(btn, ltBuildingsFree[this.value]);
             });
+
             div1.appendChild(sct);
           }
 
           div1.appendChild(btn);
         }
+      } else {
+        var divPossBlgs = document.createElement("div");
+        divPossBlgs.style.position = "absolute";
+        divPossBlgs.style.top = "0px";
+        divPossBlgs.style.width = "100%";
+        divPossBlgs.style.textAlign = "left";
+
+        var pPossibleBlgs = document.createElement("u");
+        pPossibleBlgs.innerHTML = "Verbleibende Gebäudetypen:";
+        pPossibleBlgs.style.position = "relative";
+        pPossibleBlgs.style.width = "100%";
+        pPossibleBlgs.style.left = "0px";
+        pPossibleBlgs.style.fontSize = "16px";
+        divPossBlgs.appendChild(pPossibleBlgs);
+
+        var ulPossibleBlgs = document.createElement("ul");
+        ulPossibleBlgs.style.position = "relative";
+        ulPossibleBlgs.style.fontSize = "16px";
+        if (ltBuildingsFree.length === 0) {
+          var liPossibleBlg = document.createElement("li");
+          liPossibleBlg.innerHTML = "keine";
+          ulPossibleBlgs.appendChild(liPossibleBlg);
+        } else {
+          for (var iBdgFree = 0; iBdgFree < ltBuildingsFree.length; iBdgFree++) {
+            var liPossibleBlg = document.createElement("li");
+            liPossibleBlg.innerHTML = ltBuildingsFree[iBdgFree].sCategory;
+            ulPossibleBlgs.appendChild(liPossibleBlg);
+          }
+        }
+        divPossBlgs.appendChild(ulPossibleBlgs);
+
+        div1.appendChild(divPossBlgs);
       }
 
       div0.appendChild(div1);
@@ -266,17 +301,17 @@
             }
           }
 
-          var grdNext = getGround(null);
+          var grdNext = getGround(null, buildings.ltBuildingsFree);
           grdNext.getElementsByTagName("img")[0].style.opacity = 0.5;
 
           var btnBuyGround = document.createElement("button");
           btnBuyGround.type = "submit";
           btnBuyGround.className = "btn btn-default";
-          btnBuyGround.style.position = "relative";
+          btnBuyGround.style.position = "absolute";
           btnBuyGround.style.width = "80%";
           btnBuyGround.style.height = "auto";
           btnBuyGround.style.left = "10%";
-          btnBuyGround.style.top = "40%";
+          btnBuyGround.style.top = "78%";
           btnBuyGround.style.fontSize = "16px";
           btnBuyGround.innerHTML = "Grundstück kaufen: " + buildings.sCostBuyGround + " €";
           btnBuyGround.addEventListener("click", buyGround);
