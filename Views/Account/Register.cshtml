@@ -75,7 +75,7 @@
 
     function checkLeague() {
       var bRegisterPossible = @Html.Raw(Json.Encode(Model.bRegisterPossible));
-      if (bRegisterPossible === false) {
+      if (!bRegisterPossible) {
         document.getElementById("bnRegister").disabled = true;
         return;
       }
@@ -91,9 +91,7 @@
         data: { iLand: iLand, iDivision: iDivision },
         success: function (iUser) {
           document.getElementById("txtAvailableClubs").innerText = "Noch " + iUser[1].toString() + " von " + iUser[0].toString() + " Vereinen verfügbar";
-          if (iUser[1] > 0) {
-            document.getElementById("bnRegister").disabled = false;
-          }
+          document.getElementById("bnRegister").disabled = iUser[1] === 0;
         }
       });
     }
@@ -107,7 +105,7 @@
 <body style="height: 100%; min-height: 100%">
   <h2>@ViewBag.Title.</h2>
 
-  @using (Html.BeginForm("RegisterUser", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" })) {
+  @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" })) {
     @Html.AntiForgeryToken()
     <h4>Neues Konto erstellen.</h4>
     <hr />
@@ -212,7 +210,7 @@
     </div>
     <div class="form-group">
       <div class="col-md-offset-2 col-md-10">
-        <input type="submit" id="bnRegister" class="btn btn-default" disabled="disabled" value="Registrieren" onclick="disableRegisterButton()" />
+        <input type="submit" id="bnRegister" class="btn btn-default" value="Registrieren" />
       </div>
     </div>
   }

@@ -849,8 +849,10 @@ namespace CornerkickWebMvc.Controllers
     // GET: /Account/Register
     [HttpGet]
     [AllowAnonymous]
-    public ActionResult Register(RegisterViewModel mdRegister)
+    public ActionResult Register()
     {
+      RegisterViewModel mdRegister = new RegisterViewModel();
+
       mdRegister.ddlDivision = new List<SelectListItem>();
 
       /*
@@ -877,12 +879,7 @@ namespace CornerkickWebMvc.Controllers
         mdRegister.ltClubs.Add(new SelectListItem { Text = clb.sName, Value = iC.ToString() });
       }
 
-      mdRegister.bRegisterPossible = false;
-      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) ||
-          MvcApplication.ckcore.dtSeasonStart.Year < 1000 ||
-          MvcApplication.settings.bRegisterDuringGame) {
-        mdRegister.bRegisterPossible = true;
-      }
+      mdRegister.bRegisterPossible = checkRegisterPossible();
 
       // Set jersey colors
       mdRegister.cl1 = System.Drawing.Color.White;
@@ -893,14 +890,27 @@ namespace CornerkickWebMvc.Controllers
       return View(mdRegister);
     }
 
+    private bool checkRegisterPossible()
+    {
+      if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date) ||
+          MvcApplication.ckcore.dtSeasonStart.Year < 1000 ||
+          MvcApplication.settings.bRegisterDuringGame) {
+        return true;
+      }
+
+      return false;
+    }
+
     //
     // POST: /Account/Register
     private RegisterViewModel rvmDEBUG;
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> RegisterUser(RegisterViewModel model)
+    public async Task<ActionResult> Register(RegisterViewModel model)
     {
+      model.bRegisterPossible = checkRegisterPossible();
+
       // Check emblem
       if (model.fileEmblem != null) {
         List<string> sImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
