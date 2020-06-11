@@ -1998,6 +1998,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Player is editable
       plModel.bEditable = (MvcApplication.ckcore.dtDatum - usr.dtClubStart).TotalHours < 24;
+      plModel.bSeasonStart = MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date);
 
       return View(plModel);
     }
