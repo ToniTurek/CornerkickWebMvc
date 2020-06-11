@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.1.17";
+    public const string sVersion = "3.2.0";
 
     public class Settings
     {
