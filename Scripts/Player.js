@@ -76,6 +76,15 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
             div0.title += " (Vertragsverlängerung)";
           }
 
+          // Negotiation button
+          var bnNegotiate = document.createElement("button");
+          bnNegotiate.type = "submit";
+          bnNegotiate.id = "bnNegotiate";
+          bnNegotiate.className = "btn btn-default";
+          bnNegotiate.style.width = "100%";
+          bnNegotiate.innerText = "verhandeln";
+          bnNegotiate.onclick = function () { updateContract(iPlayerId, input12, true, this); };
+
           // Contract length
           var div1 = document.createElement("div");
           div1.style.position = "relative";
@@ -110,7 +119,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           input12.step = "1";
           input12.value = "1";
           input12.autocomplete = "off";
-          input12.onkeyup = function () { updateContract(iPlayerId, input12, false); };
+          input12.onkeyup = function () { updateContract(iPlayerId, input12, false, bnNegotiate); };
           div12.appendChild(input12);
           div1.appendChild(div12);
           div0.appendChild(div1);
@@ -302,7 +311,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
             aDec: ',',
             mDec: '0'
           });
-          input262.onkeyup = function () { updateContract(iPlayerId, input12, false); };
+          input262.onkeyup = function () { updateContract(iPlayerId, input12, false, bnNegotiate); };
           div262.appendChild(input262);
           div26.appendChild(div262);
           divFixFee.appendChild(div26);
@@ -319,13 +328,6 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           txt6.id = "txtContractMood2";
           txt6.innerText = "100%";
           div6.appendChild(txt6);
-          var bnNegotiate = document.createElement("button");
-          bnNegotiate.type = "submit";
-          bnNegotiate.id = "bnNegotiate";
-          bnNegotiate.className = "btn btn-default";
-          bnNegotiate.style.width = "100%";
-          bnNegotiate.innerText = "verhandeln";
-          bnNegotiate.onclick = function () { updateContract(iPlayerId, input12, true); };
           div6.appendChild(bnNegotiate);
           div0.appendChild(div6);
 
@@ -416,15 +418,14 @@ function setInitialContractReq(input12, iPlayerId) {
   });
 }
 
-function updateContract(iPlayerId, input12, bNego) {
-  var bnNegotiate = document.getElementById("bnNegotiate");
+function updateContract(iPlayerId, input12, bNego, bnNegotiate) {
+  bnNegotiate.disabled = true;
 
   if (input12.value > 10) {
     input12.style.backgroundColor = "red";
-    bnNegotiate.disabled = true;
+    return;
   } else {
     input12.style.backgroundColor = "";
-    bnNegotiate.disabled = false;
   }
 
   var iYears = $("#tbContractYears").val();
@@ -448,7 +449,9 @@ function updateContract(iPlayerId, input12, bNego) {
 
       $("#txtContractMoney2"   ).html(contract.iSalary.toLocaleString() + " €");
       $("#txtContractBonusPlay").html(contract.iPlay  .toLocaleString() + " €");
-      $("#txtContractBonusGoal").html(contract.iGoal  .toLocaleString() + " €");
+      $("#txtContractBonusGoal").html(contract.iGoal.toLocaleString() + " €");
+
+      bnNegotiate.disabled = false;
     }
   });
 }
