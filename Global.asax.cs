@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.2.0";
+    public const string sVersion = "3.2.1";
 
     public class Settings
     {
@@ -518,7 +518,7 @@ namespace CornerkickWebMvc
         */
 
         // retire cpu player
-        if (club0.ltPlayer.Count > 500) {
+        if (club0.ltPlayer.Count > 1500) {
           ckcore.plr.retirePlayer(club0.ltPlayer[0], club0);
         }
 
