@@ -9,6 +9,7 @@
 <head>
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/mystyles.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
@@ -99,14 +100,16 @@
       @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlLand" })
     </label>
 
-    <label>
+    <label style="margin-right: 10px">
       Liga:
       @Html.DropDownListFor(m => m.iDivision, Model.ddlDivision, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlDivision" })
     </label>
 
     <label>
       Spieltag:
+      <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchday'), setLeague2)">&nbsp;< &nbsp;</a>
       <select id="ddlMatchday" onchange="setLeague2()"></select>
+      <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchday'), setLeague2)">&nbsp;> &nbsp;</a>
     </label>
 
     <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">

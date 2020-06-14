@@ -21,14 +21,15 @@
         data: { iSaison: iSeason, iLand: iLand },
         success: function (iMd) {
           document.getElementById("ddlMatchdayCup").value = iMd;
-          setCup2(iSeason);
+          setCup2();
         }
       });
     }
   });
 }
 
-function setCup2(iSaison) {
+function setCup2() {
+  var iSeason = $('#ddlSeasonCup').val();
   var iLand = $('#ddlLandCup').val();
   var iMd = $('#ddlMatchdayCup').val();
 
@@ -36,7 +37,7 @@ function setCup2(iSaison) {
     url: '/Member/setCup',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iLand: iLand, iMatchday: iMd },
+    data: { iSaison: iSeason, iLand: iLand, iMatchday: iMd },
     success: function (sTable) {
       actionDrawTeams(sTable);
     }

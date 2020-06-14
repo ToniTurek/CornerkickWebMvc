@@ -5630,6 +5630,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
       cupWcModel.iMatchday = Math.Min(cupWc.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupWc.ltMatchdays.Count - 1);
+      cupWcModel.iMatchday = Math.Max(cupWcModel.iMatchday, 0);
 
       // Increment matchday if next match is today or tomorrow
       if (cupWcModel.iMatchday + 1 < cupWc.ltMatchdays.Count) {

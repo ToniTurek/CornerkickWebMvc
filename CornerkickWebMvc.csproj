@@ -1055,6 +1055,7 @@
     <Content Include="Content\Images\user_manual\Team0.PNG" />
     <Content Include="Content\Images\user_manual\Team1a.gif" />
     <Content Include="Content\Images\user_manual\Team3a.gif" />
+    <Content Include="Content\mystyles.css" />
     <Content Include="Content\spectrum.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />

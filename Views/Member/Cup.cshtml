@@ -7,6 +7,7 @@
 
 <html style="height: 100%; min-height: 100%">
 <head>
+  <link rel="stylesheet" href="~/Content/mystyles.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
   <script type="text/javascript" src="~/Scripts/League.js"></script>
@@ -16,10 +17,6 @@
     $(document).ready(function () {
       changeLandCup();
     });
-
-    function setCup() {
-      setCup2(-1);
-    }
   </script>
 </head>
 
@@ -42,7 +39,9 @@
 
   <label style="margin-left: 10px">
     Spieltag:
+    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchdayCup'), setCup2)">&nbsp;< &nbsp;</a>
     <select id="ddlMatchdayCup" onchange="setCup()"></select>
+    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchdayCup'), setCup2)">&nbsp;> &nbsp;</a>
   </label>
 
   <div id="tableDivCupTeams"></div>

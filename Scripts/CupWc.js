@@ -1,10 +1,10 @@
 ﻿function setMatchdayCupWc(iSaison, iMd, iGroup) {
   // Show/hide group ddl
   var lbGroupsCupWc = document.getElementById("lbGroupsCupWc");
-  if (iMd > 5) {
-    lbGroupsCupWc.style.display = "none";
-  } else {
+  if (iMd >= 0 && iMd < 3) {
     lbGroupsCupWc.style.display = "inline";
+  } else {
+    lbGroupsCupWc.style.display = "none";
   }
 
   $.ajax({

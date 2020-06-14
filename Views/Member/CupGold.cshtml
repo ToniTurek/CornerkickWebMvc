@@ -7,6 +7,7 @@
 
 <html style="height: 100%; min-height: 100%">
 <head>
+  <link rel="stylesheet" href="~/Content/mystyles.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
   <script type="text/javascript" src="~/Scripts/League.js"></script>
@@ -29,6 +30,10 @@
         setMatchdayCupGold($("#ddlSeasonCupGold").val(), $(this).val(), $("#ddlGroupsCupGold").val());
       });
     });
+
+    function setMatchdayCupGold2() {
+      setMatchdayCupGold($("#ddlSeasonCupGold").val(), $("#ddlMatchdayCupGold").val(), $("#ddlGroupsCupGold").val());
+    }
   </script>
 </head>
 
@@ -40,7 +45,9 @@
 
   <label style="margin-right: 10px">
     Spieltag:
+    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchdayCupGold'), setMatchdayCupGold2)">&nbsp;< &nbsp;</a>
     @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupGold" })
+    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchdayCupGold'), setMatchdayCupGold2)">&nbsp;> &nbsp;</a>
   </label>
 
   <label id="lbGroupsCupGold">

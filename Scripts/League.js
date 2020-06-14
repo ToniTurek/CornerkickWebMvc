@@ -187,7 +187,7 @@ function setTableScorer(tbl, iGameType, ddlLand, ddlDivision) {
     "searching": false,
     "order": [[4, "desc"]],
     "language": {
-      "emptyTable": "keine Torschützen"
+      "emptyTable": "Noch keine Torschützen"
     },
     "columnDefs": [
       {
@@ -278,4 +278,29 @@ function drawTable(sTable) {
   sBox += "</table>";
 
   return sBox;
+}
+
+function changeMatchday(iPrePost, ddlMatchday, exeFunction) {
+  if (!ddlMatchday) {
+    return;
+  }
+
+  var iMdNew = 0;
+  if (iPrePost < 0 && parseInt(ddlMatchday.value) > 0) {
+    iMdNew = parseInt(ddlMatchday.value) - 1;
+  }
+
+  if (iPrePost > 0) {
+    iMdNew = parseInt(ddlMatchday.value) + 1;
+  } else {
+    iMdNew = parseInt(ddlMatchday.value) - 1;
+  }
+
+  if (ddlMatchday.innerHTML.indexOf('value="' + iMdNew.toString() + '"') < 0) {
+    return;
+  }
+
+  ddlMatchday.value = iMdNew.toString();
+
+  exeFunction();
 }
