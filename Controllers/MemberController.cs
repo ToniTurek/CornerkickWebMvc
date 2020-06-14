@@ -3826,7 +3826,7 @@ namespace CornerkickWebMvc.Controllers
       DateTime dtStartCopy = MvcApplication.ckcore.dtDatum.AddDays(iWeek * 7).Date;
       while ((int)(dtStartCopy.DayOfWeek) != 0) dtStartCopy = dtStartCopy.AddDays(+1);
 
-      // First delete all trainings starting from next week
+      // First delete all trainings starting from next week ...
       DateTime dtTmp = dtStartCopy;
       while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         for (int iT = 0; iT < clb.training.ltUnit.Count; iT++) {
@@ -3838,26 +3838,17 @@ namespace CornerkickWebMvc.Controllers
         dtTmp = dtTmp.AddDays(+1);
       }
 
-      // Then copy trainings plan of current week
+      // ... then copy trainings plan of current week
       dtTmp = dtStartCopy;
       while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         for (byte iD = 0; iD < tuPlan.Length; iD++) {
           for (byte iT = 0; iT < tuPlan[iD].Length; iT++) {
-            if (tuPlan[iD][iT].iType >= 0) {
-              // Check if already training planned
-              /*
-              bool bAlreadySet = false;
-              foreach (CornerkickManager.Main.Training.Unit tu in ltTuToday) {
-                if ((int)(tu.dt.DayOfWeek) == (int)(dtTmp.DayOfWeek) && tu.dt.TimeOfDay.Equals(tuPlan[iD][iT].dt.TimeOfDay)) {
-                  bAlreadySet = true;
-                  break;
-                }
-              }
-              if (bAlreadySet) continue;
-              */
-
+            if (tuPlan[iD][iT].iType != 0) {
               CornerkickManager.Main.TrainingPlan.Unit tuCopy = tuPlan[iD][iT].Clone();
               tuCopy.dt = dtTmp.Add(tuPlan[iD][iT].dt.TimeOfDay);
+
+              if (tuCopy.iType < 0) tuCopy.iType = (sbyte)(-(tuCopy.iType + 1));
+
               clb.training.ltUnit.Add(tuCopy);
             }
           }
