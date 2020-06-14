@@ -5047,7 +5047,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       mlLeague.ddlDivision.Add(new SelectListItem { Text = "1", Value = "0" });
-      if (clb.iLand == MvcApplication.iNations[0]) mlLeague.ddlDivision.Add(new SelectListItem { Text = "2", Value = "1" });
+      if (clb != null && clb.iLand == MvcApplication.iNations[0]) mlLeague.ddlDivision.Add(new SelectListItem { Text = "2", Value = "1" });
 
       mlLeague.ddlSeason = getDdlSeason();
       mlLeague.iSeason = MvcApplication.ckcore.iSeason;
@@ -5227,7 +5227,6 @@ namespace CornerkickWebMvc.Controllers
       List<DatatableTableLeague> ltDtTable = new List<DatatableTableLeague>();
 
       CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Cup cup = getCup(iSeason, 1, iLand, iDivision);
 
@@ -5378,7 +5377,6 @@ namespace CornerkickWebMvc.Controllers
       List<DatatableScorer> ltDtScorer = new List<DatatableScorer>();
 
       CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
 
       List<CornerkickManager.UI.Scorer> ltScorer = MvcApplication.ckcore.ui.getScorer(iGameType, iLand: iLand, iDivision: iDivision, bNation: iGameType == 7);
 

@@ -60,7 +60,7 @@ function setLeague2() {
   if (oTableScorer) {
     oTableScorer.ajax.reload();
   } else {
-    oTableScorer = setTableScorer($('#tblLeagueScorer'), 1, document.getElementById('ddlLand'), 0);
+    oTableScorer = setTableScorer($('#tblLeagueScorer'), 1, ddlLand, ddlDivision);
   }
 }
 
@@ -158,7 +158,7 @@ function getTableDatatable(tblLeague, ddlSeason, ddlLand, ddlDivision, ddlMatchd
   });
 }
 
-function setTableScorer(tbl, iGameType, ddlLand, iDivision) {
+function setTableScorer(tbl, iGameType, ddlLand, ddlDivision) {
   return tbl.DataTable({
     "ajax": {
       "url": '/Member/GetScorerTable',
@@ -167,7 +167,7 @@ function setTableScorer(tbl, iGameType, ddlLand, iDivision) {
       "data": function (d) {
         d.iGameType = iGameType;
         d.iLand = ddlLand.value;
-        d.iDivision = iDivision;
+        d.iDivision = ddlDivision.value;
       },
       "cache": false,
       "contentType": "application/json; charset=utf-8"
