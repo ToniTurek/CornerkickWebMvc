@@ -20,6 +20,7 @@
   <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script src="~/Scripts/Numbers.js"></script>
+  <script type="text/javascript" src="~/Scripts/Finance.js"></script>
 </head>
 
 <script type="text/javascript">
@@ -235,20 +236,23 @@
             var iCampIx = $("#selectCamp option:selected").index();
             var nDays   = $("#ddlTrainingscampDays").val();
 
-            $.ajax({
-              url: "/Member/bookTrainingscamp",
-              type: 'POST',
-              traditional: true,
-              data: { iIx: iCampIx, sStart: dtStart.format(), nDays: nDays },
-              dataType: "json",
-              success: function (response) {
-                alert(response);
-                calendar.fullCalendar('refetchEvents');
-              },
-              error: function (xhr) {
-                debugger;
-                alert(xhr);
-              }
+            $.when(getBalanceAjax()).done(function (iBalance) {
+              $.ajax({
+                url: "/Member/bookTrainingscamp",
+                type: 'POST',
+                traditional: true,
+                data: { iIx: iCampIx, sStart: dtStart.format(), nDays: nDays },
+                dataType: "json",
+                success: function (response) {
+                  alert(response);
+                  calendar.fullCalendar('refetchEvents');
+                  updateBalance(iBalance[0]);
+                },
+                error: function (xhr) {
+                  debugger;
+                  alert(xhr);
+                }
+              });
             });
 
             calendar.fullCalendar('unselect');
