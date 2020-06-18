@@ -413,8 +413,8 @@ namespace CornerkickWebMvc.Controllers
       */
 
       // Kondi/Frische/Moral
-      float[] fTeamAve   = MvcApplication.ckcore.tl.getTeamAve(club);
-      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(club, 11);
+      float[] fTeamAve   = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, iPlStop: 11);
       desk.sKFM = "K: " + fTeamAve[0].ToString("0.0%") + ", F: " + fTeamAve[1].ToString("0.0%") + ", M: " + fTeamAve[2].ToString("0.0%");
       desk.sStrength = "Durchschnittsstärke (Startelf): " + fTeamAve[3].ToString("0.00") + fTeamAve11[3].ToString(" (0.00)");
 
@@ -743,7 +743,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player.TrainingHistory trHistCurrent = new CornerkickGame.Player.TrainingHistory();
       trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
-      trHistCurrent.fKFM = MvcApplication.ckcore.tl.getTeamAve(clb);
+      trHistCurrent.fKFM = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum);
 
       List<Models.DataPointGeneral>[][] dataPoints = new List<Models.DataPointGeneral>[2][];
       dataPoints[0] = new List<Models.DataPointGeneral>[3];
@@ -866,7 +866,7 @@ namespace CornerkickWebMvc.Controllers
           // ... get training history data
           CornerkickGame.Player.TrainingHistory trHistExp = new CornerkickGame.Player.TrainingHistory();
           trHistExp.dt   = tu.dt;
-          trHistExp.fKFM = MvcApplication.ckcore.tl.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation);
+          trHistExp.fKFM = CornerkickManager.Tool.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation, MvcApplication.ckcore.dtDatum);
           trHistExp.iType = tu.iType;
 
           // ... add training history data to dataPoints
@@ -1501,7 +1501,7 @@ namespace CornerkickWebMvc.Controllers
       tD.iCaptainIx = MvcApplication.ckcore.plr.getCaptainIx(club);
 
       // Team averages
-      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(club, 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, iPlStop: 11);
       tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
 
@@ -1549,7 +1549,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Opp. team averages
-          float[] fTeamOppAve11 = MvcApplication.ckcore.tl.getTeamAve(clubOpp, club.nextGame.nPlStart);
+          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, iPlStop: club.nextGame.nPlStart);
           tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
           tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
         }
@@ -4562,7 +4562,7 @@ namespace CornerkickWebMvc.Controllers
           int[] iCostDaysCp = CornerkickManager.Stadium.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
           clb.stadium.iCarparkDaysConstruct = iCostDaysCp[1];
 
-          CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDaysCp[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+          CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysCp[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
         }
       } else if (iType == 7) { // Ticketcounter
         if (clb.stadium.iTicketcounterNew != iLevel) {
@@ -4570,7 +4570,7 @@ namespace CornerkickWebMvc.Controllers
           int[] iCostDaysTc = CornerkickManager.Stadium.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
           clb.stadium.iTicketcounterDaysConstruct = iCostDaysTc[1];
 
-          CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCostDaysTc[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+          CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysTc[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
         }
       } else {
         CornerkickManager.UI.doConstruction(clb, iType, (byte)iLevel, MvcApplication.ckcore.dtDatum, sConstructionNames[iType]);
@@ -4587,7 +4587,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iCost = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround);
       clb.buildings.iGround++;
-      CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iCost, "Grundstückskauf", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCost, "Grundstückskauf", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
 
       return Json("Das Grundstück wurde erworben", JsonRequestBehavior.AllowGet);
     }
@@ -4660,7 +4660,7 @@ namespace CornerkickWebMvc.Controllers
       clb.staff.iJouthScouting = (byte)iLevel[6];
       clb.staff.iKibitzer      = (byte)iLevel[7];
 
-      int iKosten = (int)(MvcApplication.ckcore.tl.getStuffSalary(clb) / 12f);
+      int iKosten = (int)(clb.getSalaryStuff() / 12f);
       string sKosten = iKosten.ToString("N0", getCi());
 
       sKosten = "Kosten: " + sKosten + " €/Monat";
@@ -4707,7 +4707,7 @@ namespace CornerkickWebMvc.Controllers
 
       // First: Pay personal pay-off costs
       int iPayOff = getPersonalPayOff(iLevel);
-      CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
+      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
 
       // Then, hire new personal
       clb.staff.iCoTrainer     = (byte)iLevel[0];
@@ -4998,7 +4998,7 @@ namespace CornerkickWebMvc.Controllers
       clb.merchMarketer.marketer = MvcApplication.ckcore.ltMerchandisingMarketer[0];
       clb.merchMarketer.iMoney = getMerchandisingMarketerOffer(clb);
 
-      CornerkickManager.Finance.doTransaction(ref clb, MvcApplication.ckcore.dtDatum, clb.merchMarketer.iMoney, "Einnahmen Merchandising Vermarkter", CornerkickManager.Finance.iTransferralTypeInMerchandising);
+      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, clb.merchMarketer.iMoney, "Einnahmen Merchandising Vermarkter", CornerkickManager.Finance.iTransferralTypeInMerchandising);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }
@@ -5030,7 +5030,7 @@ namespace CornerkickWebMvc.Controllers
       int iMd = league.getMatchday(MvcApplication.ckcore.dtDatum);
       mlLeague.league = league;
       mlLeague.ltTbl  = league.getTable(iMd - 1, 0);
-      mlLeague.iLeagueSize = MvcApplication.ckcore.tl.getCupParticipants(league, iMd).Count;
+      mlLeague.iLeagueSize = league.getParticipants(iMd, MvcApplication.ckcore.dtDatum).Count;
 
       // Add lands to dropdown list
       foreach (int iLand in MvcApplication.iNations) {
@@ -5470,7 +5470,7 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup.Matchday md = cup.ltMatchdays[iMatchday];
 
       if (md.ltGameData == null || md.ltGameData.Count == 0) {
-        List<CornerkickManager.Club> ltClubs = MvcApplication.ckcore.tl.getCupParticipants(cup, iMatchday);
+        List<CornerkickManager.Club> ltClubs = cup.getParticipants(iMatchday, MvcApplication.ckcore.dtDatum);
 
         foreach (CornerkickManager.Club clb in ltClubs) {
           if (iGroup >= 0 && iGroup < cup.ltClubs.Length && cup.ltClubs[iGroup].IndexOf(clb) < 0) continue;
@@ -6324,8 +6324,8 @@ namespace CornerkickWebMvc.Controllers
         bd[0] = usr.budget;
         bd[1] = MvcApplication.ckcore.ui.getActualBudget(clb);
 
-        if (bd[0].iPaySalary == 0) bd[0].iPaySalary = MvcApplication.ckcore.tl.getPlayerSalary(clb);
-        if (bd[0].iPayStaff  == 0) bd[0].iPayStaff  = MvcApplication.ckcore.tl.getStuffSalary (clb);
+        if (bd[0].iPaySalary == 0) bd[0].iPaySalary = clb.getSalaryPlayer();
+        if (bd[0].iPayStaff  == 0) bd[0].iPayStaff  = clb.getSalaryStuff ();
       } else  if (iYear < usr.ltBudget.Count) {
         bd[0] = usr.ltBudget[iYear][0];
         bd[1] = usr.ltBudget[iYear][1];
@@ -6797,7 +6797,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      float[] fTeamAve11 = MvcApplication.ckcore.tl.getTeamAve(ltPlayerBest, tD.formation, 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(ltPlayerBest, tD.formation, MvcApplication.ckcore.dtDatum, iPlStop: 11);
       tD.fTeamAveStrength = fTeamAve11[3];
       tD.fTeamAveAge      = fTeamAve11[4];
 
@@ -6827,12 +6827,12 @@ namespace CornerkickWebMvc.Controllers
         if (iLand >= 0 && iLand != clb.iLand) continue;
         if (iDivision >= 0 && iDivision != clb.iDivision) continue;
 
-        float[] fAve = MvcApplication.ckcore.tl.getTeamAve(clb, bTeamValue: true);
+        float[] fAve = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, bTeamValue: true);
         string sSkill = fAve[3].ToString("0.0");
         string sAge   = fAve[4].ToString("0.0");
         int    iVal   = (int)fAve[5];
 
-        float[] fAve11 = MvcApplication.ckcore.tl.getTeamAve(clb, 11, bTeamValue: true);
+        float[] fAve11 = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, iPlStop: 11, bTeamValue: true);
         string sSkill11 = fAve11[3].ToString("0.0");
         string sAge11   = fAve11[4].ToString("0.0");
         int    iVal11   = (int)fAve11[5];

@@ -186,7 +186,7 @@ namespace CornerkickWebMvc
         createCupWc(dtLeagueEnd);
 
         ckcore.calcMatchdays();
-        ckcore.drawCup(ckcore.tl.getCup(7));
+        ckcore.tl.getCup(7).draw(ckcore.dtDatum);
 
         ckcore.dtDatum = ckcore.dtSeasonStart;
       }
@@ -635,16 +635,16 @@ namespace CornerkickWebMvc
           for (int iDiv = 0; iDiv < 2; iDiv++) {
             CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, iDiv);
             if (league == null) continue;
-            ckcore.drawCup(league);
+            league.draw(ckcore.dtDatum);
           }
         }
 
         // Draw gold/silver cup
         CornerkickManager.Cup cupGold   = ckcore.tl.getCup(3);
-        ckcore.drawCup(cupGold);
+        cupGold.draw(ckcore.dtDatum);
 
         CornerkickManager.Cup cupSilver = ckcore.tl.getCup(4);
-        ckcore.drawCup(cupSilver);
+        cupSilver.draw(ckcore.dtDatum);
       }
 
       // End of season
@@ -775,7 +775,7 @@ namespace CornerkickWebMvc
           cupWc.settings.dtStart = dtWcDraw.AddDays(13).Date + new TimeSpan(20, 30, 00);
           cupWc.settings.dtEnd = ckcore.dtSeasonEnd.AddDays(-1).Date + new TimeSpan(20, 00, 00);
           ckcore.calcMatchdays(cupWc, ckcore.dtSeasonStart, ckcore.dtSeasonEnd);
-          ckcore.drawCup(cupWc);
+          cupWc.draw(ckcore.dtDatum);
         } else if (ckcore.dtDatum.Equals(dtWcDraw.AddMinutes(15))) {
           foreach (CornerkickManager.Cup league in ckcore.ltCups) { // For each 1st division league
             if (league.iId != 1) continue;

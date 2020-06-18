@@ -196,7 +196,7 @@
       }
     }
 
-    float[] fAve = MvcApplication.ckcore.tl.getTeamAve(Model.club);
+    float[] fAve = CornerkickManager.Tool.getTeamAve(Model.club, MvcApplication.ckcore.dtDatum);
     string sAveStrength = fAve[3].ToString("0.0");
     string sAveAge = fAve[4].ToString("0.0");
 
