@@ -4909,6 +4909,7 @@ namespace CornerkickWebMvc.Controllers
       else                           mdMerchandising.sMarketerMoney = clb.merchMarketer.iMoney.ToString("N0", getCi()) + " €";
 
       mdMerchandising.bFanshopsAvailable = clb.buildings.bgFanshop.iLevel > 0;
+      mdMerchandising.bMarketer = clb.merchMarketer != null;
 
       return View(mdMerchandising);
     }
@@ -4943,6 +4944,8 @@ namespace CornerkickWebMvc.Controllers
           dtm.sPricePresentBuyAve = cmi.fPricePresentBuyAve.ToString("0.00") + " €";
           dtm.iSold = cmi.iSold;
           dtm.fPriceSell = cmi.fPrice;
+          dtm.iItemIncome = cmi.iIncome;
+          if (dtm.iSold > 0) dtm.sPriceSellAve = (cmi.iIncome / (float)dtm.iSold).ToString("0.00") + " €";
         }
 
         ltDtItems.Add(dtm);

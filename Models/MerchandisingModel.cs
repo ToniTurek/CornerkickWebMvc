@@ -17,6 +17,7 @@ namespace CornerkickWebMvc.Models
     public string sMarketerMoney { get; set; }
 
     public bool bFanshopsAvailable { get; set; }
+    public bool bMarketer { get; set; }
 
     public class DatatableMerchandising
     {
@@ -29,6 +30,8 @@ namespace CornerkickWebMvc.Models
       public string sPriceBasic { get; set; }
       public string sPriceBuy { get; set; }
       public float fPriceSell { get; set; }
+      public int iItemIncome { get; set; }
+      public string sPriceSellAve { get; set; }
     }
 
     public MerchandisingModel()

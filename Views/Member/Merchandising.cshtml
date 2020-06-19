@@ -17,7 +17,6 @@
   <style>
     .disabledDiv {
       pointer-events: none;
-      opacity: 0.6;
     }
 
     .columnBorderRight {
@@ -27,8 +26,11 @@
 
   <script>
     var oTable;
+    var bEditable = false;
 
     $(document).ready(function () {
+      bEditable = @Html.Raw(Json.Encode(Model.bFanshopsAvailable)) && !@Html.Raw(Json.Encode(Model.bMarketer));
+
       oTable = setTableItems();
     }); // $(document).ready
 
@@ -59,7 +61,12 @@
           {
             "data": "iSold",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')
-          }
+          },
+          {
+            "data": "iItemIncome",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          { "data": "sPriceSellAve" }
         ],
         "paging": false,
         "info": false,
@@ -75,7 +82,7 @@
             "searchable": false
           },
           {
-            "targets": [3, 5, 6, 7, 8, 10, 11],
+            "targets": [3, 5, 6, 7, 8, 10, 11, 12],
             "className": "dt-right"
           },
           {
@@ -92,8 +99,9 @@
             "data": null
           },
           {
-            "targets": 4,
+            "targets": [4, 13],
             "defaultContent": '0.00 €',
+            "className": "dt-right",
             "data": null
           },
           {
@@ -107,28 +115,15 @@
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
           $(nRow).addClass('details-control');
 
-          var itAmount = document.createElement("input");
-          //itAmount.className = "itAutoNumeric";
-          itAmount.type = "number";
-          itAmount.style.width = "80px";
-          itAmount.style.textAlign = "right";
-          itAmount.value = 0;
+          var divAmount = document.createElement("div");
+          divAmount.style.width = "100%";
+          divAmount.align = "center";
 
           var divPriceSell = document.createElement("div");
           divPriceSell.style.width = "100%";
           divPriceSell.align = "center";
-          var itPrice = document.createElement("input");
-          itPrice.type = "number";
-          itPrice.step = "0.1";
-          itPrice.min = "0.1";
-          itPrice.style.width = "65px";
-          itPrice.style.textAlign = "right";
-          itPrice.value = aData.fPriceSell;
-          divPriceSell.appendChild(itPrice);
           var txtPrice = document.createElement("txt");
           txtPrice.style.right = "0px";
-          txtPrice.innerText = " €";
-          divPriceSell.appendChild(txtPrice);
 
           var bnBuy = document.createElement("button");
           bnBuy.style.width = "80px";
@@ -136,30 +131,59 @@
           bnBuy.className = "btn btn-default";
           bnBuy.disabled = true;
 
-          itAmount.addEventListener("keyup", function () {
-            if (this.value) {
-              this.style.backgroundColor = "white";
-              getPrice(aData.iId, parseInt(this.value), $("td:eq(5)", nRow), $("td:eq(6)", nRow), bnBuy);
-            } else {
-              this.style.backgroundColor = "red";
-            }
-          });
-          $('td:eq(4)', nRow).html(itAmount);
+          if (bEditable) {
+            var itAmount = document.createElement("input");
+            //itAmount.className = "itAutoNumeric";
+            itAmount.type = "number";
+            itAmount.style.width = "80px";
+            itAmount.style.textAlign = "right";
+            itAmount.value = 0;
 
-          itPrice.addEventListener("keyup", function () {
-            if (this.value) {
-              this.style.backgroundColor = "white";
-              setPrice(aData.iId, this.value);
-            } else {
-              this.style.backgroundColor = "red";
-            }
-          });
-          $('td:eq(8)', nRow).html(divPriceSell);
+            var itPrice = document.createElement("input");
+            itPrice.type = "number";
+            itPrice.step = "0.1";
+            itPrice.min = "0.1";
+            itPrice.style.width = "65px";
+            itPrice.style.textAlign = "right";
+            itPrice.value = aData.fPriceSell;
+            divPriceSell.appendChild(itPrice);
+            txtPrice.innerText = " €";
 
-          bnBuy.addEventListener("click", function () {
-            buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(5)", nRow).text(), parseFloat(itPrice.value));
-          });
+            itAmount.addEventListener("keyup", function () {
+              if (this.value) {
+                this.style.backgroundColor = "white";
+                getPrice(aData.iId, parseInt(this.value), $("td:eq(5)", nRow), $("td:eq(6)", nRow), bnBuy);
+              } else {
+                this.style.backgroundColor = "red";
+              }
+            });
+            divAmount.appendChild(itAmount);
+
+            itPrice.addEventListener("keyup", function () {
+              if (this.value) {
+                this.style.backgroundColor = "white";
+                setPrice(aData.iId, this.value);
+              } else {
+                this.style.backgroundColor = "red";
+              }
+            });
+
+            bnBuy.addEventListener("click", function () {
+              buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(5)", nRow).text(), parseFloat(itPrice.value));
+            });
+          } else {
+            var txtAmount = document.createElement("txt");
+            txtAmount.style.right = "0px";
+            txtAmount.innerText = "0";
+            divAmount.appendChild(txtAmount);
+
+            txtPrice.innerText = "? €";
+          }
+          divPriceSell.appendChild(txtPrice);
+
+          $('td:eq(4)', nRow).html(divAmount);
           $('td:eq(7)', nRow).html(bnBuy);
+          $('td:eq(8)', nRow).html(divPriceSell);
 
           return nRow;
         },
@@ -174,12 +198,16 @@
                 i : 0;
           };
 
-          // Calculate sum for columns 8 till 12
+          // Calculate sum for columns 3, 11 and 12
           var iCn = 3;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
 
           var iCn = 11;
+          iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
+          $(api.column(iCn).footer()).html(iSum.toLocaleString());
+
+          var iCn = 12;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
         }
@@ -307,7 +335,7 @@
             <th colspan="3" class="columnBorderRight"></th>
             <th colspan="2" style="text-align: center; font-size: 125%; background-color: orange" class="columnBorderRight">Bestand</th>
             <th colspan="5" style="text-align: center; font-size: 125%; background-color: lightgreen" class="columnBorderRight">Einkauf</th>
-            <th colspan="2" style="text-align: center; font-size: 125%; background-color: lightblue">Verkauf</th>
+            <th colspan="4" style="text-align: center; font-size: 125%; background-color: lightblue">Verkauf</th>
           </tr>
           <tr>
             <th>#</th>
@@ -322,6 +350,8 @@
             <th class="columnBorderRight" style="text-align: center"></th>
             <th>Verkaufspreis</th>
             <th>verkauft</th>
+            <th>Einnahmen [€]</th>
+            <th>Ø-Preis</th>
           </tr>
         </thead>
         <tbody>
@@ -339,6 +369,8 @@
             <th></th>
             <th></th>
             <th class="columnBorderRight" style="text-align: right"></th>
+            <th></th>
+            <th></th>
             <th></th>
             <th></th>
           </tr>
