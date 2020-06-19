@@ -5806,14 +5806,14 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Events
-        foreach (CornerkickManager.Club.Event.Item ei in club.ltEvent) {
-          if (ei.dt.Date.Equals(dt)) {
+        foreach (CornerkickManager.Club.Event.Item evi in club.ltEvent) {
+          if (evi.dt.Date.Equals(dt)) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
-              sTitle = ei.ev.sName,
-              sDescription = ei.ev.sName,
-              sStartDate = ei.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
-              sEndDate = ei.dt.AddMinutes(60).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sTitle = evi.ev.sName,
+              sDescription = evi.ev.sName,
+              sStartDate = evi.dt.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = evi.dt.Add(evi.ev.tsLength).ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(200, 200, 200)",
               sTextColor = "rgb(0, 0, 0)",
               bEditable = false,
@@ -6260,10 +6260,24 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club.Event.Item evi = new CornerkickManager.Club.Event.Item();
       evi.ev = MvcApplication.ckcore.tl.getEvent((byte)iEventId);
       evi.dt = dtStart;
-      clb.ltEvent.Add(evi);
 
-      if      (iEventId == 1) sReturn = "Sie haben die Krisensitzung anberaumt.";
-      else if (iEventId == 2) sReturn = "Sie haben die Weihnachtsfeier gebucht.";
+      if (iEventId == 1) {
+        sReturn = "Sie haben die Krisensitzung anberaumt.";
+      } else if (iEventId == 2) {
+        if (dtStart.Hour < 19) {
+          return Json("Fehler: Die Mannschaft wünscht sich eine Weihnachtsfeier, die nicht vor 19 Uhr startet.", JsonRequestBehavior.AllowGet);
+        }
+
+        sReturn = "Sie haben die Weihnachtsfeier gebucht.";
+      } else if (iEventId == 3) {
+        if (dtStart.Add(evi.ev.tsLength).Hour > 19) {
+          return Json("Fehler: Startdatum für den Jugendtag zu spät! Wählen Sie einen früheren Beginn.", JsonRequestBehavior.AllowGet);
+        }
+
+        sReturn = "Sie haben den Jugendtag geplant.";
+      }
+
+      clb.ltEvent.Add(evi);
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }
