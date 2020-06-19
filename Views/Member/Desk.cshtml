@@ -16,6 +16,15 @@
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
 
+  <style>
+    td {
+      white-space: nowrap;
+    }
+
+    td.wrapok {
+      white-space: normal
+    }
+  </style>
   <script>
     function getNewsIcon(iType) {
       if (iType === 1) return '<img src="/Content/Icons/news/birthday.png" title="birthday" style="width: 16px"/>';
@@ -160,6 +169,10 @@
           {
             "targets": [1, 2],
             "className": "dt-center"
+          },
+          {
+            "targets": 3,
+            "className": "wrapok"
           }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
