@@ -26,6 +26,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="~/Content/mystyles.css" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
@@ -99,6 +100,7 @@
           }
 
           // Add header row
+          var ltColor = ["white", "#819FF7", "#3ADF00", "#FFBF00", "#F78181", "#DA81F5", "#D8D8D8"];
           var rowHead = tblTrainingPlan.insertRow();
           rowHead.insertCell();
           for (iD = 0; iD < ltTu.length; iD++) {
@@ -107,13 +109,16 @@
             cell0.innerHTML = date.toLocaleDateString("de-DE", dateOptions);
             cell0.style.textAlign = "center";
             cell0.style.fontWeight = 'bold';
+            if (iD < ltColor.length) {
+              cell0.style.backgroundColor = ltColor[iD];
+            }
           }
 
           var iIxDay;
           for (iIxDay = 0; iIxDay < ltTu[0].length; iIxDay++) {
             var row = tblTrainingPlan.insertRow();
 
-            //var date = moment(ltTu[0][iIxDay].dt).toDate();
+            // Add time of day cells
             var cell0 = row.insertCell();
             cell0.innerHTML = sTrainingTimes[iIxDay];
             cell0.style.textAlign = "right";
@@ -121,34 +126,46 @@
 
             var iD;
             for (iD = 0; iD < ltTu.length; iD++) {
-              var sct = document.createElement("select");
-
-              var iT;
-              for (iT = 0; iT < sTrainingNames.length; iT++) {
-                var opt = document.createElement('option');
-                opt.value = iT;
-                opt.innerHTML = sTrainingNames[iT];
-                if (ltTu[iD][iIxDay].iType < 0) {
-                  opt.selected = iT === -(ltTu[iD][iIxDay].iType + 1);
-                } else {
-                  opt.selected = iT === ltTu[iD][iIxDay].iType;
-                }
-                sct.appendChild(opt);
-              }
-
-              sct.classList.add('form-control');
-              sct.style.width = "126px";
-              if (ltTu[iD][iIxDay].iType < 0) {
-                sct.disabled = true;
-              } else {
-                sct.setAttribute('data-iDay', iD);
-                sct.setAttribute('data-iToD', iIxDay);
-                sct.onchange = function () { setTraining(this); };
-              }
-
               var cell = row.insertCell();
-              //cell.className = "alignRight";
-              cell.appendChild(sct);
+
+              if (ltTu[iD][iIxDay].iType === 99) {
+                var divGame = document.createElement("div");
+                divGame.style.width = "100%";
+                divGame.align = "center";
+                var txtGame = document.createElement("txt");
+                txtGame.innerText = "Spiel";
+                divGame.appendChild(txtGame);
+                cell.appendChild(divGame);
+              } else {
+                var sct = document.createElement("select");
+
+                var iT;
+                for (iT = 0; iT < sTrainingNames.length; iT++) {
+                  var opt = document.createElement('option');
+                  opt.value = iT;
+                  opt.innerHTML = sTrainingNames[iT];
+                  if (ltTu[iD][iIxDay].iType < 0) {
+                    opt.selected = iT === -(ltTu[iD][iIxDay].iType + 1);
+                  } else {
+                    opt.selected = iT === ltTu[iD][iIxDay].iType;
+                  }
+                  sct.appendChild(opt);
+                }
+
+                sct.classList.add('form-control');
+                sct.style.width = "126px";
+                if (ltTu[iD][iIxDay].iType < 0) {
+                  sct.disabled = true;
+                } else {
+                  sct.setAttribute('data-iDay', iD);
+                  sct.setAttribute('data-iToD', iIxDay);
+                  sct.onchange = function () { setTraining(this); };
+                }
+
+                //cell.style.backgroundColor = ltColor[iD];
+                //cell.className = "alignRight";
+                cell.appendChild(sct);
+              }
             }
           }
         }
@@ -156,7 +173,12 @@
     }
 
     function changeWeek(iDeltaWeek) {
-      iWeekGlobal += iDeltaWeek;
+      if (iDeltaWeek === 0) {
+        iWeekGlobal = 0;
+      } else {
+        iWeekGlobal += iDeltaWeek;
+      }
+
       plotTrainingPlan(iWeekGlobal);
     }
 
@@ -171,6 +193,22 @@
         dataType: "json",
         data: { iWeek: iWeekGlobal },
         success: function () {
+        }
+      });
+    }
+
+    function setTrainingTemplate(iType) {
+      getDialog(document.body, "Achtung:<br>Bereits festgelegte Trainingseinheiten in dieser Woche werden überschrieben!", "Vorlage Trainingsplan", function () { setTrainingTemplateAjax(iType) });
+    }
+
+    function setTrainingTemplateAjax(iType) {
+      $.ajax({
+        type: 'post',
+        url: '/Member/TrainingSetTemplate',
+        dataType: "json",
+        data: { iWeek: iWeekGlobal, iType: parseInt(iType) },
+        success: function () {
+          plotTrainingPlan(iWeekGlobal);
         }
       });
     }
@@ -320,16 +358,30 @@
 <body>
   <div style="height: 1800px">
     <h3>Trainingsplan</h3>
-
-    <div style="position: relative; width: 1000px; height: auto; margin-bottom: 20px">
-      <div style="position: relative; width: 100%; height: 32px">
-        <button type="submit" id="bnWeekPrev" class="btn btn-default" onclick="changeWeek(-1)" style="position: absolute; width: 49%; left:  0px"><< vorherige Woche</button>
-        <button type="submit" id="bnWeekNext" class="btn btn-default" onclick="changeWeek(+1)" style="position: absolute; width: 49%; right: 0px">nächste Woche >></button>
+    <div style="position: relative; width: 1000px; height: auto; margin-bottom: 10px">
+      <div style="position: relative; width: 100%; height: 20px">
+        <div style="position: absolute; width: 33%; left: 0px; text-align: left">
+          <a class="noselect" style="cursor: pointer" onclick="changeWeek(-1)"><< vorherige Woche</a>
+        </div>
+        <div style="position: absolute; width: 33%; left: 33%; text-align: center">
+          <a class="noselect" style="cursor: pointer" onclick="changeWeek(0)">aktuelle Woche</a>
+        </div>
+        <div style="position: absolute; width: 33%; right: 0px; text-align: right">
+          <a class="noselect" style="cursor: pointer" onclick="changeWeek(+1)">nächste Woche >></a>
+        </div>
       </div>
       <table id="tblTrainingPlan" border="1" cellpadding="4" style="position: relative; width: 100%; margin-top: 6px">
         <tbody></tbody>
       </table>
       <button type="submit" id="bnCopyWeek" class="btn btn-default" onclick="copyWeek()" style="position: relative; width: 100%; margin-top: 4px">Trainingswoche bis Saisonende fortführen</button>
+
+      <div style="position: relative; width: 100%; margin-bottom: 20px; overflow: hidden">
+        <h4>Vorlagen Trainingswoche</h4>
+        <button type="submit" id="bnTrainingWeekTemplate1" class="btn btn-default" onclick="setTrainingTemplate(0)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left">Kondition</button>
+        <button type="submit" id="bnTrainingWeekTemplate2" class="btn btn-default" onclick="setTrainingTemplate(1)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left">Regeneration</button>
+        <button type="submit" id="bnTrainingWeekTemplate3" class="btn btn-default" onclick="setTrainingTemplate(2)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left" disabled="disabled">Abschluss</button>
+        <button type="submit" id="bnTrainingWeekTemplate4" class="btn btn-default" onclick="setTrainingTemplate(3)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left" disabled="disabled">Mentaltraining</button>
+      </div>
     </div>
 
     <div style="position: relative; float: left">
