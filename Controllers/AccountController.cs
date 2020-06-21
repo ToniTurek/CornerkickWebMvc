@@ -33,6 +33,7 @@ namespace CornerkickWebMvc.Controllers
     private ApplicationSignInManager _signInManager;
     private ApplicationUserManager _userManager;
     public static CultureInfo ciUser;
+    public static List<RegisterViewModel> ltRegisterUser;
     readonly string[] sCultureInfo = new string[82] {
       "",
       "",
@@ -120,7 +121,6 @@ namespace CornerkickWebMvc.Controllers
 
     public AccountController()
     {
-
       //timerRefresh.Elapsed += new System.Timers.ElapsedEventHandler(timerRefresh_Elapsed);
       //timerRefresh.Enabled = true;
     }
@@ -190,8 +190,12 @@ namespace CornerkickWebMvc.Controllers
       return usr.club;
     }
 
-#if DEBUG
     public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
+    {
+      addUserToCk(applicationUser, registerViewModel.Land, registerViewModel.cl1, registerViewModel.cl2, registerViewModel.cl3, registerViewModel.cl4, bAdmin: bAdmin, iClubExist: iClubExist, fileEmblem: fileEmblem);
+    }
+#if DEBUG
+    public void addUserToCk(ApplicationUser applicationUser, int iLand, System.Drawing.Color cl1, System.Drawing.Color cl2, System.Drawing.Color cl3, System.Drawing.Color cl4, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #else
     private void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #endif
@@ -199,7 +203,6 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clubExist = null;
       if (iClubExist >= 0 && iClubExist < MvcApplication.ckcore.ltClubs.Count) clubExist = MvcApplication.ckcore.ltClubs[iClubExist];
 
-      int iLand     = 0;
       int iDivision = 0;
 
       MvcApplication.ckcore.tl.writeLog("  add User to Ck: " + applicationUser.Vorname + " " + applicationUser.Nachname);
@@ -210,11 +213,6 @@ namespace CornerkickWebMvc.Controllers
         MvcApplication.ckcore.ltUser.Add(usrAdmin);
 
         return;
-      }
-
-      if (registerViewModel != null) {
-        iLand     = registerViewModel.Land;
-        //iDivision = registerViewModel.Liga;
       }
 
       for (int iD = 2; iD >= 0; iD--) {
@@ -264,10 +262,10 @@ namespace CornerkickWebMvc.Controllers
               clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
 
               // Assign club colors
-              clubCpu.cl[0] = registerViewModel.cl1;
-              clubCpu.cl[1] = registerViewModel.cl2;
-              clubCpu.cl[2] = registerViewModel.cl3;
-              clubCpu.cl[3] = registerViewModel.cl4;
+              clubCpu.cl[0] = cl1;
+              clubCpu.cl[1] = cl2;
+              clubCpu.cl[2] = cl3;
+              clubCpu.cl[3] = cl4;
         
               addPlayerToClub(ref clubCpu);
 
@@ -973,7 +971,10 @@ namespace CornerkickWebMvc.Controllers
             // END Initialize dummy club
           } else { // no admin
             if (MvcApplication.settings.bEmailCertification) {
-              sendActivationLinkAsync(appUser.Id);
+              if (ltRegisterUser == null) ltRegisterUser = new List<RegisterViewModel>();
+              ltRegisterUser.Add(model);
+
+              await sendActivationLinkAsync(appUser.Id);
 
               // Uncomment to debug locally
               // TempData["ViewBagLink"] = callbackUrl;
@@ -981,11 +982,11 @@ namespace CornerkickWebMvc.Controllers
               ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-MANAGER Konto zu bestätigen!";
             } else {
               await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
-            }
 
-            // Create club
-            addUserToCk(appUser, model, false, iClubExist: model.iClubIx, fileEmblem: model.fileEmblem);
-            iniCk();
+              // Create club
+              addUserToCk(appUser, model, false, iClubExist: model.iClubIx, fileEmblem: model.fileEmblem);
+              iniCk();
+            }
 
 #if !DEBUG
             // Send mail to admin
@@ -997,7 +998,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Save
-          Task<bool> tkSave = Task.Run(async () => await MvcApplication.saveAsync(MvcApplication.timerCkCalender));
+          //Task<bool> tkSave = Task.Run(async () => await MvcApplication.saveAsync(MvcApplication.timerCkCalender));
 
           if (MvcApplication.settings.bEmailCertification) {
             return View("Info");
@@ -1013,7 +1014,7 @@ namespace CornerkickWebMvc.Controllers
       return View(model);
     }
 
-    private async void sendActivationLinkAsync(string sAppUserId)
+    private async Task<bool> sendActivationLinkAsync(string sAppUserId)
     {
       // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
       // E-Mail-Nachricht mit diesem Link senden
@@ -1021,6 +1022,8 @@ namespace CornerkickWebMvc.Controllers
       var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = sAppUserId, code = code }, protocol: Request.Url.Scheme);
       MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
       await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+
+      return true;
     }
 
     [AllowAnonymous]
@@ -1064,7 +1067,20 @@ namespace CornerkickWebMvc.Controllers
 
       var result = await UserManager.ConfirmEmailAsync(userId, code);
 
-      return View(result.Succeeded ? "ConfirmEmail" : "Error");
+      if (result.Succeeded) {
+        // Create club
+        ApplicationUser appUser = UserManager.FindById(userId);
+        foreach (RegisterViewModel mrv in ltRegisterUser) {
+          if (appUser.Email.Equals(mrv.Email)) {
+            addUserToCk(appUser, mrv, bAdmin: false, iClubExist: mrv.iClubIx, fileEmblem: mrv.fileEmblem);
+            iniCk();
+
+            return View("ConfirmEmail");
+          }
+        }
+      }
+
+      return View("Error");
     }
 
     //
