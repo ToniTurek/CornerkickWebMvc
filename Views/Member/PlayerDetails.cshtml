@@ -795,7 +795,7 @@
     </div>
   }
 
-  <div style="position: absolute; top: 20px; height: 128px; width: 128px; right: 0px; border-style: outset; border-width: 3px; border-color: lightgray">
+  <div style="position: absolute; top: 20px; height: 128px; max-width: 128px; right: 0px; border-style: outset; border-width: 3px; border-color: lightgray">
     @if (Model.bOwnPlayer) {
       using (Html.BeginForm("PlayerDetails",
                             "Member",
