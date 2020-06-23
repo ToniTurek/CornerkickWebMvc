@@ -1279,8 +1279,10 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Tactic.Formation frmClub = club.ltTactic[iTactic].formation;
 
-      frmClub.ptPos[iIndexPlayer].X = iX;
-      frmClub.ptPos[iIndexPlayer].Y = iY;
+      Point ptNew = new Point(iX, iY);
+      CornerkickGame.Tool.correctPos(ref ptNew);
+
+      frmClub.ptPos[iIndexPlayer] = ptNew;
 
       frmClub.iId = 0;
 
