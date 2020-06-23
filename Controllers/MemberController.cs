@@ -2836,6 +2836,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // iMode: 0 - Extention, 1 - new contract
+    const byte iContractLengthMax = 5;
     [HttpPost]
     public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sBonusPlay, string sBonusGoal, string sFixTransferFee, string sPlayerMood)
     {
@@ -2884,7 +2885,7 @@ namespace CornerkickWebMvc.Controllers
 
         if (!checkIfNewContract(plContract, clbUser)) iContractLegth += plContract.contract.iLength;
 
-        if (iContractLegth > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
+        if (iContractLegth > iContractLengthMax) return Json("Error: Maximale Vertragslänge = " + iContractLengthMax.ToString() + " Jahre", JsonRequestBehavior.AllowGet);
 
         plContract.contract.iLength = iContractLegth;
         plContract.contract.iSalary = iSalary;
@@ -2924,7 +2925,7 @@ namespace CornerkickWebMvc.Controllers
         // Remove hidden entry from transfer list
         MvcApplication.ckcore.tr.removePlayerFromTransferlist(plContract);
       } else { // New contract
-        if (iYears > 10) return Json("Error: Maximale Vertragslänge = 10 Jahre", JsonRequestBehavior.AllowGet);
+        if (iYears > iContractLengthMax) return Json("Error: Maximale Vertragslänge = " + iContractLengthMax.ToString() + " Jahre", JsonRequestBehavior.AllowGet);
 
         // Create new offer
         CornerkickManager.Transfer.Offer offer = new CornerkickManager.Transfer.Offer();
