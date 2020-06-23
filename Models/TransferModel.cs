@@ -33,6 +33,9 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ltDdlFilterF { get; set; }
     public string sFilterF { get; set; }
 
+    public List<SelectListItem> ddlFilterLeague { get; set; }
+    public string sFilterLeague { get; set; }
+
     public List<SelectListItem> ddlFilterNation { get; set; }
     public string sFilterNation { get; set; }
 
@@ -60,6 +63,8 @@ namespace CornerkickWebMvc.Models
       for (int iF = 1; iF < 11; iF++) {
         ltDdlFilterF.Add(new SelectListItem { Text = iF.ToString(), Value = iF.ToString() });
       }
+
+      ddlFilterLeague = new List<SelectListItem>();
 
       // Nations
       ddlFilterNation = new List<SelectListItem>();

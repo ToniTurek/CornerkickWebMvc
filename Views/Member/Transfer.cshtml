@@ -53,6 +53,9 @@
 
     var iAcceptPlId   = -1;
     var iAcceptClubId = -1;
+
+    var jTable;
+
     function handleClick(rBOffer) {
       bnAcceptOffer = document.getElementById("bnAcceptOffer");
       bnMakeOffer   = document.getElementById("bnMakeOffer");
@@ -105,16 +108,16 @@
         mDec: '0'
       });
 
-      var jTable = $('#tableTransfer').DataTable({
+      jTable = $('#tableTransfer').DataTable({
         "ajax": {
           "url": '@Url.Action("getTableTransfer", "Member")',
           "type": 'POST',
           "data": function (d) {
             rbAll = document.getElementById("rbAll");
             rbFav = document.getElementById("rbFav");
-            cbNoClub = document.getElementById("cbNoClub");
             rbJouth = document.getElementById("rbJouth");
             cbFixTransferFee = document.getElementById("cbFixTransferFee");
+            sctFilterClub = document.getElementById("sctFilterClub");
 
             var iType = 0;
             if (bNation) {
@@ -128,8 +131,9 @@
             }
 
             var iClubId = -9;
-            if (cbNoClub != null && cbNoClub.checked) {
-              iClubId = -1;
+            var sClubId = sctFilterClub.value;
+            if (sClubId) {
+              iClubId = parseInt(sClubId);
             }
 
             d.iPos    = $('#ddlFilterPos')  .val();
@@ -284,9 +288,7 @@
         reloadTransferlist(jTable);
       });
 
-      $("#cbNoClub").on('change', function (ev) {
-        reloadTransferlist(jTable);
-      });
+      document.getElementById("sctFilterClub").addEventListener("change", function () { reloadTransferlist(jTable); }); 
 
       // Select row
       $('#tableTransfer tbody').on('click', 'tr', function () {
@@ -540,7 +542,7 @@
       });
 
       setView();
-    });
+    }); // document ready function
 
     function reloadTransferlist(jTable) {
       $("#divTransferlistContainer").addClass("disabledDivTransfer");
@@ -560,6 +562,43 @@
       } else {
         //divCbTransferlistAll.style.marginTop = "20px"
         divCb.style.marginTop = "16px"
+      }
+    }
+
+    function getDdlClubFilter(sLeagueId) {
+      var sctFilterClub = document.getElementById("sctFilterClub");
+
+      // Clear options from select
+      var i, L = sctFilterClub.options.length - 1;
+      for (i = L; i >= 0; i--) {
+        sctFilterClub.remove(i);
+      }
+
+      if (sLeagueId) {
+        $.ajax({
+          url: '/Member/TransferGetDdlClubFilter',
+          type: "GET",
+          dataType: "JSON",
+          data: { sLeagueId: sLeagueId },
+          success: function (ltClubs) {
+            //$('#ddlFilterClub').empty();
+            // Clear options
+            $.each(ltClubs, function (i, p) {
+              var optClub = document.createElement("option");
+              optClub.value = p[0];
+              optClub.text = p[1];
+              sctFilterClub.appendChild(optClub);
+            });
+
+            sctFilterClub.disabled = ltClubs.length < 2;
+
+            reloadTransferlist(jTable);
+          }
+        });
+      } else {
+        sctFilterClub.disabled = true;
+
+        reloadTransferlist(jTable);
       }
     }
   </script>
@@ -623,9 +662,12 @@
       </div>
 
       <div style="position: relative; width: auto; float: left; margin-right: 10px; margin-bottom: 10px">
-        @Html.DropDownListFor(m => m.sFilterNation, Model.ddlFilterNation, new { @class = "form-control", id = "ddlFilterNation", @style = "width:160px", @disabled = "disabled" })
-        @if (!Model.bNation) {
-          Html.DropDownListFor(m => m.sFilterF, Model.ltDdlFilterF, new { @class = "form-control", id = "ddlFilterClub", @style = "width:160px", @disabled = "disabled" });
+        @if (Model.bNation) {
+          @Html.DropDownListFor(m => m.sFilterNation, Model.ddlFilterNation, new { @class = "form-control", id = "ddlFilterNation", @style = "width:180px", @disabled = "disabled" })
+        } else {
+          <b class="left">Verein:</b>
+          @Html.DropDownListFor(m => m.sFilterLeague, Model.ddlFilterLeague, new { @class = "form-control", id = "ddlFilterLeague", @style = "width:180px", @onchange = "getDdlClubFilter(this.value)" })
+          <select class="form-control" id="sctFilterClub" onchange="reloadTransferlist2" style="width: 180px" disabled="disabled"></select>
         }
       </div>
 
@@ -634,10 +676,6 @@
           <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
             <input id="cbFixTransferFee" type="checkbox" value="false">
             Fixe Ablöse
-          </label>
-          <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
-            <input id="cbNoClub" type="checkbox" value="false">
-            Vereinslos
           </label>
         </div>
       }

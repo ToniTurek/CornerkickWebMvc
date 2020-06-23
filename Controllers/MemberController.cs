@@ -3063,6 +3063,15 @@ namespace CornerkickWebMvc.Controllers
 
       mdTransfer.iContractYears = 1;
 
+      mdTransfer.ddlFilterLeague.Add(new SelectListItem { Text = "Alle", Value = "", Selected = true });
+      mdTransfer.ddlFilterLeague.Add(new SelectListItem { Text = "Computer", Value = "0" });
+      foreach (CornerkickManager.Cup league in MvcApplication.ckcore.ltCups) {
+        if (league.iId == 1) {
+          mdTransfer.ddlFilterLeague.Add(new SelectListItem { Text = league.sName, Value = league.iId2.ToString() + ":" + league.iId3.ToString() });
+        }
+      }
+      mdTransfer.ddlFilterLeague.Add(new SelectListItem { Text = "vereinslos", Value = "-1" });
+
       mdTransfer.bNation = clb.bNation;
 
       mdTransfer.ddlFilterNation.Add(new SelectListItem { Text = "Alle", Value = "-1", Selected = !clb.bNation });
@@ -3462,6 +3471,34 @@ namespace CornerkickWebMvc.Controllers
       if (iTr == 0) sTable = "";
 
       return Json(sTable, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult TransferGetDdlClubFilter(string sLeagueId)
+    {
+      List<string[]> ltClubs = new List<string[]>();
+
+      if (sLeagueId.Equals("0") || sLeagueId.Equals("-1")) {
+        ltClubs.Add(new string[] { sLeagueId, ""} );
+        return Json(ltClubs, JsonRequestBehavior.AllowGet);
+      }
+
+      string[] sLeagueIdSplit = sLeagueId.Split(':');
+      if (sLeagueIdSplit.Length < 2) return Json(null, JsonRequestBehavior.AllowGet);
+
+      int iLeagueId2 = int.Parse(sLeagueIdSplit[0]);
+      int iLeagueId3 = int.Parse(sLeagueIdSplit[1]);
+
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iLeagueId2, iLeagueId3);
+
+      // Spieltage zu Dropdown Menü hinzufügen
+      foreach (CornerkickManager.Club clb in league.ltClubs[0]) {
+        string[] sClub = new string[2];
+        sClub[0] = clb.iId.ToString();
+        sClub[1] = clb.sName;
+        ltClubs.Add(sClub);
+      }
+
+      return Json(ltClubs, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
