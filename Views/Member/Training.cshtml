@@ -85,7 +85,7 @@
     });
 
     var sTrainingTimes = ["9:30", "12:00", "16:30"];
-    var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken / Abschluss", "Standardsituationen", "Trainingsspiel", "Fussballtennis", "Kopfballpendel", "Yoga", "Elfmeterschießen"];
+    var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken/Abschluss", "Standardsituationen", "Trainingsspiel", "Fussballtennis", "Kopfballpendel", "Yoga", "Elfmeterschießen"];
     var dateOptions = { weekday: 'short', month: '2-digit', day: '2-digit' };
     function plotTrainingPlan(iWeek) {
       $.ajax({
@@ -153,7 +153,7 @@
                 }
 
                 sct.classList.add('form-control');
-                sct.style.width = "126px";
+                sct.style.width = "138px";
                 if (ltTu[iD][iIxDay].iType < 0) {
                   sct.disabled = true;
                 } else {
@@ -358,7 +358,7 @@
 <body>
   <div style="height: 1800px">
     <h3>Trainingsplan</h3>
-    <div style="position: relative; width: 1000px; height: auto; margin-bottom: 10px">
+    <div style="position: relative; width: 1100px; height: auto; margin-bottom: 10px">
       <div style="position: relative; width: 100%; height: 20px">
         <div style="position: absolute; width: 33%; left: 0px; text-align: left">
           <a class="noselect" style="cursor: pointer" onclick="changeWeek(-1)"><< vorherige Woche</a>
@@ -379,7 +379,7 @@
         <h4>Vorlagen Trainingswoche</h4>
         <button type="submit" id="bnTrainingWeekTemplate1" class="btn btn-default" onclick="setTrainingTemplate(0)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left">Kondition</button>
         <button type="submit" id="bnTrainingWeekTemplate2" class="btn btn-default" onclick="setTrainingTemplate(1)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left">Regeneration</button>
-        <button type="submit" id="bnTrainingWeekTemplate3" class="btn btn-default" onclick="setTrainingTemplate(2)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left" disabled="disabled">Abschluss</button>
+        <button type="submit" id="bnTrainingWeekTemplate3" class="btn btn-default" onclick="setTrainingTemplate(2)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left">Ausgeglichen</button>
         <button type="submit" id="bnTrainingWeekTemplate4" class="btn btn-default" onclick="setTrainingTemplate(3)" style="position: relative; width: 49%; min-width: 300px; margin-right: 1%; margin-bottom: 4px; float: left" disabled="disabled">Mentaltraining</button>
       </div>
     </div>

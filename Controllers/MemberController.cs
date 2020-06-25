@@ -3942,7 +3942,8 @@ namespace CornerkickWebMvc.Controllers
         }
       }
       twt1.tuPlan[1][0].iType = 2;
-      twt1.tuPlan[1][1].iType = 3;
+      twt1.tuPlan[1][1].iType = 2;
+      twt1.tuPlan[1][2].iType = 1;
       twt1.tuPlan[2][0].iType = 2;
       twt1.tuPlan[2][1].iType = 3;
       twt1.tuPlan[2][2].iType = 9;
@@ -3980,9 +3981,35 @@ namespace CornerkickWebMvc.Controllers
       twt2.tuPlan[4][2].iType = 1;
       twt2.tuPlan[5][0].iType = 8;
       twt2.tuPlan[5][1].iType = 1;
-      twt2.tuPlan[5][2].iType = 12;
       twt2.tuPlan[6][1].iType = 1;
       ltTrainingWeekTemplate.Add(twt2);
+
+      // Mixed
+      TrainingWeekTemplate twt3 = new TrainingWeekTemplate();
+      twt3.sName = "Ausgeglichen";
+      twt3.tuPlan = new CornerkickManager.Main.TrainingPlan.Unit[7][];
+      for (int iD = 0; iD < 7; iD++) {
+        twt3.tuPlan[iD] = new CornerkickManager.Main.TrainingPlan.Unit[3];
+
+        for (int iT = 0; iT < twt3.tuPlan[iD].Length; iT++) {
+          twt3.tuPlan[iD][iT] = new CornerkickManager.Main.TrainingPlan.Unit();
+        }
+      }
+      twt3.tuPlan[1][0].iType = 2;
+      twt3.tuPlan[1][1].iType = 3;
+      twt3.tuPlan[2][0].iType = 4;
+      twt3.tuPlan[2][1].iType = 8;
+      twt3.tuPlan[2][2].iType = 12;
+      twt3.tuPlan[3][0].iType = 5;
+      twt3.tuPlan[3][1].iType = 9;
+      twt3.tuPlan[4][0].iType = 3;
+      twt3.tuPlan[4][1].iType = 10;
+      twt3.tuPlan[4][2].iType = 1;
+      twt3.tuPlan[5][0].iType = 7;
+      twt3.tuPlan[5][1].iType = 6;
+      twt3.tuPlan[6][0].iType = 1;
+      twt3.tuPlan[6][1].iType = 1;
+      ltTrainingWeekTemplate.Add(twt3);
 
       if (iType < 0) Json(false, JsonRequestBehavior.AllowGet);
       if (iType >= ltTrainingWeekTemplate.Count) Json(false, JsonRequestBehavior.AllowGet);
