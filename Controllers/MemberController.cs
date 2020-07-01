@@ -3744,7 +3744,7 @@ namespace CornerkickWebMvc.Controllers
         }
         if (!bFound) continue;
 
-        if (th.iType >= 0) {
+        if (th.iType > 0 && th.iType < mdTraining.iTrainingCount.Length) {
           mdTraining.iTrainingCount[th.iType]++;
           nTrTotal++;
         }
@@ -3899,7 +3899,7 @@ namespace CornerkickWebMvc.Controllers
       while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         for (byte iD = 0; iD < tuPlan.Length; iD++) {
           for (byte iT = 0; iT < tuPlan[iD].Length; iT++) {
-            if (tuPlan[iD][iT].iType != 0) {
+            if (tuPlan[iD][iT].iType != 0 && tuPlan[iD][iT].iType < 99) { // // Not free and not game
               CornerkickManager.Main.TrainingPlan.Unit tuCopy = tuPlan[iD][iT].Clone();
               tuCopy.dt = dtTmp.Add(tuPlan[iD][iT].dt.TimeOfDay);
 

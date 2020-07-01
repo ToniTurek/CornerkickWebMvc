@@ -402,7 +402,7 @@
           <tbody>
             @{
               foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
-                if (tr.iId >= 0 && tr.fCondi > 0f) {
+                if (tr.iId > 0 && tr.fCondi > 0f) {
                   <tr>
                     <td style="text-align: center">@tr.sName</td>
                     <td style="text-align: center">@Model.iTrainingCount[tr.iId].ToString()</td>
@@ -430,7 +430,7 @@
           <tbody>
             @{
               foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
-                if (tr.iId >= 0 && tr.fCondi < 0f) {
+                if (tr.iId > 0 && tr.fCondi < 0f) {
                   <tr>
                     <td style="text-align: center">@tr.sName</td>
                     <td style="text-align: center">@Model.iTrainingCount[tr.iId].ToString()</td>
