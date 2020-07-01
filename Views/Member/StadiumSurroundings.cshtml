@@ -323,13 +323,16 @@
     }
 
     function buyGround() {
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumSurrBuyGround',
-        dataType: "json",
-        success: function (sMessage) {
-          getCurrentBuildings();
-        }
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        $.ajax({
+          type: 'post',
+          url: '/Member/StadiumSurrBuyGround',
+          dataType: "json",
+          success: function (sMessage) {
+            getCurrentBuildings();
+            updateBalance(iBalance[0]);
+          }
+        });
       });
     }
 
