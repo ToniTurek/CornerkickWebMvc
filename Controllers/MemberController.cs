@@ -3235,8 +3235,11 @@ namespace CornerkickWebMvc.Controllers
                   MvcApplication.ckcore.sendNews(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.sName + " erhalten!", iType: CornerkickManager.Main.iNewsTypePlayerTransferNewOffer, iId: iPlayerId);
                   sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.sName + " erfolgreich abgegeben.";
 
-                  if (checkIfTop10Player(pl)) {
-                    string sNewsPaper1 = club.sName + " vor Verpflichtung von " + pl.sName;
+                  bool bNewspaperTalent = pl.iTalent > 5 && pl.getAge(MvcApplication.ckcore.dtDatum) < 23;
+                  if (bNewspaperTalent || checkIfTop10Player(pl)) {
+                    string sTalent = "";
+                    if (bNewspaperTalent) sTalent = "Talent ";
+                    string sNewsPaper1 = club.sName + " vor Verpflichtung von " + sTalent + pl.sName;
                     string sNewsPaper2 = "Angeblich steht " + club.sName + " kurz vor der Verpflichtung von " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. MW).";
                     MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
                   }
