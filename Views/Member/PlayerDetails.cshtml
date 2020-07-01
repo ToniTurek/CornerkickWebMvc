@@ -327,6 +327,7 @@
 
         // Switch buttons
         if (response.indexOf("wurde auf die Transferliste gesetzt") > -1) {
+          plotCFM();
           setTransferlistButton(0);
         } else {
           setTransferlistButton(1);
