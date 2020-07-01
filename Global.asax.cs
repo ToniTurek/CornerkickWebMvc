@@ -450,51 +450,52 @@ namespace CornerkickWebMvc
         }
       }
 
-      // Put player from cpu club on transferlist if too many
-      const int iClubCpuPlayerMax = 25;
-      const int iClubCpuPlayerMin = 16;
-      for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
-        CornerkickManager.Club clbCpu = ckcore.ltClubs[iC];
-        if (clbCpu.user != null) continue;
-        if (clbCpu.bNation) continue;
-
-        ckcore.doFormation(iC);
-
-        for (int iP = iClubCpuPlayerMax; iP < clbCpu.ltPlayer.Count; iP++) {
-          CornerkickManager.Club clbCpuTake = null;
-
-          // Find cpu club with to few players
-          for (int jC = 1; jC < ckcore.ltClubs.Count; jC++) {
-            if (iC == jC) continue;
-
-            CornerkickManager.Club clbCpuTakeTmp = ckcore.ltClubs[jC];
-            if (clbCpuTakeTmp.user != null) continue;
-            if (clbCpuTakeTmp.bNation) continue;
-
-            if (clbCpuTakeTmp.ltPlayer.Count < iClubCpuPlayerMin) {
-              clbCpuTake = clbCpuTakeTmp;
-              break;
-            }
-          }
-
-          ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
-
-          if (clbCpuTake != null) {
-            ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[iP], clbCpuTake);
-          }
-          /*
-          int jP = iP;
-          while (ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[jP], 0) != 1 && jP > 0) jP--;
-
-          if (clbCpuTake != null) {
-            ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[jP], clbCpuTake);
-          }
-          */
-        }
-      }
-
-      // Check if new jouth player and put on transferlist
       if (ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Second == 0) {
+        // Put player from cpu club on transferlist if too many
+        const int iClubCpuPlayerMax = 25;
+        const int iClubCpuPlayerMin = 16;
+        for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clbCpu = ckcore.ltClubs[iC];
+          if (clbCpu.user != null) continue;
+          if (clbCpu.bNation) continue;
+          if (clbCpu.ltPlayer.Count <= iClubCpuPlayerMax) continue;
+
+          ckcore.doFormation(iC);
+
+          for (int iP = iClubCpuPlayerMax; iP < clbCpu.ltPlayer.Count; iP++) {
+            CornerkickManager.Club clbCpuTake = null;
+
+            // Find cpu club with to few players
+            for (int jC = 1; jC < ckcore.ltClubs.Count; jC++) {
+              if (iC == jC) continue;
+
+              CornerkickManager.Club clbCpuTakeTmp = ckcore.ltClubs[jC];
+              if (clbCpuTakeTmp.user != null) continue;
+              if (clbCpuTakeTmp.bNation) continue;
+
+              if (clbCpuTakeTmp.ltPlayer.Count < iClubCpuPlayerMin) {
+                clbCpuTake = clbCpuTakeTmp;
+                break;
+              }
+            }
+
+            ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
+
+            if (clbCpuTake != null) {
+              ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[iP], clbCpuTake);
+            }
+            /*
+            int jP = iP;
+            while (ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[jP], 0) != 1 && jP > 0) jP--;
+
+            if (clbCpuTake != null) {
+              ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[jP], clbCpuTake);
+            }
+            */
+          }
+        }
+
+        // Check if new jouth player and put on transferlist
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
         CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0, iNat: iNations[random.Next(iNations.Length)]);
