@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.3.4";
+    public const string sVersion = "3.3.5";
 
     public class Settings
     {
@@ -524,7 +524,7 @@ namespace CornerkickWebMvc
         }
 
         //checkCpuJouth();
-      }
+      } // If midnight
 
       // Save .autosave
       if (bSave && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Hour % 2 == 0) {
@@ -1105,6 +1105,12 @@ namespace CornerkickWebMvc
 
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
+
+        // Set retired players name to none
+        List<CornerkickGame.Player> ltPlayerRet = CornerkickManager.Player.getRetiredPlayer(ckcore.ltPlayer);
+        for (int iPl = 0; iPl < ltPlayerRet.Count; iPl++) {
+          ltPlayerRet[iPl].sName = "";
+        }
 
         // Delete past trainings from club
         for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
