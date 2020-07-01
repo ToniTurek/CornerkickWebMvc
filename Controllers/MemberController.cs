@@ -567,6 +567,16 @@ namespace CornerkickWebMvc.Controllers
               if (pl != null) sN = sN.Replace(pl.sName, "<a href=\"/Member/PlayerDetails?i=" + pl.iId.ToString() + "\" target = \"\">" + pl.sName + "</a>");
             }
 
+            // Check for identical news already added
+            bool bSameNews = false;
+            foreach (DatatableNews dtnTmp in ltNews) {
+              if (dtnTmp.sText.Equals(sN)) {
+                bSameNews = true;
+                break;
+              }
+            }
+            if (bSameNews) continue;
+
             DatatableNews dtn = new DatatableNews();
             dtn.iId = news.iId;
             dtn.sDate = news.dt.ToString("d", getCi()) + " " + news.dt.ToString("t", getCi());
@@ -580,7 +590,6 @@ namespace CornerkickWebMvc.Controllers
       } catch (Exception e) {
         Console.WriteLine(e.Message);
       }
-
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
