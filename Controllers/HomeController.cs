@@ -138,8 +138,8 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
       if (iCamp >= 0 && iCamp < MvcApplication.ckcore.tcp.ltCamps.Count) {
         camp.camp = MvcApplication.ckcore.tcp.ltCamps[iCamp];
-        camp.dtArrival   = mnUm.dtDatum.AddDays(-1);
-        camp.dtDeparture = mnUm.dtDatum.AddDays(+8);
+        camp.dtDeparture = mnUm.dtDatum.AddDays(-1);
+        camp.dtReturn    = mnUm.dtDatum.AddDays(+8);
       }
 
       // Doping

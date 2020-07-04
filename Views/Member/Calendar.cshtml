@@ -368,16 +368,18 @@
         sBox += '<th style="text-align:center">Bonus Training</th>';
         sBox += '<th style="text-align:center">Kosten / Nacht</th>';
         sBox += '<th style="text-align:center">Reisekosten</th>';
-        sBox += '<th style="text-align:center">Reisestrapazen</th>';
+        sBox += '<th style="text-align:center">Reisedauer</th>';
+        sBox += '<th style="text-align:center">Reisestrapazen [Frische/h]</th>';
         sBox += '</tr>';
 
         sBox += '<tr>';
-        sBox += '<td align="center">' + (camp.fBonusKondi * 100).toFixed(1).toString() + '%</td>';
+        sBox += '<td align="center">' + (camp.fBonusCondi * 100).toFixed(1).toString() + '%</td>';
         sBox += '<td align="center">' + (camp.fBonusFresh * 100).toFixed(1).toString() + '%</td>';
-        sBox += '<td align="center">' + (camp.fBonusMood  * 100).toFixed(1).toString() + '%</td>';
+        sBox += '<td align="center">' + (camp.fBonusMoral * 100).toFixed(1).toString() + '%</td>';
         sBox += '<td align="center">' + (camp.fBonusF     * 100).toFixed(1).toString() + '%</td>';
         sBox += '<td align="center">' + addThousandSepToNumberInt(camp.iCost) + ' €</td>';
         sBox += '<td align="center">' + addThousandSepToNumberInt(camp.iCostTravel) + ' €</td>';
+        sBox += '<td align="center">' + camp.tsTravel.TotalHours + ' h</td>';
         sBox += '<td align="center">' + (camp.fMalusFreshTravel * 100).toFixed(1).toString() + '%</td>';
         sBox += '</tr>';
 

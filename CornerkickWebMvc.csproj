@@ -412,9 +412,6 @@
     <Content Include="App_Data\Resources\skill_names.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\Resources\trainingcamps.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -1135,7 +1132,6 @@
     <Content Include="Resources\Names\player_surnames.txt" />
     <Content Include="Resources\position_names.txt" />
     <Content Include="Resources\skill_names.txt" />
-    <Content Include="Resources\trainingcamps.txt" />
     <Content Include="Scripts\autoNumeric\autoNumeric-min.js" />
     <Content Include="Scripts\autoNumeric\autoNumeric.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -1384,6 +1380,12 @@
     <Content Include="Views\Member\Merchandising.cshtml" />
     <Content Include="App_Data\Resources\merchandising.json" />
     <Content Include="Resources\merchandising.json" />
+    <Content Include="Resources\trainingcamps.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\trainingcamps.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

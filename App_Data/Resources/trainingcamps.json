@@ -1,0 +1,66 @@
+{
+  "trainingcamps":
+    [
+      {
+        "id": 1,
+        "name": "Umgebung",
+        "condi": 0.05,
+        "fresh": 0.40,
+        "moral": 0.40,
+        "skill": 0.03,
+        "travel_malus": 0.01,
+        "cost_stay": 7500,
+        "cost_travel": 20000,
+        "travel_duration": 2.0
+      },
+      {
+        "id": 2,
+        "name": "Höhentrainingslager Tirol",
+        "condi": 0.12,
+        "fresh": 0.30,
+        "moral": 0.30,
+        "skill": 0.00,
+        "travel_malus": 0.01,
+        "cost_stay": 19000,
+        "cost_travel": 40000,
+        "travel_duration": 4.0
+      },
+      {
+        "id": 3,
+        "name": "Sylt",
+        "condi": 0.02,
+        "fresh": 0.70,
+        "moral": 0.75,
+        "skill": 0.02,
+        "travel_malus": 0.01,
+        "cost_stay": 28000,
+        "cost_travel": 32000,
+        "travel_duration": 4.0
+      },
+      {
+        "id": 4,
+        "name": "Faro",
+        "condi": 0.05,
+        "fresh": 0.40,
+        "moral": 0.55,
+        "skill": 0.04,
+        "travel_malus": 0.01,
+        "cost_stay": 44000,
+        "cost_travel": 70000,
+        "travel_duration": 8.0
+      },
+      {
+        "id": 5,
+        "name": "Dubai",
+        "condi": 0.10,
+        "fresh": 0.40,
+        "moral": 0.60,
+        "skill": 0.08,
+        "travel_malus": 0.01,
+        "cost_stay": 85000,
+        "cost_travel": 150000,
+        "travel_duration": 12.0
+      }
+    ]
+}
+

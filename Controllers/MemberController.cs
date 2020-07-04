@@ -799,8 +799,8 @@ namespace CornerkickWebMvc.Controllers
         foreach (CornerkickManager.TrainingCamp.Camp cp in MvcApplication.ckcore.tcp.ltCamps) {
           if (cp.iId == iTrainingsCamp) {
             camp.camp = cp;
-            camp.dtArrival   = MvcApplication.ckcore.dtDatum.AddDays(-1);
-            camp.dtDeparture = MvcApplication.ckcore.dtDatum.AddDays(+8);
+            camp.dtDeparture = MvcApplication.ckcore.dtDatum.AddDays(-1);
+            camp.dtReturn    = MvcApplication.ckcore.dtDatum.AddDays(+8);
             break;
           }
         }
@@ -5966,28 +5966,28 @@ namespace CornerkickWebMvc.Controllers
 
         // Trainingscamp
         bool bCampTravelDay = false;
-        CornerkickManager.TrainingCamp.Booking booking = MvcApplication.ckcore.tcp.getCurrentCamp(club, dt, true);
-        if (booking.camp.iId > 0) {
-          if (dt.Date.Equals(booking.dtArrival.Date)) {
+        CornerkickManager.TrainingCamp.Booking booking = CornerkickManager.TrainingCamp.getCurrentCamp(club, dt, bInclTravel: true, bDate: true);
+        if (booking != null) {
+          if (dt.Date.Equals(booking.dtDeparture.Date)) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
               sTitle = "Abreise Trainingslager",
               sDescription = booking.camp.sName,
-              sStartDate = booking.dtArrival.ToString("yyyy-MM-ddTHH:mm:ss"),
-              sEndDate = booking.dtArrival.AddHours(8).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sStartDate = booking.dtDeparture.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = booking.dtDeparture.Add(booking.camp.tsTravel).ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(255, 100, 0)",
               bEditable = false,
               bAllDay = false
             });
 
             bCampTravelDay = true;
-          } else if (dt.Date.Equals(booking.dtDeparture.Date)) {
+          } else if (dt.Date.Equals(booking.dtReturn.Date)) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
               sTitle = "Rückreise Trainingslager",
               sDescription = booking.camp.sName,
-              sStartDate = booking.dtDeparture.AddHours(-8).ToString("yyyy-MM-ddTHH:mm:ss"),
-              sEndDate = booking.dtDeparture.ToString("yyyy-MM-ddTHH:mm:ss"),
+              sStartDate = booking.dtReturn.Subtract(booking.camp.tsTravel).ToString("yyyy-MM-ddTHH:mm:ss"),
+              sEndDate = booking.dtReturn.ToString("yyyy-MM-ddTHH:mm:ss"),
               sColor = "rgb(255, 100, 0)",
               bEditable = false,
               bAllDay = false
@@ -6027,7 +6027,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Future training
         foreach (CornerkickManager.Main.TrainingPlan.Unit tu in club.training.ltUnit) {
-          if (tu.dt.Date.Equals(dt) && tu.iType > 0 && !bCampTravelDay) {
+          if (tu.dt.Date.Equals(dt) && tu.iType > 0 && tu.iType < 99 && !bCampTravelDay) {
             string sTrainingName = CornerkickManager.Player.getTraining(tu.iType, MvcApplication.ckcore.plr.ltTraining).sName;
 
             ltEvents.Add(new Models.DiaryEvent {
@@ -6046,7 +6046,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Past trainings
         foreach (CornerkickGame.Player.TrainingHistory th in club.ltTrainingHist) {
-          if (th.dt.Date.Equals(dt) && th.iType > 1) {
+          if (th.dt.Date.Equals(dt) && th.iType > 1 && th.iType < 99) {
             string sTrainingName = CornerkickManager.Player.getTraining(th.iType, MvcApplication.ckcore.plr.ltTraining).sName;
 
             ltEvents.Add(new Models.DiaryEvent {
@@ -6379,7 +6379,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.TrainingCamp.Camp camp = MvcApplication.ckcore.tcp.ltCamps[iIx];
 
-      MvcApplication.ckcore.tcp.bookCamp(ref club, camp, dtStart, dtEnd);
+      CornerkickManager.TrainingCamp.bookCamp(ref club, camp, dtStart, dtEnd, MvcApplication.ckcore.dtDatum);
 
       return Json("Trainingslager gebucht!", JsonRequestBehavior.AllowGet);
     }
