@@ -482,7 +482,7 @@ namespace CornerkickWebMvc
             ckcore.tr.putPlayerOnTransferlist(clbCpu.ltPlayer[iP], 0);
 
             if (clbCpuTake != null) {
-              ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[iP], clbCpuTake);
+              ckcore.tr.transferPlayer(clbCpu, clbCpu.ltPlayer[iP], clbCpuTake, bForce: true);
             }
             /*
             int jP = iP;
