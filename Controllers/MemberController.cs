@@ -3161,7 +3161,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpPost]
-    public JsonResult MakeTransferOffer(int iPlayerId, int iTransferFee, int iTransferFeeSecret)
+    public JsonResult TransferMakeOffer(int iPlayerId, int iTransferFee, int iTransferFeeSecret)
     {
       if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
       if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
@@ -3209,7 +3209,7 @@ namespace CornerkickWebMvc.Controllers
                   break;
                 }
 
-                if (pl.contract.iFixTransferFee > 0) {
+                if (pl.contract != null && pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
                   if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club, iTransferIx: iT)) {
@@ -3335,7 +3335,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(bNominate, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableTransfer(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9, int iNation = -1)
+    public ActionResult TransferGetDataTable(int iPos, int iFType, int iFValue, bool bJouth, int iType, bool bFixTransferFee, int iClubId = -9, int iNation = -1)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTransfer> ltDeTransfer = new List<Models.DatatableEntryTransfer>();
@@ -3375,13 +3375,13 @@ namespace CornerkickWebMvc.Controllers
           int iOffer = 0;
           int iFixtransferfee = 0;
           CornerkickManager.Club clubUser = ckClub();
-          if (clubUser.iId > 0 && transfer.player.contract != null) {
+          if (clubUser.iId > 0) {
             if      (MvcApplication.ckcore.tr.negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
             else if (MvcApplication.ckcore.tr.alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
             else if (CornerkickManager.Player.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
-            else if (transfer.player.iClubId >= 0 && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
+            else if (transfer.player.iClubId >= 0 && transfer.player.contract != null && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
 
-            iFixtransferfee = transfer.player.contract.iFixTransferFee;
+            if (transfer.player.contract != null) iFixtransferfee = transfer.player.contract.iFixTransferFee;
           }
 
           string sDatePutOnTl = "-";
