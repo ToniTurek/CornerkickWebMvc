@@ -4286,7 +4286,7 @@ namespace CornerkickWebMvc.Controllers
       float fVideoDaysConstract    = 0f;
       float fSnackbarDaysConstract = 0f;
       float fToiletsDaysConstract  = 0f;
-      if (nVideoDaysConstract    > 0) fSnackbarDaysConstract = (nVideoDaysConstract    - clb.stadium.iVideoDaysConstruct  ) / (float)nVideoDaysConstract;
+      if (nVideoDaysConstract    > 0) fVideoDaysConstract    = (nVideoDaysConstract    - clb.stadium.iVideoDaysConstruct  ) / (float)nVideoDaysConstract;
       if (nSnackbarDaysConstract > 0) fSnackbarDaysConstract = (nSnackbarDaysConstract - clb.stadium.iSnackbarDaysConstruct) / (float)nSnackbarDaysConstract;
       if (nToiletsDaysConstract  > 0) fToiletsDaysConstract  = (nToiletsDaysConstract  - clb.stadium.iToiletsDaysConstruct ) / (float)nToiletsDaysConstract;
 
