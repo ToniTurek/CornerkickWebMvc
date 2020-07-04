@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.3.6";
+    public const string sVersion = "3.3.7";
 
     public class Settings
     {
@@ -1110,6 +1110,15 @@ namespace CornerkickWebMvc
         List<CornerkickGame.Player> ltPlayerRet = CornerkickManager.Player.getRetiredPlayer(ckcore.ltPlayer);
         for (int iPl = 0; iPl < ltPlayerRet.Count; iPl++) {
           ltPlayerRet[iPl].sName = "";
+        }
+
+        for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
+          CornerkickManager.Club clb = ckcore.ltClubs[iC];
+          if (clb.bNation) continue;
+          if (clb.user != null) continue;
+
+          CornerkickManager.Club clb0 = ckcore.ltClubs[0];
+          while (clb.ltPlayer.Count < 16) ckcore.tr.transferPlayer(clb0, clb0.ltPlayer[0], clb, bForce: true);
         }
 
         // Delete past trainings from club
