@@ -156,7 +156,8 @@ namespace CornerkickWebMvc
       timerSave.Enabled = false;
 
       iLoadState = 1;
-      Task<bool> tkLoadGame = Task.Run(async () => await load());
+
+      Task<bool> tkLoadGame = Task.Run(async () => await load(sHomeDir));
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
@@ -1011,7 +1012,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    internal static async Task<bool> load()
+    internal static async Task<bool> load(string sHomeDir)
     {
       // Create stopwatch
       System.Diagnostics.Stopwatch swLoad = new System.Diagnostics.Stopwatch();
@@ -1019,7 +1020,6 @@ namespace CornerkickWebMvc
       // Start stopwatch
       swLoad.Start();
 
-      string sHomeDir = getHomeDir();
       if (string.IsNullOrEmpty(sHomeDir)) return false;
 
       string sFileLoad = Path.Combine(sHomeDir, "save", sFilenameSave);
