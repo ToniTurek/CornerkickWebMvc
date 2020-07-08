@@ -320,6 +320,8 @@
           success: function () {
             jTable.ajax.reload();
             calendar.fullCalendar('refetchEvents');
+            bnAcceptTg.disabled = true;
+            bnDeclineTg.disabled = true;
           },
           error: function (xhr) {
             alert(xhr.responseJSON.message);
@@ -340,6 +342,8 @@
           success: function () {
             jTable.ajax.reload();
             calendar.fullCalendar('refetchEvents');
+            bnAcceptTg.disabled = true;
+            bnDeclineTg.disabled = true;
           }
         });
       }
