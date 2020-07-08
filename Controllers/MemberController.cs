@@ -3465,7 +3465,7 @@ namespace CornerkickWebMvc.Controllers
               if (bOwnPlayer) {
                 string sChecked = "";
                 //if (iTr == 0) sChecked = " checked";
-                sTable += "<td><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.club.iId.ToString() + "\"" + sChecked + "></td>";
+                sTable += "<td><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.club.iId.ToString() + "\"" + sChecked + " style=\"cursor: pointer\"></td>";
               }
 
               sTable += "</tr>";
