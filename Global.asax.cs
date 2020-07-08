@@ -881,11 +881,12 @@ namespace CornerkickWebMvc
 
       // Clear CPU user news before saving
       for (int iN = 0; iN < ckcore.ltUser[0].ltNews.Count; iN++) {
-        if (ckcore.ltUser[0].ltNews[iN].iId < 200) {
+        if (ckcore.ltUser[0].ltNews[iN].iType < 200) {
           ckcore.ltUser[0].ltNews.RemoveAt(iN);
           iN--;
           continue;
         }
+
         if ((ckcore.dtDatum - ckcore.ltUser[0].ltNews[iN].dt).TotalDays > 7) {
           ckcore.ltUser[0].ltNews.RemoveAt(iN);
           iN--;
