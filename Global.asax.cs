@@ -32,7 +32,8 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.4.0";
+    public const string sVersion = "3.4.1";
+    public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     public class Settings
     {
@@ -85,6 +86,12 @@ namespace CornerkickWebMvc
 
     protected void Application_Start()
     {
+      // Create stopwatch
+      System.Diagnostics.Stopwatch swStart = new System.Diagnostics.Stopwatch();
+
+      // Start stopwatch
+      swStart.Start();
+
       AreaRegistration.RegisterAllAreas();
       FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
       RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -92,6 +99,13 @@ namespace CornerkickWebMvc
 
       try {
         newCk();
+
+        // Stop stopwatch
+        swStart.Stop();
+        TimeSpan tsStart = swStart.Elapsed;
+
+        // Write elapsed time to log
+        if (ckcore != null) ckcore.tl.writeLog("Elapsed time during start: " + tsStart.TotalSeconds.ToString("0.000") + "s");
       } catch {
       }
     }
@@ -141,65 +155,8 @@ namespace CornerkickWebMvc
       }
       timerSave.Enabled = false;
 
-      // Create stopwatch
-      System.Diagnostics.Stopwatch swLoad = new System.Diagnostics.Stopwatch();
-
-      // Start stopwatch
-      swLoad.Start();
-
-      // Load autosave
-      if (!load()) {
-        // New game
-        DateTime dtLeagueStart;
-        DateTime dtLeagueEnd;
-        ckcore.setSeasonStartEndDates(out dtLeagueStart, out dtLeagueEnd);
-
-        /////////////////////////////////////////////////////////////////////
-        // Create nat. Cups and Leagues
-        foreach (int iLand in iNations) {
-          // Create nat. cup
-          CornerkickManager.Cup cup = new CornerkickManager.Cup(bKo: true);
-          cup.iId = 2;
-          cup.iId2 = iLand;
-          cup.sName = "Pokal " + CornerkickManager.Main.sLand[iLand];
-          cup.settings.fAttraction = 1.0f;
-          cup.settings.iBonusCupWin = 8000000; // 8 mio.
-          cup.settings.bBonusReleaseCupWinInKo = true;
-          ckcore.ltCups.Add(cup);
-
-          // Create league
-          CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
-          league.iId = 1;
-          league.iId2 = iLand;
-          league.iId3 = 0;
-          league.sName = "Liga " + CornerkickManager.Main.sLand[iLand];
-          league.settings.fAttraction = 1.0f;
-          ckcore.ltCups.Add(league);
-
-          fillLeaguesWithCpuClubs(league, cup);
-        }
-
-        /////////////////////////////////////////////////////////////////////
-        // Create Internat. cups
-        createCupGold();
-        createCupSilver();
-        createCupWc(dtLeagueEnd);
-
-        ckcore.calcMatchdays();
-        ckcore.tl.getCup(7).draw(ckcore.dtDatum);
-
-        ckcore.dtDatum = ckcore.dtSeasonStart;
-      }
-
-      // Stop stopwatch
-      swLoad.Stop();
-      TimeSpan tsLoad = swLoad.Elapsed;
-
-      // Write elapsed time to log
-      ckcore.tl.writeLog("Elapsed time during load: " + tsLoad.TotalSeconds.ToString("0.000") + "s");
-
-      // If no calendar timer --> enable save timer to save every 15 min.
-      timerSave.Enabled = !timerCkCalender.Enabled;
+      iLoadState = 1;
+      Task<bool> tkLoadGame = Task.Run(async () => await load());
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
@@ -1054,8 +1011,14 @@ namespace CornerkickWebMvc
       }
     }
 
-    internal static bool load()
+    internal static async Task<bool> load()
     {
+      // Create stopwatch
+      System.Diagnostics.Stopwatch swLoad = new System.Diagnostics.Stopwatch();
+
+      // Start stopwatch
+      swLoad.Start();
+
       string sHomeDir = getHomeDir();
       if (string.IsNullOrEmpty(sHomeDir)) return false;
 
@@ -1234,12 +1197,67 @@ namespace CornerkickWebMvc
         readMails();
 #endif
 
+        // Stop stopwatch
+        swLoad.Stop();
+        TimeSpan tsLoad = swLoad.Elapsed;
+
+        // Write elapsed time to log
+        ckcore.tl.writeLog("Elapsed time during load: " + tsLoad.TotalSeconds.ToString("0.000") + "s");
+
+        // If no calendar timer --> enable save timer to save every 15 min.
+        timerSave.Enabled = !timerCkCalender.Enabled;
+
+        iLoadState = 0; // Success
+
         return true;
       }
+
+      // New game
+      DateTime dtLeagueStart;
+      DateTime dtLeagueEnd;
+      ckcore.setSeasonStartEndDates(out dtLeagueStart, out dtLeagueEnd);
+
+      /////////////////////////////////////////////////////////////////////
+      // Create nat. Cups and Leagues
+      foreach (int iLand in iNations) {
+        // Create nat. cup
+        CornerkickManager.Cup cup = new CornerkickManager.Cup(bKo: true);
+        cup.iId = 2;
+        cup.iId2 = iLand;
+        cup.sName = "Pokal " + CornerkickManager.Main.sLand[iLand];
+        cup.settings.fAttraction = 1.0f;
+        cup.settings.iBonusCupWin = 8000000; // 8 mio.
+        cup.settings.bBonusReleaseCupWinInKo = true;
+        ckcore.ltCups.Add(cup);
+
+        // Create league
+        CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
+        league.iId = 1;
+        league.iId2 = iLand;
+        league.iId3 = 0;
+        league.sName = "Liga " + CornerkickManager.Main.sLand[iLand];
+        league.settings.fAttraction = 1.0f;
+        ckcore.ltCups.Add(league);
+
+        fillLeaguesWithCpuClubs(league, cup);
+      }
+
+      /////////////////////////////////////////////////////////////////////
+      // Create Internat. cups
+      createCupGold();
+      createCupSilver();
+      createCupWc(dtLeagueEnd);
+
+      ckcore.calcMatchdays();
+      ckcore.tl.getCup(7).draw(ckcore.dtDatum);
+
+      ckcore.dtDatum = ckcore.dtSeasonStart;
 
       // If error while loading ...
       timerSave.Enabled = false; // ... do not overwrite the file
       settings.bLoginPossible = false; // ... disable user login
+
+      iLoadState = 3; // Error or new game
 
       return false;
     }
@@ -1322,6 +1340,8 @@ namespace CornerkickWebMvc
       int nSteps = getDeltaStepsBetweenNowAndApproach();
 
       if (nSteps > 0) {
+        iLoadState = 2;
+
         ckcore.tl.writeLog("Performing approx. " + nSteps.ToString() + " calendar steps");
 
         int iS = 0;
@@ -1352,6 +1372,8 @@ namespace CornerkickWebMvc
 
       // Write elapsed time to log
       ckcore.tl.writeLog("Elapsed time while performing calendar steps: " + swCalSteps.Elapsed.TotalSeconds.ToString("0.000") + "s");
+
+      iLoadState = 0;
 
       return true;
     }

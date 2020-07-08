@@ -38,17 +38,21 @@
           <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
               @if (MvcApplication.settings.bMaintenance) {
-                <input type="submit" value="Anmelden" class="btn btn-default" disabled="disabled" />
+                <input type="submit" style="width: 100%" value="Anmelden" class="btn btn-default" disabled="disabled" />
                 <p></p>
                 <p><strong style="font-size: 24px; color: red">Wartung</strong></p>
                 <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
               } else if (!MvcApplication.settings.bLoginPossible) {
-                <input type="submit" value="Anmelden" class="btn btn-default" disabled="disabled" />
+                <input type="submit" style="width: 100%" value="Anmelden" class="btn btn-default" disabled="disabled" />
                 <p></p>
                 <p><strong style="font-size: 24px; color: red">Update</strong></p>
                 <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
+              } else if (MvcApplication.iLoadState == 1) {
+                <input type="submit" style="width: 100%" value="Spielstand wird geladen" class="btn btn-default" disabled="disabled" />
+              } else if (MvcApplication.iLoadState == 2) {
+                <input type="submit" style="width: 100%" value="Berechne Zeitschritte" class="btn btn-default" disabled="disabled" />
               } else {
-                <input type="submit" value="Anmelden" class="btn btn-default" />
+                <input type="submit" style="width: 100%" value="Anmelden" class="btn btn-default" />
               }
             </div>
           </div>
