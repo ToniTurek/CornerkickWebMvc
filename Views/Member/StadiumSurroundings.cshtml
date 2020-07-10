@@ -112,7 +112,7 @@
         } else { // No construction
           var btn = document.createElement("button");
 
-          if (building.iType > 5) {
+          if (building.iType > 5 && building.iType < 9) {
             div1.appendChild(getNumberInputDiv(btn, building));
           }
 
@@ -234,7 +234,7 @@
       iptNew.addEventListener("keyup", function () {
         $.ajax({
           url: '/Member/StadiumSurrGetSurrTypeNumber',
-          type: "post",
+          type: "GET",
           dataType: "JSON",
           data: { iType: building.iType, iNew: getIntFromString(iptNew.value), iCurrent: getIntFromString(building.sName) },
           success: function (bdg) {
@@ -273,7 +273,7 @@
     $(document).ready(function () {
       $.ajax({
         url: '/Member/StadiumGetTopring',
-        type: "post",
+        type: "GET",
         dataType: "JSON",
         success: function (bTopring) {
           getCurrentBuildings(bTopring);
@@ -285,7 +285,7 @@
       var divGroundContainer = $("#divGroundContainer");
       divGroundContainer.html('');
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumSurrGetBuildings',
         dataType: "json",
         success: function (buildings) {

@@ -4526,7 +4526,7 @@ namespace CornerkickWebMvc.Controllers
       return View(mdStadionSurr);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumSurrGetBuildings()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4534,7 +4534,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.User usr = ckUser();
 
-      Models.StadiumSurroundingsModel.Building[] bdgsAll = new Models.StadiumSurroundingsModel.Building[9];
+      Models.StadiumSurroundingsModel.Building[] bdgsAll = new Models.StadiumSurroundingsModel.Building[10];
       for (byte iB = 0; iB < bdgsAll.Length; iB++) bdgsAll[iB] = new Models.StadiumSurroundingsModel.Building();
 
       Models.StadiumSurroundingsModel.Buildings buildings = new Models.StadiumSurroundingsModel.Buildings();
@@ -4707,13 +4707,32 @@ namespace CornerkickWebMvc.Controllers
       if (clb.buildings.bgFanshop.iLevel > 0 || (clb.buildings.bgFanshop.ctn != null && clb.buildings.bgFanshop.ctn.iLevelNew > 0)) buildings.ltBuildings    .Add(bdgsAll[iType]);
       else                                                                                                                          buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
+      // Mass-transit
+      iType++;
+      bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sMassTransitName;
+      bdgsAll[iType].iLevel = clb.buildings.bgMassTransit.iLevel;
+      bdgsAll[iType].sName = CornerkickManager.Stadium.sMassTransit[clb.buildings.bgMassTransit.iLevel];
+      bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sMassTransit[clb.buildings.bgMassTransit.iLevel + 1];
+      if (clb.buildings.bgMassTransit.ctn != null && clb.buildings.bgMassTransit.ctn.iLevelNew > clb.buildings.bgMassTransit.iLevel) {
+        bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgMassTransit.ctn.fDaysConstruct;
+        bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildMassTransit(clb)[1];
+      } else {
+        iCostDays = CornerkickManager.Stadium.getCostDaysBuildMassTransit(clb.buildings.bgMassTransit.iLevel + 1, clb.buildings.bgMassTransit.iLevel);
+        bdgsAll[iType].sCostConstructNext = iCostDays[0].ToString("N0", getCi());
+        bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
+        bdgsAll[iType].bDispoOk = MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb);
+      }
+      if (clb.buildings.bgMassTransit.iLevel > 0 || (clb.buildings.bgMassTransit.ctn != null && clb.buildings.bgMassTransit.ctn.iLevelNew > 0)) buildings.ltBuildings.Add(bdgsAll[iType]);
+      else buildings.ltBuildingsFree.Add(bdgsAll[iType]);
+
       buildings.iGround = (byte)Math.Max(clb.buildings.iGround, buildings.ltBuildings.Count);
       buildings.sCostBuyGround = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround).ToString("N0", getCi());
 
       return Json(buildings, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumSurrGetSurrTypeNumber(int iType, int iNew, int iCurrent)
     {
       CornerkickManager.Club clb = ckClub();
