@@ -23,7 +23,7 @@ namespace CornerkickWebMvc.Models
     public int    iIndex { get; set; }
     public byte   iId { get; set; }
     public string sName { get; set; }
-    public string sMoneyVicHome { get; set; }
+    public int    iMoneyVicHome { get; set; }
     public byte   nBoards { get; set; }
     public byte   iYears { get; set; }
   }

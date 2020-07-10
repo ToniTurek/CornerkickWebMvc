@@ -45,7 +45,7 @@
     function getLtSponsorBoardIds() {
       return $.ajax({
         url: "/Member/getLtSponsorBoardIds",
-        type: 'POST',
+        type: 'GET',
         traditional: true,
         dataType: "json",
         success: function (ltSponsorBoardIds) {
@@ -189,7 +189,7 @@
 
       var tableBoard = $('#tableSponsorBoard').DataTable({
         "ajax": {
-          "url": '@Url.Action("getTableSponsorBoard", "Member")',
+          "url": '@Url.Action("SponsorGetTableBoard", "Member")',
           "type": 'GET',
           "dataType": "JSON",
           "cache": false,
@@ -200,7 +200,10 @@
           { "data": "iId" },
           { "data": "iIndex" },
           { "data": "sName" },
-          { "data": "sMoneyVicHome" },
+          {
+            "data": "iMoneyVicHome",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "nBoards" },
           { "data": "iYears" }
         ],
@@ -224,6 +227,34 @@
           if (!aData.bOffer) {
             $('td', nRow).css('font-weight', "bold");
           }
+        },
+        "footerCallback": function (row, data, start, end, display) {
+          var api = this.api(), data;
+
+          // Remove the formatting to get integer data for summation
+          var intVal = function (i) {
+            return typeof i === 'string' ?
+              i.replace(/[\$,]/g, '') * 1 :
+              typeof i === 'number' ?
+                i : 0;
+          };
+
+          // Calculate sum for columns 4
+          var iSumMoney = 0;
+          for (var iRow = 0; iRow < data.length; iRow++) {
+            if (!data[iRow].bOffer) {
+              iSumMoney += data[iRow].iMoneyVicHome;
+            }
+          }
+          $(api.column(4).footer()).html(iSumMoney.toLocaleString());
+
+          var iSumCount = 0;
+          for (var iRow = 0; iRow < data.length; iRow++) {
+            if (!data[iRow].bOffer) {
+              iSumCount += data[iRow].nBoards;
+            }
+          }
+          $(api.column(5).footer()).html(iSumCount.toString());
         }
       });
 
@@ -340,7 +371,7 @@
   <p> </p>
   <h2>Banden</h2>
 
-  <table id="tableSponsorBoard" style="width: auto" class="display">
+  <table id="tableSponsorBoard" style="width: auto" class="display responsive nowrap">
     <thead>
       <tr>
         <th></th>
@@ -353,6 +384,17 @@
       </tr>
     </thead>
     <tbody></tbody>
+    <tfoot>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>Summe:</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </tfoot>
   </table>
 
   <button type="submit" id="bnTakeBoard" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
