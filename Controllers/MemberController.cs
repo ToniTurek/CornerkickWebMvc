@@ -3831,12 +3831,12 @@ namespace CornerkickWebMvc.Controllers
             ltTu[iD][iT] = new CornerkickManager.Main.TrainingPlan.Unit() { dt = dtTraining, iType = iType };
           }
 
-          // Set game
-          foreach (CornerkickGame.Game.Data gd in ltNextGames) {
-            if (CornerkickManager.Tool.checkIfGameIsClose(gd, ltTu[iD][iT].dt)) {
-              ltTu[iD][iT].iType = 99;
-              break;
-            }
+          // Set game/travel/event
+          int iEvent = CornerkickManager.Tool.checkIfGameTravelEventIsClose(clb, ltTu[iD][iT].dt);
+          if (iEvent == 0) iEvent = CornerkickManager.Tool.checkIfGameTravelEventIsClose(clb, ltTu[iD][iT].dt.Add(MvcApplication.ckcore.settings.tsTrainingLength));
+
+          if (iEvent > 0) {
+            ltTu[iD][iT].iType = (sbyte)(100 + iEvent);
           }
         }
       }
@@ -3911,7 +3911,7 @@ namespace CornerkickWebMvc.Controllers
       while (dtTmp.CompareTo(MvcApplication.ckcore.dtSeasonEnd) < 0) {
         for (byte iD = 0; iD < tuPlan.Length; iD++) {
           for (byte iT = 0; iT < tuPlan[iD].Length; iT++) {
-            if (tuPlan[iD][iT].iType != 0 && tuPlan[iD][iT].iType < 99) { // // Not free and not game
+            if (tuPlan[iD][iT].iType != 0 && tuPlan[iD][iT].iType < 100) { // // Not free and not game
               CornerkickManager.Main.TrainingPlan.Unit tuCopy = tuPlan[iD][iT].Clone();
               tuCopy.dt = dtTmp.Add(tuPlan[iD][iT].dt.TimeOfDay);
 
@@ -5966,7 +5966,6 @@ namespace CornerkickWebMvc.Controllers
         }
 
         // Trainingscamp
-        bool bCampTravelDay = false;
         CornerkickManager.TrainingCamp.Booking booking = CornerkickManager.TrainingCamp.getCurrentCamp(club, dt, bInclTravel: true, bDate: true);
         if (booking != null) {
           if (dt.Date.Equals(booking.dtDeparture.Date)) {
@@ -5980,8 +5979,6 @@ namespace CornerkickWebMvc.Controllers
               bEditable = false,
               bAllDay = false
             });
-
-            bCampTravelDay = true;
           } else if (dt.Date.Equals(booking.dtReturn.Date)) {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
@@ -5993,8 +5990,6 @@ namespace CornerkickWebMvc.Controllers
               bEditable = false,
               bAllDay = false
             });
-
-            bCampTravelDay = true;
           } else {
             ltEvents.Add(new Models.DiaryEvent {
               iID = ltEvents.Count,
@@ -6028,7 +6023,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Future training
         foreach (CornerkickManager.Main.TrainingPlan.Unit tu in club.training.ltUnit) {
-          if (tu.dt.Date.Equals(dt) && tu.iType > 0 && tu.iType < 99 && !bCampTravelDay) {
+          if (tu.dt.Date.Equals(dt) && tu.iType > 0 && tu.iType < 100) {
             string sTrainingName = CornerkickManager.Player.getTraining(tu.iType, MvcApplication.ckcore.plr.ltTraining).sName;
 
             ltEvents.Add(new Models.DiaryEvent {
@@ -6047,7 +6042,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Past trainings
         foreach (CornerkickGame.Player.TrainingHistory th in club.ltTrainingHist) {
-          if (th.dt.Date.Equals(dt) && th.iType > 1 && th.iType < 99) {
+          if (th.dt.Date.Equals(dt) && th.iType > 1 && th.iType < 100) {
             string sTrainingName = CornerkickManager.Player.getTraining(th.iType, MvcApplication.ckcore.plr.ltTraining).sName;
 
             ltEvents.Add(new Models.DiaryEvent {
@@ -6240,6 +6235,9 @@ namespace CornerkickWebMvc.Controllers
           sReturn = "Testspiel am " + md.dt.ToString("d", getCi()) + " " + md.dt.ToString("t", getCi()) + " gegen " + clubRequest.sName + " vereinbart";
 
           club.nextGame = MvcApplication.ckcore.tl.getNextGame(club, MvcApplication.ckcore.dtDatum);
+
+          // Clean club training plan for test game
+          club.cleanTraining(MvcApplication.ckcore.settings.tsTrainingLength, club.nextGame);
         } else {
           CornerkickManager.Cup cup = new CornerkickManager.Cup();
           cup.iId = -5;
@@ -6286,6 +6284,10 @@ namespace CornerkickWebMvc.Controllers
                   clubH.nextGame = MvcApplication.ckcore.tl.getNextGame(clubH, MvcApplication.ckcore.dtDatum);
 
                   MvcApplication.ckcore.sendNews(clubH.user, "Ihre Anfrage an " + club.sName + " für ein Testspiel am " + dt.ToString("d", getCi()) + " um " + dt.ToString("t", getCi()) + " wurde akzeptiert!", iType: 0, iId: gd.team[0].iTeamId);
+
+                  // Clean clubs training plan for test game
+                  club .cleanTraining(MvcApplication.ckcore.settings.tsTrainingLength, club .nextGame);
+                  clubH.cleanTraining(MvcApplication.ckcore.settings.tsTrainingLength, clubH.nextGame);
 
                   return Json("", JsonRequestBehavior.AllowGet);
                 }
@@ -6380,7 +6382,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.TrainingCamp.Camp camp = MvcApplication.ckcore.tcp.ltCamps[iIx];
 
-      CornerkickManager.TrainingCamp.bookCamp(ref club, camp, dtStart, dtEnd, MvcApplication.ckcore.dtDatum);
+      CornerkickManager.TrainingCamp.bookCamp(ref club, camp, dtStart, dtEnd, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.settings.tsTrainingLength);
 
       return Json("Trainingslager gebucht!", JsonRequestBehavior.AllowGet);
     }
@@ -6482,6 +6484,9 @@ namespace CornerkickWebMvc.Controllers
       }
 
       clb.ltEvent.Add(evi);
+
+      // Clean club training plan for event
+      clb.cleanTraining(MvcApplication.ckcore.settings.tsTrainingLength);
 
       return Json(sReturn, JsonRequestBehavior.AllowGet);
     }

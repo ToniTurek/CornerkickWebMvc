@@ -128,12 +128,22 @@
             for (iD = 0; iD < ltTu.length; iD++) {
               var cell = row.insertCell();
 
-              if (ltTu[iD][iIxDay].iType === 99) {
+              if (ltTu[iD][iIxDay].iType > 100) {
                 var divGame = document.createElement("div");
                 divGame.style.width = "100%";
                 divGame.align = "center";
                 var txtGame = document.createElement("txt");
-                txtGame.innerText = "Spiel";
+
+                if (ltTu[iD][iIxDay].iType === 101) {
+                  txtGame.innerText = "Spiel";
+                } else if (ltTu[iD][iIxDay].iType === 102) {
+                  txtGame.innerText = "Reise";
+                } else if (ltTu[iD][iIxDay].iType === 103) {
+                  txtGame.innerText = "Ereignis";
+                } else {
+                  txtGame.innerText = "?";
+                }
+
                 divGame.appendChild(txtGame);
                 cell.appendChild(divGame);
               } else {
