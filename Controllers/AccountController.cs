@@ -843,6 +843,23 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
+    [HttpGet]
+    [AllowAnonymous]
+    public JsonResult LoginGetStatus()
+    {
+      if (MvcApplication.settings.bMaintenance) {
+        return Json(4, JsonRequestBehavior.AllowGet);
+      } else if (!MvcApplication.settings.bLoginPossible) {
+        return Json(3, JsonRequestBehavior.AllowGet);
+      } else if (MvcApplication.iLoadState == 1) {
+        return Json(1, JsonRequestBehavior.AllowGet);
+      } else if (MvcApplication.iLoadState == 2) {
+        return Json(2, JsonRequestBehavior.AllowGet);
+      }
+
+      return Json(0, JsonRequestBehavior.AllowGet);
+    }
+
     //
     // GET: /Account/Register
     [HttpGet]

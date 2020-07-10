@@ -1,11 +1,53 @@
 ﻿@using CornerkickWebMvc.Models
 @model LoginViewModel
 @{
-    ViewBag.Title = "Anmelden";
+  ViewBag.Title = "Anmelden";
 }
 
-<h2>@ViewBag.Title.</h2>
-<div class="row">
+<html style="height: 100%; min-height: 100%">
+<head>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      getLoginStatus();
+    }); // $(document).ready
+
+    function getLoginStatus() {
+      $.ajax({
+        url: '/Account/LoginGetStatus',
+        type: "GET",
+        dataType: "JSON",
+        success: function (iReturn) {
+          var iptLogin = document.getElementById("iptLogin");
+
+          if (iReturn === 0) {
+            iptLogin.disabled = false;
+            iptLogin.value = "Anmelden";
+          } else {
+            iptLogin.disabled = true;
+
+            if (iReturn === 1) {
+              iptLogin.value = "Spielstand wird geladen ...";
+            } else if (iReturn === 2) {
+              iptLogin.value = "Berechne Zeitschritte ...";
+            } else {
+              iptLogin.value = "Anmelden";
+            }
+
+            // Check again in 1 sec
+            setTimeout(getLoginStatus, 1000);
+          }
+        },
+        error: function (xhr) {
+          alert(xhr.responseText);
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <h2>@ViewBag.Title.</h2>
+  <div class="row">
     <div class="col-md-8">
       <section id="loginForm">
         @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" })) {
@@ -37,22 +79,15 @@
           </div>
           <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
+              <input type="submit" id="iptLogin" style="width: 100%" value="Anmelden" class="btn btn-default" disabled="disabled" />
               @if (MvcApplication.settings.bMaintenance) {
-                <input type="submit" style="width: 100%" value="Anmelden" class="btn btn-default" disabled="disabled" />
                 <p></p>
                 <p><strong style="font-size: 24px; color: red">Wartung</strong></p>
                 <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
               } else if (!MvcApplication.settings.bLoginPossible) {
-                <input type="submit" style="width: 100%" value="Anmelden" class="btn btn-default" disabled="disabled" />
                 <p></p>
                 <p><strong style="font-size: 24px; color: red">Update</strong></p>
                 <p>Aktuell ist leider keine Anmeldung möglich. Versuchen Sie es später noch einmal!</p>
-              } else if (MvcApplication.iLoadState == 1) {
-                <input type="submit" style="width: 100%" value="Spielstand wird geladen" class="btn btn-default" disabled="disabled" />
-              } else if (MvcApplication.iLoadState == 2) {
-                <input type="submit" style="width: 100%" value="Berechne Zeitschritte" class="btn btn-default" disabled="disabled" />
-              } else {
-                <input type="submit" style="width: 100%" value="Anmelden" class="btn btn-default" />
               }
             </div>
           </div>
@@ -63,236 +98,238 @@
             @Html.ActionLink("Password vergessen", "ForgotPassword")
           </p>
           @* Diese Option aktivieren, nachdem Sie die Kontobestätigung für die Funktion zum Zurücksetzen des Kennworts aktiviert haben
-      <p>
-          @Html.ActionLink("Kennwort vergessen?", "ForgotPassword")
-      </p>*@
+            <p>
+                @Html.ActionLink("Kennwort vergessen?", "ForgotPassword")
+            </p>*@
         }
       </section>
     </div>
-@*    
-  <div class="col-md-4">
-        <section id="socialLoginForm">
-            @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
-        </section>
-    </div>
-*@
-</div>
+    @*
+      <div class="col-md-4">
+            <section id="socialLoginForm">
+                @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+            </section>
+        </div>
+    *@
+  </div>
 
-<div style="position: relative; margin-top: 60px">
-  <h3>Aktuelle Version</h3>
-  <p>@MvcApplication.sVersion</p>
+  <div style="position: relative; margin-top: 60px">
+    <h3>Aktuelle Version</h3>
+    <p>@MvcApplication.sVersion</p>
 
-  <h3>Versionshistorie</h3>
-  <table id="tableNews" style="position: relative; margin: 0px; width: auto" cellpadding="2">
-    <thead>
-      <tr>
-        <th style="text-align: center">Version</th>
-        <th style="text-align: center">Datum</th>
-        <th>Beschreibung</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>3.4.0</td>
-        <td>06.07.2020</td>
-        <td>
-          <ul>
-            <li>Spielermarktwerte überarbeitet</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>3.3.3</td>
-        <td>23.06.2020</td>
-        <td>
-          <ul>
-            <li>Ereigniskosten hinzugefügt</li>
-            <li>Vorlagen Trainingswoche überarbeitet/hinzugefügt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>3.3.2</td>
-        <td>23.06.2020</td>
-        <td>
-          <ul>
-            <li>Maximale Vertragslaufzeit der Spieler auf 5 Jahre begrenzt</li>
-            <li>Vereinsfilter im Transfermarkt hinzugefügt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>3.3.0</td>
-        <td>19.06.2020</td>
-        <td>
-          <ul>
-            <li>Ereignis "Jugendtag" hinzugefügt</li>
-            <li>Mannschaftstraining überarbeitet (u.a. Vorlagen Trainingswoche hinzugefügt)</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>3.2.0</td>
-        <td>11.06.2020</td>
-        <td>
-          <ul>
-            <li>Zweite deutsche Liga eingeführt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>3.1.1</td>
-        <td>10.05.2020</td>
-        <td>
-          <ul>
-            <li>Infos zu Training Chart hinzugefügt</li>
-            <li>Zeige Trainingshistorie jedes einzelnen Spielers</li>
-            <li>Spieler verlieren 5% Moral bei setzen auf die Transferliste</li>
-            <li>Spieler gewinnen 10% Moral bei erfolgreichem Transfer</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>3.0.0</td>
-        <td>08.05.2020</td>
-        <td>
-          <ul>
-            <li>Merchandising hinzugefügt</li>
-            <li>Zeige Warnung bei zu geringer Anzahl an Stadionextras/Gebäuden</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.15.0</td>
-        <td>03.05.2020</td>
-        <td>
-          <ul>
-            <li>Verletzungshistorie hinzugefügt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.14.0</td>
-        <td>28.04.2020</td>
-        <td>
-          <ul>
-            <li>"Zeitung" hinzugefügt</li>
-            <li>Ereignis "Weihnachtsfeier" hinzugefügt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.13.0</td>
-        <td>23.04.2020</td>
-        <td>
-          <ul>
-            <li>Ereignisse ("Krisensitzung") hinzugefügt</li>
-            <li>Tabelle Anzahl bisherige Trainings hinzugefügt</li>
-            <li>Taktikseite überarbeitet</li>
-            <li>Personalkosten überarbeitet</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.12.0</td>
-        <td>22.04.2020</td>
-        <td>
-          <ul>
-            <li>Zeige Wahrscheinlichkeiten im Livespiel</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.11.0</td>
-        <td>15.04.2020</td>
-        <td>
-          <ul>
-            <li>Vereinsseite überarbeitet</li>
-            <li>Einige fixes</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.10.0</td>
-        <td>10.04.2020</td>
-        <td>
-          <ul>
-            <li>Spielerportraits implementiert</li>
-            <li>Spielerprämien (Auflauf-/ Torprämie) werden mit Cup-Prioritätsfaktor multipliziert ausbezahlt</li>
-            <li>Konditionsabnahme bei Verletzung reduziert</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.9.2</td>
-        <td>09.04.2020</td>
-        <td>
-          <ul>
-            <li>Spielerseite überarbeitet</li>
-            <li>Mail System gefixt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.9.0</td>
-        <td>08.04.2020</td>
-        <td>
-          <ul>
-            <li>Aufstellung per drag&amp;drop möglich</li>
-            <li>Unterteilung Spielerseite in Reiter</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.8.1</td>
-        <td>08.04.2020</td>
-        <td>
-          <ul>
-            <li>Leere Spieler im Transfermarkt (Option: Alle Spieler) gefixt</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.8.0</td>
-        <td>07.04.2020</td>
-        <td>
-          <ul>
-            <li>Option zum Limitieren von Dauerkartenverkauf implementiert</li>
-            <li>Leistungsverbesserung Liga-Seiten</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.7.0</td>
-        <td>06.04.2020</td>
-        <td>
-          <ul>
-            <li>Verwende länderspezifische Namen für neue Spieler</li>
-            <li>Faktoren Chart Spielerentwicklung skaliert (Summe der einzelnen Faktoren entspricht Gesamtwert)</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.6.0</td>
-        <td>05.04.2020</td>
-        <td>
-          <ul>
-            <li>Berechne und zeige Club Erfolgsfaktor auf Club Seite</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td>2.5.7</td>
-        <td>05.04.2020</td>
-        <td>
-          <ul>
-            <li>Update Kosten Stadion Oberring und Rasenerneuerung</li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+    <h3>Versionshistorie</h3>
+    <table id="tableNews" style="position: relative; margin: 0px; width: auto" cellpadding="2">
+      <thead>
+        <tr>
+          <th style="text-align: center">Version</th>
+          <th style="text-align: center">Datum</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>3.4.0</td>
+          <td>06.07.2020</td>
+          <td>
+            <ul>
+              <li>Spielermarktwerte überarbeitet</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3.3.3</td>
+          <td>23.06.2020</td>
+          <td>
+            <ul>
+              <li>Ereigniskosten hinzugefügt</li>
+              <li>Vorlagen Trainingswoche überarbeitet/hinzugefügt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3.3.2</td>
+          <td>23.06.2020</td>
+          <td>
+            <ul>
+              <li>Maximale Vertragslaufzeit der Spieler auf 5 Jahre begrenzt</li>
+              <li>Vereinsfilter im Transfermarkt hinzugefügt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3.3.0</td>
+          <td>19.06.2020</td>
+          <td>
+            <ul>
+              <li>Ereignis "Jugendtag" hinzugefügt</li>
+              <li>Mannschaftstraining überarbeitet (u.a. Vorlagen Trainingswoche hinzugefügt)</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3.2.0</td>
+          <td>11.06.2020</td>
+          <td>
+            <ul>
+              <li>Zweite deutsche Liga eingeführt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3.1.1</td>
+          <td>10.05.2020</td>
+          <td>
+            <ul>
+              <li>Infos zu Training Chart hinzugefügt</li>
+              <li>Zeige Trainingshistorie jedes einzelnen Spielers</li>
+              <li>Spieler verlieren 5% Moral bei setzen auf die Transferliste</li>
+              <li>Spieler gewinnen 10% Moral bei erfolgreichem Transfer</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>3.0.0</td>
+          <td>08.05.2020</td>
+          <td>
+            <ul>
+              <li>Merchandising hinzugefügt</li>
+              <li>Zeige Warnung bei zu geringer Anzahl an Stadionextras/Gebäuden</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.15.0</td>
+          <td>03.05.2020</td>
+          <td>
+            <ul>
+              <li>Verletzungshistorie hinzugefügt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.14.0</td>
+          <td>28.04.2020</td>
+          <td>
+            <ul>
+              <li>"Zeitung" hinzugefügt</li>
+              <li>Ereignis "Weihnachtsfeier" hinzugefügt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.13.0</td>
+          <td>23.04.2020</td>
+          <td>
+            <ul>
+              <li>Ereignisse ("Krisensitzung") hinzugefügt</li>
+              <li>Tabelle Anzahl bisherige Trainings hinzugefügt</li>
+              <li>Taktikseite überarbeitet</li>
+              <li>Personalkosten überarbeitet</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.12.0</td>
+          <td>22.04.2020</td>
+          <td>
+            <ul>
+              <li>Zeige Wahrscheinlichkeiten im Livespiel</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.11.0</td>
+          <td>15.04.2020</td>
+          <td>
+            <ul>
+              <li>Vereinsseite überarbeitet</li>
+              <li>Einige fixes</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.10.0</td>
+          <td>10.04.2020</td>
+          <td>
+            <ul>
+              <li>Spielerportraits implementiert</li>
+              <li>Spielerprämien (Auflauf-/ Torprämie) werden mit Cup-Prioritätsfaktor multipliziert ausbezahlt</li>
+              <li>Konditionsabnahme bei Verletzung reduziert</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.9.2</td>
+          <td>09.04.2020</td>
+          <td>
+            <ul>
+              <li>Spielerseite überarbeitet</li>
+              <li>Mail System gefixt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.9.0</td>
+          <td>08.04.2020</td>
+          <td>
+            <ul>
+              <li>Aufstellung per drag&amp;drop möglich</li>
+              <li>Unterteilung Spielerseite in Reiter</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.8.1</td>
+          <td>08.04.2020</td>
+          <td>
+            <ul>
+              <li>Leere Spieler im Transfermarkt (Option: Alle Spieler) gefixt</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.8.0</td>
+          <td>07.04.2020</td>
+          <td>
+            <ul>
+              <li>Option zum Limitieren von Dauerkartenverkauf implementiert</li>
+              <li>Leistungsverbesserung Liga-Seiten</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.7.0</td>
+          <td>06.04.2020</td>
+          <td>
+            <ul>
+              <li>Verwende länderspezifische Namen für neue Spieler</li>
+              <li>Faktoren Chart Spielerentwicklung skaliert (Summe der einzelnen Faktoren entspricht Gesamtwert)</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.6.0</td>
+          <td>05.04.2020</td>
+          <td>
+            <ul>
+              <li>Berechne und zeige Club Erfolgsfaktor auf Club Seite</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>2.5.7</td>
+          <td>05.04.2020</td>
+          <td>
+            <ul>
+              <li>Update Kosten Stadion Oberring und Rasenerneuerung</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
 
 @section Scripts {
   @Scripts.Render("~/bundles/jqueryval")
