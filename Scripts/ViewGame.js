@@ -41,7 +41,7 @@ function drawGame(iState, iGameSpeed) {
         plotStatistics(iState);
       } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
         bFinished = gLoc2.bFinished;
-        if (!bFinished) {
+        if (!bFinished && iGameSpeed > 0) {
           setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
         }
       } else { // If running game --> Add latest element of locations to the array
@@ -227,7 +227,7 @@ function interpolateBall2(imgBallTmp, iB, pt0, pt1, bHighPass, nInterpSteps, iGa
   imgBallTmp.style.width  = fSizeX.toString() + '%';
   imgBallTmp.style.height = fSizeY.toString() + '%';
 
-  if (iB < nInterpSteps) {
+  if (iB < nInterpSteps && iGameSpeed > 0) {
     var fSlowDownFactor = 1.6;
 
     iB = iB + 1;

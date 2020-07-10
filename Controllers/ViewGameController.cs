@@ -409,14 +409,23 @@ namespace CornerkickWebMvc.Controllers
         user.game.ball = ball;
         user.game.tsMinute = state.tsMinute;
 
+        // Find player at ball
+        user.game.ball.plAtBall = null;
         if (user.game.ball.iPassStep == 0) {
           for (byte iHA = 0; iHA < 2; iHA++) {
             for (int iP = 0; iP < MvcApplication.ckcore.game.data.nPlStart; iP++) {
-              if (ball.ptPos == user.game.player[iHA][iP].ptPos) {
-                user.game.ball.plAtBall = user.game.player[iHA][iP];
-                break;
+              if (iP < user.game.player[iHA].Length) {
+                CornerkickGame.Player plAtBall = user.game.player[iHA][iP];
+                if (plAtBall == null) continue;
+
+                if (ball.ptPos == plAtBall.ptPos) {
+                  user.game.ball.plAtBall = plAtBall;
+                  break;
+                }
               }
             }
+
+            if (user.game.ball.plAtBall != null) break;
           }
         }
       }
