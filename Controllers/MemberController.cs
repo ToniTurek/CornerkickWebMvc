@@ -6798,7 +6798,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(sCash, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult getLtSponsorBoardIds()
     {
       CornerkickManager.Club clb = ckClub();
@@ -6812,7 +6812,8 @@ namespace CornerkickWebMvc.Controllers
       return Json(ltSponsorBoardIds, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult getTableSponsorBoard()
+    [HttpGet]
+    public ActionResult SponsorGetTableBoard()
     {
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -6836,7 +6837,7 @@ namespace CornerkickWebMvc.Controllers
           if (bOffer) deSponsorBoard.iIndex = iSpOffer - 1;
           spon.iId = (byte)Math.Min(spon.iId, MvcApplication.ckcore.fz.ltSponsoren.Count - 1);
           deSponsorBoard.sName = MvcApplication.ckcore.fz.ltSponsoren[spon.iId].name;
-          deSponsorBoard.sMoneyVicHome = spon.iMoneyVicHome.ToString("N0", getCi());
+          deSponsorBoard.iMoneyVicHome = spon.iMoneyVicHome;
           deSponsorBoard.nBoards = spon.nBoards;
           deSponsorBoard.iYears = spon.iYears;
 
