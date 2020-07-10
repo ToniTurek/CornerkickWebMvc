@@ -51,6 +51,10 @@
             "data": "iPresent",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
+          {
+            "data": "iValuePresent",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "sPricePresentBuyAve" },
           { "data": "sPriceBasic" },
           { "data": null },
@@ -82,7 +86,7 @@
             "searchable": false
           },
           {
-            "targets": [3, 5, 6, 7, 8, 10, 11, 12],
+            "targets": [3, 4, 6, 7, 8, 9, 11, 12, 13],
             "className": "dt-right"
           },
           {
@@ -90,22 +94,22 @@
             "className": "dt-center columnBorderRight"
           },
           {
-            "targets": [4, 9],
+            "targets": [5, 10],
             "className": "dt-right columnBorderRight"
           },
           {
-            "targets": 8,
+            "targets": 9,
             "defaultContent": '0 €',
             "data": null
           },
           {
-            "targets": [4, 13],
+            "targets": [5, 14],
             "defaultContent": '0.00 €',
             "className": "dt-right",
             "data": null
           },
           {
-            "targets": [9, 10],
+            "targets": [10, 11],
             "defaultContent": '',
             "orderable": false,
             "searchable": false,
@@ -181,9 +185,9 @@
           }
           divPriceSell.appendChild(txtPrice);
 
-          $('td:eq(4)', nRow).html(divAmount);
-          $('td:eq(7)', nRow).html(bnBuy);
-          $('td:eq(8)', nRow).html(divPriceSell);
+          $('td:eq(5)', nRow).html(divAmount);
+          $('td:eq(8)', nRow).html(bnBuy);
+          $('td:eq(9)', nRow).html(divPriceSell);
 
           return nRow;
         },
@@ -203,11 +207,15 @@
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
 
-          var iCn = 11;
+          var iCn = 4;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
 
           var iCn = 12;
+          iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
+          $(api.column(iCn).footer()).html(iSum.toLocaleString());
+
+          var iCn = 13;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
         }
@@ -333,25 +341,26 @@
         <thead>
           <tr>
             <th colspan="3" class="columnBorderRight"></th>
-            <th colspan="2" style="text-align: center; font-size: 125%; background-color: orange" class="columnBorderRight">Bestand</th>
+            <th colspan="3" style="text-align: center; font-size: 125%; background-color: orange" class="columnBorderRight">Bestand</th>
             <th colspan="5" style="text-align: center; font-size: 125%; background-color: lightgreen" class="columnBorderRight">Einkauf</th>
             <th colspan="4" style="text-align: center; font-size: 125%; background-color: lightblue">Verkauf</th>
           </tr>
           <tr>
-            <th>#</th>
-            <th>id</th>
-            <th class="columnBorderRight">Artikel</th>
-            <th style="text-align: center">Lager</th>
-            <th class="columnBorderRight" style="text-align: center">Ø-Preis</th>
-            <th>Grundpreis</th>
-            <th>Menge</th>
-            <th>Preis/Stück</th>
-            <th>Gesamtpreis</th>
-            <th class="columnBorderRight" style="text-align: center"></th>
-            <th>Verkaufspreis</th>
-            <th>verkauft</th>
-            <th>Einnahmen [€]</th>
-            <th>Ø-Preis</th>
+            <th style="background-color: white">#</th>
+            <th style="background-color: white">id</th>
+            <th class="columnBorderRight" style="background-color: white">Artikel</th>
+            <th style="text-align: center; background-color: white">Lager</th>
+            <th style="text-align: center; background-color: white">Wert [€]</th>
+            <th class="columnBorderRight" style="text-align: center; background-color: white">Ø-Preis</th>
+            <th style="background-color: white">Grundpreis</th>
+            <th style="background-color: white">Menge</th>
+            <th style="background-color: white">Preis/Stück</th>
+            <th style="background-color: white">Gesamtpreis</th>
+            <th class="columnBorderRight" style="text-align: center; background-color: white"></th>
+            <th style="background-color: white">Verkaufspreis</th>
+            <th style="background-color: white">verkauft</th>
+            <th style="background-color: white">Einnahmen [€]</th>
+            <th style="background-color: white">Ø-Preis</th>
           </tr>
         </thead>
         <tbody>
@@ -362,6 +371,7 @@
             <th></th>
             <th></th>
             <th class="columnBorderRight">Summe:</th>
+            <th></th>
             <th></th>
             <th class="columnBorderRight" style="text-align: right"></th>
             <th></th>

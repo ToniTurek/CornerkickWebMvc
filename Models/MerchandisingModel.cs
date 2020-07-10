@@ -25,6 +25,7 @@ namespace CornerkickWebMvc.Models
       public int iId { get; set; }
       public string sName { get; set; }
       public int iPresent { get; set; }
+      public int iValuePresent { get; set; }
       public string sPricePresentBuyAve { get; set; }
       public int iSold { get; set; }
       public string sPriceBasic { get; set; }
