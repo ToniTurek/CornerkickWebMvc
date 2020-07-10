@@ -76,13 +76,13 @@
             "className": "dt-center",
             "orderable": false,
             "render": function (fAge, type, row) {
-              if (fAge > 17) {
+              if (fAge >= 17) {
                 return "A";
-              } else if (fAge > 15) {
+              } else if (fAge >= 15) {
                 return "B";
-              } else if (fAge > 13) {
+              } else if (fAge >= 13) {
                 return "C";
-              } else if (fAge > 11) {
+              } else if (fAge >= 11) {
                 return "D";
               } else {
                 return "E";
@@ -107,13 +107,13 @@
           var clFt = "black";
           var clBg = "yellow";
 
-          if (aData.fAge > 17) {
+          if (aData.fAge >= 17) {
             clBg = "LightGrey";
-          } else if (aData.fAge > 15) {
+          } else if (aData.fAge >= 15) {
             clBg = "PowderBlue";
-          } else if (aData.fAge > 13) {
+          } else if (aData.fAge >= 13) {
             clBg = "Yellow";
-          } else if (aData.fAge > 11) {
+          } else if (aData.fAge >= 11) {
             clBg = "PaleGreen";
           } else {
             clBg = "pink";
