@@ -4185,7 +4185,7 @@ namespace CornerkickWebMvc.Controllers
       return Json("Der Ausbau des Stadions wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetCostTopring()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4206,7 +4206,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(sCostDays, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetMaxSeats()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4233,14 +4233,14 @@ namespace CornerkickWebMvc.Controllers
       return clb.stadium.bTopring && clb.stadium.iTopringDaysConstruct == 0;
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetTopring()
     {
       CornerkickManager.Club clb = ckClub();
       return Json(bStadiumGetTopring(clb), JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetBlockProgress()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4259,7 +4259,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(fPg, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetTopringProgress()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4272,7 +4272,7 @@ namespace CornerkickWebMvc.Controllers
       return Json((iCostDays[1] - clb.stadium.iTopringDaysConstruct) / (float)iCostDays[1], JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetExtras()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4312,7 +4312,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Video-wall
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetCostVideo(byte iLevel)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
@@ -4346,7 +4346,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Snackbars
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetCostSnackbar(int iBuildNew)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
@@ -4383,7 +4383,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Toilets
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumGetCostToilets(int iBuildNew)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
@@ -4448,7 +4448,7 @@ namespace CornerkickWebMvc.Controllers
       return stadiumNew;
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumRenewPitchCost()
     {
       CornerkickManager.Club clb = ckClub();

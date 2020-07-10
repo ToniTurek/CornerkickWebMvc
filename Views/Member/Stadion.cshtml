@@ -92,13 +92,22 @@
       $("#tbSnackbar").on('keyup', function (ev) {
         getSnackbar();
       });
+      $("#tbSnackbar").on('change', function (ev) {
+        getSnackbar();
+      });
 
       $("#tbToilets").on('keyup', function (ev) {
+        getToilets();
+      });
+      $("#tbToilets").on('change', function (ev) {
         getToilets();
       });
 
       $('.tbSeats').each(function () {
         $(this).on('keyup', function (ev) {
+          getStadion();
+        });
+        $(this).on('change', function (ev) {
           getStadion();
         });
       });
@@ -115,7 +124,7 @@
 
       $("#bnBuildTopring").click(function () {
         $.ajax({
-          type: 'post',
+          type: 'GET',
           url: '/Member/StadiumGetMaxSeats',
           dataType: "json",
           success: function (iSeatsMax) {
@@ -154,7 +163,7 @@
     function setImage() {
       $.ajax({
         url: '/Member/StadiumGetTopring',
-        type: "post",
+        type: "GET",
         dataType: "JSON",
         success: function (bTopring) {
           if (bTopring) {
@@ -199,7 +208,7 @@
       });
 
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumGetCostTopring',
         dataType: "json",
         success: function (sCostLength) {
@@ -223,7 +232,7 @@
 
       // Renew pitch
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumRenewPitchCost',
         dataType: "json",
         success: function (sCost) {
@@ -257,7 +266,7 @@
       });
 
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumGetTopringProgress',
         dataType: "json",
         success: function (fPgTr) {
@@ -277,7 +286,7 @@
       });
 
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumGetExtras',
         dataType: "json",
         success: function (sCurrent) {
@@ -347,7 +356,7 @@
 
       var iVideo = $('#ddlVideo').val();
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumGetCostVideo',
         dataType: "json",
         data: { iLevel: iVideo },
@@ -383,7 +392,7 @@
 
       var iSnackbar = $('#tbSnackbar').val();
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumGetCostSnackbar',
         dataType: "json",
         data: { iBuildNew: iSnackbar },
@@ -419,7 +428,7 @@
 
       var iToilets = $('#tbToilets').val();
       $.ajax({
-        type: 'post',
+        type: 'GET',
         url: '/Member/StadiumGetCostToilets',
         dataType: "json",
         data: { iBuildNew: iToilets },
