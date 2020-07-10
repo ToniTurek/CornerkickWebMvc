@@ -835,9 +835,17 @@ function plotStatistics(jState = -1) {
       }
       */
 
-      //if (document.getElementById("myCheck").checked) {
       if (document.getElementById("bShowChances").checked) {
-        drawPlayerChances(gD.fPlAction, gD.fPlActionRnd);
+        // Check if sum of chances > 0
+        var fChanceTotal = 0;
+        for (var iC = 0; iC < gD.fPlAction.length; iC++) {
+          fChanceTotal += gD.fPlAction[iC];
+        }
+
+        // Only draw chances if sum > 0
+        if (fChanceTotal > 0) {
+          drawPlayerChances(gD.fPlAction, gD.fPlActionRnd);
+        }
       }
     } // success function
   }); // ajax
