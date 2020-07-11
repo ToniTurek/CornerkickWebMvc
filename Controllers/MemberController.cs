@@ -4775,7 +4775,8 @@ namespace CornerkickWebMvc.Controllers
         CornerkickManager.Stadium.sClubMuseumName,
         CornerkickManager.Stadium.sCarparkName,
         CornerkickManager.Stadium.sTicketcounterName,
-        CornerkickManager.Stadium.sFanshopName
+        CornerkickManager.Stadium.sFanshopName,
+        CornerkickManager.Stadium.sMassTransitName
       };
 
       if (iType == 6) { // Carpark
