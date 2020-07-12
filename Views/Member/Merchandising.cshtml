@@ -35,6 +35,10 @@
     }); // $(document).ready
 
     function setTableItems() {
+      var sColumnAmount = "5";
+      var sColumnPricePiece = "6";
+      var sColumnPriceTotal = "7";
+
       return $('#tableItems').DataTable({
         "ajax": {
           "url": '@Url.Action("MerchandisingGetItems", "Member")',
@@ -156,7 +160,7 @@
             itAmount.addEventListener("keyup", function () {
               if (this.value) {
                 this.style.backgroundColor = "white";
-                getPrice(aData.iId, parseInt(this.value), $("td:eq(5)", nRow), $("td:eq(6)", nRow), bnBuy);
+                getPrice(aData.iId, parseInt(this.value), $("td:eq(" + sColumnPricePiece + ")", nRow), $("td:eq(" + sColumnPriceTotal + ")", nRow), bnBuy);
               } else {
                 this.style.backgroundColor = "red";
               }
@@ -173,7 +177,7 @@
             });
 
             bnBuy.addEventListener("click", function () {
-              buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(5)", nRow).text(), parseFloat(itPrice.value));
+              buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(" + sColumnPricePiece + ")", nRow).text(), parseFloat(itPrice.value));
             });
           } else {
             var txtAmount = document.createElement("txt");
@@ -185,7 +189,7 @@
           }
           divPriceSell.appendChild(txtPrice);
 
-          $('td:eq(5)', nRow).html(divAmount);
+          $('td:eq(' + sColumnAmount + ')', nRow).html(divAmount);
           $('td:eq(8)', nRow).html(bnBuy);
           $('td:eq(9)', nRow).html(divPriceSell);
 
