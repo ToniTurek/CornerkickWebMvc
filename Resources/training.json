@@ -18,7 +18,7 @@
         "condi": -2.0,
         "fresh": +5.0,
         "moral": +1.0,
-        "injuryrisk": 0.0001,
+        "injuryrisk": 0.0,
         "skillbonus":
           [
           ]
@@ -29,7 +29,7 @@
         "condi":  -1.2,
         "fresh": +20.0,
         "moral":   0.0,
-        "injuryrisk": 0.0001,
+        "injuryrisk": 0.0,
         "skillbonus":
           [
           ]
@@ -54,8 +54,8 @@
         "injuryrisk": 0.003,
         "skillbonus":
           [
-            { "skill":  0, "bonus": 0.01, "exclude": 0 },
-            { "skill": 16, "bonus": 0.01, "exclude": 0 }
+            { "skill":  0, "bonus": 0.020, "exclude": 0 },
+            { "skill": 16, "bonus": 0.020, "exclude": 0 }
           ]
       },
       {
@@ -67,8 +67,8 @@
         "injuryrisk": 0.003,
         "skillbonus":
           [
-            { "skill": 2, "bonus": 0.01, "exclude": 0 },
-            { "skill": 3, "bonus": 0.01, "exclude": 0 }
+            { "skill": 2, "bonus": 0.020, "exclude": 0 },
+            { "skill": 3, "bonus": 0.020, "exclude": 0 }
           ]
       },
       {
@@ -80,9 +80,9 @@
         "injuryrisk": 0.001,
         "skillbonus":
           [
-            { "skill": 1, "bonus": 0.01, "exclude": 0 },
-            { "skill": 4, "bonus": 0.01, "exclude": 0 },
-            { "skill": 5, "bonus": 0.01, "exclude": 0 }
+            { "skill": 1, "bonus": 0.020, "exclude": 0 },
+            { "skill": 4, "bonus": 0.020, "exclude": 0 },
+            { "skill": 5, "bonus": 0.020, "exclude": 0 }
           ]
       },
       {
@@ -94,10 +94,10 @@
         "injuryrisk": 0.001,
         "skillbonus":
           [
-            { "skill":  8, "bonus": 0.01, "exclude": 2 },
-            { "skill":  9, "bonus": 0.01, "exclude": 2 },
-            { "skill": 13, "bonus": 0.01, "exclude": 1 },
-            { "skill": 14, "bonus": 0.01, "exclude": 1 }
+            { "skill":  8, "bonus": 0.020, "exclude": 2 },
+            { "skill":  9, "bonus": 0.020, "exclude": 2 },
+            { "skill": 13, "bonus": 0.020, "exclude": 1 },
+            { "skill": 14, "bonus": 0.020, "exclude": 1 }
           ]
       },
       {
@@ -109,8 +109,12 @@
         "injuryrisk": 0.001,
         "skillbonus":
           [
-            { "skill":  6, "bonus": 0.010, "exclude": 2 },
-            { "skill":  7, "bonus": 0.010, "exclude": 2 },
+            { "skill":  4, "bonus": 0.005, "exclude": 2 },
+            { "skill":  5, "bonus": 0.005, "exclude": 2 },
+            { "skill":  6, "bonus": 0.015, "exclude": 2 },
+            { "skill":  7, "bonus": 0.015, "exclude": 2 },
+            { "skill":  8, "bonus": 0.005, "exclude": 2 },
+            { "skill":  9, "bonus": 0.005, "exclude": 2 },
             { "skill": 10, "bonus": 0.010, "exclude": 2 },
             { "skill": 13, "bonus": 0.003, "exclude": 1 },
             { "skill": 14, "bonus": 0.003, "exclude": 1 },
@@ -126,12 +130,12 @@
         "injuryrisk": 0.0005,
         "skillbonus":
           [
-            { "skill": 10, "bonus": 0.010, "exclude": 2 },
-            { "skill": 11, "bonus": 0.010, "exclude": 2 },
-            { "skill": 12, "bonus": 0.010, "exclude": 2 },
-            { "skill": 13, "bonus": 0.003, "exclude": 1 },
-            { "skill": 14, "bonus": 0.003, "exclude": 1 },
-            { "skill": 15, "bonus": 0.003, "exclude": 1 }
+            { "skill": 10, "bonus": 0.015, "exclude": 2 },
+            { "skill": 11, "bonus": 0.015, "exclude": 2 },
+            { "skill": 12, "bonus": 0.015, "exclude": 2 },
+            { "skill": 13, "bonus": 0.005, "exclude": 1 },
+            { "skill": 14, "bonus": 0.005, "exclude": 1 },
+            { "skill": 15, "bonus": 0.005, "exclude": 1 }
           ]
       },
       {
@@ -143,14 +147,19 @@
         "injuryrisk": 0.003,
         "skillbonus":
           [
-            { "skill":  1, "bonus": 0.003, "exclude": 0 },
-            { "skill":  2, "bonus": 0.003, "exclude": 0 },
-            { "skill":  3, "bonus": 0.003, "exclude": 0 },
-            { "skill":  4, "bonus": 0.003, "exclude": 0 },
-            { "skill":  5, "bonus": 0.003, "exclude": 0 },
-            { "skill":  6, "bonus": 0.003, "exclude": 0 },
-            { "skill":  7, "bonus": 0.003, "exclude": 0 },
-            { "skill": 10, "bonus": 0.003, "exclude": 0 }
+            { "skill":  1, "bonus": 0.005, "exclude": 0 },
+            { "skill":  2, "bonus": 0.005, "exclude": 0 },
+            { "skill":  3, "bonus": 0.005, "exclude": 0 },
+            { "skill":  4, "bonus": 0.005, "exclude": 0 },
+            { "skill":  5, "bonus": 0.005, "exclude": 0 },
+            { "skill":  6, "bonus": 0.005, "exclude": 0 },
+            { "skill":  7, "bonus": 0.005, "exclude": 0 },
+            { "skill":  8, "bonus": 0.003, "exclude": 2 },
+            { "skill":  9, "bonus": 0.003, "exclude": 2 },
+            { "skill": 10, "bonus": 0.003, "exclude": 2 },
+            { "skill": 13, "bonus": 0.003, "exclude": 1 },
+            { "skill": 14, "bonus": 0.003, "exclude": 1 },
+            { "skill": 15, "bonus": 0.003, "exclude": 1 }
           ]
       },
       {
@@ -163,7 +172,7 @@
         "skillbonus":
           [
             { "skill":  1, "bonus": 0.010, "exclude": 0 },
-            { "skill": 10, "bonus": 0.003, "exclude": 0 }
+            { "skill": 10, "bonus": 0.005, "exclude": 0 }
           ]
       },
       {
@@ -175,7 +184,7 @@
         "injuryrisk": 0.001,
         "skillbonus":
           [
-            { "skill": 10, "bonus": 0.03, "exclude": 0 }
+            { "skill": 10, "bonus": 0.040, "exclude": 0 }
           ]
       },
       {
@@ -184,11 +193,11 @@
         "condi":  -1.2,
         "fresh": +10.0,
         "moral":  +0.3,
-        "injuryrisk": 0.0002,
+        "injuryrisk": 0.0,
         "skillbonus":
           [
-            { "skill":  1, "bonus": 0.003, "exclude": 2 },
-            { "skill": 13, "bonus": 0.003, "exclude": 1 }
+            { "skill":  1, "bonus": 0.005, "exclude": 2 },
+            { "skill": 13, "bonus": 0.005, "exclude": 1 }
           ]
       },
       {
@@ -197,12 +206,12 @@
         "condi": -0.6,
         "fresh": -0.5,
         "moral": -0.2,
-        "injuryrisk": 0.0003,
+        "injuryrisk": 0.0005,
         "skillbonus":
           [
             { "skill": 12, "bonus": 0.030, "exclude": 2 },
             { "skill": 13, "bonus": 0.010, "exclude": 1 },
-            { "skill": 14, "bonus": 0.003, "exclude": 1 }
+            { "skill": 14, "bonus": 0.005, "exclude": 1 }
           ]
       }
     ]
