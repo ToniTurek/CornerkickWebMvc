@@ -88,6 +88,7 @@ namespace CornerkickWebMvc.Models
     public int fixtransferfee { get; set; }
     public string nat { get; set; }
     public string age { get; set; }
+    public bool bEndingContract { get; set; }
   }
 
   public class DatatableEntryTransferDetails

@@ -66,11 +66,11 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
         type: "POST",
         dataType: "JSON",
         data: { iPlayerId: iPlayerId },
-        success: function (bNewContract) {
+        success: function (iContractType) {
           var div0 = document.createElement("div");
           div0.id = "dialogContract2";
           div0.title = "Vertragsverhandlung";
-          if (bNewContract) {
+          if (iContractType > 0) {
             div0.title += " (neuer Vertrag)";
           } else {
             div0.title += " (Vertragsverlängerung)";
@@ -93,34 +93,48 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           div1.className = "form-group";
           var div11 = document.createElement("div");
           div11.style.position = "absolute";
-          div11.style.width = "48%";
+          div11.style.width = "38%";
           div11.style.height = "auto";
-          div11.style.top = "10px";
+          div11.style.top = "8px";
           div11.align = "right";
           div11.innerHTML = "<b class=\"left\">";
-          if (!bNewContract) {
+          if (iContractType === 0) {
             div11.innerHTML += "Zusätzl. ";
           }
           div11.innerHTML += "Laufzeit [a]: </b>";
           div1.appendChild(div11);
           var div12 = document.createElement("div");
           div12.style.position = "absolute";
-          div12.style.width = "48%";
-          div12.style.left = "52%";
+          div12.style.width = "60%";
+          div12.style.left = "40%";
           div12.align = "left";
           var input12 = document.createElement("input");
           input12.className = "form-control tbContractYears text-box single-line";
           input12.id = "tbContractYears";
           input12.style.textAlign = "right";
-          input12.style.width = "60px";
+          input12.style.width = "50px";
           input12.type = "tel";
           input12.min = "1";
-          input12.max = "10";
+          input12.max = "5";
           input12.step = "1";
           input12.value = "1";
           input12.autocomplete = "off";
           input12.onkeyup = function () { updateContract(iPlayerId, input12, false, bnNegotiate); };
           div12.appendChild(input12);
+          if (iContractType === 2) {
+            var lbNextSeason = document.createElement("label");
+            lbNextSeason.style.position = "absolute";
+            lbNextSeason.style.top = "6px";
+            lbNextSeason.style.left = "60px";
+            lbNextSeason.style.fontWeight = "normal";
+            lbNextSeason.className = "noselect";
+            var cbNextSeason = document.createElement("input");
+            cbNextSeason.type = "checkbox";
+            cbNextSeason.id = "cbNextSeason";
+            lbNextSeason.appendChild(cbNextSeason);
+            lbNextSeason.innerHTML += " Ab nächster Saison";
+            div12.appendChild(lbNextSeason);
+          }
           div1.appendChild(div12);
           div0.appendChild(div1);
 
@@ -353,11 +367,17 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
                   var sFixTransferFee = $("#tbContractFixTransferFeeOffer").val();
                   var sPlayerMood = $("#txtContractMood2").text();
 
+                  var bNextSeason = false;
+                  var cbNextSeason = document.getElementById("cbNextSeason");
+                  if (cbNextSeason !== null) {
+                    bNextSeason = cbNextSeason.checked;
+                  }
+
                   $.ajax({
                     url: "/Member/NegotiatePlayerContract",
                     type: 'POST',
                     traditional: true,
-                    data: { iId: iPlayerId, iYears: iYears, sSalary: sSalary, sBonusPlay: sBonusPlay, sBonusGoal: sBonusGoal, sFixTransferFee: sFixTransferFee, sPlayerMood: sPlayerMood },
+                    data: { iId: iPlayerId, iYears: iYears, sSalary: sSalary, sBonusPlay: sBonusPlay, sBonusGoal: sBonusGoal, sFixTransferFee: sFixTransferFee, bNextSeason: bNextSeason, sPlayerMood: sPlayerMood },
                     dataType: "json",
                     success: function (response) {
                       alert(response);

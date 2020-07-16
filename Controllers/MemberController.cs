@@ -1885,7 +1885,7 @@ namespace CornerkickWebMvc.Controllers
                 sName = plNext.sName + " *",
                 sPosition = CornerkickManager.Player.getStrPos(plNext),
                 sSkill = CornerkickGame.Tool.getAveSkill(plNext).ToString("0.0"),
-                iValue = plNext.getValue(MvcApplication.ckcore.dtDatum),
+                iValue = plNext.getValue(MvcApplication.ckcore.dtDatum) * 1000,
                 iSalary = plNext.contractNext.iSalary,
                 iLength = plNext.contractNext.iLength,
                 sNat = CornerkickManager.Main.sLandShort[plNext.iNat1],
@@ -1894,7 +1894,7 @@ namespace CornerkickWebMvc.Controllers
                 sSkillIdeal = CornerkickGame.Tool.getAveSkill(plNext, bIdeal: true).ToString("0.0"),
                 iBonusPlay = plNext.contractNext.iPlay,
                 iBonusGoal = plNext.contractNext.iGoal,
-                sFixTransferFee = plNext.contractNext.iFixTransferFee.ToString(),
+                sFixTransferFee = plNext.contractNext.iFixTransferFee > 0 ? plNext.contractNext.iFixTransferFee.ToString() : "-",
                 bJouth = bJouth
               });
             }
@@ -2843,13 +2843,17 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player plContract = MvcApplication.ckcore.ltPlayer[iPlayerId];
 
-      return Json(checkIfNewContract(plContract, clb), JsonRequestBehavior.AllowGet);
+      byte iType = 0;
+      if (!CornerkickManager.Player.ownPlayer(clb, plContract)) iType = 2;
+      else if (checkIfNewContract(plContract, clb)) iType = 1;
+
+      return Json(iType, JsonRequestBehavior.AllowGet);
     }
 
     // iMode: 0 - Extention, 1 - new contract
     const byte iContractLengthMax = 5;
     [HttpPost]
-    public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sBonusPlay, string sBonusGoal, string sFixTransferFee, string sPlayerMood)
+    public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sBonusPlay, string sBonusGoal, string sFixTransferFee, bool bNextSeason, string sPlayerMood)
     {
       // Initialize status code with ERROR
       Response.StatusCode = 1;
@@ -2947,8 +2951,10 @@ namespace CornerkickWebMvc.Controllers
         contract.iGoal = iBonusGoal;
         contract.iFixTransferFee = iFixTransferFee;
         contract.fMood = fPlayerMood;
+        contract.iClubId = clbUser.iId;
         offer.contract = contract;
         offer.club = ckClub();
+        offer.bNextSeason = bNextSeason;
 
         MvcApplication.ckcore.tr.addChangeOffer(iId, offer);
         sReturn = "Sie haben sich mit dem Spieler " + plContract.sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
@@ -3200,6 +3206,7 @@ namespace CornerkickWebMvc.Controllers
                   return Json("Sie haben nicht genug Schwarzgeld...", JsonRequestBehavior.AllowGet);
                 }
 
+                // No club
                 if (clbGive == null) {
                   offer.iFee = 0;
                   offer.iFeeSecret = 0;
@@ -3209,6 +3216,17 @@ namespace CornerkickWebMvc.Controllers
                   break;
                 }
 
+                // Ending contract
+                if (offer.bNextSeason && CornerkickManager.Player.checkIfContractIsEnding(transfer.player, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd)) {
+                  offer.iFee = 0;
+                  offer.iFeeSecret = 0;
+                  if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club, bNextSeason: true)) {
+                    sReturn = "Sie haben den Spieler " + pl.sName + " ablösefrei für die nächste Saison verpflichtet.";
+                  }
+                  break;
+                }
+
+                // Fix transfer fee
                 if (pl.contract != null && pl.contract.iFixTransferFee > 0) {
                   offer.iFee = pl.contract.iFixTransferFee;
                   offer.iFeeSecret = 0;
@@ -3373,7 +3391,7 @@ namespace CornerkickWebMvc.Controllers
             sClub = MvcApplication.ckcore.ltClubs[transfer.player.iClubId].sName;
           }
 
-          int iOffer = 0;
+          int iOffer = 0; // -2: not on transfer list, -1: negotiation cancelled, +1: already offered, +2: own player
           int iFixtransferfee = 0;
           CornerkickManager.Club clubUser = ckClub();
           if (clubUser.iId > 0) {
@@ -3396,14 +3414,15 @@ namespace CornerkickWebMvc.Controllers
             datum = sDatePutOnTl,
             name = transfer.player.sName,
             position = CornerkickManager.Player.getStrPos(transfer.player),
-            strength      = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false),
+            strength = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: false),
             strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true),
             age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
             talent = (transfer.player.iTalent + 1),
             mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
             fixtransferfee = iFixtransferfee,
             club = sClub,
-            nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1]
+            nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1],
+            bEndingContract = CornerkickManager.Player.checkIfContractIsEnding(transfer.player, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) && transfer.player.contractNext == null
           });
         } catch (Exception e) {
           MvcApplication.ckcore.tl.writeLog("Error in getTableTransfer(), iTr: " + iTr.ToString() + Environment.NewLine + e.Message + Environment.NewLine + e.Source + Environment.NewLine + e.Data + Environment.NewLine + e.StackTrace, CornerkickManager.Main.sErrorFile);

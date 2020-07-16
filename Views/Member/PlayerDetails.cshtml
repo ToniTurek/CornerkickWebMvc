@@ -907,6 +907,12 @@
                   <td align="right">@sDauer</td>
                 </tr>
               }
+              @if (player.contractNext != null && player.contractNext.iLength > 0 && player.contractNext.iClubId >= 0) {
+                <tr>
+                  <td align="right">Verein nächste Saison:</td>
+                  <td align="right">@MvcApplication.ckcore.ltClubs[player.contractNext.iClubId].sName</td>
+                </tr>
+              }
               <tr>
                 @{
                   string sVal = (player.getValue(MvcApplication.ckcore.dtDatum) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";

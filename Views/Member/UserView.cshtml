@@ -14,7 +14,7 @@
     foreach (CornerkickManager.Main.Success success in Model.usr.ltSuccess) {
       string sWDD = "S/U/N: " + success.iWin.ToString() + "/" + success.iDraw.ToString() + "/" + success.iDefeat.ToString();
       //string sCupWin = "Gewonnen: " + success.iCupWin.ToString();
-      string sCupWin = "Gewonnen: " + 0.ToString();
+      string sCupWin = "Gewonnen: " + success.getCupWin().ToString();
       if (success.cup == null) { continue; }
 
       <b>@success.cup.sName</b>
