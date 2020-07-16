@@ -353,7 +353,7 @@ namespace CornerkickWebMvc.Controllers
       pbBall = ball.Pos;
 
       if (bAverage) {
-        System.Drawing.Point ptAve = MvcApplication.ckcore.ui.getAveragePos(user.game, -1, -1, iState);
+        System.Drawing.Point ptAve = CornerkickManager.UI.getAveragePos(user.game, -1, -1, iState);
         pbBall.X = ptAve.X;
         pbBall.Y = ptAve.Y;
         pbBall.Z = 0f;
@@ -380,7 +380,7 @@ namespace CornerkickWebMvc.Controllers
 
           gPlayer.ptPos = pl.ptPos;
           if (bAverage) {
-            System.Drawing.Point ptAve = MvcApplication.ckcore.ui.getAveragePos(user.game, iHA, iP, iState);
+            System.Drawing.Point ptAve = CornerkickManager.UI.getAveragePos(user.game, iHA, iP, iState);
             gPlayer.ptPos = ptAve;
           }
 

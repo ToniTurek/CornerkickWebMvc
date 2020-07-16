@@ -1,0 +1,31 @@
+{
+  "sponsorspecial":
+    [
+      {
+        "name": "Betonmischer",
+        "type": "1",
+        "money": "100000"
+      },
+      {
+        "name": "Ballermänner",
+        "type": "2",
+        "money": "150000"
+      },
+      {
+        "name": "Begleitschutz-Agentur",
+        "type": "3",
+        "money": "200000"
+      },
+      {
+        "name": "Schweizer Käse",
+        "type": "4",
+        "money": "200000"
+      },
+      {
+        "name": "Flauschige Regenbogeneinhörner",
+        "type": "5",
+        "money": "200000"
+      }
+    ]
+}
+
