@@ -117,6 +117,7 @@
             rbFav = document.getElementById("rbFav");
             rbJouth = document.getElementById("rbJouth");
             cbFixTransferFee = document.getElementById("cbFixTransferFee");
+            cbEndingContract = document.getElementById("cbEndingContract");
             sctFilterClub = document.getElementById("sctFilterClub");
 
             var iType = 0;
@@ -150,6 +151,11 @@
             d.bFixTransferFee = false;
             if (cbFixTransferFee != null) {
               d.bFixTransferFee = cbFixTransferFee.checked;
+            }
+
+            d.bEndingContract = false;
+            if (cbEndingContract != null) {
+              d.bEndingContract = cbEndingContract.checked;
             }
 
             d.iClubId = iClubId;
@@ -288,7 +294,17 @@
         reloadTransferlist(jTable);
       });
 
+<<<<<<< HEAD
       document.getElementById("sctFilterClub").addEventListener("change", function () { reloadTransferlist(jTable); }); 
+=======
+      $("#cbEndingContract").on('change', function (ev) {
+        reloadTransferlist(jTable);
+      });
+      
+      $("#cbNoClub").on('change', function (ev) {
+        reloadTransferlist(jTable);
+      });
+>>>>>>> _CONTRACT_NEXT_SEASON
 
       // Select row
       $('#tableTransfer tbody').on('click', 'tr', function () {
@@ -673,10 +689,14 @@
       </div>
 
      @if (!Model.bNation) {
-        <div id="divCb" style="position: relative; width: 100px; height: 44px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
+        <div id="divCb" style="position: relative; width: 110px; height: 64px; float: left; margin-top: 16px; margin-right: 10px; margin-bottom: 20px">
           <label style="position: absolute; top: 0px; left: 0px; width: 100%; background-color: white">
             <input id="cbFixTransferFee" type="checkbox" value="false">
             Fixe Ablöse
+          </label>
+          <label style="position: absolute; top: 20px; left: 0px; width: 100%; background-color: white">
+            <input id="cbEndingContract" type="checkbox" value="false">
+            Ausl. Vertrag
           </label>
         </div>
       }
