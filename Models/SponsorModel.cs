@@ -27,4 +27,14 @@ namespace CornerkickWebMvc.Models
     public byte   nBoards { get; set; }
     public byte   iYears { get; set; }
   }
+
+  public class DatatableEntrySponsorSpecial
+  {
+    public bool bOffer { get; set; }
+    public int iIndex { get; set; }
+    public byte iId { get; set; }
+    public string sName { get; set; }
+    public int iMoney { get; set; }
+    public string sCondition { get; set; }
+  }
 }

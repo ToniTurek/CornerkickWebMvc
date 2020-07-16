@@ -87,12 +87,16 @@
     }
 
     $(document).ready(function () {
-      bnTakeMain = document.getElementById("bnTake");
+      var bnTakeMain = document.getElementById("bnTake");
       if (bnTakeMain != null) {
         bnTakeMain.disabled = true;
       }
-      bnTakeBoard = document.getElementById("bnTakeBoard");
+
+      var bnTakeBoard = document.getElementById("bnTakeBoard");
       bnTakeBoard.disabled = true;
+
+      var bnTakeSpecial = document.getElementById("bnTakeSpecial");
+      bnTakeSpecial.disabled = true;
 
       var iSponsorID = @Html.Raw(Json.Encode(Model.sponsorMain.iId));
 
@@ -302,6 +306,81 @@
           });
         }
       });
+
+      var tableSpecial = $('#tableSponsorSpecial').DataTable({
+        "ajax": {
+          "url": '@Url.Action("SponsorGetTableSpecial", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "bOffer" },
+          { "data": "iId" },
+          { "data": "iIndex" },
+          { "data": "sName" },
+          {
+            "data": "iMoney",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          { "data": "sCondition" }
+        ],
+        "paging": false,
+        "info": false,
+        "searching": false,
+        "responsive": true,
+        "language": {
+          "emptyTable": "Keine Sponsorenangebote"
+        },
+        columnDefs: [
+          { "className": "dt-center", "targets": "_all" },
+          {
+            targets: [0, 1, 2],
+            "visible": false,
+            "searchable": false
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (!aData.bOffer) {
+            $('td', nRow).css('font-weight', "bold");
+          }
+        }
+      });
+
+      $('#tableSponsorSpecial tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+        } else {
+          tableSpecial.$('tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+        }
+
+        var data = tableSpecial.row('.selected').data();
+        if (data) {
+          bnTakeSpecial.disabled = false;
+        } else {
+          bnTakeSpecial.disabled = true;
+        }
+      });
+
+      $('#bnTakeSpecial').click(function () {
+        var data = tableSpecial.row('.selected').data();
+        if (data) {
+          bnTakeSpecial.disabled = true;
+
+          $.ajax({
+            type: 'post',
+            url: '/Member/SponsorSetSpecial',
+            dataType: "json",
+            data: { iSponsorId: data.iId },
+            success: function (bReturn) {
+              //window.location.reload(true);
+              $('#tableSponsorSpecial').DataTable().ajax.reload();
+            }
+          });
+        }
+      });
     });
   </script>
 </head>
@@ -368,9 +447,7 @@
     }
   }
 
-  <p> </p>
-  <h3>Banden</h3>
-
+  <h3 style="margin-top: 20px">Banden</h3>
   <table id="tableSponsorBoard" style="width: auto" class="display responsive nowrap">
     <thead>
       <tr>
@@ -412,6 +489,23 @@
     }
   }
 
-  <h3>Spezialsponsoren</h3>
+  <div style="position: relative; float: left; width: 100%; margin-top: 20px">
+    <h3>Spezialsponsoren</h3>
+    Wählen Sie bis zu 2 Spezialsponsoren.
+    <table id="tableSponsorSpecial" style="width: auto" class="display responsive nowrap">
+      <thead>
+        <tr>
+          <th></th>
+          <th>id</th>
+          <th>#</th>
+          <th>Sponsor</th>
+          <th>Prämie €</th>
+          <th>Bedingung</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
+    <button type="submit" id="bnTakeSpecial" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
+  </div>
 </body>

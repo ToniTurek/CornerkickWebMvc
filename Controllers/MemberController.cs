@@ -6895,6 +6895,58 @@ namespace CornerkickWebMvc.Controllers
       return Json(new { aaData = query.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
+    [HttpGet]
+    public ActionResult SponsorGetTableSpecial()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      //The table or entity I'm querying
+      List<Models.DatatableEntrySponsorSpecial> query = new List<Models.DatatableEntrySponsorSpecial>();
+
+      int iSpOffer = 0;
+      foreach (CornerkickManager.Finance.SponsorSpecial spsp in MvcApplication.ckcore.fz.ltSponsorSpecial) {
+        Models.DatatableEntrySponsorSpecial deSponsorSpecial = new Models.DatatableEntrySponsorSpecial();
+        deSponsorSpecial.bOffer = true;
+        if (clb.ltSponsorSpecial != null) {
+          foreach (CornerkickManager.Finance.SponsorSpecial.Contract spspc in clb.ltSponsorSpecial) {
+            if (spspc.spsp.iId == spsp.iId) {
+              deSponsorSpecial.bOffer = false;
+              break;
+            }
+          }
+        }
+        deSponsorSpecial.iId = spsp.iId;
+        deSponsorSpecial.sName = spsp.sName;
+        deSponsorSpecial.iMoney = spsp.iMoney;
+        if (spsp.iType == 1) deSponsorSpecial.sCondition = "Kein Gegentor";
+        else if (spsp.iType == 2) deSponsorSpecial.sCondition = "4 oder mehr eigene Tore";
+        else if (spsp.iType == 3) deSponsorSpecial.sCondition = "Keine Karten";
+        else if (spsp.iType == 4) deSponsorSpecial.sCondition = "3 oder mehr Gegentore";
+        else if (spsp.iType == 5) deSponsorSpecial.sCondition = "Kein eigenes Tor";
+
+        query.Add(deSponsorSpecial);
+      }
+
+      return Json(new { aaData = query.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult SponsorSetSpecial(int iSponsorId)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      if (clb.ltSponsorSpecial == null) clb.ltSponsorSpecial = new List<CornerkickManager.Finance.SponsorSpecial.Contract>();
+
+      // Check if already two special sponsors
+      if (clb.ltSponsorSpecial.Count > 1) return Json(false, JsonRequestBehavior.AllowGet);
+
+      clb.ltSponsorSpecial.Add(new CornerkickManager.Finance.SponsorSpecial.Contract() { spsp = MvcApplication.ckcore.fz.getSponsorSpecial((byte)iSponsorId) });
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
     /// Statistic
