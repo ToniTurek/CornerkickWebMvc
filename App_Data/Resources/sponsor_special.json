@@ -4,12 +4,12 @@
       {
         "name": "Betonmischer",
         "type": "1",
-        "money": "100000"
+        "money": "150000"
       },
       {
         "name": "Ballermänner",
         "type": "2",
-        "money": "150000"
+        "money": "250000"
       },
       {
         "name": "Begleitschutz-Agentur",
@@ -19,12 +19,12 @@
       {
         "name": "Schweizer Käse",
         "type": "4",
-        "money": "200000"
+        "money": "500000"
       },
       {
         "name": "Flauschige Regenbogeneinhörner",
         "type": "5",
-        "money": "200000"
+        "money": "500000"
       }
     ]
 }
