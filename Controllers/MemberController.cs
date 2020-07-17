@@ -597,6 +597,34 @@ namespace CornerkickWebMvc.Controllers
       //return Json(new { aaData = ltNews.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
+    [HttpGet]
+    public JsonResult DeskGetEndingContractsInfo()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+      // Return if before december
+      if (MvcApplication.ckcore.dtDatum.Year < MvcApplication.ckcore.dtSeasonEnd.Year && MvcApplication.ckcore.dtDatum.Month < 12) return Json(null, JsonRequestBehavior.AllowGet);
+
+      string sInfo = "";
+      foreach (CornerkickGame.Player pl in clb.ltPlayer) {
+        if (CornerkickManager.Player.checkIfContractIsEnding(pl, MvcApplication.ckcore.dtSeasonEnd, MvcApplication.ckcore.dtSeasonEnd)) sInfo += pl.sName + ", ";
+      }
+      foreach (CornerkickGame.Player plJ in clb.ltPlayerJouth) {
+        if (CornerkickManager.Player.checkIfContractIsEnding(plJ, MvcApplication.ckcore.dtSeasonEnd, MvcApplication.ckcore.dtSeasonEnd)) sInfo += plJ.sName + ", ";
+      }
+
+      if (!string.IsNullOrEmpty(sInfo)) {
+        if (sInfo.EndsWith(", ")) sInfo = sInfo.Remove(sInfo.Length - 2, 2);
+
+        string sWhen = "sofort";
+        if (MvcApplication.ckcore.dtDatum.Year < MvcApplication.ckcore.dtSeasonEnd.Year) sWhen = "nächstem Jahr";
+        sInfo = "ACHTUNG! Folgende Spieler besitzen einen auslaufenden Vertrag und können ab " + sWhen + " von einem anderen Verein abgeworben werden:" + Environment.NewLine + sInfo;
+      }
+
+      return Json(sInfo, JsonRequestBehavior.AllowGet);
+    }
+
     public ContentResult GetLastGames()
     {
       CornerkickManager.Club club = ckClub();

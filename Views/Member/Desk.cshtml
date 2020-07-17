@@ -118,6 +118,20 @@
         chart.render();
       });
 
+      // Get ending contracts info
+      $.ajax({
+        url: '/Member/DeskGetEndingContractsInfo',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (sInfo) {
+          if (sInfo) {
+            alert(sInfo);
+          }
+        }
+      });
+
       $('#iDeleteLog').change(function () {
         $.ajax({
           url: '/Member/SetDeleteLog',
