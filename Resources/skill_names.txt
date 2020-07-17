@@ -15,4 +15,5 @@ Reaktion
 Sprungkraft
 Ballsicherheit
 Antritt
+Spielintelligenz
 Beidfüßigkeit

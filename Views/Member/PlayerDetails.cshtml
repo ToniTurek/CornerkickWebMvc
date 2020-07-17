@@ -1163,7 +1163,11 @@
                   }
                 }
               </tr>
-              @for (i = 1; i < player.iSkill.Length - 1; i++) {
+              @for (i = 1; i < player.iSkill.Length; i++) {
+                if (i == 16) {
+                  continue;
+                }
+
                 var fTraining = player.fSkillTraining[i] + 1.0;
                 <tr>
                   <td align="right">@CornerkickManager.Player.sSkills[i]</td>
