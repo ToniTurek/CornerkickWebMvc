@@ -177,6 +177,7 @@
             });
 
             bnBuy.addEventListener("click", function () {
+              this.disabled = true;
               buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(" + sColumnPricePiece + ")", nRow).text(), parseFloat(itPrice.value));
             });
           } else {
