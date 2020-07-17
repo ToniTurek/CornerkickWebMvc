@@ -312,11 +312,7 @@
             div21.style.float = "right";
             div21.style.clear = "both";
             if (news.iId >= 0) {
-              if (news.iType === 71) {
-                div21.innerHTML = getClubEmblem(news.iId);
-              } else {
-                div21.innerHTML = getPortrait(news.iId, "width: 100%");
-              }
+              div21.innerHTML = news.sImg;
             }
             div21.setAttribute('data-ipage', iN + 1);
             div2.appendChild(div21);

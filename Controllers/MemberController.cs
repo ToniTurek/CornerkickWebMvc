@@ -432,6 +432,7 @@ namespace CornerkickWebMvc.Controllers
       public string sText { get; set; }
       public bool   bOld { get; set; }
       public string sHeader { get; set; }
+      public string sImg { get; set; }
     }
 
     public JsonResult DeskGetNews()
@@ -583,6 +584,11 @@ namespace CornerkickWebMvc.Controllers
             dtn.sText = sN;
             dtn.iType = news.iType;
             dtn.sHeader = news.sFromId;
+            if (news.iType == 71) {
+              dtn.sImg = getClubEmblem(MvcApplication.ckcore.ltClubs[news.iId], sStyle: "width: 100%", bTiny: true);
+            } else {
+              dtn.sImg = getPlayerPortrait(MvcApplication.ckcore.ltPlayer[news.iId], sStyle: "width: 100%", bSmall: true);
+            }
 
             ltNews.Add(dtn);
           }
@@ -2085,6 +2091,14 @@ namespace CornerkickWebMvc.Controllers
       sPortrait += ".png\" alt=\"Wappen\"" + sStyle + " title=\"" + plPortrait.sName + "\"/>";
 
       return sPortrait;
+    }
+
+    private static string getPlayerPortraitFile(CornerkickGame.Player plPortrait, bool bSmall = false)
+    {
+      bool bUserPortrait;
+      bool bSmallOk;
+
+      return getPlayerPortraitFile(plPortrait, out bUserPortrait, out bSmallOk, bSmall);
     }
     private static string getPlayerPortraitFile(CornerkickGame.Player plPortrait, out bool bUserPortrait, out bool bSmallOk, bool bSmall = false)
     {
