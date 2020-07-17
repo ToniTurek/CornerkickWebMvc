@@ -179,7 +179,7 @@ namespace CornerkickWebMvc.Controllers
       if (System.IO.File.Exists(getHomeDir() + "/save/" + modelAdmin.sSelectedAutosaveFile)) {
         MvcApplication.timerCkCalender.Enabled = false;
 
-        MvcApplication.newCk();
+        MvcApplication.newCk(bLoadGame: false);
 
         MvcApplication.ckcore.io.load(getHomeDir() + "/save/" + modelAdmin.sSelectedAutosaveFile);
       }

@@ -110,7 +110,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    internal static void newCk()
+    internal static void newCk(bool bLoadGame = true)
     {
       string sHomeDir = getHomeDir();
 
@@ -156,8 +156,10 @@ namespace CornerkickWebMvc
       timerSave.Enabled = false;
 
       // Load ck game
-      iLoadState = 1;
-      Task<bool> tkLoadGame = Task.Run(async () => await load(sHomeDir));
+      if (bLoadGame) {
+        iLoadState = 1;
+        Task<bool> tkLoadGame = Task.Run(async () => await load(sHomeDir));
+      }
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
