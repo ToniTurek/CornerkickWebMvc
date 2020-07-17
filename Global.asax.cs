@@ -1072,6 +1072,9 @@ namespace CornerkickWebMvc
         // Set admin user to CPU
         if (ckcore.ltClubs.Count > 0) ckcore.ltClubs[0].user = null;
 
+        // Set length of EocInfo flag
+        Controllers.MemberController.bHideEocInfo = new bool[MvcApplication.ckcore.ltUser.Count];
+
         // Set retired players name to none
         List<CornerkickGame.Player> ltPlayerRet = CornerkickManager.Player.getRetiredPlayer(ckcore.ltPlayer);
         for (int iPl = 0; iPl < ltPlayerRet.Count; iPl++) {

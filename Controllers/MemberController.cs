@@ -100,6 +100,7 @@ namespace CornerkickWebMvc.Controllers
     };
 
     internal static bool[] bShowClub = new bool[MvcApplication.iNations.Length]; // Flag if club will be used if nation is possible
+    internal static bool[] bHideEocInfo; // Flag if end of contract info will be displayed
 
     public MemberController()
     {
@@ -609,6 +610,13 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
 
+      // Check hide info flag
+      CornerkickManager.User usr = ckUser();
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
+      if (iUserIx >= 0 && iUserIx < bHideEocInfo.Length) {
+        if (bHideEocInfo[iUserIx]) return Json(null, JsonRequestBehavior.AllowGet);
+      }
+
       // Return if before december
       if (MvcApplication.ckcore.dtDatum.Year < MvcApplication.ckcore.dtSeasonEnd.Year && MvcApplication.ckcore.dtDatum.Month < 12) return Json(null, JsonRequestBehavior.AllowGet);
 
@@ -626,6 +634,9 @@ namespace CornerkickWebMvc.Controllers
         string sWhen = "sofort";
         if (MvcApplication.ckcore.dtDatum.Year < MvcApplication.ckcore.dtSeasonEnd.Year) sWhen = "nächstem Jahr";
         sInfo = "ACHTUNG! Folgende Spieler besitzen einen auslaufenden Vertrag und können ab " + sWhen + " von einem anderen Verein abgeworben werden:" + Environment.NewLine + sInfo;
+
+        // Set flag to true to not show info again
+        if (iUserIx >= 0 && iUserIx < bHideEocInfo.Length) bHideEocInfo[iUserIx] = true;
       }
 
       return Json(sInfo, JsonRequestBehavior.AllowGet);
