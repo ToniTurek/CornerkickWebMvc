@@ -85,22 +85,23 @@
       setImage();
 
       getStadion();
-      getVideo();
-      getSnackbar();
-      getToilets();
+      getExtras();
+      getVideoCost();
+      getSnackbarCost();
+      getToiletsCost();
 
       $("#tbSnackbar").on('keyup', function (ev) {
-        getSnackbar();
+        getSnackbarCost();
       });
       $("#tbSnackbar").on('change', function (ev) {
-        getSnackbar();
+        getSnackbarCost();
       });
 
       $("#tbToilets").on('keyup', function (ev) {
-        getToilets();
+        getToiletsCost();
       });
       $("#tbToilets").on('change', function (ev) {
-        getToilets();
+        getToiletsCost();
       });
 
       $('.tbSeats').each(function () {
@@ -284,7 +285,36 @@
           }
         }
       });
+    }
 
+    function setStadion() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumChangeSet',
+        dataType: "json",
+        data: { iSeats: seats, iArt: seattypes },
+        success: function (sMessage) {
+          alert(sMessage);
+          //getStadion();
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function buildTopring() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/StadiumBuildTopring',
+        dataType: "json",
+        success: function (sMessage) {
+          alert(sMessage);
+          //getStadion();
+          window.location.reload(true);
+        }
+      });
+    }
+
+    function getExtras() {
       $.ajax({
         type: 'GET',
         url: '/Member/StadiumGetExtras',
@@ -324,33 +354,8 @@
       });
     }
 
-    function setStadion() {
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumChangeSet',
-        dataType: "json",
-        data: { iSeats: seats, iArt: seattypes },
-        success: function (sMessage) {
-          alert(sMessage);
-          window.location.reload(true);
-        }
-      });
-    }
-
-    function buildTopring() {
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildTopring',
-        dataType: "json",
-        success: function (sMessage) {
-          alert(sMessage);
-          window.location.reload(true);
-        }
-      });
-    }
-
     // Video-wall
-    function getVideo() {
+    function getVideoCost() {
       bnBuildVideo = document.getElementById("bnBuildVideo");
       bnBuildVideo.disabled = true;
 
@@ -380,13 +385,13 @@
         data: { iLevel: iVideo },
         success: function (sMessage) {
           alert(sMessage);
-          window.location.reload(true);
+          getExtras();
         }
       });
     }
 
     // Snackbars
-    function getSnackbar() {
+    function getSnackbarCost() {
       bnBuildSnackbar = document.getElementById("bnBuildSnackbar");
       bnBuildSnackbar.disabled = true;
 
@@ -416,13 +421,13 @@
         data: { iBuildNew: iSnackbar },
         success: function (sMessage) {
           alert(sMessage);
-          window.location.reload(true);
+          getExtras();
         }
       });
     }
 
     // Toilets
-    function getToilets() {
+    function getToiletsCost() {
       bnBuild = document.getElementById("bnBuildToilets");
       bnBuild.disabled = true;
 
@@ -452,7 +457,7 @@
         data: { iBuildNew: iToilets },
         success: function (sMessage) {
           alert(sMessage);
-          window.location.reload(true);
+          getExtras();
         }
       });
     }
@@ -591,7 +596,7 @@
               sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
             }
           }
-          <p style="text-align: center; font-weight:bold">Akt. Rasenqualität: @sPitchQuality</p>
+          <p style="text-align: center; font-weight: bold">Akt. Rasenqualität: @sPitchQuality</p>
           <button type="submit" id="bnRenewPitch" class="btn btn-default" style="width: 100%">Rasen +10%, Kosten: 0</button>
         </div>
       </div>
@@ -664,7 +669,7 @@
             <div id="pbVideo" style="position: relative; width: 308px"><div id="plVideo" class="progress-label"></div></div>
             <div id="divVideo" style="position: relative; width: 100%; height: 36px">
               <text style="position: absolute; left: 0px; top: 6px; width: 40px; font-size: 16px">Neu:</text>
-              @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideo()", id = "ddlVideo", @style = "position: absolute; width: 268px; min-width: 268px; left: 40px" })
+              @Html.DropDownListFor(m => m.iVideo, Model.ltDdlVideo, new { @class = "form-control", @onchange = "getVideoCost()", id = "ddlVideo", @style = "position: absolute; width: 268px; min-width: 268px; left: 40px" })
             </div>
             <button type="submit" id="bnBuildVideo" class="btn btn-default" style="width: 49%; min-width: 308px">Kosten: 0</button>
           </div>
