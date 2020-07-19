@@ -505,6 +505,12 @@
         if (!Model.club.bNation) {
           <p>@Html.ActionLink("Liga", "League", "Member"): @sTabellenplatz</p>
           <p>@Html.ActionLink("Pokal", "Cup", "Member"): @Model.sPokalrunde</p>
+          if (!string.IsNullOrEmpty(Model.sGoldCupRound)) {
+            <p>@Html.ActionLink("Gold-Cup", "CupGold", "Member"): @Model.sGoldCupRound</p>
+          }
+          if (!string.IsNullOrEmpty(Model.sSilverCupRound)) {
+            <p>@Html.ActionLink("Silver-Cup", "CupSilver", "Member"): @Model.sSilverCupRound</p>
+          }
         }
         <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
         <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>

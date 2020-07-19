@@ -14,6 +14,8 @@ namespace CornerkickWebMvc.Models
     public string sDtNextGame { get; set; }
     public string sTabellenplatz { get; set; }
     public string sPokalrunde { get; set; }
+    public string sGoldCupRound { get; set; }
+    public string sSilverCupRound { get; set; }
     public string sVDL { get; set; }
     public string sKFM { get; set; }
     public string sStrength { get; set; }

@@ -367,7 +367,7 @@ namespace CornerkickWebMvc.Controllers
       }
       if (iSpl > 0) desk.sTabellenplatz = iPlatz.ToString() + ". Platz nach " + iSpl.ToString() + " von " + ((ltTbl.Count - 1) * 2).ToString() + " Spielen";
 
-      // Get Cup Round
+      // Nat. cup round
       desk.sPokalrunde = "-";
       CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, club.iLand);
       if (cup != null) {
@@ -394,6 +394,40 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      // Gold/Silver cup round
+      for (int iCupId = 3; iCupId <= 4; iCupId++) {
+        CornerkickManager.Cup cupInternat = MvcApplication.ckcore.tl.getCup(iCupId);
+
+        if (cupInternat.checkClubInCup(club)) {
+          int iMd = cupInternat.getMatchday(MvcApplication.ckcore.dtDatum);
+          string sText = "";
+
+          int iClubsTotal = cupInternat.getClubsTotal();
+          if (iMd < 6) {
+            sText = "Gruppenphase, " + cupInternat.getPlace(club, iMd, bGroupPhaseOnly: true).ToString() + ". Platz";
+          } else {
+            int iPlace = cupInternat.getPlace(club, iMd);
+
+            if (iPlace > 9) {
+              sText = "ausgeschieden (Gruppenphase, " + cupInternat.getPlace(club, iMd, bGroupPhaseOnly: true).ToString() + ". Platz)";
+            } else {
+              //sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
+              if (iPlace > 1) {
+                byte iKoRound = cupInternat.getKoRound(iPlace);
+                int iMdClub = Math.Max(cup.getMatchdays(club), 0);
+
+                if (iMdClub < iMd) sText = "ausgeschieden (" + CornerkickManager.Main.sCupRound[iKoRound - 1] + ")";
+                else               sText = CornerkickManager.Main.sCupRound[iKoRound - 1];
+              } else {
+                sText = "gewonnen";
+              }
+            }
+          }
+
+          if      (iCupId == 3) desk.sGoldCupRound = sText;
+          else if (iCupId == 4) desk.sSilverCupRound = sText;
+        }
+      }
       /*
       desk.sVDL = "";
       List<CornerkickGame.Game.GameSummary> ltGameSummary = MvcApplication.ckcore.tl.getNextGames(club, false, true);
