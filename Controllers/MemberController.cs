@@ -414,7 +414,7 @@ namespace CornerkickWebMvc.Controllers
               //sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
               if (iPlace > 1) {
                 byte iKoRound = cupInternat.getKoRound(iPlace);
-                int iMdClub = Math.Max(cup.getMatchdays(club), 0);
+                int iMdClub = Math.Max(cupInternat.getMatchdays(club), 0);
 
                 if (iMdClub < iMd) sText = "ausgeschieden (" + CornerkickManager.Main.sCupRound[iKoRound - 1] + ")";
                 else               sText = CornerkickManager.Main.sCupRound[iKoRound - 1];
