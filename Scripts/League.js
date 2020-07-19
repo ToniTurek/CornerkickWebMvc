@@ -300,7 +300,9 @@ function changeMatchday(iPrePost, ddlMatchday, exeFunction) {
     return;
   }
 
+  ddlMatchday.disabled = true;
   ddlMatchday.value = iMdNew.toString();
+  ddlMatchday.disabled = false;
 
   exeFunction();
 }
