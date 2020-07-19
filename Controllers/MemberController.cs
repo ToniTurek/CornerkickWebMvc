@@ -3892,6 +3892,8 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      List<CornerkickGame.Game.Data> ltGames = MvcApplication.ckcore.tl.getNextGames(clb, dtSunday);
+
       for (int iD = 0; iD < ltTu.Length; iD++) { // Loop until Saturday
         for (int iT = 0; iT < ltTu[iD].Length; iT++) {
           // Set training type 'free' if null
@@ -3905,8 +3907,8 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Set game/travel/event
-          int iEvent = CornerkickManager.Tool.checkIfGameTravelEventIsClose(clb, ltTu[iD][iT].dt);
-          if (iEvent == 0) iEvent = CornerkickManager.Tool.checkIfGameTravelEventIsClose(clb, ltTu[iD][iT].dt.Add(MvcApplication.ckcore.settings.tsTrainingLength));
+          int iEvent = CornerkickManager.Tool.checkIfGameTravelEventIsClose(clb, ltTu[iD][iT].dt, ltGames: ltGames);
+          if (iEvent == 0) iEvent = CornerkickManager.Tool.checkIfGameTravelEventIsClose(clb, ltTu[iD][iT].dt.Add(MvcApplication.ckcore.settings.tsTrainingLength), ltGames: ltGames);
 
           if (iEvent > 0) {
             ltTu[iD][iT].iType = (sbyte)(100 + iEvent);
