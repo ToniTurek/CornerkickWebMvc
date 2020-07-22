@@ -3009,6 +3009,9 @@ namespace CornerkickWebMvc.Controllers
               clb.ltPlayerJouth.RemoveAt(iPlJ);
               clb.ltPlayer.Add(plJ);
 
+              // Reset jersey number
+              plJ.iNr = 0;
+
               // Add club history to player
               plContract.ltClubHistory.Add(new CornerkickGame.Player.ClubHistory() {
                 iClubId = clb.iId,
