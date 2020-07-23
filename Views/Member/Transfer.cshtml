@@ -88,14 +88,22 @@
     $(document).ready(function () {
       var bNation = @Html.Raw(Json.Encode(Model.bNation));
 
-      bnMakeOffer = document.getElementById("bnMakeOffer");
+      var bnMakeOffer = document.getElementById("bnMakeOffer");
       bnMakeOffer  .style.display = "none";
-      bnAcceptOffer = document.getElementById("bnAcceptOffer");
+      var bnAcceptOffer = document.getElementById("bnAcceptOffer");
       bnAcceptOffer.style.display = "none";
-      bnCancelOffer = document.getElementById("bnCancelOffer");
+      var bnCancelOffer = document.getElementById("bnCancelOffer");
       bnCancelOffer.style.display = "none";
-      bnAddToFavLst = document.getElementById("bnAddToFavLst");
+      var bnAddToFavLst = document.getElementById("bnAddToFavLst");
       bnAddToFavLst.style.display = "none";
+
+      // Filter options
+      var rbAll = document.getElementById("rbAll");
+      var rbFav = document.getElementById("rbFav");
+      var rbJouth = document.getElementById("rbJouth");
+      var cbFixTransferFee = document.getElementById("cbFixTransferFee");
+      var cbEndingContract = document.getElementById("cbEndingContract");
+      var sctFilterClub = document.getElementById("sctFilterClub");
 
       $("#tbTransferFee").autoNumeric('init', {
         aSep: '.',
@@ -114,13 +122,6 @@
           "url": '@Url.Action("TransferGetDataTable", "Member")',
           "type": 'POST',
           "data": function (d) {
-            rbAll = document.getElementById("rbAll");
-            rbFav = document.getElementById("rbFav");
-            rbJouth = document.getElementById("rbJouth");
-            cbFixTransferFee = document.getElementById("cbFixTransferFee");
-            cbEndingContract = document.getElementById("cbEndingContract");
-            sctFilterClub = document.getElementById("sctFilterClub");
-
             var iType = 0;
             if (bNation) {
               iType = 1;
@@ -343,7 +344,7 @@
                     bnMakeOffer.style.display = "none";
                   }
                 } else if (data[0].iOffer === -2) { // Not on transfer list
-                  if (data[0].bEndingContract) { // Ending contract
+                  if (data[0].bEndingContract && !rbJouth.checked) { // Ending contract
                     bnMakeOffer.innerHTML = "Spieler für nächste Saison verpflichten";
                     bnMakeOffer.style.display = "block";
                   } else {
