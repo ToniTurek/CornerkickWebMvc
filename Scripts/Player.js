@@ -134,6 +134,17 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
             lbNextSeason.appendChild(cbNextSeason);
             lbNextSeason.innerHTML += " Ab nächster Saison";
             div12.appendChild(lbNextSeason);
+
+            if (iContractType === 3) {
+              if (cbNextSeason) {
+                cbNextSeason.checked = true;
+                cbNextSeason.disabled = true;
+              }
+
+              if (lbNextSeason) {
+                lbNextSeason.disabled = true;
+              }
+            }
           }
           div1.appendChild(div12);
           div0.appendChild(div1);
