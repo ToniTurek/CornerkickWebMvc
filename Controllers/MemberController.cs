@@ -6719,7 +6719,7 @@ namespace CornerkickWebMvc.Controllers
         iBudget[i][ 6] = bd[i].iPaySalary;
         iBudget[i][ 7] = bd[i].iPayStaff;
         iBudget[i][ 8] = bd[i].iPayTransfer;
-        iBudget[i][ 9] = bd[i].iPayStadium;
+        iBudget[i][ 9] = bd[i].iPayStadium + bd[i].iPayStadiumSurr;
         iBudget[i][10] = bd[i].iPayTravel;
         iBudget[i][11] = bd[i].iPayInterest;
         iBudget[i][12] = bd[i].iPayMerchandising;
