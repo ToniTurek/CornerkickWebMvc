@@ -121,7 +121,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           input12.autocomplete = "off";
           input12.onkeyup = function () { updateContract(iPlayerId, input12, false, bnNegotiate); };
           div12.appendChild(input12);
-          if (iContractType === 2) {
+          if (iContractType > 1) {
             var lbNextSeason = document.createElement("label");
             lbNextSeason.style.position = "absolute";
             lbNextSeason.style.top = "6px";
@@ -346,6 +346,19 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           div0.appendChild(div6);
 
           parent.appendChild(div0);
+
+          if (iContractType === 3) {
+            var cbNextSeason2 = document.getElementById("cbNextSeason");
+            if (cbNextSeason2) {
+              cbNextSeason2.checked = true;
+              cbNextSeason2.disabled = true;
+            }
+
+            var lbNextSeason2 = document.getElementById("lbNextSeason");
+            if (lbNextSeason2) {
+              lbNextSeason2.disabled = true;
+            }
+          }
 
           setMoodText(contract.fMood);
 

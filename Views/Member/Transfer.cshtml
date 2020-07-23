@@ -57,16 +57,17 @@
     var jTable;
 
     function handleClick(rBOffer) {
-      bnAcceptOffer = document.getElementById("bnAcceptOffer");
-      bnMakeOffer   = document.getElementById("bnMakeOffer");
-      bnCancelOffer = document.getElementById("bnCancelOffer");
-      bnAddToFavLst = document.getElementById("bnAddToFavLst");
+      var bnAcceptOffer = document.getElementById("bnAcceptOffer");
+      var bnMakeOffer   = document.getElementById("bnMakeOffer");
+      var bnCancelOffer = document.getElementById("bnCancelOffer");
+      var bnAddToFavLst = document.getElementById("bnAddToFavLst");
 
-      iAcceptClubId = rBOffer.value;
-
+      bnAcceptOffer.style.display = "none";
       bnMakeOffer  .style.display = "none";
       bnCancelOffer.style.display = "none";
       bnAddToFavLst.style.display = "none";
+
+      iAcceptClubId = rBOffer.value;
 
       if (iAcceptPlId >= 0) {
         bnAcceptOffer.style.display = "block";
@@ -319,35 +320,57 @@
           if (data) {
             iAcceptPlId = data[0].playerId;
 
-            if (data[0].iOffer == 1) { // Already offered
-              bnMakeOffer.innerHTML = "Angebot ändern";
-              bnCancelOffer.style.display = "block";
-            } else {
-              if (bNation) {
+            // Make offer button
+            if (bNation) {
+              bnMakeOffer.style.display = "block";
+
+              if (data[0].iOffer === 2) { // Own player
+                bnMakeOffer.innerHTML = "Spieler ausladen";
+              } else {
                 bnMakeOffer.innerHTML = "Spieler nominieren";
+              }
+            } else { // Not nation
+              if (data[0].iOffer === 1) { // Already offered
+                bnMakeOffer.innerHTML = "Angebot ändern";
               } else {
                 bnMakeOffer.innerHTML = "Spieler verpflichten";
-              }
-              bnCancelOffer.style.display = "none";
-            }
 
-            if (data[0].iOffer == 2) { // Own player
-              bnMakeOffer.style.display = "none";
-              bnAddToFavLst.style.display = "none";
-              if (bNation) {
-                bnMakeOffer.style.display = "block";
-                bnMakeOffer.innerHTML = "Spieler ausladen";
-              }
-            } else if (data[0].iOffer == -2 && !bNation) { // Not on transfer list
-              bnMakeOffer.style.display = "none";
-              bnAddToFavLst.style.display = "block";
-            } else {
-              bnMakeOffer.style.display = "block";
-              if (!bNation) {
-                bnAddToFavLst.style.display = "block";
+                if (data[0].iOffer === 2) { // Own player
+                  if (bNation) {
+                    bnMakeOffer.style.display = "block";
+                    bnMakeOffer.innerHTML = "Spieler ausladen";
+                  } else {
+                    bnMakeOffer.style.display = "none";
+                  }
+                } else if (data[0].iOffer === -2) { // Not on transfer list
+                  if (data[0].bEndingContract) { // Ending contract
+                    bnMakeOffer.innerHTML = "Spieler für nächste Saison verpflichten";
+                    bnMakeOffer.style.display = "block";
+                  } else {
+                    bnMakeOffer.style.display = "none";
+                  }
+                } else {
+                  bnMakeOffer.style.display = "block";
+                }
               }
             }
             bnAcceptOffer.style.display = "none";
+
+            // Cancel offer button
+            if (!bNation) {
+              if (data[0].iOffer === 1) { // Already offered
+                bnCancelOffer.style.display = "block";
+              } else {
+                bnCancelOffer.style.display = "none";
+              }
+            }
+
+            // Favorites button
+            if (data[0].iOffer === 2) { // Own player
+              bnAddToFavLst.style.display = "none";
+            } else {
+              bnAddToFavLst.style.display = "block";
+            }
 
             // Initialize transfer fee
             var sClubName = data[0].club;
@@ -557,6 +580,16 @@
     }); // document ready function
 
     function reloadTransferlist(jTable) {
+      var bnAcceptOffer = document.getElementById("bnAcceptOffer");
+      var bnMakeOffer   = document.getElementById("bnMakeOffer");
+      var bnCancelOffer = document.getElementById("bnCancelOffer");
+      var bnAddToFavLst = document.getElementById("bnAddToFavLst");
+
+      bnAcceptOffer.style.display = "none";
+      bnMakeOffer  .style.display = "none";
+      bnCancelOffer.style.display = "none";
+      bnAddToFavLst.style.display = "none";
+
       $("#divTransferlistContainer").addClass("disabledDivTransfer");
       $("body").css("cursor", "progress");
       jTable.ajax.reload();

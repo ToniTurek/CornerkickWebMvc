@@ -2903,6 +2903,9 @@ namespace CornerkickWebMvc.Controllers
       return Json(contract, JsonRequestBehavior.AllowGet);
     }
 
+    // Returns
+    //   true:  external player or jouth player with initial contract (not transfered)
+    //   false: own player
     private bool checkIfNewContract(CornerkickGame.Player pl, CornerkickManager.Club clbUser)
     {
       bool bForceNewContract = true;
@@ -2920,6 +2923,12 @@ namespace CornerkickWebMvc.Controllers
 
       return bForceNewContract;
     }
+
+    // Returns
+    //   0: contract extension
+    //   1: new contract (for own jouth player)
+    //   2: new contract for external player
+    //   3: new contract for external player with ending contract
     [HttpPost]
     public JsonResult PlayerCheckIfNewContract(int iPlayerId)
     {
@@ -2931,8 +2940,14 @@ namespace CornerkickWebMvc.Controllers
       CornerkickGame.Player plContract = MvcApplication.ckcore.ltPlayer[iPlayerId];
 
       byte iType = 0;
-      if (!CornerkickManager.Player.ownPlayer(clb, plContract)) iType = 2;
-      else if (checkIfNewContract(plContract, clb)) iType = 1;
+      if (!CornerkickManager.Player.ownPlayer(clb, plContract)) {
+        iType = 2;
+
+        // If player has a club (and a contract) and not fixed transfer fee and is not on transfer list
+        if (plContract.iClubId >= 0 && plContract.contract != null && plContract.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(plContract)) iType++;
+      } else if (checkIfNewContract(plContract, clb)) {
+        iType = 1;
+      }
 
       return Json(iType, JsonRequestBehavior.AllowGet);
     }
@@ -3488,6 +3503,7 @@ namespace CornerkickWebMvc.Controllers
             if      (MvcApplication.ckcore.tr.negotiationCancelled(clubUser, transfer.player)) iOffer = -1;
             else if (MvcApplication.ckcore.tr.alreadyOffered      (clubUser, transfer.player)) iOffer = +1;
             else if (CornerkickManager.Player.ownPlayer           (clubUser, transfer.player)) iOffer = +2;
+            // If player has a club (and a contract) and not fixed transfer fee and is not on transfer list: iOffer = -2
             else if (transfer.player.iClubId >= 0 && transfer.player.contract != null && transfer.player.contract.iFixTransferFee < 1 && !MvcApplication.ckcore.plr.onTransferlist(transfer.player)) iOffer = -2;
 
             if (transfer.player.contract != null) iFixtransferfee = transfer.player.contract.iFixTransferFee;
