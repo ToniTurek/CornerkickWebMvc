@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.6.6";
+    public const string sVersion = "3.6.7";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     public class Settings
@@ -1081,6 +1081,19 @@ namespace CornerkickWebMvc
           ltPlayerRet[iPl].sName = "";
         }
 
+        // Check for valid offer contracts (to be removed for next commit)
+        for (int iT = 0; iT < ckcore.ltTransfer.Count; iT++) {
+          CornerkickManager.Transfer.Item transfer = ckcore.ltTransfer[iT];
+
+          if (transfer.ltOffers != null) {
+            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
+              CornerkickManager.Transfer.Offer offer = transfer.ltOffers[iO];
+              if (offer.contract == null) offer.contract = ckcore.plr.getContract(transfer.player, (byte)random.Next(1, 5));
+            }
+          }
+        }
+
+        // Transfer player from club0 to cpu-club if too few
         for (int iC = 1; iC < ckcore.ltClubs.Count; iC++) {
           CornerkickManager.Club clb = ckcore.ltClubs[iC];
           if (clb.bNation) continue;

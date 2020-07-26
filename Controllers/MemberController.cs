@@ -3327,6 +3327,7 @@ namespace CornerkickWebMvc.Controllers
                   offer.iFeeSecret = 0;
                   if (MvcApplication.ckcore.tr.transferPlayer(clbGive, iPlayerId, club, bNextSeason: true)) {
                     sReturn = "Sie haben den Spieler " + pl.sName + " ablösefrei für die nächste Saison verpflichtet.";
+                    createNewspaperPlayerTransfer(pl, club, -1);
                   }
                   break;
                 }
@@ -3387,9 +3388,15 @@ namespace CornerkickWebMvc.Controllers
 
       // Create news
       if (checkIfTop10Player(pl)) {
-        string sNewsPaper1 = pl.sName + " bei " + clbTake.sName + " vorgestellt";
-        string sNewsPaper2 = "Auf der heutigen Pressekonferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablösesumme soll angeblich bei " + (iTransferFee / 1000000.0).ToString("0.0") + " mio. liegen.";
-        MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
+        if (iTransferFee < 0) {
+          string sNewsPaper1 = pl.sName + " wechselt zu " + clbTake.sName;
+          string sNewsPaper2 = "Wie heute bekannt gegeben wurde, schließt sich " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) zur neuen Saison " + clbTake.sName + " an.";
+          MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
+        } else {
+          string sNewsPaper1 = pl.sName + " bei " + clbTake.sName + " vorgestellt";
+          string sNewsPaper2 = "Auf der heutigen Pressekonferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablösesumme soll angeblich bei " + (iTransferFee / 1000000.0).ToString("0.0") + " mio. liegen.";
+          MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
+        }
       }
     }
 
