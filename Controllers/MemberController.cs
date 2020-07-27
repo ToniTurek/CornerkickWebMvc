@@ -3246,8 +3246,8 @@ namespace CornerkickWebMvc.Controllers
           CornerkickManager.Club clbPlayer = null;
           if (pl.iClubId >= 0 && pl.iClubId < MvcApplication.ckcore.ltClubs.Count) clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
           if (clbPlayer != null) {
-            sNewsPaper2 = "Nach übereinstimmenden Medienberichten stehen die Zeichen zwischen ";
-            sNewsPaper2 += clbPlayer.sName;
+            sNewsPaper2 = "Nach über&shy;ein&shy;stimmenden Medien&shy;berichten stehen die Zeichen zwischen ";
+            sNewsPaper2 += clbPlayer.sName.Replace(" ", "&nbsp;");
             sNewsPaper2 += " und " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) auf Abschied.";
             //sNewsPaper2 += " Die kolportierte Ablösesumme soll bei ca. " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. liegen";
           }
