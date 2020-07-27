@@ -4920,7 +4920,7 @@ namespace CornerkickWebMvc.Controllers
           int[] iCostDaysCp = CornerkickManager.Stadium.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
           clb.stadium.iCarparkDaysConstruct = iCostDaysCp[1];
 
-          CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysCp[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+          CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysCp[0], CornerkickManager.Finance.iTransferralTypePayStadiumSurr, "Bau " + sConstructionNames[iType]);
         }
       } else if (iType == 7) { // Ticketcounter
         if (clb.stadium.iTicketcounterNew != iLevel) {
@@ -4928,7 +4928,7 @@ namespace CornerkickWebMvc.Controllers
           int[] iCostDaysTc = CornerkickManager.Stadium.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
           clb.stadium.iTicketcounterDaysConstruct = iCostDaysTc[1];
 
-          CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysTc[0], "Bau " + sConstructionNames[iType], CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+          CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysTc[0], CornerkickManager.Finance.iTransferralTypePayStadiumSurr, "Bau " + sConstructionNames[iType]);
         }
       } else {
         CornerkickManager.UI.doConstruction(clb, iType, (byte)iLevel, MvcApplication.ckcore.dtDatum, sConstructionNames[iType]);
@@ -4945,7 +4945,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iCost = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround);
       clb.buildings.iGround++;
-      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCost, "Grundstückskauf", CornerkickManager.Finance.iTransferralTypePayStadiumSurr);
+      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCost, CornerkickManager.Finance.iTransferralTypePayStadiumSurrGround);
 
       return Json("Das Grundstück wurde erworben", JsonRequestBehavior.AllowGet);
     }
@@ -5065,7 +5065,7 @@ namespace CornerkickWebMvc.Controllers
 
       // First: Pay personal pay-off costs
       int iPayOff = getPersonalPayOff(iLevel);
-      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iPayOff, "Abfindungen", CornerkickManager.Finance.iTransferralTypePaySalaryStaff);
+      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iPayOff, CornerkickManager.Finance.iTransferralTypePaySalaryStaff, "Abfindungen");
 
       // Then, hire new personal
       clb.staff.iCoTrainer     = (byte)iLevel[0];
@@ -5360,7 +5360,7 @@ namespace CornerkickWebMvc.Controllers
       clb.merchMarketer.marketer = MvcApplication.ckcore.ltMerchandisingMarketer[0];
       clb.merchMarketer.iMoney = getMerchandisingMarketerOffer(clb);
 
-      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, clb.merchMarketer.iMoney, "Einnahmen Merchandising Vermarkter", CornerkickManager.Finance.iTransferralTypeInMerchandising);
+      CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, clb.merchMarketer.iMoney, CornerkickManager.Finance.iTransferralTypeInMerchandisingMarketer);
 
       return Json(true, JsonRequestBehavior.AllowGet);
     }

@@ -1110,7 +1110,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Resources\cup_round_names.txt" />
+    <Content Include="Resources\cup_round_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Names\player_names_ARG.txt" />
     <Content Include="Resources\Names\player_names_BRA.txt" />
     <Content Include="Resources\Names\player_names_ENG.txt" />
@@ -1127,11 +1129,17 @@
     <Content Include="Resources\Names\player_surnames_GER.txt" />
     <Content Include="Resources\Names\player_surnames_ITA.txt" />
     <Content Include="Resources\Names\player_surnames_NED.txt" />
-    <Content Include="Resources\nations.txt" />
+    <Content Include="Resources\nations.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Names\player_names.txt" />
     <Content Include="Resources\Names\player_surnames.txt" />
-    <Content Include="Resources\position_names.txt" />
-    <Content Include="Resources\skill_names.txt" />
+    <Content Include="Resources\position_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\skill_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\autoNumeric\autoNumeric-min.js" />
     <Content Include="Scripts\autoNumeric\autoNumeric.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -1352,10 +1360,18 @@
     <Content Include="Views\Member\CupWc.cshtml" />
     <Content Include="Views\Member\UserView.cshtml" />
     <Content Include="Views\Account\RemoveUser.cshtml" />
-    <Content Include="Resources\doping.json" />
-    <Content Include="Resources\injury_names.json" />
-    <Content Include="Resources\news.json" />
-    <Content Include="Resources\sponsor.json" />
+    <Content Include="Resources\doping.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\injury_names.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\news.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\sponsor.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="App_Data\Resources\doping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1370,7 +1386,9 @@
     </Content>
     <Content Include="Views\Member\Contracts.cshtml" />
     <Content Include="Views\Member\WishList.cshtml" />
-    <Content Include="Resources\training.json" />
+    <Content Include="Resources\training.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="App_Data\Resources\training.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1378,18 +1396,25 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Member\Merchandising.cshtml" />
-    <Content Include="App_Data\Resources\merchandising.json" />
-    <Content Include="Resources\merchandising.json" />
+    <Content Include="App_Data\Resources\merchandising.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\merchandising.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\trainingcamps.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="App_Data\Resources\trainingcamps.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\Resources\sponsor_special.json">
+    <Content Include="Resources\sponsor_special.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\sponsor_special.json">
+    <Content Include="Resources\account_names.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Resources\account_names.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Web.Release.config">

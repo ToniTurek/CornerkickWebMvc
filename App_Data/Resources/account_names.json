@@ -1,0 +1,126 @@
+{
+  "accounttypes":
+    [
+      {
+        "type": "1",
+        "name": "Zuschauereinnahmen"
+      },
+      {
+        "type": "2",
+        "name": "Spielertransfer"
+      },
+      {
+        "type": "3",
+        "name": "Verkauf Dauerkarten"
+      },
+      {
+        "type": "11",
+        "name": ""
+      },
+      {
+        "type": "12",
+        "name": ""
+      },
+      {
+        "type": "13",
+        "name": "Prämien"
+      },
+      {
+        "type": "14",
+        "name": "Startgeld"
+      },
+      {
+        "type": "21",
+        "name": "Prämien Hauptsponsor"
+      },
+      {
+        "type": "22",
+        "name": "Prämien Hauptsponsor"
+      },
+      {
+        "type": "23",
+        "name": "Prämien Hauptsponsor"
+      },
+      {
+        "type": "24",
+        "name": "Prämien Bandenwerbungen"
+      },
+      {
+        "type": "25",
+        "name": "Prämien Spezialsponsor"
+      },
+      {
+        "type": "50",
+        "name": "Einnahmen Merchandising"
+      },
+      {
+        "type": "51",
+        "name": "Einnahmen Merchandising Vermarkter"
+      },
+      {
+        "type": "101",
+        "name": "Spielergehälter"
+      },
+      {
+        "type": "102",
+        "name": "Personalkosten"
+      },
+      {
+        "type": "103",
+        "name": "Spielerscouting"
+      },
+      {
+        "type": "110",
+        "name": "Stadionausbau"
+      },
+      {
+        "type": "111",
+        "name": "Bau"
+      },
+      {
+        "type": "112",
+        "name": "Spielertransfer"
+      },
+      {
+        "type": "113",
+        "name": "Erneuerung Stadionrasen"
+      },
+      {
+        "type": "114",
+        "name": "Grundstückskauf"
+      },
+      {
+        "type": "121",
+        "name": "Dispozinsen"
+      },
+      {
+        "type": "122",
+        "name": "Kreditzinsen"
+      },
+      {
+        "type": "130",
+        "name": "Kosten Trainingslager"
+      },
+      {
+        "type": "131",
+        "name": "Reisekosten Trainingslager"
+      },
+      {
+        "type": "140",
+        "name": "Auflaufprämien Spieler"
+      },
+      {
+        "type": "141",
+        "name": "Torprämien Spieler"
+      },
+      {
+        "type": "150",
+        "name": "Ausgaben Merchandising"
+      },
+      {
+        "type": "160",
+        "name": "Kosten"
+      }
+    ]
+}
+
