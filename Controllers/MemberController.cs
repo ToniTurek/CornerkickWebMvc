@@ -5304,6 +5304,7 @@ namespace CornerkickWebMvc.Controllers
           dtm.iSold = cmi.iSold;
           dtm.fPriceSell = cmi.fPrice;
           dtm.iItemIncome = cmi.iIncome;
+          dtm.iWinLoose = cmi.iIncome - (int)((dtm.iPresent + dtm.iSold) * cmi.fPricePresentBuyAve);
           if (dtm.iSold > 0) dtm.sPriceSellAve = (cmi.iIncome / (float)dtm.iSold).ToString("0.00") + " €";
         }
 

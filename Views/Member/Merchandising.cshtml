@@ -74,6 +74,10 @@
             "data": "iItemIncome",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
+          {
+            "data": "iWinLoose",
+            "render": $.fn.dataTable.render.number('.', ',', 0, '')
+          },
           { "data": "sPriceSellAve" }
         ],
         "paging": false,
@@ -90,7 +94,7 @@
             "searchable": false
           },
           {
-            "targets": [3, 4, 6, 7, 8, 9, 11, 12, 13],
+            "targets": [3, 4, 6, 7, 8, 9, 11, 12, 13, 14],
             "className": "dt-right"
           },
           {
@@ -107,7 +111,7 @@
             "data": null
           },
           {
-            "targets": [5, 14],
+            "targets": [5, 15],
             "defaultContent": '0.00 €',
             "className": "dt-right",
             "data": null
@@ -194,6 +198,13 @@
           $('td:eq(8)', nRow).html(bnBuy);
           $('td:eq(9)', nRow).html(divPriceSell);
 
+          // Color win/loose column
+          if (aData.iWinLoose > 0) {
+            $('td:eq(12)', nRow).css('color', "green");
+          } else if (aData.iWinLoose < 0) {
+            $('td:eq(12)', nRow).css('color', "red");
+          }
+
           return nRow;
         },
         "footerCallback": function (row, data, start, end, display) {
@@ -223,6 +234,15 @@
           var iCn = 13;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
+
+          var iCn = 14;
+          iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
+          $(api.column(iCn).footer()).html(iSum.toLocaleString(/*undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }*/));
+          if (iSum > 0) {
+            $(api.column(iCn).footer()).css('color', "green");
+          } else if (iSum < 0) {
+            $(api.column(iCn).footer()).css('color', "red");
+          }
         }
       });
     }
@@ -348,7 +368,7 @@
             <th colspan="3" class="columnBorderRight"></th>
             <th colspan="3" style="text-align: center; font-size: 125%; background-color: orange" class="columnBorderRight">Bestand</th>
             <th colspan="5" style="text-align: center; font-size: 125%; background-color: lightgreen" class="columnBorderRight">Einkauf</th>
-            <th colspan="4" style="text-align: center; font-size: 125%; background-color: lightblue">Verkauf</th>
+            <th colspan="5" style="text-align: center; font-size: 125%; background-color: lightblue">Verkauf</th>
           </tr>
           <tr>
             <th style="background-color: white">#</th>
@@ -365,6 +385,7 @@
             <th style="background-color: white">Verkaufspreis</th>
             <th style="background-color: white">verkauft</th>
             <th style="background-color: white">Einnahmen [€]</th>
+            <th style="background-color: white">G/V [€]</th>
             <th style="background-color: white">Ø-Preis</th>
           </tr>
         </thead>
@@ -384,6 +405,7 @@
             <th></th>
             <th></th>
             <th class="columnBorderRight" style="text-align: right"></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>

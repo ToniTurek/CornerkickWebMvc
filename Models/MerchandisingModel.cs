@@ -32,6 +32,7 @@ namespace CornerkickWebMvc.Models
       public string sPriceBuy { get; set; }
       public float fPriceSell { get; set; }
       public int iItemIncome { get; set; }
+      public int iWinLoose { get; set; }
       public string sPriceSellAve { get; set; }
     }
 
