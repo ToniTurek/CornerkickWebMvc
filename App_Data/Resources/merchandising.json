@@ -68,14 +68,14 @@
         "id": 10,
         "name": "Fußball",
         "price": 50.0,
-        "sellfactor": 0.75,
+        "sellfactor": 0.7,
         "quantityfactor": 1000
       },
       {
         "id": 11,
         "name": "Bettwäsche",
         "price": 60.0,
-        "sellfactor": 0.75,
+        "sellfactor": 0.7,
         "quantityfactor": 750
       },
       {
