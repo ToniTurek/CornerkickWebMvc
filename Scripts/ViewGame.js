@@ -33,6 +33,9 @@ function drawGame(iState, iGameSpeed) {
         plotStatistics(-3);
       }
 
+      // Set finished flag
+      bFinished = gLoc2.bFinished;
+
       if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
         $("#tblComments tr").remove();
 
@@ -40,7 +43,6 @@ function drawGame(iState, iGameSpeed) {
         drawGame2(gLoc2, iState, iGameSpeed);
         plotStatistics(iState);
       } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
-        bFinished = gLoc2.bFinished;
         if (!bFinished && iGameSpeed > 0) {
           setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
         }
