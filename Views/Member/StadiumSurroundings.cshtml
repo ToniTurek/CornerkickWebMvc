@@ -55,7 +55,7 @@
           bCategory.style.position = "relative";
           bCategory.style.width = "100%";
           bCategory.style.left = "0px";
-          bCategory.style.fontSize = "20px";
+          bCategory.style.fontSize = "22px";
           div1.appendChild(bCategory);
 
           var pCurr = document.createElement("p");
@@ -64,7 +64,13 @@
           pCurr.style.width = "100%";
           pCurr.style.left = "0px";
           pCurr.style.fontSize = "18px";
+          pCurr.style.marginTop = "4px";
+          pCurr.style.marginBottom = "2px";
           div1.appendChild(pCurr);
+
+          if (!building.bTypeInt) {
+            plotStars(div1, building.iLevel, building.iLevelMax);
+          }
         }
 
         if (building.iLevelReq > building.iLevel) {
@@ -87,13 +93,19 @@
         }
 
         if (building.nDaysConstruct > 0) {
+          var divNext = document.createElement("div");
+          divNext.style.position = "absolute";
+          divNext.style.bottom = "0px";
+          divNext.style.left = "0px";
+          divNext.style.width = "100%";
+
           var pNext = document.createElement("p");
           pNext.innerHTML = "Ausbau zu: " + building.sNameNext + " (noch " + building.nDaysConstruct.toString() + " Tage)";
           pNext.style.position = "relative";
           pNext.style.width = "100%";
           pNext.style.left = "0px";
           pNext.style.fontSize = "16px";
-          div1.appendChild(pNext);
+          divNext.appendChild(pNext);
 
           var divPb = document.createElement("div");
           divPb.style.position = "relative";
@@ -108,19 +120,22 @@
           divPb1.style.width = fProgress.toString() + '%';
           divPb1.innerHTML = fProgress.toFixed(1) + '%';
           divPb.appendChild(divPb1);
-          div1.appendChild(divPb);
+          divNext.appendChild(divPb);
+
+          div1.appendChild(divNext);
         } else { // No construction
           var btn = document.createElement("button");
 
-          if (building.iType > 5 && building.iType < 9) {
+          if (building.bTypeInt) {
             div1.appendChild(getNumberInputDiv(btn, building));
           }
 
           btn.type = "submit";
           btn.className = "btn btn-default";
-          btn.style.position = "relative";
+          btn.style.position = "absolute";
           btn.style.width = "100%";
           btn.style.left = "0px";
+          btn.style.bottom = "0px";
           btn.style.height = "auto";
           btn.style.fontSize = "16px";
           setBuildingBtn(btn, building);
@@ -197,6 +212,36 @@
       div0.appendChild(div1);
 
       return div0;
+    }
+
+    function plotStars(parent, iStars, iStarsMax) {
+      var iStarHeight = 24;
+
+      var divStars = document.createElement("div");
+      divStars.style.position = "relative";
+      divStars.style.top = "0px";
+      divStars.style.width = "100%";
+      divStars.style.height = iStarHeight.toString() + "px";
+      divStars.style.marginBottom = "6px";
+
+      var i = 0;
+      for (i = 0; i < iStarsMax; i++) {
+        var imgStar = document.createElement("img");
+        imgStar.style.position = "relative";
+        //imgStar.style.left = (i * (iStarHeight + 4)).toFixed(0) + "px";
+        imgStar.style.top = "0px";
+        imgStar.style.width = iStarHeight.toString() + "px";
+        imgStar.style.marginRight = "2px";
+        if (i < iStars) {
+          imgStar.src = "/Content/Icons/star.ico";
+          imgStar.title = (i + 1).toString();
+        } else {
+          imgStar.src = "/Content/Icons/star_empty.png";
+        }
+        divStars.appendChild(imgStar);
+      }
+
+      parent.appendChild(divStars);
     }
 
     function setBuildingBtn(btn, building) {

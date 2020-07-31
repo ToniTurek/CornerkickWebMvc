@@ -56,8 +56,10 @@ namespace CornerkickWebMvc.Models
     {
       public string sCategory { get; set; }
       public int iLevel { get; set; }
+      public int iLevelMax { get; set; } // Maximum level
       public int iLevelReq { get; set; } // Required level
       public byte iType { get; set; }
+      public bool bTypeInt { get; set; } // true: Integer type, false: level type
       public string sName { get; set; }
       public string sNameNext { get; set; }
       public int nDaysConstruct { get; set; }
