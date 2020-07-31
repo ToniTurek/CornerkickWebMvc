@@ -559,6 +559,13 @@
               success: function (response) {
                 alert(response);
 
+                // Play cash sound
+                var audioSell = new Audio("/Content/Sound/cash.wav");
+                if (audioSell) {
+                  audioSell.volume = 0.5;
+                  audioSell.play();
+                }
+
                 jTable.ajax.reload();
                 updateBalance(iBalance[0]);
                 bnAcceptOffer.style.display = "none";

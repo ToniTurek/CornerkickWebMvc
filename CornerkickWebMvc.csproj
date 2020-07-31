@@ -1053,6 +1053,12 @@
     <Content Include="Content\Images\user_manual\Team1a.gif" />
     <Content Include="Content\Images\user_manual\Team3a.gif" />
     <Content Include="Content\mystyles.css" />
+    <Content Include="Content\Sound\bar.wav" />
+    <Content Include="Content\Sound\cash.wav" />
+    <Content Include="Content\Sound\construction.wav" />
+    <Content Include="Content\Sound\homegoal.mp3" />
+    <Content Include="Content\Sound\missed_goal.wav" />
+    <Content Include="Content\Sound\whistle.wav" />
     <Content Include="Content\spectrum.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />

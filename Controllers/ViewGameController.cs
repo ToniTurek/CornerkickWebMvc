@@ -462,6 +462,26 @@ namespace CornerkickWebMvc.Controllers
       // Set flag for updating statistic
       gLoc.bUpdateStatistic = state.bNewRound;
 
+      ///////////////////////////////////////////////////////////////////
+      // Events
+      ///////////////////////////////////////////////////////////////////
+      ///// Shoots
+      if (state.shoot.plShoot != null) {
+        if (state.shoot.iResult == 1) gLoc.iEvent = (byte)(1 + state.shoot.plShoot.iHA);
+        else if (state.shoot.iResult == 5 || state.shoot.iResult == 6) gLoc.iEvent = 3;
+        else gLoc.iEvent = 4;
+      }
+
+      // Foul
+      if (state.duel.plDef != null && state.duel.iResult > 1) {
+        gLoc.iEvent = 5;
+      }
+
+      // Whistle
+      if (state.iStandard == 9) {
+        gLoc.iEvent = 6;
+      }
+
       return Json(gLoc, JsonRequestBehavior.AllowGet);
     }
 

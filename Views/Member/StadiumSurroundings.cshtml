@@ -393,6 +393,13 @@
           data: { iType: iType, iLevel: iLevel },
           success: function (sMessage) {
             alert(sMessage);
+
+            var audioConstruction = new Audio("/Content/Sound/construction.wav");
+            if (audioConstruction) {
+              audioConstruction.volume = 0.5;
+              audioConstruction.play();
+            }
+
             getCurrentBuildings();
             updateBalance(iBalance[0]);
           }

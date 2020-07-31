@@ -174,10 +174,12 @@
               dataType: "json",
               data: { iSponsorIndex: iIndex },
               success: function (sCash) {
-                /*
-                var audioCash = new Audio("/Content/Sounds/cash.wav");
-                audioCash.play();
-                */
+                // Play cash sound
+                var audioCash = new Audio("/Content/Sound/cash.wav");
+                if (audioCash) {
+                  audioCash.volume = 0.5;
+                  audioCash.play();
+                }
 
                 //jTable.ajax.reload();
                 bnTakeMain.style.display = "none";

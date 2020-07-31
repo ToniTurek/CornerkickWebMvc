@@ -92,6 +92,9 @@ function drawGame2(gLoc, iState, iGameSpeed) {
     iState = -2;
   }
 
+  // Play sounds
+  playSound(gLoc.iEvent);
+
   // Update statistic
   var bUpdate = gLoc.bUpdateStatistic;
   if (bUpdate === true && iState === -1) {
@@ -428,6 +431,35 @@ function changePlayerJerseyColor(iHA, cl1, cl2) {
         playerGlobal[iP].style.borderColor = cl2;
       }
     }
+  }
+}
+
+function playSound(iType) {
+  if (iType < 1) {
+    return;
+  }
+
+  var sAudioDir = "/Content/Sound/";
+  var sAudioFile = "";
+  if (iType === 1 || iType === 2) {
+    sAudioFile = sAudioDir + "homegoal.mp3";
+  } else if (iType === 3) {
+    sAudioFile = sAudioDir + "bar.wav";
+  } else if (iType === 4) {
+    sAudioFile = sAudioDir + "missed_goal.wav";
+  } else if (iType === 5) {
+    sAudioFile = sAudioDir + "whistle.wav";
+  } else if (iType === 6) {
+    sAudioFile = sAudioDir + "whistle.wav";
+  }
+
+  var audioGame = new Audio(sAudioFile);
+  if (audioGame) {
+    audioGame.volume = 0.5;
+    if (iType === 2) {
+      audioGame.volume = 0.25;
+    }
+    audioGame.play();
   }
 }
 

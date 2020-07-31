@@ -56,6 +56,8 @@ namespace CornerkickWebMvc.Models
 
       public List<string[]> ltComments { get; set; }
       public bool bUpdateStatistic { get; set; }
+
+      public byte iEvent { get; set; } // 1: home goal, 2: away goal, 3: post/bar, 4: shoot (no goal), 5: referee whistle
     }
 
     public struct gamePlayer
