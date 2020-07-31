@@ -159,7 +159,36 @@
           }
         });
       });
-    });
+
+      setView();
+      $(window).resize(function () {
+        setView();
+      });
+    }); // document ready
+
+    function setView() {
+      var divStadion = document.getElementById("divStadion");
+      var bMobile = divStadion.offsetWidth < 900;
+      //document.getElementById("bnRenewPitch").innerHTML = divStadion.offsetWidth.toString();
+
+      $('.ddlSeatTypes').each(function () {
+        if (bMobile) {
+          $(this).removeClass("form-control");
+          $(this).css("width", 54);
+        } else {
+          $(this).addClass("form-control");
+        }
+      });
+
+      $('.tbSeats').each(function () {
+        if (bMobile) {
+          $(this).removeClass("form-control");
+          $(this).css("width", 54);
+        } else {
+          $(this).addClass("form-control");
+        }
+      });
+    }
 
     function setImage() {
       $.ajax({
@@ -517,7 +546,7 @@
             sLoc[10, 0] = sLoc[0, 0]; sLoc[10, 1] = 0.9f;       // A1
             sLoc[11, 0] = sLoc[1, 0]; sLoc[11, 1] = sLoc[10, 1]; // B1
             sLoc[12, 0] = sLoc[2, 0]; sLoc[12, 1] = sLoc[10, 1]; // C1
-            sLoc[13, 0] = 0.92f; sLoc[13, 1] = sLoc[3, 1]; // D1
+            sLoc[13, 0] = 0.93f; sLoc[13, 1] = sLoc[3, 1]; // D1
             sLoc[14, 0] = sLoc[13, 0]; sLoc[14, 1] = sLoc[4, 1]; // E1
             sLoc[15, 0] = sLoc[5, 0]; sLoc[15, 1] = 0.05f;       // F1
             sLoc[16, 0] = sLoc[6, 0]; sLoc[16, 1] = sLoc[15, 1]; // G1
@@ -562,10 +591,6 @@
               }
 
               string sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; left: " + (sLoc[iB, 0] - 0.03).ToString("0%");
-              if (iB == 8 || iB == 9) {
-                sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; right: " + (1.0 - sLoc[iB, 0] - 0.03).ToString("0%");
-              }
-
               <div style="@sStyle">
                 <div style="position: relative">
                   @Html.EditorFor(Model => Model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
