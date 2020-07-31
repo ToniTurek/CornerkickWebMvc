@@ -51,6 +51,7 @@ namespace CornerkickWebMvc.Models
       public bool bSusp { get; set; }
       public bool bYellowCard { get; set; }
       public sbyte iIxManMarking { get; set; }
+      public bool bOffStandards { get; set; }
       public byte iNb { get; set; }
     }
 

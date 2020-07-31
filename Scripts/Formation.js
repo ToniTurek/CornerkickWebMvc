@@ -1,5 +1,6 @@
 ﻿async function drawAufstellung(iFormation, iSelectedPlayer, onLoad) {
   var drawFormation = $("#drawFormation");
+  var divDrawFormation = document.getElementById("drawFormation");
   var textteamaverage = $("#average");
   var divTacticOrientation    = document.getElementById("divTacticOrientation");
   var divTacticIndOrientation = document.getElementById("divTacticIndOrientation");
@@ -119,6 +120,38 @@
         textteamaverage.html("Durchschnittsstärke (-alter): " + teamData.sTeamAveSkill + " (" + teamData.sTeamAveAge + ")");
 
         drawFormation/*.hide()*/.html(result).fadeIn('slow')/*.show()*/;
+
+        // NEW approach with javascript DOM elements
+        if (document.getElementById("rbOffence").checked) {
+          $.each(teamData.ltPlayer2, function (iPl, pl2) {
+            var divOffencePl = document.getElementById("divOffencePl_" + iPl.toString());
+            var iTop = divOffencePl.offsetTop;
+            var iLeft = divOffencePl.offsetLeft + divOffencePl.offsetWidth;
+
+            // Checkbox offence
+            var lbOffence = document.createElement("label");
+            lbOffence.style.position = "absolute";
+            lbOffence.style.top = iTop.toString() + "px";
+            lbOffence.style.left = iLeft.toString() + "px";
+            lbOffence.style.fontWeight = "normal";
+            lbOffence.style.color = "white";
+            lbOffence.className = "noselect";
+            var cbOffence = document.createElement("input");
+            cbOffence.type = "checkbox";
+            cbOffence.id = "cbOffence";
+            cbOffence.setAttribute('data-iPlayerIx', iPl);
+            if (pl2.bOffStandards) {
+              cbOffence.checked = true;
+            }
+            cbOffence.title = "Bei Standards nach vorne";
+            cbOffence.addEventListener("click", function () { setPlayerStandard(this); });
+            lbOffence.appendChild(cbOffence);
+            //lbOffence.innerHTML += "SnV";
+            divDrawFormation.appendChild(lbOffence);
+
+            return iPl !== 11;
+          });
+        }
 
         for (var iDg = 0; iDg < 11; iDg++) {
           var divPlayerBox = document.getElementById("divPlayerBox_" + iDg.toString());
@@ -329,6 +362,20 @@ function getSubstitutionList() {
       alert("ERROR in getSubstitutionList");
       return false;
     }
+  });
+}
+
+function setPlayerStandard(cbOffence) {
+  if (!e) var e = window.event;
+  e.cancelBubble = true;
+  if (e.stopPropagation) e.stopPropagation();
+
+  var iPlayerIx = cbOffence.getAttribute('data-iPlayerIx');
+
+  $.ajax({
+    url: '/Member/TeamSetOffenceFlag',
+    dataType: "JSON",
+    data: { iPlayerIx: iPlayerIx, bSet: cbOffence.checked }
   });
 }
 

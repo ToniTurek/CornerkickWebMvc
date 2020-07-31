@@ -1517,6 +1517,20 @@ namespace CornerkickWebMvc.Controllers
       return Json(ltsSubstitution, JsonRequestBehavior.AllowGet);
     }
 
+    public void TeamSetOffenceFlag(int iPlayerIx, bool bSet)
+    {
+      CornerkickManager.User usr = ckUser();
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return;
+      if (iPlayerIx < 0) return;
+      if (clb.ltPlayer == null) return;
+      if (iPlayerIx >= clb.ltPlayer.Count) return;
+
+      clb.ltPlayer[iPlayerIx].bOffStandards = bSet;
+      Models.TeamModels.ltPlayer[iPlayerIx] = clb.ltPlayer[iPlayerIx];
+      updatePlayerOfGame(usr.game, clb);
+    }
+
     public JsonResult CkAufstellungFormation(int iF, int iSP = -1, bool bMobile = false, byte iTactic = 0)
     {
       CornerkickManager.User usr  = ckUser();
@@ -1562,7 +1576,9 @@ namespace CornerkickWebMvc.Controllers
 
         pl2.bSusp = bSusp;
 
+        // Individuel player tactic
         pl2.iIxManMarking = pl.iIxManMarking;
+        pl2.bOffStandards = pl.bOffStandards;
 
         if (tD.formation.ptPos.Length > iP) {
           pl2.iPos = CornerkickGame.Tool.getBasisPos(CornerkickGame.Tool.getPosRole(tD.formation.ptPos[iP], MvcApplication.ckcore.game.ptPitch));
@@ -1729,7 +1745,7 @@ namespace CornerkickWebMvc.Controllers
 
         CornerkickGame.Tactic tc = club.ltTactic[iTactic];
 
-        if (CornerkickGame.Tool.getPosRole(tc.formation.ptPos[iPl], MvcApplication.ckcore.game.ptPitch) == 1) continue; // If keeper --> continue
+        //if (CornerkickGame.Tool.getPosRole(tc.formation.ptPos[iPl], MvcApplication.ckcore.game.ptPitch) == 1) continue; // If keeper --> continue
 
         float fHeight = 0.05f;
         if (bMobile) fHeight = 0.07f;
@@ -1747,7 +1763,9 @@ namespace CornerkickWebMvc.Controllers
         string sPlNo = pl.iNr.ToString();
         if (club.bNation) sPlNo = (iPl + 1).ToString();
 
-        sDiv += "<div onclick=\"javascript: selectPlayer(" + iPl.ToString() + ")\" style=\"position: absolute; ";
+        sDiv += "<div onclick=\"javascript: selectPlayer(" + iPl.ToString() + ")\" ";
+        sDiv += "id=\"divOffencePl_" + iPl.ToString() + "\" ";
+        sDiv += "style=\"position: absolute; ";
         sDiv += "top: "    + fTop   .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
         sDiv += "left: "   + fLeft  .ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
         sDiv += "height: " + fHeight.ToString("0.00%", System.Globalization.CultureInfo.InvariantCulture) + "; ";
