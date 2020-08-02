@@ -391,7 +391,7 @@
 
       $.when(getBalanceAjax()).done(function (iBalance) {
         $.ajax({
-          type: 'post',
+          type: 'GET',
           url: '/Member/StadiumBuildBuilding',
           dataType: "json",
           data: { iType: iType, iLevel: iLevel },

@@ -2947,7 +2947,7 @@ namespace CornerkickWebMvc.Controllers
     //   1: new contract (for own jouth player)
     //   2: new contract for external player
     //   3: new contract for external player with ending contract
-    [HttpPost]
+    [HttpGet]
     public JsonResult PlayerCheckIfNewContract(int iPlayerId)
     {
       if (iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
@@ -2972,7 +2972,6 @@ namespace CornerkickWebMvc.Controllers
 
     // iMode: 0 - Extention, 1 - new contract
     const byte iContractLengthMax = 5;
-    [HttpPost]
     public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sBonusPlay, string sBonusGoal, string sFixTransferFee, bool bNextSeason, string sPlayerMood)
     {
       // Initialize status code with ERROR
@@ -4927,7 +4926,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(bdg, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumBuildBuilding(int iType, int iLevel)
     {
       CornerkickManager.Club clb = ckClub();

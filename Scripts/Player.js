@@ -63,7 +63,7 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
     } else {
       $.ajax({
         url: '/Member/PlayerCheckIfNewContract',
-        type: "POST",
+        type: "GET",
         dataType: "JSON",
         data: { iPlayerId: iPlayerId },
         success: function (iContractType) {
@@ -399,7 +399,6 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
 
                   $.ajax({
                     url: "/Member/NegotiatePlayerContract",
-                    type: 'POST',
                     traditional: true,
                     data: { iId: iPlayerId, iYears: iYears, sSalary: sSalary, sBonusPlay: sBonusPlay, sBonusGoal: sBonusGoal, sFixTransferFee: sFixTransferFee, bNextSeason: bNextSeason, sPlayerMood: sPlayerMood },
                     dataType: "json",
