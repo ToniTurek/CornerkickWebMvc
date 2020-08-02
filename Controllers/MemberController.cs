@@ -448,8 +448,8 @@ namespace CornerkickWebMvc.Controllers
       */
 
       // Kondi/Frische/Moral
-      float[] fTeamAve   = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum);
-      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, iPlStop: 11);
+      float[] fTeamAve   = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
       desk.sKFM = "K: " + fTeamAve[0].ToString("0.0%") + ", F: " + fTeamAve[1].ToString("0.0%") + ", M: " + fTeamAve[2].ToString("0.0%");
       desk.sStrength = "Durchschnittsstärke (Startelf): " + fTeamAve[3].ToString("0.00") + fTeamAve11[3].ToString(" (0.00)");
 
@@ -831,7 +831,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player.TrainingHistory trHistCurrent = new CornerkickGame.Player.TrainingHistory();
       trHistCurrent.dt = MvcApplication.ckcore.dtDatum;
-      trHistCurrent.fKFM = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum);
+      trHistCurrent.fKFM = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
 
       List<Models.DataPointGeneral>[][] dataPoints = new List<Models.DataPointGeneral>[2][];
       dataPoints[0] = new List<Models.DataPointGeneral>[3];
@@ -954,7 +954,7 @@ namespace CornerkickWebMvc.Controllers
           // ... get training history data
           CornerkickGame.Player.TrainingHistory trHistExp = new CornerkickGame.Player.TrainingHistory();
           trHistExp.dt   = tu.dt;
-          trHistExp.fKFM = CornerkickManager.Tool.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation, MvcApplication.ckcore.dtDatum);
+          trHistExp.fKFM = CornerkickManager.Tool.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
           trHistExp.iType = tu.iType;
 
           // ... add training history data to dataPoints
@@ -1607,7 +1607,7 @@ namespace CornerkickWebMvc.Controllers
       tD.iCaptainIx = MvcApplication.ckcore.plr.getCaptainIx(club);
 
       // Team averages
-      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, iPlStop: 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
       tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
 
@@ -1655,7 +1655,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Opp. team averages
-          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, iPlStop: club.nextGame.nPlStart);
+          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: club.nextGame.nPlStart);
           tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
           tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
         }
@@ -1982,7 +1982,7 @@ namespace CornerkickWebMvc.Controllers
                 sName = plNext.sName + " *",
                 sPosition = CornerkickManager.Player.getStrPos(plNext),
                 sSkill = CornerkickGame.Tool.getAveSkill(plNext).ToString("0.0"),
-                iValue = plNext.getValue(MvcApplication.ckcore.dtDatum) * 1000,
+                iValue = plNext.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) * 1000,
                 iSalary = plNext.contractNext.iSalary,
                 iLength = plNext.contractNext.iLength,
                 sNat = CornerkickManager.Main.sLandShort[plNext.iNat1],
@@ -2407,7 +2407,7 @@ namespace CornerkickWebMvc.Controllers
 
       long iDateCurrent = convertDateTimeToTimestamp(MvcApplication.ckcore.dtDatum);
       ltDataPoints[0].Add(new Models.DataPointGeneral(iDateCurrent, CornerkickGame.Tool.getAveSkill(pl, bIdeal: true)));
-      ltDataPoints[1].Add(new Models.DataPointGeneral(iDateCurrent, pl.getValue(MvcApplication.ckcore.dtDatum) * 1000));
+      ltDataPoints[1].Add(new Models.DataPointGeneral(iDateCurrent, pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) * 1000));
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
@@ -3266,7 +3266,7 @@ namespace CornerkickWebMvc.Controllers
           if (clbPlayer != null) {
             sNewsPaper2 = "Nach über&shy;ein&shy;stimmenden Medien&shy;berichten stehen die Zeichen zwischen ";
             sNewsPaper2 += clbPlayer.sName.Replace(" ", "&nbsp;");
-            sNewsPaper2 += " und " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) auf Abschied.";
+            sNewsPaper2 += " und " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 1000.0).ToString("0.0") + " mio. MW) auf Abschied.";
             //sNewsPaper2 += " Die kolportierte Ablösesumme soll bei ca. " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000).ToString("0.0") + " mio. liegen";
           }
           MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
@@ -3382,7 +3382,7 @@ namespace CornerkickWebMvc.Controllers
                     string sTalent = "";
                     if (bNewspaperTalent) sTalent = "Talent ";
                     string sNewsPaper1 = club.sName + " vor Verpflichtung von " + sTalent + pl.sName;
-                    string sNewsPaper2 = "Angeblich steht " + club.sName + " kurz vor der Verpflichtung von " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW).";
+                    string sNewsPaper2 = "Angeblich steht " + club.sName + " kurz vor der Verpflichtung von " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 1000.0).ToString("0.0") + " mio. MW).";
                     MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
                   }
                 }
@@ -3408,11 +3408,11 @@ namespace CornerkickWebMvc.Controllers
       if (checkIfTop10Player(pl)) {
         if (iTransferFee < 0) {
           string sNewsPaper1 = pl.sName + " wechselt zu " + clbTake.sName;
-          string sNewsPaper2 = "Wie heute bekannt gegeben wurde, schließt sich " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) zur neuen Saison " + clbTake.sName + " an.";
+          string sNewsPaper2 = "Wie heute bekannt gegeben wurde, schließt sich " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 1000.0).ToString("0.0") + " mio. MW) zur neuen Saison " + clbTake.sName + " an.";
           MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
         } else {
           string sNewsPaper1 = pl.sName + " bei " + clbTake.sName + " vorgestellt";
-          string sNewsPaper2 = "Auf der heutigen Pressekonferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum) / 1000.0).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablösesumme soll angeblich bei " + (iTransferFee / 1000000.0).ToString("0.0") + " mio. liegen.";
+          string sNewsPaper2 = "Auf der heutigen Pressekonferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 1000.0).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablösesumme soll angeblich bei " + (iTransferFee / 1000000.0).ToString("0.0") + " mio. liegen.";
           MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
         }
       }
@@ -3549,7 +3549,7 @@ namespace CornerkickWebMvc.Controllers
             strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player, bIdeal: true),
             age = ((int)transfer.player.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
             talent = (transfer.player.iTalent + 1),
-            mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum) * 1000,
+            mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) * 1000,
             fixtransferfee = iFixtransferfee,
             club = sClub,
             nat = CornerkickManager.Main.sLandShort[transfer.player.iNat1],
@@ -7260,7 +7260,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(ltPlayerBest, tD.formation, MvcApplication.ckcore.dtDatum, iPlStop: 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(ltPlayerBest, tD.formation, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
       tD.fTeamAveStrength = fTeamAve11[3];
       tD.fTeamAveAge      = fTeamAve11[4];
 
@@ -7290,12 +7290,12 @@ namespace CornerkickWebMvc.Controllers
         if (iLand >= 0 && iLand != clb.iLand) continue;
         if (iDivision >= 0 && iDivision != clb.iDivision) continue;
 
-        float[] fAve = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, bTeamValue: true);
+        float[] fAve = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, bTeamValue: true);
         string sSkill = fAve[3].ToString("0.0");
         string sAge   = fAve[4].ToString("0.0");
         int    iVal   = (int)fAve[5];
 
-        float[] fAve11 = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, iPlStop: 11, bTeamValue: true);
+        float[] fAve11 = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11, bTeamValue: true);
         string sSkill11 = fAve11[3].ToString("0.0");
         string sAge11   = fAve11[4].ToString("0.0");
         int    iVal11   = (int)fAve11[5];
