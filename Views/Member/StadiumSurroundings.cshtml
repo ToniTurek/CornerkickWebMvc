@@ -24,6 +24,8 @@
   </style>
 
   <script type="text/javascript">
+    var bSound = true;
+
     function getGround(building, ltBuildingsFree) {
       var div0 = document.createElement("div");
       div0.style.position = "relative";
@@ -316,6 +318,8 @@
     }
 
     $(document).ready(function () {
+      bSound = @Html.Raw(Json.Encode(Model.bSound));
+
       $.ajax({
         url: '/Member/StadiumGetTopring',
         type: "GET",
@@ -394,10 +398,12 @@
           success: function (sMessage) {
             alert(sMessage);
 
-            var audioConstruction = new Audio("/Content/Sound/construction.wav");
-            if (audioConstruction) {
-              audioConstruction.volume = 0.5;
-              audioConstruction.play();
+            if (bSound) {
+              var audioConstruction = new Audio("/Content/Sound/construction.wav");
+              if (audioConstruction) {
+                audioConstruction.volume = 0.5;
+                audioConstruction.play();
+              }
             }
 
             getCurrentBuildings();

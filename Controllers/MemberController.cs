@@ -4639,8 +4639,14 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult StadiumSurroundings(Models.StadiumSurroundingsModel mdStadionSurr)
     {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return View(mdStadionSurr);
+
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdStadionSurr);
+
+      mdStadionSurr.bSound = true;
+      if (usr.lti.Count > 1) mdStadionSurr.bSound = usr.lti[1] > 0;
 
       mdStadionSurr.ddlTrainingsgel  = new List<SelectListItem>();
       mdStadionSurr.ddlGym           = new List<SelectListItem>();
@@ -6940,8 +6946,14 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Sponsor(Models.SponsorModel sponsorModel)
     {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return View(sponsorModel);
+
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(sponsorModel);
+
+      sponsorModel.bSound = true;
+      if (usr.lti.Count > 1) sponsorModel.bSound = usr.lti[1] > 0;
 
       Random rnd = new Random();
 

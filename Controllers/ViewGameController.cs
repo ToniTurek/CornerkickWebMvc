@@ -90,6 +90,9 @@ namespace CornerkickWebMvc.Controllers
         user.game.data.iGameSpeed = 300;
       }
 
+      view.bSound = true;
+      if (user.lti.Count > 1) view.bSound = user.lti[1] > 0;
+
       view.ddlGames = new List<SelectListItem>();
 
       List<FileInfo> fiGames = getFileInfoGames(clubUser);

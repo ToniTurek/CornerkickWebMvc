@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -50,30 +51,34 @@ namespace CornerkickWebMvc.Controllers
             }
         }
 
-        //
-        // GET: /Manage/Index
-        public async Task<ActionResult> Index(ManageMessageId? message)
-        {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Ihr Kennwort wurde geändert."
-                : message == ManageMessageId.SetPasswordSuccess ? "Ihr Kennwort wurde festgelegt."
-                : message == ManageMessageId.SetTwoFactorSuccess ? "Ihr Anbieter für zweistufige Authentifizierung wurde festgelegt."
-                : message == ManageMessageId.Error ? "Fehler"
-                : message == ManageMessageId.AddPhoneSuccess ? "Ihre Telefonnummer wurde hinzugefügt."
-                : message == ManageMessageId.RemovePhoneSuccess ? "Ihre Telefonnummer wurde entfernt."
-                : "";
+    //
+    // GET: /Manage/Index
+    public async Task<ActionResult> Index(ManageMessageId? message)
+    {
+      ViewBag.StatusMessage =
+          message == ManageMessageId.ChangePasswordSuccess ? "Ihr Kennwort wurde geändert."
+          : message == ManageMessageId.SetPasswordSuccess ? "Ihr Kennwort wurde festgelegt."
+          : message == ManageMessageId.SetTwoFactorSuccess ? "Ihr Anbieter für zweistufige Authentifizierung wurde festgelegt."
+          : message == ManageMessageId.Error ? "Fehler"
+          : message == ManageMessageId.AddPhoneSuccess ? "Ihre Telefonnummer wurde hinzugefügt."
+          : message == ManageMessageId.RemovePhoneSuccess ? "Ihre Telefonnummer wurde entfernt."
+          : "";
 
-            var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
-            {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
-            };
-            return View(model);
-        }
+      var userId = User.Identity.GetUserId();
+      var model = new IndexViewModel {
+        HasPassword = HasPassword(),
+        PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
+        TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
+        Logins = await UserManager.GetLoginsAsync(userId),
+        BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+      };
+
+      CornerkickManager.User usr = Controllers.MemberController.ckUserStatic(User);
+      model.bSound = true;
+      if (usr.lti.Count > 1) model.bSound = usr.lti[1] > 0;
+
+      return View(model);
+    }
 
         //
         // POST: /Manage/RemoveLogin
@@ -333,9 +338,20 @@ namespace CornerkickWebMvc.Controllers
             base.Dispose(disposing);
         }
 
-#region Hilfsprogramme
-        // Wird für XSRF-Schutz beim Hinzufügen externer Anmeldungen verwendet.
-        private const string XsrfKey = "XsrfId";
+    public void SetSound(bool bOn)
+    {
+      CornerkickManager.User usr = Controllers.MemberController.ckUserStatic(User);
+      if (usr == null) return;
+
+      if (usr.lti == null) usr.lti = new List<int>();
+      while (usr.lti.Count < 2) usr.lti.Add(0);
+
+      usr.lti[1] = bOn ? 1 : 0;
+    }
+
+    #region Hilfsprogramme
+    // Wird für XSRF-Schutz beim Hinzufügen externer Anmeldungen verwendet.
+    private const string XsrfKey = "XsrfId";
 
         private IAuthenticationManager AuthenticationManager
         {
@@ -385,5 +401,5 @@ namespace CornerkickWebMvc.Controllers
         }
 
 #endregion
-    }
+  }
 }

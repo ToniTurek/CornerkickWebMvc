@@ -7,6 +7,8 @@ namespace CornerkickWebMvc.Models
 {
   public class SponsorModel
   {
+    public bool bSound { get; set; }
+
     public List<CornerkickManager.Finance.Sponsor> ltSponsorOffers { get; set; }
     public List<CornerkickManager.Finance.Sponsor> ltSponsorBoards { get; set; }
     public      CornerkickManager.Finance.Sponsor  sponsorMain { get; set; }

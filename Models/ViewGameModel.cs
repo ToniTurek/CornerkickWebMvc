@@ -10,6 +10,7 @@ namespace CornerkickWebMvc.Models
   public class ViewGameModel
   {
     public bool bAdmin { get; set; }
+    public bool bSound { get; set; }
 
     public int iStateGlobal { get; set; }
 

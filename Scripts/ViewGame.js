@@ -439,6 +439,13 @@ function playSound(iType) {
     return;
   }
 
+  var cbSound = document.getElementById("cbSound");
+  if (cbSound) {
+    if (!cbSound.checked) {
+      return;
+    }
+  }
+
   var sAudioDir = "/Content/Sound/";
   var sAudioFile = "";
   if (iType === 1 || iType === 2) {

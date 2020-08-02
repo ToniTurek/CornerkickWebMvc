@@ -646,7 +646,7 @@
       // Dialogs
       $("#dialogOptions").dialog({
           autoOpen: false,
-          height: 288,
+          height: 290,
           width: 260
       });
 
@@ -1102,9 +1102,19 @@
     <div id="divOptionsPos" style="position: absolute; top: 164px; left: 100px; width: 140px; height: auto">
       @Html.DropDownListFor(m => m.iPositions, Model.ddlPositions, new { @Id = "ddlPositions", @class = "form-control" })
     </div>
-    <label style="position: absolute; top: 210px; cursor: pointer">
+    <label style="position: absolute; top: 200px; cursor: pointer">
       Chancen:
-      <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px" onclick="openDialogChances(this.checked)">
+      <input type="checkbox" name="cbPlAction" style="position: absolute; top: 0px; left: 90px; cursor: pointer" onclick="openDialogChances(this.checked)">
+    </label>
+    <label style="position: absolute; top: 220px; cursor: pointer">
+      Sound:
+      @{
+        if (Model.bSound) {
+          <input type="checkbox" name="cbSound" id="cbSound" style="position: absolute; top: 0px; left: 90px; cursor: pointer" checked="checked">
+        } else {
+          <input type="checkbox" name="cbSound" id="cbSound" style="position: absolute; top: 0px; left: 90px; cursor: pointer">
+        }
+      }
     </label>
   </div>
 
