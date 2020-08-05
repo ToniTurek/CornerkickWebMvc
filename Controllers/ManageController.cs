@@ -75,7 +75,13 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.User usr = Controllers.MemberController.ckUserStatic(User);
       model.bSound = true;
-      if (usr.lti.Count > 1) model.bSound = usr.lti[1] > 0;
+      if (usr.lti != null) {
+        if (usr.lti.Count > 1) model.bSound = usr.lti[1] > 0;
+      }
+      model.bShowBalanceToday = true;
+      if (usr.lti != null) {
+        if (usr.lti.Count > 2) model.bShowBalanceToday = usr.lti[2] > 0;
+      }
 
       return View(model);
     }
@@ -347,6 +353,17 @@ namespace CornerkickWebMvc.Controllers
       while (usr.lti.Count < 2) usr.lti.Add(0);
 
       usr.lti[1] = bOn ? 1 : 0;
+    }
+
+    public void DeskSetBalanceTodayDialog(bool bOn)
+    {
+      CornerkickManager.User usr = Controllers.MemberController.ckUserStatic(User);
+      if (usr == null) return;
+
+      if (usr.lti == null) usr.lti = new List<int>();
+      while (usr.lti.Count < 3) usr.lti.Add(0);
+
+      usr.lti[2] = bOn ? 1 : 0;
     }
 
     #region Hilfsprogramme

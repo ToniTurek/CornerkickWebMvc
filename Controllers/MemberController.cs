@@ -332,6 +332,12 @@ namespace CornerkickWebMvc.Controllers
         if (usr.lti.Count > 0) desk.iDeleteLog = usr.lti[0];
       }
 
+      // Show todays balance?
+      desk.bShowBalanceToday = true;
+      if (usr.lti != null) {
+        if (usr.lti.Count > 2) desk.bShowBalanceToday = usr.lti[2] > 0;
+      }
+
       CornerkickManager.Club club = ckClub();
       if (club == null) return View(desk);
       desk.club = club;
@@ -723,6 +729,33 @@ namespace CornerkickWebMvc.Controllers
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+    }
+
+    [HttpGet]
+    public JsonResult DeskGetBalanceToday()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      List<CornerkickManager.Finance.Account> ltBalanceToday = new List<CornerkickManager.Finance.Account>();
+      foreach (CornerkickManager.Finance.Account acc in clb.ltAccount) {
+        if (acc.dt.Date.Equals(MvcApplication.ckcore.dtDatum.Date)) {
+          ltBalanceToday.Add(acc);
+        }
+      }
+
+      return Json(ltBalanceToday, JsonRequestBehavior.AllowGet);
+    }
+
+    public void DeskSetBalanceTodayDialog(bool bOn)
+    {
+      CornerkickManager.User usr = Controllers.MemberController.ckUserStatic(User);
+      if (usr == null) return;
+
+      if (usr.lti == null) usr.lti = new List<int>();
+      while (usr.lti.Count < 3) usr.lti.Add(0);
+
+      usr.lti[2] = bOn ? 1 : 0;
     }
 
     [Authorize]
@@ -2922,27 +2955,6 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Returns
-    //   true:  external player or jouth player with initial contract (not transfered)
-    //   false: own player
-    private bool checkIfNewContract(CornerkickGame.Player pl, CornerkickManager.Club clbUser)
-    {
-      bool bForceNewContract = true;
-
-      CornerkickManager.Club clbPlayer = null;
-      if (pl.iClubId >= 0) clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
-
-      if (clbPlayer != null) {
-        if (clbUser != null) bForceNewContract = clbUser.iId != clbPlayer.iId;
-
-        if (!bForceNewContract && CornerkickManager.Player.ownPlayer(clbPlayer, pl, 2)) {
-          if (pl.contract.iSalary == CornerkickManager.Finance.iPlayerJouthSalary) bForceNewContract = true;
-        }
-      }
-
-      return bForceNewContract;
-    }
-
-    // Returns
     //   0: contract extension
     //   1: new contract (for own jouth player)
     //   2: new contract for external player
@@ -2968,6 +2980,27 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(iType, JsonRequestBehavior.AllowGet);
+    }
+
+    // Returns
+    //   true:  external player or jouth player with initial contract (not transfered)
+    //   false: own player
+    private bool checkIfNewContract(CornerkickGame.Player pl, CornerkickManager.Club clbUser)
+    {
+      bool bForceNewContract = true;
+
+      CornerkickManager.Club clbPlayer = null;
+      if (pl.iClubId >= 0) clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
+
+      if (clbPlayer != null) {
+        if (clbUser != null) bForceNewContract = clbUser.iId != clbPlayer.iId;
+
+        if (!bForceNewContract && CornerkickManager.Player.ownPlayer(clbPlayer, pl, 2)) {
+          if (pl.contract.iSalary == CornerkickManager.Finance.iPlayerJouthSalary) bForceNewContract = true;
+        }
+      }
+
+      return bForceNewContract;
     }
 
     // iMode: 0 - Extention, 1 - new contract

@@ -11,10 +11,13 @@
   <meta name="viewport" content="width=device-width" />
   <title>Index</title>
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
+  <script type="text/javascript" src="~/Scripts/dialog.js"></script>
 
   <style>
     td {
@@ -42,6 +45,19 @@
     $(document).ready(function () {
       setNews();
       setNewspaper();
+
+      var bShowBalanceToday = @Html.Raw(Json.Encode(Model.bShowBalanceToday));
+      if (bShowBalanceToday) {
+        showBalanceToday(document.body);
+      }
+
+      /*
+      var divBody = document.getElementById("divBody");
+      divBody.addEventListener("click", function () {
+        alert("Test");
+      });
+      */
+      //document.body.onclick(function() { alert("Test") });
 
       $.get("/Member/GetLastGames/", function (dataLastGames) {
         var chart = new CanvasJS.Chart("chartContainerLastGames", {
@@ -142,7 +158,7 @@
           data: { iDeleteAfter: $(this).val() }
         });
       });
-    });
+    }); // document ready
 
     function setNews() {
       $('#tableNews').DataTable({
@@ -430,11 +446,118 @@
         }
       }
     }
+
+    function showBalanceToday(parent) {
+      $.ajax({
+        url: '/Member/DeskGetBalanceToday',
+        dataType: "JSON",
+        type: 'GET',
+        success: function (ltBalanceToday) {
+          var div0 = document.createElement("div");
+          div0.id = "dlgBalanceToday";
+          div0.title = "Heutige Transaktionen";
+
+          var div1 = document.createElement("div");
+          div1.style.position = "relative";
+          div1.style.width = "100%";
+
+          var tbl1 = document.createElement("table");
+          tbl1.style.width = "100%";
+          tbl1.border = 1;
+          tbl1.cellPadding = 4;
+          var tblbdy1 = document.createElement("tbody");
+
+          var iBalanceTodayTotal = 0;
+          var i = 0;
+          for (i = 0; i < ltBalanceToday.length; i++) {
+            var blc = ltBalanceToday[i];
+
+            var tr1 = document.createElement("tr");
+
+            var td1 = document.createElement("td");
+            td1.align = "center";
+            td1.innerHTML = blc.sSubject;
+            tr1.appendChild(td1);
+
+            var td2 = document.createElement("td");
+            td2.align = "right";
+            td2.innerHTML = blc.iValue.toLocaleString();
+            if (blc.iValue < 0) {
+              td2.style.color = "red";
+            } else {
+              td2.style.color = "green";
+            }
+            tr1.appendChild(td2);
+
+            tblbdy1.appendChild(tr1);
+
+            iBalanceTodayTotal += blc.iValue;
+          }
+
+          var trTotal = document.createElement("tr");
+
+          var tdTotal1 = document.createElement("td");
+          tdTotal1.align = "center";
+          tdTotal1.innerHTML = "Gesamt";
+          tdTotal1.style.fontWeight = "bold";
+          trTotal.appendChild(tdTotal1);
+
+          var tdTotal2 = document.createElement("td");
+          tdTotal2.align = "right";
+          tdTotal2.innerHTML = iBalanceTodayTotal.toLocaleString();
+          if (iBalanceTodayTotal < 0) {
+            tdTotal2.style.color = "red";
+          } else {
+            tdTotal2.style.color = "green";
+          }
+          tdTotal2.style.fontWeight = "bold";
+          trTotal.appendChild(tdTotal2);
+
+          tblbdy1.appendChild(trTotal);
+
+          tbl1.appendChild(tblbdy1);
+          div1.appendChild(tbl1);
+          div0.appendChild(div1);
+          parent.appendChild(div0);
+
+          $(div0).dialog({
+            autoOpen: true,
+            width: 376,
+            modal: false,
+            buttons: [
+              {
+                text: "schließen und nicht mehr anzeigen",
+                //class: "foo bar baz",
+                id: "bnOkAndHide",
+                tabIndex: -1,
+                click: function () {
+                  $.ajax({
+                    url: '/Manage/DeskSetBalanceTodayDialog',
+                    dataType: "JSON",
+                    data: { bOn: false },
+                  });
+                  
+                  $(this).dialog('destroy').remove();
+                }
+              },
+              {
+                text: "schließen",
+                //class: "foo bar baz",
+                id: "bnOk",
+                click: function () {
+                  $(this).dialog('destroy').remove();
+                }
+              }
+            ]
+          });
+        }
+      });
+    }
   </script>
 </head>
 
 <body>
-  <div style="position: relative; width: 100%">
+  <div id="divBody" style="position: relative; width: 100%">
     @{
       CornerkickManager.Club clb = Model.club;
 

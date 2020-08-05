@@ -18,6 +18,14 @@
         data: { bOn: bOn }
       });
     }
+
+    function changeShowBalanceToday(bOn) {
+      $.ajax({
+        url: '/Manage/DeskSetBalanceTodayDialog',
+        dataType: "JSON",
+        data: { bOn: bOn }
+      });
+    }
   </script>
 </head>
 
@@ -47,82 +55,93 @@
         ]
       </dd>
       @*
-        <dt>Externe Anmeldungen:</dt>
-        <dd>
-            @Model.Logins.Count [
-            @Html.ActionLink("Verwalten", "ManageLogins") ]
-        </dd>
+      <dt>Externe Anmeldungen:</dt>
+      <dd>
+          @Model.Logins.Count [
+          @Html.ActionLink("Verwalten", "ManageLogins") ]
+      </dd>
       *@
       @*
-        Telefonnummern können als zweiter Faktor in einem zweistufigen Authentifizierungssystem verwendet werden.
+      Telefonnummern können als zweiter Faktor in einem zweistufigen Authentifizierungssystem verwendet werden.
 
-         In <a href="https://go.microsoft.com/fwlink/?LinkId=403804">diesem Artikel</a>
-            finden Sie Details zum Einrichten dieser ASP.NET-Anwendung für die Unterstützung der zweistufigen Authentifizierung mithilfe von SMS.
+       In <a href="https://go.microsoft.com/fwlink/?LinkId=403804">diesem Artikel</a>
+          finden Sie Details zum Einrichten dieser ASP.NET-Anwendung für die Unterstützung der zweistufigen Authentifizierung mithilfe von SMS.
 
-         Heben Sie die Auskommentierung für den folgenden Block auf, nachdem Sie die zweistufige Authentifizierung eingerichtet haben.
+       Heben Sie die Auskommentierung für den folgenden Block auf, nachdem Sie die zweistufige Authentifizierung eingerichtet haben.
       *@
       @*
-        <dt>Telefonnummer:</dt>
-        <dd>
-            @(Model.PhoneNumber ?? "None")
-            @if (Model.PhoneNumber != null)
-            {
-                <br />
-                <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
-                using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                {
-                    @Html.AntiForgeryToken()
-                    <text>[<input type="submit" value="Entfernen" class="btn-link" />] </text>
-                }
-            }
-            else
-            {
-                <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
-            }
-        </dd>
+      <dt>Telefonnummer:</dt>
+      <dd>
+          @(Model.PhoneNumber ?? "None")
+          @if (Model.PhoneNumber != null)
+          {
+              <br />
+              <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
+              using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+              {
+                  @Html.AntiForgeryToken()
+                  <text>[<input type="submit" value="Entfernen" class="btn-link" />] </text>
+              }
+          }
+          else
+          {
+              <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
+          }
+      </dd>
       *@
       @*
-        <dt>Zweistufige Authentifizierung:</dt>
-        <dd>
-            <p>
-                Es sind keine Anbieter für die zweistufige Authentifizierung konfiguriert. In <a href="https://go.microsoft.com/fwlink/?LinkId=403804">diesem Artikel</a>
-                finden Sie Details zum Einrichten dieser ASP.NET-Anwendung für die Unterstützung der zweistufigen Authentifizierung.
-            </p>
+      <dt>Zweistufige Authentifizierung:</dt>
+      <dd>
+          <p>
+              Es sind keine Anbieter für die zweistufige Authentifizierung konfiguriert. In <a href="https://go.microsoft.com/fwlink/?LinkId=403804">diesem Artikel</a>
+              finden Sie Details zum Einrichten dieser ASP.NET-Anwendung für die Unterstützung der zweistufigen Authentifizierung.
+          </p>
       *@
       @*@if (Model.TwoFactor)
-        {
-            using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-            {
-                @Html.AntiForgeryToken()
-                <text>Aktiviert
-                <input type="submit" value="Deaktivieren" class="btn btn-link" />
-                </text>
-            }
-        }
-        else
-        {
-            using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-            {
-                @Html.AntiForgeryToken()
-                <text>Deaktiviert
-                <input type="submit" value="Aktivieren" class="btn btn-link" />
-                </text>
-            }
-        }*@
+      {
+          using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+          {
+              @Html.AntiForgeryToken()
+              <text>Aktiviert
+              <input type="submit" value="Deaktivieren" class="btn btn-link" />
+              </text>
+          }
+      }
+      else
+      {
+          using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+          {
+              @Html.AntiForgeryToken()
+              <text>Deaktiviert
+              <input type="submit" value="Aktivieren" class="btn btn-link" />
+              </text>
+          }
+      }*@
       @*
-        </dd>
+      </dd>
       *@
     </dl>
     <h4>Optionen</h4>
     <hr />
     <dl class="dl-horizontal">
-      <dt>Sound:</dt>
-      <dd>
+      <dt style="width: 220px">Sound:</dt>
+      <dd style="margin-left: 240px">
         @{
           if (Model.bSound) {
             <input type="checkbox" name="cbSound" checked="checked" onclick="changeSound(this.checked)" style="cursor: pointer">
           } else {
             <input type="checkbox" name="cbSound" onclick="changeSound(this.checked)" style="cursor: pointer">
+          }
+        }
+      </dd>
+
+      <dt style="width: 220px">Übersicht tägl. Transaktionen:</dt>
+      <dd style="margin-left: 240px">
+        @{
+          if (Model.bShowBalanceToday) {
+            <input type="checkbox" name="cbShowBalanceToday" checked="checked" onclick="changeShowBalanceToday(this.checked)" style="cursor: pointer">
+          } else {
+            <input type="checkbox" name="cbShowBalanceToday" onclick="changeShowBalanceToday(this.checked)" style="cursor: pointer">
           }
         }
       </dd>
