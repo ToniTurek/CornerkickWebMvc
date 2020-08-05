@@ -3411,7 +3411,7 @@ namespace CornerkickWebMvc.Controllers
           MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
         } else {
           string sNewsPaper1 = pl.sName + " bei " + clbTake.sName + " vorgestellt";
-          string sNewsPaper2 = "Auf der heutigen Pressekonferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 1000.0).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablösesumme soll angeblich bei " + (iTransferFee / 1000000.0).ToString("0.0") + " mio. liegen.";
+          string sNewsPaper2 = "Auf der heutigen Presse&shy;konferenz wurde " + pl.sName + " (" + ((int)pl.getAge(MvcApplication.ckcore.dtDatum)).ToString() + " Jahre, " + CornerkickManager.Player.getStrPos(pl) + ", " + (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 1000.0).ToString("0.0") + " mio. MW) offiziell vorgestellt. Die Ablöse&shy;summe soll angeblich bei " + (iTransferFee / 1000000.0).ToString("0.0") + " mio. liegen.";
           MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewsPaper1 + "#" + sNewsPaper2, iType: 200, iId: pl.iId);
         }
       }
