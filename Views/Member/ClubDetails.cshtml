@@ -327,10 +327,10 @@
           <b>@success.cup.sName:</b>
           <p>@sWDD<br />@sCupWin</p>
 
-          <p style="margin: 0">Höchster Sieg    (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, +1, 0)</p>
-          <p style="margin: 0">Höchster Sieg    (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, +1, 1)</p>
-          <p style="margin: 0">Höchste Niederl. (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, -1, 0)</p>
-          <p>Höchste Niederl. (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(User, success.cup.iId, -1, 1)</p>
+          <p style="margin: 0">Höchster Sieg    (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(Model.club, success.cup.iId, +1, 0, User)</p>
+          <p style="margin: 0">Höchster Sieg    (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(Model.club, success.cup.iId, +1, 1, User)</p>
+          <p style="margin: 0">Höchste Niederl. (H): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(Model.club, success.cup.iId, -1, 0, User)</p>
+          <p                  >Höchste Niederl. (A): @CornerkickWebMvc.Controllers.MemberController.getStringRecordGame(Model.club, success.cup.iId, -1, 1, User)</p>
 
           @*
           if (success.ltCupPlace.Count > 0) {

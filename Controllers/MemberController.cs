@@ -5120,6 +5120,7 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="Club Details"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
+    [Authorize]
     public ActionResult ClubDetails(Models.ClubModel mdClub, int iClub, HttpPostedFileBase file = null)
     {
       if (file != null) AccountController.uploadFileAsync(file, "emblems", iClub);
@@ -5229,10 +5230,8 @@ namespace CornerkickWebMvc.Controllers
       return sEmblemFile;
     }
 
-    public static string getStringRecordGame(System.Security.Principal.IPrincipal User, int iGameType, sbyte iWDD, byte iHA)
+    public static string getStringRecordGame(CornerkickManager.Club clb, int iGameType, sbyte iWDD, byte iHA, System.Security.Principal.IPrincipal User = null)
     {
-      CornerkickManager.Club clb = ckClubStatic(User);
-
       CornerkickGame.Game.Data gdRecord = MvcApplication.ckcore.ui.getRecordGame(clb, iGameType, iWDD, iHA);
 
       if (gdRecord != null) {
