@@ -546,7 +546,7 @@ Folgende taktische Einstellungen stehen zur Verfügung:
 <div id="h3Training" class="ckLink"></div>
 <h3>Mannschaftstraining</h3>
 <p>Durch das Mannschaftstraining kann zum einen die körperliche Verfassung der Spieler (<a href="#uPlayerCondi">Kondition</a> und <a href="#uPlayerFresh">Frische</a>) gesteuert werden, zum anderen werden die <a href="#h3PlayerSkills">individuellen Fähigkeiten</a> der Spieler je nach Art des Trainings trainiert. Wird eine Trainingsart über einen längeren Zeitraum nicht durchgeführt, sinkt die Fähigkeit der Spieler in diesem Bereich.</p>
-Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die Fähigkeiten der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:<br />(Verl.risiko: Verletzungsrisiko pro Tag)
+Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die Fähigkeiten der Spieler durch die unterschiedlichen Mannschaftstrainings beeinflusst werden:<br />(Verl.risiko: Verletzungsrisiko pro Spieler pro Tag (Spieler-Roustheit = 100%))
 <table style="width: auto" border="1" cellpadding="3">
   <tr>
     <th style="text-align:center">Art</th>
@@ -606,9 +606,9 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die F�
         }
       }
 
-      if (tr.fInjuryRisk > 0.0015) {
+      if (tr.fInjuryRisk > 0.003) {
         sStyle[3] = "color: red";
-      } else if (tr.fInjuryRisk > 0.0005) {
+      } else if (tr.fInjuryRisk > 0.0015) {
         sStyle[3] = "color: orange";
       }
 
