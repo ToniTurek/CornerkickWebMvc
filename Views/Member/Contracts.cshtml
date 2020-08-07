@@ -20,6 +20,9 @@
           "type": 'GET',
           "dataType": "JSON",
           "data": function (d) {
+            d.bPro = document.getElementById('rbPro').checked;
+            d.bJouth = document.getElementById('rbJouth').checked;
+            d.iPos = document.getElementById('ddlFilterPos').value;
             d.bNextSeason = document.getElementById('rbSeasonNext').checked;
           },
           "contentType": "application/json; charset=utf-8"
@@ -122,6 +125,9 @@
     $(document).ready(function () {
       var tblContracts = drawDatatableContracts();
 
+      document.getElementById("rbPro").addEventListener("change", function () { updateDatatable(tblContracts); });
+      document.getElementById("rbJouth").addEventListener("change", function () { updateDatatable(tblContracts); });
+      document.getElementById("ddlFilterPos").addEventListener("change", function () { updateDatatable(tblContracts); });
       document.getElementById("rbSeasonCurrent").addEventListener("change", function () { updateDatatable(tblContracts); });
       document.getElementById("rbSeasonNext").addEventListener("change", function () { updateDatatable(tblContracts); });
     }); // $(document).ready(function () {});
@@ -135,20 +141,42 @@
 <div style="position: relative; width: 100%">
   <h3>Spielerverträge</h3>
 
-  <div align="center" style="position: absolute; width: 204px; height: 24px; top: 0px; right: 0px; background-color: white; white-space: nowrap; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px; z-index: 99">
-    <form>
-      <fieldset>
-        <label style="cursor: pointer">
-          <input type="radio" id="rbSeasonCurrent" name="rbSeason" value="0" checked>
-          Aktuell
-        </label>
-        <label style="cursor: pointer">
-          <input type="radio" id="rbSeasonNext" name="rbSeason" value="1">
-          Nächste Saison
-        </label>
-      </fieldset>
-    </form>
-  </div>
+    <div id="divCbProfiJouth" align="center" style="position: relative; float: left; width: 170px; height: 24px; margin-right: 10px; white-space: nowrap; border: 1px solid grey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+      <form>
+        <fieldset>
+          <label style="font-size: 100%; color: black; margin-right: 6px">
+            <input type="checkbox" id="rbPro" name="rbProJouth" checked>
+            Profis
+          </label>
+          <label style="font-size: 100%; color: black">
+            <input type="checkbox" id="rbJouth" name="rbProJouth" checked>
+            Jugend
+          </label>
+        </fieldset>
+      </form>
+    </div>
+
+    <div style="position: relative; float: left; width: 146px; margin-right: 10px; margin-bottom: 12px">
+      <label>
+        Position:
+        @Html.DropDownListFor(m => m.sFilterPos, Model.ltDdlFilterPos, new { @class = "form-control", id = "ddlFilterPos", @style = "position: absolute; top: -8px; left: 64px; width:80px" })
+      </label>
+    </div>
+
+    <div align="center" style="position: relative; float: left; width: 204px; height: 24px; top: 0px; right: 0px; background-color: white; white-space: nowrap; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px; z-index: 99">
+      <form>
+        <fieldset>
+          <label style="cursor: pointer">
+            <input type="radio" id="rbSeasonCurrent" name="rbSeason" value="0" checked>
+            Aktuell
+          </label>
+          <label style="cursor: pointer">
+            <input type="radio" id="rbSeasonNext" name="rbSeason" value="1">
+            Nächste Saison
+          </label>
+        </fieldset>
+      </form>
+    </div>
 
   <div class="dataTables_wrapper">
     <table id="tableTeamContracts" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">

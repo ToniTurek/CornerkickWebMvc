@@ -1938,7 +1938,7 @@ namespace CornerkickWebMvc.Controllers
       return View(mdContracts);
     }
 
-    public ActionResult ContractsGetTableTeam(bool bNextSeason)
+    public ActionResult ContractsGetTableTeam(bool bPro, bool bJouth, byte iPos, bool bNextSeason)
     {
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -1949,17 +1949,21 @@ namespace CornerkickWebMvc.Controllers
       //The table or entity I'm querying
       List<Models.ContractsModel.DatatableEntry> query = new List<Models.ContractsModel.DatatableEntry>();
 
-      bool bJouth = false;
+      List<List<CornerkickGame.Player>> ltPlayerProJouth = new List<List<CornerkickGame.Player>>();
+      if (bPro)   ltPlayerProJouth.Add(club.ltPlayer);
+      if (bJouth) ltPlayerProJouth.Add(club.ltPlayerJouth);
+
+      bool bJouth2 = !bPro;
       int iIx = 0;
-      foreach (List<CornerkickGame.Player> ltPlayerTeam in new List<CornerkickGame.Player>[] { club.ltPlayer, club.ltPlayerJouth }) {
+      foreach (List<CornerkickGame.Player> ltPlayerTeam in ltPlayerProJouth) {
         // Update player numbers if nation
         if (club.bNation) {
           for (byte iP = 0; iP < Math.Min(ltPlayerTeam.Count, byte.MaxValue); iP++) ltPlayerTeam[iP].iNrNat = (byte)(iP + 1);
         }
 
-        List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType, nPlStart: 0);
+        List<string[]> ltLV = MvcApplication.ckcore.ui.listTeam(ltPlayerTeam, club, false, iGameType, nPlStart: 0, iPosFilter: iPos);
 
-        for (int i = 0; i < ltPlayerTeam.Count; i++) {
+        for (int i = 0; i < ltLV.Count; i++) {
           if (bNextSeason && ltPlayerTeam[i].contract.iLength == 1) continue;
 
           string sName = ltLV[i][2];
@@ -1975,7 +1979,7 @@ namespace CornerkickWebMvc.Controllers
           int iGoal = int.Parse(ltLV[i][23].Replace(".", ""));
 
           string sNb = ltLV[i][1];
-          if (bJouth) sNb = "-";
+          if (bJouth2) sNb = "-";
 
           int iContractLength = int.Parse(ltLV[i][11]);
           if (bNextSeason) iContractLength--;
@@ -1996,11 +2000,11 @@ namespace CornerkickWebMvc.Controllers
             iBonusPlay = iPlay,
             iBonusGoal = iGoal,
             sFixTransferFee = ltLV[i][24],
-            bJouth = bJouth
+            bJouth = bJouth2
           });
         }
 
-        bJouth = true;
+        bJouth2 = true;
       }
 
       if (bNextSeason) {

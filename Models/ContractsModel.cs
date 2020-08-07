@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace CornerkickWebMvc.Models
 {
@@ -25,6 +27,22 @@ namespace CornerkickWebMvc.Models
       public int iLength { get; set; }
       public string sNat { get; set; }
       public bool bJouth { get; set; }
+    }
+
+    // Filter
+    public List<SelectListItem> ltDdlFilterPos { get; set; }
+    [Display(Name = "Pos.: ")]
+    public string sFilterPos { get; set; }
+
+    public ContractsModel()
+    {
+      ltDdlFilterPos = new List<SelectListItem>();
+      ltDdlFilterPos.Add(new SelectListItem { Text = "alle", Value = "0" });
+
+      // Positionen zu Dropdown Menü hinzufügen
+      for (int iPos = 1; iPos < 12; iPos++) {
+        ltDdlFilterPos.Add(new SelectListItem { Text = CornerkickManager.Main.sPosition[iPos], Value = iPos.ToString() });
+      }
     }
   }
 }
