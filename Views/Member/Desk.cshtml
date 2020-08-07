@@ -453,6 +453,14 @@
         dataType: "JSON",
         type: 'GET',
         success: function (ltBalanceToday) {
+          if (!ltBalanceToday) {
+            return;
+          }
+
+          if (ltBalanceToday.length === 0) {
+            return;
+          }
+
           var div0 = document.createElement("div");
           div0.id = "dlgBalanceToday";
           div0.title = "Heutige Transaktionen";
