@@ -233,7 +233,7 @@
           dataType: "JSON",
           data: { iNextAction: iNextAction, iX: iX, iY: iY },
           success: function () {
-            drawGame(-2, -1);
+            drawGame(-4, -1);
             getPlayerChancesAdmin();
           }
         });
@@ -248,7 +248,7 @@
           type: "GET",
           dataType: "JSON",
           success: function () {
-            drawGame(-2, -1);
+            drawGame(-3, -1);
           }
         });
       });
@@ -265,7 +265,7 @@
           dataType: "JSON",
           data: { iHA: iHA, iPl: iPl, iX: iX, iY: iY },
           success: function () {
-            drawGame(-2, -1);
+            drawGame(-4, -1);
           }
         });
       });
@@ -277,7 +277,7 @@
           dataType: "JSON",
           data: { fReferee: $(this).val() },
           success: function () {
-            drawGame(-2, -1);
+            drawGame(-4, -1);
           }
         });
       });

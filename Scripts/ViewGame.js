@@ -4,7 +4,7 @@ var playerGlobal = [];
 var imgBall;
 var divBallTarget;
 
-// iState: -3: initial call, -2: game finished, -1: running game, >=0: specific state
+// iState: -4: admin, -3: initial call, -2: game finished, -1: running game, >=0: specific state
 function drawGame(iState, iGameSpeed) {
   var iPositionsValue = $('#ddlPositions').val();
   var bAverage = iPositionsValue > 0;
@@ -36,7 +36,7 @@ function drawGame(iState, iGameSpeed) {
       // Set finished flag
       bFinished = gLoc2.bFinished;
 
-      if (iState >= 0 || gLoc2.bFinished) { // If specific state or game is finished --> draw only once
+      if (iState >= 0 || gLoc2.bFinished || iState === -4) { // If specific state or game is finished --> draw only once
         $("#tblComments tr").remove();
 
         gLocArray = [];

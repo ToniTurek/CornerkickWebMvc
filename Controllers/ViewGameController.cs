@@ -468,21 +468,23 @@ namespace CornerkickWebMvc.Controllers
       ///////////////////////////////////////////////////////////////////
       // Events
       ///////////////////////////////////////////////////////////////////
-      ///// Shoots
-      if (state.shoot.plShoot != null) {
-        if (state.shoot.iResult == 1) gLoc.iEvent = (byte)(1 + state.shoot.plShoot.iHA);
-        else if (state.shoot.iResult == 5 || state.shoot.iResult == 6) gLoc.iEvent = 3;
-        else gLoc.iEvent = 4;
-      }
+      if (iState != -4) {
+        // Shoots
+        if (state.shoot.plShoot != null) {
+          if (state.shoot.iResult == 1) gLoc.iEvent = (byte)(1 + state.shoot.plShoot.iHA);
+          else if (state.shoot.iResult == 5 || state.shoot.iResult == 6) gLoc.iEvent = 3;
+          else gLoc.iEvent = 4;
+        }
 
-      // Foul
-      if (state.duel.plDef != null && state.duel.iResult > 1) {
-        gLoc.iEvent = 5;
-      }
+        // Foul
+        if (state.duel.plDef != null && state.duel.iResult > 1) {
+          gLoc.iEvent = 5;
+        }
 
-      // Whistle
-      if (state.iStandard == 9) {
-        gLoc.iEvent = 6;
+        // Whistle
+        if (state.iStandard == 9) {
+          gLoc.iEvent = 6;
+        }
       }
 
       return Json(gLoc, JsonRequestBehavior.AllowGet);
@@ -528,7 +530,8 @@ namespace CornerkickWebMvc.Controllers
         for (int i = gD.iLastStatePerformed; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, user, club, i);
       }
 
-      setGameData(ref gD, gameData, user, club, out user.game.iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
+      iStandard = user.game.iStandard;
+      setGameData(ref gD, gameData, user, club, out iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
 
       return Json(gD, JsonRequestBehavior.AllowGet);
     }
