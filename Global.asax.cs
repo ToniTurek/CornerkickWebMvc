@@ -1088,7 +1088,7 @@ namespace CornerkickWebMvc
           if (transfer.ltOffers != null) {
             for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
               CornerkickManager.Transfer.Offer offer = transfer.ltOffers[iO];
-              if (offer.contract == null) offer.contract = ckcore.plr.getContract(transfer.player, (byte)random.Next(1, 5));
+              if (offer.contract == null) offer.contract = CornerkickManager.Player.getContract(transfer.player, (byte)random.Next(1, 5), ckcore.dtDatum, ckcore.dtSeasonEnd);
             }
           }
         }

@@ -479,7 +479,7 @@ namespace CornerkickWebMvc.Controllers
             pl.iSkill[iS] = (byte)(pl.iSkill[iS] + iSkillChange);
           }
 
-          pl.contract = MvcApplication.ckcore.plr.getContract(pl, (byte)rnd.Next(1, 4));
+          pl.contract = CornerkickManager.Player.getContract(pl, (byte)rnd.Next(1, 4), MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
 
           pl.iNr = (byte)(iPos + (11 * iPl));
 
