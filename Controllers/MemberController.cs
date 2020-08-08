@@ -2068,6 +2068,8 @@ namespace CornerkickWebMvc.Controllers
         plModel.sColorJersey = "rgb(" + clbPlayer.cl[0].R.ToString() + "," + clbPlayer.cl[0].G.ToString() + "," + clbPlayer.cl[0].B.ToString() + ")";
         System.Drawing.Color clJerseyNo = getColorBW(clbPlayer);
         plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")";
+
+        plModel.bCpuPlayerNotOnTransferlist = !plModel.bOwnPlayer && !MvcApplication.ckcore.plr.onTransferlist(plDetails) && !plModel.bJouth && plDetails.contractNext == null;
       }
 
       plModel.bNation = club.bNation;
@@ -2935,6 +2937,61 @@ namespace CornerkickWebMvc.Controllers
       dataPoints[fChanceDevFte.Length] = new Models.DataPointGeneral(fChanceDevFte.Length, fChanceDev, fChanceDev.ToString("0.00%"));
 
       return Content(JsonConvert.SerializeObject(dataPoints), "application/json");
+    }
+
+    public JsonResult PlayerDetailsForcePutOnTransferList(int iPlayerId)
+    {
+      if (iPlayerId < 0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      if (pl.iClubId < 0) return Json(null, JsonRequestBehavior.AllowGet);
+      CornerkickManager.Club clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
+      if (clbPlayer.user != null) return Json("Dies ist nur bei Computer-Vereinen möglich", JsonRequestBehavior.AllowGet);
+
+      if (MvcApplication.ckcore.plr.onTransferlist(pl)) {
+        return Json("Der Spieler " + pl.sName + " ist bereits auf der Transferliste", JsonRequestBehavior.AllowGet);
+      }
+
+      int iSecretMoney = getSecretMoneyForcePutOnTransferList(pl);
+
+      CornerkickManager.Club clbUser = ckClub();
+      if (clbUser.iBalanceSecret < iSecretMoney) {
+        return Json("Sie haben leider nicht genug Schwarzgeld zur Hand...", JsonRequestBehavior.AllowGet);
+      }
+
+      JsonResult jsnResult = TransferPutOnTakeFromTransferList(iPlayerId);
+      if (jsnResult.Data.Equals("Der Spieler " + MvcApplication.ckcore.ltPlayer[iPlayerId].sName + " wurde auf die Transferliste gesetzt")) {
+        clbUser.iBalanceSecret -= iSecretMoney;
+      }
+
+      return jsnResult;
+    }
+
+    public JsonResult PlayerDetailsGetSecretMoneyForcePutOnTransferList(int iPlayerId)
+    {
+      if (iPlayerId < 0) return Json(null, JsonRequestBehavior.AllowGet);
+      if (iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json(null, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player pl = MvcApplication.ckcore.ltPlayer[iPlayerId];
+
+      if (pl.iClubId < 0) return Json(null, JsonRequestBehavior.AllowGet);
+      CornerkickManager.Club clbPlayer = MvcApplication.ckcore.ltClubs[pl.iClubId];
+      if (clbPlayer.user != null) return Json("Dies ist nur bei Computer-Vereinen möglich", JsonRequestBehavior.AllowGet);
+
+      if (MvcApplication.ckcore.plr.onTransferlist(pl)) {
+        return Json("Der Spieler " + pl.sName + " ist bereits auf der Transferliste", JsonRequestBehavior.AllowGet);
+      } else {
+        return Json("Um sich für Sie auf die Transferliste zu streiken, verlangt " + pl.sName + " etwas Schwarzgeld in Höhe von " + getSecretMoneyForcePutOnTransferList(pl).ToString("N0", getCi()) + " €", JsonRequestBehavior.AllowGet);
+      }
+
+      return Json(null, JsonRequestBehavior.AllowGet);
+    }
+
+    private int getSecretMoneyForcePutOnTransferList(CornerkickGame.Player pl)
+    {
+      return 1000 * (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 50);
     }
 
     [HttpPost]

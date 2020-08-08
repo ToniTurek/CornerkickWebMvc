@@ -351,6 +351,39 @@
     document.getElementById("bnPutOnTakeFromTransfer").innerHTML = sText;
   }
 
+  function forcePutOnTransferlistGetSecretMoney() {
+    $.ajax({
+      url: "/Member/PlayerDetailsGetSecretMoneyForcePutOnTransferList",
+      traditional: true,
+      data: { iPlayerId: @Model.iPlayer },
+      dataType: "json",
+      success: function (response) {
+        getDialog(document.body, response, "Handgeld", forcePutOnTransferlist);
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
+  }
+
+  function forcePutOnTransferlist() {
+    $.ajax({
+      url: "/Member/PlayerDetailsForcePutOnTransferList",
+      traditional: true,
+      data: { iPlayerId: @Model.iPlayer },
+      dataType: "json",
+      success: function (response) {
+        alert(response);
+        document.getElementById("bnForcePutOnTransfer").style.display = "none";
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
+  }
+
   function getCaptainIdAjax(iC) {
     return $.ajax({
       url: "/Member/getClubCaptain",
@@ -1034,19 +1067,19 @@
       </div>
 
       <div style="position: relative; width: 100%; height: 100%; float: left">
-        @{
-          if (Model.bOwnPlayer) {
-            string sExtendContract = "Vertrag verlängern";
-            if (Model.bJouthWithContract) {
-              sExtendContract = "In Profikader übernehmen";
-            } else if (Model.bJouth) {
-              sExtendContract = "Profivertrag aushandeln";
-            }
+        <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px">
+          <h4>Optionen</h4>
 
-            <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px">
-              <h4>Optionen</h4>
+          @{
+            if (Model.bOwnPlayer) {
+              string sExtendContract = "Vertrag verlängern";
+              if (Model.bJouthWithContract) {
+                sExtendContract = "In Profikader übernehmen";
+              } else if (Model.bJouth) {
+                sExtendContract = "Profivertrag aushandeln";
+              }
 
-              @if (!Model.bNation) {
+              if (!Model.bNation) {
                 @* Extend player contract *@
                 if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
                   <button type="submit" id="bnContract" class="btn btn-default" style="width: 90%; margin-bottom: 4px">@sExtendContract</button>
@@ -1060,7 +1093,7 @@
                 }
               }
 
-              @if (!Model.bJouth) {
+              if (!Model.bJouth) {
                 if (!Model.bCaptain) {
                   <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Kapitän machen</button>
                 }
@@ -1073,9 +1106,11 @@
                   <button type="submit" id="bnDoping" class="btn btn-default" style="width: 90%; margin-top: 4px">Spieler dopen</button>
                 }
               }
-            </div>
+            } else if (Model.bCpuPlayerNotOnTransferlist) {
+              <button type="submit" id="bnForcePutOnTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px" onclick="forcePutOnTransferlistGetSecretMoney()">Setzen auf Transferliste erstreiken</button>
+            }
           }
-        }
+        </div>
       </div>
     </div>
 

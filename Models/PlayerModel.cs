@@ -20,6 +20,7 @@ namespace CornerkickWebMvc.Models
     public bool bJouthBelow16 { get; set; }
     public bool bJouthWithContract { get; set; }
     public bool bNation { get; set; }
+    public bool bCpuPlayerNotOnTransferlist { get; set; }
 
     // Emblem
     public string sPortrait { get; set; }
