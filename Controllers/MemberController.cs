@@ -5395,6 +5395,9 @@ namespace CornerkickWebMvc.Controllers
       mdMerchandising.bFanshopsAvailable = clb.buildings.bgFanshop.iLevel > 0;
       mdMerchandising.bMarketer = clb.merchMarketer != null;
 
+      // Secret Balance
+      mdMerchandising.fBalanceSecretFracMerchandisingIncome = clb.fBalanceSecretFracMerchandisingIncome * 100f;
+
       return View(mdMerchandising);
     }
     private int getMerchandisingMarketerOffer(CornerkickManager.Club clb)
@@ -5490,6 +5493,24 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, clb.merchMarketer.iMoney, CornerkickManager.Finance.iTransferralTypeInMerchandisingMarketer);
 
       return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult MerchandisingSetBalanceSecret(float fBalanceSecret)
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json("Kein club", JsonRequestBehavior.AllowGet);
+
+      if (fBalanceSecret < 0.0) {
+        return Json("Falsche Eingabe!", JsonRequestBehavior.AllowGet);
+      }
+
+      if (fBalanceSecret > 20) {
+        return Json("Maximal 20% erlaubt!", JsonRequestBehavior.AllowGet);
+      }
+
+      clb.fBalanceSecretFracMerchandisingIncome = fBalanceSecret / 100f;
+
+      return Json(null, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////

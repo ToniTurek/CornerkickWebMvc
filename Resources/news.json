@@ -25,7 +25,7 @@
       "iType": 13
     },
     {
-      "sText": "Ihr Spieler #STRING# ist nicht mehr der Schnellste. Schnelligkeit: #STRING2#",
+      "sText": "Ihr Spieler #STRING# ist nicht mehr der Schnellste. Schnelligkeit: #STRING2#: #STRING3#",
       "iType": 14
     },
     {
@@ -113,11 +113,11 @@
       "iType": 60
     },
     {
-      "sText": "Einem Ihrer Mitarbeiter fällt auf, dass ein erheblicher Teil der Zuschauereinnahmen verschwunden zu sein scheint und meldet dies der Polizei. Die anschließende Untersuchung deckt eine schwarze Kasse auf von der Sie natürlich nichts wissen. Trotzdem wird das Geld konfisziert und Ihrem Verein #INT# Punkte in der laufenden Saison abgezogen.",
+      "sText": "Einem Ihrer Mitarbeiter fällt auf, dass ein erheblicher Teil der #STRING#einnahmen verschwunden zu sein scheint und meldet dies der Polizei. Die anschließende Untersuchung deckt eine schwarze Kasse auf von der Sie natürlich nichts wissen. Trotzdem wird das Geld konfisziert und Ihrem Verein #INT# Punkte in der laufenden Saison abgezogen.",
       "iType": 61
     },
     {
-      "sText": "Einem Ihrer Mitarbeiter fällt auf, dass ein erheblicher Teil der Zuschauereinnahmen verschwunden zu sein scheint und meldet dies der Polizei. Die anschließende Untersuchung deckt eine schwarze Kasse auf von der Sie natürlich nichts wissen. Trotzdem wird das Geld (insgesammt #INT# €) konfisziert.",
+      "sText": "Einem Ihrer Mitarbeiter fällt auf, dass ein erheblicher Teil der #STRING#einnahmen verschwunden zu sein scheint und meldet dies der Polizei. Die anschließende Untersuchung deckt eine schwarze Kasse auf von der Sie natürlich nichts wissen. Trotzdem wird das Geld (insgesammt #INT# €) konfisziert.",
       "iType": 62
     },
     {

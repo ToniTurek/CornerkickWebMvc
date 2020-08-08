@@ -32,6 +32,19 @@
       bEditable = @Html.Raw(Json.Encode(Model.bFanshopsAvailable)) && !@Html.Raw(Json.Encode(Model.bMarketer));
 
       oTable = setTableItems();
+
+      $('#fBalanceSecretFracMerchandisingIncome').keyup(function () {
+        $.ajax({
+          url: '/Member/MerchandisingSetBalanceSecret',
+          dataType: "json",
+          data: { fBalanceSecret: $(this).val() },
+          success: function (returnValue) {
+            if (returnValue) {
+              alert(returnValue);
+            }
+          }
+        });
+      });
     }); // $(document).ready
 
     function setTableItems() {
@@ -413,6 +426,18 @@
           </tr>
         </tfoot>
       </table>
+    </div>
+
+    <div style="position: relative; width: 220px; height: 80px; margin-top: 10px; background-color: black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+      <div style="position: relative; width: 210px; left: 10px; margin-top: 4px; text-align: center">
+        <div style="position: relative; width: 100%">
+          <b style="color: white">Schwarze Kasse</b>
+        </div>
+        <p style="color: white">
+          Einbehaltene Einnahmen [%]:
+          @Html.TextBoxFor(m => m.fBalanceSecretFracMerchandisingIncome, new { @class = "form-control", autocomplete = "off", style = "position: relative; left: 80px; text-align: right; width: 60px", type = "tel" })
+        </p>
+      </div>
     </div>
   </div>
 </body>
