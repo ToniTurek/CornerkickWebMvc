@@ -7,8 +7,11 @@
 
 <html style="height: 100%; min-height: 100%">
 <head>
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
   <link rel="stylesheet" href="~/Content/mystyles.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Scorer.js"></script>
   <script type="text/javascript" src="~/Scripts/League.js"></script>
   <script type="text/javascript" src="~/Scripts/CupGold.js"></script>
@@ -16,6 +19,7 @@
   <script>
     $(document).ready(function () {
       var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
+
       setMatchdayCupGold(-1, iMatchday, 0);
 
       $("#ddlSeasonCupGold").change(function () {
@@ -58,6 +62,6 @@
   <div id="tableDivCupGoldTeams"></div>
   <div id="divCupGoldTable" style="position: relative; width: 100%"></div>
 
-  <div id="divCupGoldScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+  <div id="divCupGoldScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 40px"></div>
 </body>
 </html>

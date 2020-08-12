@@ -60,7 +60,7 @@ function setLeague2() {
   if (oTableScorer) {
     oTableScorer.ajax.reload();
   } else {
-    oTableScorer = setTableScorer($('#tblLeagueScorer'), 1, ddlLand, ddlDivision);
+    oTableScorer = setTableScorer(document.getElementById("divLeagueScorer"), 1, ddlLand, ddlDivision);
   }
 }
 
@@ -153,62 +153,6 @@ function getTableDatatable(tblLeague, ddlSeason, ddlLand, ddlDivision, ddlMatchd
         } else if (aData.iPlLast > aData.iPl) {
           $('td', nRow).eq(1).css("color", "green");
         }
-      }
-    }
-  });
-}
-
-function setTableScorer(tbl, iGameType, ddlLand, ddlDivision) {
-  return tbl.DataTable({
-    "ajax": {
-      "url": '/Member/GetScorerTable',
-      "type": 'GET',
-      "dataType": "JSON",
-      "data": function (d) {
-        d.iGameType = iGameType;
-        d.iLand = ddlLand.value;
-        d.iDivision = ddlDivision.value;
-      },
-      "cache": false,
-      "contentType": "application/json; charset=utf-8"
-    },
-    "columns": [
-      { "data": "iIx" },
-      { "data": "iId" },
-      { "data": "sPlName" },
-      { "data": "sClubName" },
-      { "data": "iGoals" },
-      { "data": "iAssists" },
-      { "data": "iScorer" },
-      { "data": "bBold" }
-    ],
-    "paging": false,
-    "info": false,
-    "searching": false,
-    "order": [[4, "desc"]],
-    "language": {
-      "emptyTable": "Noch keine Torschützen"
-    },
-    "columnDefs": [
-      {
-        "targets": [1, 7],
-        "visible": false,
-        "orderable": false,
-        "searchable": false
-      },
-      {
-        "targets": [0, 2],
-        "orderable": false,
-        "searchable": false
-      },
-      {
-        "targets": [0, 4, 5, 6],
-        "className": "dt-right"
-      }
-    ],
-    "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-      if (aData.bBold) {
-        $('td', nRow).css("font-weight", "bold");
       }
     }
   });

@@ -5970,6 +5970,7 @@ namespace CornerkickWebMvc.Controllers
     {
       if (cup == null) return "";
       if (cup.ltMatchdays == null) return "";
+      if (cup.ltMatchdays.Count == 0) return "";
 
       CornerkickManager.Club clbUser = ckClub();
 

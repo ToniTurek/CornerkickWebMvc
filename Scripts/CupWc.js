@@ -46,4 +46,7 @@ function drawTableWc() {
       divTableWc.html(sBox).show();
     }
   });
+
+  // Scorer table
+  var dtCupWcScorer = setTableScorer(document.getElementById("divCupWcScorer"), 7, null, null);
 }

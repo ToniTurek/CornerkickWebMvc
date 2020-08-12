@@ -30,30 +30,25 @@
 
 function setCup2() {
   var iSeason = $('#ddlSeasonCup').val();
-  var iLand = $('#ddlLandCup').val();
+  var ddlLand = document.getElementById("ddlLandCup");
   var iMd = $('#ddlMatchdayCup').val();
 
   $.ajax({
     url: '/Member/setCup',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSeason, iLand: iLand, iMatchday: iMd },
+    data: { iSaison: iSeason, iLand: ddlLand.value, iMatchday: iMd },
     success: function (sTable) {
       actionDrawTeams(sTable);
     }
   });
 
-  $.ajax({
-    url: '/Member/LeagueCupGetScorer',
-    type: "GET",
-    dataType: "JSON",
-    data: { iGameType: 2, iLand: iLand, iDivision: -1 },
-    success: function (sText) {
-      if (sText) {
-        $("#divCupScorer").html(getScorerTable(sText)).show();
-      }
-    }
-  });
+  // Scorer table
+  if (dtCupScorer) {
+    dtCupScorer.ajax.reload();
+  } else {
+    dtCupScorer = setTableScorer(document.getElementById("divCupScorer"), 2, ddlLand, null);
+  }
 }
 
 function actionDrawTeams(sTable) {

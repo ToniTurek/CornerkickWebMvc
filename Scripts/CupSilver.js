@@ -47,4 +47,7 @@ function drawTableCupSilver() {
       divTableCupSilver.html(sBox).show();
     }
   });
+
+  // Scorer table
+  var dtCupSilverScorer = setTableScorer(document.getElementById("divCupSilverScorer"), 4, null, null);
 }

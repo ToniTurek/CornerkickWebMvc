@@ -32,10 +32,7 @@ function drawTableCupGold() {
   var iGp = parseInt($('#ddlGroupsCupGold').val());
 
   var divTableCupGold = $("#divCupGoldTable");
-  var divScorerCupGold = $("#divCupGoldScorer");
-
   divTableCupGold.html('');
-  divScorerCupGold.html('');
 
   $.ajax({
     url: '/Member/CupGetLeague',
@@ -47,4 +44,7 @@ function drawTableCupGold() {
       divTableCupGold.html(sBox).show();
     }
   });
+
+  // Scorer table
+  var dtCupGoldScorer = setTableScorer(document.getElementById("divCupGoldScorer"), 3, null, null);
 }
