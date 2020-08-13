@@ -5229,7 +5229,7 @@ namespace CornerkickWebMvc.Controllers
           mdClub.bEmblemEditable = mdClub.sEmblem.StartsWith("<img src=\"/Content/Uploads/emblems/0.png");
         }
 
-        mdClub.sAttrFc = mdClub.club.getAttractionFactor(MvcApplication.ckcore.iSeason).ToString("0.0");
+        mdClub.sAttrFc = mdClub.club.getAttractionFactor(MvcApplication.ckcore.iSeason, ltCups: MvcApplication.ckcore.ltCups, dtNow: MvcApplication.ckcore.dtDatum).ToString("0.0");
       }
 
       return View(mdClub);
@@ -5357,7 +5357,11 @@ namespace CornerkickWebMvc.Controllers
       for (int iC = 0; iC < iLtCupIds.Length; iC++) {
         ltDataPoints[iC] = new List<Models.DataPointGeneral>();
 
-        CornerkickManager.Main.Success suc = CornerkickManager.Tool.getSuccess(clb, MvcApplication.ckcore.tl.getCup(iLtCupIds[iC]));
+        CornerkickManager.Cup cup = null;
+        if      (iLtCupIds[iC] == 1) cup = MvcApplication.ckcore.tl.getCup(iLtCupIds[iC], iId2: clb.iLand, iId3: clb.iDivision);
+        else if (iLtCupIds[iC] == 2) cup = MvcApplication.ckcore.tl.getCup(iLtCupIds[iC], iId2: clb.iLand);
+        else                         cup = MvcApplication.ckcore.tl.getCup(iLtCupIds[iC]);
+        CornerkickManager.Main.Success suc = CornerkickManager.Tool.getSuccess(clb, cup);
 
         for (int iS = 1; iS <= MvcApplication.ckcore.iSeason; iS++) {
           List<float> ltAttractionFactorCup = new List<float>();
