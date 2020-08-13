@@ -17,51 +17,55 @@
   <script type="text/javascript" src="~/Scripts/CupSilver.js"></script>
 
   <script>
+    var dtCupSilverTable;
+
     $(document).ready(function () {
       var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
 
-      setMatchdayCupSilver(-1, iMatchday, 0);
+      setMatchdayCupSilver();
 
       $("#ddlSeasonCupSilver").change(function () {
-        setMatchdayCupSilver($(this).val(), $("#ddlMatchdayCupSilver").val(), $("#ddlGroupsCupSilver").val());
+        setMatchdayCupSilver();
       });
 
       $("#ddlGroupsCupSilver").change(function () {
-        setMatchdayCupSilver($("#ddlSeasonCupSilver").val(), $("#ddlMatchdayCupSilver").val(), $(this).val());
+        setMatchdayCupSilver();
       });
 
       $("#ddlMatchdayCupSilver").change(function () {
-        setMatchdayCupSilver($("#ddlSeasonCupSilver").val(), $(this).val(), $("#ddlGroupsCupSilver").val());
+        setMatchdayCupSilver();
       });
     });
-
-    function setMatchdayCupSilver2() {
-      setMatchdayCupSilver($("#ddlSeasonCupSilver").val(), $("#ddlMatchdayCupSilver").val(), $("#ddlGroupsCupSilver").val());
-    }
   </script>
 </head>
 
 <body style="height: 100%; min-height: 100%">
-  <label style="margin-right: 10px">
-    Saison:
-    @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupSilver" })
-  </label>
+  <div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
+    <label style="margin-right: 10px">
+      Saison:
+      @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupSilver" })
+    </label>
 
-  <label style="margin-right: 10px">
-    Spieltag:
-    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchdayCupSilver'), setMatchdayCupSilver2)">&nbsp;< &nbsp;</a>
-    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupSilver" })
-    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchdayCupSilver'), setMatchdayCupSilver2)">&nbsp;> &nbsp;</a>
-  </label>
+    <label style="margin-right: 10px">
+      Spieltag:
+      <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchdayCupSilver'), setMatchdayCupSilver)">&nbsp;< &nbsp;</a>
+      @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupSilver" })
+      <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchdayCupSilver'), setMatchdayCupSilver)">&nbsp;> &nbsp;</a>
+    </label>
 
-  <label id="lbGroupsCupSilver">
-    Gruppe:
-    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupSilver" })
-  </label>
+    <label id="lbGroupsCupSilver">
+      Gruppe:
+      @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupSilver" })
+    </label>
 
-  <div id="tableDivCupSilverTeams"></div>
-  <div id="divCupSilverTable" style="position: relative; width: 100%"></div>
+    <div style="position: relative; width: 100%; height: auto; margin-bottom: 20px">
+      <div id="divCupSilverTeams" style="position: relative; width: 47%; min-width: 350px; margin-right: 6%; margin-bottom: 20px; float: left"></div>
+      <div id="divCupSilverTable" style="position: relative; width: 47%; min-width: 350px; float: left">
+        <h4>Tabelle</h4>
+      </div>
+    </div>
 
-  <div id="divCupSilverScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 40px"></div>
+    <div id="divCupSilverScorer" style="width: 40%; min-width: 350px; height: auto; float: left"></div>
+  </div>
 </body>
 </html>

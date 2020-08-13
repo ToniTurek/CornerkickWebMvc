@@ -5723,13 +5723,13 @@ namespace CornerkickWebMvc.Controllers
       public int iGoalsDiff { get; set; }
       public int iPoints { get; set; }
     }
-    public JsonResult getTableDatatable(int iSeason, int iType, int iLand, byte iDivision, int iMatchday, sbyte iGroup = -1, bool bH = false, bool bA = false, int iColor1 = 0, int iColor2 = 0, int iColor3 = 0, int iColor4 = 0)
+    public JsonResult getTableDatatable(int iSeason, int iType, int iLand, int iDivision, int iMatchday, sbyte iGroup = -1, bool bH = false, bool bA = false, int iColor1 = 0, int iColor2 = 0, int iColor3 = 0, int iColor4 = 0)
     {
       List<DatatableTableLeague> ltDtTable = new List<DatatableTableLeague>();
 
       CornerkickManager.Club clb = ckClub();
 
-      CornerkickManager.Cup cup = getCup(iSeason, 1, iLand, iDivision);
+      CornerkickManager.Cup cup = getCup(iSeason, iType, iLand, iDivision);
 
       byte iHA = 0;
       if (bH) iHA = 1;
@@ -6057,6 +6057,8 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupGold(Models.CupGoldModel cupGoldModel)
     {
+      CornerkickManager.Club clbUser = ckClub();
+
       cupGoldModel.ddlSeason = getDdlSeason();
       if (cupGoldModel.ddlSeason.Count > 0) cupGoldModel.ddlSeason.RemoveAt(0);
       cupGoldModel.iSeason = MvcApplication.ckcore.iSeason;
@@ -6069,12 +6071,21 @@ namespace CornerkickWebMvc.Controllers
         string sText = (iMd + 1).ToString();
         if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
-        cupGoldModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+        cupGoldModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = (iMd + 1).ToString() });
       }
 
       // Increment matchday if next match is today or tomorrow
       if (cupGoldModel.iMatchday + 1 < cupGold.ltMatchdays.Count) {
         if ((cupGold.ltMatchdays[cupGoldModel.iMatchday + 1].dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) cupGoldModel.iMatchday++;
+      }
+
+      // Initialize group
+      cupGoldModel.iGroup = 0;
+      for (int iG = 0; iG < cupGold.ltClubs.Length; iG++) {
+        if (cupGold.checkClubInCup(clbUser, iG)) {
+          cupGoldModel.iGroup = iG;
+          break;
+        }
       }
 
       return View(cupGoldModel);
@@ -6092,6 +6103,8 @@ namespace CornerkickWebMvc.Controllers
     //[Authorize]
     public ActionResult CupSilver(Models.CupSilverModel cupSilverModel)
     {
+      CornerkickManager.Club clbUser = ckClub();
+
       cupSilverModel.ddlSeason = getDdlSeason();
       if (cupSilverModel.ddlSeason.Count > 0) cupSilverModel.ddlSeason.RemoveAt(0);
       cupSilverModel.iSeason = MvcApplication.ckcore.iSeason;
@@ -6104,12 +6117,21 @@ namespace CornerkickWebMvc.Controllers
         string sText = (iMd + 1).ToString();
         if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
-        cupSilverModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = iMd.ToString() });
+        cupSilverModel.ddlMatchday.Add(new SelectListItem { Text = sText, Value = (iMd + 1).ToString() });
       }
 
       // Increment matchday if next match is today or tomorrow
       if (cupSilverModel.iMatchday + 1 < cupSilver.ltMatchdays.Count) {
         if ((cupSilver.ltMatchdays[cupSilverModel.iMatchday + 1].dt.Date - MvcApplication.ckcore.dtDatum.Date).Days < 2) cupSilverModel.iMatchday++;
+      }
+
+      // Initialize group
+      cupSilverModel.iGroup = 0;
+      for (int iG = 0; iG < cupSilver.ltClubs.Length; iG++) {
+        if (cupSilver.checkClubInCup(clbUser, iG)) {
+          cupSilverModel.iGroup = iG;
+          break;
+        }
       }
 
       return View(cupSilverModel);

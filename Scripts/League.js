@@ -53,7 +53,7 @@ function setLeague2() {
   if (oTableLeague) {
     oTableLeague.ajax.reload();
   } else {
-    oTableLeague = getTableDatatable($("#tblLeague"), ddlSeason, ddlLand, ddlDivision, ddlMatchday, rbTableH, rbTableA);
+    oTableLeague = getTableDatatable(document.getElementById("divTableLeague"), 1, ddlSeason, ddlLand, ddlDivision, ddlMatchday, null, rbTableH, rbTableA, 1, 4, 8, -1);
   }
 
   // Scorer table
@@ -64,25 +64,97 @@ function setLeague2() {
   }
 }
 
-function getTableDatatable(tblLeague, ddlSeason, ddlLand, ddlDivision, ddlMatchday, rbTableH, rbTableA) {
-  return tblLeague.DataTable({
+function getTableDatatable(parent, iGameType, ddlSeason, ddlLand, ddlDivision, ddlMatchday, ddlGroup, rbTableH, rbTableA, iColor1, iColor2, iColor3, iColor4) {
+  var tbl = document.createElement("table");
+  tbl.style.position = "relative";
+  tbl.cellPadding = 0;
+  tbl.border = 0;
+  tbl.className = "display responsive nowrap compact";
+
+  var thead = document.createElement("thead");
+  var tr = document.createElement("tr");
+
+  var th0 = document.createElement("th");
+  th0.innerText = "id";
+  tr.appendChild(th0);
+  var th1 = document.createElement("th");
+  th1.innerText = "#";
+  tr.appendChild(th1);
+  var th2 = document.createElement("th");
+  th2.innerText = "";
+  tr.appendChild(th2);
+  var th3 = document.createElement("th");
+  th3.innerText = "";
+  tr.appendChild(th3);
+  var th4 = document.createElement("th");
+  th4.innerText = "Verein";
+  tr.appendChild(th4);
+  var th5 = document.createElement("th");
+  th5.innerText = "Sp";
+  tr.appendChild(th5);
+  var th6 = document.createElement("th");
+  th6.innerText = "g";
+  tr.appendChild(th6);
+  var th7 = document.createElement("th");
+  th7.innerText = "u";
+  tr.appendChild(th7);
+  var th8 = document.createElement("th");
+  th8.innerText = "v";
+  tr.appendChild(th8);
+  var th9 = document.createElement("th");
+  th9.innerText = "Tore";
+  tr.appendChild(th9);
+  var th10 = document.createElement("th");
+  th10.innerText = "+/-";
+  tr.appendChild(th10);
+  var th11 = document.createElement("th");
+  th11.innerText = "Pkte.";
+  tr.appendChild(th11);
+  var th12 = document.createElement("th");
+  th12.innerText = "bgcl";
+  tr.appendChild(th12);
+  var th13 = document.createElement("th");
+  th13.innerText = "bold";
+  tr.appendChild(th13);
+
+  thead.appendChild(tr);
+  tbl.appendChild(thead);
+  tbl.appendChild(document.createElement("tbody"));
+  parent.appendChild(tbl);
+
+  return $(tbl).DataTable({
     "ajax": {
       "url": '/Member/getTableDatatable',
       "type": 'GET',
       "dataType": "JSON",
       "data": function (d) {
+        var iLand = -1;
+        if (ddlLand) { iLand = ddlLand.value; }
+
+        var iDivision = -1;
+        if (ddlDivision) { iDivision = ddlDivision.value; }
+
+        var iGroup = -1;
+        if (ddlGroup) { iGroup = ddlGroup.value; }
+
+        var bH = false;
+        if (rbTableH) { bH = rbTableH.checked; }
+
+        var bA = false;
+        if (rbTableA) { bA = rbTableA.checked; }
+
         d.iSeason = ddlSeason.value;
-        d.iType = 1;
-        d.iLand = ddlLand.value;
-        d.iDivision = ddlDivision.value;
+        d.iType = iGameType;
+        d.iLand = iLand;
+        d.iDivision = iDivision;
         d.iMatchday = ddlMatchday.value;
-        d.iGroup = -1;
-        d.bH = rbTableH.checked;
-        d.bA = rbTableA.checked;
-        d.iColor1 = 1;
-        d.iColor2 = 4;
-        d.iColor3 = 8;
-        d.iColor4 = -1;
+        d.iGroup = iGroup;
+        d.bH = bH;
+        d.bA = bA;
+        d.iColor1 = iColor1;
+        d.iColor2 = iColor2;
+        d.iColor3 = iColor3;
+        d.iColor4 = iColor4;
       },
       "cache": false,
       "contentType": "application/json; charset=utf-8"

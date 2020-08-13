@@ -17,51 +17,55 @@
   <script type="text/javascript" src="~/Scripts/CupGold.js"></script>
 
   <script>
+    var dtCupGoldTable;
+
     $(document).ready(function () {
       var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
 
-      setMatchdayCupGold(-1, iMatchday, 0);
+      setMatchdayCupGold();
 
       $("#ddlSeasonCupGold").change(function () {
-        setMatchdayCupGold($(this).val(), $("#ddlMatchdayCupGold").val(), $("#ddlGroupsCupGold").val());
+        setMatchdayCupGold();
       });
 
       $("#ddlGroupsCupGold").change(function () {
-        setMatchdayCupGold($("#ddlSeasonCupGold").val(), $("#ddlMatchdayCupGold").val(), $(this).val());
+        setMatchdayCupGold();
       });
 
       $("#ddlMatchdayCupGold").change(function () {
-        setMatchdayCupGold($("#ddlSeasonCupGold").val(), $(this).val(), $("#ddlGroupsCupGold").val());
+        setMatchdayCupGold();
       });
     });
-
-    function setMatchdayCupGold2() {
-      setMatchdayCupGold($("#ddlSeasonCupGold").val(), $("#ddlMatchdayCupGold").val(), $("#ddlGroupsCupGold").val());
-    }
   </script>
 </head>
 
 <body style="height: 100%; min-height: 100%">
-  <label style="margin-right: 10px">
-    Saison:
-    @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupGold" })
-  </label>
+  <div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
+    <label style="margin-right: 10px">
+      Saison:
+      @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", id = "ddlSeasonCupGold" })
+    </label>
 
-  <label style="margin-right: 10px">
-    Spieltag:
-    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchdayCupGold'), setMatchdayCupGold2)">&nbsp;< &nbsp;</a>
-    @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupGold" })
-    <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchdayCupGold'), setMatchdayCupGold2)">&nbsp;> &nbsp;</a>
-  </label>
+    <label style="margin-right: 10px">
+      Spieltag:
+      <a class="noselect" style="cursor: pointer" onclick="changeMatchday(-1, document.getElementById('ddlMatchdayCupGold'), setMatchdayCupGold)">&nbsp;< &nbsp;</a>
+      @Html.DropDownListFor(m => m.iMatchday, Model.ddlMatchday, new { @class = "form-horizontal", id = "ddlMatchdayCupGold" })
+      <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchdayCupGold'), setMatchdayCupGold)">&nbsp;> &nbsp;</a>
+    </label>
 
-  <label id="lbGroupsCupGold">
-    Gruppe:
-    @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupGold" })
-  </label>
+    <label id="lbGroupsCupGold">
+      Gruppe:
+      @Html.DropDownListFor(m => m.iGroup, Model.ddlGroup, new { @class = "form-horizontal", id = "ddlGroupsCupGold" })
+    </label>
 
-  <div id="tableDivCupGoldTeams"></div>
-  <div id="divCupGoldTable" style="position: relative; width: 100%"></div>
+    <div style="position: relative; width: 100%; height: auto; margin-bottom: 20px">
+      <div id="divCupGoldTeams" style="position: relative; width: 47%; min-width: 350px; margin-right: 6%; margin-bottom: 20px; float: left"></div>
+      <div id="divCupGoldTable" style="position: relative; width: 47%; min-width: 350px; float: left">
+        <h4>Tabelle</h4>
+      </div>
+    </div>
 
-  <div id="divCupGoldScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 40px"></div>
+    <div id="divCupGoldScorer" style="width: 40%; min-width: 350px; height: auto; float: left"></div>
+  </div>
 </body>
 </html>

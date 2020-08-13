@@ -112,7 +112,7 @@
       <a class="noselect" style="cursor: pointer" onclick="changeMatchday(+1, document.getElementById('ddlMatchday'), setLeague2)">&nbsp;> &nbsp;</a>
     </label>
 
-    <div style="position: relative; width: 100%; height: auto; margin-bottom: 4%">
+    <div style="position: relative; width: 100%; height: auto; margin-bottom: 20px">
       <div style="position: relative; width: 47%; min-width: 350px; margin-right: 6%; margin-bottom: 20px; float: left">
         <div id="tableDivTeams" style="position: relative"></div>
       </div>
@@ -138,31 +138,7 @@
           </form>
         </div>
 
-        <div id="tableDivLeague" style="position: relative; width: 100%">
-          <table id="tblLeague" style="position: relative" cellpadding="0" border="0" class="display responsive nowrap compact">
-            <thead>
-              <tr>
-                <th>id</th>
-                <th>#</th>
-                <th></th>
-                <th></th>
-                <th>Verein</th>
-                <th>Sp</th>
-                <th>g</th>
-                <th>u</th>
-                <th>v</th>
-                <th>Tore</th>
-                <th>+/-</th>
-                <th>Pkte.</th>
-                <th>bgcl</th>
-                <th>bold</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!---Data and tags are dynamically generated--->
-            </tbody>
-          </table>
-        </div>
+        <div id="divTableLeague" style="position: relative; width: 100%"></div>
       </div>
     </div>
 
@@ -171,7 +147,7 @@
       <div id="chartContainerPlaceHist" style="height: 400px; width: 100%"></div>
     </div>
 
-    <div id="divLeagueScorer" style="width: 40%; min-width: 350px; margin-right: 6%; height: auto; margin-top: 20px; float: left"></div>
+    <div id="divLeagueScorer" style="width: 40%; min-width: 350px; height: auto; float: left"></div>
   </div>
 </body>
 </html>

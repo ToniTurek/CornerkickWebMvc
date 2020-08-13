@@ -1,22 +1,39 @@
-﻿function setMatchdayCupWc(iSaison, iMd, iGroup) {
-  // Show/hide group ddl
+﻿function setMatchdayCupWc() {
+  var ddlSeason = document.getElementById("ddlSeasonCupWc");
+  var ddlMatchday = document.getElementById("ddlMatchdayCupWc");
+  var ddlGroup = document.getElementById("ddlGroupsCupWc");
+
+  var iMd = ddlMatchday.value;
+
+  // Show/hide groups
+  var divCupWcTable = document.getElementById("divCupWcTable");
   var lbGroupsCupWc = document.getElementById("lbGroupsCupWc");
-  if (iMd >= 0 && iMd < 3) {
+  if (iMd > 0 && iMd < 4) {
     lbGroupsCupWc.style.display = "inline";
+
+    // Table
+    if (dtCupWcTable) {
+      dtCupWcTable.ajax.reload();
+    } else {
+      dtCupWcTable = getTableDatatable(divCupWcTable, 7, ddlSeason, null, null, ddlMatchday, ddlGroup, null, null, 2, 0, 0, 0);
+    }
   } else {
     lbGroupsCupWc.style.display = "none";
   }
+  divCupWcTable.style.display = lbGroupsCupWc.style.display;
 
   $.ajax({
     url: '/Member/setCupWc',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iMatchday: iMd, iGroup: iGroup },
+    data: { iSaison: ddlSeason.value, iMatchday: iMd - 1, iGroup: ddlGroup.value },
     success: function (sTeams) {
       actionDrawTeams(sTeams);
-      drawTableWc();
     }
   });
+
+  // Scorer table
+  var dtCupWcScorer = setTableScorer(document.getElementById("divCupWcScorer"), 7, null, null);
 }
 
 function actionDrawTeams(sTeams) {
@@ -24,29 +41,4 @@ function actionDrawTeams(sTeams) {
   divDrawCupTeams.html('');
   result = drawTeams(sTeams);
   divDrawCupTeams.html(result).show();
-}
-
-function drawTableWc() {
-  var iMd = parseInt($('#ddlMatchdayCupWc').val());
-  var iGp = parseInt($('#ddlGroupsCupWc').val());
-
-  var divTableWc = $("#divCupWcTable");
-  var divScorer = $("#divCupWcScorer");
-
-  divTableWc.html('');
-  divScorer.html('');
-
-  $.ajax({
-    url: '/Member/CupGetLeague',
-    type: "GET",
-    dataType: "JSON",
-    data: { iCupId: 7, iSaison: 1, iMatchday: iMd, iGroup: iGp },
-    success: function (sTable) {
-      var sBox = drawTable(sTable);
-      divTableWc.html(sBox).show();
-    }
-  });
-
-  // Scorer table
-  var dtCupWcScorer = setTableScorer(document.getElementById("divCupWcScorer"), 7, null, null);
 }

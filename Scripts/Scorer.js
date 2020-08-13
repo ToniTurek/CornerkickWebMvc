@@ -20,6 +20,8 @@
 }
 
 function setTableScorer(parent, iGameType, ddlLand, ddlDivision) {
+  parent.innerText = "";
+
   var header = document.createElement("h4");
   header.innerText = "Torschützen";
   parent.appendChild(header);

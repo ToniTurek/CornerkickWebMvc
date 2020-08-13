@@ -1,53 +1,44 @@
-﻿function setMatchdayCupSilver(iSaison, iMd, iGroup) {
+﻿function setMatchdayCupSilver() {
+  var ddlSeason = document.getElementById("ddlSeasonCupSilver");
+  var ddlMatchday = document.getElementById("ddlMatchdayCupSilver");
+  var ddlGroup = document.getElementById("ddlGroupsCupSilver");
+
+  var iMd = ddlMatchday.value;
+
   // Show/hide group ddl
+  var divCupSilverTable = document.getElementById("divCupSilverTable");
   var lbGroupsCupSilver = document.getElementById("lbGroupsCupSilver");
-  if (iMd > 5) {
-    lbGroupsCupSilver.style.display = "none";
-  } else {
+  if (iMd > 0 && iMd < 7) {
     lbGroupsCupSilver.style.display = "inline";
+
+    // Table
+    if (dtCupSilverTable) {
+      dtCupSilverTable.ajax.reload();
+    } else {
+      dtCupSilverTable = getTableDatatable(divCupSilverTable, 4, ddlSeason, null, null, ddlMatchday, ddlGroup, null, null, 2, 0, 0, 0);
+    }
+  } else {
+    lbGroupsCupSilver.style.display = "none";
   }
+  divCupSilverTable.style.display = lbGroupsCupSilver.style.display;
 
   $.ajax({
     url: '/Member/setCupSilver',
     type: "GET",
     dataType: "JSON",
-    data: { iSaison: iSaison, iMatchday: iMd, iGroup: iGroup },
+    data: { iSaison: ddlSeason.value, iMatchday: iMd - 1, iGroup: ddlGroup.value },
     success: function (sTeams) {
       actionDrawTeamsCupSilver(sTeams);
-      drawTableCupSilver();
-    }
-  });
-}
-
-function actionDrawTeamsCupSilver(sTeams) {
-  var divDrawCupSilverTeams = $("#tableDivCupSilverTeams");
-  divDrawCupSilverTeams.html('');
-  result = drawTeams(sTeams);
-  divDrawCupSilverTeams.html(result).show();
-}
-
-function drawTableCupSilver() {
-  var iSn = parseInt($('#ddlSeasonCupSilver').val());
-  var iMd = parseInt($('#ddlMatchdayCupSilver').val());
-  var iGp = parseInt($('#ddlGroupsCupSilver').val());
-
-  var divTableCupSilver = $("#divCupSilverTable");
-  var divScorerCupSilver = $("#divCupSilverScorer");
-
-  divTableCupSilver.html('');
-  divScorerCupSilver.html('');
-
-  $.ajax({
-    url: '/Member/CupGetLeague',
-    type: "GET",
-    dataType: "JSON",
-    data: { iCupId: 4, iSaison: iSn, iMatchday: iMd, iGroup: iGp },
-    success: function (sTable) {
-      var sBox = drawTable(sTable);
-      divTableCupSilver.html(sBox).show();
     }
   });
 
   // Scorer table
   var dtCupSilverScorer = setTableScorer(document.getElementById("divCupSilverScorer"), 4, null, null);
+}
+
+function actionDrawTeamsCupSilver(sTeams) {
+  var divDrawCupSilverTeams = $("#divCupSilverTeams");
+  divDrawCupSilverTeams.html('');
+  result = drawTeams(sTeams);
+  divDrawCupSilverTeams.html(result).show();
 }
