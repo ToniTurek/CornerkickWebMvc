@@ -34,4 +34,16 @@ namespace CornerkickWebMvc.Models
     public int iTeamValueTotal11 { get; set; }
     public string sLeague { get; set; }
   }
+
+  public class DatatableEntryStadiums
+  {
+    public int iIx { get; set; }
+    public string sName { get; set; }
+    public string sClubName { get; set; }
+    public int iTotal { get; set; }
+    public int iType0 { get; set; }
+    public int iType1 { get; set; }
+    public int iType2 { get; set; }
+    public bool bTopring { get; set; }
+  }
 }

@@ -43,7 +43,7 @@
       var dtTeams = $('#tblTeams').DataTable({
         "ajax": {
           "url": '@Url.Action("StatisticGetTableTeams", "Member")',
-          "type": 'POST',
+          "type": 'GET',
           "data": function (d) {
             d.sCupId = ddlStatLeagues.value;
           }
@@ -92,7 +92,49 @@
       $('#ddlStatLeagues').change(function () {
         dtTeams.ajax.reload();
       });
-    
+
+      drawTableTransfers();
+      drawTableStadiums();
+    }); // document ready
+
+    function drawBest11() {
+      var bJouth = document.getElementById("rbJouth").checked;
+      var ddlStatNations   = $('#ddlStatNations');
+      var ddlStatFormation = $('#ddlStatFormation');
+      // end declarations
+
+      iNation    = ddlStatNations  .val();
+      iFormation = ddlStatFormation.val();
+
+      $.ajax({
+        cache: false,
+        url: "/Member/StatisticGetBest11",
+        type: "GET",
+        data: { iNat: iNation, iF: iFormation, bJouth: bJouth },
+        success: function (teamData) {
+          if (teamData) { // check if data is defined
+            var bMobile = $(window).width() < 960;
+            var result = "";
+            var drawFormation = $("#drawFormation");
+
+            $.each(teamData.ltPlayer2, function (i, pl2) {
+              result += getBoxFormation(i, teamData.formation.ptPos[i], pl2.sName, (i + 1).toString(), pl2.sSkillAve, false, false, -1, pl2.iPos, bMobile, 0.5, pl2.sTeamname, pl2.sAge, pl2.sNat, false, false, pl2.sPortrait);
+
+              return i !== 11;
+            });
+
+            drawFormation.html(result).fadeIn('slow');
+
+            var txtStatAverage = $("#txtStatAverage");
+            txtStatAverage.html("Durchschnittsstärke (-alter): " + teamData.fTeamAveStrength.toFixed(2) + " (" + teamData.fTeamAveAge.toFixed(1) + ")");
+          } else {
+            alert("data hasn't worked!");
+          }
+        }
+      });
+    }
+
+    function drawTableTransfers() {
       $('#tblStatisticTransfers').DataTable({
         "ajax": {
           "url": '@Url.Action("StatisticGetTransferTable", "Member")',
@@ -130,40 +172,57 @@
           { "targets": [0, 2, 3], "className": "dt-right" }
         ]
       });
-    });
+    }
 
-    function drawBest11() {
-      var bJouth = document.getElementById("rbJouth").checked;
-      var ddlStatNations   = $('#ddlStatNations');
-      var ddlStatFormation = $('#ddlStatFormation');
-      // end declarations
-
-      iNation    = ddlStatNations  .val();
-      iFormation = ddlStatFormation.val();
-
-      $.ajax({
-        cache: false,
-        url: "/Member/StatisticGetBest11",
-        type: "GET",
-        data: { iNat: iNation, iF: iFormation, bJouth: bJouth },
-        success: function (teamData) {
-          if (teamData) { // check if data is defined
-            var bMobile = $(window).width() < 960;
-            var result = "";
-            var drawFormation = $("#drawFormation");
-
-            $.each(teamData.ltPlayer2, function (i, pl2) {
-              result += getBoxFormation(i, teamData.formation.ptPos[i], pl2.sName, (i + 1).toString(), pl2.sSkillAve, false, false, -1, pl2.iPos, bMobile, 0.5, pl2.sTeamname, pl2.sAge, pl2.sNat, false, false, pl2.sPortrait);
-
-              return i !== 11;
-            });
-
-            drawFormation.html(result).fadeIn('slow');
-
-            var txtStatAverage = $("#txtStatAverage");
-            txtStatAverage.html("Durchschnittsstärke (-alter): " + teamData.fTeamAveStrength.toFixed(2) + " (" + teamData.fTeamAveAge.toFixed(1) + ")");
+    function drawTableStadiums() {
+      $('#tblStatisticStadiums').DataTable({
+        "ajax": {
+          "url": '@Url.Action("StatisticGetStadiumsTable", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8"
+        },
+        "columns": [
+          { "data": "iIx" },
+          { "data": "sName" },
+          {
+            "data": "iTotal",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iType0",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iType1",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iType2",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          { "data": "bTopring" },
+          { "data": "sClubName" }
+        ],
+        "language": {
+          "emptyTable": "Keine Stadien"
+        },
+        "pageLength": 10,
+        "paging": false,
+        "info": false,
+        "responsive": false,
+        "searching": false,
+        "select": false,
+        "columnDefs": [
+          { "targets": [1, 6, 7], "className": "dt-center" },
+          { "targets": [0, 2, 3, 4, 5], "className": "dt-right" }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.bTopring) {
+            $('td:eq(6)', nRow).html("X");
           } else {
-            alert("data hasn't worked!");
+            $('td:eq(6)', nRow).html("-");
           }
         }
       });
@@ -218,7 +277,7 @@
         </tr>
       </thead>
       <tbody>
-       @for (byte iS = 0; iS < Model.sPlayerSkillBest.Length; iS++) {
+        @for (byte iS = 0; iS < Model.sPlayerSkillBest.Length; iS++) {
           if (Model.sPlayerSkillBest[iS] == null) {
             continue;
           }
@@ -278,6 +337,30 @@
             <th>Aufn. Verein</th>
             <th>Abg. Verein</th>
             <th>Datum</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="position: relative">
+    <h3 style="position: relative; margin-top: 30px">Größte Stadien</h3>
+
+    <div style="position: relative; width: auto; top: 0px">
+      <table id="tblStatisticStadiums" cellspacing="0" style="width: auto" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Kapazität</th>
+            <th>Stehpl.</th>
+            <th>Sitzpl.</th>
+            <th>VIP Pl.</th>
+            <th>Oberring</th>
+            <th>Heimatverein</th>
           </tr>
         </thead>
         <tbody>

@@ -7345,6 +7345,7 @@ namespace CornerkickWebMvc.Controllers
       return View(statisticModel);
     }
 
+    [HttpGet]
     public JsonResult StatisticGetBest11(int iNat, int iF, bool bJouth = false)
     {
       Models.TeamModels.TeamData tD = new Models.TeamModels.TeamData();
@@ -7415,7 +7416,8 @@ namespace CornerkickWebMvc.Controllers
       return Json(tD, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult StatisticGetTableTeams(string sCupId)
+    [HttpGet]
+    public JsonResult StatisticGetTableTeams(string sCupId)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryTeams> ltDeTeams = new List<Models.DatatableEntryTeams>();
@@ -7472,7 +7474,8 @@ namespace CornerkickWebMvc.Controllers
       return Json(new { aaData = ltDeTeams.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
-    public ActionResult StatisticGetTransferTable()
+    [HttpGet]
+    public JsonResult StatisticGetTransferTable()
     {
       //The table or entity I'm querying
       List<Models.PlayerModel.DatatableEntryClubHistory> ltDeClubHistory = new List<Models.PlayerModel.DatatableEntryClubHistory>();
@@ -7525,6 +7528,35 @@ namespace CornerkickWebMvc.Controllers
       }
 
       return Json(new { aaData = ltDeClubHistory.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpGet]
+    public JsonResult StatisticGetStadiumsTable()
+    {
+      //The table or entity I'm querying
+      List<Models.DatatableEntryStadiums> ltDeStadiums = new List<Models.DatatableEntryStadiums>();
+
+      int iT = 1;
+      foreach (CornerkickManager.Club clb in MvcApplication.ckcore.ltClubs) {
+        Models.DatatableEntryStadiums dteStadium = new Models.DatatableEntryStadiums();
+
+        dteStadium.sName = clb.stadium.sName;
+        dteStadium.sClubName = clb.sName;
+        dteStadium.iType0 = clb.stadium.getSeats(0);
+        dteStadium.iType1 = clb.stadium.getSeats(1);
+        dteStadium.iType2 = clb.stadium.getSeats(2);
+        dteStadium.iTotal = dteStadium.iType0 + dteStadium.iType1 + dteStadium.iType2;
+        dteStadium.bTopring = clb.stadium.bTopring && clb.stadium.iTopringDaysConstruct == 0;
+
+        ltDeStadiums.Add(dteStadium);
+      }
+
+      ltDeStadiums = ltDeStadiums.OrderByDescending(o => o.iTotal).ToList().GetRange(0, 20);
+      for (int i = 0; i < ltDeStadiums.Count; i++) {
+        ltDeStadiums[i].iIx = i + 1;
+      }
+
+      return Json(new { aaData = ltDeStadiums.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
