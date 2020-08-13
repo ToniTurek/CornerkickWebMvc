@@ -7545,7 +7545,18 @@ namespace CornerkickWebMvc.Controllers
         dteStadium.iType0 = clb.stadium.getSeats(0);
         dteStadium.iType1 = clb.stadium.getSeats(1);
         dteStadium.iType2 = clb.stadium.getSeats(2);
+
+        foreach (CornerkickGame.Stadium.Block blk in clb.stadium.blocks) {
+          if (blk.iSeatsDaysConstruct > 0) {
+            if (blk.iType == 0) dteStadium.iType0Ctn = blk.iSeats;
+            else if (blk.iType == 1) dteStadium.iType1Ctn = blk.iSeats;
+            else if (blk.iType == 2) dteStadium.iType2Ctn = blk.iSeats;
+          }
+        }
+
         dteStadium.iTotal = dteStadium.iType0 + dteStadium.iType1 + dteStadium.iType2;
+        dteStadium.iTotalCtn = dteStadium.iType0Ctn + dteStadium.iType1Ctn + dteStadium.iType2Ctn;
+
         dteStadium.bTopring = clb.stadium.bTopring && clb.stadium.iTopringDaysConstruct == 0;
 
         ltDeStadiums.Add(dteStadium);

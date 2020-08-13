@@ -219,6 +219,22 @@
           { "targets": [0, 2, 3, 4, 5], "className": "dt-right" }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.iTotalCtn > 0) {
+            $('td:eq(2)', nRow).html(aData.iTotal.toLocaleString() + " (" + aData.iTotalCtn.toLocaleString() + ")");
+
+            if (aData.iType0Ctn > 0) {
+              $('td:eq(3)', nRow).html(aData.iType0.toLocaleString() + " (" + aData.iType0Ctn.toLocaleString() + ")");
+            }
+
+            if (aData.iType1Ctn > 0) {
+              $('td:eq(4)', nRow).html(aData.iType1.toLocaleString() + " (" + aData.iType1Ctn.toLocaleString() + ")");
+            }
+
+            if (aData.iType2Ctn > 0) {
+              $('td:eq(5)', nRow).html(aData.iType2.toLocaleString() + " (" + aData.iType2Ctn.toLocaleString() + ")");
+            }
+          }
+
           if (aData.bTopring) {
             $('td:eq(6)', nRow).html("X");
           } else {
@@ -355,7 +371,7 @@
           <tr>
             <th>#</th>
             <th>Name</th>
-            <th>Kapazität</th>
+            <th>Kapazität (im Bau)</th>
             <th>Stehpl.</th>
             <th>Sitzpl.</th>
             <th>VIP Pl.</th>

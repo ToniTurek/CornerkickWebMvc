@@ -41,9 +41,13 @@ namespace CornerkickWebMvc.Models
     public string sName { get; set; }
     public string sClubName { get; set; }
     public int iTotal { get; set; }
+    public int iTotalCtn { get; set; }
     public int iType0 { get; set; }
     public int iType1 { get; set; }
     public int iType2 { get; set; }
+    public int iType0Ctn { get; set; }
+    public int iType1Ctn { get; set; }
+    public int iType2Ctn { get; set; }
     public bool bTopring { get; set; }
   }
 }
