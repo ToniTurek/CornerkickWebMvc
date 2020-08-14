@@ -521,8 +521,10 @@ namespace CornerkickWebMvc.Controllers
           sN = sN.Replace("Hauptsponsor",     "<a href=\"/Member/Sponsor\">Hauptsponsor</a>");
           sN = sN.Replace("Gold Cup",         "<a href=\"/Member/CupGold\">Gold Cup</a>");
           sN = sN.Replace("Silver Cup",       "<a href=\"/Member/CupSilver\">Silver Cup</a>");
+          sN = sN.Replace("WM",               "<a href=\"/Member/CupWc\">WM</a>");
           sN = sN.Replace("Testspiel",        "<a href=\"/Member/Calendar\">Testspiel</a>");
           sN = sN.Replace("Transferangebot",  "<a href=\"/Member/Transfer\">Transferangebot</a>");
+          sN = sN.Replace("wählen Sie",       "<a href=\"/Member/Transfer\">wählen Sie</a>");
 
           for (int iNat = 0; iNat < MvcApplication.iNations.Length; iNat++) {
             string sReplace = "Pokal " + CornerkickManager.Main.sLand[MvcApplication.iNations[iNat]];
