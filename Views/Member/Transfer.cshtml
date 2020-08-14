@@ -134,9 +134,11 @@
             }
 
             var iClubId = -9;
-            var sClubId = sctFilterClub.value;
-            if (sClubId) {
-              iClubId = parseInt(sClubId);
+            if (sctFilterClub) {
+              var sClubId = sctFilterClub.value;
+              if (sClubId) {
+                iClubId = parseInt(sClubId);
+              }
             }
 
             d.iPos    = $('#ddlFilterPos')  .val();
@@ -297,7 +299,9 @@
         reloadTransferlist(jTable);
       });
 
-      document.getElementById("sctFilterClub").addEventListener("change", function () { reloadTransferlist(jTable); }); 
+      if (sctFilterClub) {
+        sctFilterClub.addEventListener("change", function () { reloadTransferlist(jTable); }); 
+      }
 
       $("#cbEndingContract").on('change', function (ev) {
         reloadTransferlist(jTable);
