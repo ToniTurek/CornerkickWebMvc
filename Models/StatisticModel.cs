@@ -32,6 +32,7 @@ namespace CornerkickWebMvc.Models
     public string sTeamAveSkill11 { get; set; }
     public string sTeamAveAge11 { get; set; }
     public int iTeamValueTotal11 { get; set; }
+    public float fAttrFactor { get; set; }
     public string sLeague { get; set; }
   }
 

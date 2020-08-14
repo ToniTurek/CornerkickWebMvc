@@ -78,6 +78,11 @@
             "className": "dt-right",
             render: $.fn.dataTable.render.number('.', ',', 0, '')
           },
+          {
+            "data": "fAttrFactor",
+            "className": "dt-right",
+            render: $.fn.dataTable.render.number('.', ',', 1, '')
+          },
           { "data": "sLeague", "className": "dt-center" }
         ],
         columnDefs: [
@@ -329,6 +334,7 @@
             <th>&#8709;-Stärke Startelf</th>
             <th>&#8709;-Alter Startelf</th>
             <th>&#8709;-MW Startelf [€]</th>
+            <th>Erfolgsfaktor</th>
             <th>Liga</th>
           </tr>
         </thead>

@@ -7469,6 +7469,7 @@ namespace CornerkickWebMvc.Controllers
           sTeamAveSkill11 = sSkill11,
           sTeamAveAge11 = sAge11,
           iTeamValueTotal11 = iVal11,
+          fAttrFactor = clb.getAttractionFactor(MvcApplication.ckcore.iSeason, ltCups: MvcApplication.ckcore.ltCups, dtNow: MvcApplication.ckcore.dtDatum),
           sLeague = sLeagueName
         });
 
