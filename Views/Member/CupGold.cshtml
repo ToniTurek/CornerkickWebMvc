@@ -20,8 +20,6 @@
     var dtCupGoldTable;
 
     $(document).ready(function () {
-      var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
-
       setMatchdayCupGold();
 
       $("#ddlSeasonCupGold").change(function () {

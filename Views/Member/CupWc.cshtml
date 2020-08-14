@@ -20,9 +20,7 @@
     var dtCupWcTable;
 
     $(document).ready(function () {
-      var iMatchday = @Html.Raw(Json.Encode(Model.iMatchday));
-
-      setMatchdayCupWc(iMatchday);
+      setMatchdayCupWc();
 
       $("#ddlSeasonCupWc").change(function () {
         setMatchdayCupWc();

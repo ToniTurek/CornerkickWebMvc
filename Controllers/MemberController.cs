@@ -6068,10 +6068,10 @@ namespace CornerkickWebMvc.Controllers
       cupGoldModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-      cupGoldModel.iMatchday = Math.Min(cupGold.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupGold.ltMatchdays.Count - 1);
+      cupGoldModel.iMatchday = Math.Min(cupGold.getMatchday(MvcApplication.ckcore.dtDatum), cupGold.ltMatchdays.Count);
 
       cupGoldModel.ddlMatchday = new List<SelectListItem>();
-      for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 2); iMd++) {
+      for (int iMd = 0; iMd < Math.Max(6, cupGoldModel.iMatchday + 1); iMd++) {
         string sText = (iMd + 1).ToString();
         if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
@@ -6114,10 +6114,10 @@ namespace CornerkickWebMvc.Controllers
       cupSilverModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-      cupSilverModel.iMatchday = Math.Min(cupSilver.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupSilver.ltMatchdays.Count - 1);
+      cupSilverModel.iMatchday = Math.Min(cupSilver.getMatchday(MvcApplication.ckcore.dtDatum), cupSilver.ltMatchdays.Count);
 
       cupSilverModel.ddlMatchday = new List<SelectListItem>();
-      for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 2); iMd++) {
+      for (int iMd = 0; iMd < Math.Max(6, cupSilverModel.iMatchday + 1); iMd++) {
         string sText = (iMd + 1).ToString();
         if (iMd > 5) sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
 
@@ -6157,7 +6157,7 @@ namespace CornerkickWebMvc.Controllers
       cupWcModel.iSeason = MvcApplication.ckcore.iSeason;
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
-      cupWcModel.iMatchday = Math.Min(cupWc.getMatchday(MvcApplication.ckcore.dtDatum) - 1, cupWc.ltMatchdays.Count - 1);
+      cupWcModel.iMatchday = Math.Min(cupWc.getMatchday(MvcApplication.ckcore.dtDatum), cupWc.ltMatchdays.Count);
       cupWcModel.iMatchday = Math.Max(cupWcModel.iMatchday, 0);
 
       // Increment matchday if next match is today or tomorrow
