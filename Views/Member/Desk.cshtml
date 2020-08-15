@@ -226,6 +226,7 @@
         sTextFontSize = "12px";
       }
 
+      divNewspaper.style.display = "none";
       divNewspaper.style.width = sSizeFp[0];
       divNewspaper.style.height = sSizeFp[1];
 
@@ -273,6 +274,8 @@
 
             divFp.appendChild(divFp2);
             divNewspaper.appendChild(divFp);
+
+            divNewspaper.style.display = "block";
           }
 
           for (var iN = 0; iN < ltNews.length; iN++) {
