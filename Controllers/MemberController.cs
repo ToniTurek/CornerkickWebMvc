@@ -651,6 +651,7 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(null, JsonRequestBehavior.AllowGet);
+      if (clb.bNation) return Json(null, JsonRequestBehavior.AllowGet);
 
       // Check hide info flag
       CornerkickManager.User usr = ckUser();
