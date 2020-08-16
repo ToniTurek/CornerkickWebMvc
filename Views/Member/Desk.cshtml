@@ -591,20 +591,20 @@
           </div>
         }
 
-        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
-          if (clb.staff.iCoTrainer == 0 &&
-              clb.staff.iCondiTrainer == 0 &&
-              clb.staff.iPhysio == 0 &&
-              clb.staff.iMentalTrainer == 0 &&
-              clb.staff.iDoctor == 0 &&
-              clb.staff.iJouthTrainer == 0 &&
-              clb.staff.iJouthScouting == 0 &&
-              clb.staff.iKibitzer == 0) {
-            <div style="position: relative; width: 100%; text-align: center">
-              @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
-            </div>
-          }
+        if (clb.staff.iCoTrainer == 0 &&
+            clb.staff.iCondiTrainer == 0 &&
+            clb.staff.iPhysio == 0 &&
+            clb.staff.iMentalTrainer == 0 &&
+            clb.staff.iDoctor == 0 &&
+            clb.staff.iJouthTrainer == 0 &&
+            clb.staff.iJouthScouting == 0 &&
+            clb.staff.iKibitzer == 0) {
+          <div style="position: relative; width: 100%; text-align: center">
+            @Html.ActionLink("ACHTUNG: Sie haben noch kein Personal eingestellt!", "Personal", "Member", null, new { @style = "color:red" })
+          </div>
+        }
 
+        if (MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date)) {
           if (Model.user.budget.iInSpec == 0) {
             <div style="position: relative; width: 100%; text-align: center">
               @Html.ActionLink("ACHTUNG: Sie haben Ihre Finanzplanung noch nicht abgeschlossen!", "Finance", "Member", null, new { @style = "color:red" })
