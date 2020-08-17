@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.8.4";
+    public const string sVersion = "3.8.5";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     public class Settings
@@ -703,6 +703,16 @@ namespace CornerkickWebMvc
               // For each national team
               foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
                 if (!nat.bNation) continue;
+
+                if (nat.user != null && nat.ltPlayer.Count < 11) {
+                  ckcore.sendNews(nat.user, "Der Verband von " + nat.sName + " entscheidet sich dann doch für einen anderen Trainer.");
+                  nat.user.nation = null;
+                  nat.user = null;
+
+                  // Nominate player
+                  nat.ltPlayer.Clear();
+                  nat.ltPlayer = ckcore.getBestPlayer(nat.iLand, iPlCount: nPlayerNat);
+                }
 
                 while (nat.ltPlayer.Count > nPlayerNat) nat.ltPlayer.RemoveAt(nPlayerNat);
 
