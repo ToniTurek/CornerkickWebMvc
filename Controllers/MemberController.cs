@@ -573,11 +573,12 @@ namespace CornerkickWebMvc.Controllers
       usr.lti[0] = iDeleteAfter;
     }
 
-    public ContentResult DeskGetNewspaper()
+    [HttpGet]
+    public JsonResult DeskGetNewspaper()
     {
       CornerkickManager.User usr = ckUser();
-      if (usr == null) return Content(null, "application/json");
-      if (usr.ltNews == null) return Content(null, "application/json");
+      if (usr == null) return Json(null, JsonRequestBehavior.AllowGet);
+      if (usr.ltNews == null) return Json(null, JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Club clb = ckClub();
 
@@ -642,7 +643,8 @@ namespace CornerkickWebMvc.Controllers
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
-      return Content(JsonConvert.SerializeObject(ltNews.ToArray(), _jsonSetting), "application/json");
+      return Json(ltNews.ToArray(), JsonRequestBehavior.AllowGet);
+      //return Content(JsonConvert.SerializeObject(ltNews.ToArray(), _jsonSetting), "application/json");
       //return Json(new { aaData = ltNews.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
