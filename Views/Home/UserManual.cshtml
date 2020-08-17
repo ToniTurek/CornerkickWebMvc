@@ -796,7 +796,9 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
   <ul>
     <li>
       <u>Schnelligkeit</u><br />
-      Der Wert der Schnelligkeit eines Spielers gibt die maximale Anzahl von Schritten pro Spielzug an. Der Wert wird im Spiel reduziert durch die aktuelle Frische des Spielers, die Taktikeinstellung <a href="#uTacticPower">Einsatz</a> sowie das Führen des Balles abhängig von der <a href="#uPlayerSkillsTechnic">Technik</a> des Spielers (s. <a href="#h4FreshLoss">Frischeverlust im Spiel</a>).
+      Der Wert der Schnelligkeit eines Spielers gibt die (maximale) Anzahl von möglichen Schritten pro Runde an. Reduziert wird dieser Wert durch die aktuelle Frische des Spielers:
+      \[Schritte_{Runde} = {Schnelligkeit \cdot \sqrt{Frische}} \cdot \left(\frac{6.5}{Schnelligkeit}\right)^{0.25}\]
+      Mit jedem Schritt innerhalb einer Runde steigt der Frischeverlust pro Schritt an (s. <a href="#h4FreshLoss">Frischeverlust im Spiel</a>). Durch die Taktikeinstellung <a href="#uTacticPower">Einsatz</a> kann festgelegt werden, wieviele Schritte von den maximal möglichen tatsächlich durchgeführt werden.
     </li>
     <li>
       <u>Antritt</u><br />
