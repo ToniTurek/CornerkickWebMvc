@@ -7558,9 +7558,9 @@ namespace CornerkickWebMvc.Controllers
 
         foreach (CornerkickGame.Stadium.Block blk in clb.stadium.blocks) {
           if (blk.iSeatsDaysConstruct > 0) {
-            if (blk.iType == 0) dteStadium.iType0Ctn = blk.iSeats;
-            else if (blk.iType == 1) dteStadium.iType1Ctn = blk.iSeats;
-            else if (blk.iType == 2) dteStadium.iType2Ctn = blk.iSeats;
+            if      (blk.iType == 0) dteStadium.iType0Ctn += blk.iSeats;
+            else if (blk.iType == 1) dteStadium.iType1Ctn += blk.iSeats;
+            else if (blk.iType == 2) dteStadium.iType2Ctn += blk.iSeats;
           }
         }
 
