@@ -135,7 +135,7 @@ namespace CornerkickWebMvc.Controllers
     public ActionResult OneStep()
     {
       // Do one step now
-      MvcApplication.performCalendarStep();
+      MvcApplication.performCalendarStep(bSave: false);
 
       return RedirectToAction("Settings");
     }
