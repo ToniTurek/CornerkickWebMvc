@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.8.5";
+    public const string sVersion = "3.8.6";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     public class Settings
@@ -577,6 +577,8 @@ namespace CornerkickWebMvc
 
       // Beginn of new season
       if (iRetCk == 4) {
+        /*
+        // Create second league
         if (ckcore.tl.getCup(1, iNations[0], 1) == null) {
           // Create league
           CornerkickManager.Cup league = new CornerkickManager.Cup(nGroups: 1, bGroupsTwoGames: true);
@@ -593,6 +595,7 @@ namespace CornerkickWebMvc
 
           ckcore.calcMatchdays();
         }
+        */
 
         // Draw leagues
         foreach (int iN in iNations) {
@@ -606,6 +609,11 @@ namespace CornerkickWebMvc
         // Draw gold/silver cup
         cupGold  .draw(ckcore.dtDatum);
         cupSilver.draw(ckcore.dtDatum);
+
+        // Set club next game
+        foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
+          clb.nextGame = ckcore.tl.getNextGame(clb, ckcore.dtDatum);
+        }
       }
 
       // End of season
@@ -747,8 +755,12 @@ namespace CornerkickWebMvc
       }
 
       if (cupGold != null) {
-        if (cupGold.ltMatchdays[cupGold.ltMatchdays.Count - 1].ltGameData.Count == 1) {
-          dtWcDraw = new DateTime(Math.Max(cupGold.ltMatchdays[cupGold.ltMatchdays.Count - 1].dt.Ticks, dtWcDraw.Ticks));
+        if (cupGold.ltMatchdays != null && cupGold.ltMatchdays.Count > 0) {
+          if (cupGold.ltMatchdays[cupGold.ltMatchdays.Count - 1].ltGameData != null) {
+            if (cupGold.ltMatchdays[cupGold.ltMatchdays.Count - 1].ltGameData.Count == 1) {
+              dtWcDraw = new DateTime(Math.Max(cupGold.ltMatchdays[cupGold.ltMatchdays.Count - 1].dt.Ticks, dtWcDraw.Ticks));
+            }
+          }
         }
       }
 
