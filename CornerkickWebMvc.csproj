@@ -1048,10 +1048,13 @@
     <Content Include="Content\Images\user_manual\LiveGame_options.png" />
     <Content Include="Content\Images\user_manual\Nego2.png" />
     <Content Include="Content\Images\user_manual\PlayerDetails.gif" />
+    <Content Include="Content\Images\user_manual\PlayerDetails_1.gif" />
+    <Content Include="Content\Images\user_manual\PlayerDetails_2.gif" />
     <Content Include="Content\Images\user_manual\Tactic.PNG" />
     <Content Include="Content\Images\user_manual\Team0.PNG" />
-    <Content Include="Content\Images\user_manual\Team1a.gif" />
+    <Content Include="Content\Images\user_manual\Team1b.gif" />
     <Content Include="Content\Images\user_manual\Team3a.gif" />
+    <Content Include="Content\Images\user_manual\Training.png" />
     <Content Include="Content\mystyles.css" />
     <Content Include="Content\Sound\bar.wav" />
     <Content Include="Content\Sound\cash.wav" />

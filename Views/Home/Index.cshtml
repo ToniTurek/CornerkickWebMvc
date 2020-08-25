@@ -31,10 +31,10 @@
     });
 
     function zoomImg(img) {
-      var small = { width: "200px" };
-      var large = { width: "800px" };
+      var small = { height: "200px" };
+      var large = { height: "800px" };
 
-      if (img.width() == "200") {
+      if (img.height() == "200") {
         img.animate(large);
       } else {
         img.animate(small);
@@ -149,30 +149,39 @@
     </div>
   </div>
 
-  <div style="width: 100%; height: 400px; z-index: 99">
+  <h4>Bildergalerie (klicken zum vergrößern):</h4>
+  <div style="width: 100%; height: 440px; z-index: 99">
     @*<div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomVideo(this, 1)">*@
-    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left">
-      <video width="200" controls="controls">
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left">
+      <video height="200" controls="controls">
         <source src="~/Content/Video/game_example_1.mp4" type="video/mp4" />
         <source src="~/Content/Video/game_example_1.ogg" type="video/ogg">
         Your browser does not support the video tag.
       </video>
     </div>
 
-    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
-      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Team1a.gif" />
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="height: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Team1b.gif" title="Aufstellung (1)"/>
     </div>
 
-    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
-      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Team3a.gif" />
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="height: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Team3a.gif" title="Aufstellung (2)"/>
     </div>
 
-    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
-      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/PlayerDetails.gif" />
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="height: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Tactic.png" title="Taktik"/>
     </div>
 
-    <div style="width: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
-      <img style="width: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Tactic.png" />
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="height: 100%; border: 1px solid black" src="~/Content/Images/user_manual/Training.png" title="Training"/>
+    </div>
+
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="height: 100%; border: 1px solid black" src="~/Content/Images/user_manual/PlayerDetails_1.gif" title="Spielerdetails (1)"/>
+    </div>
+
+    <div style="height: 200px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; float: left" onclick="zoomImg($(this))">
+      <img style="height: 100%; border: 1px solid black" src="~/Content/Images/user_manual/PlayerDetails_2.gif" title="Spielerdetails (2)"/>
     </div>
   </div>
 
