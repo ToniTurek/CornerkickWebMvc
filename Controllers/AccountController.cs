@@ -201,8 +201,8 @@ namespace CornerkickWebMvc.Controllers
 #endif
     {
       // Check if user is already added
-      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
-        if (usr.id.Equals(applicationUser.Id)) return;
+      foreach (CornerkickManager.User usrExist in MvcApplication.ckcore.ltUser) {
+        if (usrExist.id.Equals(applicationUser.Id)) return;
       }
 
       // Get existing club
