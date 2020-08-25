@@ -200,6 +200,12 @@ namespace CornerkickWebMvc.Controllers
     private void addUserToCk(ApplicationUser applicationUser, int iLand, System.Drawing.Color cl1, System.Drawing.Color cl2, System.Drawing.Color cl3, System.Drawing.Color cl4, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #endif
     {
+      // Check if user is already added
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr.id.Equals(applicationUser.Id)) return;
+      }
+
+      // Get existing club
       CornerkickManager.Club clubExist = null;
       if (iClubExist >= 0 && iClubExist < MvcApplication.ckcore.ltClubs.Count) clubExist = MvcApplication.ckcore.ltClubs[iClubExist];
 
