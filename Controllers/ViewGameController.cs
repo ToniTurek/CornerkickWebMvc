@@ -784,7 +784,7 @@ namespace CornerkickWebMvc.Controllers
             int[] iSub = gameData.team[iHA].ltSubstitutions[iS];
             float fMin = iSub[2];
 
-            string sSubDesc = (iSub[2] + 1).ToString() + ". Min.: " + sTeam + " - " + MvcApplication.ckcore.ltPlayer[iSub[1]].sName + " für " + MvcApplication.ckcore.ltPlayer[iSub[0]].sName;
+            string sSubDesc = (iSub[2] + 1).ToString() + ". Min.: " + sTeam + " - " + MvcApplication.ckcore.ltPlayer[iSub[1]].plGame.sName + " für " + MvcApplication.ckcore.ltPlayer[iSub[0]].plGame.sName;
 
             if (string.IsNullOrEmpty(gD.sStatSubs)) gD.sStatSubs = "<br/><u>Spielerwechsel:</u>";
             gD.sStatSubs += "<br/>" + sSubDesc;
@@ -1234,7 +1234,7 @@ namespace CornerkickWebMvc.Controllers
         tc.fPassRight = fTaktik;
         if (tc.fPassLeft + tc.fPassRight > 1f) tc.fPassLeft  = (float)Math.Round(1f - tc.fPassRight, 2);
         fRet = tc.fPassLeft;
-      } else if (iTaktik == 9) tc.iAngriffAbseits = (int)Math.Round(fTaktik);
+      } else if (iTaktik == 9) tc.iGapOffsite = (int)Math.Round(fTaktik);
 
       // Set tactic of current game
       if (usrAdmin.game != null) {

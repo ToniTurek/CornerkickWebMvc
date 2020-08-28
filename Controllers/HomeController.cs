@@ -126,13 +126,17 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.User usr = new CornerkickManager.User();
       mnUm.ltUser.Add(usr);
 
+      // Create club
+      CornerkickManager.Club clb = new CornerkickManager.Club();
+      mnUm.ltClubs.Add(clb);
+
       // Create player
-      CornerkickGame.Player pl = new CornerkickGame.Player();
-      pl.fCondition = 0.6f;
-      pl.fFresh = 0.8f;
-      pl.fMoral = 1.0f;
-      pl.iClubId = 0;
-      pl.dtBirthday = mnUm.dtDatum.AddYears(-iAge);
+      CornerkickManager.Player pl = new CornerkickManager.Player();
+      pl.plGame.fCondition = 0.6f;
+      pl.plGame.fFresh = 0.8f;
+      pl.plGame.fMoral = 1.0f;
+      pl.contract = CornerkickManager.PlayerTool.getContract(pl, 1, clb, mnUm.dtDatum, mnUm.dtSeasonEnd);
+      pl.plGame.dtBirthday = mnUm.dtDatum.AddYears(-iAge);
 
       // Trainings camp
       CornerkickManager.TrainingCamp.Booking camp = new CornerkickManager.TrainingCamp.Booking();
@@ -143,7 +147,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       // Doping
-      if (iDoping >= 0 && iDoping < MvcApplication.ckcore.ltDoping.Count) pl.doDoping(MvcApplication.ckcore.ltDoping[iDoping]);
+      if (iDoping >= 0 && iDoping < MvcApplication.ckcore.ltDoping.Count) pl.plGame.doDoping(MvcApplication.ckcore.ltDoping[iDoping]);
 
       // For the next 7 days ...
       for (byte iD = 0; iD < 7; iD++) {
@@ -153,14 +157,14 @@ namespace CornerkickWebMvc.Controllers
           //if ((int)dtTmp.DayOfWeek == 0) break;
 
           // ... do training
-          CornerkickManager.Player.Training training = CornerkickManager.Player.getTraining(iType, MvcApplication.ckcore.plr.ltTraining);
-          CornerkickManager.Player.doTraining(ref pl, training, MvcApplication.ckcore.plr.ltTraining, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
+          CornerkickManager.PlayerTool.Training training = CornerkickManager.PlayerTool.getTraining(iType, MvcApplication.ckcore.plt.ltTraining);
+          CornerkickManager.PlayerTool.doTraining(ref pl, training, MvcApplication.ckcore.plt.ltTraining, iTrainerCondi, iTrainerPhysio, 2, 2, dtTmp, usr, iTrainingPerDay: 1, ltPlayerTeam: null, campBooking: camp, bJouth: false, bNoInjuries: true);
         }
 
         // ... add training data to dataPoints
-        dataPoints[0].Add(new Models.DataPointGeneral(iD + 1, pl.fCondition));
-        dataPoints[1].Add(new Models.DataPointGeneral(iD + 1, pl.fFresh));
-        dataPoints[2].Add(new Models.DataPointGeneral(iD + 1, pl.fMoral));
+        dataPoints[0].Add(new Models.DataPointGeneral(iD + 1, pl.plGame.fCondition));
+        dataPoints[1].Add(new Models.DataPointGeneral(iD + 1, pl.plGame.fFresh));
+        dataPoints[2].Add(new Models.DataPointGeneral(iD + 1, pl.plGame.fMoral));
       }
 
       JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };

@@ -46,7 +46,7 @@ namespace CornerkickWebMvc.Models
     {
       // Chart training CFM
       ddlTraining = new List<SelectListItem>();
-      foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
+      foreach (CornerkickManager.PlayerTool.Training tr in MvcApplication.ckcore.plt.ltTraining) {
         if (tr.iId < 0) continue;
 
         ddlTraining.Add(

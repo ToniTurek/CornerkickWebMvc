@@ -54,8 +54,8 @@ namespace CornerkickWebMvc.Models
       ltDdlFilterFType = new List<SelectListItem>();
       ltDdlFilterFType.Add(new SelectListItem { Text = "-", Value = "-1" });
       // Positionen zu Dropdown Menü hinzufügen
-      for (int iF = 0; iF < CornerkickManager.Player.sSkills.Length - 1; iF++) {
-        ltDdlFilterFType.Add(new SelectListItem { Text = CornerkickManager.Player.sSkills[iF], Value = iF.ToString() });
+      for (int iF = 0; iF < CornerkickManager.PlayerTool.sSkills.Length - 1; iF++) {
+        ltDdlFilterFType.Add(new SelectListItem { Text = CornerkickManager.PlayerTool.sSkills[iF], Value = iF.ToString() });
       }
 
       ltDdlFilterF = new List<SelectListItem>();

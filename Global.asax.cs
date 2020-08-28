@@ -32,7 +32,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.8.7";
+    public const string sVersion = "3.9.0";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     public class Settings
@@ -461,11 +461,11 @@ namespace CornerkickWebMvc
         // Check if new jouth player and put on transferlist
         CornerkickManager.Club club0 = ckcore.ltClubs[0];
 
-        CornerkickGame.Player plNew = ckcore.plr.newPlayer(club0, iNat: iNations[random.Next(iNations.Length)]);
+        CornerkickManager.Player plNew = ckcore.plt.newPlayer(club0, iNat: iNations[random.Next(iNations.Length)]);
         ckcore.tr.putPlayerOnTransferlist(plNew, 0);
 
         // Player jouth
-        foreach (CornerkickGame.Player plJ in club0.ltPlayerJouth) {
+        foreach (CornerkickManager.Player plJ in club0.ltPlayerJouth) {
           ckcore.tr.putPlayerOnTransferlist(plJ, 0);
         }
 
@@ -483,7 +483,7 @@ namespace CornerkickWebMvc
 
         // retire cpu player
         if (club0.ltPlayer.Count > 1500) {
-          ckcore.plr.retirePlayer(club0.ltPlayer[0], club0);
+          ckcore.plt.retirePlayer(club0.ltPlayer[0], club0);
         }
 
         //checkCpuJouth();
@@ -516,39 +516,39 @@ namespace CornerkickWebMvc
           if (clb.user != null) continue;
 
           for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-            clb.ltPlayer[iP].fCondition = 0.9f;
-            clb.ltPlayer[iP].fFresh     = 1.0f;
-            clb.ltPlayer[iP].fMoral     = Math.Max(clb.ltPlayer[iP].fMoral, 0.95f);
+            clb.ltPlayer[iP].plGame.fCondition = 0.9f;
+            clb.ltPlayer[iP].plGame.fFresh     = 1.0f;
+            clb.ltPlayer[iP].plGame.fMoral     = Math.Max(clb.ltPlayer[iP].plGame.fMoral, 0.95f);
           }
         }
       }
 
       // Reset player moral if ...
       for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
-        CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+        CornerkickManager.Player pl = ckcore.ltPlayer[iPl];
         string sClubName = "vereinslos";
-        if (pl.iClubId >= 0 && pl.iClubId < ckcore.ltClubs.Count) sClubName = ckcore.ltClubs[pl.iClubId].sName;
+        if (pl.contract != null) sClubName = pl.contract.club.sName;
 
         // ... NaN
-        if (float.IsNaN(pl.fMoral)) {
-          pl.fMoral = 1f;
-          ckcore.tl.writeLog("Reset moral (NaN) of player " + pl.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
+        if (float.IsNaN(pl.plGame.fMoral)) {
+          pl.plGame.fMoral = 1f;
+          ckcore.tl.writeLog("Reset moral (NaN) of player " + pl.plGame.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
         }
 
         // ... below minimum
-        if (pl.fMoral < ckcore.settings.fMoralMin) {
-          ckcore.tl.writeLog("Reset moral (" + pl.fMoral.ToString("0.0%") + ") of player " + pl.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
-          pl.fMoral = ckcore.settings.fMoralMin;
+        if (pl.plGame.fMoral < ckcore.settings.fMoralMin) {
+          ckcore.tl.writeLog("Reset moral (" + pl.plGame.fMoral.ToString("0.0%") + ") of player " + pl.plGame.sName + ", id: " + iPl.ToString() + ", club: " + sClubName, CornerkickManager.Main.sErrorFile);
+          pl.plGame.fMoral = ckcore.settings.fMoralMin;
         }
       }
 
       // Jan no injury
-      CornerkickGame.Player plJan = ckcore.ltPlayer[101];
-      plJan.injury = null;
+      CornerkickManager.Player plJan = ckcore.ltPlayer[101];
+      plJan.plGame.injury = null;
 
       // Assign random portrait if none
       for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
-        CornerkickGame.Player pl = ckcore.ltPlayer[iPl];
+        CornerkickManager.Player pl = ckcore.ltPlayer[iPl];
         if (pl == null) continue;
 
         try {
@@ -673,10 +673,9 @@ namespace CornerkickWebMvc
         // For each transfer
         foreach (CornerkickManager.Transfer.Item transfer in ckcore.ltTransfer) {
           if (transfer.player == null) continue;
-          if (transfer.player.iClubId <                     0) continue;
-          if (transfer.player.iClubId >= ckcore.ltClubs.Count) continue;
+          if (transfer.player.contract == null) continue;
 
-          CornerkickManager.Club clbCpu = ckcore.ltClubs[transfer.player.iClubId];
+          CornerkickManager.Club clbCpu = transfer.player.contract.club;
           if (clbCpu.user != null) continue; // If human user
           if (ckcore.ltUser.IndexOf(clbCpu.user) == 0) continue; // If main CPU user
 
@@ -725,7 +724,7 @@ namespace CornerkickWebMvc
                 while (nat.ltPlayer.Count > nPlayerNat) nat.ltPlayer.RemoveAt(nPlayerNat);
 
                 // Set player no.
-                for (int iP = 0; iP < nat.ltPlayer.Count; iP++) nat.ltPlayer[iP].iNrNat = (byte)(iP + 1);
+                for (int iP = 0; iP < nat.ltPlayer.Count; iP++) nat.ltPlayer[iP].plGame.iNrNat = (byte)(iP + 1);
               }
             }
 
@@ -818,9 +817,9 @@ namespace CornerkickWebMvc
           Nation2 nat2 = new Nation2();
           nat2.nation = nat;
 
-          List<CornerkickGame.Player> ltPlayerNatTmp = ckcore.getBestPlayer(iNat, iPlCount: nPlayerNat);
-          foreach (CornerkickGame.Player plNatTmp in ltPlayerNatTmp) {
-            nat2.fSkillTotal += CornerkickGame.Tool.getAveSkill(plNatTmp, bIdeal: true);
+          List<CornerkickManager.Player> ltPlayerNatTmp = ckcore.getBestPlayer(iNat, iPlCount: nPlayerNat);
+          foreach (CornerkickManager.Player plNatTmp in ltPlayerNatTmp) {
+            nat2.fSkillTotal += CornerkickGame.Tool.getAveSkill(plNatTmp.plGame, bIdeal: true);
           }
 
           ltNat2.Add(nat2);
@@ -1175,21 +1174,9 @@ namespace CornerkickWebMvc
         Controllers.MemberController.bHideEocInfo = new bool[MvcApplication.ckcore.ltUser.Count];
 
         // Set retired players name to none
-        List<CornerkickGame.Player> ltPlayerRet = CornerkickManager.Player.getRetiredPlayer(ckcore.ltPlayer);
+        List<CornerkickManager.Player> ltPlayerRet = CornerkickManager.PlayerTool.getRetiredPlayer(ckcore.ltPlayer);
         for (int iPl = 0; iPl < ltPlayerRet.Count; iPl++) {
-          ltPlayerRet[iPl].sName = "";
-        }
-
-        // Check for valid offer contracts (to be removed for next commit)
-        for (int iT = 0; iT < ckcore.ltTransfer.Count; iT++) {
-          CornerkickManager.Transfer.Item transfer = ckcore.ltTransfer[iT];
-
-          if (transfer.ltOffers != null) {
-            for (int iO = 0; iO < transfer.ltOffers.Count; iO++) {
-              CornerkickManager.Transfer.Offer offer = transfer.ltOffers[iO];
-              if (offer.contract == null) offer.contract = CornerkickManager.Player.getContract(transfer.player, (byte)random.Next(1, 5), ckcore.dtDatum, ckcore.dtSeasonEnd);
-            }
-          }
+          ltPlayerRet[iPl].plGame.sName = "";
         }
 
         // Transfer player from club0 to cpu-club if too few

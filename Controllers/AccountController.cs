@@ -262,8 +262,8 @@ namespace CornerkickWebMvc.Controllers
               */
 
               // Retire all cpu player
-              while (clubCpu.ltPlayer     .Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayer     [0], clubCpu);
-              while (clubCpu.ltPlayerJouth.Count > 0) MvcApplication.ckcore.plr.retirePlayer(clubCpu.ltPlayerJouth[0], clubCpu);
+              while (clubCpu.ltPlayer     .Count > 0) MvcApplication.ckcore.plt.retirePlayer(clubCpu.ltPlayer     [0], clubCpu);
+              while (clubCpu.ltPlayerJouth.Count > 0) MvcApplication.ckcore.plt.retirePlayer(clubCpu.ltPlayerJouth[0], clubCpu);
 
               clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
 
@@ -475,28 +475,28 @@ namespace CornerkickWebMvc.Controllers
 
       for (byte iPos = 1; iPos < 12; iPos++) {
         for (byte iPl = 0; iPl < 2; iPl++) {
-          CornerkickGame.Player pl = MvcApplication.ckcore.plr.newPlayer(club, iPos);
+          CornerkickManager.Player pl = MvcApplication.ckcore.plt.newPlayer(club, iPos);
 #if DEBUG
-          pl.fFresh = 1f;
+          pl.plGame.fFresh = 1f;
 #endif
 
           // Change player skill
-          for (int iS = 1; iS < pl.iSkill.Length; iS++) {
-            pl.iSkill[iS] = (byte)(pl.iSkill[iS] + iSkillChange);
+          for (int iS = 1; iS < pl.plGame.iSkill.Length; iS++) {
+            pl.plGame.iSkill[iS] = (byte)(pl.plGame.iSkill[iS] + iSkillChange);
           }
 
-          pl.contract = CornerkickManager.Player.getContract(pl, (byte)rnd.Next(1, 4), MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
+          pl.contract = CornerkickManager.PlayerTool.getContract(pl, (byte)rnd.Next(1, 4), club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
 
-          pl.iNr = (byte)(iPos + (11 * iPl));
+          pl.plGame.iNr = (byte)(iPos + (11 * iPl));
 
           // Count speed
-          iSpeed  += pl.iSkill[0];
+          iSpeed  += pl.plGame.iSkill[0];
 
           // Count talent
           iTalent += pl.iTalent;
 
           // Count age
-          float fAge = pl.getAge(MvcApplication.ckcore.dtDatum);
+          float fAge = pl.plGame.getAge(MvcApplication.ckcore.dtDatum);
           fAlter += fAge;
         }
       }
@@ -505,19 +505,19 @@ namespace CornerkickWebMvc.Controllers
       byte iCount7 = 0;
       byte iCount5 = 0;
       for (int iPl = 0; iPl < club.ltPlayer.Count; iPl++) {
-        CornerkickGame.Player pl = club.ltPlayer[iPl];
-        pl.iSkill[0] = 6;
+        CornerkickManager.Player pl = club.ltPlayer[iPl];
+        pl.plGame.iSkill[0] = 6;
       }
 
       while (iCount7 < 2 || iCount5 < 1) {
-        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
-        if (!CornerkickGame.Tool.bPlayerMainPos(pl, 1)) { // if not keeper
+        if (!CornerkickGame.Tool.bPlayerMainPos(pl.plGame, 1)) { // if not keeper
           if (iCount7 < 2) {
-            pl.iSkill[0] = 7;
+            pl.plGame.iSkill[0] = 7;
             iCount7++;
           } else if (iCount5 < 1) {
-            pl.iSkill[0] = 5;
+            pl.plGame.iSkill[0] = 5;
             iCount5++;
           }
         }
@@ -552,7 +552,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Equalize player talent
       while (iTalent > 4.51 * club.ltPlayer.Count) {
-        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
         if (pl.iTalent > 2) {
           pl.iTalent--;
 
@@ -561,7 +561,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       while (iTalent < 4.49 * club.ltPlayer.Count) {
-        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
         if (pl.iTalent < 7) {
           pl.iTalent++;
 
@@ -571,11 +571,11 @@ namespace CornerkickWebMvc.Controllers
 
       // Equalize player age
       while (fAlter > 24.0f * club.ltPlayer.Count) {
-        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
-        if (pl.getAge(MvcApplication.ckcore.dtDatum) > 22) {
+        if (pl.plGame.getAge(MvcApplication.ckcore.dtDatum) > 22) {
           try {
-            pl.dtBirthday = new DateTime(pl.dtBirthday.Year + 1, pl.dtBirthday.Month, pl.dtBirthday.Day); // make younger
+            pl.plGame.dtBirthday = new DateTime(pl.plGame.dtBirthday.Year + 1, pl.plGame.dtBirthday.Month, pl.plGame.dtBirthday.Day); // make younger
           } catch {
             continue;
           }
@@ -585,11 +585,11 @@ namespace CornerkickWebMvc.Controllers
       }
 
       while (fAlter < 24.0f * club.ltPlayer.Count) {
-        CornerkickGame.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
-        if (pl.getAge(MvcApplication.ckcore.dtDatum) < 30) {
+        if (pl.plGame.getAge(MvcApplication.ckcore.dtDatum) < 30) {
           try {
-            pl.dtBirthday = new DateTime(pl.dtBirthday.Year - 1, pl.dtBirthday.Month, pl.dtBirthday.Day); // make older
+            pl.plGame.dtBirthday = new DateTime(pl.plGame.dtBirthday.Year - 1, pl.plGame.dtBirthday.Month, pl.plGame.dtBirthday.Day); // make older
           } catch {
             continue;
           }
@@ -603,31 +603,31 @@ namespace CornerkickWebMvc.Controllers
       int iBreak = 0;
       float fAgeTalent = getAgeTalent(club);
       while (fAgeTalent > 64.0 || fAgeTalent < 62.0) {
-        CornerkickGame.Player pl1 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
-        CornerkickGame.Player pl2 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl1 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
+        CornerkickManager.Player pl2 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
         if (pl1.iTalent > 2 && pl1.iTalent < 7 &&
             pl2.iTalent > 2 && pl2.iTalent < 7) {
           int iDeltaTalent = +1;
-          if ((fAgeTalent > 70.75 && pl1.dtBirthday.Year > pl2.dtBirthday.Year) ||
-              (fAgeTalent < 68.75 && pl1.dtBirthday.Year < pl2.dtBirthday.Year)) iDeltaTalent = -1;
+          if ((fAgeTalent > 70.75 && pl1.plGame.dtBirthday.Year > pl2.plGame.dtBirthday.Year) ||
+              (fAgeTalent < 68.75 && pl1.plGame.dtBirthday.Year < pl2.plGame.dtBirthday.Year)) iDeltaTalent = -1;
 
           pl1.iTalent -= iDeltaTalent;
           pl2.iTalent += iDeltaTalent;
 
           fAgeTalent = getAgeTalent(club);
-        } else if (pl1.getAge(MvcApplication.ckcore.dtDatum) > 22 &&
-                   pl2.getAge(MvcApplication.ckcore.dtDatum) < 30) {
+        } else if (pl1.plGame.getAge(MvcApplication.ckcore.dtDatum) > 22 &&
+                   pl2.plGame.getAge(MvcApplication.ckcore.dtDatum) < 30) {
           try {
-            pl1.dtBirthday = new DateTime(pl1.dtBirthday.Year + 1, pl1.dtBirthday.Month, pl1.dtBirthday.Day); // make younger
+            pl1.plGame.dtBirthday = new DateTime(pl1.plGame.dtBirthday.Year + 1, pl1.plGame.dtBirthday.Month, pl1.plGame.dtBirthday.Day); // make younger
           } catch {
-            MvcApplication.ckcore.tl.writeLog("ERROR: cannot make player " + pl1.sName + " younger. Player birthday: " + pl1.dtBirthday.ToShortDateString());
+            MvcApplication.ckcore.tl.writeLog("ERROR: cannot make player " + pl1.plGame.sName + " younger. Player birthday: " + pl1.plGame.dtBirthday.ToShortDateString());
           }
 
           try {
-            pl2.dtBirthday = new DateTime(pl2.dtBirthday.Year - 1, pl2.dtBirthday.Month, pl2.dtBirthday.Day); // make older
+            pl2.plGame.dtBirthday = new DateTime(pl2.plGame.dtBirthday.Year - 1, pl2.plGame.dtBirthday.Month, pl2.plGame.dtBirthday.Day); // make older
           } catch {
-            MvcApplication.ckcore.tl.writeLog("ERROR: cannot make player " + pl2.sName + " older. Player birthday: " + pl2.dtBirthday.ToShortDateString());
+            MvcApplication.ckcore.tl.writeLog("ERROR: cannot make player " + pl2.plGame.sName + " older. Player birthday: " + pl2.plGame.dtBirthday.ToShortDateString());
           }
 
           fAgeTalent = getAgeTalent(club);
@@ -645,8 +645,8 @@ namespace CornerkickWebMvc.Controllers
       float fAgeTalent = 0f;
 
       // Count age
-      foreach (CornerkickGame.Player pl in club.ltPlayer) {
-        fAgeTalent += (pl.getAge(MvcApplication.ckcore.dtDatum) - 10f) * pl.iTalent;
+      foreach (CornerkickManager.Player pl in club.ltPlayer) {
+        fAgeTalent += (pl.plGame.getAge(MvcApplication.ckcore.dtDatum) - 10f) * pl.iTalent;
       }
 
       return fAgeTalent / club.ltPlayer.Count;
@@ -986,8 +986,8 @@ namespace CornerkickWebMvc.Controllers
             club0.staff.iJouthScouting = 10;
 
             for (int iPl = 0; iPl < 100; iPl++) {
-              CornerkickGame.Player sp = MvcApplication.ckcore.plr.newPlayer(club0);
-              MvcApplication.ckcore.tr.putPlayerOnTransferlist(sp.iId, 0);
+              CornerkickManager.Player sp = MvcApplication.ckcore.plt.newPlayer(club0);
+              MvcApplication.ckcore.tr.putPlayerOnTransferlist(sp.plGame.iId, 0);
             }
 
             MvcApplication.ckcore.ltClubs.Add(club0);
