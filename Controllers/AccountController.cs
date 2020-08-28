@@ -323,8 +323,12 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  3, usr.club.iId);
       string sWelcomeMsg2 = "Schauen Sie sich die Anleitung um mehr über die Funktionsweise von Cornerkick zu erfahren.";
       MvcApplication.ckcore.sendNews(usr, sWelcomeMsg2, 3, usr.club.iId);
-      string sNewspaper = "Herzlich Willkommen!#" + usr.sFirstname + " " + usr.sSurname + " steigt als neuer Manager bei " + clb.sName + " ein.";
-      MvcApplication.ckcore.sendNews(usr, sNewspaper, 203);
+
+      // Create newspaper
+      string sNewspaper = "Herzlich Willkommen!#" + usr.sFirstname + " " + usr.sSurname + " steigt als neuer Manager bei " + clb.sName + " ein. ";
+      sNewspaper += "Aktuell befindet sich der Verein in der " + league.sName + ". ";
+      sNewspaper += "In Fach&shy;kreisen werden dem Verein unter der neuen Leitung große Ambitionen nachgesagt...";
+      MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewspaper, 203);
 #if DEBUG
       }
       }

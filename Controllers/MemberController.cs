@@ -628,10 +628,13 @@ namespace CornerkickWebMvc.Controllers
             dtn.sText = sN;
             dtn.iType = news.iType;
             dtn.sHeader = news.sFromId;
-            if (news.iType == 71) {
-              dtn.sImg = getClubEmblem(MvcApplication.ckcore.ltClubs[news.iId], sStyle: "width: 100%", bTiny: true);
-            } else {
-              dtn.sImg = getPlayerPortrait(MvcApplication.ckcore.ltPlayer[news.iId], sStyle: "width: 100%", bSmall: true);
+
+            if (news.iId >= 0) {
+              if (news.iType == 71) {
+                dtn.sImg = getClubEmblem(MvcApplication.ckcore.ltClubs[news.iId], sStyle: "width: 100%", bTiny: true);
+              } else {
+                dtn.sImg = getPlayerPortrait(MvcApplication.ckcore.ltPlayer[news.iId], sStyle: "width: 100%", bSmall: true);
+              }
             }
 
             ltNews.Add(dtn);
