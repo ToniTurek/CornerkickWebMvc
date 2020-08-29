@@ -1022,7 +1022,7 @@ namespace CornerkickWebMvc.Controllers
 #if !DEBUG
             // Send mail to admin
             try {
-              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered");
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered." + Environment.NewLine + "Land: " + model.Land.ToString());
             } catch {
             }
 #endif
@@ -1162,7 +1162,6 @@ namespace CornerkickWebMvc.Controllers
       var result = await UserManager.ConfirmEmailAsync(userId, code);
 
       if (result.Succeeded) {
-
         // Create club
         ApplicationUser appUser = UserManager.FindById(userId);
         foreach (RegisterViewModel mrv in ltRegisterUser) {
@@ -1172,6 +1171,14 @@ namespace CornerkickWebMvc.Controllers
 
             ltRegisterUser.Remove(mrv);
             saveRegisterUser();
+
+#if !DEBUG
+            // Send mail to admin
+            try {
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user has confirmed email: " + mrv.Email, mrv.Email + " has confirmed email.");
+            } catch {
+            }
+#endif
 
             return View("ConfirmEmail");
           }
