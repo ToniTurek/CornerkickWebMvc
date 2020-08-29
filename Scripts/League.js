@@ -53,7 +53,11 @@ function setLeague2() {
   if (oTableLeague) {
     oTableLeague.ajax.reload();
   } else {
-    oTableLeague = getTableDatatable(document.getElementById("divTableLeague"), 1, ddlSeason, ddlLand, ddlDivision, ddlMatchday, null, rbTableH, rbTableA, 1, 4, 8, -1);
+    if (parseInt(ddlDivision.value) === 0) {
+      oTableLeague = getTableDatatable(document.getElementById("divTableLeague"), 1, ddlSeason, ddlLand, ddlDivision, ddlMatchday, null, rbTableH, rbTableA, 1, 4, 8, -2);
+    } else {
+      oTableLeague = getTableDatatable(document.getElementById("divTableLeague"), 1, ddlSeason, ddlLand, ddlDivision, ddlMatchday, null, rbTableH, rbTableA, 0, 2, 0,  0);
+    }
   }
 
   // Scorer table
