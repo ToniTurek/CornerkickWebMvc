@@ -1057,6 +1057,36 @@ namespace CornerkickWebMvc.Controllers
       return true;
     }
 
+    //
+    // GET: /Account/Register
+    [HttpGet]
+    [AllowAnonymous]
+    public ActionResult ResentActivationLink()
+    {
+      RegisterViewModel mdRegister = new RegisterViewModel();
+
+      return View(mdRegister);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ResentActivationLink(RegisterViewModel model)
+    {
+      ApplicationUser appUser = await UserManager.FindByNameAsync(model.Email);
+      if (appUser != null) {
+        sendActivationLinkAsync(appUser.Id);
+
+        ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-MANAGER Konto zu bestätigen!";
+
+        return View("Info");
+      }
+
+      ViewBag.Message = "Fehler: Die angegebene e-mail konnte nicht gefunden werden. Bitte versuchen Sie es erneut.";
+
+      return View("Info");
+    }
+
     [AllowAnonymous]
     [HttpGet]
     public ActionResult RegisterCheckLeague(int iLand, int iDivision)

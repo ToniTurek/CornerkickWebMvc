@@ -1,0 +1,25 @@
+﻿@model CornerkickWebMvc.Models.RegisterViewModel
+
+@{
+  ViewBag.Title = "Aktivierungslink erneut senden";
+}
+
+<h2>Aktivierungslink erneut senden</h2>
+
+@using (Html.BeginForm("ResentActivationLink", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" })) {
+  @Html.AntiForgeryToken()
+  <h4>Bitte gib deine e-mail Addresse an um einen neuen Aktivierungslink zu senden.</h4>
+  <hr />
+  @Html.ValidationSummary("", new { @class = "text-danger" })
+  <div class="form-group">
+    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+    <div class="col-md-10">
+      @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email" })
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <input type="submit" id="bnResent" class="btn btn-default" value="senden" />
+    </div>
+  </div>
+}
