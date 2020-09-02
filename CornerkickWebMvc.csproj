@@ -1356,6 +1356,7 @@
     <Content Include="Scripts\Player.js" />
     <Content Include="Scripts\Scorer.js" />
     <Content Include="Scripts\spectrum.js" />
+    <Content Include="Views\Account\ResentActivationLink.cshtml" />
     <Content Include="Views\Shared\_Layout_plain.cshtml" />
     <Content Include="Views\Member\Transfer.cshtml" />
     <Content Include="Views\Home\UserManual.cshtml" />
