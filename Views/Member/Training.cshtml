@@ -411,7 +411,7 @@
           </thead>
           <tbody>
             @{
-              foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
+              foreach (CornerkickManager.PlayerTool.Training tr in MvcApplication.ckcore.plt.ltTraining) {
                 if (tr.iId > 0 && tr.fCondi > 0f) {
                   <tr>
                     <td style="text-align: center">@tr.sName</td>
@@ -439,7 +439,7 @@
           </thead>
           <tbody>
             @{
-              foreach (CornerkickManager.Player.Training tr in MvcApplication.ckcore.plr.ltTraining) {
+              foreach (CornerkickManager.PlayerTool.Training tr in MvcApplication.ckcore.plt.ltTraining) {
                 if (tr.iId > 0 && tr.fCondi < 0f) {
                   <tr>
                     <td style="text-align: center">@tr.sName</td>

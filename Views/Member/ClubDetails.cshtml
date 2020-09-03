@@ -348,10 +348,14 @@
       <div style="position: relative; width: 50%; min-width: 320px; height: auto; float: left">
         <table cellpadding="3" style="width: auto">
           <tbody>
-            @foreach (CornerkickGame.Player pl in Model.club.ltPlayer) {
+            @foreach (CornerkickManager.Player pl in Model.club.ltPlayer) {
               <tr>
-                <td align="right">@pl.sName</td>
-                <td align="left">@MvcApplication.ckcore.ltClubs[pl.iClubId].sName</td>
+                <td align="right">@pl.plGame.sName</td>
+                @if (pl.contract?.club != null) {
+                  <td align="left">@pl.contract.club.sName</td>
+                } else {
+                  <td align="left">vereinslos</td>
+                }
               </tr>
             }
           </tbody>

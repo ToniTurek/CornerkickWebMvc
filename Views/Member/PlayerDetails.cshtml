@@ -16,7 +16,7 @@
 
 @{
   var player = MvcApplication.ckcore.ltPlayer[Model.iPlayer];
-  ViewBag.Title = player.sName;
+  ViewBag.Title = player.plGame.sName;
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -226,7 +226,7 @@
       if (@Html.Raw(Json.Encode(player.bRetire))) {
         alert("Der Spieler beendet seine Karriere nach Ablauf des Vertrages.");
       } else if ($("#bnContract").text() === "In Profikader übernehmen") {
-        getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
+        getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.plGame.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
       } else {
         getContractDialog(document.body, @Model.iPlayer, false);
       }
@@ -760,7 +760,7 @@
       @{
         string sPlPrevName = "";
         if (Model.iPlIdPrev >= 0) {
-          sPlPrevName = "<<   " + MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].sName;
+          sPlPrevName = "<<   " + MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].plGame.sName;
           <div style="position: absolute; left:  0%; width: 49%">
             @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
           </div>
@@ -768,7 +768,7 @@
 
         string sPlNextName = "";
         if (Model.iPlIdNext >= 0) {
-          sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].sName + "   >>";
+          sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].plGame.sName + "   >>";
 
           <div style="position: absolute; left: 50%; width: 49%; text-align: right">
             @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
@@ -779,13 +779,13 @@
   }
 
   @{
-    string sAveSkill = CornerkickGame.Tool.getAveSkill(player).ToString("0.0");
+    string sAveSkill = CornerkickGame.Tool.getAveSkill(player.plGame).ToString("0.0");
     string sTalent = (player.iTalent + 1).ToString();
-    string sAge = ((int)player.getAge(MvcApplication.ckcore.dtDatum)).ToString();
-    string sPos = CornerkickManager.Player.getStrPos(player);
+    string sAge = ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum)).ToString();
+    string sPos = CornerkickManager.PlayerTool.getStrPos(player.plGame);
     string sClub = "vereinslos";
-    if (player.iClubId >= 0) {
-      sClub = MvcApplication.ckcore.ltClubs[player.iClubId].sName;
+    if (player.contract?.club != null) {
+      sClub = player.contract.club.sName;
     }
 
     <div style="position: relative; width: 100%; margin-top: 4px">
@@ -795,14 +795,14 @@
             @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()", @style = "width:180px" })
           </div>
         } else {
-          string sPlName = player.sName;
+          string sPlName = player.plGame.sName;
           <div style="position: relative; width: 100%; height: 84px">
             @if (!Model.bJouth) {
-              string sPlNo = player.iNr.ToString();
+              string sPlNo = player.plGame.iNr.ToString();
               <div style="position: absolute; width: 96px; height: 100%; text-align: center; background-color: @Model.sColorJersey">
                 <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
 
-                @if (Model.bOwnPlayer && (player.iNr < 1 || Model.bSeasonStart)) {
+                @if (Model.bOwnPlayer && (player.plGame.iNr < 1 || Model.bSeasonStart)) {
                   <div style="position: absolute; top: 18px; left: 22px; width: 100%; text-align: left">
                     @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @onchange = "setNo()", id = "iDdlINo", @style = "width: 70px; height: 50px; font-size: 42px; color: " + Model.sColorJerseyNo + "; background-color: transparent" })
                   </div>
@@ -868,11 +868,11 @@
               </tr>
               <tr>
                 <td align="right">Geburtsdatum:</td>
-                <td align="right">@player.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@sAge)</td>
+                <td align="right">@player.plGame.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@sAge)</td>
               </tr>
               <tr>
                 <td align="right">Körpergröße/-gewicht:</td>
-                <td align="right">@player.iHeight.ToString("0cm") / @player.iWeight.ToString("0kg")</td>
+                <td align="right">@player.plGame.iHeight.ToString("0cm") / @player.plGame.iWeight.ToString("0kg")</td>
               </tr>
               <tr>
                 <td align="right">Positionen:</td>
@@ -880,7 +880,7 @@
               </tr>
               <tr>
                 <td align="right">Stärke (bereinigt):</td>
-                <td align="right">@sAveSkill (@CornerkickGame.Tool.getAveSkill(player, bIdeal: true).ToString("0.0"))</td>
+                <td align="right">@sAveSkill (@CornerkickGame.Tool.getAveSkill(player.plGame, bIdeal: true).ToString("0.0"))</td>
               </tr>
               <tr>
                 <td align="right">Talent:</td>
@@ -889,18 +889,18 @@
               <tr>
                 <td align="right">Fuß (links/rechts):</td>
                 @{
-                  if (player.fFootL > 0.99 && player.fFootR > 0.99) {
+                  if (player.plGame.fFootL > 0.99 && player.plGame.fFootR > 0.99) {
                     <td align="right">beidfüßig</td>
                   } else {
-                    <td align="right">@player.fFootL.ToString("0%") / @player.fFootR.ToString("0%")</td>
+                    <td align="right">@player.plGame.fFootL.ToString("0%") / @player.plGame.fFootR.ToString("0%")</td>
                   }
                 }
               </tr>
               <tr>
                 @{
                   string sVerletzung = "keine";
-                  if (player.injury != null) {
-                    sVerletzung = "Noch " + player.injury.fLength.ToString("0.0") + " Tage (" + player.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.injury.iType][player.injury.iType2];
+                  if (player.plGame.injury != null) {
+                    sVerletzung = "Noch " + player.plGame.injury.fLength.ToString("0.0") + " Tage (" + player.plGame.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.plGame.injury.iType][player.plGame.injury.iType2];
                   }
                 }
                 <td align="right">Verletzung:</td>
@@ -940,10 +940,10 @@
                   <td align="right">@sDauer</td>
                 </tr>
               }
-              @if (player.contractNext != null && player.contractNext.iLength > 0 && player.contractNext.iClubId >= 0) {
+              @if (player.contractNext?.club != null && player.contractNext.iLength > 0) {
                 <tr>
                   <td align="right">Verein nächste Saison:</td>
-                  <td align="right">@MvcApplication.ckcore.ltClubs[player.contractNext.iClubId].sName</td>
+                  <td align="right">@player.contractNext.club.sName</td>
                 </tr>
               }
               <tr>
@@ -963,31 +963,31 @@
             <tbody>
               <tr>
                 <td align="right">Führungspersönlichkeit:</td>
-                <td align="right">@player.character.fLeader.ToString("0.0%")</td>
+                <td align="right">@player.plGame.character.fLeader.ToString("0.0%")</td>
               </tr>
               <tr>
                 <td align="right">Schußhäufigkeit:</td>
-                <td align="right">@player.character.fShoot.ToString("0.0%")</td>
+                <td align="right">@player.plGame.character.fShoot.ToString("0.0%")</td>
               </tr>
               <tr>
                 <td align="right">Teamplayer:</td>
-                <td align="right">@player.character.fPass.ToString("0.0%")</td>
+                <td align="right">@player.plGame.character.fPass.ToString("0.0%")</td>
               </tr>
               <tr>
                 <td align="right">Dribbler:</td>
-                <td align="right">@player.character.fDribbling.ToString("0.0%")</td>
+                <td align="right">@player.plGame.character.fDribbling.ToString("0.0%")</td>
               </tr>
               <tr>
                 <td align="right">Flexibilität:</td>
-                <td align="right">@player.character.fFlexibel.ToString("0.0%")</td>
+                <td align="right">@player.plGame.character.fFlexibel.ToString("0.0%")</td>
               </tr>
               <tr>
                 <td align="right">Robustheit:</td>
-                <td align="right">@player.character.fRobustness.ToString("0.0%")</td>
+                <td align="right">@player.plGame.character.fRobustness.ToString("0.0%")</td>
               </tr>
               <tr>
                 <td align="right">Gemüt:</td>
-                <td align="right">@((2 - player.character.fCholeric).ToString("0.0%"))</td>
+                <td align="right">@((2 - player.plGame.character.fCholeric).ToString("0.0%"))</td>
               </tr>
             </tbody>
           </table>
@@ -998,37 +998,37 @@
                 <td align="right"><ins>Sperren:</ins></td>
               </tr>
               @{
-                if (player.iSuspension[0] + player.iSuspension[1] + player.iSuspension[4] == 0) {
+                if (player.plGame.iSuspension[0] + player.plGame.iSuspension[1] + player.plGame.iSuspension[4] == 0) {
                   <tr>
                     <td align="right">keine</td>
                   </tr>
                 } else {
-                  if (player.iSuspension[0] > 0) {
-                    string sSp = "Liga: " + player.iSuspension[0].ToString() + " Spiele";
+                  if (player.plGame.iSuspension[0] > 0) {
+                    string sSp = "Liga: " + player.plGame.iSuspension[0].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
                   }
-                  if (player.iSuspension[1] > 0) {
-                    string sSp = "Pokal: " + player.iSuspension[1].ToString() + " Spiele";
+                  if (player.plGame.iSuspension[1] > 0) {
+                    string sSp = "Pokal: " + player.plGame.iSuspension[1].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
                   }
-                  if (player.iSuspension[2] + player.iSuspension[3] > 0) {
-                    string sSp = "Int: " + (player.iSuspension[2] + player.iSuspension[3]).ToString() + " Spiele";
+                  if (player.plGame.iSuspension[2] + player.plGame.iSuspension[3] > 0) {
+                    string sSp = "Int: " + (player.plGame.iSuspension[2] + player.plGame.iSuspension[3]).ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
                   }
-                  if (player.iSuspension[4] > 0) {
-                    string sSp = "Testspiele: " + player.iSuspension[4].ToString() + " Spiele";
+                  if (player.plGame.iSuspension[4] > 0) {
+                    string sSp = "Testspiele: " + player.plGame.iSuspension[4].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
                   }
-                  if (player.iSuspension[6] > 0) {
-                    string sSp = "Nat: " + player.iSuspension[6].ToString() + " Spiele";
+                  if (player.plGame.iSuspension[6] > 0) {
+                    string sSp = "Nat: " + player.plGame.iSuspension[6].ToString() + " Spiele";
                     <tr>
                       <td align="right">@sSp</td>
                     </tr>
@@ -1081,12 +1081,12 @@
 
               if (!Model.bNation) {
                 @* Extend player contract *@
-                if ((int)player.getAge(MvcApplication.ckcore.dtDatum) > 15) {
+                if ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum) > 15) {
                   <button type="submit" id="bnContract" class="btn btn-default" style="width: 90%; margin-bottom: 4px">@sExtendContract</button>
                 }
 
                 @* Put on / take from transferlist *@
-                if (MvcApplication.ckcore.plr.onTransferlist(player)) {
+                if (MvcApplication.ckcore.plt.onTransferlist(player)) {
                   <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Von Transferliste nehmen</button>
                 } else {
                   <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Auf Transferliste setzen</button>
@@ -1130,20 +1130,20 @@
               </tr>
             </thead>
             <tbody>
-              @for (i = 0; i < player.fExperiencePos.Length; i++) {
+              @for (i = 0; i < player.plGame.fExperiencePos.Length; i++) {
                 byte j = (byte)(i + 1);
 
                 string sColor = "";
                 string sBold = "";
-                if (player.fExperiencePos[i] > 0.99) {
+                if (player.plGame.fExperiencePos[i] > 0.99) {
                   sBold = "style=font-weight:bold";
-                } else if (player.fExperiencePos[i] > 0.8) {
+                } else if (player.plGame.fExperiencePos[i] > 0.8) {
                   sColor = "style=color:blue";
                 }
                 <tr @sBold>
                   <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
-                  <td align="right"><span @sColor>@player.fExperiencePos[i].ToString("0.0%")</span></td>
-                  <td align="center">@CornerkickGame.Tool.getAveSkill(player, j).ToString("0.0")</td>
+                  <td align="right"><span @sColor>@player.plGame.fExperiencePos[i].ToString("0.0%")</span></td>
+                  <td align="center">@CornerkickGame.Tool.getAveSkill(player.plGame, j).ToString("0.0")</td>
                 </tr>
               }
             </tbody>
@@ -1172,14 +1172,14 @@
             </thead>
             <tbody>
               <tr>
-                <td align="right">@CornerkickManager.Player.sSkills[0]</td>
-                <td align="center">@player.iSkill[0]</td>
+                <td align="right">@CornerkickManager.PlayerTool.sSkills[0]</td>
+                <td align="center">@player.plGame.iSkill[0]</td>
                 @{
                   if (Model.bOwnPlayer && !Model.bNation) {
                     var fTraining = player.fSkillTraining[i] + 1.0;
                     <td align="right">@fTraining.ToString("0.0%")</td>
                     <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                    <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                    <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
                   }
                 }
               </tr>
@@ -1187,31 +1187,31 @@
                 @{
                   i = 16;
                 }
-                <td align="right">@CornerkickManager.Player.sSkills[i]</td>
-                <td align="center">@player.iSkill[i]</td>
+                <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
+                <td align="center">@player.plGame.iSkill[i]</td>
                 @{
                   if (Model.bOwnPlayer && !Model.bNation) {
                     var fTraining = player.fSkillTraining[i] + 1.0;
                     <td align="right">@fTraining.ToString("0.0%")</td>
                     <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                    <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                    <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
                   }
                 }
               </tr>
-              @for (i = 1; i < player.iSkill.Length; i++) {
+              @for (i = 1; i < player.plGame.iSkill.Length; i++) {
                 if (i == 16) {
                   continue;
                 }
 
                 var fTraining = player.fSkillTraining[i] + 1.0;
                 <tr>
-                  <td align="right">@CornerkickManager.Player.sSkills[i]</td>
-                  <td align="center">@player.iSkill[i]</td>
+                  <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
+                  <td align="center">@player.plGame.iSkill[i]</td>
                   @{
                     if (Model.bOwnPlayer && !Model.bNation) {
                       <td align="right">@fTraining.ToString("0.0%")</td>
                       <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                      <td align="right">@player.fIndTraining[i].ToString("0.0%")</td>
+                      <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
                     }
                   }
                 </tr>

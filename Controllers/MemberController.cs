@@ -362,16 +362,16 @@ namespace CornerkickWebMvc.Controllers
 
       desk.sTabellenplatz = "-";
       List<CornerkickManager.Cup.TableItem> ltTbl = league.getTable();
-      int iPlatz = 1;
-      int iSpl = 0;
+      int iPlaceLeague = 1;
+      int iGms = 0;
       foreach (CornerkickManager.Cup.TableItem tbl in ltTbl) {
         if (tbl.iId == club.iId) {
-          iSpl = tbl.iGUV[0] + tbl.iGUV[1] + tbl.iGUV[2];
+          iGms = tbl.iWDL[0] + tbl.iWDL[1] + tbl.iWDL[2];
           break;
         }
-        iPlatz++;
+        iPlaceLeague++;
       }
-      if (iSpl > 0) desk.sTabellenplatz = iPlatz.ToString() + ". Platz nach " + iSpl.ToString() + " von " + ((ltTbl.Count - 1) * 2).ToString() + " Spielen";
+      if (iGms > 0) desk.sTabellenplatz = iPlaceLeague.ToString() + ". Platz nach " + iGms.ToString() + " von " + ((ltTbl.Count - 1) * 2).ToString() + " Spielen";
 
       // Nat. cup round
       desk.sPokalrunde = "-";
@@ -1612,8 +1612,10 @@ namespace CornerkickWebMvc.Controllers
 
         pl2.sName = pl.sName;
         pl2.iNb = pl.iNr;
-        //pl2.sNat = CornerkickManager.Main.sLandShort[pl.iNat1];
-        //pl2.sPortrait = getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true);
+
+        CornerkickManager.Player plMng = CornerkickManager.PlayerTool.getPlayerFromId(pl.iId, club.ltPlayer);
+        pl2.sNat = CornerkickManager.Main.sLandShort[plMng.iNat1];
+        pl2.sPortrait = getPlayerPortrait(plMng, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true);
 
         // Check if player is suspended
         bool bSusp = false;
@@ -5649,7 +5651,7 @@ namespace CornerkickWebMvc.Controllers
       string sBox = "";
       for (var i = 0; i < ltTbl.Count; i++) {
         CornerkickManager.Cup.TableItem tbpl = ltTbl[i];
-        int iGames = tbpl.iGUV[0] + tbpl.iGUV[1] + tbpl.iGUV[2];
+        int iGames = tbpl.iWDL[0] + tbpl.iWDL[1] + tbpl.iWDL[2];
         int iDiff = tbpl.iGoals - tbpl.iGoalsOpp;
 
         string sStyle = "";
@@ -5699,9 +5701,9 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td>&nbsp;</td>";
         sBox += "<td align=\"right\">" + iGames.ToString() + "</td>";
         sBox += "<td>&nbsp;</td>";
-        sBox += "<td align=\"right\">" + tbpl.iGUV[0].ToString() + "</td>";
-        sBox += "<td align=\"right\">" + tbpl.iGUV[1].ToString() + "</td>";
-        sBox += "<td align=\"right\">" + tbpl.iGUV[2].ToString() + "</td>";
+        sBox += "<td align=\"right\">" + tbpl.iWDL[0].ToString() + "</td>";
+        sBox += "<td align=\"right\">" + tbpl.iWDL[1].ToString() + "</td>";
+        sBox += "<td align=\"right\">" + tbpl.iWDL[2].ToString() + "</td>";
         sBox += "<td>&nbsp;</td>";
         sBox += "<td align=\"center\">" + tbpl.iGoals.ToString() + ":" + tbpl.iGoalsOpp.ToString() + "</td>";
         sBox += "<td align=\"right\">" + iDiff.ToString() + "</td>";
@@ -5782,10 +5784,10 @@ namespace CornerkickWebMvc.Controllers
 
         dtL.sEmblem = getClubEmblem(tbpl.club, sStyle: "width: 24px", bTiny: true);
         dtL.sClubName = "<a href=\"/Member/ClubDetails?iClub=" + tbpl.iId.ToString() + "\" target=\"\">" + tbpl.sName + "</a>";
-        dtL.iGames = tbpl.iGUV[0] + tbpl.iGUV[1] + tbpl.iGUV[2];
-        dtL.iWin    = tbpl.iGUV[0];
-        dtL.iDraw   = tbpl.iGUV[1];
-        dtL.iDefeat = tbpl.iGUV[2];
+        dtL.iGames = tbpl.iWDL[0] + tbpl.iWDL[1] + tbpl.iWDL[2];
+        dtL.iWin    = tbpl.iWDL[0];
+        dtL.iDraw   = tbpl.iWDL[1];
+        dtL.iDefeat = tbpl.iWDL[2];
         dtL.sGoals = tbpl.iGoals.ToString() + ":" + tbpl.iGoalsOpp.ToString();
         dtL.iGoalsDiff = tbpl.iGoals - tbpl.iGoalsOpp;
         dtL.iPoints = tbpl.iPoints;
