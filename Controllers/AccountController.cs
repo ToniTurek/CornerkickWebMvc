@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define _USE_AMAZON_S3
+
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
@@ -34,6 +36,7 @@ namespace CornerkickWebMvc.Controllers
     private ApplicationUserManager _userManager;
     public static CultureInfo ciUser;
     public static List<RegisterViewModel> ltRegisterUser;
+    const string sFilenameRegisterUser = "registerUser.txt";
     readonly string[] sCultureInfo = new string[82] {
       "",
       "",
@@ -323,8 +326,12 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.ckcore.sendNews(usr, sWelcomeMsg,  3, usr.club.iId);
       string sWelcomeMsg2 = "Schauen Sie sich die Anleitung um mehr über die Funktionsweise von Cornerkick zu erfahren.";
       MvcApplication.ckcore.sendNews(usr, sWelcomeMsg2, 3, usr.club.iId);
-      string sNewspaper = "Herzlich Willkommen!#" + usr.sFirstname + " " + usr.sSurname + " steigt als neuer Manager bei " + clb.sName + " ein.";
-      MvcApplication.ckcore.sendNews(usr, sNewspaper, 203);
+
+      // Create newspaper
+      string sNewspaper = "Herzlich Willkommen!#" + usr.sFirstname + " " + usr.sSurname + " steigt als neuer Manager bei " + clb.sName + " ein. ";
+      sNewspaper += "Aktuell befindet sich der Verein in der " + league.sName + ". ";
+      sNewspaper += "In Fach&shy;kreisen werden dem Verein unter der neuen Leitung große Ambitionen nachgesagt...";
+      MvcApplication.ckcore.sendNews(MvcApplication.ckcore.ltUser[0], sNewspaper, 203);
 #if DEBUG
       }
       }
@@ -996,6 +1003,7 @@ namespace CornerkickWebMvc.Controllers
             if (MvcApplication.settings.bEmailCertification) {
               if (ltRegisterUser == null) ltRegisterUser = new List<RegisterViewModel>();
               ltRegisterUser.Add(model);
+              saveRegisterUser();
 
               await sendActivationLinkAsync(appUser.Id);
 
@@ -1014,7 +1022,7 @@ namespace CornerkickWebMvc.Controllers
 #if !DEBUG
             // Send mail to admin
             try {
-              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered");
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user: " + model.Email, model.Email + " has registered." + Environment.NewLine + "Land: " + model.Land.ToString());
             } catch {
             }
 #endif
@@ -1044,9 +1052,39 @@ namespace CornerkickWebMvc.Controllers
       string code = await UserManager.GenerateEmailConfirmationTokenAsync(sAppUserId);
       var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = sAppUserId, code = code }, protocol: Request.Url.Scheme);
       MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
-      await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a>");
+      await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a><br/><br/><br/>Sollte der link nicht funktioniert, kopiere den folgenden Text und füge ihn in die Adresszeile deines Browsers ein:<br/><br/>" + callbackUrl);
 
       return true;
+    }
+
+    //
+    // GET: /Account/Register
+    [HttpGet]
+    [AllowAnonymous]
+    public ActionResult ResentActivationLink()
+    {
+      RegisterViewModel mdRegister = new RegisterViewModel();
+
+      return View(mdRegister);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ResentActivationLink(RegisterViewModel model)
+    {
+      ApplicationUser appUser = await UserManager.FindByNameAsync(model.Email);
+      if (appUser != null) {
+        sendActivationLinkAsync(appUser.Id);
+
+        ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-MANAGER Konto zu bestätigen!";
+
+        return View("Info");
+      }
+
+      ViewBag.Message = "Fehler: Die angegebene e-mail konnte nicht gefunden werden. Bitte versuchen Sie es erneut.";
+
+      return View("Info");
     }
 
     [AllowAnonymous]
@@ -1088,6 +1126,69 @@ namespace CornerkickWebMvc.Controllers
     {
       if (userId == null || code == null) return View("Error");
 
+      // Read register user from file
+      if (ltRegisterUser == null || ltRegisterUser.Count == 0) {
+        string sFileRegisterUser = Path.Combine(MvcApplication.getHomeDir(), sFilenameRegisterUser);
+#if _USE_AMAZON_S3
+        AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+        if (!System.IO.File.Exists(sFileRegisterUser)) as3.downloadFile("registerUser", sFilenameRegisterUser);
+#endif
+
+        if (System.IO.File.Exists(sFileRegisterUser)) {
+          ltRegisterUser = new List<RegisterViewModel>();
+          string lineRegUsr;
+          System.IO.StreamReader fileRegUsr = new System.IO.StreamReader(@sFileRegisterUser);
+
+          while ((lineRegUsr = fileRegUsr.ReadLine()) != null) {
+            RegisterViewModel rvm = new RegisterViewModel();
+
+            string[] sLineRegUsrSplit = lineRegUsr.Split(';');
+            if (sLineRegUsrSplit.Length < 9) continue;
+
+            rvm.Email = sLineRegUsrSplit[0];
+            rvm.Verein = sLineRegUsrSplit[1];
+            rvm.Vorname = sLineRegUsrSplit[2];
+            rvm.Nachname = sLineRegUsrSplit[3];
+
+            int iLand = 0;
+            int.TryParse(sLineRegUsrSplit[4], out iLand);
+            rvm.Land = iLand;
+
+            int iLiga = 0;
+            int.TryParse(sLineRegUsrSplit[5], out iLiga);
+            rvm.Liga = iLiga;
+
+            byte[] iCl1 = new byte[3];
+            string[] sLineRegUsrCl1Split = sLineRegUsrSplit[6].Split('/');
+            if (sLineRegUsrCl1Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl1Split[iCl], out iCl1[iCl]);
+            }
+
+            byte[] iCl2 = new byte[3];
+            string[] sLineRegUsrCl2Split = sLineRegUsrSplit[7].Split('/');
+            if (sLineRegUsrCl2Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl2Split[iCl], out iCl1[iCl]);
+            }
+
+            byte[] iCl3 = new byte[3];
+            string[] sLineRegUsrCl3Split = sLineRegUsrSplit[8].Split('/');
+            if (sLineRegUsrCl3Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl3Split[iCl], out iCl1[iCl]);
+            }
+
+            byte[] iCl4 = new byte[3];
+            string[] sLineRegUsrCl4Split = sLineRegUsrSplit[9].Split('/');
+            if (sLineRegUsrCl4Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl4Split[iCl], out iCl1[iCl]);
+            }
+
+            ltRegisterUser.Add(rvm);
+          }
+
+          fileRegUsr.Close();
+        }
+      }
+
       var result = await UserManager.ConfirmEmailAsync(userId, code);
 
       if (result.Succeeded) {
@@ -1097,6 +1198,17 @@ namespace CornerkickWebMvc.Controllers
           if (appUser.Email.Equals(mrv.Email)) {
             addUserToCk(appUser, mrv, bAdmin: false, iClubExist: mrv.iClubIx, fileEmblem: mrv.fileEmblem);
             iniCk();
+
+            ltRegisterUser.Remove(mrv);
+            saveRegisterUser();
+
+#if !DEBUG
+            // Send mail to admin
+            try {
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user has confirmed email: " + mrv.Email, mrv.Email + " has confirmed email.");
+            } catch {
+            }
+#endif
 
             return View("ConfirmEmail");
           }
@@ -1427,9 +1539,37 @@ namespace CornerkickWebMvc.Controllers
       base.Dispose(disposing);
     }
 
-#region Hilfsprogramme
-      // Wird für XSRF-Schutz beim Hinzufügen externer Anmeldungen verwendet
-      private const string XsrfKey = "XsrfId";
+    private void saveRegisterUser()
+    {
+      string sFileRegisterUser = Path.Combine(MvcApplication.getHomeDir(), sFilenameRegisterUser);
+
+      using (System.IO.StreamWriter fileSettings = new System.IO.StreamWriter(sFileRegisterUser)) {
+        foreach (RegisterViewModel rvm in ltRegisterUser) {
+          fileSettings.Write(rvm.Email + ";");
+          fileSettings.Write(rvm.Verein + ";");
+          fileSettings.Write(rvm.Vorname + ";");
+          fileSettings.Write(rvm.Nachname + ";");
+          fileSettings.Write(rvm.Land.ToString() + ";");
+          fileSettings.Write(rvm.Liga.ToString() + ";");
+          fileSettings.Write(rvm.cl1.R.ToString() + "/" + rvm.cl1.G.ToString() + "/" + rvm.cl1.B.ToString() + ";");
+          fileSettings.Write(rvm.cl2.R.ToString() + "/" + rvm.cl2.G.ToString() + "/" + rvm.cl2.B.ToString() + ";");
+          fileSettings.Write(rvm.cl3.R.ToString() + "/" + rvm.cl3.G.ToString() + "/" + rvm.cl3.B.ToString() + ";");
+          fileSettings.Write(rvm.cl4.R.ToString() + "/" + rvm.cl4.G.ToString() + "/" + rvm.cl4.B.ToString() + ";");
+          fileSettings.WriteLine();
+        }
+
+        fileSettings.Close();
+      }
+
+#if _USE_AMAZON_S3
+      AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
+      as3.uploadFile(sFileRegisterUser, "registerUser");
+#endif
+    }
+
+    #region Hilfsprogramme
+    // Wird für XSRF-Schutz beim Hinzufügen externer Anmeldungen verwendet
+    private const string XsrfKey = "XsrfId";
 
       private IAuthenticationManager AuthenticationManager
       {
