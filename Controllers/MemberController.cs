@@ -3006,7 +3006,18 @@ namespace CornerkickWebMvc.Controllers
       return 1000 * (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 50);
     }
 
-    [HttpPost]
+    // Copy of CornerkickGame.Player.Contract class without club
+    public class ContractMvc
+    {
+      public byte iLength;  // Length of contract [years]
+      public int iSalary;  // Salary [$/month]
+      public int iGoal;    // Bonus goal
+      public int iPlay;    // Bonus play
+      public int iFixTransferFee;  // Fix transfer fee
+      public bool bTransferCurrentSeason; // Player was transferred in current season (no further transfer allowed)
+      public float fMood; // Player mood while negotiating
+    }
+    [HttpGet]
     public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0, bool bNegotiate = true)
     {
       if (iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
@@ -3024,7 +3035,17 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(plSalary, club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason: iGamesPerSeason, iFixedFee: iFixedFee, bNegotiate: bNegotiate, bForceNewContract: bForceNewContract);
 
-      return Json(contract, JsonRequestBehavior.AllowGet);
+      // Create reduced contract to return
+      ContractMvc cctMvc = new ContractMvc();
+      cctMvc.iLength                = contract.iLength;  // Length of contract [years]
+      cctMvc.iSalary                = contract.iSalary;  // Salary [$/month]
+      cctMvc.iGoal                  = contract.iGoal;    // Bonus goal
+      cctMvc.iPlay                  = contract.iPlay;    // Bonus play
+      cctMvc.iFixTransferFee        = contract.iFixTransferFee;  // Fix transfer fee
+      cctMvc.bTransferCurrentSeason = contract.bTransferCurrentSeason; // Player was transferred in current season (no further transfer allowed)
+      cctMvc.fMood                  = contract.fMood; // Player mood while negotiating
+
+      return Json(cctMvc, JsonRequestBehavior.AllowGet);
     }
 
     // Returns

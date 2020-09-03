@@ -2,7 +2,7 @@
   //alert(iPlayerId + ", " + iYears + ", " + iSalaryOffer);
   if (iYears) {
     return $.ajax({
-      type: 'post',
+      type: 'GET',
       url: '/Member/GetPlayerSalary',
       dataType: "json",
       data: {
@@ -10,8 +10,9 @@
       },
       success: function (contract) {
       },
-      error: function (sReturn) {
-        alert(sReturn);
+      error: function (jqXHR, msg, obj) {
+        alert(msg);
+        alert(obj);
       }
     });
   }
