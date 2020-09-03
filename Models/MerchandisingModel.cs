@@ -35,6 +35,7 @@ namespace CornerkickWebMvc.Models
       public int iItemIncome { get; set; }
       public int iWinLoose { get; set; }
       public string sPriceSellAve { get; set; }
+      public bool bPlayerJersey { get; set; }
     }
 
     public MerchandisingModel()

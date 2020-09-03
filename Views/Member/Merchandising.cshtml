@@ -24,6 +24,18 @@
     }
   </style>
 
+  <style media="screen" type="text/css">
+    tr.details-control td.symbol {
+      background: url('/Content/Icons/plus.png') no-repeat center center;
+      cursor: pointer;
+    }
+
+    tr.shown td.symbol {
+      background: url('/Content/Icons/minus.png') no-repeat center center;
+      cursor: pointer;
+    }
+  </style>
+
   <script>
     var oTable;
     var bEditable = false;
@@ -45,12 +57,41 @@
           }
         });
       });
+
+      // Add event listener for opening and closing details
+      $('#tableItems tbody').on('click', 'tr.details-control td.symbol', function () {
+        var tr = $(this).closest('tr');
+        var row = oTable.row(tr);
+
+        if (row.child.isShown()) {
+          // This row is already open - close it
+          row.child.hide();
+          tr.removeClass('shown');
+        } else {
+          // Open this row
+          data = row.data();
+          $.when(getJerseyItemSubTable()).done(function (sChildTable) {
+            row.child(sChildTable).show();
+            tr.addClass('shown');
+          });
+        }
+      });
     }); // $(document).ready
 
+    function getJerseyItemSubTable() {
+      return $.ajax({
+        type: 'GET',
+        url: "/Member/MerchandisingGetJerseyItemSubTable",
+        dataType: "json",
+        success: function (sTable) {
+        }
+      });
+    }
+
     function setTableItems() {
-      var sColumnAmount = "5";
-      var sColumnPricePiece = "6";
-      var sColumnPriceTotal = "7";
+      var sColumnAmount = "6";
+      var sColumnPricePiece = "7";
+      var sColumnPriceTotal = "8";
 
       return $('#tableItems').DataTable({
         "ajax": {
@@ -61,6 +102,7 @@
           "contentType": "application/json; charset=utf-8"
         },
         "columns": [
+          { "data": null },
           { "data": "iIx" },
           { "data": "iId" },
           { "data": "sName" },
@@ -91,7 +133,8 @@
             "data": "iWinLoose",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')
           },
-          { "data": "sPriceSellAve" }
+          { "data": "sPriceSellAve" },
+          { "data": "bPlayerJersey" }
         ],
         "paging": false,
         "info": false,
@@ -101,36 +144,44 @@
         },
         "columnDefs": [
           {
-            "targets": [0, 1],
+            "targets": 0,
+            "className": "symbol",
+            "orderable": false,
+            "data": null,
+            "defaultContent": '',
+            "searchable": false
+          },
+          {
+            "targets": [1, 2, 17],
             "visible": false,
             "orderable": false,
             "searchable": false
           },
           {
-            "targets": [3, 4, 6, 7, 8, 9, 11, 12, 13, 14],
+            "targets": [4, 5, 7, 8, 9, 10, 12, 13, 14, 15],
             "className": "dt-right"
           },
           {
-            "targets": 2,
+            "targets": 3,
             "className": "dt-center columnBorderRight"
           },
           {
-            "targets": [5, 10],
+            "targets": [6, 11],
             "className": "dt-right columnBorderRight"
           },
           {
-            "targets": 9,
+            "targets": 10,
             "defaultContent": '0 €',
             "data": null
           },
           {
-            "targets": [5, 15],
+            "targets": [6, 16],
             "defaultContent": '0.00 €',
             "className": "dt-right",
             "data": null
           },
           {
-            "targets": [10, 11],
+            "targets": [11, 12],
             "defaultContent": '',
             "orderable": false,
             "searchable": false,
@@ -138,8 +189,6 @@
           }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-          $(nRow).addClass('details-control');
-
           var divAmount = document.createElement("div");
           divAmount.style.width = "100%";
           divAmount.align = "center";
@@ -208,14 +257,18 @@
           divPriceSell.appendChild(txtPrice);
 
           $('td:eq(' + sColumnAmount + ')', nRow).html(divAmount);
-          $('td:eq(8)', nRow).html(bnBuy);
-          $('td:eq(9)', nRow).html(divPriceSell);
+          $('td:eq(9)', nRow).html(bnBuy);
+          $('td:eq(10)', nRow).html(divPriceSell);
 
           // Color win/loose column
           if (aData.iWinLoose > 0) {
-            $('td:eq(12)', nRow).css('color', "green");
+            $('td:eq(13)', nRow).css('color', "green");
           } else if (aData.iWinLoose < 0) {
-            $('td:eq(12)', nRow).css('color', "red");
+            $('td:eq(13)', nRow).css('color', "red");
+          }
+
+          if (aData.bPlayerJersey) {
+            $(nRow).addClass('details-control');
           }
 
           return nRow;
@@ -232,15 +285,11 @@
           };
 
           // Calculate sum for columns 3, 11 and 12
-          var iCn = 3;
-          iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
-          $(api.column(iCn).footer()).html(iSum.toLocaleString());
-
           var iCn = 4;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
 
-          var iCn = 12;
+          var iCn = 5;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
 
@@ -249,6 +298,10 @@
           $(api.column(iCn).footer()).html(iSum.toLocaleString());
 
           var iCn = 14;
+          iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
+          $(api.column(iCn).footer()).html(iSum.toLocaleString());
+
+          var iCn = 15;
           iSum = api.column(iCn).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0);
           $(api.column(iCn).footer()).html(iSum.toLocaleString(/*undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }*/));
           if (iSum > 0) {
@@ -378,12 +431,15 @@
       <table id="tableItems" style="position: relative; margin: 0px; width: auto; border: 1px solid black" class="display responsive nowrap">
         <thead>
           <tr>
+            <th></th>
             <th colspan="3" class="columnBorderRight"></th>
             <th colspan="3" style="text-align: center; font-size: 125%; background-color: orange" class="columnBorderRight">Bestand</th>
             <th colspan="5" style="text-align: center; font-size: 125%; background-color: lightgreen" class="columnBorderRight">Einkauf</th>
             <th colspan="5" style="text-align: center; font-size: 125%; background-color: lightblue">Verkauf</th>
+            <th></th>
           </tr>
           <tr>
+            <th></th>
             <th style="background-color: white">#</th>
             <th style="background-color: white">id</th>
             <th class="columnBorderRight" style="background-color: white">Artikel</th>
@@ -400,6 +456,7 @@
             <th style="background-color: white">Einnahmen [€]</th>
             <th style="background-color: white">G/V [€]</th>
             <th style="background-color: white">Ø-Preis</th>
+            <th>bPlayerJersey</th>
           </tr>
         </thead>
         <tbody>
@@ -407,6 +464,7 @@
         </tbody>
         <tfoot>
           <tr>
+            <th></th>
             <th></th>
             <th></th>
             <th class="columnBorderRight">Summe:</th>
@@ -418,6 +476,7 @@
             <th></th>
             <th></th>
             <th class="columnBorderRight" style="text-align: right"></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>

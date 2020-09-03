@@ -5466,11 +5466,51 @@ namespace CornerkickWebMvc.Controllers
           dtm.iWinLoose = cmi.iIncome - (int)((dtm.iPresent + dtm.iSold) * cmi.fPricePresentBuyAve);
           if (dtm.iSold > 0) dtm.sPriceSellAve = (cmi.iIncome / (float)dtm.iSold).ToString("0.00") + " €";
         }
+        dtm.bPlayerJersey = mi.bPlayerJersey;
 
         ltDtItems.Add(dtm);
       }
 
       return Json(new { aaData = ltDtItems }, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpGet]
+    public JsonResult MerchandisingGetJerseyItemSubTable()
+    {
+      string sTable = "";
+
+      CornerkickManager.Club clbUser = ckClub();
+
+      sTable += "<table id=\"tableSoldJerseys\" cellspacing=\"0\" style =\"width: auto\" class=\"compact nowrap\" > ";
+      sTable += "<thead>";
+      sTable += "<tr>";
+      sTable += "<th>#</th>";
+      sTable += "<th>Name</th>";
+      sTable += "<th>Nummer</th>";
+      sTable += "<th>verkauft</th>";
+      sTable += "</tr>";
+      sTable += "</thead>";
+      sTable += "<tbody>";
+
+      List<CornerkickManager.Player> ltPl = new List<CornerkickManager.Player>(clbUser.ltPlayer);
+      ltPl = ltPl.OrderByDescending(x => x.iSoldJerseys).ToList();
+
+      int i = 0;
+      foreach (CornerkickManager.Player pl in ltPl) {
+        sTable += "<tr id=\"rowSoldJersey_" + pl.plGame.iId.ToString() + "\">";
+        sTable += "<td align=\"right\">" + (i + 1).ToString() + "</td>";
+        sTable += "<td align=\"center\">" + pl.plGame.sName + "</td>";
+        sTable += "<td align=\"center\">" + pl.plGame.iNr.ToString() + "</td>";
+        sTable += "<td align=\"right\">" + pl.iSoldJerseys.ToString("N0", getCi()) + "</td>";
+        sTable += "</tr>";
+
+        i++;
+      }
+
+      sTable += "</tbody>";
+      sTable += "</table>";
+
+      return Json(sTable, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult getMerchandisingPrice(int iItemId, int iAmount)
