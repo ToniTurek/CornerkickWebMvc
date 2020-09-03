@@ -5460,7 +5460,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(mi.getPrice(iAmount), JsonRequestBehavior.AllowGet);
     }
 
-    public JsonResult buyMerchandisingItem(int iItemId, int iAmount, string sPriceBuy, float fPriceSell)
+    public JsonResult buyMerchandisingItem(int iItemId, int iAmount, string sPriceBuy, string sPriceSell)
     {
       CornerkickManager.Merchandising.Item mi = CornerkickManager.Merchandising.getItem(iItemId, MvcApplication.ckcore.ltMerchandising);
       if (mi == null) return Json(false, JsonRequestBehavior.AllowGet);
@@ -5471,6 +5471,9 @@ namespace CornerkickWebMvc.Controllers
       sPriceBuy = sPriceBuy.Replace("€", "").Trim();
       float fPriceBuy = 0f;
       if (!float.TryParse(sPriceBuy, NumberStyles.Currency, CultureInfo.InvariantCulture, out fPriceBuy)) return Json(false, JsonRequestBehavior.AllowGet);
+
+      float fPriceSell = 0f;
+      if (!float.TryParse(sPriceSell, NumberStyles.Currency, CultureInfo.InvariantCulture, out fPriceSell)) return Json(false, JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Merchandising.buyMerchandisingItem(clb, mi, iAmount, fPriceBuy, fPriceSell, MvcApplication.ckcore.dtDatum);
 

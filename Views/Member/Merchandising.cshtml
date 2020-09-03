@@ -195,7 +195,7 @@
 
             bnBuy.addEventListener("click", function () {
               this.disabled = true;
-              buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(" + sColumnPricePiece + ")", nRow).text(), parseFloat(itPrice.value));
+              buyItem(aData.iId, parseInt(itAmount.value), $("td:eq(" + sColumnPricePiece + ")", nRow).text(), itPrice.value);
             });
           } else {
             var txtAmount = document.createElement("txt");
@@ -292,13 +292,13 @@
       });
     }
 
-    function buyItem(iItemId, iAmount, sPriceBuy, fPriceSell) {
+    function buyItem(iItemId, iAmount, sPriceBuy, sPriceSell) {
       $.when(getBalanceAjax()).done(function (iBalance) {
         $.ajax({
           url: '/Member/buyMerchandisingItem',
           type: "POST",
           dataType: "JSON",
-          data: { iItemId: iItemId, iAmount: iAmount, sPriceBuy: sPriceBuy, fPriceSell: fPriceSell },
+          data: { iItemId: iItemId, iAmount: iAmount, sPriceBuy: sPriceBuy, sPriceSell: sPriceSell },
           success: function (bReturn) {
             if (bReturn) {
               oTable.ajax.reload();
