@@ -4051,7 +4051,7 @@ namespace CornerkickWebMvc.Controllers
       return View(mdTraining);
     }
 
-    private static CornerkickManager.Main.TrainingPlan.Unit[][] getTrainingPlan(CornerkickManager.Club clb, int iWeek)
+    internal static CornerkickManager.Main.TrainingPlan.Unit[][] getTrainingPlan(CornerkickManager.Club clb, int iWeek)
     {
       if (clb == null) return null;
 
@@ -4210,13 +4210,22 @@ namespace CornerkickWebMvc.Controllers
       public string sName { get; set; }
       public CornerkickManager.Main.TrainingPlan.Unit[][] tuPlan { get; set; }
     }
-    public List<TrainingWeekTemplate> ltTrainingWeekTemplate;
+    public static List<TrainingWeekTemplate> ltTrainingWeekTemplate;
 
     [HttpPost]
     public JsonResult TrainingSetTemplate(int iWeek, int iType)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      setTrainingWeekTemplate(clb, iWeek, iType);
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
+    public static void setTrainingWeekTemplate(CornerkickManager.Club clb, int iWeek, int iType)
+    {
+      if (clb == null) return;
 
       // Define training week templates
       ltTrainingWeekTemplate = new List<TrainingWeekTemplate>();
@@ -4302,8 +4311,8 @@ namespace CornerkickWebMvc.Controllers
       twt3.tuPlan[6][1].iType = 1;
       ltTrainingWeekTemplate.Add(twt3);
 
-      if (iType < 0) Json(false, JsonRequestBehavior.AllowGet);
-      if (iType >= ltTrainingWeekTemplate.Count) Json(false, JsonRequestBehavior.AllowGet);
+      if (iType < 0) return;
+      if (iType >= ltTrainingWeekTemplate.Count) return;
 
       // Get last Sunday
       DateTime dtStartCopy = MvcApplication.ckcore.dtDatum.AddDays(iWeek * 7).Date;
@@ -4336,8 +4345,6 @@ namespace CornerkickWebMvc.Controllers
           clb.training.ltUnit.Add(tuCopy);
         }
       }
-
-      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////

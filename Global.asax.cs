@@ -575,6 +575,30 @@ namespace CornerkickWebMvc
         }
       }
 
+      // Set training template if user has set no training
+      if (ckcore.dtDatum.DayOfWeek == DayOfWeek.Monday && ckcore.dtDatum.Hour == 0 && ckcore.dtDatum.Minute == 0) {
+        foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
+          if (clb.user == null) continue;
+
+          bool bTraining = false;
+
+          CornerkickManager.Main.TrainingPlan.Unit[][] tpWeek = Controllers.MemberController.getTrainingPlan(clb, 0);
+          foreach (CornerkickManager.Main.TrainingPlan.Unit[] tpDay in tpWeek) {
+            foreach (CornerkickManager.Main.TrainingPlan.Unit tu in tpDay) {
+              if (tu.iType > 0) {
+                bTraining = true;
+                break;
+              }
+            }
+            if (bTraining) break;
+          }
+
+          if (!bTraining) {
+            Controllers.MemberController.setTrainingWeekTemplate(clb, 0, 2);
+          }
+        }
+      }
+
       // Beginn of new season
       if (iRetCk == 4) {
         /*
