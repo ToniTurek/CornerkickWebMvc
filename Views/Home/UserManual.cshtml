@@ -588,8 +588,8 @@ Die folgende Tabelle gibt qualitativ an, wie die Fitness, die Moral sowie die FÃ
     <th style="text-align:center">Verl.risiko</th>
   </tr>
   @{
-    for (int iT = 0; iT < MvcApplication.ckcore.plr.ltTraining.Count; iT++) {
-      CornerkickManager.Player.Training tr = MvcApplication.ckcore.plr.ltTraining[iT];
+    for (int iT = 0; iT < MvcApplication.ckcore.plt.ltTraining.Count; iT++) {
+      CornerkickManager.PlayerTool.Training tr = MvcApplication.ckcore.plt.ltTraining[iT];
 
       if (tr.iId < 0) {
         continue;
