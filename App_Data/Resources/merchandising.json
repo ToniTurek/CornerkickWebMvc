@@ -6,112 +6,128 @@
         "name": "Vereinstrikot",
         "price": 30.0,
         "sellfactor": 1.0,
-        "quantityfactor": 1500
+        "quantityfactor": 1500,
+        "player_jersey": true
       },
       {
         "id": 2,
         "name": "Vereinsschal",
         "price": 20.0,
-        "sellfactor": 1.0,
-        "quantityfactor": 2000
+        "sellfactor": 1.2,
+        "quantityfactor": 2000,
+        "player_jersey": false
       },
       {
         "id": 3,
         "name": "Käppi",
         "price": 10.0,
-        "sellfactor": 0.75,
-        "quantityfactor": 5000
+        "sellfactor": 0.7,
+        "quantityfactor": 5000,
+        "player_jersey": false
       },
       {
         "id": 4,
         "name": "T-Shirt",
         "price": 12.5,
         "sellfactor": 0.65,
-        "quantityfactor": 3000
+        "quantityfactor": 3000,
+        "player_jersey": false
       },
       {
         "id": 5,
         "name": "Pullover",
         "price": 40.0,
-        "sellfactor": 0.75,
-        "quantityfactor": 1000
+        "sellfactor": 0.4,
+        "quantityfactor": 1000,
+        "player_jersey": false
       },
       {
         "id": 6,
         "name": "Socken",
         "price": 15.0,
-        "sellfactor": 0.7,
-        "quantityfactor": 2500
+        "sellfactor": 0.6,
+        "quantityfactor": 2500,
+        "player_jersey": false
       },
       {
         "id": 7,
         "name": "Schweißband",
         "price": 4.0,
         "sellfactor": 0.7,
-        "quantityfactor": 12000
+        "quantityfactor": 12000,
+        "player_jersey": false
       },
       {
         "id": 8,
         "name": "Bedruckte Tasse",
         "price": 5.0,
-        "sellfactor": 0.8,
-        "quantityfactor": 10000
+        "sellfactor": 0.7,
+        "quantityfactor": 10000,
+        "player_jersey": false
       },
       {
         "id": 9,
         "name": "Kugelschreiber",
         "price": 0.5,
-        "sellfactor": 0.75,
-        "quantityfactor": 100000
+        "sellfactor": 2.0,
+        "quantityfactor": 100000,
+        "player_jersey": false
       },
       {
         "id": 10,
         "name": "Fußball",
         "price": 50.0,
-        "sellfactor": 0.7,
-        "quantityfactor": 1000
+        "sellfactor": 0.35,
+        "quantityfactor": 1000,
+        "player_jersey": false
       },
       {
         "id": 11,
         "name": "Bettwäsche",
         "price": 60.0,
-        "sellfactor": 0.7,
-        "quantityfactor": 750
+        "sellfactor": 0.3,
+        "quantityfactor": 750,
+        "player_jersey": false
       },
       {
         "id": 12,
         "name": "Handtuch",
         "price": 25.0,
-        "sellfactor": 0.75,
-        "quantityfactor": 2000
+        "sellfactor": 0.35,
+        "quantityfactor": 2000,
+        "player_jersey": false
       },
       {
         "id": 13,
         "name": "Bademantel",
         "price": 35.0,
-        "sellfactor": 0.6,
-        "quantityfactor": 1250
+        "sellfactor": 0.3,
+        "quantityfactor": 1250,
+        "player_jersey": false
       },
       {
         "id": 14,
         "name": "Sonnenbrille",
         "price": 15.0,
-        "sellfactor": 0.6,
-        "quantityfactor": 2500
+        "sellfactor": 0.4,
+        "quantityfactor": 2500,
+        "player_jersey": false
       },
       {
         "id": 15,
         "name": "Krawatte",
         "price": 20.0,
-        "sellfactor": 0.5,
-        "quantityfactor": 2000
+        "sellfactor": 0.3,
+        "quantityfactor": 2000,
+        "player_jersey": false
       },
       {
         "id": 16,
         "name": "Babystrampler",
         "price": 10.0,
-        "sellfactor": 0.5,
-        "quantityfactor": 2500
+        "sellfactor": 0.4,
+        "quantityfactor": 2500,
+        "player_jersey": false
       }
     ]
 }
