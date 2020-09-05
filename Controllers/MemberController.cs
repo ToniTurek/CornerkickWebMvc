@@ -1278,7 +1278,8 @@ namespace CornerkickWebMvc.Controllers
       int iGameType = 0;
       if (club.nextGame != null) iGameType = club.nextGame.iGameType;
 
-      List<CornerkickManager.Player> ltPlayerTeam = club.ltPlayer;
+      // Create copy of player list
+      List<CornerkickManager.Player> ltPlayerTeam = new List<CornerkickManager.Player>(club.ltPlayer);
 
       // Update player numbers if nation
       if (club.bNation) {
@@ -1297,7 +1298,7 @@ namespace CornerkickWebMvc.Controllers
 
             ltPlayerTeam.Clear();
             foreach (CornerkickGame.Player plG in user.game.player[iHA]) {
-              ltPlayerTeam.Add(new CornerkickManager.Player() { plGame = plG });
+              ltPlayerTeam.Add(CornerkickManager.PlayerTool.getPlayerFromId(plG.iId, club.ltPlayer));
             }
           }
         }
