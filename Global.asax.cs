@@ -585,7 +585,7 @@ namespace CornerkickWebMvc
           CornerkickManager.Main.TrainingPlan.Unit[][] tpWeek = Controllers.MemberController.getTrainingPlan(clb, 0);
           foreach (CornerkickManager.Main.TrainingPlan.Unit[] tpDay in tpWeek) {
             foreach (CornerkickManager.Main.TrainingPlan.Unit tu in tpDay) {
-              if (tu.iType > 0) {
+              if (tu.iType > 0 && tu.iType < 100) {
                 bTraining = true;
                 break;
               }
