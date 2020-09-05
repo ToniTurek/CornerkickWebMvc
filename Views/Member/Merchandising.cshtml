@@ -323,6 +323,26 @@
           cell1.text(fPrice.toFixed(2) + " €");
           cell2.text((fPrice * iAmount).toLocaleString() + " €");
           bnBuy.disabled = iAmount === 0;
+
+          // Calculate sum and add to table footer
+          var tbl = document.getElementById("tableItems");
+          var iColumn = 0;
+          var iSum = 0;
+
+          iColumn = 6;
+          iSum = 0;
+          for (var i = 0, row; row = tbl.tBodies[0].rows[i]; i++) {
+            var ipt = row.cells[iColumn].getElementsByTagName("input")[0];
+            iSum = iSum + parseInt(ipt.value);
+          }
+          tbl.tFoot.rows[0].cells[iColumn].innerText = iSum.toLocaleString();
+
+          iColumn = 8;
+          iSum = 0;
+          for (var i = 0, row; row = tbl.tBodies[0].rows[i]; i++) {
+            iSum = iSum + parseInt(row.cells[iColumn].innerText.replace(/\./g, '').replace('€'));
+          }
+          tbl.tFoot.rows[0].cells[iColumn].innerText = iSum.toLocaleString() + " €";
         },
         error: function (xhr) {
           alert(xhr.responseText);
