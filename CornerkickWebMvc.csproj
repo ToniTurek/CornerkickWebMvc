@@ -1037,6 +1037,10 @@
     <Content Include="Content\Images\sponsors\7.png" />
     <Content Include="Content\Images\sponsors\8.png" />
     <Content Include="Content\Images\sponsors\9.png" />
+    <Content Include="Content\Images\stadium\carpark.png" />
+    <Content Include="Content\Images\stadium\carpark_connection_left.png" />
+    <Content Include="Content\Images\stadium\carpark_connection_right.png" />
+    <Content Include="Content\Images\stadium\carpark_construct.png" />
     <Content Include="Content\Images\stadium\field.png" />
     <Content Include="Content\Images\stadium\field_full.png" />
     <Content Include="Content\Images\stadium\stadion_L.jpg" />
@@ -1356,6 +1360,7 @@
     <Content Include="Scripts\Player.js" />
     <Content Include="Scripts\Scorer.js" />
     <Content Include="Scripts\spectrum.js" />
+    <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ResentActivationLink.cshtml" />
     <Content Include="Views\Shared\_Layout_plain.cshtml" />
     <Content Include="Views\Member\Transfer.cshtml" />
@@ -1475,7 +1480,6 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
-    <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
     <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />

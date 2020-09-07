@@ -4843,6 +4843,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sTrainingCourts.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sTrainingCourts[clb.buildings.bgTrainingCourts.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sTrainingCourts[clb.buildings.bgTrainingCourts.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iTrainingCourtsGround[Math.Max(clb.buildings.bgTrainingCourts.iLevel, clb.buildings.bgTrainingCourts.ctn != null ? clb.buildings.bgTrainingCourts.ctn.iLevelNew : 0)];
       if (clb.buildings.bgTrainingCourts.ctn != null && clb.buildings.bgTrainingCourts.ctn.iLevelNew > clb.buildings.bgTrainingCourts.iLevel) {
         bdgsAll[0].nDaysConstruct      = (int)clb.buildings.bgTrainingCourts.ctn.fDaysConstruct;
         bdgsAll[0].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildTrainingCourts(clb)[1];
@@ -4862,6 +4863,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sGym.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sGym[clb.buildings.bgGym.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sGym[clb.buildings.bgGym.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iGymGround[Math.Max(clb.buildings.bgGym.iLevel, clb.buildings.bgGym.ctn != null ? clb.buildings.bgGym.ctn.iLevelNew : 0)];
       if (clb.buildings.bgGym.ctn != null && clb.buildings.bgGym.ctn.iLevelNew > clb.buildings.bgGym.iLevel) {
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgGym.ctn.fDaysConstruct;
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildGym(clb)[1];
@@ -4881,6 +4883,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sSpa.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sSpa[clb.buildings.bgSpa.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sSpa[clb.buildings.bgSpa.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iSpaGround[Math.Max(clb.buildings.bgSpa.iLevel, clb.buildings.bgSpa.ctn != null ? clb.buildings.bgSpa.ctn.iLevelNew : 0)];
       if (clb.buildings.bgSpa.ctn != null && clb.buildings.bgSpa.ctn.iLevelNew > clb.buildings.bgSpa.iLevel) {
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgSpa.ctn.fDaysConstruct;
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildSpa(clb)[1];
@@ -4900,6 +4903,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sJouthInternat.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sJouthInternat[clb.buildings.bgJouthInternat.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sJouthInternat[clb.buildings.bgJouthInternat.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iJouthInternatGround[Math.Max(clb.buildings.bgJouthInternat.iLevel, clb.buildings.bgJouthInternat.ctn != null ? clb.buildings.bgJouthInternat.ctn.iLevelNew : 0)];
       if (clb.buildings.bgJouthInternat.ctn != null && clb.buildings.bgJouthInternat.ctn.iLevelNew > clb.buildings.bgJouthInternat.iLevel) {
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgJouthInternat.ctn.fDaysConstruct;
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildJouthInternat(clb)[1];
@@ -4919,6 +4923,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sClubHouse.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sClubHouse[clb.buildings.bgClubHouse.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sClubHouse[clb.buildings.bgClubHouse.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iClubHouseGround[Math.Max(clb.buildings.bgClubHouse.iLevel, clb.buildings.bgClubHouse.ctn != null ? clb.buildings.bgClubHouse.ctn.iLevelNew : 0)];
       if (clb.buildings.bgClubHouse.ctn != null && clb.buildings.bgClubHouse.ctn.iLevelNew > clb.buildings.bgClubHouse.iLevel) {
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgClubHouse.ctn.fDaysConstruct;
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildClubHouse(clb)[1];
@@ -4938,6 +4943,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sClubMuseum.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sClubMuseum[clb.buildings.bgClubMuseum.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sClubMuseum[clb.buildings.bgClubMuseum.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iClubMuseumGround[Math.Max(clb.buildings.bgClubMuseum.iLevel, clb.buildings.bgClubMuseum.ctn != null ? clb.buildings.bgClubMuseum.ctn.iLevelNew : 0)];
       if (clb.buildings.bgClubMuseum.ctn != null && clb.buildings.bgClubMuseum.ctn.iLevelNew > clb.buildings.bgClubMuseum.iLevel) {
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgClubMuseum.ctn.fDaysConstruct;
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildClubMuseum(clb)[1];
@@ -4952,12 +4958,13 @@ namespace CornerkickWebMvc.Controllers
 
       iType++;
       iCostDays = CornerkickManager.Stadium.getCostDaysContructCarpark(Math.Max(clb.stadium.iCarpark + 1, clb.stadium.iCarparkNew), clb.stadium.iCarpark, usr);
-      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sCarparkName;
       bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sCarparkName;
       bdgsAll[iType].bTypeInt = true;
       bdgsAll[iType].iLevel = clb.stadium.iCarpark;
       bdgsAll[iType].sName = clb.stadium.iCarpark.ToString();
       bdgsAll[iType].sNameNext = clb.stadium.iCarparkNew.ToString();
+      bdgsAll[iType].nRepeat = (int)Math.Ceiling(Math.Max(clb.stadium.iCarpark, clb.stadium.iCarparkNew) / (float)CornerkickManager.Stadium.iCarparkPerGround);
       bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
       bdgsAll[iType].iLevelReq = CornerkickManager.UI.getRequiredFeature(clb, 2);
       if (clb.stadium.iCarparkNew > clb.stadium.iCarpark) {
@@ -4971,12 +4978,13 @@ namespace CornerkickWebMvc.Controllers
 
       iType++;
       iCostDays = CornerkickManager.Stadium.getCostDaysContructTicketcounter(Math.Max(clb.stadium.iTicketcounter + 1, clb.stadium.iTicketcounterNew), clb.stadium.iTicketcounter, usr);
-      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTicketcounterName;
       bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = CornerkickManager.Stadium.sTicketcounterName;
       bdgsAll[iType].bTypeInt = true;
       bdgsAll[iType].iLevel = clb.stadium.iTicketcounter;
       bdgsAll[iType].sName = clb.stadium.iTicketcounter.ToString();
       bdgsAll[iType].sNameNext = clb.stadium.iTicketcounterNew.ToString();
+      bdgsAll[iType].nRepeat = (int)Math.Ceiling(Math.Max(clb.stadium.iTicketcounter, clb.stadium.iTicketcounterNew) / (float)CornerkickManager.Stadium.iTicketcounterPerGround);
       bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
       bdgsAll[iType].iLevelReq = CornerkickManager.UI.getRequiredFeature(clb, 3);
       if (clb.stadium.iTicketcounterNew > clb.stadium.iTicketcounter) {
@@ -4989,11 +4997,12 @@ namespace CornerkickWebMvc.Controllers
       else                                                                     buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       iType++;
-      bdgsAll[iType].sCategory = clb.buildings.bgFanshop.sName;
       bdgsAll[iType].iType = iType;
+      bdgsAll[iType].sCategory = clb.buildings.bgFanshop.sName;
       bdgsAll[iType].bTypeInt = true;
       bdgsAll[iType].iLevel = clb.buildings.bgFanshop.iLevel;
       bdgsAll[iType].sName = clb.buildings.bgFanshop.iLevel.ToString();
+      bdgsAll[iType].nRepeat = (int)Math.Ceiling(Math.Max(clb.buildings.bgFanshop.iLevel, clb.buildings.bgFanshop.ctn != null ? clb.buildings.bgFanshop.ctn.iLevelNew : 0) / (float)CornerkickManager.Stadium.iFanshopPerGround);
       bdgsAll[iType].iLevelReq = CornerkickManager.UI.getRequiredFeature(clb, 4, iCustomers: (int)clb.getAttractionFactor(MvcApplication.ckcore.iSeason));
       if (clb.buildings.bgFanshop.ctn != null && clb.buildings.bgFanshop.ctn.iLevelNew > clb.buildings.bgFanshop.iLevel) {
         bdgsAll[iType].sNameNext = clb.buildings.bgFanshop.ctn.iLevelNew.ToString();
@@ -5017,6 +5026,7 @@ namespace CornerkickWebMvc.Controllers
       bdgsAll[iType].iLevelMax = CornerkickManager.Stadium.sMassTransit.Length;
       bdgsAll[iType].sName = CornerkickManager.Stadium.sMassTransit[clb.buildings.bgMassTransit.iLevel];
       bdgsAll[iType].sNameNext = CornerkickManager.Stadium.sMassTransit[clb.buildings.bgMassTransit.iLevel + 1];
+      bdgsAll[iType].nRepeat = CornerkickManager.Stadium.iMassTransitGround[Math.Max(clb.buildings.bgMassTransit.iLevel, clb.buildings.bgMassTransit.ctn != null ? clb.buildings.bgMassTransit.ctn.iLevelNew : 0)];
       if (clb.buildings.bgMassTransit.ctn != null && clb.buildings.bgMassTransit.ctn.iLevelNew > clb.buildings.bgMassTransit.iLevel) {
         bdgsAll[iType].nDaysConstruct = (int)clb.buildings.bgMassTransit.ctn.fDaysConstruct;
         bdgsAll[iType].nDaysConstructTotal = CornerkickManager.Stadium.getCostDaysBuildMassTransit(clb)[1];
@@ -5026,8 +5036,8 @@ namespace CornerkickWebMvc.Controllers
         bdgsAll[iType].nDaysConstructTotal = iCostDays[1];
         bdgsAll[iType].bDispoOk = MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb);
       }
-      if (clb.buildings.bgMassTransit.iLevel > 0 || (clb.buildings.bgMassTransit.ctn != null && clb.buildings.bgMassTransit.ctn.iLevelNew > 0)) buildings.ltBuildings.Add(bdgsAll[iType]);
-      else buildings.ltBuildingsFree.Add(bdgsAll[iType]);
+      if (clb.buildings.bgMassTransit.iLevel > 0 || (clb.buildings.bgMassTransit.ctn != null && clb.buildings.bgMassTransit.ctn.iLevelNew > 0)) buildings.ltBuildings    .Add(bdgsAll[iType]);
+      else                                                                                                                                      buildings.ltBuildingsFree.Add(bdgsAll[iType]);
 
       buildings.iGround = (byte)Math.Max(clb.buildings.iGround, buildings.ltBuildings.Count);
       buildings.sCostBuyGround = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround).ToString("N0", getCi());
@@ -5084,6 +5094,11 @@ namespace CornerkickWebMvc.Controllers
 
       if (iType == 6) { // Carpark
         if (clb.stadium.iCarparkNew != iLevel) {
+          if (Math.Ceiling(iLevel / (float)CornerkickManager.Stadium.iCarparkPerGround) > Math.Ceiling(clb.stadium.iCarpark / (float)CornerkickManager.Stadium.iCarparkPerGround)) {
+            if (clb.buildings.iGround <= CornerkickManager.Stadium.getRequiredGrounds(clb)) {
+              return Json("Sie benötigen erst ein neues Grundstück", JsonRequestBehavior.AllowGet);
+            }
+          }
           clb.stadium.iCarparkNew = iLevel;
           int[] iCostDaysCp = CornerkickManager.Stadium.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
           clb.stadium.iCarparkDaysConstruct = iCostDaysCp[1];
@@ -5105,7 +5120,7 @@ namespace CornerkickWebMvc.Controllers
       return Json("Der Bau des " + sConstructionNames[iType] + "s wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
     
-    [HttpPost]
+    [HttpGet]
     public JsonResult StadiumSurrBuyGround()
     {
       CornerkickManager.Club clb = ckClub();

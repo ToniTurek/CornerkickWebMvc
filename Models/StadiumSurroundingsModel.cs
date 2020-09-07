@@ -68,6 +68,7 @@ namespace CornerkickWebMvc.Models
       public int nDaysConstructTotal { get; set; }
       public string sCostConstructNext { get; set; }
       public bool bDispoOk { get; set; }
+      public int nRepeat { get; set; } // Number of repeated buildings
     }
   }
 }
