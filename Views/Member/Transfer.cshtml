@@ -56,6 +56,8 @@
 
     var jTable;
 
+    var bSound = true;
+
     function handleClick(rBOffer) {
       var bnAcceptOffer = document.getElementById("bnAcceptOffer");
       var bnMakeOffer   = document.getElementById("bnMakeOffer");
@@ -87,6 +89,7 @@
 
     $(document).ready(function () {
       var bNation = @Html.Raw(Json.Encode(Model.bNation));
+      bSound = @Html.Raw(Json.Encode(Model.bSound));
 
       var bnMakeOffer = document.getElementById("bnMakeOffer");
       bnMakeOffer  .style.display = "none";
@@ -564,10 +567,12 @@
                 alert(response);
 
                 // Play cash sound
-                var audioSell = new Audio("/Content/Sound/cash.wav");
-                if (audioSell) {
-                  audioSell.volume = 0.5;
-                  audioSell.play();
+                if (bSound) {
+                  var audioSell = new Audio("/Content/Sound/cash.wav");
+                  if (audioSell) {
+                    audioSell.volume = 0.5;
+                    audioSell.play();
+                  }
                 }
 
                 jTable.ajax.reload();

@@ -3321,8 +3321,14 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Transfer(Models.TransferModel mdTransfer)
     {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return View(mdTransfer);
+
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return View(mdTransfer);
+
+      mdTransfer.bSound = true;
+      if (usr.lti.Count > 1) mdTransfer.bSound = usr.lti[1] > 0;
 
       mdTransfer.bTransferlistOpen = MvcApplication.ckcore.dtDatum.Date.CompareTo(MvcApplication.ckcore.dtSeasonStart.Date) > 0;
 

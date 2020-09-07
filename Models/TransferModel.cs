@@ -41,6 +41,8 @@ namespace CornerkickWebMvc.Models
 
     public bool bNation { get; set; }
 
+    public bool bSound { get; set; }
+
     public TransferModel()
     {
       ltDdlFilterPos = new List<SelectListItem>();
