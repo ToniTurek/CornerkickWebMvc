@@ -5504,7 +5504,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Club clbUser = ckClub();
 
-      sTable += "<table id=\"tableSoldJerseys\" cellspacing=\"0\" style =\"width: auto\" class=\"compact nowrap\" > ";
+      sTable += "<table id=\"tableSoldJerseys\" class=\"display compact nowrap\" > ";
       sTable += "<thead>";
       sTable += "<tr>";
       sTable += "<th>#</th>";
