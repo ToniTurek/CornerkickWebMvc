@@ -1,7 +1,7 @@
 ﻿@model CornerkickWebMvc.Models.StadiumSurroundingsModel
 
 @{
-  ViewBag.Title = "Stadionumgebung";
+  ViewBag.Title = "Vereinsgelände";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!doctype html>
@@ -416,7 +416,7 @@
 </head>
 
 <body>
-  <h2>Stadionumgebung</h2>
+  <h2>@ViewBag.Title</h2>
   <div id="divGroundContainer" style="position: relative; height: 600px"></div>
 </body>
 </html>
