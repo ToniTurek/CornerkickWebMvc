@@ -1,0 +1,73 @@
+{
+  "training_court":
+    {
+      "building_type_name": "Trainingsgelände",
+      "names": [ "Rasenplatz", "Einfaches Trainingsgelände", "Mittleres Trainingsgelände", "Großes Trainingsgelände", "Luxus Trainingsgelände" ],
+      "costs": [ 0, 2000000, 10000000, 30000000, 100000000 ],
+      "construct": [ 0, 90, 180, 320, 600 ],
+      "grounds": [ 1, 1, 1, 1, 2 ]
+    },
+  "gym":
+    {
+      "building_type_name": "Fitnessraum",
+      "names": [ "Nichts", "Fitnessräder", "Einfacher Fitnessraum", "Großer Fitnessraum", "Unterdruckhalle" ],
+      "costs": [ 0, 100000, 500000, 3000000, 20000000 ],
+      "construct": [ 0, 30, 180, 320, 600 ],
+      "grounds": [ 1, 1, 1, 1, 1 ]
+    },
+  "spa":
+    {
+      "building_type_name": "Wellnessraum",
+      "names": [ "Nichts", "Whirlpool", "Schwimmbecken", "Saunalandschaft", "Wellnessoase" ],
+      "costs": [ 0, 100000, 500000, 3000000, 20000000 ],
+      "construct": [ 0, 30, 180, 320, 600 ],
+      "grounds": [ 1, 1, 1, 1, 1 ]
+    },
+  "jouth_internat":
+    {
+      "building_type_name": "Jugendinternat",
+      "names": [ "Keins", "Einfaches Jugendinternat", "Mittleres Jugendinternat", "Großes Jugendinternat", "Nachwuchsleistungszentrum" ],
+      "costs": [ 0, 1500000, 7000000, 20000000, 60000000 ],
+      "construct": [ 0, 60, 120, 240, 480 ],
+      "grounds": [ 1, 1, 1, 1, 2 ]
+    },
+  "club_house":
+    {
+      "building_type_name": "Vereinsheim",
+      "names": [ "Keins", "Einfaches Vereinsheim", "Mittleres Vereinsheim", "Großes Vereinsheim", "Luxus Vereinsheim" ],
+      "costs": [ 0, 2000000, 10000000, 30000000, 100000000 ],
+      "construct": [ 0, 90, 180, 320, 600 ],
+      "grounds": [ 1, 1, 1, 1, 2 ]
+    },
+  "club_museum":
+    {
+      "building_type_name": "Vereinsmuseum",
+      "names": [ "Keins", "Einfaches Vereinsmuseum", "Mittleres Vereinsmuseum", "Großes Vereinsmuseum", "Historisches Vereinsdorf" ],
+      "costs": [ 0, 2000000, 10000000, 30000000, 100000000 ],
+      "construct": [ 0, 90, 180, 320, 600 ],
+      "grounds": [ 1, 1, 1, 1, 2 ]
+    },
+  "mass_transit":
+    {
+      "building_type_name": "ÖPNV-Anbindung",
+      "names": [ "Keine", "Bushaltestelle", "S/U-Bahnhof", "Regional-/Fernbahnhof", "Flughafen" ],
+      "costs": [ 0, 2500000, 12500000, 40000000, 150000000 ],
+      "construct": [ 0, 90, 180, 320, 600 ],
+      "grounds": [ 1, 1, 1, 2, 3 ]
+    },
+  "carpark":
+    {
+      "building_type_name": "Parkplätze",
+      "capacity_per_ground": 750
+    },
+  "ticket_counter":
+    {
+      "building_type_name": "Ticketschalter",
+      "capacity_per_ground": 30
+    },
+  "fanshop":
+    {
+      "building_type_name": "Fanshop",
+      "capacity_per_ground": 40
+    }
+}
