@@ -58,43 +58,60 @@
         div1.id = "divGround_" + building.iType.toString();
 
         if (building.iType === 6) {
-          var nCarparks = Math.max(Math.min(building.iLevel - (iRep * 750), 750) / 30, 1);
+          var nCarparks = Math.max(Math.ceil(Math.min(building.iLevel - (iRep * 750), 750) / 30), 1);
 
           if (nCarparks >= 25 || building.nDaysConstruct === 0) {
-            if (nCarparks > 5) {
+            if (nCarparks > 0) {
+              var imgCarparkIn = document.createElement("img");
+              imgCarparkIn.className = "imgCarpark";
+              imgCarparkIn.style.position = "absolute";
+              imgCarparkIn.style.top = "0px";
+              imgCarparkIn.style.left = "-13px";
+              imgCarparkIn.src = "/Content/Images/stadium/carpark_connection_road_in.png";
+              div1.appendChild(imgCarparkIn);
+
+              var imgCarparkOut = document.createElement("img");
+              imgCarparkOut.className = "imgCarpark";
+              imgCarparkOut.style.position = "absolute";
+              imgCarparkOut.style.top = (84 * Math.trunc(nCarparks / 10)).toString() + "px";
+              imgCarparkOut.style.right = "-13px";
+              imgCarparkOut.src = "/Content/Images/stadium/carpark_connection_road_out.png";
+              div1.appendChild(imgCarparkOut);
+            }
+            if (nCarparks >= 10) {
               var imgCarpark = document.createElement("img");
               imgCarpark.className = "imgCarpark";
               imgCarpark.style.position = "absolute";
               imgCarpark.style.top = "0px";
-              imgCarpark.style.left = "10px";
-              imgCarpark.src = "/Content/Images/stadium/carpark_connection_left.png";
+              imgCarpark.style.left = "244px";
+              imgCarpark.src = "/Content/Images/stadium/carpark_connection_right.png";
               div1.appendChild(imgCarpark);
             }
-            if (nCarparks > 10) {
+            if (nCarparks >= 10) {
               var imgCarpark = document.createElement("img");
               imgCarpark.className = "imgCarpark";
               imgCarpark.style.position = "absolute";
               imgCarpark.style.top = "42px";
-              imgCarpark.style.left = "244px";
-              imgCarpark.src = "/Content/Images/stadium/carpark_connection_right.png";
-              div1.appendChild(imgCarpark);
-            }
-            if (nCarparks > 15) {
-              var imgCarpark = document.createElement("img");
-              imgCarpark.className = "imgCarpark";
-              imgCarpark.style.position = "absolute";
-              imgCarpark.style.top = "84px";
               imgCarpark.style.left = "10px";
               imgCarpark.src = "/Content/Images/stadium/carpark_connection_left.png";
               div1.appendChild(imgCarpark);
             }
-            if (nCarparks > 20) {
+            if (nCarparks >= 20) {
+              var imgCarpark = document.createElement("img");
+              imgCarpark.className = "imgCarpark";
+              imgCarpark.style.position = "absolute";
+              imgCarpark.style.top = "84px";
+              imgCarpark.style.left = "244px";
+              imgCarpark.src = "/Content/Images/stadium/carpark_connection_right.png";
+              div1.appendChild(imgCarpark);
+            }
+            if (nCarparks >= 20) {
               var imgCarpark = document.createElement("img");
               imgCarpark.className = "imgCarpark";
               imgCarpark.style.position = "absolute";
               imgCarpark.style.top = "126px";
-              imgCarpark.style.left = "244px";
-              imgCarpark.src = "/Content/Images/stadium/carpark_connection_right.png";
+              imgCarpark.style.left = "10px";
+              imgCarpark.src = "/Content/Images/stadium/carpark_connection_left.png";
               div1.appendChild(imgCarpark);
             }
           }
@@ -141,6 +158,9 @@
             bCategory.style.width = "100%";
             bCategory.style.left = "0px";
             bCategory.style.fontSize = "22px";
+            if (building.iType === 6) {
+              bCategory.style.textShadow = "0px 0px 6px white";
+            }
             div1.appendChild(bCategory);
 
             var pCurr = document.createElement("p");
@@ -152,6 +172,9 @@
             pCurr.style.marginBottom = "2px";
             if (!bDisabled) {
               pCurr.innerText = "Akt.: " + building.sName;
+            }
+            if (building.iType === 6) {
+              pCurr.style.textShadow = "0px 0px 6px white";
             }
             div1.appendChild(pCurr);
           }
@@ -330,6 +353,9 @@
         txtNew.style.left = "0px";
         txtNew.style.width = "48%";
         txtNew.style.fontSize = "16px";
+        if (building.iType === 6) {
+          txtNew.style.textShadow = "0px 0px 6px white";
+        }
         divNew.appendChild(txtNew);
 
         var iptNew = document.createElement("input");

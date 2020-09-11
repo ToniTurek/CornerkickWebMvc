@@ -1040,6 +1040,8 @@
     <Content Include="Content\Images\stadium\carpark.png" />
     <Content Include="Content\Images\stadium\carpark_connection_left.png" />
     <Content Include="Content\Images\stadium\carpark_connection_right.png" />
+    <Content Include="Content\Images\stadium\carpark_connection_road_in.png" />
+    <Content Include="Content\Images\stadium\carpark_connection_road_out.png" />
     <Content Include="Content\Images\stadium\carpark_construct.png" />
     <Content Include="Content\Images\stadium\field.png" />
     <Content Include="Content\Images\stadium\field_full.png" />
