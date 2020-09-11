@@ -181,7 +181,7 @@
         });
 
         var iSeasonalTicketsTotal = @Model.iSeasonalTickets[0] + @Model.iSeasonalTickets[1] + @Model.iSeasonalTickets[2];
-        $("#txtSeasonalTickets").text("Verkaufte Dauerkarten: " + iSeasonalTicketsTotal.toString() + " (" + @Model.iSeasonalTickets[0].ToString() + "/" + @Model.iSeasonalTickets[1].ToString() + "/" + @Model.iSeasonalTickets[2].ToString() + ")");
+        $("#txtSeasonalTickets").text("Verkaufte Dauerkarten: " + iSeasonalTicketsTotal.toLocaleString() + " (" + (@Model.iSeasonalTickets[0]).toLocaleString() + "/" + (@Model.iSeasonalTickets[1]).toLocaleString() + "/" + (@Model.iSeasonalTickets[2]).toLocaleString() + ")");
       }
 
       $('.tbPriceSeason').each(function () {
