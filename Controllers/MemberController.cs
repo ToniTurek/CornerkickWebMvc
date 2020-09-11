@@ -6372,8 +6372,8 @@ namespace CornerkickWebMvc.Controllers
             iID = ltEvents.Count,
             sTitle = "Nachtruhe",
             sDescription = "Nachtruhe",
-            sStartDate = dt.Add(new TimeSpan(23, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
-            sEndDate = dt.AddDays(1).Add(new TimeSpan(7, 0, 0)).ToString("yyyy-MM-ddTHH:mm:ss"),
+            sStartDate = dt.Add(CornerkickManager.Main.tsNightStart).ToString("yyyy-MM-ddTHH:mm:ss"),
+            sEndDate = dt.AddDays(1).Add(CornerkickManager.Main.tsNightEnd).ToString("yyyy-MM-ddTHH:mm:ss"),
             sColor = "rgb(0, 0, 140)",
             bEditable = false,
             bAllDay = false
@@ -8195,6 +8195,9 @@ namespace CornerkickWebMvc.Controllers
 
     public int compareDates(DateTime dt)
     {
+      if (dt.TimeOfDay.CompareTo(CornerkickManager.Main.tsNightStart) >= 0) return -3;
+      if (dt.TimeOfDay.CompareTo(CornerkickManager.Main.tsNightEnd)   <= 0) return -3;
+
       CornerkickManager.Club club = ckClub();
       if (club == null) return 0;
 
