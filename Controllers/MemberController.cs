@@ -6909,6 +6909,8 @@ namespace CornerkickWebMvc.Controllers
         }
 
         sReturn = "Sie haben den Jugendtag geplant.";
+      } else if (iEventId == 4) {
+        sReturn = "Sie haben die Sommerparty geplant.";
       }
 
       clb.ltEvent.Add(evi);

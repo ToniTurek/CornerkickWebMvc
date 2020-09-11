@@ -259,6 +259,9 @@
           <li>
             <a href="#h4CalendarEventsJouthDay">Jugendtag</a>
           </li>
+          <li>
+            <a href="#h4CalendarEventsSummerParty">Sommerparty</a>
+          </li>
         </ul>
       </li>
     </ol>
@@ -460,7 +463,7 @@ Dies geschieht bei einer Krisensitzung:<br />
     Achtung: Spieler mit einer Moral größer als 105% verlieren 5% Moral!
   </li>
 </ul>
-Beispiel: Spieler A hat nur noch eine Moral von 80%. Bei nach einer Krisensitzung erhält er zunächst (100% - 80%)/2 = 10% Moral und anschließend zusätzlich 5%. Er hat nach der Krisensitzung also eine Moral von 95%.<br />
+Beispiel: Spieler A hat nur noch eine Moral von 80%. Bei einer Krisensitzung erhält er zunächst (100% - 80%)/2 = 10% Moral und anschließend zusätzlich 5%. Er hat nach der Krisensitzung also eine Moral von 95%.<br />
 Das Ausrichten einer Krisensitzung ist kostenlos.<br /><br />
 Bemerke: Krisensitzungen haben nur zwei Mal pro Saison einen Effekt.
 
@@ -480,6 +483,20 @@ Bemerke: Eine Weihnachtsfeier hat nur ein Mal pro Saison und nur im Dezember ein
 <h4><span id="h4CalendarEventsJouthDay" class="ckLink"></span>Jugendtag</h4>
 Bei einem Jugendtag entdeckst du einen neuen Jugendspieler, solange der letzte Jugendtag länger als 6 Monate her ist.<br />
 Die Kosten des Jugendtages belaufen sich auf @MvcApplication.ckcore.ltEvent[2].iCost.ToString() €.
+
+<h4><span id="h4CalendarEventsSummerParty" class="ckLink"></span>Sommerparty</h4>
+Dies geschieht bei einer Sommerparty:<br />
+<ul>
+  <li>
+    Alle Spieler gewinnen 4% Moral skaliert mit der vierten Potenz der aktuellen Moral:
+    \[Moral_{neu} = Moral_{alt} + (4\% / Moral_{alt}^{4})\]
+    Ein Spieler mit einer niedrigen Moral gewinnt somit mehr Moral durch die Sommerparty als ein Spieler mit einer hohen Moral.<br /><br />
+    Beispiel A: Spieler A hat eine Moral von 90%. Durch die Sommerparty gewinnt er 4% / 90%^4 = 6.1% und hat somit nach der Sommerparty eine Moral von 96.1%.<br />
+    Beispiel B: Spieler B hat eine Moral von 110%. Durch die Sommerparty gewinnt er 4% / 110%^4 = 2.73% und hat somit nach der Sommerparty eine Moral von 112.73%.<br />
+  </li>
+</ul>
+Die Kosten der Sommerparty belaufen sich auf @MvcApplication.ckcore.ltEvent[3].iCost.ToString() €.<br /><br />
+Bemerke: Eine Sommerparty hat nur zwei Mal pro Saison und nur zwischen April und September einen Effekt.
 
 <h2><span id="h2Team" class="ckLink"></span>Mannschaft</h2>
 <h3><span id="h3Team" class="ckLink"></span>Aufstellung</h3>
@@ -533,7 +550,7 @@ Folgende taktische Einstellungen stehen zur Verfügung:
   </li>
   <li>
     <u>Aggresivität</u><br />
-    Je höher die Aggresivität eingestellt ist, desto eher werden Zweikämpfe gewonnen. Gleichzeitig steigt aber auch das Risiko für Fouls und Karten.
+    Je höher die Aggressivität eingestellt ist, desto eher werden Zweikämpfe gewonnen. Gleichzeitig steigt aber auch das Risiko für Fouls und Karten.
   </li>
   <li>
     <u>Schusshäufigkeit</u><br />
