@@ -431,7 +431,7 @@
   function moveIntoProTeam() {
     $.ajax({
       url: "/Member/PlayerDetailsMoveIntoProTeam",
-      type: 'POST',
+      type: 'GET',
       traditional: true,
       data: { iPlayerId: @Model.iPlayer },
       dataType: "json",
