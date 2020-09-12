@@ -296,6 +296,8 @@
             success: function (bOk) {
               if (bOk) {
                 plotCFM();
+                printAveSkill(@Model.iPlayer);
+
                 $("#dialogDoping").dialog("close");
               } else {
                 alert("Der Inhalt Ihrer Schwarzen Kasse reicht leider nicht aus...");
@@ -313,6 +315,7 @@
     });
 
     plotStars(document.getElementById("divStars"), @player.iTalent);
+    printAveSkill(@Model.iPlayer);
 
     // Show tutorial
     tt = @Html.Raw(Json.Encode(Model.tutorial));
@@ -334,6 +337,7 @@
         // Switch buttons
         if (response.indexOf("wurde auf die Transferliste gesetzt") > -1) {
           plotCFM();
+          printAveSkill(@Model.iPlayer);
           setTransferlistButton(0);
         } else {
           setTransferlistButton(1);
@@ -426,6 +430,7 @@
         }
 
         plotCFM();
+        printAveSkill(@Model.iPlayer);
       },
       error: function (xhr) {
         debugger;
@@ -437,7 +442,7 @@
   function moveIntoProTeam() {
     $.ajax({
       url: "/Member/PlayerDetailsMoveIntoProTeam",
-      type: 'POST',
+      type: 'GET',
       traditional: true,
       data: { iPlayerId: @Model.iPlayer },
       dataType: "json",
@@ -480,6 +485,23 @@
       }
       parent.appendChild(imgStar);
     }
+  }
+
+  function printAveSkill(iPlayerId) {
+    $.ajax({
+      url: "/Member/PlayerDetailsGetAveSkill",
+      type: "GET",
+      dataType: "JSON",
+      data: { iPlayerId: iPlayerId },
+      success: function (fAveSkill) {
+        document.getElementById("txtAveSkill").innerText = fAveSkill[0].toFixed(1);
+        document.getElementById("tdAveSkill").innerText = fAveSkill[0].toFixed(1) + " (" + fAveSkill[1].toFixed(1) + ")";
+      },
+      error: function (xhr) {
+        debugger;
+        alert(xhr);
+      }
+    });
   }
 
   function getXY(fAngle, fRadius) {
@@ -785,7 +807,6 @@
   }
 
   @{
-    string sAveSkill = CornerkickGame.Tool.getAveSkill(player.plGame).ToString("0.0");
     string sTalent = (player.iTalent + 1).ToString();
     string sAge = ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum)).ToString();
     string sPos = CornerkickManager.PlayerTool.getStrPos(player.plGame);
@@ -829,7 +850,7 @@
 
       <div id="divStars" style="position: absolute; top: 0px; left: 110px; width: 84px; height: 84px; text-align: center">
         <text style="position: absolute; top: 22px; left: 0px; width: 100%; font-size: 10px">@sPos</text>
-        <b style="position: absolute; top: 26px; left: 0px; font-size: 26px; width: 100%">@sAveSkill</b>
+        <b id="txtAveSkill" style="position: absolute; top: 26px; left: 0px; font-size: 26px; width: 100%"></b>
         <text style="position: absolute; top: 54px; left: 0px; width: 100%; font-size: 10px">@sAge</text>
       </div>
     </div>
@@ -886,7 +907,7 @@
               </tr>
               <tr>
                 <td align="right">Stärke (bereinigt):</td>
-                <td align="right">@sAveSkill (@CornerkickGame.Tool.getAveSkill(player.plGame, bIdeal: true).ToString("0.0"))</td>
+                <td id="tdAveSkill" align="right"></td>
               </tr>
               <tr>
                 <td align="right">Talent:</td>
