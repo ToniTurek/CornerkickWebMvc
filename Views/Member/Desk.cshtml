@@ -42,8 +42,13 @@
       return '<img src="/Content/Icons/news/info.png" title="info" style="width: 16px"/>';
     }
 
+    $(window).resize(function () {
+      setNewsTableWrap();
+    });
+
     $(document).ready(function () {
       setNews();
+      setNewsTableWrap();
       setNewspaper();
 
       var bShowBalanceToday = @Html.Raw(Json.Encode(Model.bShowBalanceToday));
@@ -197,8 +202,12 @@
             "searchable": false
           },
           {
-            "targets": [1, 2],
+            "targets": 1,
             "className": "dt-center"
+          },
+          {
+            "targets": 2,
+            "className": "newsDate dt-center"
           },
           {
             "targets": 3,
@@ -565,6 +574,14 @@
           });
         }
       });
+    }
+
+    function setNewsTableWrap() {
+      if ($(window).width() < 960) {
+        $("td.newsDate").addClass("wrapok");
+      } else {
+        $("td.newsDate").removeClass("wrapok");
+      }
     }
   </script>
 </head>
