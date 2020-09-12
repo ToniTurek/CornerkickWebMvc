@@ -2302,6 +2302,16 @@ namespace CornerkickWebMvc.Controllers
       */
     }
 
+    [HttpGet]
+    public JsonResult PlayerDetailsGetAveSkill(int iPlayerId)
+    {
+      if (iPlayerId < 0) return Json(0.0, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId].plGame;
+
+      return Json(new float[] { CornerkickGame.Tool.getAveSkill(player), CornerkickGame.Tool.getAveSkill(player, bIdeal: true) }, JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult setPlayerIndTraining(int iPlayer, int iIndTr)
     {
       CornerkickManager.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];
