@@ -13,6 +13,7 @@
 }
 
 <!DOCTYPE html>
+<html>
 <head>
   <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
   <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
@@ -25,6 +26,53 @@
   <script type="text/javascript" src="~/Scripts/draw.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Formation.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
+
+  <style>
+    .selected td {
+      background-color: pink !important; /* Add !important to make sure override datables base styles */
+    }
+
+    #slider {
+      margin: 10px;
+    }
+
+    .ui-slider-vertical {
+      height: 100%;
+      width: 20px;
+    }
+
+    .ui-slider .ui-slider-handle {
+      height: 26px;
+      width: 26px;
+      padding-left: 0px;
+    }
+
+    #slider-Orientation .ui-slider-range {
+      background: orange;
+    }
+
+    #slider-Orientation .ui-slider-handle {
+      border-color: orange;
+    }
+
+    #slider-IndOrientation .ui-slider-range {
+      background: orange;
+    }
+
+    #slider-IndOrientation .ui-slider-handle {
+      border-color: orange;
+    }
+
+    #slider-IndOrientation.ui-slider-vertical {
+      width: 15px;
+    }
+
+    #slider-IndOrientation.ui-slider .ui-slider-handle {
+      height: 22px;
+      width: 22px;
+    }
+  </style>
 
   <style>
     .disabledDiv {
@@ -60,6 +108,8 @@
     var bPreventOnClick = false;
 
     var datatableTeamGlobal;
+
+    var tt; // Tutorial object
 
     $('#img_arrow_1').on('touchstart', function () {
       movePlayer(1);
@@ -436,6 +486,10 @@
                 oTable.ajax.reload();
 
                 getSubstitutionList();
+
+                if (tt && tt.bShow && tt.iLevel === 5) {
+                  drawTutorial(document.getElementById("divBody"), tt.iLevel + 1, tt);
+                }
               }
             }
           });
@@ -515,6 +569,12 @@
             $("#divFieldContainer").removeClass("disabledDiv");
           }
         });
+      }
+
+      // Show tutorial
+      tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel > 2) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
       }
 
       //window.scrollTo(0, 600);
@@ -639,175 +699,134 @@
   </script>
 </head>
 
-<style>
-  .selected td {
-    background-color: pink !important; /* Add !important to make sure override datables base styles */
-  }
+<body>
+  <div id="divBody" style="position: relative; width: 100%">
+    @{
+      if (true) { // is admin
+        <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-top: 16px; margin-bottom: 1%">
+          <img style="position: relative; width: 100%; transform:rotate(180deg)" src="~/Content/Images/stadium/field.png" />
+          <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
+          <div id="divDrawFormationContainer" style="position: absolute; float: left; margin-left: 5%; width: 90%; height: 94%; top: 3%; left: 0%">
+            <div id="drawFormation" onclick="javascript:cleanSelectedPlayer()" style="position: absolute; float: left; width: 100%; height: 100%; top: 0px; left: 0px"></div>
 
-  #slider {
-    margin: 10px;
-  }
-
-  .ui-slider-vertical {
-    height: 100%;
-    width: 20px;
-  }
-
-  .ui-slider .ui-slider-handle {
-    height: 26px;
-    width: 26px;
-    padding-left: 0px;
-  }
-
-  #slider-Orientation .ui-slider-range {
-    background: orange;
-  }
-
-  #slider-Orientation .ui-slider-handle {
-    border-color: orange;
-  }
-
-  #slider-IndOrientation .ui-slider-range {
-    background: orange;
-  }
-
-  #slider-IndOrientation .ui-slider-handle {
-    border-color: orange;
-  }
-
-  #slider-IndOrientation.ui-slider-vertical {
-    width: 15px;
-  }
-
-  #slider-IndOrientation.ui-slider .ui-slider-handle {
-    height: 22px;
-    width: 22px;
-  }
-</style>
-
-@{
-  if (true) { // is admin
-    <div class="image" id="divFieldContainer" style="position: relative; width: 70%; min-width: 360px; margin-top: 16px; margin-bottom: 1%">
-      <img style="position: relative; width: 100%; transform:rotate(180deg)" src="~/Content/Images/stadium/field.png" />
-      <img style="position: relative; width: 100%" src="~/Content/Images/stadium/field.png" />
-      <div id="divDrawFormationContainer" style="position: absolute; float: left; margin-left: 5%; width: 90%; height: 94%; top: 3%; left: 0%">
-        <div id="drawFormation" onclick="javascript:cleanSelectedPlayer()" style="position: absolute; float: left; width: 100%; height: 100%; top: 0px; left: 0px"></div>
-
-        <div id="divTacticOrientation" style="position: absolute; width: 0%; height: 100%; top: 0%; left: 101%; display:none">
-          @*
-            <p>
-              <input type="text" id="inputOrientation" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; width: 37px; left: 0px">
-            </p>*@
-          <div id="slider-Orientation" style="position: relative; height: 100%"></div>
-        </div>
-
-        <div id="divTacticIndOrientation" style="position: absolute; width: 0%; height: 50%; min-height: 200px; top: 0%; left: -3%; display:none">
-          @*
-            <p>
-              <input type="text" id="inputIndOrientation" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; width: 37px; left: 0px">
-            </p>*@
-          <div id="slider-IndOrientation" style="position: relative; height: 100%"></div>
-        </div>
-      </div>
-
-      <div id="divTeamOppAve" style="position: absolute; top: 0px; width: 50%"></div>
-
-      <div align="center" style="position: absolute; top: -15px; width: 260px; right: 6px">
-        <div style="position: relative; width: 260px; height: 30px; white-space: nowrap; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
-          <form>
-            <fieldset>
-              <label style="font-size:140%; color: black; margin-right: 4%">
-                <input type="radio" id="rbDefence" name="rbDefOff" value="0" checked>
-                Formation
-              </label>
-              <label style="font-size:140%; color: black">
-                <input type="radio" id="rbOffence" name="rbDefOff" value="1">
-                Offensive
-              </label>
-            </fieldset>
-          </form>
-        </div>
-      </div>
-
-      <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
-    </div>
-
-    <div class="form-group" style="position: relative; float: left; width: 70%; height: auto; background-color: white">
-      <div class="form-group" style="position: relative; float: left; width: 50%; min-width: 340px; height: 30px">
-        <div style="position: absolute; width: 120px; height: auto">
-          @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlFormation", @class = "form-control" })
-        </div>
-        <input id="tbSaveFormation" class="form-control" style="position: absolute; left: 120px; width: 100px; height: auto" />
-        <button type="submit" id="bnSaveFormation" class="btn btn-default" style="position: absolute; left: 220px; width: 60px; height: auto">save</button>
-        <button type="submit" id="bnDeleteFormation" class="btn btn-default" style="position: absolute; left: 280px; width: 60px; height: auto">delete</button>
-      </div>
-      @{
-        if (!Model.bGame) {
-          <div style="position: relative; float: left; width: 50%; min-width: 340px; height: 30px">
-            <div style="position: absolute; width: 49%">
-              <button type="submit" id="bnAutoFormation" class="btn btn-default" style="position: relative; width: 100%">Co-Trainer</button>
+            <div id="divTacticOrientation" style="position: absolute; width: 0%; height: 100%; top: 0%; left: 101%; display:none">
+              @*
+                <p>
+                  <input type="text" id="inputOrientation" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; width: 37px; left: 0px">
+                </p>*@
+              <div id="slider-Orientation" style="position: relative; height: 100%"></div>
             </div>
 
-            <div style="position: absolute; width: 49%; left: 51%">
-              @Html.DropDownListFor(m => m.sAutoFormationType, Model.ltDdlAutoFormationType, new { @class = "form-control", id = "ddlAutoFormationType", @style = "width: 100%" })
+            <div id="divTacticIndOrientation" style="position: absolute; width: 0%; height: 50%; min-height: 200px; top: 0%; left: -3%; display:none">
+              @*
+                <p>
+                  <input type="text" id="inputIndOrientation" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; width: 37px; left: 0px">
+                </p>*@
+              <div id="slider-IndOrientation" style="position: relative; height: 100%"></div>
             </div>
           </div>
+
+          <div id="divTeamOppAve" style="position: absolute; top: 0px; width: 50%"></div>
+
+          <div align="center" style="position: absolute; top: -15px; width: 260px; right: 6px">
+            <div style="position: relative; width: 260px; height: 30px; white-space: nowrap; background-color: white; border: 2px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+              <form>
+                <fieldset>
+                  <label style="font-size:140%; color: black; margin-right: 4%">
+                    <input type="radio" id="rbDefence" name="rbDefOff" value="0" checked>
+                    Formation
+                  </label>
+                  <label style="font-size:140%; color: black">
+                    <input type="radio" id="rbOffence" name="rbDefOff" value="1">
+                    Offensive
+                  </label>
+                </fieldset>
+              </form>
+            </div>
+          </div>
+
+          <b id="average" style="position: absolute; bottom: 0%; left: 0%; width: 100%; text-align:center; font-size:130%; color:white"></b>
+        </div>
+
+        <div class="form-group" style="position: relative; float: left; width: 70%; height: auto; background-color: white">
+          <div class="form-group" style="position: relative; float: left; width: 50%; min-width: 340px; height: 30px">
+            <div style="position: absolute; width: 120px; height: auto">
+              @Html.DropDownListFor(m => m.sFormation, Model.ltsFormations, new { @Id = "ddlFormation", @class = "form-control" })
+            </div>
+            <input id="tbSaveFormation" class="form-control" style="position: absolute; left: 120px; width: 100px; height: auto" />
+            <button type="submit" id="bnSaveFormation" class="btn btn-default" style="position: absolute; left: 220px; width: 60px; height: auto">save</button>
+            <button type="submit" id="bnDeleteFormation" class="btn btn-default" style="position: absolute; left: 280px; width: 60px; height: auto">delete</button>
+          </div>
+          @{
+            if (!Model.bGame) {
+              <div style="position: relative; float: left; width: 50%; min-width: 340px; height: 30px">
+                <div style="position: absolute; width: 49%">
+                  <button type="submit" id="bnAutoFormation" class="btn btn-default" style="position: relative; width: 100%">Co-Trainer</button>
+                </div>
+
+                <div style="position: absolute; width: 49%; left: 51%">
+                  @Html.DropDownListFor(m => m.sAutoFormationType, Model.ltDdlAutoFormationType, new { @class = "form-control", id = "ddlAutoFormationType", @style = "width: 100%" })
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        // Substitutions
+        if (Model.bGame) {
+          if (CornerkickWebMvc.Models.TeamModels.ltsSubstitution != null) {
+            <div style="position: relative; float: left; width: 70%; min-width: 320px; height: auto; min-height: 85px; border: 1px solid black">
+              <div style="position: relative; left: 2%; width: 96%">
+                <h4>Geplante Spielerwechsel</h4>
+                <div id="drawSubstitutions" style="position: relative; width: 50%; margin-bottom: 4px"></div>
+                <div style="position: absolute; left: 50%; top: 0px; width: 50%; height: 75px; text-align: right">
+                  @using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
+                    <input type="submit" style="width: 100%" class="btn btn-default" value="bestätigen" />
+                  }
+                  @using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
+                    <input type="submit" value="zurücksetzen" class="btn btn-default" style="width: 100%" />
+                  }
+                </div>
+              </div>
+            </div>
+          }
         }
       }
-    </div>
-
-    // Substitutions
-    if (Model.bGame) {
-      if (CornerkickWebMvc.Models.TeamModels.ltsSubstitution != null) {
-        <div style="position: relative; float: left; width: 70%; min-width: 320px; height: auto; min-height: 85px; border: 1px solid black">
-          <div style="position: relative; left: 2%; width: 96%">
-            <h4>Geplante Spielerwechsel</h4>
-            <div id="drawSubstitutions" style="position: relative; width: 50%; margin-bottom: 4px"></div>
-            <div style="position: absolute; left: 50%; top: 0px; width: 50%; height: 75px; text-align: right">
-              @using (Html.BeginForm("TeamSetSubstitutions", "Member", FormMethod.Post)) {
-                <input type="submit" style="width: 100%" class="btn btn-default" value="bestätigen" />
-              }
-              @using (Html.BeginForm("TeamUnsetSubstitutions", "Member", FormMethod.Post)) {
-                <input type="submit" value="zurücksetzen" class="btn btn-default" style="width: 100%" />
-              }
-            </div>
-          </div>
-        </div>
-      }
     }
-  }
-}
 
-<div id="tablediv">
-  <div class="dataTables_wrapper">
-    <table id="tableTeam" cellspacing="0" style="width: 100%" class="display responsive nowrap">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>ID</th>
-          <th>subst</th>
-          <th>Nr</th>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Stärke</th>
-          <th>Kondi.</th>
-          <th>Frische</th>
-          <th>Moral</th>
-          <th>Spielpr.</th>
-          <th>Form</th>
-          <th>FP</th>
-          <th>Note</th>
-          <th>Alter</th>
-          <th>Tal.</th>
-          <th>St. ber.</th>
-          <th>C</th>
-          <th>Nat.</th>
-          <th>susp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!---Data and tags are dynamically generated--->
-      </tbody>
-    </table>
+    <div id="tablediv">
+      <div class="dataTables_wrapper">
+        <table id="tableTeam" cellspacing="0" style="width: 100%" class="display responsive nowrap">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ID</th>
+              <th>subst</th>
+              <th>Nr</th>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Stärke</th>
+              <th>Kondi.</th>
+              <th>Frische</th>
+              <th>Moral</th>
+              <th>Spielpr.</th>
+              <th>Form</th>
+              <th>FP</th>
+              <th>Note</th>
+              <th>Alter</th>
+              <th>Tal.</th>
+              <th>St. ber.</th>
+              <th>C</th>
+              <th>Nat.</th>
+              <th>susp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!---Data and tags are dynamically generated--->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-</div>
+</body>
+</html>

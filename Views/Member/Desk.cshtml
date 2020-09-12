@@ -18,6 +18,7 @@
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/dialog.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
   <style>
     td {
@@ -28,6 +29,7 @@
       white-space: normal
     }
   </style>
+
   <script>
     function getNewsIcon(iType) {
       if (iType === 1) return '<img src="/Content/Icons/news/birthday.png" title="birthday" style="width: 16px"/>';
@@ -49,6 +51,12 @@
       var bShowBalanceToday = @Html.Raw(Json.Encode(Model.bShowBalanceToday));
       if (bShowBalanceToday) {
         showBalanceToday(document.body);
+      }
+
+      // Show tutorial
+      var tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel < 3) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel);
       }
 
       /*
@@ -549,7 +557,7 @@
                     dataType: "JSON",
                     data: { bOn: false },
                   });
-                  
+
                   $(this).dialog('destroy').remove();
                 }
               },

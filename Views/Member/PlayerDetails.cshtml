@@ -26,7 +26,7 @@
     border-color: @Model.sColorJerseyNo;
   }
   .ui-tabs-nav .ui-state-active a {
-      color: @Model.sColorJerseyNo;
+    color: @Model.sColorJerseyNo;
   }
 </style>
 
@@ -313,6 +313,12 @@
     });
 
     plotStars(document.getElementById("divStars"), @player.iTalent);
+
+    // Show tutorial
+    tt = @Html.Raw(Json.Encode(Model.tutorial));
+    if (tt && tt.bShow && tt.iLevel > 2) {
+      drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+    }
   }); // $(document).ready(function () {
 
   function putOnTakeFromTransferlist() {

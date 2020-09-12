@@ -102,6 +102,13 @@ namespace CornerkickWebMvc.Controllers
     internal static bool[] bShowClub = new bool[MvcApplication.iNations.Length]; // Flag if club will be used if nation is possible
     internal static bool[] bHideEocInfo; // Flag if end of contract info will be displayed
 
+    public class Tutorial
+    {
+      public bool bShow;
+      public int iLevel;
+    }
+    public static Tutorial[] ttUser; // User tutorial
+
     public MemberController()
     {
 #if _CONSOLE
@@ -236,6 +243,27 @@ namespace CornerkickWebMvc.Controllers
       return Json(bShowClub, JsonRequestBehavior.AllowGet);
     }
 
+    [HttpGet]
+    public JsonResult SetTutorialLevel(bool bShow, int iLevel)
+    {
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        ttUser[iUserIx].bShow = bShow;
+        ttUser[iUserIx].iLevel = iLevel;
+      }
+
+      if (usr.lti == null) usr.lti = new List<int>();
+      while (usr.lti.Count < 5) usr.lti.Add(0);
+
+      usr.lti[3] = bShow ? 1 : 0;
+      usr.lti[4] = iLevel;
+
+      return Json(true, JsonRequestBehavior.AllowGet);
+    }
+
 #if _CONSOLE
     //////////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -336,6 +364,12 @@ namespace CornerkickWebMvc.Controllers
       desk.bShowBalanceToday = true;
       if (usr.lti != null) {
         if (usr.lti.Count > 2) desk.bShowBalanceToday = usr.lti[2] > 0;
+      }
+
+      // Assign tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        desk.tutorial = ttUser[iUserIx];
       }
 
       CornerkickManager.Club club = ckClub();
@@ -1065,6 +1099,13 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club club = ckClub();
       team.club = club;
       if (club == null) return View(team);
+
+      // Tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(user);
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        team.tutorial = ttUser[iUserIx];
+        if (team.tutorial.iLevel == 2) team.tutorial.iLevel = 3;
+      }
 
       team.bAdmin = AccountController.checkUserIsAdmin(User.Identity.GetUserName());
 
@@ -2070,6 +2111,13 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      // Tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        plModel.tutorial = ttUser[iUserIx];
+        if (plModel.tutorial.iLevel == 6) plModel.tutorial.iLevel = 7;
+      }
 
       plModel.iPlayer = i;
       CornerkickManager.Player plDetails = MvcApplication.ckcore.ltPlayer[i];

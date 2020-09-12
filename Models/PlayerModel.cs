@@ -9,6 +9,8 @@ namespace CornerkickWebMvc.Models
 {
   public class PlayerModel
   {
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
+
     public int iPlayer { get; set; }
     public int iPlayerIndTr { get; set; }
 
