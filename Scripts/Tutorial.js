@@ -41,6 +41,13 @@ function drawTutorial2(parent, iLevel, ttRef) {
   } else if (iLevel === 7) {
     sText = "Als nächstes schauen wir uns mal einen deiner Spieler genauer an. Klicke hierzu auf den Namen eines Spielers in der Aufstellungsliste.";
     bNextButton = false;
+  } else if (iLevel === 8) {
+    sText = "Gut gemacht. Hier findest du alle Informationen über den Spieler in den drei Menüs 'Überblick', 'Fähigkeiten' und 'Statistik'.";
+    bNextButton = true;
+  } else if (iLevel === 9) {
+    sText = "Im Menü 'Überblick' hast du unten links verschiedene Optionen. Zum Beispiel kannst du den Spieler auf die Transferliste setzen, oder zu deinem Kapitän oder Vize-Kapitän ernennen.";
+    sText += "</br></br>Kapitäne sollten die Spieler mit der höchsten Führungspersönlichkeit (FP) sein.";
+    bNextButton = true;
   }
 
   drawTutorialDialog(parent, iLevel, sText, bNextButton, ttRef);
@@ -75,6 +82,7 @@ function drawTutorialDialog(parent, iLevel, sText, bNextButton, ttRef) {
   var buttons = [
     {
       text: "schließen",
+      class: "bnTutorial bnClose",
       icon: "ui-icon-closethick",
       click: function () {
         $(this).dialog('destroy').remove();
@@ -85,6 +93,7 @@ function drawTutorialDialog(parent, iLevel, sText, bNextButton, ttRef) {
   if (iLevel > 0) {
     buttons.push({
       text: "nochmal von Vorne",
+      class: "bnTutorial bnRestart",
       //icon: "ui-icon-closethick",
       click: function () {
         $.when(setLevel(true, 0)).done(function () {
@@ -101,7 +110,7 @@ function drawTutorialDialog(parent, iLevel, sText, bNextButton, ttRef) {
     buttons.push({
       text: "weiter",
       icon: "ui-icon-check",
-      //class: "foo bar baz",
+      class: "bnTutorial bnOk",
       id: "bnOk",
       click: function () {
         $.when(setLevel(true, iLevel + 1)).done(function () {
