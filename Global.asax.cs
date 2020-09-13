@@ -515,9 +515,15 @@ namespace CornerkickWebMvc
           CornerkickManager.Club clb = ckcore.ltClubs[iC];
           if (clb.user != null) continue;
 
+          float fContiCPU = 0.9f;
+          float fFreshCPU = 1.0f;
+          if (clb.iDivision > 0) {
+            fContiCPU = 0.85f;
+            fFreshCPU = 0.95f;
+          }
           for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
-            clb.ltPlayer[iP].plGame.fCondition = 0.9f;
-            clb.ltPlayer[iP].plGame.fFresh     = 1.0f;
+            clb.ltPlayer[iP].plGame.fCondition = fContiCPU;
+            clb.ltPlayer[iP].plGame.fFresh     = fFreshCPU;
             clb.ltPlayer[iP].plGame.fMoral     = Math.Max(clb.ltPlayer[iP].plGame.fMoral, 0.95f);
           }
         }
