@@ -518,8 +518,8 @@ namespace CornerkickWebMvc
           float fContiCPU = 0.9f;
           float fFreshCPU = 1.0f;
           if (clb.iDivision > 0) {
-            fContiCPU = 0.85f;
-            fFreshCPU = 0.95f;
+            fContiCPU = 0.80f;
+            fFreshCPU = 0.92f;
           }
           for (int iP = 0; iP < clb.ltPlayer.Count; iP++) {
             clb.ltPlayer[iP].plGame.fCondition = fContiCPU;
