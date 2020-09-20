@@ -11,7 +11,8 @@
   <meta name="viewport" content="width=device-width" />
   <title>Index</title>
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
@@ -21,28 +22,18 @@
   <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
   <style>
-    td {
-      white-space: nowrap;
-    }
+      td {
+        white-space: nowrap;
+      }
 
-    td.wrapok {
-      white-space: normal;
-    }
+      td.wrapok {
+        white-space: normal;
+      }
 
-    .ui-dialog .ui-dialog-buttonpane {
-      text-align: left !important;
-      height: 50px !important;
-    }
-
-    .bnTutorial.bnClose {
-      position: absolute;
-      left: 20px;
-    }
-
-    .bnTutorial.bnRestart {
-      position: absolute;
-      left: 136px;
-    }
+      .ui-dialog .ui-dialog-buttonpane {
+        text-align: left !important;
+        height: 50px !important;
+      }
   </style>
 
   <script>
@@ -70,7 +61,8 @@
 
       // Show tutorial
       var tt = @Html.Raw(Json.Encode(Model.tutorial));
-      if (tt && tt.bShow && tt.iLevel < 3) {
+      if (tt && tt.bShow && (tt.iLevel < 3 || tt.iLevel === 32)) {
+        if (tt.iLevel === 19) tt.iLevel += 1;
         drawTutorial(document.getElementById("divBody"), tt.iLevel);
       }
 

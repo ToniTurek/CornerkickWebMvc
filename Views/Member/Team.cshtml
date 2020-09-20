@@ -15,10 +15,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
@@ -103,16 +104,6 @@
     .ui-dialog .ui-dialog-buttonpane {
       text-align: left !important;
       height: 50px !important;
-    }
-
-    .bnTutorial.bnClose {
-      position: absolute;
-      left: 20px;
-    }
-
-    .bnTutorial.bnRestart {
-      position: absolute;
-      left: 136px;
     }
   </style>
 
@@ -502,7 +493,9 @@
 
                 getSubstitutionList();
 
+                // Increment tutorial
                 if (tt && tt.bShow && tt.iLevel === 5) {
+                  setLevel(true, tt.iLevel + 1);
                   drawTutorial(document.getElementById("divBody"), tt.iLevel + 1, tt);
                 }
               }
@@ -588,7 +581,7 @@
 
       // Show tutorial
       tt = @Html.Raw(Json.Encode(Model.tutorial));
-      if (tt && tt.bShow && tt.iLevel > 2) {
+      if (tt && tt.bShow && tt.iLevel > 2 && tt.iLevel < 8) {
         drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
       }
 

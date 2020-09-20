@@ -34,6 +34,8 @@ namespace CornerkickWebMvc.Models
     public string[] sTestgameClub { get; set; }
 
     public CornerkickManager.TrainingCamp.Camp camp { get; set; }
+
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
   }
 
   public class DiaryEvent

@@ -10,8 +10,9 @@
 <html>
 <head>
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
   <link rel="stylesheet" href="/resources/demos/style.css">
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
@@ -35,20 +36,11 @@
       text-align: left !important;
       height: 50px !important;
     }
-
-    .bnTutorial.bnClose {
-      position: absolute;
-      left: 20px;
-    }
-
-    .bnTutorial.bnRestart {
-      position: absolute;
-      left: 136px;
-    }
   </style>
 
   <script>
     var iCpt = 0;
+    var tt; // Tutorial object
 
     function setIndTraining(iInd) {
       $.ajax({
@@ -141,6 +133,10 @@
             plotCFM();
           } else if (iTabActive == 1) {
             plotChanceDevelopment();
+
+            if (tt && tt.bShow && tt.iLevel === 10) {
+              drawTutorial(document.getElementById("divBody"), tt.iLevel + 1, tt);
+            }
           } else if (iTabActive == 2) {
             plotPlayerDevelopment();
             plotTrainingDevelopment(@Model.iPlayer);
@@ -336,8 +332,8 @@
 
       // Show tutorial
       tt = @Html.Raw(Json.Encode(Model.tutorial));
-      if (tt && tt.bShow && tt.iLevel === 7) {
-        drawTutorial(document.getElementById("divBody"), tt.iLevel + 1, tt);
+      if (tt && tt.bShow && tt.iLevel > 7 && tt.iLevel < 16) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
       }
     }); // $(document).ready(function () {
 

@@ -10,10 +10,15 @@
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
   <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
   <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
   <script type="text/javascript" src="~/Scripts/jQuery-1.12.4.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Finance.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
   <script type="text/javascript">
     var bMobile = false;
@@ -386,131 +391,139 @@
           });
         }
       });
-    });
+
+      // Show tutorial
+      tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel > 28 && tt.iLevel < 31) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+      }
+    }); // document ready
   </script>
 </head>
 
 <body>
-  <h3>Hauptsponsor</h3>
+  <div id="divBody" style="position: relative; width: 100%">
+    <h3>Hauptsponsor</h3>
 
-  <div class="image" style="position: relative; width: 100%; height: auto; margin-bottom: 2%; background-color: white" align="center">
-    <div id="divJerseyContainer" class="image" style="position: relative; width: 640px; height: 560px; margin-bottom: 2%; background-color: @Model.sColorJersey" align="center">
-      <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
-      <div id="divJerseyEmblem" style="position: absolute; width: 60px; height: 60px; top: 110px; left: 380px"></div>
-      <div id="divSponsorMain" style="position: relative; width: 312px; height: 262px; top: 190px; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
+    <div class="image" style="position: relative; width: 100%; height: auto; margin-bottom: 2%; background-color: white" align="center">
+      <div id="divJerseyContainer" class="image" style="position: relative; width: 640px; height: 560px; margin-bottom: 2%; background-color: @Model.sColorJersey" align="center">
+        <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+        <div id="divJerseyEmblem" style="position: absolute; width: 60px; height: 60px; top: 110px; left: 380px"></div>
+        <div id="divSponsorMain" style="position: relative; width: 312px; height: 262px; top: 190px; border: 1px solid #ddd; border-radius: 4px; padding: 5px"></div>
+      </div>
     </div>
-  </div>
 
-  <table id="tableSponsors" style="width: auto" class="display nowrap">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>id</th>
-        <th>Sponsor</th>
-        <th>Prämie/Jahr €</th>
-        <th>Siegprämie €</th>
-        <th>Meisterprämie €</th>
-        <th>Laufzeit</th>
-      </tr>
-    </thead>
-    <tbody>
-      @{
-        if (Model.sponsorMain.iId > 0) {
-          <tr style="font-weight:bold">
-            <td>0</td>
-            <td>@Model.sponsorMain.iId</td>
-            <td>@MvcApplication.ckcore.fz.ltSponsoren[Model.sponsorMain.iId].name</td>
-            <td>@Model.sponsorMain.iGeldJahr.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-            <td>@Model.sponsorMain.iMoneyVicHome.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-            <td>@Model.sponsorMain.iGeldMeister.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-            <td>@Model.sponsorMain.iYears</td>
-          </tr>
-        }
-
-        int iSp = 0;
-        foreach (CornerkickManager.Finance.Sponsor spon in Model.ltSponsorOffers) {
-          if (spon.iType == 0 && spon.iId > 0 && spon.iId < MvcApplication.ckcore.fz.ltSponsoren.Count) {
-            <tr>
-              <td>@iSp</td>
-              <td>@spon.iId</td>
-              <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].name</td>
-              <td>@spon.iGeldJahr.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-              <td>@spon.iMoneyVicHome.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-              <td>@spon.iGeldMeister.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
-              <td>@spon.iYears</td>
+    <table id="tableSponsors" style="width: auto" class="display nowrap">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>id</th>
+          <th>Sponsor</th>
+          <th>Prämie/Jahr €</th>
+          <th>Siegprämie €</th>
+          <th>Meisterprämie €</th>
+          <th>Laufzeit</th>
+        </tr>
+      </thead>
+      <tbody>
+        @{
+          if (Model.sponsorMain.iId > 0) {
+            <tr style="font-weight:bold">
+              <td>0</td>
+              <td>@Model.sponsorMain.iId</td>
+              <td>@MvcApplication.ckcore.fz.ltSponsoren[Model.sponsorMain.iId].name</td>
+              <td>@Model.sponsorMain.iGeldJahr.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td>@Model.sponsorMain.iMoneyVicHome.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td>@Model.sponsorMain.iGeldMeister.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+              <td>@Model.sponsorMain.iYears</td>
             </tr>
           }
-          iSp++;
+
+          int iSp = 0;
+          foreach (CornerkickManager.Finance.Sponsor spon in Model.ltSponsorOffers) {
+            if (spon.iType == 0 && spon.iId > 0 && spon.iId < MvcApplication.ckcore.fz.ltSponsoren.Count) {
+              <tr>
+                <td>@iSp</td>
+                <td>@spon.iId</td>
+                <td>@MvcApplication.ckcore.fz.ltSponsoren[spon.iId].name</td>
+                <td>@spon.iGeldJahr.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+                <td>@spon.iMoneyVicHome.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+                <td>@spon.iGeldMeister.ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User))</td>
+                <td>@spon.iYears</td>
+              </tr>
+            }
+            iSp++;
+          }
         }
+      </tbody>
+    </table>
+
+    @{
+      if (Model.sponsorMain.iId <= 0) {
+        <button type="submit" id="bnTake" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
       }
-    </tbody>
-  </table>
-
-  @{
-    if (Model.sponsorMain.iId <= 0) {
-      <button type="submit" id="bnTake" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
     }
-  }
 
-  <h3 style="margin-top: 20px">Banden</h3>
-  <table id="tableSponsorBoard" style="width: auto" class="display responsive nowrap">
-    <thead>
-      <tr>
-        <th></th>
-        <th>id</th>
-        <th>#</th>
-        <th>Sponsor</th>
-        <th>Prämie/Heimspiel € *</th>
-        <th>Banden</th>
-        <th>Laufzeit</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th>Summe:</th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    </tfoot>
-  </table>
-
-  <button type="submit" id="bnTakeBoard" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
-  * Entspricht Wettbewerbs-Prioritätsfaktor von 1.0
-
-  @{
-    for (int iB = 0; iB < 12; iB++) {
-      if (iB < Model.ltSponsorBoards.Count) {
-        CornerkickManager.Finance.Sponsor spon = Model.ltSponsorBoards[iB];
-      }
-      string sImgId = "divSponsorBoard_" + iB.ToString();
-      <div class="image" style="position: relative; width: 100%; margin-top: 2%">
-        <div id=@sImgId style="position: relative; float: left; width: 328px; height: 58px; margin-right: 12px; margin-bottom: 12px; border: 4px solid black; border-radius: 6px; background-color: #ddd; box-shadow: 4px 4px #696969"></div>
-      </div>
-    }
-  }
-
-  <div style="position: relative; float: left; width: 100%; margin-top: 20px">
-    <h3>Spezialsponsoren</h3>
-    Wählen Sie bis zu 2 Spezialsponsoren.
-    <table id="tableSponsorSpecial" style="width: auto" class="display responsive nowrap">
+    <h3 style="margin-top: 20px">Banden</h3>
+    <table id="tableSponsorBoard" style="width: auto" class="display responsive nowrap">
       <thead>
         <tr>
           <th></th>
           <th>id</th>
           <th>#</th>
           <th>Sponsor</th>
-          <th>Prämie €</th>
-          <th>Bedingung</th>
+          <th>Prämie/Heimspiel € *</th>
+          <th>Banden</th>
+          <th>Laufzeit</th>
         </tr>
       </thead>
       <tbody></tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th>Summe:</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </tfoot>
     </table>
 
-    <button type="submit" id="bnTakeSpecial" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
+    <button type="submit" id="bnTakeBoard" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
+    * Entspricht Wettbewerbs-Prioritätsfaktor von 1.0
+
+    @{
+      for (int iB = 0; iB < 12; iB++) {
+        if (iB < Model.ltSponsorBoards.Count) {
+          CornerkickManager.Finance.Sponsor spon = Model.ltSponsorBoards[iB];
+        }
+        string sImgId = "divSponsorBoard_" + iB.ToString();
+        <div class="image" style="position: relative; width: 100%; margin-top: 2%">
+          <div id=@sImgId style="position: relative; float: left; width: 328px; height: 58px; margin-right: 12px; margin-bottom: 12px; border: 4px solid black; border-radius: 6px; background-color: #ddd; box-shadow: 4px 4px #696969"></div>
+        </div>
+      }
+    }
+
+    <div style="position: relative; float: left; width: 100%; margin-top: 20px">
+      <h3>Spezialsponsoren</h3>
+      Wählen Sie bis zu 2 Spezialsponsoren.
+      <table id="tableSponsorSpecial" style="width: auto" class="display responsive nowrap">
+        <thead>
+          <tr>
+            <th></th>
+            <th>id</th>
+            <th>#</th>
+            <th>Sponsor</th>
+            <th>Prämie €</th>
+            <th>Bedingung</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <button type="submit" id="bnTakeSpecial" class="btn btn-default" style="width: 100%; margin-top: 6px; font-size: 16px">Sponsor wählen</button>
+    </div>
   </div>
 </body>

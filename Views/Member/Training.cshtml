@@ -27,15 +27,18 @@
 <head>
   <meta name="viewport" content="width=device-width" />
   <link rel="stylesheet" href="~/Content/mystyles.css" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
   <script type="text/javascript" src="~/Scripts/moment.js"></script>
   <script type="text/javascript" src="~/Scripts/dialog.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
   <script type="text/javascript">
     var iWeekGlobal = 0;
+    var tt; // Tutorial object
 
     $(document).ready(function () {
       plotTrainingPlan(0);
@@ -81,7 +84,13 @@
 
         chartFAve.render();
       });
-    });
+
+      // Show tutorial
+      tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel > 15 && tt.iLevel < 20) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+      }
+    }); // document.ready
 
     var sTrainingTimes = ["9:30", "12:00", "16:30"];
     var sTrainingNames = ["Frei", "Regeneration", "Kondition", "Spritzigkeit", "Zweikämpfe", "5 gegen 2", "Torschüsse", "Flanken/Abschluss", "Standardsituationen", "Trainingsspiel", "Fussballtennis", "Kopfballpendel", "Yoga", "Elfmeterschießen"];
@@ -365,7 +374,7 @@
 </head>
 
 <body>
-  <div style="height: 1800px">
+  <div id="divBody" style="height: 1800px">
     <h3>Trainingsplan</h3>
     <div style="position: relative; width: 1100px; height: auto; margin-bottom: 10px">
       <div style="position: relative; width: 100%; height: 20px">

@@ -1,0 +1,31 @@
+﻿.ui-dialog-buttonpane {
+    min-height: 55px !important;
+}
+
+.bnTutorial.bnHide {
+    position: absolute;
+    left: 20px;
+}
+
+.bnTutorial.bnClose {
+    position: absolute;
+    left: 20px;
+}
+
+.bnTutorial.bnRestart {
+    position: absolute;
+    left: 18px;
+}
+
+.bnTutorial.bnPrev {
+    position: absolute;
+    left: 116px;
+}
+
+.ui-dialog-titlebar {
+    background-color: rgb(31, 158, 69) !important;
+}
+
+.ui-dialog-title {
+    color: white !important;
+}

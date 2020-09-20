@@ -50,5 +50,7 @@ namespace CornerkickWebMvc.Models
     public string[] sAutoSubsIn { get; set; }
 
     public int[] iAutoSubsMin { get; set; }
+
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
   }
 }

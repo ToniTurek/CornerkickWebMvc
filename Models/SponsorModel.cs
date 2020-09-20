@@ -17,6 +17,8 @@ namespace CornerkickWebMvc.Models
 
     public string sEmblem { get; set; }
     public string sColorJersey   { get; set; }
+
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
   }
 
   public class DatatableEntrySponsorBoard

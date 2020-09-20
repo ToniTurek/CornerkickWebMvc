@@ -34,5 +34,7 @@ namespace CornerkickWebMvc.Models
 
     public List<SelectListItem> ltDdlPersonalKibitzer { get; set; }
     public string sPersonalKibitzer { get; set; }
+
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
   }
 }

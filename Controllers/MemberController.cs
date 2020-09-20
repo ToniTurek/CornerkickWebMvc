@@ -370,6 +370,7 @@ namespace CornerkickWebMvc.Controllers
       int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
       if (iUserIx >= 0 && iUserIx < ttUser.Length) {
         desk.tutorial = ttUser[iUserIx];
+        if (desk.tutorial.iLevel == 31) desk.tutorial.iLevel = 32;
       }
 
       CornerkickManager.Club club = ckClub();
@@ -2116,7 +2117,7 @@ namespace CornerkickWebMvc.Controllers
       int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
       if (iUserIx >= 0 && iUserIx < ttUser.Length) {
         plModel.tutorial = ttUser[iUserIx];
-        if (plModel.tutorial.iLevel == 6) plModel.tutorial.iLevel = 7;
+        if (plModel.tutorial.iLevel == 7) plModel.tutorial.iLevel = 8;
       }
 
       plModel.iPlayer = i;
@@ -3901,6 +3902,13 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      // Tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(ckUser());
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        tactic.tutorial = ttUser[iUserIx];
+        if (tactic.tutorial.iLevel == 24) tactic.tutorial.iLevel = 25;
+      }
+
       return View(tactic);
     }
 
@@ -4113,6 +4121,14 @@ namespace CornerkickWebMvc.Controllers
         } else {
           mdTraining.sTrainingCountRel[iT] = "-";
         }
+      }
+
+      // Tutorial
+      CornerkickManager.User usr = ckUser();
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        mdTraining.tutorial = ttUser[iUserIx];
+        if (mdTraining.tutorial.iLevel == 15) mdTraining.tutorial.iLevel = 16;
       }
 
       return View(mdTraining);
@@ -5250,6 +5266,13 @@ namespace CornerkickWebMvc.Controllers
       personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "Level: 1 - " + CornerkickManager.Finance.iCostKibitzer[1].ToString("N0", getCi()) + " €/Monat", Value = "1" });
       personal.ltDdlPersonalKibitzer.Add(new SelectListItem { Text = "-", Value = "0" });
 
+      // Tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(ckUser());
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        personal.tutorial = ttUser[iUserIx];
+        if (personal.tutorial.iLevel == 19) personal.tutorial.iLevel = 20;
+      }
+
       return View(personal);
     }
 
@@ -6356,7 +6379,10 @@ namespace CornerkickWebMvc.Controllers
     [Authorize]
     public ActionResult Calendar(Models.CalendarModels cal)
     {
-      cal.iClubId = ckClub().iId;
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return View(cal);
+
+      cal.iClubId = clb.iId;
 
       cal.ddlTestgameClubs = new List<SelectListItem>();
       foreach (CornerkickManager.Club clbTg in MvcApplication.ckcore.ltClubs) {
@@ -6366,6 +6392,13 @@ namespace CornerkickWebMvc.Controllers
         //CornerkickGame.Game.Data gdNext = MvcApplication.ckcore.tl.getNextGame(clbTg, MvcApplication.ckcore.dtDatum, false);
 
         cal.ddlTestgameClubs.Add(new SelectListItem { Text = clbTg.sName, Value = clbTg.iId.ToString() });
+      }
+
+      // Tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(ckUser());
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        cal.tutorial = ttUser[iUserIx];
+        if (cal.tutorial.iLevel == 21) cal.tutorial.iLevel = 22;
       }
 
       return View(cal);
@@ -7284,6 +7317,13 @@ namespace CornerkickWebMvc.Controllers
 
       sponsorModel.sEmblem = getClubEmblem(clb, "height: 100%; width: 100%; object-fit: contain");
       sponsorModel.sColorJersey = "rgb(" + clb.cl[0].R.ToString() + "," + clb.cl[0].G.ToString() + "," + clb.cl[0].B.ToString() + ")";
+
+      // Tutorial
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(ckUser());
+      if (iUserIx >= 0 && iUserIx < ttUser.Length) {
+        sponsorModel.tutorial = ttUser[iUserIx];
+        if (sponsorModel.tutorial.iLevel == 28) sponsorModel.tutorial.iLevel = 29;
+      }
 
       return View(sponsorModel);
     }
