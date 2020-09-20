@@ -7,15 +7,34 @@
 
 <html style="height: 100%; min-height: 100%">
 <head>
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/Finance.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
   <script>
+    var tt; // Tutorial object
+
     $(document).ready(function () {
       getPersonalCost();
 
       $("#bnHireStuff").click(function () {
         hirePersonal();
+
+        // Increment tutorial
+        if (tt && tt.bShow && tt.iLevel === 20) {
+          setLevel(true, tt.iLevel + 1);
+          drawTutorial(document.getElementById("divBody"), tt.iLevel + 1, tt);
+        }
       });
+
+      // Show tutorial
+      tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel > 19 && tt.iLevel < 22) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+      }
     });
 
     function getPersonalCost() {
@@ -66,60 +85,62 @@
 </head>
 
 <body style="width: 100%">
-  <h3>Personal</h3>
+  <div id="divBody" style="width: 100%">
+    <h3>Personal</h3>
 
-  <div class="form-group">
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalCoachCo, new SelectList(Model.ltDdlPersonalCoachCo, "Value", "Text", Model.staff.iCoTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId0", @style = "width: 230px" });
+    <div class="form-group">
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Co-Trainer:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalCoachCo, new SelectList(Model.ltDdlPersonalCoachCo, "Value", "Text", Model.staff.iCoTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId0", @style = "width: 230px" });
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalCoachCondi, new SelectList(Model.ltDdlPersonalCoachCondi, "Value", "Text", Model.staff.iCondiTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId1", @style = "width: 230px" })
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalMasseur, new SelectList(Model.ltDdlPersonalMasseur, "Value", "Text", Model.staff.iPhysio), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId2", @style = "width: 230px" })
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalMental, new SelectList(Model.ltDdlPersonalMental, "Value", "Text", Model.staff.iMentalTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId3", @style = "width: 230px" })
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalMed, new SelectList(Model.ltDdlPersonalMed, "Value", "Text", Model.staff.iDoctor), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId4", @style = "width: 230px" })
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalJouthCoach, new SelectList(Model.ltDdlPersonalJouthCoach, "Value", "Text", Model.staff.iJouthTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId5", @style = "width: 230px" })
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalJouthScouting, new SelectList(Model.ltDdlPersonalJouthScouting, "Value", "Text", Model.staff.iJouthScouting), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId6", @style = "width: 230px" })
+        </div>
+      </div>
+      <div style="position: relative; height: 40px">
+        <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Spielbeobachter:</label>
+        <div style="position: absolute; height: 30px; left: 190px">
+          @Html.DropDownListFor(m => m.sPersonalKibitzer, new SelectList(Model.ltDdlPersonalKibitzer, "Value", "Text", Model.staff.iKibitzer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId7", @style = "width: 230px" })
+        </div>
       </div>
     </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Konditionstrainer:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalCoachCondi, new SelectList(Model.ltDdlPersonalCoachCondi, "Value", "Text", Model.staff.iCondiTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId1", @style = "width: 230px" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Masseur:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalMasseur, new SelectList(Model.ltDdlPersonalMasseur, "Value", "Text", Model.staff.iPhysio), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId2", @style = "width: 230px" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Mentaltrainer:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalMental, new SelectList(Model.ltDdlPersonalMental, "Value", "Text", Model.staff.iMentalTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId3", @style = "width: 230px" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Medizinische Abteilung:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalMed, new SelectList(Model.ltDdlPersonalMed, "Value", "Text", Model.staff.iDoctor), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId4", @style = "width: 230px" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendtrainer:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalJouthCoach, new SelectList(Model.ltDdlPersonalJouthCoach, "Value", "Text", Model.staff.iJouthTrainer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId5", @style = "width: 230px" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Jugendscouting:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalJouthScouting, new SelectList(Model.ltDdlPersonalJouthScouting, "Value", "Text", Model.staff.iJouthScouting), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId6", @style = "width: 230px" })
-      </div>
-    </div>
-    <div style="position: relative; height: 40px">
-      <label for="Trainer" style="position: absolute; text-align: right; width: 180px; top: 4px">Spielbeobachter:</label>
-      <div style="position: absolute; height: 30px; left: 190px">
-        @Html.DropDownListFor(m => m.sPersonalKibitzer, new SelectList(Model.ltDdlPersonalKibitzer, "Value", "Text", Model.staff.iKibitzer), new { @class = "form-control", @onchange = "getPersonalCost()", id = "iDdlId7", @style = "width: 230px" })
-      </div>
-    </div>
+
+    <p id="lbPersonalkosten"></p>
+    <button type="submit" id="bnHireStuff" class="btn btn-default" style="position: relative; width: 150px">Personal einstellen</button>
   </div>
-
-  <p id="lbPersonalkosten"></p>
-  <button type="submit" id="bnHireStuff" class="btn btn-default" style="position: relative; width: 150px">Personal einstellen</button>
 </body>
 </html>

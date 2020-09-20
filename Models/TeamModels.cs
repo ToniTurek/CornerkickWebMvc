@@ -12,6 +12,7 @@ namespace CornerkickWebMvc.Models
     public CornerkickManager.Club club { get; set; }
 
     public bool bAdmin { get; set; }
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
 
     public static List<CalendarModels> ltCalendar = new List<CalendarModels>();
 

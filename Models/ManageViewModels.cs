@@ -14,6 +14,7 @@ namespace CornerkickWebMvc.Models
     public bool BrowserRemembered { get; set; }
     public bool bSound { get; set; }
     public bool bShowBalanceToday { get; set; }
+    public bool bShowTutorial { get; set; }
   }
 
   public class ManageLoginsViewModel

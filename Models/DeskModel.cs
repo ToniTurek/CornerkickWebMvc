@@ -26,6 +26,7 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ddlDeleteLog { get; set; }
     public int iDeleteLog { get; set; }
     public bool bShowBalanceToday { get; set; }
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
 
     public DeskModel()
     {

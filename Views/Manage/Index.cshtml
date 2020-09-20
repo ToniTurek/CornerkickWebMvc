@@ -26,6 +26,14 @@
         data: { bOn: bOn }
       });
     }
+
+    function changeShowTutorial(bShow) {
+      $.ajax({
+        url: '/Manage/SetShowTutorial',
+        dataType: "JSON",
+        data: { bShow: bShow }
+      });
+    }
   </script>
 </head>
 
@@ -121,29 +129,26 @@
       </dd>
       *@
     </dl>
+
     <h4>Optionen</h4>
     <hr />
     <dl class="dl-horizontal">
       <dt style="width: 220px">Sound:</dt>
       <dd style="margin-left: 240px">
-        @{
-          if (Model.bSound) {
-            <input type="checkbox" name="cbSound" checked="checked" onclick="changeSound(this.checked)" style="cursor: pointer">
-          } else {
-            <input type="checkbox" name="cbSound" onclick="changeSound(this.checked)" style="cursor: pointer">
-          }
-        }
+        @{ string sChecked1 = Model.bSound ? "checked=checked" : ""; }
+        <input type="checkbox" name="cbSound" @sChecked1 onclick="changeSound(this.checked)" style="cursor: pointer">
       </dd>
 
       <dt style="width: 220px">Übersicht tägl. Transaktionen:</dt>
       <dd style="margin-left: 240px">
-        @{
-          if (Model.bShowBalanceToday) {
-            <input type="checkbox" name="cbShowBalanceToday" checked="checked" onclick="changeShowBalanceToday(this.checked)" style="cursor: pointer">
-          } else {
-            <input type="checkbox" name="cbShowBalanceToday" onclick="changeShowBalanceToday(this.checked)" style="cursor: pointer">
-          }
-        }
+        @{ string sChecked2 = Model.bShowBalanceToday ? "checked=checked" : ""; }
+        <input type="checkbox" name="cbShowBalanceToday" @sChecked2 onclick="changeShowBalanceToday(this.checked)" style="cursor: pointer">
+      </dd>
+
+      <dt style="width: 220px">Tutorial zeigen:</dt>
+      <dd style="margin-left: 240px">
+        @{ string sChecked3 = Model.bShowTutorial ? "checked=checked" : ""; }
+        <input type="checkbox" name="cbShowBalanceToday" @sChecked3 onclick="changeShowTutorial(this.checked)" style="cursor: pointer">
       </dd>
     </dl>
   </div>

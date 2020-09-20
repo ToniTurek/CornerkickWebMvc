@@ -82,6 +82,10 @@ namespace CornerkickWebMvc.Controllers
       if (usr.lti != null) {
         if (usr.lti.Count > 2) model.bShowBalanceToday = usr.lti[2] > 0;
       }
+      model.bShowTutorial = true;
+      if (usr.lti != null) {
+        if (usr.lti.Count > 3) model.bShowTutorial = usr.lti[3] > 0;
+      }
 
       return View(model);
     }
@@ -364,6 +368,22 @@ namespace CornerkickWebMvc.Controllers
       while (usr.lti.Count < 3) usr.lti.Add(0);
 
       usr.lti[2] = bOn ? 1 : 0;
+    }
+
+    public void SetShowTutorial(bool bShow)
+    {
+      CornerkickManager.User usr = Controllers.MemberController.ckUserStatic(User);
+      if (usr == null) return;
+
+      if (usr.lti == null) usr.lti = new List<int>();
+      while (usr.lti.Count < 4) usr.lti.Add(0);
+
+      usr.lti[3] = bShow ? 1 : 0;
+
+      int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(usr);
+      if (iUserIx >= 0 && iUserIx < Controllers.MemberController.ttUser.Length) {
+        Controllers.MemberController.ttUser[iUserIx].bShow = bShow;
+      }
     }
 
     #region Hilfsprogramme

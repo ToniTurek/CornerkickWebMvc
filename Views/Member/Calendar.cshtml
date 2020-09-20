@@ -5,31 +5,33 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<html style="height: 100%; min-height: 100%">
 <head>
-  <link href="~/Content/fullcalendar.css" rel="stylesheet" />
-  <link href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
-  <link href="/resources/demos/style.css" rel="stylesheet">
-  <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/rowReorder.dataTables.min.css" rel="stylesheet" />
-  <link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
-  <script src="~/Scripts/jquery-2.0.0.min.js"></script>
-  <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
-  <script src="~/Scripts/moment.min.js"></script>
-  <script src="~/Scripts/fullcalendar/fullcalendar.js"></script>
-  <script src="~/Scripts/fullcalendar/locale-all.js"></script>
-  <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
-  <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
-  <script src="~/Scripts/Numbers.js"></script>
+  <link rel="stylesheet" href="~/Content/fullcalendar.css" />
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/rowReorder.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/DataTables/css/responsive.dataTables.min.css" />
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
+  <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/moment.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/fullcalendar/fullcalendar.js"></script>
+  <script type="text/javascript" src="~/Scripts/fullcalendar/locale-all.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+  <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
   <script type="text/javascript" src="~/Scripts/Finance.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
   <style>
     .fc-today {
       background-color: #FBEFD6;
     }
   </style>
-</head>
 
-<script type="text/javascript">
+  <script type="text/javascript">
   var dtCk = "@MvcApplication.ckcore.dtDatum.ToString("yyyy-MM-dd HH:mm")";
 
   $(document).ready(function () {
@@ -78,7 +80,7 @@
               document.getElementById('selectM')     .value = start.format("m");
               document.getElementById('selectEventH').value = start.format("H");
               document.getElementById('selectEventM').value = start.format("m");
-              
+
               $("#dialogOptions").dialog("open");
             } else if (iCompare === -2) {
               alert("Keine Aktion am Spieltag möglich!");
@@ -356,7 +358,13 @@
         });
       }
     });
-  });
+
+    // Show tutorial
+    tt = @Html.Raw(Json.Encode(Model.tutorial));
+    if (tt && tt.bShow && tt.iLevel > 21 && tt.iLevel < 25) {
+      drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+    }
+  }); // document ready
 
   function setSelectedCamp() {
     var iCampIx = $("#selectCamp option:selected").index();
@@ -404,110 +412,115 @@
       }
     });
   }
-</script>
+  </script>
+</head>
 
-<div id="calendar" style="position: relative; width: 100%; margin-top: 2%; margin-bottom: 2%"></div>
+<body style="width: 100%">
+  <div id="divBody" style="width: 100%">
+    <div id="calendar" style="position: relative; width: 100%; margin-top: 2%; margin-bottom: 2%"></div>
 
-<h4>Anfragen Testspiele</h4>
+    <h4>Anfragen Testspiele</h4>
 
-<table id="tableTestgames" cellspacing="0" style="width: auto" class="display responsive nowrap">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Datum</th>
-      <th>Heim</th>
-      <th>Auswärts</th>
-    </tr>
-  </thead>
-  <tbody>
-  </tbody>
-</table>
+    <table id="tableTestgames" cellspacing="0" style="width: auto" class="display responsive nowrap">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Datum</th>
+          <th>Heim</th>
+          <th>Auswärts</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-<button type="submit" id="bnAcceptTestgame" class="btn btn-default" style="width: 49%">Anfrage bestätigen</button>
-<button type="submit" id="bnDeclineTestgame" class="btn btn-default" style="width: 49%">Anfrage ablehnen</button>
+    <button type="submit" id="bnAcceptTestgame" class="btn btn-default" style="width: 49%">Anfrage bestätigen</button>
+    <button type="submit" id="bnDeclineTestgame" class="btn btn-default" style="width: 49%">Anfrage ablehnen</button>
 
-<div id="dialogOptions" title="Was wollen Sie machen?">
-  <label style="cursor: pointer">
-    <input type="radio" name="rbOptions" id="rbTestgame" value="1" checked="checked">
-    Testspiel vereinbaren
-  </label>
-  <label style="cursor: pointer">
-    <input type="radio" name="rbOptions" id="rbTrainingscamp" value="2">
-    Trainingslager planen
-  </label>
-  <label style="cursor: pointer">
-    <input type="radio" name="rbOptions" id="rbEvent" value="3">
-    Ereignis planen
-  </label>
-</div>
+    <div id="dialogOptions" title="Was wollen Sie machen?">
+      <label style="cursor: pointer">
+        <input type="radio" name="rbOptions" id="rbTestgame" value="1" checked="checked">
+        Testspiel vereinbaren
+      </label>
+      <label style="cursor: pointer">
+        <input type="radio" name="rbOptions" id="rbTrainingscamp" value="2">
+        Trainingslager planen
+      </label>
+      <label style="cursor: pointer">
+        <input type="radio" name="rbOptions" id="rbEvent" value="3">
+        Ereignis planen
+      </label>
+    </div>
 
-<div id="dialogTestgame" title="Testspielanfrage">
-  <text>Beginn Testspiel: </text>
-  <select name="H" id="selectH">
-    @{
-      for (int iH = 0; iH < 24; iH++) {
-        <option value="@iH.ToString()">@iH.ToString("D2")</option>
-      }
-    }
-  </select>
-  <select name="M" id="selectM">
-    @{
-      for (int iM = 0; iM < 60; iM += 15) {
-        <option value="@iM.ToString()">@iM.ToString("D2")</option>
-      }
-    }
-  </select>
+    <div id="dialogTestgame" title="Testspielanfrage">
+      <text>Beginn Testspiel: </text>
+      <select name="H" id="selectH">
+        @{
+          for (int iH = 0; iH < 24; iH++) {
+            <option value="@iH.ToString()">@iH.ToString("D2")</option>
+          }
+        }
+      </select>
+      <select name="M" id="selectM">
+        @{
+          for (int iM = 0; iM < 60; iM += 15) {
+            <option value="@iM.ToString()">@iM.ToString("D2")</option>
+          }
+        }
+      </select>
 
-  <p style="position: relative; margin-top: 10px">Wählen Sie Ihren gewünschten Testspielgegner:</p>
-  @Html.DropDownListFor(m => m.sTestgameClub, Model.ddlTestgameClubs, new { id = "ddlSelectClubTestgame", @style = "position: relative; text-align: right" })
-</div>
+      <p style="position: relative; margin-top: 10px">Wählen Sie Ihren gewünschten Testspielgegner:</p>
+      @Html.DropDownListFor(m => m.sTestgameClub, Model.ddlTestgameClubs, new { id = "ddlSelectClubTestgame", @style = "position: relative; text-align: right" })
+    </div>
 
-<div id="dialogTrainingscamp" title="Trainingslager buchen" style="width: 200px">
-  <p>Wählen Sie Ihr gewünschtes Trainingslager:</p>
+    <div id="dialogTrainingscamp" title="Trainingslager buchen" style="width: 200px">
+      <p>Wählen Sie Ihr gewünschtes Trainingslager:</p>
 
-  <select name="Camp" id="selectCamp">
-    @{
-      foreach (CornerkickManager.TrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
-        <option value="@camp.iId.ToString()">@camp.sName</option>
-      }
-    }
-  </select>
+      <select name="Camp" id="selectCamp">
+        @{
+          foreach (CornerkickManager.TrainingCamp.Camp camp in MvcApplication.ckcore.tcp.ltCamps) {
+            <option value="@camp.iId.ToString()">@camp.sName</option>
+          }
+        }
+      </select>
 
-  <div id="tableDivSelectedCamp" style="position: relative; margin-top: 6px"></div>
+      <div id="tableDivSelectedCamp" style="position: relative; margin-top: 6px"></div>
 
-  <div style="position: relative; margin-top: 16px">
-    <text>Übernachtungen:</text>
-    <select id="ddlTrainingscampDays"></select>
+      <div style="position: relative; margin-top: 16px">
+        <text>Übernachtungen:</text>
+        <select id="ddlTrainingscampDays"></select>
+      </div>
+
+      <div style="position: relative; margin-top: 16px">
+        <text id="txtCost">Gesamtkosten:</text>
+      </div>
+    </div>
+
+    <div id="dlgEvent" title="Ereignis">
+      <text>Beginn Ereignis:</text>
+      <select name="H" id="selectEventH">
+        @{
+          for (int iH = 0; iH < 24; iH++) {
+            <option value="@iH.ToString()">@iH.ToString("D2")</option>
+          }
+        }
+      </select>
+      <select name="M" id="selectEventM">
+        @{
+          for (int iM = 0; iM < 60; iM += 15) {
+            <option value="@iM.ToString()">@iM.ToString("D2")</option>
+          }
+        }
+      </select>
+
+      <p>Wählen Sie Ihr geplantes Ereignis:</p>
+
+      <select name="Event" id="selectEvent">
+        <option value="1">Krisensitzung</option>
+        <option value="2">Weihnachtsfeier</option>
+        <option value="3">Jugendtag</option>
+        <option value="4">Sommerparty</option>
+      </select>
+    </div>
   </div>
-
-  <div style="position: relative; margin-top: 16px">
-    <text id="txtCost">Gesamtkosten:</text>
-  </div>
-</div>
-
-<div id="dlgEvent" title="Ereignis">
-  <text>Beginn Ereignis:</text>
-  <select name="H" id="selectEventH">
-    @{
-      for (int iH = 0; iH < 24; iH++) {
-        <option value="@iH.ToString()">@iH.ToString("D2")</option>
-      }
-    }
-  </select>
-  <select name="M" id="selectEventM">
-    @{
-      for (int iM = 0; iM < 60; iM += 15) {
-        <option value="@iM.ToString()">@iM.ToString("D2")</option>
-      }
-    }
-  </select>
-
-  <p>Wählen Sie Ihr geplantes Ereignis:</p>
-
-  <select name="Event" id="selectEvent">
-    <option value="1">Krisensitzung</option>
-    <option value="2">Weihnachtsfeier</option>
-    <option value="3">Jugendtag</option>
-    <option value="4">Sommerparty</option>
-  </select>
-</div>
+</body>
+</html>

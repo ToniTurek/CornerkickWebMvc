@@ -13,6 +13,8 @@ namespace CornerkickWebMvc.Models
     public CornerkickManager.Main.TrainingPlan.Unit[][] ltTu { get; set; }
     public int   [] iTrainingCount    { get; set; }
     public string[] sTrainingCountRel { get; set; }
+    public Controllers.MemberController.Tutorial tutorial { get; set; }
+
   }
 
   //DataContract for Serializing Data - required to serve in JSON format

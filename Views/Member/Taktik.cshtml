@@ -11,8 +11,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
   <link rel="stylesheet" href="/resources/demos/style.css">
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
+
   <style>
     #slider {
       margin: 10px;
@@ -40,6 +42,14 @@
 
     #slider-Ausrichtung .ui-slider-handle {
       border-color: orange;
+    }
+
+    #slider-Einsatz .ui-slider-range {
+      background: rgb(255,0,255);
+    }
+
+    #slider-Einsatz .ui-slider-handle {
+      border-color: rgb(255,0,255);
     }
 
     #slider-left .ui-slider-range {
@@ -109,6 +119,7 @@
 
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.js"></script>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
   <script>
     @{
       int iAusrichtung = (int)(taktik.fOrientation       * 100);
@@ -365,6 +376,12 @@
       createAutoSubs(0);
 
       setView();
+
+      // Show tutorial
+      tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel > 24 && tt.iLevel < 30) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+      }
     }); // $(document).ready
 
     $(window).resize(function () {
@@ -542,129 +559,131 @@
 </head>
 
 <body>
-  <fieldset>
-    <div style="position: relative; width: 100%; height: 100%; min-height: 800px">
-      <div style="position: relative; width: 100%; height: 70px">
-        <div style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
-          <div style="position: absolute; width: 30%; top: 50%; left: 0%">
-            @Html.DropDownListFor(m => m.sStandards[3], Model.ltDdlStandards[3], new { @class = "form-control", @onchange = "setStandards(3)", id = "iDdlStandard3" })
-          </div>
-          <div style="position: absolute; width: 30%; top: 50%; right: 0px">
-            @Html.DropDownListFor(m => m.sStandards[2], Model.ltDdlStandards[2], new { @class = "form-control", @onchange = "setStandards(2)", id = "iDdlStandard2" })
-          </div>
-          <div style="position: absolute; width: 30%; top: 50%; left: 35%">
-            @Html.DropDownListFor(m => m.sStandards[0], Model.ltDdlStandards[0], new { @class = "form-control", @onchange = "setStandards(0)", id = "iDdlStandard0" })
-          </div>
-          <div style="position: absolute; width: 30%; top: 0%; left: 35%">
-            @Html.DropDownListFor(m => m.sStandards[1], Model.ltDdlStandards[1], new { @class = "form-control", @onchange = "setStandards(1)", id = "iDdlStandard1" })
+  <div id="divBody" style="width: 100%">
+    <fieldset>
+      <div style="position: relative; width: 100%; height: 100%; min-height: 800px">
+        <div style="position: relative; width: 100%; height: 70px">
+          <div style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
+            <div style="position: absolute; width: 30%; top: 50%; left: 0%">
+              @Html.DropDownListFor(m => m.sStandards[3], Model.ltDdlStandards[3], new { @class = "form-control", @onchange = "setStandards(3)", id = "iDdlStandard3" })
+            </div>
+            <div style="position: absolute; width: 30%; top: 50%; right: 0px">
+              @Html.DropDownListFor(m => m.sStandards[2], Model.ltDdlStandards[2], new { @class = "form-control", @onchange = "setStandards(2)", id = "iDdlStandard2" })
+            </div>
+            <div style="position: absolute; width: 30%; top: 50%; left: 35%">
+              @Html.DropDownListFor(m => m.sStandards[0], Model.ltDdlStandards[0], new { @class = "form-control", @onchange = "setStandards(0)", id = "iDdlStandard0" })
+            </div>
+            <div style="position: absolute; width: 30%; top: 0%; left: 35%">
+              @Html.DropDownListFor(m => m.sStandards[1], Model.ltDdlStandards[1], new { @class = "form-control", @onchange = "setStandards(1)", id = "iDdlStandard1" })
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
-        <img style="position: relative; width: 100%" src="~/Content/Images/tactic.png" />
+        <div class="image" style="position: relative; width: 100%; margin-bottom: 2%">
+          <img style="position: relative; width: 100%" src="~/Content/Images/tactic.png" />
 
-        <div id="tactic" style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
-          <div id="divTcOrientation" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 33%">
-            <input type="text" id="inputAusrichtung" readonly style="position: absolute; border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 37px; width: 44px; left: -6px">
-            <div id="slider-Ausrichtung" style="position: absolute; top: 20px; float: left; height: 100%"></div>
-          </div>
+          <div id="tactic" style="position: absolute; float: left; width: 100%; height: 100%; top: 0%; left: 0%">
+            <div id="divTcOrientation" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 33%">
+              <input type="text" id="inputAusrichtung" readonly style="position: absolute; border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 37px; width: 44px; left: -6px">
+              <div id="slider-Ausrichtung" style="position: absolute; top: 20px; float: left; height: 100%"></div>
+            </div>
 
-          <div id="divTcOffsiteDistOffence" style="position: absolute; width: 0%; height: 10%; min-height: 300px; min-height: 100px; top: 20%; left: 18%">
-            <input type="text" id="inputDistOffence" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            <div id="slider-DistOffence" style="position: relative; float: left; height: 100%"></div>
-          </div>
+            <div id="divTcOffsiteDistOffence" style="position: absolute; width: 0%; height: 10%; min-height: 300px; min-height: 100px; top: 20%; left: 18%">
+              <input type="text" id="inputDistOffence" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+              <div id="slider-DistOffence" style="position: relative; float: left; height: 100%"></div>
+            </div>
 
-          <div id="divTcShootDist" style="position: absolute; width: 0%; height: 25%; min-height: 300px; top: 2%; left: 58%; transform:rotate(-23deg)">
-            <input type="text" id="inputSchussentf" readonly style="position: absolute; border: 0; color:#f6931f; font-weight: bold; text-align: left; background-color: transparent; float: left; width: 44px; left: -6px">
-            <div id="slider-Schussentf" style="position: absolute; top: 20px; float: left; height: 100%"></div>
-          </div>
+            <div id="divTcShootDist" style="position: absolute; width: 0%; height: 25%; min-height: 300px; top: 2%; left: 58%; transform:rotate(-23deg)">
+              <input type="text" id="inputSchussentf" readonly style="position: absolute; border: 0; color:#f6931f; font-weight: bold; text-align: left; background-color: transparent; float: left; width: 44px; left: -6px">
+              <div id="slider-Schussentf" style="position: absolute; top: 20px; float: left; height: 100%"></div>
+            </div>
 
-          <div id="divTcPassLeft" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 5%">
-            <input type="text" id="inputLeft" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
-            <div id="slider-left" style="position: relative; float: left; height: 100%"></div>
-          </div>
+            <div id="divTcPassLeft" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 5%">
+              <input type="text" id="inputLeft" readonly style="border:0; color:#f6931f; font-weight:bold; text-align: left; float: left; width: 37px; left: 0px">
+              <div id="slider-left" style="position: relative; float: left; height: 100%"></div>
+            </div>
 
-          <div id="divTcPassRight" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; right: 5%">
-            <input type="text" id="inputRight" readonly style="border: 0; color:#f6931f; font-weight: bold; text-align: right; float: right; width: 37px; right: 0px">
-            <div id="slider-right" style="position: relative; float: right; height: 100%; right: 0px"></div>
-          </div>
+            <div id="divTcPassRight" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; right: 5%">
+              <input type="text" id="inputRight" readonly style="border: 0; color:#f6931f; font-weight: bold; text-align: right; float: right; width: 37px; right: 0px">
+              <div id="slider-right" style="position: relative; float: right; height: 100%; right: 0px"></div>
+            </div>
 
-          <div id="divTcPassMid" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 50%">
-            <input type="text" id="inputMid" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 37px; left: 0px">
-            <div id="slider-mid" style="position: relative; float: left; height: 100%"></div>
-          </div>
+            <div id="divTcPassMid" style="position: absolute; width: 0%; height: 34%; min-height: 300px; top: 11%; left: 50%">
+              <input type="text" id="inputMid" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 37px; left: 0px">
+              <div id="slider-mid" style="position: relative; float: left; height: 100%"></div>
+            </div>
 
-          <div id="divTcPower" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 5%">
-            <input type="text" id="inputEinsatz" readonly style="border:0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
-            <div id="slider-Einsatz" style="position: relative; float: left"></div>
-          </div>
+            <div id="divTcPower" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 5%">
+              <input type="text" id="inputEinsatz" readonly style="border:0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
+              <div id="slider-Einsatz" style="position: relative; float: left"></div>
+            </div>
 
-          <div id="divTcDuel" style="position: absolute; width: 40%; min-width: 300px; top: 58%; left: 5%">
-            <input type="text" id="inputZweikampf" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
-            <div id="slider-Zweikampf" style="position: relative; float: left"></div>
-          </div>
+            <div id="divTcDuel" style="position: absolute; width: 40%; min-width: 300px; top: 58%; left: 5%">
+              <input type="text" id="inputZweikampf" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
+              <div id="slider-Zweikampf" style="position: relative; float: left"></div>
+            </div>
 
-          <div id="divTcOffsite" style="position: absolute; width: 40%; min-width: 300px; top: 64%; left: 5%; text-align: center">
-            <label style="width: 100%; background-color: white; font-size: 32px; color: blue; font-family: 'MV Boli'">
-              @Html.CheckBoxFor(m => m.tactic.bOffsite, new { id = "cbTcOffsite" })
-              Abseitsfalle
-            </label>
-          </div>
+            <div id="divTcOffsite" style="position: absolute; width: 40%; min-width: 300px; top: 64%; left: 5%; text-align: center">
+              <label style="width: 100%; background-color: white; font-size: 32px; color: blue; font-family: 'MV Boli'">
+                @Html.CheckBoxFor(m => m.tactic.bOffsite, new { id = "cbTcOffsite" })
+                Abseitsfalle
+              </label>
+            </div>
 
-          <div id="divTcPassLength" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 55%">
-            <input type="text" id="inputPassLength" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; background-color: transparent; float: left; width: 46px; left: 0px">
-            <div id="slider-PassLength" style="position: relative; float: left"></div>
-          </div>
-          <div id="divTcPassRisk" style="position: absolute; width: 40%; min-width: 300px; top: 58%; left: 55%">
-            <input type="text" id="inputPassRisk" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
-            <div id="slider-PassRisk" style="position: relative; float: left"></div>
-          </div>
-          <div id="divTcPassFreq" style="position: absolute; width: 40%; min-width: 300px; top: 64%; left: 55%">
-            <input type="text" id="inputPassFreq" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
-            <div id="slider-PassFreq" style="position: relative; float: left"></div>
-          </div>
+            <div id="divTcPassLength" style="position: absolute; width: 40%; min-width: 300px; top: 52%; left: 55%">
+              <input type="text" id="inputPassLength" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; background-color: transparent; float: left; width: 46px; left: 0px">
+              <div id="slider-PassLength" style="position: relative; float: left"></div>
+            </div>
+            <div id="divTcPassRisk" style="position: absolute; width: 40%; min-width: 300px; top: 58%; left: 55%">
+              <input type="text" id="inputPassRisk" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
+              <div id="slider-PassRisk" style="position: relative; float: left"></div>
+            </div>
+            <div id="divTcPassFreq" style="position: absolute; width: 40%; min-width: 300px; top: 64%; left: 55%">
+              <input type="text" id="inputPassFreq" readonly style="border: 0; color: #f6931f; font-weight: bold; text-align: left; float: left; width: 46px; left: 0px">
+              <div id="slider-PassFreq" style="position: relative; float: left"></div>
+            </div>
 
-          <div id="divTcSubs" style="position: absolute; width: 60%; min-width: 300px; top: 80%; left: 20%; text-align: center">
-            @for (byte i = 0; i < 3; i++) {
-              var htmlAttributesEditorFor = new Dictionary<string, object>
-              {
-                { "type", "number" },
-                { "class", "form-control" },
-                { "id", "tbAutoSubsMin" + i.ToString() },
-                { "autocomplete", "off" },
-                { "min",   "0" },
-                { "max", "120" },
-                { "onkeyup", "setAutoSubs(" + i.ToString() + ")" }
-              };
-              if (i > 0) {
-                htmlAttributesEditorFor.Add("disabled", "disabled");
+            <div id="divTcSubs" style="position: absolute; width: 60%; min-width: 300px; top: 80%; left: 20%; text-align: center">
+              @for (byte i = 0; i < 3; i++) {
+                var htmlAttributesEditorFor = new Dictionary<string, object>
+                {
+                        { "type", "number" },
+                        { "class", "form-control" },
+                        { "id", "tbAutoSubsMin" + i.ToString() },
+                        { "autocomplete", "off" },
+                        { "min",   "0" },
+                        { "max", "120" },
+                        { "onkeyup", "setAutoSubs(" + i.ToString() + ")" }
+                      };
+                if (i > 0) {
+                  htmlAttributesEditorFor.Add("disabled", "disabled");
+                }
+
+                string sIdO = "divAutoSubOut" + i.ToString();
+                string sIdI = "divAutoSubIn" + i.ToString();
+                string sDdlIdO = "ddlAutoSubOut" + i.ToString();
+                string sDdlIdI = "ddlAutoSubIn" + i.ToString();
+                <div style="position: relative; width: 100%; height: 40px">
+                  <div id=@sIdO style="position: absolute; width: 38%; left:  0%">
+                    <select class="form-control" disabled="disabled" id=@sDdlIdO onchange="setAutoSubs(@i)">
+                      <option value="-1">aus</option>
+                    </select>
+                  </div>
+                  <div id=@sIdI style="position: absolute; width: 38%; left: 40%">
+                    <select class="form-control" disabled="disabled" id=@sDdlIdI onchange="setAutoSubs(@i)">
+                      <option value="-1">aus</option>
+                    </select>
+                  </div>
+                  <div style="position: absolute; width: 60px; left: 80%">
+                    @Html.EditorFor(Model => Model.iAutoSubsMin[i], new { htmlAttributes = htmlAttributesEditorFor })
+                  </div>
+                </div>
               }
-
-              string sIdO = "divAutoSubOut" + i.ToString();
-              string sIdI = "divAutoSubIn"  + i.ToString();
-              string sDdlIdO = "ddlAutoSubOut" + i.ToString();
-              string sDdlIdI = "ddlAutoSubIn"  + i.ToString();
-              <div style="position: relative; width: 100%; height: 40px">
-                <div id=@sIdO style="position: absolute; width: 38%; left:  0%">
-                  <select class="form-control" disabled="disabled" id=@sDdlIdO onchange="setAutoSubs(@i)">
-                    <option value="-1">aus</option>
-                  </select>
-                </div>
-                <div id=@sIdI style="position: absolute; width: 38%; left: 40%">
-                  <select class="form-control" disabled="disabled" id=@sDdlIdI onchange="setAutoSubs(@i)">
-                    <option value="-1">aus</option>
-                  </select>
-                </div>
-                <div style="position: absolute; width: 60px; left: 80%">
-                  @Html.EditorFor(Model => Model.iAutoSubsMin[i], new { htmlAttributes = htmlAttributesEditorFor })
-                </div>
-              </div>
-            }
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </fieldset>
+    </fieldset>
+  </div>
 </body>
 </html>

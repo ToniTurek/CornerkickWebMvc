@@ -1,9 +1,18 @@
 ﻿@model CornerkickWebMvc.Models.PlayerModel
 
+@{
+  var player = MvcApplication.ckcore.ltPlayer[Model.iPlayer];
+  ViewBag.Title = player.plGame.sName;
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
 <head>
   <link rel="stylesheet" href="~/Content/DataTables/css/jquery.dataTables.min.css" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="~/Content/themes/jQuery/1.12.1/jquery-ui.css" />
   <link rel="stylesheet" href="/resources/demos/style.css">
+  <link rel="stylesheet" href="~/Content/tutorial.css" />
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/canvasjs.min.js"></script>
@@ -12,1337 +21,1353 @@
   <script type="text/javascript" src="~/Scripts/Player.js"></script>
   <script type="text/javascript" src="~/Scripts/Numbers.js"></script>
   <script type="text/javascript" src="~/Scripts/dialog.js"></script>
-</head>
+  <script type="text/javascript" src="~/Scripts/Tutorial.js"></script>
 
-@{
-  var player = MvcApplication.ckcore.ltPlayer[Model.iPlayer];
-  ViewBag.Title = player.plGame.sName;
-  Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<style>
-  .ui-tabs .ui-state-active {
-    background: @Model.sColorJersey;
-    border-color: @Model.sColorJerseyNo;
-  }
-  .ui-tabs-nav .ui-state-active a {
+  <style>
+    .ui-tabs .ui-state-active {
+      background: @Model.sColorJersey;
+      border-color: @Model.sColorJerseyNo;
+    }
+    .ui-tabs-nav .ui-state-active a {
       color: @Model.sColorJerseyNo;
-  }
-</style>
+    }
 
-<script>
-  var iCpt = 0;
+    .ui-dialog .ui-dialog-buttonpane {
+      text-align: left !important;
+      height: 50px !important;
+    }
+  </style>
 
-  function setIndTraining(iInd) {
-    $.ajax({
-      url: '/Member/setPlayerIndTraining',
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayer: @Model.iPlayer, iIndTr: iInd },
-      success: function (iIndTr) {
-        plotChanceDevelopment();
-      }
-    });
-  }
+  <script>
+    var iCpt = 0;
+    var tt; // Tutorial object
 
-  function setName() {
-    var tbName = document.getElementById("sName");
-
-    if (tbName) {
+    function setIndTraining(iInd) {
       $.ajax({
-        url: '/Member/setPlayerName',
+        url: '/Member/setPlayerIndTraining',
         type: "GET",
         dataType: "JSON",
-        data: { iPlayer: @Model.iPlayer, sName: tbName.value },
+        data: { iPlayer: @Model.iPlayer, iIndTr: iInd },
+        success: function (iIndTr) {
+          plotChanceDevelopment();
+        }
+      });
+    }
+
+    function setName() {
+      var tbName = document.getElementById("sName");
+
+      if (tbName) {
+        $.ajax({
+          url: '/Member/setPlayerName',
+          type: "GET",
+          dataType: "JSON",
+          data: { iPlayer: @Model.iPlayer, sName: tbName.value },
+          success: function () {
+            tbName.style.backgroundColor = "";
+          },
+          error: function (xhr) {
+            tbName.style.backgroundColor = "yellow";
+            alert(xhr.responseText);
+          }
+        });
+      }
+    }
+
+    function setNo() {
+      var iNo = $('#iDdlINo').val();
+      $.ajax({
+        url: '/Member/setPlayerNo',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: @Model.iPlayer, iNo: iNo },
         success: function () {
-          tbName.style.backgroundColor = "";
+        }
+      });
+    }
+
+    function setDopingDesc() {
+      var iDp = $('#ddlDoping').val();
+
+      $.ajax({
+        url: '/Member/PlayerDetailsGetDopingDesc',
+        type: "GET",
+        dataType: "JSON",
+        data: { iDp: iDp },
+        success: function (sDopDesc) {
+          $("#txtDialogDoping").html(sDopDesc);
+        }
+      });
+    }
+
+    function drawStatistic(iMode) {
+      var bSeason = iMode === 0;
+
+      $.ajax({
+        url: '/Member/PlayerDetailsGetStatistic',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: @Model.iPlayer, bSeason: bSeason },
+        success: function (sStatistic) {
+          $('#tblStatistic tbody').html(sStatistic);
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      // Set club emblem
+      var divEmblemClub = document.getElementById("divEmblemClub");
+      var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
+      divEmblemClub.innerHTML = sEmblemImg;
+
+      // Set player portrait emblem
+      var divPortrait = document.getElementById("divPortrait");
+      var sPortraitImg = @Html.Raw(Json.Encode(Model.sPortrait));
+      divPortrait.innerHTML = sPortraitImg;
+
+      $("#tabs").tabs({
+        activate: function (event, ui) {
+          var iTabActive = $(this).tabs('option', 'active');
+
+          if (iTabActive == 0) {
+            plotCFM();
+          } else if (iTabActive == 1) {
+            plotChanceDevelopment();
+
+            if (tt && tt.bShow && tt.iLevel === 10) {
+              drawTutorial(document.getElementById("divBody"), tt.iLevel + 1, tt);
+            }
+          } else if (iTabActive == 2) {
+            plotPlayerDevelopment();
+            plotTrainingDevelopment(@Model.iPlayer);
+            drawStatistic(0);
+          }
+        }
+      });
+
+      plotCFM();
+
+      $('#tableClubHistory').DataTable({
+        "ajax": {
+          "url": '@Url.Action("PlayerDetailsGetClubHistoryTable", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8",
+          "data": function (d) {
+            d.iPlayerId = @Model.iPlayer;
+          }
+        },
+        "columns": [
+          { "data": "iIx" },
+          { "data": "sDt" },
+          { "data": "sClubTakeName" },
+          {
+            "data": "iTransferFee",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          },
+          {
+            "data": "iValue",
+            render: $.fn.dataTable.render.number('.', ',', 0, '')
+          }
+        ],
+        rowReorder: {
+          dataSrc: 'iIx'
+        },
+        "pageLength": 10,
+        "paging": false,
+        "info": false,
+        "responsive": false,
+        "searching": false,
+        "columnDefs": [
+          { "targets": [0], "orderSequence": ["desc", "asc"] },
+          {
+            "targets": [0], // iIx
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          { "targets": [1, 2], "className": "dt-center" },
+          { "targets": [3, 4], "className": "dt-right" }
+        ],
+        select: false
+      });
+
+      $('#tableInjuryHistory').DataTable({
+        "ajax": {
+          "url": '@Url.Action("PlayerDetailsGetInjuryHistoryTable", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8",
+          "data": function (d) {
+            d.iPlayerId = @Model.iPlayer;
+          }
+        },
+        "language": {
+          "emptyTable": "Bisher keine Verletzungen"
+        },
+        "columns": [
+          { "data": "iIx" },
+          { "data": "sDt" },
+          { "data": "sInjuryName" },
+          { "data": "iInjuryLength" }
+        ],
+        rowReorder: {
+          dataSrc: 'iIx'
+        },
+        "pageLength": 10,
+        "paging": false,
+        "info": false,
+        "responsive": false,
+        "searching": false,
+        "columnDefs": [
+          { "targets": [0], "orderSequence": ["desc", "asc"] },
+          {
+            "targets": [0], // iIx
+            "orderable": false,
+            "visible": false,
+            "searchable": false
+          },
+          { "targets": [1, 2], "className": "dt-center" },
+          { "targets": 3, "className": "dt-right" }
+        ],
+        select: false
+      });
+
+      $("#bnContract").click(function () {
+        if (@Html.Raw(Json.Encode(player.bRetire))) {
+          alert("Der Spieler beendet seine Karriere nach Ablauf des Vertrages.");
+        } else if ($("#bnContract").text() === "In Profikader übernehmen") {
+          getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.plGame.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
+        } else {
+          getContractDialog(document.body, @Model.iPlayer, false);
+        }
+      });
+
+      $("#bnPutOnTakeFromTransfer").click(function () {
+        putOnTakeFromTransferlist();
+      });
+
+      $("#bnCaptain").click(function () {
+        iCpt = 0;
+
+        $.when(getCaptainIdAjax(iCpt)).done(function (sCaptain) {
+          if (sCaptain) {
+            $("#txtCaptain").html("Möchten Sie Ihren bisherigen Kapitän " + sCaptain + " wirklich absetzen?");
+            $("#dialogCaptain").dialog("open");
+          } else {
+            makePlayerCaptainAjax(@Model.iPlayer, iCpt);
+          }
+        });
+      });
+
+      $("#bnCaptain2").click(function () {
+        iCpt = 1;
+
+        $.when(getCaptainIdAjax(iCpt)).done(function (sCaptain) {
+          if (sCaptain) {
+            $("#txtCaptain").html("Möchten Sie Ihren bisherigen Vize-Kapitän " + sCaptain + " wirklich absetzen?");
+            $("#dialogCaptain").dialog("open");
+          } else {
+            makePlayerCaptainAjax(@Model.iPlayer, iCpt);
+          }
+        });
+      });
+
+      $("#dialogCaptain").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            makePlayerCaptainAjax(@Model.iPlayer, iCpt)
+
+            $(this).dialog("close");
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+
+      $("#bnDoping").click(function () {
+        setDopingDesc();
+        $("#dialogDoping").dialog("open");
+      });
+
+      $("#dialogDoping").dialog({
+        autoOpen: false,
+        buttons: {
+          "Bestätigen": function () {
+            var iDp = $('#ddlDoping').val();
+
+            $.ajax({
+              url: "/Member/PlayerDetailsDoDoping",
+              type: 'POST',
+              traditional: true,
+              data: { iPlayerId: @Model.iPlayer, iDp: iDp },
+              dataType: "json",
+              success: function (bOk) {
+                if (bOk) {
+                  plotCFM();
+                  printAveSkill(@Model.iPlayer);
+
+                  $("#dialogDoping").dialog("close");
+                } else {
+                  alert("Der Inhalt Ihrer Schwarzen Kasse reicht leider nicht aus...");
+                }
+              },
+              error: function (xhr) {
+                alert(xhr.error);
+              }
+            });
+          },
+          Cancel: function () {
+            $(this).dialog("close");
+          }
+        }
+      });
+
+      plotStars(document.getElementById("divStars"), @player.iTalent);
+      printAveSkill(@Model.iPlayer);
+
+      // Show tutorial
+      tt = @Html.Raw(Json.Encode(Model.tutorial));
+      if (tt && tt.bShow && tt.iLevel > 7 && tt.iLevel < 16) {
+        drawTutorial(document.getElementById("divBody"), tt.iLevel, tt);
+      }
+    }); // $(document).ready(function () {
+
+    function putOnTakeFromTransferlist() {
+      $.ajax({
+        url: "/Member/TransferPutOnTakeFromTransferList",
+        type: 'POST',
+        traditional: true,
+        data: { iPlayerId: @Model.iPlayer },
+        dataType: "json",
+        success: function (response) {
+          alert(response);
+
+          // Switch buttons
+          if (response.indexOf("wurde auf die Transferliste gesetzt") > -1) {
+            plotCFM();
+            printAveSkill(@Model.iPlayer);
+            setTransferlistButton(0);
+          } else {
+            setTransferlistButton(1);
+          }
         },
         error: function (xhr) {
-          tbName.style.backgroundColor = "yellow";
-          alert(xhr.responseText);
+          debugger;
+          alert(xhr);
         }
       });
     }
-  }
 
-  function setNo() {
-    var iNo = $('#iDdlINo').val();
-    $.ajax({
-      url: '/Member/setPlayerNo',
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayer: @Model.iPlayer, iNo: iNo },
-      success: function () {
-      }
-    });
-  }
-
-  function setDopingDesc() {
-    var iDp = $('#ddlDoping').val();
-
-    $.ajax({
-      url: '/Member/PlayerDetailsGetDopingDesc',
-      type: "GET",
-      dataType: "JSON",
-      data: { iDp: iDp },
-      success: function (sDopDesc) {
-        $("#txtDialogDoping").html(sDopDesc);
-      }
-    });
-  }
-
-  function drawStatistic(iMode) {
-    var bSeason = iMode === 0;
-
-    $.ajax({
-      url: '/Member/PlayerDetailsGetStatistic',
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayer: @Model.iPlayer, bSeason: bSeason },
-      success: function (sStatistic) {
-        $('#tblStatistic tbody').html(sStatistic);
-      }
-    });
-  }
-
-  $(document).ready(function () {
-    // Set club emblem
-    var divEmblemClub = document.getElementById("divEmblemClub");
-    var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
-    divEmblemClub.innerHTML = sEmblemImg;
-
-    // Set player portrait emblem
-    var divPortrait = document.getElementById("divPortrait");
-    var sPortraitImg = @Html.Raw(Json.Encode(Model.sPortrait));
-    divPortrait.innerHTML = sPortraitImg;
-
-    $("#tabs").tabs({
-      activate: function (event, ui) {
-        var iTabActive = $(this).tabs('option', 'active');
-
-        if (iTabActive == 0) {
-          plotCFM();
-        } else if (iTabActive == 1) {
-          plotChanceDevelopment();
-        } else if (iTabActive == 2) {
-          plotPlayerDevelopment();
-          plotTrainingDevelopment(@Model.iPlayer);
-          drawStatistic(0);
-        }
-      }
-    });
-
-    plotCFM();
-
-    $('#tableClubHistory').DataTable({
-      "ajax": {
-        "url": '@Url.Action("PlayerDetailsGetClubHistoryTable", "Member")',
-        "type": 'GET',
-        "dataType": "JSON",
-        "cache": false,
-        "contentType": "application/json; charset=utf-8",
-        "data": function (d) {
-          d.iPlayerId = @Model.iPlayer;
-        }
-      },
-      "columns": [
-        { "data": "iIx" },
-        { "data": "sDt" },
-        { "data": "sClubTakeName" },
-        {
-          "data": "iTransferFee",
-          render: $.fn.dataTable.render.number('.', ',', 0, '')
-        },
-        {
-          "data": "iValue",
-          render: $.fn.dataTable.render.number('.', ',', 0, '')
-        }
-      ],
-      rowReorder: {
-        dataSrc: 'iIx'
-      },
-      "pageLength": 10,
-      "paging": false,
-      "info": false,
-      "responsive": false,
-      "searching": false,
-      "columnDefs": [
-        { "targets": [0], "orderSequence": ["desc", "asc"] },
-        {
-          "targets": [0], // iIx
-          "orderable": false,
-          "visible": false,
-          "searchable": false
-        },
-        { "targets": [1, 2], "className": "dt-center" },
-        { "targets": [3, 4], "className": "dt-right" }
-      ],
-      select: false
-    });
-
-    $('#tableInjuryHistory').DataTable({
-      "ajax": {
-        "url": '@Url.Action("PlayerDetailsGetInjuryHistoryTable", "Member")',
-        "type": 'GET',
-        "dataType": "JSON",
-        "cache": false,
-        "contentType": "application/json; charset=utf-8",
-        "data": function (d) {
-          d.iPlayerId = @Model.iPlayer;
-        }
-      },
-      "language": {
-        "emptyTable": "Bisher keine Verletzungen"
-      },
-      "columns": [
-        { "data": "iIx" },
-        { "data": "sDt" },
-        { "data": "sInjuryName" },
-        { "data": "iInjuryLength" }
-      ],
-      rowReorder: {
-        dataSrc: 'iIx'
-      },
-      "pageLength": 10,
-      "paging": false,
-      "info": false,
-      "responsive": false,
-      "searching": false,
-      "columnDefs": [
-        { "targets": [0], "orderSequence": ["desc", "asc"] },
-        {
-          "targets": [0], // iIx
-          "orderable": false,
-          "visible": false,
-          "searchable": false
-        },
-        { "targets": [1, 2], "className": "dt-center" },
-        { "targets": 3, "className": "dt-right" }
-      ],
-      select: false
-    });
-
-    $("#bnContract").click(function () {
-      if (@Html.Raw(Json.Encode(player.bRetire))) {
-        alert("Der Spieler beendet seine Karriere nach Ablauf des Vertrages.");
-      } else if ($("#bnContract").text() === "In Profikader übernehmen") {
-        getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.plGame.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
+    function setTransferlistButton(iOption) {
+      var sText = "";
+      if (iOption === 0) {
+        sText = "Von Transferliste nehmen";
       } else {
-        getContractDialog(document.body, @Model.iPlayer, false);
+        sText = "Auf Transferliste setzen";
       }
-    });
 
-    $("#bnPutOnTakeFromTransfer").click(function () {
-      putOnTakeFromTransferlist();
-    });
+      document.getElementById("bnPutOnTakeFromTransfer").innerHTML = sText;
+    }
 
-    $("#bnCaptain").click(function () {
-      iCpt = 0;
-
-      $.when(getCaptainIdAjax(iCpt)).done(function (sCaptain) {
-        if (sCaptain) {
-          $("#txtCaptain").html("Möchten Sie Ihren bisherigen Kapitän " + sCaptain + " wirklich absetzen?");
-          $("#dialogCaptain").dialog("open");
-        } else {
-          makePlayerCaptainAjax(@Model.iPlayer, iCpt);
+    function forcePutOnTransferlistGetSecretMoney() {
+      $.ajax({
+        url: "/Member/PlayerDetailsGetSecretMoneyForcePutOnTransferList",
+        traditional: true,
+        data: { iPlayerId: @Model.iPlayer },
+        dataType: "json",
+        success: function (response) {
+          getDialog(document.body, response, "Handgeld", forcePutOnTransferlist);
+        },
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
         }
       });
-    });
+    }
 
-    $("#bnCaptain2").click(function () {
-      iCpt = 1;
-
-      $.when(getCaptainIdAjax(iCpt)).done(function (sCaptain) {
-        if (sCaptain) {
-          $("#txtCaptain").html("Möchten Sie Ihren bisherigen Vize-Kapitän " + sCaptain + " wirklich absetzen?");
-          $("#dialogCaptain").dialog("open");
-        } else {
-          makePlayerCaptainAjax(@Model.iPlayer, iCpt);
+    function forcePutOnTransferlist() {
+      $.ajax({
+        url: "/Member/PlayerDetailsForcePutOnTransferList",
+        traditional: true,
+        data: { iPlayerId: @Model.iPlayer },
+        dataType: "json",
+        success: function (response) {
+          alert(response);
+          document.getElementById("bnForcePutOnTransfer").style.display = "none";
+        },
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
         }
       });
-    });
+    }
 
-    $("#dialogCaptain").dialog({
-      autoOpen: false,
-      buttons: {
-        "Bestätigen": function () {
-          makePlayerCaptainAjax(@Model.iPlayer, iCpt)
-
-          $(this).dialog("close");
+    function getCaptainIdAjax(iC) {
+      return $.ajax({
+        url: "/Member/getClubCaptain",
+        type: "GET",
+        dataType: "JSON",
+        data: { iC: iC },
+        success: function (sCaptainName) {
+          //alert(sCaptainName);
         },
-        Cancel: function () {
-          $(this).dialog("close");
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
         }
-      }
-    });
+      });
+    }
 
-    $("#bnDoping").click(function () {
-      setDopingDesc();
-      $("#dialogDoping").dialog("open");
-    });
+    function makePlayerCaptainAjax(iPlayerId, iC) {
+      $.ajax({
+        url: "/Member/PlayerMakeCaptain",
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayerId: iPlayerId, iC: iC },
+        success: function (response) {
+          alert(response);
 
-    $("#dialogDoping").dialog({
-      autoOpen: false,
-      buttons: {
-        "Bestätigen": function () {
-          var iDp = $('#ddlDoping').val();
+          var bnCaptain  = document.getElementById("bnCaptain");
+          var bnCaptain2 = document.getElementById("bnCaptain2");
+          if (iC === 0) {
+            if (bnCaptain)  { bnCaptain .style.display = "none"; }
+            if (bnCaptain2) { bnCaptain2.style.display = "block"; }
+          } else if (iC === 1) {
+            if (bnCaptain)  { bnCaptain .style.display = "block"; }
+            if (bnCaptain2) { bnCaptain2.style.display = "none"; }
+          }
 
-          $.ajax({
-            url: "/Member/PlayerDetailsDoDoping",
-            type: 'POST',
-            traditional: true,
-            data: { iPlayerId: @Model.iPlayer, iDp: iDp },
-            dataType: "json",
-            success: function (bOk) {
-              if (bOk) {
-                plotCFM();
-                printAveSkill(@Model.iPlayer);
-
-                $("#dialogDoping").dialog("close");
-              } else {
-                alert("Der Inhalt Ihrer Schwarzen Kasse reicht leider nicht aus...");
-              }
-            },
-            error: function (xhr) {
-              alert(xhr.error);
-            }
-          });
-        },
-        Cancel: function () {
-          $(this).dialog("close");
-        }
-      }
-    });
-
-    plotStars(document.getElementById("divStars"), @player.iTalent);
-    printAveSkill(@Model.iPlayer);
-  }); // $(document).ready(function () {
-
-  function putOnTakeFromTransferlist() {
-    $.ajax({
-      url: "/Member/TransferPutOnTakeFromTransferList",
-      type: 'POST',
-      traditional: true,
-      data: { iPlayerId: @Model.iPlayer },
-      dataType: "json",
-      success: function (response) {
-        alert(response);
-
-        // Switch buttons
-        if (response.indexOf("wurde auf die Transferliste gesetzt") > -1) {
           plotCFM();
           printAveSkill(@Model.iPlayer);
-          setTransferlistButton(0);
+        },
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
+        }
+      });
+    }
+
+    function moveIntoProTeam() {
+      $.ajax({
+        url: "/Member/PlayerDetailsMoveIntoProTeam",
+        type: 'GET',
+        traditional: true,
+        data: { iPlayerId: @Model.iPlayer },
+        dataType: "json",
+        success: function (response) {
+          alert(response);
+          window.location.reload(true);
+        },
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
+        }
+      });
+    }
+
+    function plotStars(parent, iStars) {
+      var fRadius = parent.offsetHeight / 2;
+      var iStarHeight = 18;
+
+      var i = 0;
+      for (i = 0; i < Math.max(10, iStars + 1); i++) {
+        if (i > 9) {
+          iStarHeight = 26;
+        }
+
+        var imgStar = document.createElement("img");
+        imgStar.style.position = "absolute";
+        var fXY = getXY(((i + 0.0) * Math.PI) / 5, fRadius - (iStarHeight / 2));
+        imgStar.style.left = ((fRadius - (iStarHeight / 2)) + fXY[0]).toFixed(0) + "px";
+        imgStar.style.top  = ((fRadius - (iStarHeight / 1)) - fXY[1] + 9).toFixed(0) + "px";
+        if (i > 9) {
+          imgStar.style.zIndex = -1;
+        }
+
+        imgStar.style.width = iStarHeight.toString() + "px";
+        if (i <= iStars) {
+          imgStar.src = "/Content/Icons/star.ico";
+          imgStar.title = (i + 1).toString();
         } else {
-          setTransferlistButton(1);
+          imgStar.src = "/Content/Icons/star_empty.png";
         }
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
+        parent.appendChild(imgStar);
       }
-    });
-  }
-
-  function setTransferlistButton(iOption) {
-    var sText = "";
-    if (iOption === 0) {
-      sText = "Von Transferliste nehmen";
-    } else {
-      sText = "Auf Transferliste setzen";
     }
 
-    document.getElementById("bnPutOnTakeFromTransfer").innerHTML = sText;
-  }
-
-  function forcePutOnTransferlistGetSecretMoney() {
-    $.ajax({
-      url: "/Member/PlayerDetailsGetSecretMoneyForcePutOnTransferList",
-      traditional: true,
-      data: { iPlayerId: @Model.iPlayer },
-      dataType: "json",
-      success: function (response) {
-        getDialog(document.body, response, "Handgeld", forcePutOnTransferlist);
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
-      }
-    });
-  }
-
-  function forcePutOnTransferlist() {
-    $.ajax({
-      url: "/Member/PlayerDetailsForcePutOnTransferList",
-      traditional: true,
-      data: { iPlayerId: @Model.iPlayer },
-      dataType: "json",
-      success: function (response) {
-        alert(response);
-        document.getElementById("bnForcePutOnTransfer").style.display = "none";
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
-      }
-    });
-  }
-
-  function getCaptainIdAjax(iC) {
-    return $.ajax({
-      url: "/Member/getClubCaptain",
-      type: "GET",
-      dataType: "JSON",
-      data: { iC: iC },
-      success: function (sCaptainName) {
-        //alert(sCaptainName);
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
-      }
-    });
-  }
-
-  function makePlayerCaptainAjax(iPlayerId, iC) {
-    $.ajax({
-      url: "/Member/PlayerMakeCaptain",
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayerId: iPlayerId, iC: iC },
-      success: function (response) {
-        alert(response);
-
-        var bnCaptain  = document.getElementById("bnCaptain");
-        var bnCaptain2 = document.getElementById("bnCaptain2");
-        if (iC === 0) {
-          if (bnCaptain)  { bnCaptain .style.display = "none"; }
-          if (bnCaptain2) { bnCaptain2.style.display = "block"; }
-        } else if (iC === 1) {
-          if (bnCaptain)  { bnCaptain .style.display = "block"; }
-          if (bnCaptain2) { bnCaptain2.style.display = "none"; }
+    function printAveSkill(iPlayerId) {
+      $.ajax({
+        url: "/Member/PlayerDetailsGetAveSkill",
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayerId: iPlayerId },
+        success: function (fAveSkill) {
+          document.getElementById("txtAveSkill").innerText = fAveSkill[0].toFixed(1);
+          document.getElementById("tdAveSkill").innerText = fAveSkill[0].toFixed(1) + " (" + fAveSkill[1].toFixed(1) + ")";
+        },
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
         }
-
-        plotCFM();
-        printAveSkill(@Model.iPlayer);
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
-      }
-    });
-  }
-
-  function moveIntoProTeam() {
-    $.ajax({
-      url: "/Member/PlayerDetailsMoveIntoProTeam",
-      type: 'GET',
-      traditional: true,
-      data: { iPlayerId: @Model.iPlayer },
-      dataType: "json",
-      success: function (response) {
-        alert(response);
-        window.location.reload(true);
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
-      }
-    });
-  }
-
-  function plotStars(parent, iStars) {
-    var fRadius = parent.offsetHeight / 2;
-    var iStarHeight = 18;
-
-    var i = 0;
-    for (i = 0; i < Math.max(10, iStars + 1); i++) {
-      if (i > 9) {
-        iStarHeight = 26;
-      }
-
-      var imgStar = document.createElement("img");
-      imgStar.style.position = "absolute";
-      var fXY = getXY(((i + 0.0) * Math.PI) / 5, fRadius - (iStarHeight / 2));
-      imgStar.style.left = ((fRadius - (iStarHeight / 2)) + fXY[0]).toFixed(0) + "px";
-      imgStar.style.top  = ((fRadius - (iStarHeight / 1)) - fXY[1] + 9).toFixed(0) + "px";
-      if (i > 9) {
-        imgStar.style.zIndex = -1;
-      }
-
-      imgStar.style.width = iStarHeight.toString() + "px";
-      if (i <= iStars) {
-        imgStar.src = "/Content/Icons/star.ico";
-        imgStar.title = (i + 1).toString();
-      } else {
-        imgStar.src = "/Content/Icons/star_empty.png";
-      }
-      parent.appendChild(imgStar);
+      });
     }
-  }
 
-  function printAveSkill(iPlayerId) {
-    $.ajax({
-      url: "/Member/PlayerDetailsGetAveSkill",
-      type: "GET",
-      dataType: "JSON",
-      data: { iPlayerId: iPlayerId },
-      success: function (fAveSkill) {
-        document.getElementById("txtAveSkill").innerText = fAveSkill[0].toFixed(1);
-        document.getElementById("tdAveSkill").innerText = fAveSkill[0].toFixed(1) + " (" + fAveSkill[1].toFixed(1) + ")";
-      },
-      error: function (xhr) {
-        debugger;
-        alert(xhr);
-      }
-    });
-  }
+    function getXY(fAngle, fRadius) {
+      var fXY = [];
 
-  function getXY(fAngle, fRadius) {
-    var fXY = [];
+      fXY.push(fRadius * Math.sin(fAngle));
+      fXY.push(fRadius * Math.cos(fAngle));
 
-    fXY.push(fRadius * Math.sin(fAngle));
-    fXY.push(fRadius * Math.cos(fAngle));
+      return fXY;
+    }
 
-    return fXY;
-  }
+    function plotCFM() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/PlayerDetailsGetCFM',
+        dataType: "json",
+        data: { iPlId: @Model.iPlayer },
+        success: function (dataCFM) {
+          CanvasJS.addColorSet("customColorSet1",
+            [
+              "lightblue",
+              "blue",
+              "green",
+              "red",
+            ]);
 
-  function plotCFM() {
-    $.ajax({
-      type: 'post',
-      url: '/Member/PlayerDetailsGetCFM',
-      dataType: "json",
-      data: { iPlId: @Model.iPlayer },
-      success: function (dataCFM) {
-        CanvasJS.addColorSet("customColorSet1",
-          [
-            "lightblue",
-            "blue",
-            "green",
-            "red",
-          ]);
-
-        var chartCFM = new CanvasJS.Chart("divChartCFM", {
-          colorSet: "customColorSet1",
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          axisX: {
-            gridThickness: 1,
-            interval: 1
-          },
-          axisY: {
-            valueFormatString: "0.0%",
-            includeZero: true
-          },
-          legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },
-          data: [
-            {
-              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
-              type: "column",
-              indexLabel: "{y}",
-              indexLabelFontColor: "black",
-              indexLabelPlacement: "outside",
-              yValueFormatString: "0.0%",
-              dataPoints: [
-                { label: "Kondition", x: 0, y: dataCFM[0].y },
-                { label: "",          x: 0, y: dataCFM[1].y },
-                { label: "Frische",   x: 1, y: dataCFM[2].y },
-                { label: "Moral",     x: 2, y: dataCFM[3].y }
-              ]
-            }
-          ]
-        });
-
-        chartCFM.render();
-      }
-    });
-  }
-
-  function plotPlayerDevelopment() {
-    $.ajax({
-      type: 'post',
-      url: '/Member/PlayerDetailsGetDevelopmentData',
-      dataType: "json",
-      data: { iPlId: @Model.iPlayer },
-      success: function (dataDev) {
-        var chartDev = new CanvasJS.Chart("divChartDevelopment", {
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          axisX: {
-            gridThickness: 1,
-            interval: 12,
-            valueFormatString: "DD MMM",
-            labelAngle: -20
-          },
-          axisY: {
-            title: "Stärke",
-            includeZero: false
-          },
-          axisY2: {
-            title: "Marktwert [mio. €]",
-            valueFormatString: "#,,.###",
-            includeZero: false
-          },
-          legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },
-          data: [
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              xValueType: "dateTime",
-              yValueFormatString: "0.00",
-              dataPoints: dataDev[0]
+          var chartCFM = new CanvasJS.Chart("divChartCFM", {
+            colorSet: "customColorSet1",
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            axisX: {
+              gridThickness: 1,
+              interval: 1
             },
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              xValueType: "dateTime",
-              axisYType: "secondary",
-              dataPoints: dataDev[1]
-            }
-          ]
-        });
-
-        chartDev.render();
-      }
-    });
-  }
-
-  function plotChanceDevelopment() {
-    $.ajax({
-      type: 'post',
-      url: '/Member/PlayerDetailsGetChanceDevelopment',
-      dataType: "json",
-      data: { iPlId: @Model.iPlayer },
-      success: function (dataCFM) {
-        CanvasJS.addColorSet("customColorSet1",
-          [
-            "blue",
-            "red",
-            "green",
-            "BlueViolet",
-            "yellow",
-            "DeepPink",
-            "orange",
-            "lightblue",
-            "DimGray",
-          ]);
-
-        var chartCFM = new CanvasJS.Chart("divChartChanceDevelopment", {
-          colorSet: "customColorSet1",
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          axisX: {
-            gridThickness: 1,
-            interval: 1
-          },
-          axisY: {
-            valueFormatString: "0.0%",
-            includeZero: true
-          },
-          legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },
-          data: [
-            {
-              // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
-              type: "column",
-              indexLabel: "{y}",
-              indexLabelFontColor: "black",
-              indexLabelPlacement: "outside",
-              yValueFormatString: "0.00%",
-              dataPoints: [
-                { label: "Tr.-Bonus", x: 0, y: dataCFM[7].y },
-                { label: "Talent",    x: 1, y: dataCFM[2].y },
-                { label: "Spielpr.",  x: 2, y: dataCFM[3].y },
-                { label: "Alter",     x: 3, y: dataCFM[4].y },
-                { label: "Trainer",   x: 4, y: dataCFM[5].y },
-                { label: "Gebäude",   x: 5, y: dataCFM[6].y },
-                { label: "F-Level",   x: 6, y: dataCFM[1].y },
-                { label: "Ind. Tr.",  x: 7, y: dataCFM[0].y },
-                { label: "Total",     x: 8, y: dataCFM[8].y }
-              ]
-            }
-          ]
-        });
-
-        chartCFM.render();
-      }
-    });
-  }
-
-  function plotTrainingDevelopment(iPlayerId) {
-    $.ajax({
-      type: 'post',
-      url: '/Member/GetPlayerTrainingHistotyData',
-      dataType: "json",
-      data: { iPlayerId: iPlayerId },
-      success: function (dataCFM) {
-        var chartCFM = new CanvasJS.Chart("divChartTrainingHistory", {
-          animationEnabled: true,
-          theme: "theme2",//theme1
-          toolTip: {
-            shared: true,
-            borderColor: "black",
-            contentFormatter: function (e) {
-              var content = "";
-
-              // Date
-              var dateOptions = { day: 'numeric', weekday: 'short', month: 'numeric', hour: "numeric", minute: "2-digit" };
-              var d = new Date();
-              d.setTime(e.entries[0].dataPoint.x);
-              content += "<div style=\"width: 100%; text-align: center\"><u>" + d.toLocaleString(undefined, dateOptions) + "</u></div>";
-
-              // CFM
-              content += "<table>";
-              // For each type
-              for (var i = 0; i < e.entries.length; i++) {
-                content += "<tr><td style=\"text-align:right; color:" + e.entries[i].dataSeries.color + "\">" + e.entries[i].dataSeries.name + ":</td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
+            axisY: {
+              valueFormatString: "0.0%",
+              includeZero: true
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "column",
+                indexLabel: "{y}",
+                indexLabelFontColor: "black",
+                indexLabelPlacement: "outside",
+                yValueFormatString: "0.0%",
+                dataPoints: [
+                  { label: "Kondition", x: 0, y: dataCFM[0].y },
+                  { label: "",          x: 0, y: dataCFM[1].y },
+                  { label: "Frische",   x: 1, y: dataCFM[2].y },
+                  { label: "Moral",     x: 2, y: dataCFM[3].y }
+                ]
               }
-              content += "</table>";
+            ]
+          });
 
-              // Training type
-              content += "<div style=\"width: 100%; text-align: center\">" + e.entries[0].dataPoint.z + "</div>";
-
-              return content;
-            }
-          },
-          axisX: {
-            gridThickness: 1,
-            interval: 1,
-            intervalType: "day",
-            valueFormatString: "DDD DD MMM",
-            labelAngle: -20
-          },
-          axisY: {
-            valueFormatString: "0.0%",
-            includeZero: false
-          },
-          legend: {
-            horizontalAlign: "center", // left, center ,right
-            verticalAlign: "bottom",  // top, center, bottom
-            dockInsidePlotArea: true
-          },
-          data: [
-            {
-              // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-              type: "line",
-              color: "blue",
-              showInLegend: true,
-              legendText: "Kondition",
-              name: "Kondition",
-              xValueType: "dateTime",
-              xValueFormatString: "DD MMM HH:mm",
-              yValueFormatString: "0.0%",
-              dataPoints: dataCFM[0]
-            },
-            {
-              type: "line",
-              color: "green",
-              showInLegend: true,
-              legendText: "Frische",
-              name: "Frische",
-              xValueType: "dateTime",
-              xValueFormatString: "DD MMM HH:mm",
-              yValueFormatString: "0.0%",
-              dataPoints: dataCFM[1]
-            },
-            {
-              type: "line",
-              color: "red",
-              showInLegend: true,
-              legendText: "Moral",
-              name: "Moral",
-              xValueType: "dateTime",
-              xValueFormatString: "DD MMM HH:mm",
-              yValueFormatString: "0.0%",
-              dataPoints: dataCFM[2]
-            }
-          ]
-        });
-
-        chartCFM.render();
-      }
-    });
-  }
-</script>
-
-<div style="position: relative; width: 100%; height: 100%; min-height: 500px; margin-bottom: 20px; float: left">
-  @if (Model.iPlIdPrev >= 0 || Model.iPlIdNext >= 0) {
-    <div style="position: relative; width: 100%; height: 20px">
-      @{
-        string sPlPrevName = "";
-        if (Model.iPlIdPrev >= 0) {
-          sPlPrevName = "<<   " + MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].plGame.sName;
-          <div style="position: absolute; left:  0%; width: 49%">
-            @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
-          </div>
+          chartCFM.render();
         }
-
-        string sPlNextName = "";
-        if (Model.iPlIdNext >= 0) {
-          sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].plGame.sName + "   >>";
-
-          <div style="position: absolute; left: 50%; width: 49%; text-align: right">
-            @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
-          </div>
-        }
-      }
-    </div>
-  }
-
-  @{
-    string sTalent = (player.iTalent + 1).ToString();
-    string sAge = ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum)).ToString();
-    string sPos = CornerkickManager.PlayerTool.getStrPos(player.plGame);
-    string sClub = "vereinslos";
-    if (player.contract?.club != null) {
-      sClub = player.contract.club.sName;
+      });
     }
 
-    <div style="position: relative; width: 100%; margin-top: 4px">
-      <div style="position: absolute; top: 0px; left: 0px">
-        @if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
-          <div class="form-group">
-            @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()", @style = "width:180px" })
-          </div>
-        } else {
-          string sPlName = player.plGame.sName;
-          <div style="position: relative; width: 100%; height: 84px">
-            @if (!Model.bJouth) {
-              string sPlNo = player.plGame.iNr.ToString();
-              <div style="position: absolute; width: 96px; height: 100%; text-align: center; background-color: @Model.sColorJersey">
-                <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+    function plotPlayerDevelopment() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/PlayerDetailsGetDevelopmentData',
+        dataType: "json",
+        data: { iPlId: @Model.iPlayer },
+        success: function (dataDev) {
+          var chartDev = new CanvasJS.Chart("divChartDevelopment", {
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            axisX: {
+              gridThickness: 1,
+              interval: 12,
+              valueFormatString: "DD MMM",
+              labelAngle: -20
+            },
+            axisY: {
+              title: "Stärke",
+              includeZero: false
+            },
+            axisY2: {
+              title: "Marktwert [mio. €]",
+              valueFormatString: "#,,.###",
+              includeZero: false
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                xValueType: "dateTime",
+                yValueFormatString: "0.00",
+                dataPoints: dataDev[0]
+              },
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                xValueType: "dateTime",
+                axisYType: "secondary",
+                dataPoints: dataDev[1]
+              }
+            ]
+          });
 
-                @if (Model.bOwnPlayer && (player.plGame.iNr < 1 || Model.bSeasonStart)) {
-                  <div style="position: absolute; top: 18px; left: 22px; width: 100%; text-align: left">
-                    @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @onchange = "setNo()", id = "iDdlINo", @style = "width: 70px; height: 50px; font-size: 42px; color: " + Model.sColorJerseyNo + "; background-color: transparent" })
-                  </div>
-                } else {
-                  <div>
-                    <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
+          chartDev.render();
+        }
+      });
+    }
+
+    function plotChanceDevelopment() {
+      $.ajax({
+        type: 'post',
+        url: '/Member/PlayerDetailsGetChanceDevelopment',
+        dataType: "json",
+        data: { iPlId: @Model.iPlayer },
+        success: function (dataCFM) {
+          CanvasJS.addColorSet("customColorSet1",
+            [
+              "blue",
+              "red",
+              "green",
+              "BlueViolet",
+              "yellow",
+              "DeepPink",
+              "orange",
+              "lightblue",
+              "DimGray",
+            ]);
+
+          var chartCFM = new CanvasJS.Chart("divChartChanceDevelopment", {
+            colorSet: "customColorSet1",
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            axisX: {
+              gridThickness: 1,
+              interval: 1
+            },
+            axisY: {
+              valueFormatString: "0.0%",
+              includeZero: true
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "column", "splineArea", "area", "spline", "pie",etc.
+                type: "column",
+                indexLabel: "{y}",
+                indexLabelFontColor: "black",
+                indexLabelPlacement: "outside",
+                yValueFormatString: "0.00%",
+                dataPoints: [
+                  { label: "Tr.-Bonus", x: 0, y: dataCFM[7].y },
+                  { label: "Talent",    x: 1, y: dataCFM[2].y },
+                  { label: "Spielpr.",  x: 2, y: dataCFM[3].y },
+                  { label: "Alter",     x: 3, y: dataCFM[4].y },
+                  { label: "Trainer",   x: 4, y: dataCFM[5].y },
+                  { label: "Gebäude",   x: 5, y: dataCFM[6].y },
+                  { label: "F-Level",   x: 6, y: dataCFM[1].y },
+                  { label: "Ind. Tr.",  x: 7, y: dataCFM[0].y },
+                  { label: "Total",     x: 8, y: dataCFM[8].y }
+                ]
+              }
+            ]
+          });
+
+          chartCFM.render();
+        }
+      });
+    }
+
+    function plotTrainingDevelopment(iPlayerId) {
+      $.ajax({
+        type: 'post',
+        url: '/Member/GetPlayerTrainingHistotyData',
+        dataType: "json",
+        data: { iPlayerId: iPlayerId },
+        success: function (dataCFM) {
+          var chartCFM = new CanvasJS.Chart("divChartTrainingHistory", {
+            animationEnabled: true,
+            theme: "theme2",//theme1
+            toolTip: {
+              shared: true,
+              borderColor: "black",
+              contentFormatter: function (e) {
+                var content = "";
+
+                // Date
+                var dateOptions = { day: 'numeric', weekday: 'short', month: 'numeric', hour: "numeric", minute: "2-digit" };
+                var d = new Date();
+                d.setTime(e.entries[0].dataPoint.x);
+                content += "<div style=\"width: 100%; text-align: center\"><u>" + d.toLocaleString(undefined, dateOptions) + "</u></div>";
+
+                // CFM
+                content += "<table>";
+                // For each type
+                for (var i = 0; i < e.entries.length; i++) {
+                  content += "<tr><td style=\"text-align:right; color:" + e.entries[i].dataSeries.color + "\">" + e.entries[i].dataSeries.name + ":</td><td style=\"text-align:right\">" + (e.entries[i].dataPoint.y * 100).toFixed(1) + "%</td>";
+                }
+                content += "</table>";
+
+                // Training type
+                content += "<div style=\"width: 100%; text-align: center\">" + e.entries[0].dataPoint.z + "</div>";
+
+                return content;
+              }
+            },
+            axisX: {
+              gridThickness: 1,
+              interval: 1,
+              intervalType: "day",
+              valueFormatString: "DDD DD MMM",
+              labelAngle: -20
+            },
+            axisY: {
+              valueFormatString: "0.0%",
+              includeZero: false
+            },
+            legend: {
+              horizontalAlign: "center", // left, center ,right
+              verticalAlign: "bottom",  // top, center, bottom
+              dockInsidePlotArea: true
+            },
+            data: [
+              {
+                // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+                type: "line",
+                color: "blue",
+                showInLegend: true,
+                legendText: "Kondition",
+                name: "Kondition",
+                xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
+                yValueFormatString: "0.0%",
+                dataPoints: dataCFM[0]
+              },
+              {
+                type: "line",
+                color: "green",
+                showInLegend: true,
+                legendText: "Frische",
+                name: "Frische",
+                xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
+                yValueFormatString: "0.0%",
+                dataPoints: dataCFM[1]
+              },
+              {
+                type: "line",
+                color: "red",
+                showInLegend: true,
+                legendText: "Moral",
+                name: "Moral",
+                xValueType: "dateTime",
+                xValueFormatString: "DD MMM HH:mm",
+                yValueFormatString: "0.0%",
+                dataPoints: dataCFM[2]
+              }
+            ]
+          });
+
+          chartCFM.render();
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <div id="divBody" style="position: relative; width: 100%">
+    <div style="position: relative; width: 100%; height: 100%; min-height: 500px; margin-bottom: 20px; float: left">
+      @if (Model.iPlIdPrev >= 0 || Model.iPlIdNext >= 0) {
+        <div style="position: relative; width: 100%; height: 20px">
+          @{
+            string sPlPrevName = "";
+            if (Model.iPlIdPrev >= 0) {
+              sPlPrevName = "<<   " + MvcApplication.ckcore.ltPlayer[Model.iPlIdPrev].plGame.sName;
+              <div style="position: absolute; left:  0%; width: 49%">
+                @Html.ActionLink(@sPlPrevName, "PlayerDetails", "Member", new { i = @Model.iPlIdPrev.ToString() }, new { target = "" })
+              </div>
+            }
+
+            string sPlNextName = "";
+            if (Model.iPlIdNext >= 0) {
+              sPlNextName = MvcApplication.ckcore.ltPlayer[Model.iPlIdNext].plGame.sName + "   >>";
+
+              <div style="position: absolute; left: 50%; width: 49%; text-align: right">
+                @Html.ActionLink(@sPlNextName, "PlayerDetails", "Member", new { i = @Model.iPlIdNext.ToString() }, new { target = "" })
+              </div>
+            }
+          }
+        </div>
+      }
+
+      @{
+        string sTalent = (player.iTalent + 1).ToString();
+        string sAge = ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum)).ToString();
+        string sPos = CornerkickManager.PlayerTool.getStrPos(player.plGame);
+        string sClub = "vereinslos";
+        if (player.contract?.club != null) {
+          sClub = player.contract.club.sName;
+        }
+
+        <div style="position: relative; width: 100%; margin-top: 4px">
+          <div style="position: absolute; top: 0px; left: 0px">
+            @if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
+              <div class="form-group">
+                @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()", @style = "width:180px" })
+              </div>
+            } else {
+              string sPlName = player.plGame.sName;
+              <div style="position: relative; width: 100%; height: 84px">
+                @if (!Model.bJouth) {
+                  string sPlNo = player.plGame.iNr.ToString();
+                  <div style="position: absolute; width: 96px; height: 100%; text-align: center; background-color: @Model.sColorJersey">
+                    <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+
+                    @if (Model.bOwnPlayer && (player.plGame.iNr < 1 || Model.bSeasonStart)) {
+                      <div style="position: absolute; top: 18px; left: 22px; width: 100%; text-align: left">
+                        @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @onchange = "setNo()", id = "iDdlINo", @style = "width: 70px; height: 50px; font-size: 42px; color: " + Model.sColorJerseyNo + "; background-color: transparent" })
+                      </div>
+                    } else {
+                      <div>
+                        <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
+                      </div>
+                    }
                   </div>
                 }
+              </div>
+
+              <div style="position: relative; width: 100%">
+                <text style="font-size: 28px">@sPlName</text>
               </div>
             }
           </div>
 
-          <div style="position: relative; width: 100%">
-            <text style="font-size: 28px">@sPlName</text>
+          <div id="divStars" style="position: absolute; top: 0px; left: 110px; width: 84px; height: 84px; text-align: center">
+            <text style="position: absolute; top: 22px; left: 0px; width: 100%; font-size: 10px">@sPos</text>
+            <b id="txtAveSkill" style="position: absolute; top: 26px; left: 0px; font-size: 26px; width: 100%"></b>
+            <text style="position: absolute; top: 54px; left: 0px; width: 100%; font-size: 10px">@sAge</text>
           </div>
+        </div>
+      }
+
+      <div style="position: absolute; top: 20px; height: 128px; max-width: 128px; right: 0px; border-style: outset; border-width: 3px; border-color: lightgray">
+        @if (Model.bOwnPlayer) {
+          using (Html.BeginForm("PlayerDetails",
+                                "Member",
+                                new { i = Model.iPlayer },
+                                FormMethod.Post,
+                                new { enctype = "multipart/form-data", style = "height: 100%" })) {
+            <div id="divPortrait" style="position: relative; height: 100%; cursor: pointer" onclick="document.getElementById('fileInput').click();"></div>
+            <input id="fileInput" name="file" type="file" accept="image/*" style="position: absolute; left: 0px; display: none" onchange="this.form.submit();">
+          }
+        } else {
+          <div id="divPortrait" style="position: relative; height: 100%"></div>
         }
       </div>
 
-      <div id="divStars" style="position: absolute; top: 0px; left: 110px; width: 84px; height: 84px; text-align: center">
-        <text style="position: absolute; top: 22px; left: 0px; width: 100%; font-size: 10px">@sPos</text>
-        <b id="txtAveSkill" style="position: absolute; top: 26px; left: 0px; font-size: 26px; width: 100%"></b>
-        <text style="position: absolute; top: 54px; left: 0px; width: 100%; font-size: 10px">@sAge</text>
-      </div>
-    </div>
-  }
+      <div id="tabs" style="position: absolute; width: 100%; top: 154px">
+        <ul>
+          <li><a href="#tabs-1">Überblick</a></li>
+          <li><a href="#tabs-2">Fähigkeiten</a></li>
+          <li><a href="#tabs-3">Statistik</a></li>
+        </ul>
 
-  <div style="position: absolute; top: 20px; height: 128px; max-width: 128px; right: 0px; border-style: outset; border-width: 3px; border-color: lightgray">
-    @if (Model.bOwnPlayer) {
-      using (Html.BeginForm("PlayerDetails",
-                            "Member",
-                            new { i = Model.iPlayer },
-                            FormMethod.Post,
-                            new { enctype = "multipart/form-data", style = "height: 100%" })) {
-        <div id="divPortrait" style="position: relative; height: 100%; cursor: pointer" onclick="document.getElementById('fileInput').click();"></div>
-        <input id="fileInput" name="file" type="file" accept="image/*" style="position: absolute; left: 0px; display: none" onchange="this.form.submit();">
-      }
-    } else {
-      <div id="divPortrait" style="position: relative; height: 100%"></div>
-    }
-  </div>
+        <div id="tabs-1" style="overflow: hidden">
+          <div style="position: absolute; width: 10%; right: 10px">
+            <h4>Verein</h4>
+            <div id="divEmblemClub" style="position: relative; width: 100%; border-style: outset; border-width: 3px; border-color: lightgray"></div>
+          </div>
 
-  <div id="tabs" style="position: absolute; width: 100%; top: 154px">
-    <ul>
-      <li><a href="#tabs-1">Überblick</a></li>
-      <li><a href="#tabs-2">Fähigkeiten</a></li>
-      <li><a href="#tabs-3">Statistik</a></li>
-    </ul>
+          <div style="position: relative; width: 100%; height: auto">
+            <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
+              <h4>Allgemeine Daten</h4>
+              <table cellpadding="1" style="width: 100%">
+                <tbody>
+                  <tr>
+                    <td align="right">Verein:</td>
+                    <td align="right">@sClub</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Geburtsdatum:</td>
+                    <td align="right">@player.plGame.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@sAge)</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Körpergröße/-gewicht:</td>
+                    <td align="right">@player.plGame.iHeight.ToString("0cm") / @player.plGame.iWeight.ToString("0kg")</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Positionen:</td>
+                    <td align="right">@sPos</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Stärke (bereinigt):</td>
+                    <td id="tdAveSkill" align="right"></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Talent:</td>
+                    <td align="right">@sTalent</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Fuß (links/rechts):</td>
+                    @{
+                      if (player.plGame.fFootL > 0.99 && player.plGame.fFootR > 0.99) {
+                        <td align="right">beidfüßig</td>
+                      } else {
+                        <td align="right">@player.plGame.fFootL.ToString("0%") / @player.plGame.fFootR.ToString("0%")</td>
+                      }
+                    }
+                  </tr>
+                  <tr>
+                    @{
+                      string sVerletzung = "keine";
+                      if (player.plGame.injury != null) {
+                        sVerletzung = "Noch " + player.plGame.injury.fLength.ToString("0.0") + " Tage (" + player.plGame.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.plGame.injury.iType][player.plGame.injury.iType2];
+                      }
+                    }
+                    <td align="right">Verletzung:</td>
+                    <td align="right">@sVerletzung</td>
+                  </tr>
+                  @if (player.contract != null && player.contract.iLength > 0) {
+                    <tr>
+                      <td align="right">Gehalt:</td>
+                      <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                    </tr>
+                    if (!Model.bJouth) {
+                      <tr>
+                        <td align="right">Auflaufprämie:</td>
+                        <td align="right">@player.contract.iPlay.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                      </tr>
+                      <tr>
+                        <td align="right">Torprämie:</td>
+                        <td align="right">@player.contract.iGoal.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                      </tr>
+                      <tr>
+                        <td align="right">Fixe Ablöse:</td>
+                        <td align="right">@player.contract.iFixTransferFee.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                      </tr>
+                    }
+                    <tr>
+                      @{
+                        string sDauer = player.contract.iLength.ToString() + " Jahre";
+                        if (player.contract.iLength == 1) {
+                          sDauer = "Saisonende";
 
-    <div id="tabs-1" style="overflow: hidden">
-      <div style="position: absolute; width: 10%; right: 10px">
-        <h4>Verein</h4>
-        <div id="divEmblemClub" style="position: relative; width: 100%; border-style: outset; border-width: 3px; border-color: lightgray"></div>
-      </div>
-
-      <div style="position: relative; width: 100%; height: auto">
-        <div style="position: relative; width: 260px; height: auto; margin-bottom: 10px; float: left">
-          <h4>Allgemeine Daten</h4>
-          <table cellpadding="1" style="width: 100%">
-            <tbody>
-              <tr>
-                <td align="right">Verein:</td>
-                <td align="right">@sClub</td>
-              </tr>
-              <tr>
-                <td align="right">Geburtsdatum:</td>
-                <td align="right">@player.plGame.dtBirthday.ToString("d", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) (@sAge)</td>
-              </tr>
-              <tr>
-                <td align="right">Körpergröße/-gewicht:</td>
-                <td align="right">@player.plGame.iHeight.ToString("0cm") / @player.plGame.iWeight.ToString("0kg")</td>
-              </tr>
-              <tr>
-                <td align="right">Positionen:</td>
-                <td align="right">@sPos</td>
-              </tr>
-              <tr>
-                <td align="right">Stärke (bereinigt):</td>
-                <td id="tdAveSkill" align="right"></td>
-              </tr>
-              <tr>
-                <td align="right">Talent:</td>
-                <td align="right">@sTalent</td>
-              </tr>
-              <tr>
-                <td align="right">Fuß (links/rechts):</td>
-                @{
-                  if (player.plGame.fFootL > 0.99 && player.plGame.fFootR > 0.99) {
-                    <td align="right">beidfüßig</td>
-                  } else {
-                    <td align="right">@player.plGame.fFootL.ToString("0%") / @player.plGame.fFootR.ToString("0%")</td>
+                          if (player.bRetire) {
+                            sDauer += " (beendet Karriere)";
+                          }
+                        }
+                      }
+                      <td align="right">Laufzeit:</td>
+                      <td align="right">@sDauer</td>
+                    </tr>
                   }
-                }
-              </tr>
-              <tr>
-                @{
-                  string sVerletzung = "keine";
-                  if (player.plGame.injury != null) {
-                    sVerletzung = "Noch " + player.plGame.injury.fLength.ToString("0.0") + " Tage (" + player.plGame.getInjuryRel().ToString("0%") + ") " + CornerkickManager.Main.ltInjury[player.plGame.injury.iType][player.plGame.injury.iType2];
+                  @if (player.contractNext?.club != null && player.contractNext.iLength > 0) {
+                    <tr>
+                      <td align="right">Verein nächste Saison:</td>
+                      <td align="right">@player.contractNext.club.sName</td>
+                    </tr>
                   }
-                }
-                <td align="right">Verletzung:</td>
-                <td align="right">@sVerletzung</td>
-              </tr>
-              @if (player.contract != null && player.contract.iLength > 0) {
-                <tr>
-                  <td align="right">Gehalt:</td>
-                  <td align="right">@player.contract.iSalary.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
-                </tr>
-                if (!Model.bJouth) {
                   <tr>
-                    <td align="right">Auflaufprämie:</td>
-                    <td align="right">@player.contract.iPlay.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                    @{
+                      string sVal = (player.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";
+                    }
+                    <td align="right">Marktwert:</td>
+                    <td align="right">@sVal</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+              <h4>Charakter</h4>
+              <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
+                <tbody>
+                  <tr>
+                    <td align="right">Führungspersönlichkeit:</td>
+                    <td align="right">@player.plGame.character.fLeader.ToString("0.0%")</td>
                   </tr>
                   <tr>
-                    <td align="right">Torprämie:</td>
-                    <td align="right">@player.contract.iGoal.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                    <td align="right">Schußhäufigkeit:</td>
+                    <td align="right">@player.plGame.character.fShoot.ToString("0.0%")</td>
                   </tr>
                   <tr>
-                    <td align="right">Fixe Ablöse:</td>
-                    <td align="right">@player.contract.iFixTransferFee.ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) €</td>
+                    <td align="right">Teamplayer:</td>
+                    <td align="right">@player.plGame.character.fPass.ToString("0.0%")</td>
                   </tr>
-                }
-                <tr>
+                  <tr>
+                    <td align="right">Dribbler:</td>
+                    <td align="right">@player.plGame.character.fDribbling.ToString("0.0%")</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Flexibilität:</td>
+                    <td align="right">@player.plGame.character.fFlexibel.ToString("0.0%")</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Robustheit:</td>
+                    <td align="right">@player.plGame.character.fRobustness.ToString("0.0%")</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Gemüt:</td>
+                    <td align="right">@((2 - player.plGame.character.fCholeric).ToString("0.0%"))</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table cellpadding="1" style="width: 100%; margin-top: 20px; margin-bottom: 6px">
+                <tbody>
+                  <tr>
+                    <td align="right"><ins>Sperren:</ins></td>
+                  </tr>
                   @{
-                    string sDauer = player.contract.iLength.ToString() + " Jahre";
-                    if (player.contract.iLength == 1) {
-                      sDauer = "Saisonende";
-
-                      if (player.bRetire) {
-                        sDauer += " (beendet Karriere)";
+                    if (player.plGame.iSuspension[0] + player.plGame.iSuspension[1] + player.plGame.iSuspension[4] == 0) {
+                      <tr>
+                        <td align="right">keine</td>
+                      </tr>
+                    } else {
+                      if (player.plGame.iSuspension[0] > 0) {
+                        string sSp = "Liga: " + player.plGame.iSuspension[0].ToString() + " Spiele";
+                        <tr>
+                          <td align="right">@sSp</td>
+                        </tr>
+                      }
+                      if (player.plGame.iSuspension[1] > 0) {
+                        string sSp = "Pokal: " + player.plGame.iSuspension[1].ToString() + " Spiele";
+                        <tr>
+                          <td align="right">@sSp</td>
+                        </tr>
+                      }
+                      if (player.plGame.iSuspension[2] + player.plGame.iSuspension[3] > 0) {
+                        string sSp = "Int: " + (player.plGame.iSuspension[2] + player.plGame.iSuspension[3]).ToString() + " Spiele";
+                        <tr>
+                          <td align="right">@sSp</td>
+                        </tr>
+                      }
+                      if (player.plGame.iSuspension[4] > 0) {
+                        string sSp = "Testspiele: " + player.plGame.iSuspension[4].ToString() + " Spiele";
+                        <tr>
+                          <td align="right">@sSp</td>
+                        </tr>
+                      }
+                      if (player.plGame.iSuspension[6] > 0) {
+                        string sSp = "Nat: " + player.plGame.iSuspension[6].ToString() + " Spiele";
+                        <tr>
+                          <td align="right">@sSp</td>
+                        </tr>
                       }
                     }
                   }
-                  <td align="right">Laufzeit:</td>
-                  <td align="right">@sDauer</td>
-                </tr>
-              }
-              @if (player.contractNext?.club != null && player.contractNext.iLength > 0) {
-                <tr>
-                  <td align="right">Verein nächste Saison:</td>
-                  <td align="right">@player.contractNext.club.sName</td>
-                </tr>
-              }
-              <tr>
-                @{
-                  string sVal = (player.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) * 1000).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " €";
-                }
-                <td align="right">Marktwert:</td>
-                <td align="right">@sVal</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                </tbody>
+              </table>
+            </div>
 
-        <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
-          <h4>Charakter</h4>
-          <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
-            <tbody>
-              <tr>
-                <td align="right">Führungspersönlichkeit:</td>
-                <td align="right">@player.plGame.character.fLeader.ToString("0.0%")</td>
-              </tr>
-              <tr>
-                <td align="right">Schußhäufigkeit:</td>
-                <td align="right">@player.plGame.character.fShoot.ToString("0.0%")</td>
-              </tr>
-              <tr>
-                <td align="right">Teamplayer:</td>
-                <td align="right">@player.plGame.character.fPass.ToString("0.0%")</td>
-              </tr>
-              <tr>
-                <td align="right">Dribbler:</td>
-                <td align="right">@player.plGame.character.fDribbling.ToString("0.0%")</td>
-              </tr>
-              <tr>
-                <td align="right">Flexibilität:</td>
-                <td align="right">@player.plGame.character.fFlexibel.ToString("0.0%")</td>
-              </tr>
-              <tr>
-                <td align="right">Robustheit:</td>
-                <td align="right">@player.plGame.character.fRobustness.ToString("0.0%")</td>
-              </tr>
-              <tr>
-                <td align="right">Gemüt:</td>
-                <td align="right">@((2 - player.plGame.character.fCholeric).ToString("0.0%"))</td>
-              </tr>
-            </tbody>
-          </table>
+            <div style="position: relative; width: 40px; height: auto; margin-right: 10px; float: left; text-align: right">
+              @if (Model.bCaptain) {
+                <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+              } else if (Model.bCaptain2) {
+                <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
+              }
 
-          <table cellpadding="1" style="width: 100%; margin-top: 20px; margin-bottom: 6px">
-            <tbody>
-              <tr>
-                <td align="right"><ins>Sperren:</ins></td>
-              </tr>
               @{
-                if (player.plGame.iSuspension[0] + player.plGame.iSuspension[1] + player.plGame.iSuspension[4] == 0) {
-                  <tr>
-                    <td align="right">keine</td>
-                  </tr>
+                string sNat = CornerkickManager.Main.sLandShort[player.iNat1];
+
+                if (string.IsNullOrEmpty(sNat)) {
+                  <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
                 } else {
-                  if (player.plGame.iSuspension[0] > 0) {
-                    string sSp = "Liga: " + player.plGame.iSuspension[0].ToString() + " Spiele";
-                    <tr>
-                      <td align="right">@sSp</td>
-                    </tr>
-                  }
-                  if (player.plGame.iSuspension[1] > 0) {
-                    string sSp = "Pokal: " + player.plGame.iSuspension[1].ToString() + " Spiele";
-                    <tr>
-                      <td align="right">@sSp</td>
-                    </tr>
-                  }
-                  if (player.plGame.iSuspension[2] + player.plGame.iSuspension[3] > 0) {
-                    string sSp = "Int: " + (player.plGame.iSuspension[2] + player.plGame.iSuspension[3]).ToString() + " Spiele";
-                    <tr>
-                      <td align="right">@sSp</td>
-                    </tr>
-                  }
-                  if (player.plGame.iSuspension[4] > 0) {
-                    string sSp = "Testspiele: " + player.plGame.iSuspension[4].ToString() + " Spiele";
-                    <tr>
-                      <td align="right">@sSp</td>
-                    </tr>
-                  }
-                  if (player.plGame.iSuspension[6] > 0) {
-                    string sSp = "Nat: " + player.plGame.iSuspension[6].ToString() + " Spiele";
-                    <tr>
-                      <td align="right">@sSp</td>
-                    </tr>
-                  }
+                  string sFlag = "/Content/Icons/flags/" + sNat + ".png";
+                  <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
                 }
               }
-            </tbody>
-          </table>
-        </div>
+            </div>
 
-        <div style="position: relative; width: 40px; height: auto; margin-right: 10px; float: left; text-align: right">
-          @if (Model.bCaptain) {
-            <img src="/Content/Icons/captain.png" alt="Kapitän" title="Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
-          } else if (Model.bCaptain2) {
-            <img src="/Content/Icons/captain2.png" alt="Vize-Kapitän" title="Vize-Kapitän" style="position: relative; width: 24px; margin-bottom: 4px" />
-          }
-
-          @{
-            string sNat = CornerkickManager.Main.sLandShort[player.iNat1];
-
-            if (string.IsNullOrEmpty(sNat)) {
-              <img src="/Content/Icons/flags/0.png" alt="unbekannt" title="unbekannt" style="position: relative; width: 24px; margin-bottom: 4px" />
-            } else {
-              string sFlag = "/Content/Icons/flags/" + sNat + ".png";
-              <img src=@sFlag alt=@sNat title=@sNat style="position: relative; width: 24px; margin-bottom: 4px" />
+            @if (Model.bOwnPlayer && !Model.bNation) {
+              <div style="position: relative; height: 340px; width: 300px; margin-bottom: 10px; float: left">
+                <h4>Konstitution</h4>
+                <div id="divChartCFM" style="position: relative; width: 100%; height: 310px"></div>
+              </div>
             }
-          }
-        </div>
-
-        @if (Model.bOwnPlayer && !Model.bNation) {
-          <div style="position: relative; height: 340px; width: 300px; margin-bottom: 10px; float: left">
-            <h4>Konstitution</h4>
-            <div id="divChartCFM" style="position: relative; width: 100%; height: 310px"></div>
           </div>
-        }
-      </div>
 
-      <div style="position: relative; width: 100%; height: 100%; float: left">
-        <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px">
-          <h4>Optionen</h4>
+          <div style="position: relative; width: 100%; height: 100%; float: left">
+            <div style="position: relative; width: 320px; height: 100%; float: left; margin-top: 6px">
+              <h4>Optionen</h4>
 
-          @{
-            if (Model.bOwnPlayer) {
-              string sExtendContract = "Vertrag verlängern";
-              if (Model.bJouthWithContract) {
-                sExtendContract = "In Profikader übernehmen";
-              } else if (Model.bJouth) {
-                sExtendContract = "Profivertrag aushandeln";
-              }
-
-              if (!Model.bNation) {
-                @* Extend player contract *@
-                if ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum) > 15) {
-                  <button type="submit" id="bnContract" class="btn btn-default" style="width: 90%; margin-bottom: 4px">@sExtendContract</button>
-                }
-
-                @* Put on / take from transferlist *@
-                if (MvcApplication.ckcore.plt.onTransferlist(player)) {
-                  <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Von Transferliste nehmen</button>
-                } else {
-                  <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Auf Transferliste setzen</button>
-                }
-              }
-
-              if (!Model.bJouth) {
-                if (!Model.bCaptain) {
-                  <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Kapitän machen</button>
-                }
-
-                if (!Model.bCaptain2) {
-                  <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Vize-Kapitän machen</button>
-                }
-
-                if (!Model.bNation) {
-                  <button type="submit" id="bnDoping" class="btn btn-default" style="width: 90%; margin-top: 4px">Spieler dopen</button>
-                }
-              }
-            } else if (Model.bCpuPlayerNotOnTransferlist) {
-              <button type="submit" id="bnForcePutOnTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px" onclick="forcePutOnTransferlistGetSecretMoney()">Setzen auf Transferliste erstreiken</button>
-            }
-          }
-        </div>
-      </div>
-    </div>
-
-    <div id="tabs-2" style="overflow: hidden">
-      <div style="position: relative; width: 100%">
-        @{
-          int i = 0;
-        }
-        <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
-          <h4>Positionen</h4>
-          <table border="1" cellpadding="4" style="width: auto">
-            <thead>
-              <tr>
-                <th style="text-align:center">Position</th>
-                <th style="text-align:center">Wert</th>
-                <th style="text-align:center">Stärke</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (i = 0; i < player.plGame.fExperiencePos.Length; i++) {
-                byte j = (byte)(i + 1);
-
-                string sColor = "";
-                string sBold = "";
-                if (player.plGame.fExperiencePos[i] > 0.99) {
-                  sBold = "style=font-weight:bold";
-                } else if (player.plGame.fExperiencePos[i] > 0.8) {
-                  sColor = "style=color:blue";
-                }
-                <tr @sBold>
-                  <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
-                  <td align="right"><span @sColor>@player.plGame.fExperiencePos[i].ToString("0.0%")</span></td>
-                  <td align="center">@CornerkickGame.Tool.getAveSkill(player.plGame, j).ToString("0.0")</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
-          <h4>Individuelle Fähigkeiten</h4>
-          @{
-            i = 0;
-          }
-
-          <table border="1" cellpadding="4" style="width: auto">
-            <thead>
-              <tr>
-                <th style="text-align:center">Fähigkeit</th>
-                <th>Wert</th>
-                @{
-                  if (Model.bOwnPlayer && !Model.bNation) {
-                    <th>Training</th>
-                    <th>Ind.</th>
-                    <th>Bonus</th>
+              @{
+                if (Model.bOwnPlayer) {
+                  string sExtendContract = "Vertrag verlängern";
+                  if (Model.bJouthWithContract) {
+                    sExtendContract = "In Profikader übernehmen";
+                  } else if (Model.bJouth) {
+                    sExtendContract = "Profivertrag aushandeln";
                   }
-                }
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td align="right">@CornerkickManager.PlayerTool.sSkills[0]</td>
-                <td align="center">@player.plGame.iSkill[0]</td>
-                @{
-                  if (Model.bOwnPlayer && !Model.bNation) {
-                    var fTraining = player.fSkillTraining[i] + 1.0;
-                    <td align="right">@fTraining.ToString("0.0%")</td>
-                    <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                    <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
-                  }
-                }
-              </tr>
-              <tr>
-                @{
-                  i = 16;
-                }
-                <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
-                <td align="center">@player.plGame.iSkill[i]</td>
-                @{
-                  if (Model.bOwnPlayer && !Model.bNation) {
-                    var fTraining = player.fSkillTraining[i] + 1.0;
-                    <td align="right">@fTraining.ToString("0.0%")</td>
-                    <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                    <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
-                  }
-                }
-              </tr>
-              @for (i = 1; i < player.plGame.iSkill.Length; i++) {
-                if (i == 16) {
-                  continue;
-                }
 
-                var fTraining = player.fSkillTraining[i] + 1.0;
-                <tr>
-                  <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
-                  <td align="center">@player.plGame.iSkill[i]</td>
-                  @{
-                    if (Model.bOwnPlayer && !Model.bNation) {
-                      <td align="right">@fTraining.ToString("0.0%")</td>
-                      <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                      <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
+                  if (!Model.bNation) {
+                    @* Extend player contract *@
+                    if ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum) > 15) {
+                      <button type="submit" id="bnContract" class="btn btn-default" style="width: 90%; margin-bottom: 4px">@sExtendContract</button>
+                    }
+
+                    @* Put on / take from transferlist *@
+                    if (MvcApplication.ckcore.plt.onTransferlist(player)) {
+                      <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Von Transferliste nehmen</button>
+                    } else {
+                      <button type="submit" id="bnPutOnTakeFromTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px">Auf Transferliste setzen</button>
                     }
                   }
-                </tr>
+
+                  if (!Model.bJouth) {
+                    if (!Model.bCaptain) {
+                      <button type="submit" id="bnCaptain" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Kapitän machen</button>
+                    }
+
+                    if (!Model.bCaptain2) {
+                      <button type="submit" id="bnCaptain2" class="btn btn-default" style="width: 90%; margin-bottom: 4px">Zum Vize-Kapitän machen</button>
+                    }
+
+                    if (!Model.bNation) {
+                      <button type="submit" id="bnDoping" class="btn btn-default" style="width: 90%; margin-top: 4px">Spieler dopen</button>
+                    }
+                  }
+                } else if (Model.bCpuPlayerNotOnTransferlist) {
+                  <button type="submit" id="bnForcePutOnTransfer" class="btn btn-default" style="width: 90%; margin-bottom: 8px" onclick="forcePutOnTransferlistGetSecretMoney()">Setzen auf Transferliste erstreiken</button>
+                }
               }
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      @if (Model.bOwnPlayer && !Model.bNation) {
-        <h4>Entwicklungschancen</h4>
-        <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 50%; min-width: 320px; margin-top: 10px; margin-bottom: 10px; float: left"></div>
-      }
-    </div>
-
-    <div id="tabs-3" style="overflow: hidden">
-      <div style="position: relative; width: 100%; height: 380px">
-        <h4>Spielerentwicklung</h4>
-        <div id="divChartDevelopment" style="position: relative; height: 320px; width: 100%"></div>
-      </div>
-
-      @{
-        if (Model.bOwnPlayer && !Model.bJouth) {
-          <div style="position: relative; width: 100%; height: 380px">
-            <h4>Trainingshistorie</h4>
-            <div id="divChartTrainingHistory" style="position: relative; height: 320px; width: 100%"></div>
+            </div>
           </div>
-        }
-      }
-
-      <div id="divTableClubHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">
-        <h4>Vereinshistorie</h4>
-        <table id="tableClubHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Datum</th>
-              <th>Verein</th>
-              <th>Ablöse [€]</th>
-              <th>Marktwert [€]</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!---Data and tags are dynamically generated--->
-          </tbody>
-        </table>
-      </div>
-
-      <div id="divTableInjuryHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">
-        <h4>Verletzungshistorie</h4>
-        <table id="tableInjuryHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Datum</th>
-              <th>Verletzung</th>
-              <th>Dauer [d]</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!---Data and tags are dynamically generated--->
-          </tbody>
-        </table>
-      </div>
-
-      @if (!Model.bJouth) {
-        <div style="position: relative; width: auto; height: auto; float: left">
-          <h4>Spielstatistiken</h4>
-          <table id="tblStatistic" border="1" cellpadding="4" style="width: auto">
-            <thead>
-              <tr>
-                <th align="center">
-                  <label>
-                    Saison
-                    <input name="rBStatistic" id="rBStatisticSeason" onchange="drawStatistic(0)" type="radio" checked="checked" value="0">
-                  </label>
-                  <label>
-                    Total
-                    <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
-                  </label>
-                </th>
-                <th style="text-align:center">Liga</th>
-                <th style="text-align:center">Pokal</th>
-                <th style="text-align:center">Int.</th>
-                <th style="text-align:center">Nat.</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
         </div>
-      }
-    </div>
-  </div>
-</div>
 
-<div id="dialogCaptain" title="Bitte bestätigen...">
-  <p id="txtCaptain"></p>
-</div>
+        <div id="tabs-2" style="overflow: hidden">
+          <div style="position: relative; width: 100%">
+            @{
+              int i = 0;
+            }
+            <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
+              <h4>Positionen</h4>
+              <table border="1" cellpadding="4" style="width: auto">
+                <thead>
+                  <tr>
+                    <th style="text-align:center">Position</th>
+                    <th style="text-align:center">Wert</th>
+                    <th style="text-align:center">Stärke</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (i = 0; i < player.plGame.fExperiencePos.Length; i++) {
+                    byte j = (byte)(i + 1);
 
-<div id="dialogDoping" title="Spieler dopen">
-  <div style="position: relative; width: 100%; height: 40px" class="form-group">
-    <div style="position: absolute; width: 35%; height: auto; top: 10px" class="form-group">
-      <b class="left">Dopingmittel:</b>
+                    string sColor = "";
+                    string sBold = "";
+                    if (player.plGame.fExperiencePos[i] > 0.99) {
+                      sBold = "style=font-weight:bold";
+                    } else if (player.plGame.fExperiencePos[i] > 0.8) {
+                      sColor = "style=color:blue";
+                    }
+                    <tr @sBold>
+                      <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
+                      <td align="right"><span @sColor>@player.plGame.fExperiencePos[i].ToString("0.0%")</span></td>
+                      <td align="center">@CornerkickGame.Tool.getAveSkill(player.plGame, j).ToString("0.0")</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
+              <h4>Individuelle Fähigkeiten</h4>
+              @{
+                i = 0;
+              }
+
+              <table border="1" cellpadding="4" style="width: auto">
+                <thead>
+                  <tr>
+                    <th style="text-align:center">Fähigkeit</th>
+                    <th>Wert</th>
+                    @{
+                      if (Model.bOwnPlayer && !Model.bNation) {
+                        <th>Training</th>
+                        <th>Ind.</th>
+                        <th>Bonus</th>
+                      }
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td align="right">@CornerkickManager.PlayerTool.sSkills[0]</td>
+                    <td align="center">@player.plGame.iSkill[0]</td>
+                    @{
+                      if (Model.bOwnPlayer && !Model.bNation) {
+                        var fTraining = player.fSkillTraining[i] + 1.0;
+                        <td align="right">@fTraining.ToString("0.0%")</td>
+                        <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                        <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
+                      }
+                    }
+                  </tr>
+                  <tr>
+                    @{
+                      i = 16;
+                    }
+                    <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
+                    <td align="center">@player.plGame.iSkill[i]</td>
+                    @{
+                      if (Model.bOwnPlayer && !Model.bNation) {
+                        var fTraining = player.fSkillTraining[i] + 1.0;
+                        <td align="right">@fTraining.ToString("0.0%")</td>
+                        <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                        <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
+                      }
+                    }
+                  </tr>
+                  @for (i = 1; i < player.plGame.iSkill.Length; i++) {
+                    if (i == 16) {
+                      continue;
+                    }
+
+                    var fTraining = player.fSkillTraining[i] + 1.0;
+                    <tr>
+                      <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
+                      <td align="center">@player.plGame.iSkill[i]</td>
+                      @{
+                        if (Model.bOwnPlayer && !Model.bNation) {
+                          <td align="right">@fTraining.ToString("0.0%")</td>
+                          <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
+                          <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
+                        }
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          @if (Model.bOwnPlayer && !Model.bNation) {
+            <h4>Entwicklungschancen</h4>
+            <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 50%; min-width: 320px; margin-top: 10px; margin-bottom: 10px; float: left"></div>
+          }
+        </div>
+
+        <div id="tabs-3" style="overflow: hidden">
+          <div style="position: relative; width: 100%; height: 380px">
+            <h4>Spielerentwicklung</h4>
+            <div id="divChartDevelopment" style="position: relative; height: 320px; width: 100%"></div>
+          </div>
+
+          @{
+            if (Model.bOwnPlayer && !Model.bJouth) {
+              <div style="position: relative; width: 100%; height: 380px">
+                <h4>Trainingshistorie</h4>
+                <div id="divChartTrainingHistory" style="position: relative; height: 320px; width: 100%"></div>
+              </div>
+            }
+          }
+
+          <div id="divTableClubHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">
+            <h4>Vereinshistorie</h4>
+            <table id="tableClubHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Datum</th>
+                  <th>Verein</th>
+                  <th>Ablöse [€]</th>
+                  <th>Marktwert [€]</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!---Data and tags are dynamically generated--->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="divTableInjuryHistory" style="position: relative; float: left; width: auto; margin-right: 40px; margin-bottom: 10px">
+            <h4>Verletzungshistorie</h4>
+            <table id="tableInjuryHistory" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Datum</th>
+                  <th>Verletzung</th>
+                  <th>Dauer [d]</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!---Data and tags are dynamically generated--->
+              </tbody>
+            </table>
+          </div>
+
+          @if (!Model.bJouth) {
+            <div style="position: relative; width: auto; height: auto; float: left">
+              <h4>Spielstatistiken</h4>
+              <table id="tblStatistic" border="1" cellpadding="4" style="width: auto">
+                <thead>
+                  <tr>
+                    <th align="center">
+                      <label>
+                        Saison
+                        <input name="rBStatistic" id="rBStatisticSeason" onchange="drawStatistic(0)" type="radio" checked="checked" value="0">
+                      </label>
+                      <label>
+                        Total
+                        <input name="rBStatistic" id="rBStatisticTotal" onchange="drawStatistic(1)" type="radio" value="1">
+                      </label>
+                    </th>
+                    <th style="text-align:center">Liga</th>
+                    <th style="text-align:center">Pokal</th>
+                    <th style="text-align:center">Int.</th>
+                    <th style="text-align:center">Nat.</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
     </div>
-    <div style="position: absolute; width: 65%; left: 35%" class="col-md-10">
-      @Html.DropDownListFor(m => m.iDp, new SelectList(Model.ddlDoping, "Value", "Text", Model.iDp), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setDopingDesc()", id = "ddlDoping", style = "width: 100%" })
+
+    <div id="dialogCaptain" title="Bitte bestätigen...">
+      <p id="txtCaptain"></p>
+    </div>
+
+    <div id="dialogDoping" title="Spieler dopen">
+      <div style="position: relative; width: 100%; height: 40px" class="form-group">
+        <div style="position: absolute; width: 35%; height: auto; top: 10px" class="form-group">
+          <b class="left">Dopingmittel:</b>
+        </div>
+        <div style="position: absolute; width: 65%; left: 35%" class="col-md-10">
+          @Html.DropDownListFor(m => m.iDp, new SelectList(Model.ddlDoping, "Value", "Text", Model.iDp), /* "--Select One--",*/ new { @class = "form-control", @onchange = "setDopingDesc()", id = "ddlDoping", style = "width: 100%" })
+        </div>
+      </div>
+      <div style="position: relative" class="form-group">
+        <b>Eigenschaften:</b>
+        <p id="txtDialogDoping"></p>
+      </div>
     </div>
   </div>
-  <div style="position: relative" class="form-group">
-    <b>Eigenschaften:</b>
-    <p id="txtDialogDoping"></p>
-  </div>
-</div>
+</body>
+</html>
