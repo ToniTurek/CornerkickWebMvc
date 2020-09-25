@@ -1242,7 +1242,10 @@
                     }
                   </tr>
                   @for (i = 1; i < player.plGame.iSkill.Length; i++) {
-                    if (i == 16) {
+                    if (i == 16) { // Acceleration (already at 2nd order)
+                      continue;
+                    }
+                    if (i == 17) { // Game intelligence
                       continue;
                     }
 

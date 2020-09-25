@@ -7512,6 +7512,7 @@ namespace CornerkickWebMvc.Controllers
 
       statisticModel.sPlayerSkillBest = new string[CornerkickManager.PlayerTool.sSkills.Length][];
       for (byte iS = 0; iS < CornerkickManager.PlayerTool.sSkills.Length; iS++) {
+        if (iS == 17) continue; // Game intelligence skill skill
         if (iS == CornerkickGame.Player.iIndTrainingIxFoot) continue; // Both foot skill
 
         statisticModel.sPlayerSkillBest[iS] = new string[4]; // Skill name, player name, skill value, club
