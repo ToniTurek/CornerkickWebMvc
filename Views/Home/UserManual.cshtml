@@ -257,10 +257,13 @@
             <a href="#h4CalendarEventsChristmasParty">Weihnachtsfeier</a>
           </li>
           <li>
-            <a href="#h4CalendarEventsJouthDay">Jugendtag</a>
+            <a href="#h4CalendarEventsSummerParty">Sommerparty</a>
           </li>
           <li>
-            <a href="#h4CalendarEventsSummerParty">Sommerparty</a>
+            <a href="#h4CalendarEventsBrainWash">Gehirnwäsche</a>
+          </li>
+          <li>
+            <a href="#h4CalendarEventsJouthDay">Jugendtag</a>
           </li>
         </ul>
       </li>
@@ -454,16 +457,14 @@ Um ein Ereignis durchzuführen, musst du in der Kalenderansicht auf das gewünsc
 Dies geschieht bei einer Krisensitzung:<br />
 <ul>
   <li>
-    Alle Spieler mit einer Moral kleiner als 90% gewinnen die Hälfte der Differenz zu 100% dazu
+    Alle Spieler gewinnen oder verlieren (!) die Hälfte der Differenz zu 100%
   </li>
   <li>
-    Zusätzlich gewinnen diese Spieler 5% Moral
-  </li>
-  <li>
-    Achtung: Spieler mit einer Moral größer als 105% verlieren 5% Moral!
+    Alle Spieler mit weniger als 100% Moral gewinnen zusätzlich 2.5% Moral dazu
   </li>
 </ul>
-Beispiel: Spieler A hat nur noch eine Moral von 80%. Bei einer Krisensitzung erhält er zunächst (100% - 80%)/2 = 10% Moral und anschließend zusätzlich 5%. Er hat nach der Krisensitzung also eine Moral von 95%.<br />
+Beispiel A: Spieler A hat nur noch eine Moral von 90%. Bei einer Krisensitzung gewinnt er zunächst (100% - 90%)/2 = 5% Moral und anschließend zusätzlich noch einmal 2.5%. Er hat nach der Krisensitzung also eine Moral von 97.5%.<br />
+Beispiel B: Spieler B hat eine Moral von 105%. Bei einer Krisensitzung verliert er (100% - 105%)/2 = -2.5% Moral. Er hat nach der Krisensitzung also nur noch eine Moral von 102.5%.<br /><br />
 Das Ausrichten einer Krisensitzung ist kostenlos.<br /><br />
 Bemerke: Krisensitzungen haben nur zwei Mal pro Saison einen Effekt.
 
@@ -477,12 +478,8 @@ Dies geschieht bei einer Weihnachtsfeier:<br />
     Alle Spieler verlieren 2% Frische
   </li>
 </ul>
-Die Kosten der Weihnachtsfeier belaufen sich auf @MvcApplication.ckcore.ltEvent[1].iCost.ToString() €.<br /><br />
+Die Kosten der Weihnachtsfeier belaufen sich auf @MvcApplication.ckcore.ltEvent[1].iCost.ToString("N0") €.<br /><br />
 Bemerke: Eine Weihnachtsfeier hat nur ein Mal pro Saison und nur im Dezember einen Effekt.
-
-<h4><span id="h4CalendarEventsJouthDay" class="ckLink"></span>Jugendtag</h4>
-Bei einem Jugendtag entdeckst du einen neuen Jugendspieler, solange der letzte Jugendtag länger als 6 Monate her ist.<br />
-Die Kosten des Jugendtages belaufen sich auf @MvcApplication.ckcore.ltEvent[2].iCost.ToString() €.
 
 <h4><span id="h4CalendarEventsSummerParty" class="ckLink"></span>Sommerparty</h4>
 Dies geschieht bei einer Sommerparty:<br />
@@ -490,13 +487,29 @@ Dies geschieht bei einer Sommerparty:<br />
   <li>
     Alle Spieler gewinnen 4% Moral skaliert mit der vierten Potenz der aktuellen Moral:
     \[Moral_{neu} = Moral_{alt} + (4\% / Moral_{alt}^{4})\]
-    Ein Spieler mit einer niedrigen Moral gewinnt somit mehr Moral durch die Sommerparty als ein Spieler mit einer hohen Moral.<br /><br />
-    Beispiel A: Spieler A hat eine Moral von 90%. Durch die Sommerparty gewinnt er 4% / 90%^4 = 6.1% und hat somit nach der Sommerparty eine Moral von 96.1%.<br />
-    Beispiel B: Spieler B hat eine Moral von 110%. Durch die Sommerparty gewinnt er 4% / 110%^4 = 2.73% und hat somit nach der Sommerparty eine Moral von 112.73%.<br />
   </li>
 </ul>
-Die Kosten der Sommerparty belaufen sich auf @MvcApplication.ckcore.ltEvent[3].iCost.ToString() €.<br /><br />
+Ein Spieler mit einer niedrigen Moral gewinnt somit mehr Moral durch die Sommerparty als ein Spieler mit einer hohen Moral.<br /><br />
+Beispiel A: Spieler A hat eine Moral von 90%. Durch die Sommerparty gewinnt er 4% / 90%^4 = 6.1% und hat somit nach der Sommerparty eine Moral von 96.1%.<br />
+Beispiel B: Spieler B hat eine Moral von 110%. Durch die Sommerparty gewinnt er 4% / 110%^4 = 2.73% und hat somit nach der Sommerparty eine Moral von 112.73%.<br /><br />
+Die Kosten der Sommerparty belaufen sich auf @MvcApplication.ckcore.ltEvent[3].iCost.ToString("N0") €.<br /><br />
 Bemerke: Eine Sommerparty hat nur zwei Mal pro Saison und nur zwischen April und September einen Effekt.
+
+<h4><span id="h4CalendarEventsBrainWash" class="ckLink"></span>Gehirnwäsche</h4>
+Bei einem Gehirnwäschetermin wird die Moral aller Spieler auf 100% gesetzt.
+Die Kosten der Gehirnwäsche belaufen sich auf @MvcApplication.ckcore.ltEvent[4].iCost.ToString("N0") €.<br /><br />
+Bemerke: Eine Gehirnwäsche hat nur einmal pro Saison einen Effekt.
+
+<h4><span id="h4CalendarEventsJouthDay" class="ckLink"></span>Jugendtag</h4>
+Bei einem Jugendtag entdeckst du mit folgener Wahrscheinlichkeit einen neuen Jugendspieler:<br />
+<ul>
+  <li>Erster Jugendtag in der Saison: 100%</li>
+  <li>Zweiter Jugendtag in der Saison: 50%</li>
+  <li>Dritter Jugendtag in der Saison: 33%</li>
+  <li>Vierter Jugendtag in der Saison: 25%</li>
+  <li>usw.</li>
+</ul>
+Die Kosten des Jugendtages belaufen sich auf @MvcApplication.ckcore.ltEvent[2].iCost.ToString("N0") €.
 
 <h2><span id="h2Team" class="ckLink"></span>Mannschaft</h2>
 <h3><span id="h3Team" class="ckLink"></span>Aufstellung</h3>
@@ -828,11 +841,12 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       <u>Dribbling</u><br />
-      Je höher der Dribbling Wert, desto größer ist die Wahrscheinlichkeit einen offensiven Zweikampf zu gewinnen.
+      Je höher der Dribbling-Wert, desto größer ist die Wahrscheinlichkeit einen offensiven Zweikampf zu gewinnen.
     </li>
     <li>
       <u>Zweikampf</u><br />
-      Je höher der Zweikampf Wert, desto größer ist die Wahrscheinlichkeit einen defensiven Zweikampf zu gewinnen.
+      Je höher der Zweikampf-Wert, desto größer ist die Wahrscheinlichkeit einen defensiven Zweikampf zu gewinnen.<br />
+      Zudem steigert ein hoher Zweikampf-Wert (in Kombination mit dem Körpergewicht des Spielers) die Wahrscheinlichkeit, bei einem flachen Pass einen Gegenspieler auf der Flankenzielposition zu verdrängen bzw. verringert die Wahrscheinlichkeit von einem Gegenspieler verdrängt zu werden.
     </li>
     <li>
       <u>Passstärke</u><br />
@@ -856,7 +870,7 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       <u>Schussgenauigkeit</u><br />
-      Eine höhere Schussgenauigkeit erhöht die Chance, dass bei einem Schuss der Ball aufs Tor kommt sowie die Chance eines Torerfolgs
+      Eine höhere Schussgenauigkeit erhöht die Chance, dass bei einem Schuss der Ball aufs Tor kommt sowie die Chance eines Torerfolgs.
     </li>
     <li>
       <u>Kopfball</u><br />
@@ -869,12 +883,25 @@ Der Konditionsgewinn hängt vom Alter des Spielers ab. Junge Spieler bauen leich
     </li>
     <li>
       <u>Reaktion</u><br />
+      Die Reaktion ist eine exklusive Torwartfähigkeit. Eine gute Reaktion erhöht die Wahrscheinlichkeit, Torschüsse besonders aus kurzer Entfernung abzuwehren.
     </li>
     <li>
       <u>Sprungkraft</u><br />
+      Die Fähigkeit Sprungkraft wird immer mit der Körpergröße des Spielers kombiniert.
+      <ul>
+        <li>
+          <u>Torwart</u><br />
+          Eine hohe Sprungkraft (und Körpergröße) erhöht die Wahrscheinlichkeit, Torschüsse besonders aus großer Entfernung abzuwehren.
+        </li>
+        <li>
+          <u>Feldspieler</u><br />
+          Eine hohe Sprungkraft (und Körpergröße) erhöht die Wahrscheinlichkeit, bei einer hohen Flanke einen Gegenspieler auf der Flankenzielposition zu verdrängen bzw. verringert die Wahrscheinlichkeit von einem Gegenspieler verdrängt zu werden.
+        </li>
+      </ul>
     </li>
     <li>
       <u>Ballsicherheit</u><br />
+      Die Ballsicherheit ist eine exklusive Torwartfähigkeit. Eine gute Ballsicherheit erhöht die Wahrscheinlichkeit, dass der Ball nach einem Torschuss vom Torwart festgehalten wird und verringert das Risiko, dass der Torwart eine Flanke fallen lässt.
     </li>
     <li>
       <u>Beidfüßigkeit</u><br />
