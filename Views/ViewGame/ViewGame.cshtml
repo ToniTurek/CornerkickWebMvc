@@ -908,9 +908,7 @@
       @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 165px" })
 
      @if (Model.bAdmin) {
-        <div id="divAdminOptions" style="position: relative; top: 0px; right: 0px; width: auto; text-align: right">
-          <a href="#" id="aAdminOptions" style="color:#000aaa">Admin</a>
-        </div>
+        <a href="#" id="aAdminOptions" style="position: absolute; top: 0px; right: 0px; color:#000aaa">Admin</a>
       }
     </div>
   }
