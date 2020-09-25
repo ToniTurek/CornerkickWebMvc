@@ -490,7 +490,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Kondi/Frische/Moral
       float[] fTeamAve   = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
-      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: 11);
       desk.sKFM = "K: " + fTeamAve[0].ToString("0.0%") + ", F: " + fTeamAve[1].ToString("0.0%") + ", M: " + fTeamAve[2].ToString("0.0%");
       desk.sStrength = "Durchschnittsstärke (Startelf): " + fTeamAve[3].ToString("0.00") + fTeamAve11[3].ToString(" (0.00)");
 
@@ -1030,7 +1030,7 @@ namespace CornerkickWebMvc.Controllers
           // ... get training history data
           CornerkickManager.Player.TrainingHistory trHistExp = new CornerkickManager.Player.TrainingHistory();
           trHistExp.dt   = tu.dt;
-          trHistExp.fKFM = CornerkickManager.Tool.getTeamAve(ltPlayerTrExp, clb.ltTactic[0].formation, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
+          trHistExp.fKFM = CornerkickManager.Tool.getTeamAve(ltPlayerTrExp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd);
           trHistExp.iType = tu.iType;
 
           // ... add training history data to dataPoints
@@ -1701,7 +1701,7 @@ namespace CornerkickWebMvc.Controllers
       tD.iCaptainIx = MvcApplication.ckcore.plt.getCaptainIx(club);
 
       // Team averages
-      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: 11);
       tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
 
@@ -1749,7 +1749,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Opp. team averages
-          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: club.nextGame.nPlStart);
+          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: club.nextGame.nPlStart);
           tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
           tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
         }
@@ -7613,7 +7613,7 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(ltPlayerBest, tD.formation, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(ltPlayerBest, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
       tD.fTeamAveStrength = fTeamAve11[3];
       tD.fTeamAveAge      = fTeamAve11[4];
 
@@ -7649,7 +7649,7 @@ namespace CornerkickWebMvc.Controllers
         string sAge   = fAve[4].ToString("0.0");
         int    iVal   = (int)fAve[5];
 
-        float[] fAve11 = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11, bTeamValue: true);
+        float[] fAve11 = CornerkickManager.Tool.getTeamAve(clb, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: 11, bTeamValue: true);
         string sSkill11 = fAve11[3].ToString("0.0");
         string sAge11   = fAve11[4].ToString("0.0");
         int    iVal11   = (int)fAve11[5];
