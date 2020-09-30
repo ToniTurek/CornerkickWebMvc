@@ -13,7 +13,7 @@ namespace CornerkickWebMvc.Models
     public int[] iSeats { get; set; }
     public int[] iSeatType { get; set; }
     public int[] iSeatsBuild { get; set; }
-    public bool bOberring { get; set; }
+    public bool bTopring { get; set; }
     public static int iKosten { get; set; }
 
     public bool bEditable { get; set; } // Stadium name editable
@@ -29,6 +29,8 @@ namespace CornerkickWebMvc.Models
     public byte iToiletsNew { get; set; }
     public byte iSnackbarReq { get; set; }
     public byte iToiletsReq { get; set; }
+
+    public bool bSound { get; set; }
 
     public StadionModel()
     {

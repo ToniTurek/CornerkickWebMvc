@@ -12,6 +12,7 @@
   <script type="text/javascript" src="~/Scripts/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
   <script type="text/javascript" src="~/Scripts/dialog.js"></script>
+  <script type="text/javascript" src="~/Scripts/Finance.js"></script>
 
   <style>
     .ui-widget-header {
@@ -30,6 +31,16 @@
       top: -4px;
       text-shadow: 1px 1px 0 #fff;
     }
+
+    .myPb {
+      height: 14px;
+      background-color: lime;
+      text-align: center; /* To center it horizontally (if you want) */
+      line-height: 14px; /* To center it vertically */
+      color: black;
+      text-shadow: 1px 1px 0 #DCDCDC;
+      -webkit-border-radius: 3px;
+    }
   </style>
 
   <script type="text/javascript">
@@ -43,16 +54,19 @@
       });
     }
 
-    var seats = [];
-    var seattypes = [];
+    var ltBlocks = [];
+    var bTopring = false;
+    var bSound = true;
     $(document).ready(function () {
-      bnBuild = document.getElementById("bnBuild");
+      bSound = @Html.Raw(Json.Encode(Model.bSound));
+
+      var bnBuild = document.getElementById("bnBuild");
       bnBuild.disabled = true;
 
-      bnBuildTopring = document.getElementById("bnBuildTopring");
+      var bnBuildTopring = document.getElementById("bnBuildTopring");
       bnBuildTopring.disabled = true;
 
-      bnRenewPitch = document.getElementById("bnRenewPitch");
+      var bnRenewPitch = document.getElementById("bnRenewPitch");
       bnRenewPitch.disabled = true;
 
       var pbVideo = $("#pbVideo");
@@ -84,11 +98,17 @@
 
       setImage();
 
-      getStadion();
+      ltBlocks = @Html.Raw(Json.Encode(Model.stadion.blocks));
+      bTopring = @Html.Raw(Json.Encode(Model.stadion.bTopring && Model.stadion.iTopringDaysConstruct == 0));
+
+      drawSeats(ltBlocks, bTopring, -1);
+      getTopring();
       getExtras();
       getVideoCost();
       getSnackbarCost();
       getToiletsCost();
+      getRenewPitchCostDays();
+      drawPitchQuality();
 
       $("#tbSnackbar").on('keyup', function (ev) {
         getSnackbarCost();
@@ -104,30 +124,21 @@
         getToiletsCost();
       });
 
-      $('.tbSeats').each(function () {
-        $(this).on('keyup', function (ev) {
-          getStadion();
-        });
-        $(this).on('change', function (ev) {
-          getStadion();
-        });
+      bnBuild.addEventListener("click", function () {
+        var iBlock = bnBuild.getAttribute('data-iBlock');
+        var iSeats = bnBuild.getAttribute('data-iSeats');
+        var iType = bnBuild.getAttribute('data-iType');
+        var iCost = parseInt(bnBuild.getAttribute('data-sCost'));
+        var sDur = bnBuild.getAttribute('data-sDur');
+
+        var sDesc = "Wollen Sie das Stadion für " + iCost.toLocaleString() + "€ wirklich ausbauen?<br>Der Ausbau würde " + sDur + " Tage dauern.";
+        getDialog(document.body, sDesc, "Stadionausbau", function () { buildBlock(iBlock, iSeats, iType); });
       });
 
-      $("#bnBuild").click(function () {
-        $.when(getStadion()).done(function () {
-          bnBuild = document.getElementById("bnBuild");
-          var sCost = bnBuild.getAttribute('data-sCost');
-          var sDur  = bnBuild.getAttribute('data-sDur');
-          var sDesc = "Wollen Sie das Stadion für " + sCost + "€ wirklich ausbauen?<br>Der Ausbau würde " + sDur + " Tage dauern.";
-          getDialog(document.body, sDesc, "Stadionausbau", setStadion);
-        });
-      });
-
-      $("#bnBuildTopring").click(function () {
+      bnBuildTopring.addEventListener("click", function () {
         $.ajax({
-          type: 'GET',
           url: '/Member/StadiumGetMaxSeats',
-          dataType: "json",
+          dataType: "JSON",
           success: function (iSeatsMax) {
             var sCost = bnBuildTopring.getAttribute('data-sCost');
             var sDur  = bnBuildTopring.getAttribute('data-sDur');
@@ -148,52 +159,56 @@
         buildToilets();
       });
 
-      $("#bnRenewPitch").click(function () {
-        $.ajax({
-          type: 'post',
-          url: '/Member/StadiumRenewPitch',
-          dataType: "json",
-          success: function (sMessage) {
-            alert(sMessage);
-            window.location.reload(true);
-          }
+      bnRenewPitch.addEventListener("click", function () {
+        $.when(getBalanceAjax()).done(function (iBalance) {
+          $.ajax({
+            url: '/Member/StadiumRenewPitch',
+            dataType: "JSON",
+            success: function (sMessage) {
+              drawPitchQuality();
+              getRenewPitchCostDays();
+              updateBalance(iBalance[0]);
+
+              alert(sMessage);
+            }
+          });
         });
       });
 
-      setView();
+      let sctBuildBlocks = document.getElementById("sctBuildBlocks");
+      sctBuildBlocks.disabled = true;
+      $.each(ltBlocks, function (i, block) {
+        if (!bTopring && i > 9) {
+          return false;
+        }
+
+        if (block.iSeatsDaysConstruct === 0) {
+          var optBlock = document.createElement("option");
+          optBlock.value = i;
+          optBlock.text = block.sName;
+          sctBuildBlocks.appendChild(optBlock);
+        }
+      });
+      sctBuildBlocks.addEventListener("change", function () {
+        drawSeats(ltBlocks, bTopring, parseInt(this.value));
+      });
+
+      var cbBuildBlocks = document.getElementById("cbBuildBlocks");
+      cbBuildBlocks.checked = false;
+      cbBuildBlocks.addEventListener("change", function () {
+        sctBuildBlocks.disabled = !this.checked;
+
+        drawSeats(ltBlocks, bTopring, this.checked ? parseInt(sctBuildBlocks.value) : -1);
+      });
+
       $(window).resize(function () {
-        setView();
+        drawSeats(ltBlocks, bTopring, parseInt(sctBuildBlocks.value));
       });
     }); // document ready
-
-    function setView() {
-      var divStadion = document.getElementById("divStadion");
-      var bMobile = divStadion.offsetWidth < 900;
-      //document.getElementById("bnRenewPitch").innerHTML = divStadion.offsetWidth.toString();
-
-      $('.ddlSeatTypes').each(function () {
-        if (bMobile) {
-          $(this).removeClass("form-control");
-          $(this).css("width", 54);
-        } else {
-          $(this).addClass("form-control");
-        }
-      });
-
-      $('.tbSeats').each(function () {
-        if (bMobile) {
-          $(this).removeClass("form-control");
-          $(this).css("width", 54);
-        } else {
-          $(this).addClass("form-control");
-        }
-      });
-    }
 
     function setImage() {
       $.ajax({
         url: '/Member/StadiumGetTopring',
-        type: "GET",
         dataType: "JSON",
         success: function (bTopring) {
           if (bTopring) {
@@ -206,41 +221,38 @@
       });
     }
 
-    function getStadion() {
-      seats = [];
-      seattypes = [];
-      $('.tbSeats').each(function () {
-        seats.push($(this).val());
-      });
-
-      $('.ddlSeatTypes').each(function () {
-        seattypes.push($(this).val());
-      });
+    function getStadiumBuildBlock(iBlock, iSeats, iType) {
+      if (!e) var e = window.event;
+      e.cancelBubble = true;
+      if (e.stopPropagation) e.stopPropagation();
 
       $.ajax({
-        type: 'post',
-        url: '/Member/StadiumChange',
-        dataType: "json",
-        data: { iSeats: seats, iArt: seattypes },
-        success: function (sCostLength) {
+        url: '/Member/StadiumGetBuildCost',
+        dataType: "JSON",
+        data: { iBlock: iBlock, iSeats: iSeats, iType: iType },
+        success: function (iCostDaysDispo) {
           bnBuild = document.getElementById("bnBuild");
 
-          bnBuild.setAttribute('data-sCost', sCostLength[0]);
-          bnBuild.setAttribute('data-sDur',  sCostLength[1]);
-          bnBuild.innerHTML = "Kosten: " + sCostLength[0] + " €, Dauer: " + sCostLength[1] + " Tage";
+          bnBuild.setAttribute('data-iBlock', iBlock);
+          bnBuild.setAttribute('data-iSeats', iSeats);
+          bnBuild.setAttribute('data-iType',  iType);
+          bnBuild.setAttribute('data-sCost', iCostDaysDispo[0]);
+          bnBuild.setAttribute('data-sDur', iCostDaysDispo[1]);
+          bnBuild.innerHTML = "Kosten: " + iCostDaysDispo[0].toLocaleString() + " €, Dauer: " + iCostDaysDispo[1].toString() + " Tage";
 
-          if (sCostLength[1] == "0" || sCostLength[1] == "" || sCostLength[2] == "0") {
+          if (iCostDaysDispo[1] === 0 || iCostDaysDispo[1] === 0 || iCostDaysDispo[2] === 0) {
             bnBuild.disabled = true;
           } else {
             bnBuild.disabled = false;
           }
         }
       });
+    }
 
+    function getTopring() {
       $.ajax({
-        type: 'GET',
         url: '/Member/StadiumGetCostTopring',
-        dataType: "json",
+        dataType: "JSON",
         success: function (sCostLength) {
           bnBuildTopring = document.getElementById("bnBuildTopring");
 
@@ -260,45 +272,9 @@
         }
       });
 
-      // Renew pitch
       $.ajax({
-        type: 'GET',
-        url: '/Member/StadiumRenewPitchCost',
-        dataType: "json",
-        success: function (sCost) {
-          $("#bnRenewPitch").text("Rasen + 10%, Kosten: " + sCost + " €");
-
-          if (sCost == "0" || sCost == "") {
-            bnRenewPitch.disabled = true;
-          } else {
-            bnRenewPitch.disabled = false;
-          }
-        }
-      });
-
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumGetBlockProgress',
-        dataType: "json",
-        success: function (ltfPg) {
-          var iB = 0;
-          for (iB = 0; iB < ltfPg.length; iB++) {
-            if (ltfPg[iB] >= 0.0) {
-              // Create progress bars
-              var pbBlock = $("#pbBlock_" + iB.toString());
-              pbBlock.progressbar({
-                value: ltfPg[iB] * 100
-              });
-              pbBlock.css("display", "block");
-            }
-          }
-        }
-      });
-
-      $.ajax({
-        type: 'GET',
         url: '/Member/StadiumGetTopringProgress',
-        dataType: "json",
+        dataType: "JSON",
         success: function (fPgTr) {
           if (fPgTr >= 0.0) {
             // Create progress bars
@@ -316,42 +292,224 @@
       });
     }
 
-    function setStadion() {
+    function getRenewPitchCostDays() {
       $.ajax({
-        type: 'post',
-        url: '/Member/StadiumChangeSet',
-        dataType: "json",
-        data: { iSeats: seats, iArt: seattypes },
-        success: function (sMessage) {
-          alert(sMessage);
-          //getStadion();
-          window.location.reload(true);
+        url: '/Member/StadiumRenewPitchCost',
+        dataType: "JSON",
+        success: function (sCost) {
+          var bnRenewPitch = document.getElementById("bnRenewPitch");
+          bnRenewPitch.innerText = "Rasen + 10%, Kosten: " + sCost + " €";
+
+          if (sCost == "0" || sCost == "") {
+            bnRenewPitch.disabled = true;
+          } else {
+            bnRenewPitch.disabled = false;
+          }
         }
       });
     }
 
-    function buildTopring() {
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildTopring',
-        dataType: "json",
-        success: function (sMessage) {
-          alert(sMessage);
-          //getStadion();
-          window.location.reload(true);
+    function buildBlock(iBlock, iSeats, iType) {
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        $.ajax({
+          url: '/Member/StadiumChangeSet',
+          dataType: "JSON",
+          data: { iBlock: iBlock, iSeats: iSeats, iType: iType },
+          success: function (sMessage) {
+            // Update ltBlocks
+            ltBlocks[iBlock].iSeats = iSeats;
+            ltBlocks[iBlock].iType = iType;
+            ltBlocks[iBlock].iSeatsDaysConstruct = 1;
+            ltBlocks[iBlock].iSeatsDaysConstructIni = 1;
+
+            drawSeats(ltBlocks, bTopring, -1);
+            updateBalance(iBalance[0]);
+
+            if (bSound) {
+              var audioConstruction = new Audio("/Content/Sound/construction.wav");
+              if (audioConstruction) {
+                audioConstruction.volume = 0.5;
+                audioConstruction.play();
+              }
+            }
+
+            alert(sMessage);
+          }
+        });
+      });
+    }
+
+    function drawSeats(ltBlocks, bTopring, iBlockBuild) {
+      var divStadion = document.getElementById("divStadion");
+
+      var bMobile = divStadion.offsetWidth < 500;
+
+      var ltPts = [];
+      for (var i = 0; i < ltBlocks.length; i++) {
+        ltPts.push({ X: 0, Y: 0 });
+      }
+
+      var fDivWidth = 0.07;
+      var fDivHeight = 0.04;
+      ltPts[ 0].X = 0.27;                         ltPts[ 0].Y = bTopring ? 0.77 : 0.73;        // A
+      ltPts[ 1].X = 0.50 - (fDivWidth / 2);       ltPts[ 1].Y = ltPts[ 0].Y; // B
+      ltPts[ 2].X = 1 - ltPts[0].X - fDivWidth;   ltPts[ 2].Y = ltPts[ 0].Y; // C
+      ltPts[ 3].X = bMobile ? 0.72 : 0.80;        ltPts[ 3].Y = 0.55;        // D
+      ltPts[ 4].X = ltPts[ 3].X;                  ltPts[ 4].Y = 0.32;        // E
+      ltPts[ 5].X = ltPts[ 2].X;                  ltPts[ 5].Y = bTopring ? 1 - ltPts[ 0].Y - fDivHeight : 0.12; // F
+      ltPts[ 6].X = ltPts[ 1].X;                  ltPts[ 6].Y = ltPts[ 5].Y; // G
+      ltPts[ 7].X = ltPts[ 0].X;                  ltPts[ 7].Y = ltPts[ 5].Y; // H
+      ltPts[ 8].X = bMobile && ltBlocks[18].iSeats > 0 ? 1 - ltPts[4].X - fDivWidth : 0.20 - fDivWidth; ltPts[ 8].Y = ltPts[4].Y; // I
+      ltPts[ 9].X = bMobile && ltBlocks[19].iSeats > 0 ? 1 - ltPts[3].X - fDivWidth : 0.20 - fDivWidth; ltPts[ 9].Y = ltPts[3].Y; // J
+
+      if (bTopring) {
+        ltPts[10].X = ltPts[ 0].X;                  ltPts[10].Y = 0.9;         // A1
+        ltPts[11].X = ltPts[ 1].X;                  ltPts[11].Y = ltPts[10].Y; // B1
+        ltPts[12].X = ltPts[ 2].X;                  ltPts[12].Y = ltPts[10].Y; // C1
+        ltPts[13].X = 0.88;                         ltPts[13].Y = ltPts[ 3].Y; // D1
+        ltPts[14].X = ltPts[13].X;                  ltPts[14].Y = ltPts[ 4].Y; // E1
+        ltPts[15].X = ltPts[ 5].X;                  ltPts[15].Y = bMobile ? 0.01 : 0.05; // F1
+        ltPts[16].X = ltPts[ 6].X;                  ltPts[16].Y = ltPts[15].Y; // G1
+        ltPts[17].X = ltPts[ 7].X;                  ltPts[17].Y = ltPts[15].Y; // H1
+        ltPts[18].X = bMobile && ltBlocks[18].iSeats > 0 ? 0.01 : 1 - ltPts[14].X - fDivWidth; ltPts[18].Y = ltPts[ 8].Y; // I1
+        ltPts[19].X = bMobile && ltBlocks[19].iSeats > 0 ? 0.01 : 1 - ltPts[13].X - fDivWidth; ltPts[19].Y = ltPts[ 9].Y; // J1
+        ltPts[20].X = 0.08;                         ltPts[20].Y = 0.84;        // K
+        ltPts[21].X = 1 - ltPts[20].X - fDivWidth;  ltPts[21].Y = ltPts[20].Y; // L
+        ltPts[22].X = ltPts[21].X;                  ltPts[22].Y = 0.12;        // M
+        ltPts[23].X = ltPts[20].X;                  ltPts[23].Y = ltPts[22].Y; // N
+      }
+
+      var sBlockType = ["Stehpl.", "Sitzpl.", "V.I.P."];
+
+      divStadion.innerHTML = '';
+
+      for (var i = 0; i < ltBlocks.length; i++) {
+        if (i > 9 && !bTopring) {
+          break;
         }
+
+        var block = ltBlocks[i];
+
+        var divBlock = document.createElement("div");
+        divBlock.className = "divBlock";
+        divBlock.style.position = "absolute";
+        divBlock.style.left = (ltPts[i].X * 100).toFixed(0) + "%";
+        divBlock.style.top  = (ltPts[i].Y * 100).toFixed(0) + "%";
+        divBlock.style.width = (fDivWidth * 100).toString() + "%";
+        if (block.iSeats > 0) {
+          divBlock.style.minWidth = "64px";
+        }
+        //divBlock.style.height = (fDivHeight * 100).toString() + "%";
+        divBlock.style.textAlign = "center";
+        //divBlock.style.border = "1px solid red";
+        divBlock.style.backgroundColor = "white";
+        divBlock.style.webkitBorderRadius = "3px";
+
+        if (iBlockBuild === i && block.iSeatsDaysConstruct === 0) {
+          divBlock.style.minWidth = "64px";
+          divBlock.style.zIndex = 99;
+
+          var iptSeats = document.createElement("input");
+          iptSeats.id = "iptBlockSeats";
+          iptSeats.style.width = "100%";
+          iptSeats.value = block.iSeats;
+          divBlock.appendChild(iptSeats);
+
+          var sctType = document.createElement("select");
+          sctType.id = "sctBlockType";
+          sctType.style.width = "100%";
+          $.each(sBlockType, function (j, blkType) {
+            var optBlockType = document.createElement("option");
+            optBlockType.value = j;
+            optBlockType.text = blkType;
+            optBlockType.selected = j === block.iType;
+            sctType.appendChild(optBlockType);
+          });
+          divBlock.appendChild(sctType);
+
+          iptSeats.addEventListener("change", function () {
+            getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
+          });
+          iptSeats.addEventListener("keyup", function () {
+            getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
+          });
+
+          sctType.addEventListener("change", function () {
+            getStadiumBuildBlock(iBlockBuild, parseInt(iptSeats.value), parseInt(this.value));
+          });
+        } else {
+          divBlock.style.border = "1px solid black";
+
+          var txtBlock = document.createElement("text");
+          //txtBlock.style.color = "white";
+          txtBlock.innerHTML = "<strong>" + ltBlocks[i].sName + "</strong>";
+          if (ltBlocks[i].iSeats > 0) {
+            txtBlock.innerHTML += ": " + ltBlocks[i].iSeats.toLocaleString() + " " + sBlockType[ltBlocks[i].iType];
+          }
+          //txtBlock.style.zIndex = 99;
+          divBlock.appendChild(txtBlock);
+
+          // Progress bar
+          if (block.iSeatsDaysConstruct > 0) {
+            divBlock.style.backgroundColor = "yellow";
+
+            var divPb = document.createElement("div");
+            divPb.style.position = "relative";
+            divPb.style.top = "0px";
+            divPb.style.left = "2%";
+            divPb.style.marginBottom = "2px";
+            divPb.style.width = "96%";
+            divPb.style.backgroundColor = "white";
+            divPb.style.webkitBorderRadius = "3px";
+            var divPb1 = document.createElement("div");
+            divPb1.className = "myPb";
+            var fProgress = (100 * (block.iSeatsDaysConstructIni - block.iSeatsDaysConstruct) / block.iSeatsDaysConstructIni);
+            divPb1.style.width = fProgress.toString() + '%';
+            divPb1.innerHTML = fProgress.toFixed(1) + '%';
+            divPb.appendChild(divPb1);
+            divBlock.appendChild(divPb);
+          }
+
+          divBlock.style.opacity = 0.75;
+        }
+
+        divStadion.appendChild(divBlock);
+      }
+    }
+
+    function buildTopring() {
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        $.ajax({
+          url: '/Member/StadiumBuildTopring',
+          dataType: "JSON",
+          success: function (sMessage) {
+            getTopring();
+            updateBalance(iBalance[0]);
+
+            if (bSound) {
+              var audioConstruction = new Audio("/Content/Sound/construction.wav");
+              if (audioConstruction) {
+                audioConstruction.volume = 0.5;
+                audioConstruction.play();
+              }
+            }
+
+            alert(sMessage);
+          }
+        });
       });
     }
 
     function getExtras() {
       $.ajax({
-        type: 'GET',
         url: '/Member/StadiumGetExtras',
-        dataType: "json",
+        dataType: "JSON",
         success: function (sCurrent) {
-          $("#txtVideo").text("Aktuell: " + sCurrent[0][0]);
+          var txtVideo = document.getElementById("txtVideo");
+          txtVideo.innerText = "Aktuell: " + sCurrent[0][0];
           if (sCurrent[0][2] != "0") {
-            $("#txtVideoNew").text("Ausbau zu: " + sCurrent[0][1] + " (noch " + sCurrent[0][2] + "d)");
+            var txtVideoNew = document.getElementById("txtVideoNew");
+            txtVideoNew.innerText = "Ausbau zu: " + sCurrent[0][1] + " (noch\xa0" + sCurrent[0][2] + "d)"
             $("#txtVideoNew").css("display", "block");
             $("#pbVideo").progressbar("value", parseFloat(sCurrent[0][3].replace("%", "").replace(",", ".")));
             $("#pbVideo").css("display", "block");
@@ -362,7 +520,7 @@
 
           $("#txtSnackbar").text("Aktuell: " + sCurrent[1][0]);
           if (sCurrent[1][2] != "0") {
-            $("#txtSnackbarNew").text("Ausbau zu: " + sCurrent[1][1] + " (noch " + sCurrent[1][2] + "d)");
+            $("#txtSnackbarNew").text("Ausbau zu: " + sCurrent[1][1] + " (noch\xa0" + sCurrent[1][2] + "d)");
             $("#txtSnackbarNew").css("display", "block");
             $("#pbSnackbar").progressbar("value", parseFloat(sCurrent[1][3].replace("%", "").replace(",", ".")));
             $("#pbSnackbar").css("display", "block");
@@ -372,7 +530,7 @@
 
           $("#txtToilets").text("Aktuell: " + sCurrent[2][0]);
           if (sCurrent[2][2] != "0") {
-            $("#txtToiletsNew").text("Ausbau zu: " + sCurrent[2][1] + " (noch " + sCurrent[2][2] + "d)");
+            $("#txtToiletsNew").text("Ausbau zu: " + sCurrent[2][1] + " (noch\xa0" + sCurrent[2][2] + "d)");
             $("#txtToiletsNew").css("display", "block");
             $("#pbToilets").progressbar("value", parseFloat(sCurrent[2][3].replace("%", "").replace(",", ".")));
             $("#pbToilets").css("display", "block");
@@ -385,17 +543,17 @@
 
     // Video-wall
     function getVideoCost() {
-      bnBuildVideo = document.getElementById("bnBuildVideo");
+      var bnBuildVideo = document.getElementById("bnBuildVideo");
       bnBuildVideo.disabled = true;
 
       var iVideo = $('#ddlVideo').val();
       $.ajax({
-        type: 'GET',
         url: '/Member/StadiumGetCostVideo',
-        dataType: "json",
+        dataType: "JSON",
         data: { iLevel: iVideo },
         success: function (sCostDaysDispo) {
-          $("#bnBuildVideo").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          bnBuildVideo.innerText = "Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage";
+
           if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
             bnBuildVideo.disabled = true;
           } else {
@@ -406,32 +564,44 @@
     }
 
     function buildVideo() {
-      var iVideo = $('#ddlVideo').val();
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildVideo',
-        dataType: "json",
-        data: { iLevel: iVideo },
-        success: function (sMessage) {
-          alert(sMessage);
-          getExtras();
-        }
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        var iVideo = $('#ddlVideo').val();
+
+        $.ajax({
+          url: '/Member/StadiumBuildVideo',
+          dataType: "JSON",
+          data: { iLevel: iVideo },
+          success: function (sMessage) {
+            getExtras();
+            updateBalance(iBalance[0]);
+
+            if (bSound) {
+              var audioConstruction = new Audio("/Content/Sound/construction.wav");
+              if (audioConstruction) {
+                audioConstruction.volume = 0.5;
+                audioConstruction.play();
+              }
+            }
+
+            alert(sMessage);
+          }
+        });
       });
     }
 
     // Snackbars
     function getSnackbarCost() {
-      bnBuildSnackbar = document.getElementById("bnBuildSnackbar");
+      var bnBuildSnackbar = document.getElementById("bnBuildSnackbar");
       bnBuildSnackbar.disabled = true;
 
       var iSnackbar = $('#tbSnackbar').val();
       $.ajax({
-        type: 'GET',
         url: '/Member/StadiumGetCostSnackbar',
-        dataType: "json",
+        dataType: "JSON",
         data: { iBuildNew: iSnackbar },
         success: function (sCostDaysDispo) {
-          $("#bnBuildSnackbar").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          bnBuildSnackbar.innerText = "Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage";
+
           if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
             bnBuildSnackbar.disabled = true;
           } else {
@@ -442,51 +612,86 @@
     }
 
     function buildSnackbar() {
-      var iSnackbar = $('#tbSnackbar').val();
-      $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildSnackbar',
-        dataType: "json",
-        data: { iBuildNew: iSnackbar },
-        success: function (sMessage) {
-          alert(sMessage);
-          getExtras();
-        }
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        var iSnackbar = $('#tbSnackbar').val();
+
+        $.ajax({
+          url: '/Member/StadiumBuildSnackbar',
+          dataType: "JSON",
+          data: { iBuildNew: iSnackbar },
+          success: function (sMessage) {
+            getExtras();
+            updateBalance(iBalance[0]);
+
+            if (bSound) {
+              var audioConstruction = new Audio("/Content/Sound/construction.wav");
+              if (audioConstruction) {
+                audioConstruction.volume = 0.5;
+                audioConstruction.play();
+              }
+            }
+
+            alert(sMessage);
+          }
+        });
       });
     }
 
     // Toilets
     function getToiletsCost() {
-      bnBuild = document.getElementById("bnBuildToilets");
-      bnBuild.disabled = true;
+      var bnBuildToilets = document.getElementById("bnBuildToilets");
+      bnBuildToilets.disabled = true;
 
       var iToilets = $('#tbToilets').val();
       $.ajax({
-        type: 'GET',
         url: '/Member/StadiumGetCostToilets',
-        dataType: "json",
+        dataType: "JSON",
         data: { iBuildNew: iToilets },
         success: function (sCostDaysDispo) {
-          $("#bnBuildToilets").text("Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage");
+          bnBuildToilets.innerText = "Kosten: " + sCostDaysDispo[0] + " €, Dauer: " + sCostDaysDispo[1] + " Tage";
+
           if (sCostDaysDispo[1] == "0" || sCostDaysDispo[1] == "" || sCostDaysDispo[2] == "0") {
-            bnBuild.disabled = true;
+            bnBuildToilets.disabled = true;
           } else {
-            bnBuild.disabled = false;
+            bnBuildToilets.disabled = false;
           }
         }
       });
     }
 
     function buildToilets() {
-      var iToilets = $('#tbToilets').val();
+      $.when(getBalanceAjax()).done(function (iBalance) {
+        var iToilets = $('#tbToilets').val();
+
+        $.ajax({
+          url: '/Member/StadiumBuildToilets',
+          dataType: "JSON",
+          data: { iBuildNew: iToilets },
+          success: function (sMessage) {
+            getExtras();
+            updateBalance(iBalance[0]);
+
+            if (bSound) {
+              var audioConstruction = new Audio("/Content/Sound/construction.wav");
+              if (audioConstruction) {
+                audioConstruction.volume = 0.5;
+                audioConstruction.play();
+              }
+            }
+
+            alert(sMessage);
+          }
+        });
+      });
+    }
+
+    function drawPitchQuality() {
       $.ajax({
-        type: 'post',
-        url: '/Member/StadiumBuildToilets',
-        dataType: "json",
-        data: { iBuildNew: iToilets },
-        success: function (sMessage) {
-          alert(sMessage);
-          getExtras();
+        url: '/Member/StadiumGetPitchQuality',
+        dataType: "JSON",
+        success: function (fPitchQuality) {
+          var txtPitchQuality = document.getElementById("txtPitchQuality");
+          txtPitchQuality.innerText = "Akt. Rasenqualität: " + (fPitchQuality * 100).toFixed(1) + "%";
         }
       });
     }
@@ -523,113 +728,25 @@
 
     <div class="image" style="position: relative; width: 100%; margin-bottom: 1%">
       <img id="imgStadium" style="position: relative; width: 100%" src="~/Content/Images/stadium/stadion_S.jpg" alt="" />
-      <div id="divStadion" style="position: absolute; margin-left: 0%; width: 100%; height: 100%; top: 0%; left: 0%; border: 1px solid black">
-        @{
-          if (Model.iSeats != null) {
-            float[,] sLoc = new float[Model.iSeats.Length, 2];
+      <div id="divStadion" style="position: absolute; margin-left: 0%; width: 100%; height: 100%; top: 0%; left: 0%; border: 1px solid black"></div>
 
-            float fShiftY = 0f;
-            if (Model.bOberring) {
-              fShiftY = 0.03f;
-            }
-            sLoc[0, 0] = 0.31f; sLoc[0, 1] = 0.75f + fShiftY;       // A
-            sLoc[1, 0] = 0.50f; sLoc[1, 1] = sLoc[0, 1]; // B
-            sLoc[2, 0] = 1 - sLoc[0, 0]; sLoc[2, 1] = sLoc[0, 1]; // C
-            sLoc[3, 0] = 0.83f; sLoc[3, 1] = 0.55f + fShiftY;       // D
-            sLoc[4, 0] = sLoc[3, 0]; sLoc[4, 1] = 0.32f + fShiftY;       // E
-            sLoc[5, 0] = sLoc[2, 0]; sLoc[5, 1] = 0.14f + fShiftY;       // F
-            sLoc[6, 0] = sLoc[1, 0]; sLoc[6, 1] = sLoc[5, 1]; // G
-            sLoc[7, 0] = sLoc[0, 0]; sLoc[7, 1] = sLoc[5, 1]; // H
-            sLoc[8, 0] = 1 - sLoc[3, 0]; sLoc[8, 1] = sLoc[4, 1]; // I
-            sLoc[9, 0] = sLoc[8, 0]; sLoc[9, 1] = sLoc[3, 1]; // J
-
-            sLoc[10, 0] = sLoc[0, 0]; sLoc[10, 1] = 0.9f;       // A1
-            sLoc[11, 0] = sLoc[1, 0]; sLoc[11, 1] = sLoc[10, 1]; // B1
-            sLoc[12, 0] = sLoc[2, 0]; sLoc[12, 1] = sLoc[10, 1]; // C1
-            sLoc[13, 0] = 0.93f; sLoc[13, 1] = sLoc[3, 1]; // D1
-            sLoc[14, 0] = sLoc[13, 0]; sLoc[14, 1] = sLoc[4, 1]; // E1
-            sLoc[15, 0] = sLoc[5, 0]; sLoc[15, 1] = 0.05f;       // F1
-            sLoc[16, 0] = sLoc[6, 0]; sLoc[16, 1] = sLoc[15, 1]; // G1
-            sLoc[17, 0] = sLoc[7, 0]; sLoc[17, 1] = sLoc[15, 1]; // H1
-            sLoc[18, 0] = 1 - sLoc[13, 0]; sLoc[18, 1] = sLoc[8, 1]; // I1
-            sLoc[19, 0] = sLoc[18, 0]; sLoc[19, 1] = sLoc[9, 1]; // J1
-            sLoc[20, 0] = 0.13f; sLoc[20, 1] = 0.84f;       // K
-            sLoc[21, 0] = 1 - sLoc[20, 0]; sLoc[21, 1] = sLoc[20, 1]; // L
-            sLoc[22, 0] = sLoc[21, 0]; sLoc[22, 1] = 0.12f;       // M
-            sLoc[23, 0] = sLoc[20, 0]; sLoc[23, 1] = sLoc[22, 1]; // N
-
-
-            for (byte iB = 0; iB < Model.iSeats.Length; iB++) {
-              if (iB >= 10 && !Model.bOberring) {
-                break;
-              }
-
-              var htmlAttributesEditorFor = new Dictionary<string, object>
-              {
-                { "type", "number" },
-                { "class", "form-control tbSeats" },
-                { "id", "tbSeats_" + iB.ToString() },
-                //{ "style", "position: absolute; left: " + (sLoc[iB, 0] - 0.03).ToString("0%") + "; top: " + (sLoc[iB, 1] - 0.03f).ToString("0%") + "; width: 6%; min-width: 60px; text-align: right" },
-                { "style", "position: relative width: 100%; text-align: right" },
-                { "autocomplete", "off" },
-                { "min", "0" }
-              };
-              if (Model.iSeatsBuild[iB] > 0) { htmlAttributesEditorFor.Add("readonly", "readonly"); }
-
-              //@Html.EditorFor(model => model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
-
-              var htmlAttributesDropDownListFor = new Dictionary<string, object>
-              {
-                { "class", "form-control ddlSeatTypes" },
-                { "id", "iDdlId" + iB.ToString() },
-                { "style", "position: relative; text-align: right" },
-                { "onchange", "getStadion()" }
-              };
-
-              if (Model.iSeatsBuild[iB] > 0) {
-                htmlAttributesDropDownListFor.Add("disabled", "disabled");
-              }
-
-              string sStyle = "position: absolute; margin-left: 0%; width: 7%; min-width: 70px; height: auto; top: " + (sLoc[iB, 1] - 0.02f).ToString("0%") + "; left: " + (sLoc[iB, 0] - 0.03).ToString("0%");
-              <div style="@sStyle">
-                <div style="position: relative">
-                  @Html.EditorFor(Model => Model.iSeats[iB], new { htmlAttributes = htmlAttributesEditorFor })
-                </div>
-
-                @if (Model.iSeatsBuild[iB] > 0) {
-                  @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right", @disabled = "disabled" })
-                } else {
-                  @Html.DropDownListFor(Model => Model.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { @class = "form-control ddlSeatTypes", @onchange = "getStadion()", id = "iDdlId" + iB.ToString(), @style = "position: relative; text-align: right" })
-                }
-
-                @if (Model.iSeatsBuild[iB] > 0) {
-                  // Progress bar
-                  string sPbId = "pbBlock_" + iB.ToString();
-                  <div id="@sPbId" style="position: absolute; width: 100%; top: 28px"></div>
-                }
-              </div>
-              //@Html.DropDownListFor(m => m.iSeatType[iB], new SelectList(Model.ltDdlStadionSeatType, "Value", "Text", Model.iSeatType[iB]), new { htmlAttributes = htmlAttributesDropDownListFor })
-            }
-          }
-        }
-
-        @* Pitch quality *@
-        <div style="position: absolute; left: 35%; width: 30%; min-width: 150px; height: auto; top: 40%">
-          @{
-            string sPitchQuality = "100%";
-            if (Model.stadion != null) {
-              sPitchQuality = Model.stadion.fPitchQuality.ToString("0.0%");
-            }
-          }
-          <p style="text-align: center; font-weight: bold">Akt. Rasenqualität: @sPitchQuality</p>
-          <button type="submit" id="bnRenewPitch" class="btn btn-default" style="width: 100%">Rasen +10%, Kosten: 0</button>
-        </div>
+      @* Pitch quality *@
+      <div style="position: absolute; left: 25%; width: 50%; min-width: 160px; height: auto; top: 44%; text-align: center">
+        <p id="txtPitchQuality" style="font-weight: bold"></p>
+        <button type="submit" id="bnRenewPitch" class="btn btn-default" style="width: 50%; min-width: 200px">Rasen +10%, Kosten: 0</button>
       </div>
     </div>
 
     @{
       if (Model.stadion != null) {
-        <button type="submit" id="bnBuild" class="btn btn-default" style="width: 100%; margin-bottom: 6px">Kosten: 0</button>
+        <div style="width: 100%; height: 76px">
+          <label style="float: left; margin-right: 8px; margin-top: 6px">
+            Baumodus:
+            <input id="cbBuildBlocks" type="checkbox" value="false">
+          </label>
+          <select class="form-control" id="sctBuildBlocks" style="float: left; width: 60px; margin-right: 8px; margin-bottom: 4px" disabled="disabled"></select>
+          <button type="submit" id="bnBuild" class="btn btn-default" style="float: right; width: 80%; min-width: 405px" disabled="disabled">Kosten: 0</button>
+        </div>
         
         <div id="divTopring" style="position: relative; width: 100%; margin-bottom: 20px">
           <button type="submit" id="bnBuildTopring" class="btn btn-default" style="width: 100%">Oberring bauen. Kosten: 0</button>

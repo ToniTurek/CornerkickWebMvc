@@ -4448,6 +4448,9 @@ namespace CornerkickWebMvc.Controllers
 
       if (clb.stadium.blocks == null) return View(stadionModel);
 
+      stadionModel.bSound = true;
+      if (usr.lti.Count > 1) stadionModel.bSound = usr.lti[1] > 0;
+
       stadionModel.stadion = clb.stadium;
 
       stadionModel.sName = clb.stadium.sName;
@@ -4467,7 +4470,7 @@ namespace CornerkickWebMvc.Controllers
         stadionModel.iSeatsBuild[i] = clb.stadium.blocks[i].iSeatsDaysConstruct;
       }
 
-      stadionModel.bOberring = bStadiumGetTopring(clb);
+      stadionModel.bTopring = bStadiumGetTopring(clb);
 
       if (clb.stadium.iVideoDaysConstruct == 0) clb.stadium.iVideoNew = clb.stadium.iVideo;
       stadionModel.iVideo = clb.stadium.iVideoNew;
@@ -4502,59 +4505,38 @@ namespace CornerkickWebMvc.Controllers
       return View(stadionModel);
     }
 
-    /*
-    public JsonResult StadionChange(Models.StadionModel stadionModel, string sId, int iSeats)
-    {
-      CornerkickManager.Club clb = ckClub();
-
-      byte iB = 255;
-      string[] sB = sId.Split('_');
-      if (sB.Length < 1) return Json(0, JsonRequestBehavior.AllowGet);
-
-      byte.TryParse(sB[sB.Length - 1], out iB);
-      if (iB > stadionModel.stadion.iPlaetze.Length) return Json(0, JsonRequestBehavior.AllowGet);
-      stadionModel.stadion.iPlaetze[iB] = iSeats;
-
-      UpdateModel(stadionModel);
-
-      int iKosten = MvcApplication.ckcore.tl.iKostenStadionAusbau(stadionModel.stadion, clb.stadium);
-
-      return Json(iKosten, JsonRequestBehavior.AllowGet);
-      //return View(stadionModel);
-    }
-    */
-
-    [HttpPost]
-    public JsonResult StadiumChange(int[] iSeats, int[] iArt)
+    public JsonResult StadiumGetBuildCost(int iBlock, int iSeats, int iType)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Stadium stadiumNew = getStadiumUpdate(clb.stadium, iSeats, iArt);
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.blocks[iBlock].iSeats = iSeats;
+      stadiumNew.blocks[iBlock].iType = (byte)iType;
 
       int[] iCostDays = CornerkickManager.Stadium.getCostDaysContructStadium(stadiumNew, clb.stadium, ckUser());
       int iDispoOk = 0;
       if (MvcApplication.ckcore.fz.checkDispoLimit(iCostDays[0], clb)) iDispoOk = 1;
 
-      string[] sKostenDauer = new string[] { iCostDays[0].ToString("N0", getCi()), iCostDays[1].ToString(), iDispoOk.ToString() };
+      int[] iCostDaysDispo = new int[] { iCostDays[0], iCostDays[1], iDispoOk };
 
-      return Json(sKostenDauer, JsonRequestBehavior.AllowGet);
+      return Json(iCostDaysDispo, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
-    public JsonResult StadiumChangeSet(int[] iSeats, int[] iArt)
+    public JsonResult StadiumChangeSet(int iBlock, int iSeats, int iType)
     {
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickGame.Stadium stadiumNew = getStadiumUpdate(clb.stadium, iSeats, iArt);
+      CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
+      stadiumNew.blocks[iBlock].iSeats = iSeats;
+      stadiumNew.blocks[iBlock].iType = (byte)iType;
 
       MvcApplication.ckcore.ui.buildStadium(ref clb, stadiumNew);
 
       return Json("Der Ausbau des Stadions wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
     }
 
-    [HttpGet]
     public JsonResult StadiumGetCostTopring()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4575,7 +4557,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(sCostDays, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpGet]
     public JsonResult StadiumGetMaxSeats()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4602,33 +4583,12 @@ namespace CornerkickWebMvc.Controllers
       return clb.stadium.bTopring && clb.stadium.iTopringDaysConstruct == 0;
     }
 
-    [HttpGet]
     public JsonResult StadiumGetTopring()
     {
       CornerkickManager.Club clb = ckClub();
       return Json(bStadiumGetTopring(clb), JsonRequestBehavior.AllowGet);
     }
 
-    [HttpGet]
-    public JsonResult StadiumGetBlockProgress()
-    {
-      CornerkickManager.Club clb = ckClub();
-      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
-
-      int nBlocksMax = clb.stadium.blocks.Length;
-      if (!clb.stadium.bTopring) nBlocksMax = 10;
-      float[] fPg = new float[nBlocksMax];
-
-      for (byte iB = 0; iB < nBlocksMax; iB++) {
-        int iDaysMax = CornerkickManager.Stadium.getCostDaysContructStadiumBlock(clb.stadium.blocks[iB], clb.stadium.blocks[iB], 0, ckUser())[0];
-        if (clb.stadium.blocks[iB].iSeatsDaysConstruct > 0) fPg[iB] = (clb.stadium.blocks[iB].iSeatsDaysConstructIni - clb.stadium.blocks[iB].iSeatsDaysConstruct) / (float)clb.stadium.blocks[iB].iSeatsDaysConstructIni;
-        else                                                fPg[iB] = -1f;
-      }
-
-      return Json(fPg, JsonRequestBehavior.AllowGet);
-    }
-
-    [HttpGet]
     public JsonResult StadiumGetTopringProgress()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4641,7 +4601,6 @@ namespace CornerkickWebMvc.Controllers
       return Json((iCostDays[1] - clb.stadium.iTopringDaysConstruct) / (float)iCostDays[1], JsonRequestBehavior.AllowGet);
     }
 
-    [HttpGet]
     public JsonResult StadiumGetExtras()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4666,7 +4625,6 @@ namespace CornerkickWebMvc.Controllers
       }, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public JsonResult StadiumBuildTopring()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4681,7 +4639,6 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Video-wall
-    [HttpGet]
     public JsonResult StadiumGetCostVideo(byte iLevel)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
@@ -4700,7 +4657,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(sCostDaysDispo, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public JsonResult StadiumBuildVideo(byte iLevel)
     {
       CornerkickManager.Club clb = ckClub();
@@ -4715,7 +4671,6 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Snackbars
-    [HttpGet]
     public JsonResult StadiumGetCostSnackbar(int iBuildNew)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
@@ -4737,7 +4692,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(sCostDaysDispo, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public JsonResult StadiumBuildSnackbar(int iBuildNew)
     {
       CornerkickManager.Club clb = ckClub();
@@ -4752,7 +4706,6 @@ namespace CornerkickWebMvc.Controllers
     }
 
     // Toilets
-    [HttpGet]
     public JsonResult StadiumGetCostToilets(int iBuildNew)
     {
       string[] sCostDaysDispo = new string[3] { "0", "0", "0" };
@@ -4774,7 +4727,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(sCostDaysDispo, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public JsonResult StadiumBuildToilets(int iBuildNew)
     {
       CornerkickManager.Club clb = ckClub();
@@ -4817,7 +4769,14 @@ namespace CornerkickWebMvc.Controllers
       return stadiumNew;
     }
 
-    [HttpGet]
+    public JsonResult StadiumGetPitchQuality()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(0.0, JsonRequestBehavior.AllowGet);
+
+      return Json(clb.stadium.fPitchQuality, JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult StadiumRenewPitchCost()
     {
       CornerkickManager.Club clb = ckClub();
@@ -4826,7 +4785,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(MvcApplication.ckcore.st.getCostStadiumRenewPitch(clb.stadium, 0.1f, ckUser()).ToString("N0", getCi()), JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public JsonResult StadiumRenewPitch()
     {
       CornerkickManager.Club clb = ckClub();
