@@ -530,6 +530,14 @@
           url: '/Member/StadiumSurrBuyGround',
           dataType: "json",
           success: function (sMessage) {
+            if (bSound) {
+              var audioCash = new Audio("/Content/Sound/cash.wav");
+              if (audioCash) {
+                audioCash.volume = 0.5;
+                audioCash.play();
+              }
+            }
+
             getCurrentBuildings(bTopringGlobal);
             updateBalance(iBalance[0]);
           }
