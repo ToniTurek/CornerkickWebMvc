@@ -93,6 +93,8 @@
     }
 
     $(document).ready(function () {
+      bSound = @Html.Raw(Json.Encode(Model.bSound));
+
       var bnTakeMain = document.getElementById("bnTake");
       if (bnTakeMain != null) {
         bnTakeMain.disabled = true;
