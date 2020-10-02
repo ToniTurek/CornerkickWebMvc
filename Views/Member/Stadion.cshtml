@@ -202,7 +202,9 @@
       });
 
       $(window).resize(function () {
-        drawSeats(ltBlocks, bTopring, parseInt(sctBuildBlocks.value));
+        if (cbBuildBlocks.checked) {
+          drawSeats(ltBlocks, bTopring, parseInt(sctBuildBlocks.value));
+        }
       });
     }); // document ready
 
@@ -412,6 +414,7 @@
           var iptSeats = document.createElement("input");
           iptSeats.id = "iptBlockSeats";
           iptSeats.style.width = "100%";
+          iptSeats.type = "number";
           iptSeats.value = block.iSeats;
           divBlock.appendChild(iptSeats);
 
