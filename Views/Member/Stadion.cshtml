@@ -201,11 +201,13 @@
         drawSeats(ltBlocks, bTopring, this.checked ? parseInt(sctBuildBlocks.value) : -1);
       });
 
+      /*
       $(window).resize(function () {
         if (cbBuildBlocks.checked) {
           drawSeats(ltBlocks, bTopring, parseInt(sctBuildBlocks.value));
         }
       });
+      */
     }); // document ready
 
     function setImage() {
@@ -235,17 +237,25 @@
         success: function (iCostDaysDispo) {
           bnBuild = document.getElementById("bnBuild");
 
-          bnBuild.setAttribute('data-iBlock', iBlock);
-          bnBuild.setAttribute('data-iSeats', iSeats);
-          bnBuild.setAttribute('data-iType',  iType);
-          bnBuild.setAttribute('data-sCost', iCostDaysDispo[0]);
-          bnBuild.setAttribute('data-sDur', iCostDaysDispo[1]);
-          bnBuild.innerHTML = "Kosten: " + iCostDaysDispo[0].toLocaleString() + " €, Dauer: " + iCostDaysDispo[1].toString() + " Tage";
-
-          if (iCostDaysDispo[1] === 0 || iCostDaysDispo[1] === 0 || iCostDaysDispo[2] === 0) {
+          if (typeof iCostDaysDispo === 'number') {
+            bnBuild.innerHTML = "Maximale Anzahl Plätze: " + iCostDaysDispo.toLocaleString();
             bnBuild.disabled = true;
           } else {
-            bnBuild.disabled = false;
+            bnBuild.setAttribute('data-iBlock', iBlock);
+            bnBuild.setAttribute('data-iSeats', iSeats);
+            bnBuild.setAttribute('data-iType', iType);
+            bnBuild.setAttribute('data-sCost', iCostDaysDispo[0]);
+            bnBuild.setAttribute('data-sDur', iCostDaysDispo[1]);
+            bnBuild.innerText = "Kosten: " + iCostDaysDispo[0].toLocaleString() + " €, Dauer: " + iCostDaysDispo[1].toString() + " Tage";
+
+            if (iCostDaysDispo[1] === 0 || iCostDaysDispo[1] === 0 || iCostDaysDispo[2] === 0) {
+              if (iCostDaysDispo[2] === 0) {
+                bnBuild.innerText += ". Zu wenig Geld!"
+              }
+              bnBuild.disabled = true;
+            } else {
+              bnBuild.disabled = false;
+            }
           }
         }
       });
@@ -350,6 +360,11 @@
         }
       }
 
+      // Reset build button
+      var bnBuild = document.getElementById("bnBuild");
+      bnBuild.disabled = true;
+      bnBuild.innerText = "Block ausbauen";
+
       var divStadion = document.getElementById("divStadion");
 
       var bMobile = divStadion.offsetWidth < 500;
@@ -438,11 +453,9 @@
             sctType.appendChild(optBlockType);
           });
 
-          /*
           iptSeats.addEventListener("change", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
-          */
           iptSeats.addEventListener("keyup", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
@@ -765,7 +778,7 @@
             <input id="cbBuildBlocks" type="checkbox" value="false">
           </label>
           <select class="form-control" id="sctBuildBlocks" style="float: left; width: 60px; margin-right: 8px; margin-bottom: 4px" disabled="disabled"></select>
-          <button type="submit" id="bnBuild" class="btn btn-default" style="float: right; width: 80%; min-width: 405px" disabled="disabled">Kosten: 0</button>
+          <button type="submit" id="bnBuild" class="btn btn-default" style="float: right; width: 80%; min-width: 360px" disabled="disabled">Block ausbauen</button>
         </div>
         
         <div id="divTopring" style="position: relative; width: 100%; margin-bottom: 20px">
