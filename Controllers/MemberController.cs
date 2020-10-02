@@ -3759,7 +3759,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(new { aaData = ltDeTransfer.ToArray() }, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public ActionResult getTableTransferDetails2(int iPlayerId)
     {
       if (iPlayerId <                                     0) return Json(null, JsonRequestBehavior.AllowGet);
@@ -3799,9 +3798,9 @@ namespace CornerkickWebMvc.Controllers
               }
 
               string sStyle = "";
-              if (offer.contract.club == clubUser) sStyle = "font-weight:bold";
+              if (offer.contract.club == clubUser) sStyle = " style=\"font-weight:bold\"";
 
-              sTable += "<tr id=\"rowTransferDetail_" + offer.contract.club.iId.ToString() + "\" style=" + sStyle + ">";
+              sTable += "<tr id=\"rowTransferDetail_" + offer.contract.club.iId.ToString() + "\" class=\"noSelect\"" + sStyle + ">";
               sTable += "<td>" + (iTr + 1).ToString() + "</td>";
               sTable += "<td align=\"center\">" + offer.dt.ToString("d", getCi()) + "</td>";
               sTable += "<td align=\"center\">" + sClub + "</td>";
@@ -3810,7 +3809,7 @@ namespace CornerkickWebMvc.Controllers
               if (bOwnPlayer) {
                 string sChecked = "";
                 //if (iTr == 0) sChecked = " checked";
-                sTable += "<td><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.contract.club.iId.ToString() + "\"" + sChecked + " style=\"cursor: pointer\"></td>";
+                sTable += "<td class=\"select-checkbox\"><input type=\"radio\" id=\"rB_OfferClubId_" + iTr.ToString() + "\" name=\"OfferClubId\" onclick=\"handleClick(this);\" value =\"" + offer.contract.club.iId.ToString() + "\"" + sChecked + " style=\"cursor: pointer\"></td>";
               }
 
               sTable += "</tr>";

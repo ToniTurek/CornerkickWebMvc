@@ -20,9 +20,8 @@
 
 function getTableTransferDetailsAjax(iPlayerId) {
   return $.ajax({
-    type: 'POST',
     url: "/Member/getTableTransferDetails2",
-    dataType: "json",
+    dataType: "JSON",
     data: { iPlayerId: iPlayerId },
     success: function (sTable) {
     }

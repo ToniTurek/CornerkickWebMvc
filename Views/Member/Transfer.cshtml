@@ -172,7 +172,7 @@
         },
         "info": false,
         "searching": true,
-        'responsive': {
+        "responsive": {
           'details': {
             'type': 'column',
             'target': 0
@@ -319,7 +319,7 @@
           bnMakeOffer  .style.display = "none";
           bnCancelOffer.style.display = "none";
           bnAddToFavLst.style.display = "none";
-        } else {
+        } else if (!$(this).hasClass('noSelect')) {
           jTable.$('tr.selected').removeClass('selected');
           $(this).addClass('selected');
           $(this).addClass('selected-Details');
@@ -404,16 +404,17 @@
       $('#tableTransfer tbody').on('click', 'tr.details-control td.symbol', function () {
         var tr = $(this).closest('tr');
         var row = jTable.row(tr);
-
+        
         if (row.child.isShown()) {
           // This row is already open - close it
           row.child.hide();
           tr.removeClass('shown');
         } else {
           // Open this row
-          data = row.data();
+          var data = row.data();
           $.when(getTableTransferDetailsAjax(data.playerId)).done(function (sChildTable) {
             row.child(sChildTable).show();
+            row.child().addClass('noSelect');
             tr.addClass('shown');
           });
         }
