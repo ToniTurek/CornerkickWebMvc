@@ -441,9 +441,11 @@
           iptSeats.addEventListener("change", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
+          /*
           iptSeats.addEventListener("keyup", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
+          */
 
           sctType.addEventListener("change", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(iptSeats.value), parseInt(this.value));
