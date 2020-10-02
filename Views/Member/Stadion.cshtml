@@ -424,7 +424,6 @@
           iptSeats.style.width = "100%";
           iptSeats.type = "number";
           iptSeats.value = block.iSeats;
-          divBlock.appendChild(iptSeats);
 
           var sctType = document.createElement("select");
           sctType.id = "sctBlockType";
@@ -438,14 +437,15 @@
           });
           divBlock.appendChild(sctType);
 
+          /*
           iptSeats.addEventListener("change", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
-          /*
+          */
           iptSeats.addEventListener("keyup", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
-          */
+          divBlock.appendChild(iptSeats);
 
           sctType.addEventListener("change", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(iptSeats.value), parseInt(this.value));
