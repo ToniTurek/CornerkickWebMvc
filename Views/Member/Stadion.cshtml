@@ -393,6 +393,8 @@
 
       divStadion.innerHTML = '';
 
+      var iptSeats;
+
       for (var i = 0; i < ltBlocks.length; i++) {
         if (i > 9 && !bTopring) {
           break;
@@ -415,11 +417,11 @@
         divBlock.style.backgroundColor = "white";
         divBlock.style.webkitBorderRadius = "3px";
 
-        if (iBlockBuild === i && block.iSeatsDaysConstruct === 0) {
+        if (iBlockBuild === i && block.iSeatsDaysConstruct === 0 && !iptSeats) {
           divBlock.style.minWidth = "64px";
           divBlock.style.zIndex = 99;
 
-          var iptSeats = document.createElement("input");
+          iptSeats = document.createElement("input");
           iptSeats.id = "iptBlockSeats_" + iBlockBuild.toString();
           iptSeats.style.width = "100%";
           iptSeats.type = "number";
@@ -451,8 +453,6 @@
 
           divBlock.appendChild(iptSeats);
           divBlock.appendChild(sctType);
-
-          iptSeats.focus();
         } else {
           divBlock.style.border = "1px solid black";
 
@@ -490,6 +490,10 @@
         }
 
         divStadion.appendChild(divBlock);
+      }
+
+      if (iptSeats) {
+        iptSeats.focus();
       }
     }
 
