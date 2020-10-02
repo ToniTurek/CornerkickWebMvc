@@ -420,10 +420,10 @@
           divBlock.style.zIndex = 99;
 
           var iptSeats = document.createElement("input");
-          iptSeats.id = "iptBlockSeats";
+          iptSeats.id = "iptBlockSeats_" + iBlockBuild.toString();
           iptSeats.style.width = "100%";
           iptSeats.type = "number";
-          iptSeats.value = block.iSeats;
+          iptSeats.value = block.iSeats.toString();
 
           var sctType = document.createElement("select");
           sctType.id = "sctBlockType";
@@ -435,7 +435,6 @@
             optBlockType.selected = j === block.iType;
             sctType.appendChild(optBlockType);
           });
-          divBlock.appendChild(sctType);
 
           /*
           iptSeats.addEventListener("change", function () {
@@ -445,11 +444,15 @@
           iptSeats.addEventListener("keyup", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(this.value), parseInt(sctType.value));
           });
-          divBlock.appendChild(iptSeats);
 
           sctType.addEventListener("change", function () {
             getStadiumBuildBlock(iBlockBuild, parseInt(iptSeats.value), parseInt(this.value));
           });
+
+          divBlock.appendChild(iptSeats);
+          divBlock.appendChild(sctType);
+
+          iptSeats.focus();
         } else {
           divBlock.style.border = "1px solid black";
 
