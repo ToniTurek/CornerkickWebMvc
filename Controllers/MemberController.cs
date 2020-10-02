@@ -4510,6 +4510,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
+      int iSeatsMax = CornerkickManager.Stadium.getMaxSeats(clb.stadium, (byte)iType);
+      if (iSeats > iSeatsMax) return Json(iSeatsMax, JsonRequestBehavior.AllowGet);
+
       CornerkickGame.Stadium stadiumNew = clb.stadium.Clone();
       stadiumNew.blocks[iBlock].iSeats = iSeats;
       stadiumNew.blocks[iBlock].iType = (byte)iType;
