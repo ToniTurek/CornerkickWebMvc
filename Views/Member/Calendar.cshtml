@@ -64,13 +64,20 @@
       slotMinutes: 15,
       locale: 'de',
       events: "/Member/PostCalendarData/",
-      select: function (start, end) {
+      select: function (start) {
+        var sStart = start.format();
+
+        var view = $('#calendar').fullCalendar('getView');
+        if (view.name == 'month') {
+          start = start.hour(12);
+          sStart += "T12:00:00";
+        }
+
         $.ajax({
           url: "/Member/compareDates",
-          type: 'POST',
           traditional: true,
-          data: { dt: start.format() },
-          dataType: "json",
+          data: { dt: sStart },
+          dataType: "JSON",
           success: function (iCompare) {
             if (iCompare > 0) {
               dtStart = start;
