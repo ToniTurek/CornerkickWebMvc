@@ -26,7 +26,7 @@
   "jouth_internat":
     {
       "building_type_name": "Jugendinternat",
-      "names": [ "Keins", "Einfaches Jugendinternat", "Mittleres Jugendinternat", "Großes Jugendinternat", "Nachwuchsleistungszentrum" ],
+      "names": [ "Keins", "Einfaches Jugendinternat", "Großes Jugendinternat", "Jugendakademie", "Nachwuchsleistungszentrum" ],
       "costs": [ 0, 1500000, 7000000, 20000000, 60000000 ],
       "construct": [ 0, 60, 120, 240, 480 ],
       "grounds": [ 1, 1, 1, 1, 2 ]
