@@ -548,9 +548,23 @@ namespace CornerkickWebMvc
         }
       }
 
+      // CHEAT-section
       // Jan no injury
       CornerkickManager.Player plJan = ckcore.ltPlayer[101];
       plJan.plGame.injury = null;
+
+      if (ckcore.dtDatum.Day == 1 && ckcore.dtDatum.Hour == 20 && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Second == 0) {
+        CornerkickManager.Club clbJanos = ckcore.ltClubs[5];
+        CornerkickManager.Club clbDavid = ckcore.ltClubs[143];
+
+        int iBalanceMin = 10000000;
+        foreach (CornerkickManager.Club clbBalance in new CornerkickManager.Club[] { clbJanos, clbDavid }) {
+          if (clbBalance.iBalance < iBalanceMin) {
+            int iDeltaBalance = iBalanceMin - clbBalance.iBalance;
+            CornerkickManager.Finance.doTransaction(clbBalance, ckcore.dtDatum, iDeltaBalance, 0, "Ausgleich");
+          }
+        }
+      }
 
       // Assign random portrait if none
       for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
