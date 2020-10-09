@@ -2361,6 +2361,24 @@ namespace CornerkickWebMvc.Controllers
       return Json(new float[] { CornerkickGame.Tool.getAveSkill(player), CornerkickGame.Tool.getAveSkill(player, bIdeal: true) }, JsonRequestBehavior.AllowGet);
     }
 
+    public JsonResult PlayerDetailsGetDoping(int iPlayerId)
+    {
+      float[] fDoping = new float[4];
+
+      if (iPlayerId < 0) return Json(fDoping, JsonRequestBehavior.AllowGet);
+
+      CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId].plGame;
+
+      if (player.doping != null) {
+        fDoping[0] = player.doping.fEffect;
+        fDoping[1] = player.doping.fEffect / player.doping.fEffectMax;
+        fDoping[2] = player.doping.fReductionRate;
+        fDoping[3] = player.doping.fDetectable * (player.doping.fEffect / player.doping.fEffectMax);
+      }
+
+      return Json(fDoping, JsonRequestBehavior.AllowGet);
+    }
+
     public JsonResult setPlayerIndTraining(int iPlayer, int iIndTr)
     {
       CornerkickManager.Player player = MvcApplication.ckcore.ltPlayer[iPlayer];

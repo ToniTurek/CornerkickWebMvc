@@ -302,14 +302,14 @@
 
             $.ajax({
               url: "/Member/PlayerDetailsDoDoping",
-              type: 'POST',
               traditional: true,
               data: { iPlayerId: @Model.iPlayer, iDp: iDp },
-              dataType: "json",
+              dataType: "JSON",
               success: function (bOk) {
                 if (bOk) {
                   plotCFM();
                   printAveSkill(@Model.iPlayer);
+                  printDoping(@Model.iPlayer);
 
                   $("#dialogDoping").dialog("close");
                 } else {
@@ -329,6 +329,7 @@
 
       plotStars(document.getElementById("divStars"), @player.iTalent);
       printAveSkill(@Model.iPlayer);
+      printDoping(@Model.iPlayer);
 
       // Show tutorial
       tt = @Html.Raw(Json.Encode(Model.tutorial));
@@ -509,6 +510,67 @@
         success: function (fAveSkill) {
           document.getElementById("txtAveSkill").innerText = fAveSkill[0].toFixed(1);
           document.getElementById("tdAveSkill").innerText = fAveSkill[0].toFixed(1) + " (" + fAveSkill[1].toFixed(1) + ")";
+        },
+        error: function (xhr) {
+          debugger;
+          alert(xhr);
+        }
+      });
+    }
+
+    function printDoping(iPlayerId) {
+      $.ajax({
+        url: "/Member/PlayerDetailsGetDoping",
+        dataType: "JSON",
+        data: { iPlayerId: iPlayerId },
+        success: function (fDoping) {
+          var tblDoping = document.getElementById("tblDoping").getElementsByTagName('tbody')[0];
+          while (tblDoping.hasChildNodes()) {
+            tblDoping.removeChild(tblDoping.firstChild);
+          }
+
+          if (fDoping[0] > 0) {
+            var row0 = tblDoping.insertRow();
+            var cell00 = row0.insertCell();
+            cell00.innerHTML = "Kondition:";
+            cell00.style.textAlign = "right";
+            var cell01 = row0.insertCell();
+            cell01.innerHTML = '+' + (fDoping[0] * 100).toFixed(1).toLocaleString() + '%';
+            cell01.style.textAlign = "right";
+
+            var row1 = tblDoping.insertRow();
+            var cell10 = row1.insertCell();
+            cell10.innerHTML = "Rest:";
+            cell10.style.textAlign = "right";
+            var cell11 = row1.insertCell();
+            cell11.innerHTML = (fDoping[1] * 100).toFixed(1).toLocaleString() + '%';
+            cell11.style.textAlign = "right";
+
+            var row2 = tblDoping.insertRow();
+            var cell20 = row2.insertCell();
+            cell20.innerHTML = "Reduktion:";
+            cell20.style.textAlign = "right";
+            var cell21 = row2.insertCell();
+            cell21.innerHTML = (fDoping[2] * 100).toFixed(1).toLocaleString() + '% / d';
+            cell21.style.textAlign = "right";
+
+            var row3 = tblDoping.insertRow();
+            var cell30 = row3.insertCell();
+            cell30.innerHTML = "Det.-Risiko:";
+            cell30.style.textAlign = "right";
+            var cell31 = row3.insertCell();
+            cell31.innerHTML = (fDoping[3] * 100).toFixed(1).toLocaleString() + '%';
+            cell31.style.textAlign = "right";
+
+            document.getElementById("divCharacterDoping").style.height = "370px";
+          } else {
+            var row0 = tblDoping.insertRow();
+            var cell00 = row0.insertCell();
+            cell00.innerHTML = "keins";
+            cell00.style.textAlign = "right";
+
+            document.getElementById("divCharacterDoping").style.height = "300px";
+          }
         },
         error: function (xhr) {
           debugger;
@@ -1000,7 +1062,7 @@
               </table>
             </div>
 
-            <div style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
+            <div id="divCharacterDoping" style="position: relative; width: 220px; height: auto; margin-bottom: 10px; float: left">
               <h4>Charakter</h4>
               <table cellpadding="1" style="width: 100%; margin-bottom: 6px">
                 <tbody>
@@ -1035,10 +1097,10 @@
                 </tbody>
               </table>
 
-              <table cellpadding="1" style="width: 100%; margin-top: 20px; margin-bottom: 6px">
+              <table cellpadding="1" style="width: 100%; margin-top: 12px">
                 <tbody>
                   <tr>
-                    <td align="right"><ins>Sperren:</ins></td>
+                    <td align="right"><ins>Sperren</ins></td>
                   </tr>
                   @{
                     if (player.plGame.iSuspension[0] + player.plGame.iSuspension[1] + player.plGame.iSuspension[4] == 0) {
@@ -1079,6 +1141,15 @@
                     }
                   }
                 </tbody>
+              </table>
+
+              <table id="tblDoping" cellpadding="1" style="position: absolute; width: auto; right: 0px; margin-top: 12px; margin-bottom: 6px">
+                <thead>
+                  <tr>
+                    <th colspan="2" style="text-align: right; font-weight: normal; text-decoration: underline">Doping</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
               </table>
             </div>
 
