@@ -1,4 +1,4 @@
-﻿function changeLand() {
+﻿function iniLeague() {
   var iSeason = $('#ddlSeason').val();
   var iLand = $('#ddlLand').val();
   var iDivision = $('#ddlDivision').val();
@@ -21,13 +21,20 @@
         data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision },
         success: function (iMd) {
           document.getElementById("ddlMatchday").value = iMd;
-          setLeague2();
+
+          updateLeague();
         }
       });
     }
   });
 
   plotLeaguePlaceGraph(iSeason);
+}
+
+function updateLeague() {
+  setLeague2();
+
+  setTimeout(updateLeague, 5000);
 }
 
 function setLeague2() {
@@ -39,15 +46,7 @@ function setLeague2() {
   var rbTableA = document.getElementById("rbTableA");
 
   // Teams
-  $.ajax({
-    url: '/Member/setLeagueTeams',
-    type: "GET",
-    dataType: "JSON",
-    data: { iSeason: ddlSeason.value, iLand: ddlLand.value, iDivision: ddlDivision.value, iMatchday: ddlMatchday.value },
-    success: function (sTeams) {
-      actionDrawTeams(sTeams);
-    }
-  });
+  setTeams(ddlSeason.value, ddlLand.value, ddlDivision.value, ddlMatchday.value);
 
   // Table
   if (oTableLeague) {
@@ -66,6 +65,18 @@ function setLeague2() {
   } else {
     oTableScorer = setTableScorer(document.getElementById("divLeagueScorer"), 1, ddlLand, ddlDivision);
   }
+}
+
+function setTeams(iSeason, iLand, iDivision, iMatchday) {
+  $.ajax({
+    url: '/Member/setLeagueTeams',
+    type: "GET",
+    dataType: "JSON",
+    data: { iSeason: iSeason, iLand: iLand, iDivision: iDivision, iMatchday: iMatchday },
+    success: function (sTeams) {
+      actionDrawTeams(sTeams);
+    }
+  });
 }
 
 function getTableDatatable(parent, iGameType, ddlSeason, ddlLand, ddlDivision, ddlMatchday, ddlGroup, rbTableH, rbTableA, iColor1, iColor2, iColor3, iColor4) {

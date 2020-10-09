@@ -6001,15 +6001,36 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td style=\"white-space: nowrap\" align=\"center\">&nbsp;-&nbsp;</td>";
         sBox += "<td style=\"white-space: nowrap\" align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"\">" + sClubNameA + "</a></td>";
 
-        if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
-          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
+        string sLiveGameTd = getLiveGameTd(gd);
+        if (!string.IsNullOrEmpty(sLiveGameTd)) {
+          sBox += sLiveGameTd;
         } else {
-          sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
+          if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
+            sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
+          } else {
+            sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
+          }
         }
         sBox += "</tr>";
       }
 
       return Json(sBox, JsonRequestBehavior.AllowGet);
+    }
+
+    private string getLiveGameTd(CornerkickGame.Game.Data gd)
+    {
+      foreach (CornerkickManager.User usr in MvcApplication.ckcore.ltUser) {
+        if (usr?.game != null) {
+          if (!usr.game.data.bFinished) {
+            if (usr.game.data.team[0].iTeamId == gd.team[0].iTeamId ||
+                usr.game.data.team[1].iTeamId == gd.team[1].iTeamId) {
+              return "<td style=\"white-space: nowrap; color: #ff8c00\" align=\"center\">" + CornerkickManager.UI.getResultString(usr.game.data) + " - " + MvcApplication.ckcore.ui.getMinuteString(usr.game.tsMinute, false) + " Min.</td>";
+            }
+          }
+        }
+      }
+
+      return null;
     }
 
     public JsonResult LeagueCupGetScorer(byte iGameType, int iLand, int iDivision)
@@ -6195,11 +6216,17 @@ namespace CornerkickWebMvc.Controllers
         sBox += "<td style=\"white-space: nowrap\" align=\"center\">&nbsp;-&nbsp;</td>";
         sBox += "<td style=\"white-space: nowrap\" align=\"left\"><a href=\"/Member/ClubDetails?iClub=" + iIdA.ToString() + "\" target=\"\">" + sClubNameA + "</a></td>";
 
-        if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
-          sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
+        string sLiveGameTd = getLiveGameTd(gd);
+        if (!string.IsNullOrEmpty(sLiveGameTd)) {
+          sBox += sLiveGameTd;
         } else {
-          sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
+          if (gd.team[0].iGoals >= 0 && gd.team[1].iGoals >= 0) {
+            sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
+          } else {
+            sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
+          }
         }
+
         sBox += "</tr>";
       }
 

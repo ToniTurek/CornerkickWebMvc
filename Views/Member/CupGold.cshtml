@@ -21,6 +21,7 @@
 
     $(document).ready(function () {
       setMatchdayCupGold();
+      updateCupGold();
 
       $("#ddlSeasonCupGold").change(function () {
         setMatchdayCupGold();
@@ -34,6 +35,12 @@
         setMatchdayCupGold();
       });
     });
+
+    function updateCupGold() {
+      setMatchdayCupGold(true);
+
+      setTimeout(updateCupGold, 5000);
+    }
   </script>
 </head>
 

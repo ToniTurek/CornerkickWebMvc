@@ -21,6 +21,7 @@
 
     $(document).ready(function () {
       setMatchdayCupSilver();
+      updateCupSilver();
 
       $("#ddlSeasonCupSilver").change(function () {
         setMatchdayCupSilver();
@@ -34,6 +35,12 @@
         setMatchdayCupSilver();
       });
     });
+
+    function updateCupSilver() {
+      setMatchdayCupSilver(true);
+
+      setTimeout(updateCupSilver, 5000);
+    }
   </script>
 </head>
 
