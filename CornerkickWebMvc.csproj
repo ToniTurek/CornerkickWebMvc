@@ -1138,27 +1138,63 @@
     <Content Include="Resources\cup_round_names.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Names\player_names_ARG.txt" />
-    <Content Include="Resources\Names\player_names_BRA.txt" />
-    <Content Include="Resources\Names\player_names_ENG.txt" />
-    <Content Include="Resources\Names\player_names_ESP.txt" />
-    <Content Include="Resources\Names\player_names_FRA.txt" />
-    <Content Include="Resources\Names\player_names_GER.txt" />
-    <Content Include="Resources\Names\player_names_ITA.txt" />
-    <Content Include="Resources\Names\player_names_NED.txt" />
-    <Content Include="Resources\Names\player_surnames_ARG.txt" />
-    <Content Include="Resources\Names\player_surnames_BRA.txt" />
-    <Content Include="Resources\Names\player_surnames_ENG.txt" />
-    <Content Include="Resources\Names\player_surnames_ESP.txt" />
-    <Content Include="Resources\Names\player_surnames_FRA.txt" />
-    <Content Include="Resources\Names\player_surnames_GER.txt" />
-    <Content Include="Resources\Names\player_surnames_ITA.txt" />
-    <Content Include="Resources\Names\player_surnames_NED.txt" />
+    <Content Include="Resources\Names\player_names_ARG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_BRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_ENG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_ESP.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_FRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_GER.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_ITA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_names_NED.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_ARG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_BRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_ENG.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_ESP.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_FRA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_GER.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_ITA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames_NED.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\nations.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Names\player_names.txt" />
-    <Content Include="Resources\Names\player_surnames.txt" />
+    <Content Include="Resources\Names\player_names.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Names\player_surnames.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\position_names.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1538,6 +1574,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\mail\" />
+    <Folder Include="App_Data\Resources\Names\" />
     <Folder Include="Content\Uploads\Portraits\" />
     <Folder Include="Views\MemberPages\" />
   </ItemGroup>
