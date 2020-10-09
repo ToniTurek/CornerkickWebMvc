@@ -529,17 +529,21 @@
           type: 'GET',
           url: '/Member/StadiumSurrBuyGround',
           dataType: "json",
-          success: function (sMessage) {
-            if (bSound) {
-              var audioCash = new Audio("/Content/Sound/cash.wav");
-              if (audioCash) {
-                audioCash.volume = 0.5;
-                audioCash.play();
+          success: function (bOk) {
+            if (bOk) {
+              if (bSound) {
+                var audioCash = new Audio("/Content/Sound/cash.wav");
+                if (audioCash) {
+                  audioCash.volume = 0.5;
+                  audioCash.play();
+                }
               }
-            }
 
-            getCurrentBuildings(bTopringGlobal);
-            updateBalance(iBalance[0]);
+              getCurrentBuildings(bTopringGlobal);
+              updateBalance(iBalance[0]);
+            } else {
+              alert("Ihr Kreditrahmen ist nicht hoch genug zum Erwerb des Grundstückes!");
+            }
           }
         });
       });

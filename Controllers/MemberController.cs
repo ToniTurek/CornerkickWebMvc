@@ -5176,10 +5176,17 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
       int iCost = CornerkickManager.Stadium.getCostBuyGround(clb.buildings.iGround);
+
+      // Check dispo
+      if (!MvcApplication.ckcore.fz.checkDispoLimit(iCost, clb)) {
+        return Json(false, JsonRequestBehavior.AllowGet);
+      }
+
+      // Add and pay ground
       clb.buildings.iGround++;
       CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCost, CornerkickManager.Finance.iTransferralTypePayStadiumSurrGround);
 
-      return Json("Das Grundstück wurde erworben", JsonRequestBehavior.AllowGet);
+      return Json(true, JsonRequestBehavior.AllowGet);
     }
 
     //////////////////////////////////////////////////////////////////////////
