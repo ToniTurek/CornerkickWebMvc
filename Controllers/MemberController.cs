@@ -5134,11 +5134,13 @@ namespace CornerkickWebMvc.Controllers
 
       if (iType == 6) { // Carpark
         if (clb.stadium.iCarparkNew != iLevel) {
+          // Check if enough grounds are available
           if (Math.Ceiling(iLevel / (float)CornerkickManager.Stadium.iCarparkPerGround) > Math.Ceiling(clb.stadium.iCarpark / (float)CornerkickManager.Stadium.iCarparkPerGround)) {
             if (clb.buildings.iGround <= CornerkickManager.Stadium.getRequiredGrounds(clb)) {
               return Json("Sie benötigen erst ein neues Grundstück", JsonRequestBehavior.AllowGet);
             }
           }
+
           clb.stadium.iCarparkNew = iLevel;
           int[] iCostDaysCp = CornerkickManager.Stadium.getCostDaysContructCarpark(iLevel, clb.stadium.iCarpark, usr);
           clb.stadium.iCarparkDaysConstruct = iCostDaysCp[1];
@@ -5147,6 +5149,13 @@ namespace CornerkickWebMvc.Controllers
         }
       } else if (iType == 7) { // Ticketcounter
         if (clb.stadium.iTicketcounterNew != iLevel) {
+          // Check if enough grounds are available
+          if (Math.Ceiling(iLevel / (float)CornerkickManager.Stadium.iTicketcounterPerGround) > Math.Ceiling(clb.stadium.iTicketcounter / (float)CornerkickManager.Stadium.iTicketcounterPerGround)) {
+            if (clb.buildings.iGround <= CornerkickManager.Stadium.getRequiredGrounds(clb)) {
+              return Json("Sie benötigen erst ein neues Grundstück", JsonRequestBehavior.AllowGet);
+            }
+          }
+
           clb.stadium.iTicketcounterNew = (byte)iLevel;
           int[] iCostDaysTc = CornerkickManager.Stadium.getCostDaysContructTicketcounter(iLevel, clb.stadium.iTicketcounter, usr);
           clb.stadium.iTicketcounterDaysConstruct = iCostDaysTc[1];
