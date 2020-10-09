@@ -76,8 +76,8 @@
       {
         "id": 10,
         "name": "Fußball",
-        "price": 50.0,
-        "sellfactor": 0.35,
+        "price": 30.0,
+        "sellfactor": 0.3,
         "quantityfactor": 1000,
         "player_jersey": false
       },
@@ -85,7 +85,7 @@
         "id": 11,
         "name": "Bettwäsche",
         "price": 60.0,
-        "sellfactor": 0.3,
+        "sellfactor": 0.2,
         "quantityfactor": 750,
         "player_jersey": false
       },
@@ -127,6 +127,14 @@
         "price": 10.0,
         "sellfactor": 0.4,
         "quantityfactor": 2500,
+        "player_jersey": false
+      },
+      {
+        "id": 17,
+        "name": "Mund-Nasen-Schutz",
+        "price": 5.0,
+        "sellfactor": 0.4,
+        "quantityfactor": 10000,
         "player_jersey": false
       }
     ]
