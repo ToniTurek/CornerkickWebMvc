@@ -76,12 +76,11 @@
 
         $.ajax({
           url: "/Member/GetPlayerName",
-          type: 'POST',
           traditional: true,
           data: { iPlayer: iAcceptPlId },
-          dataType: "json",
+          dataType: "JSON",
           success: function (sName) {
-            $("#bnAcceptOffer").text("Angebot für " + sName + " annehmen");
+            bnAcceptOffer.innerText = "Angebot für " + sName + " annehmen";
           }
         });
       }
@@ -560,10 +559,9 @@
           $.when(getBalanceAjax()).done(function (iBalance) {
             $.ajax({
               url: "/Member/AcceptTransferOffer",
-              type: 'POST',
               traditional: true,
               data: { iPlayerId: iAcceptPlId, iClubId: iAcceptClubId },
-              dataType: "json",
+              dataType: "JSON",
               success: function (response) {
                 alert(response);
 

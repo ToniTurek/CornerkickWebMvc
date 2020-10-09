@@ -3309,7 +3309,6 @@ namespace CornerkickWebMvc.Controllers
       return Json("Der Vertrag mit " + player.plGame.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.", JsonRequestBehavior.AllowGet);
     }
 
-    [HttpPost]
     public JsonResult GetPlayerName(int iPlayer)
     {
       if (iPlayer < 0) return Json("", JsonRequestBehavior.AllowGet);
@@ -3611,7 +3610,6 @@ namespace CornerkickWebMvc.Controllers
       }
     }
 
-    [HttpPost]
     public JsonResult AcceptTransferOffer(int iPlayerId, int iClubId)
     {
       string sReturn = "Error";
