@@ -5528,8 +5528,8 @@ namespace CornerkickWebMvc.Controllers
       if (clb == null) return View(mdMerchandising);
 
       mdMerchandising.marketer = clb.merchMarketer;
-      if (clb.merchMarketer == null) mdMerchandising.sMarketerMoney = getMerchandisingMarketerOffer(clb).ToString("N0", getCi()) + " €";
-      else                           mdMerchandising.sMarketerMoney = clb.merchMarketer.iMoney.ToString("N0", getCi()) + " €";
+      if (clb.merchMarketer == null) mdMerchandising.sMarketerMoney = getMerchandisingMarketerOffer(clb).ToString("N0", getCi());
+      else                           mdMerchandising.sMarketerMoney = clb.merchMarketer.iMoney.ToString("N0", getCi());
 
       mdMerchandising.bFanshopsAvailable = clb.buildings.bgFanshop.iLevel > 0;
       mdMerchandising.bMarketer = clb.merchMarketer != null;

@@ -414,11 +414,11 @@
             @{
               if (Model.marketer == null) {
                 <td><b>@MvcApplication.ckcore.ltMerchandisingMarketer[0].sName</b></td>
-                <td>Angebot: @Model.sMarketerMoney</td>
+                <td>Angebot: @Model.sMarketerMoney&nbsp;€</td>
                 <td><button class="btn btn-default" style="width: 100px" onclick="takeMarketer()">annehmen</button></td>
               } else {
                 <td><b>@Model.marketer.marketer.sName</b></td>
-                <td>Bezahlt: @Model.sMarketerMoney</td>
+                <td>Bezahlt: @Model.sMarketerMoney&nbsp;€</td>
               }
             }
             <td>Laufzeit: Saisonende</td>
