@@ -334,7 +334,12 @@
             ltBlocks[iBlock].iSeatsDaysConstruct = 1;
             ltBlocks[iBlock].iSeatsDaysConstructIni = 1;
 
+            var cbBuildBlocks = document.getElementById("cbBuildBlocks");
+            cbBuildBlocks.checked = false;
+            var sctBuildBlocks = document.getElementById("sctBuildBlocks");
+            sctBuildBlocks.disabled = true;
             drawSeats(ltBlocks, bTopring, -1);
+
             updateBalance(iBalance[0]);
 
             if (bSound) {
