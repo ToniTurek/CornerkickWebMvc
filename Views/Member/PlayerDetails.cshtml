@@ -39,82 +39,16 @@
   </style>
 
   <script>
+    var iPlayerId;
     var iCpt = 0;
     var tt; // Tutorial object
 
-    function setIndTraining(iInd) {
-      $.ajax({
-        url: '/Member/setPlayerIndTraining',
-        type: "GET",
-        dataType: "JSON",
-        data: { iPlayer: @Model.iPlayer, iIndTr: iInd },
-        success: function (iIndTr) {
-          plotChanceDevelopment();
-        }
-      });
-    }
-
-    function setName() {
-      var tbName = document.getElementById("sName");
-
-      if (tbName) {
-        $.ajax({
-          url: '/Member/setPlayerName',
-          type: "GET",
-          dataType: "JSON",
-          data: { iPlayer: @Model.iPlayer, sName: tbName.value },
-          success: function () {
-            tbName.style.backgroundColor = "";
-          },
-          error: function (xhr) {
-            tbName.style.backgroundColor = "yellow";
-            alert(xhr.responseText);
-          }
-        });
-      }
-    }
-
-    function setNo() {
-      var iNo = $('#iDdlINo').val();
-      $.ajax({
-        url: '/Member/setPlayerNo',
-        type: "GET",
-        dataType: "JSON",
-        data: { iPlayer: @Model.iPlayer, iNo: iNo },
-        success: function () {
-        }
-      });
-    }
-
-    function setDopingDesc() {
-      var iDp = $('#ddlDoping').val();
-
-      $.ajax({
-        url: '/Member/PlayerDetailsGetDopingDesc',
-        type: "GET",
-        dataType: "JSON",
-        data: { iDp: iDp },
-        success: function (sDopDesc) {
-          $("#txtDialogDoping").html(sDopDesc);
-        }
-      });
-    }
-
-    function drawStatistic(iMode) {
-      var bSeason = iMode === 0;
-
-      $.ajax({
-        url: '/Member/PlayerDetailsGetStatistic',
-        type: "GET",
-        dataType: "JSON",
-        data: { iPlayer: @Model.iPlayer, bSeason: bSeason },
-        success: function (sStatistic) {
-          $('#tblStatistic tbody').html(sStatistic);
-        }
-      });
-    }
-
     $(document).ready(function () {
+      // Set global player id variable
+      iPlayerId = @Html.Raw(Json.Encode(Model.iPlayer));
+
+      var bOwnPlayer = @Html.Raw(Json.Encode(Model.bOwnPlayer));
+
       // Set club emblem
       var divEmblemClub = document.getElementById("divEmblemClub");
       var sEmblemImg = @Html.Raw(Json.Encode(Model.sEmblem));
@@ -139,7 +73,7 @@
             }
           } else if (iTabActive == 2) {
             plotPlayerDevelopment();
-            plotTrainingDevelopment(@Model.iPlayer);
+            plotTrainingDevelopment(iPlayerId);
             drawStatistic(0);
           }
         }
@@ -155,7 +89,7 @@
           "cache": false,
           "contentType": "application/json; charset=utf-8",
           "data": function (d) {
-            d.iPlayerId = @Model.iPlayer;
+            d.iPlayerId = iPlayerId;
           }
         },
         "columns": [
@@ -201,7 +135,7 @@
           "cache": false,
           "contentType": "application/json; charset=utf-8",
           "data": function (d) {
-            d.iPlayerId = @Model.iPlayer;
+            d.iPlayerId = iPlayerId;
           }
         },
         "language": {
@@ -241,7 +175,7 @@
         } else if ($("#bnContract").text() === "In Profikader übernehmen") {
           getDialog(document.body, "Möchten Sie den Spieler " + @Html.Raw(Json.Encode(player.plGame.sName)) + " wirklich in den Profikader übernehmen?", "Bitte bestätigen...", moveIntoProTeam);
         } else {
-          getContractDialog(document.body, @Model.iPlayer, false);
+          getContractDialog(document.body, iPlayerId, false);
         }
       });
 
@@ -257,7 +191,7 @@
             $("#txtCaptain").html("Möchten Sie Ihren bisherigen Kapitän " + sCaptain + " wirklich absetzen?");
             $("#dialogCaptain").dialog("open");
           } else {
-            makePlayerCaptainAjax(@Model.iPlayer, iCpt);
+            makePlayerCaptainAjax(iPlayerId, iCpt);
           }
         });
       });
@@ -270,7 +204,7 @@
             $("#txtCaptain").html("Möchten Sie Ihren bisherigen Vize-Kapitän " + sCaptain + " wirklich absetzen?");
             $("#dialogCaptain").dialog("open");
           } else {
-            makePlayerCaptainAjax(@Model.iPlayer, iCpt);
+            makePlayerCaptainAjax(iPlayerId, iCpt);
           }
         });
       });
@@ -279,7 +213,7 @@
         autoOpen: false,
         buttons: {
           "Bestätigen": function () {
-            makePlayerCaptainAjax(@Model.iPlayer, iCpt)
+            makePlayerCaptainAjax(iPlayerId, iCpt)
 
             $(this).dialog("close");
           },
@@ -303,13 +237,13 @@
             $.ajax({
               url: "/Member/PlayerDetailsDoDoping",
               traditional: true,
-              data: { iPlayerId: @Model.iPlayer, iDp: iDp },
+              data: { iPlayerId: iPlayerId, iDp: iDp },
               dataType: "JSON",
               success: function (bOk) {
                 if (bOk) {
                   plotCFM();
-                  printAveSkill(@Model.iPlayer);
-                  printDoping(@Model.iPlayer);
+                  printAveSkill(iPlayerId);
+                  printDoping(iPlayerId);
 
                   $("#dialogDoping").dialog("close");
                 } else {
@@ -328,8 +262,10 @@
       });
 
       plotStars(document.getElementById("divStars"), @player.iTalent);
-      printAveSkill(@Model.iPlayer);
-      printDoping(@Model.iPlayer);
+      printAveSkill(iPlayerId);
+      if (bOwnPlayer) {
+        printDoping(iPlayerId);
+      }
 
       // Show tutorial
       tt = @Html.Raw(Json.Encode(Model.tutorial));
@@ -338,12 +274,84 @@
       }
     }); // $(document).ready(function () {
 
+    function setIndTraining(iInd) {
+      $.ajax({
+        url: '/Member/setPlayerIndTraining',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: iPlayerId, iIndTr: iInd },
+        success: function (iIndTr) {
+          plotChanceDevelopment();
+        }
+      });
+    }
+
+    function setName() {
+      var tbName = document.getElementById("sName");
+
+      if (tbName) {
+        $.ajax({
+          url: '/Member/setPlayerName',
+          type: "GET",
+          dataType: "JSON",
+          data: { iPlayer: iPlayerId, sName: tbName.value },
+          success: function () {
+            tbName.style.backgroundColor = "";
+          },
+          error: function (xhr) {
+            tbName.style.backgroundColor = "yellow";
+            alert(xhr.responseText);
+          }
+        });
+      }
+    }
+
+    function setNo() {
+      var iNo = $('#iDdlINo').val();
+      $.ajax({
+        url: '/Member/setPlayerNo',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: iPlayerId, iNo: iNo },
+        success: function () {
+        }
+      });
+    }
+
+    function setDopingDesc() {
+      var iDp = $('#ddlDoping').val();
+
+      $.ajax({
+        url: '/Member/PlayerDetailsGetDopingDesc',
+        type: "GET",
+        dataType: "JSON",
+        data: { iDp: iDp },
+        success: function (sDopDesc) {
+          $("#txtDialogDoping").html(sDopDesc);
+        }
+      });
+    }
+
+    function drawStatistic(iMode) {
+      var bSeason = iMode === 0;
+
+      $.ajax({
+        url: '/Member/PlayerDetailsGetStatistic',
+        type: "GET",
+        dataType: "JSON",
+        data: { iPlayer: iPlayerId, bSeason: bSeason },
+        success: function (sStatistic) {
+          $('#tblStatistic tbody').html(sStatistic);
+        }
+      });
+    }
+
     function putOnTakeFromTransferlist() {
       $.ajax({
         url: "/Member/TransferPutOnTakeFromTransferList",
         type: 'POST',
         traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
+        data: { iPlayerId: iPlayerId },
         dataType: "json",
         success: function (response) {
           alert(response);
@@ -351,7 +359,7 @@
           // Switch buttons
           if (response.indexOf("wurde auf die Transferliste gesetzt") > -1) {
             plotCFM();
-            printAveSkill(@Model.iPlayer);
+            printAveSkill(iPlayerId);
             setTransferlistButton(0);
           } else {
             setTransferlistButton(1);
@@ -379,7 +387,7 @@
       $.ajax({
         url: "/Member/PlayerDetailsGetSecretMoneyForcePutOnTransferList",
         traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
+        data: { iPlayerId: iPlayerId },
         dataType: "json",
         success: function (response) {
           getDialog(document.body, response, "Handgeld", forcePutOnTransferlist);
@@ -395,7 +403,7 @@
       $.ajax({
         url: "/Member/PlayerDetailsForcePutOnTransferList",
         traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
+        data: { iPlayerId: iPlayerId },
         dataType: "json",
         success: function (response) {
           alert(response);
@@ -444,7 +452,7 @@
           }
 
           plotCFM();
-          printAveSkill(@Model.iPlayer);
+          printAveSkill(iPlayerId);
         },
         error: function (xhr) {
           debugger;
@@ -458,7 +466,7 @@
         url: "/Member/PlayerDetailsMoveIntoProTeam",
         type: 'GET',
         traditional: true,
-        data: { iPlayerId: @Model.iPlayer },
+        data: { iPlayerId: iPlayerId },
         dataType: "json",
         success: function (response) {
           alert(response);
@@ -524,13 +532,28 @@
         dataType: "JSON",
         data: { iPlayerId: iPlayerId },
         success: function (fDoping) {
-          var tblDoping = document.getElementById("tblDoping").getElementsByTagName('tbody')[0];
-          while (tblDoping.hasChildNodes()) {
-            tblDoping.removeChild(tblDoping.firstChild);
-          }
+          // Get the DOM element and clear it
+          var tblDoping = document.getElementById("tblDoping");
+          tblDoping.innerHTML = '';
+
+          // Create an empty <thead> element and add it to the table
+          var tblDopingHdr = tblDoping.createTHead();
+
+          // Create an empty <tr> element and add it to the first position of <thead>
+          var rowHdr = tblDopingHdr.insertRow(0);
+
+          // Insert a new cell (<th>) at the first position of the "new" <tr> element
+          var cellHdr = rowHdr.insertCell(0);
+          cellHdr.colSpan = 2;
+          cellHdr.style.textAlign = "right";
+          cellHdr.style.textDecoration = "underline";
+          cellHdr.innerHTML = "Doping";
+
+          // Create an empty <tbody> element and add it to the table
+          var tblDopingBody = tblDoping.createTBody();
 
           if (fDoping[0] > 0) {
-            var row0 = tblDoping.insertRow();
+            var row0 = tblDopingBody.insertRow();
             var cell00 = row0.insertCell();
             cell00.innerHTML = "Kondition:";
             cell00.style.textAlign = "right";
@@ -538,7 +561,7 @@
             cell01.innerHTML = '+' + (fDoping[0] * 100).toFixed(1).toLocaleString() + '%';
             cell01.style.textAlign = "right";
 
-            var row1 = tblDoping.insertRow();
+            var row1 = tblDopingBody.insertRow();
             var cell10 = row1.insertCell();
             cell10.innerHTML = "Rest:";
             cell10.style.textAlign = "right";
@@ -546,7 +569,7 @@
             cell11.innerHTML = (fDoping[1] * 100).toFixed(1).toLocaleString() + '%';
             cell11.style.textAlign = "right";
 
-            var row2 = tblDoping.insertRow();
+            var row2 = tblDopingBody.insertRow();
             var cell20 = row2.insertCell();
             cell20.innerHTML = "Reduktion:";
             cell20.style.textAlign = "right";
@@ -554,7 +577,7 @@
             cell21.innerHTML = (fDoping[2] * 100).toFixed(1).toLocaleString() + '% / d';
             cell21.style.textAlign = "right";
 
-            var row3 = tblDoping.insertRow();
+            var row3 = tblDopingBody.insertRow();
             var cell30 = row3.insertCell();
             cell30.innerHTML = "Det.-Risiko:";
             cell30.style.textAlign = "right";
@@ -564,7 +587,7 @@
 
             document.getElementById("divCharacterDoping").style.height = "370px";
           } else {
-            var row0 = tblDoping.insertRow();
+            var row0 = tblDopingBody.insertRow();
             var cell00 = row0.insertCell();
             cell00.innerHTML = "keins";
             cell00.style.textAlign = "right";
@@ -593,7 +616,7 @@
         type: 'post',
         url: '/Member/PlayerDetailsGetCFM',
         dataType: "json",
-        data: { iPlId: @Model.iPlayer },
+        data: { iPlId: iPlayerId },
         success: function (dataCFM) {
           CanvasJS.addColorSet("customColorSet1",
             [
@@ -648,7 +671,7 @@
         type: 'post',
         url: '/Member/PlayerDetailsGetDevelopmentData',
         dataType: "json",
-        data: { iPlId: @Model.iPlayer },
+        data: { iPlId: iPlayerId },
         success: function (dataDev) {
           var chartDev = new CanvasJS.Chart("divChartDevelopment", {
             animationEnabled: true,
@@ -701,7 +724,7 @@
         type: 'post',
         url: '/Member/PlayerDetailsGetChanceDevelopment',
         dataType: "json",
-        data: { iPlId: @Model.iPlayer },
+        data: { iPlId: iPlayerId },
         success: function (dataCFM) {
           CanvasJS.addColorSet("customColorSet1",
             [
@@ -1143,14 +1166,7 @@
                 </tbody>
               </table>
 
-              <table id="tblDoping" cellpadding="1" style="position: absolute; width: auto; right: 0px; margin-top: 12px; margin-bottom: 6px">
-                <thead>
-                  <tr>
-                    <th colspan="2" style="text-align: right; font-weight: normal; text-decoration: underline">Doping</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
+              <table id="tblDoping" cellpadding="1" style="position: absolute; width: auto; right: 0px; margin-top: 12px; margin-bottom: 6px"></table>
             </div>
 
             <div style="position: relative; width: 40px; height: auto; margin-right: 10px; float: left; text-align: right">
