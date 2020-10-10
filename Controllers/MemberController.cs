@@ -4800,7 +4800,12 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clb = ckClub();
       if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      return Json(MvcApplication.ckcore.st.getCostStadiumRenewPitch(clb.stadium, 0.1f, ckUser()).ToString("N0", getCi()), JsonRequestBehavior.AllowGet);
+      return Json(
+        new string[] {
+                        Math.Min(1f - clb.stadium.fPitchQuality, 0.1f).ToString("0%"),
+                        MvcApplication.ckcore.st.getCostStadiumRenewPitch(clb.stadium, 0.1f, ckUser()).ToString("N0", getCi())
+                      },
+      JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult StadiumRenewPitch()

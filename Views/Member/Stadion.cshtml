@@ -308,11 +308,11 @@
       $.ajax({
         url: '/Member/StadiumRenewPitchCost',
         dataType: "JSON",
-        success: function (sCost) {
+        success: function (pitch) {
           var bnRenewPitch = document.getElementById("bnRenewPitch");
-          bnRenewPitch.innerText = "Rasen + 10%, Kosten: " + sCost + " €";
+          bnRenewPitch.innerText = "Rasen +" + pitch[0] + ", Kosten: " + pitch[1] + "€";
 
-          if (sCost == "0" || sCost == "") {
+          if (pitch[1] == "0" || pitch[1] == "") {
             bnRenewPitch.disabled = true;
           } else {
             bnRenewPitch.disabled = false;
