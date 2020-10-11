@@ -28,7 +28,7 @@
     var ltColor = ["#3ADF00", "#F78181", "#00ffff", "#FFBF00", "#819FF7", "#DA81F5", "", "#00ffbf", "", "#ffff00"];
     var bTopringGlobal = false;
 
-    function getGround(building, ltBuildingsFree, bDisabled, i, iRep) {
+    function getGround(building, ltBuildingsFree, bDisabled, i, iRep, cl1) {
       var div0 = document.createElement("div");
       div0.id = "divGroundAll_" + i.toString();
       div0.style.position = "relative";
@@ -136,6 +136,32 @@
             }
             divCarpark.appendChild(imgCarpark);
           }
+        } else if (building.iType === 8) {
+          var nFanshops = Math.max(Math.ceil(Math.min(building.iLevel - (iRep * 40), 40) / 2), 1);
+
+          var divFanshop = document.createElement("div");
+          divFanshop.style.position = "absolute";
+          divFanshop.style.top = "0px";
+          divFanshop.style.left = "0px";
+          divFanshop.style.height = "100%";
+          divFanshop.style.width = "100%";
+          divFanshop.style.textAlign = "left";
+          div1.appendChild(divFanshop);
+
+          for (var iC = 0; iC < nFanshops; iC++) {
+            var imgFanshop = document.createElement("img");
+            imgFanshop.className = "imgCarpark";
+            imgFanshop.style.position = "relative";
+            //imgFanshop.style.width = "38px";
+            imgFanshop.style.width = "53px";
+            imgFanshop.style.backgroundColor = cl1;
+            if (nFanshops >= 20 || building.nDaysConstruct === 0) {
+              imgFanshop.src = "/Content/Images/stadium/fanshop.png";
+            } else {
+              imgFanshop.src = "/Content/Images/stadium/carpark_construct.png";
+            }
+            divFanshop.appendChild(imgFanshop);
+          }
         } else if (building.iType < ltColor.length) {
           var divBorder = document.createElement("div");
           divBorder.className = "divGround";
@@ -150,7 +176,7 @@
         }
 
         if (!ltBuildingsFree && (building.iLevel > 0 || building.nDaysConstruct > 0)) {
-          if (building.iType === 6 && bDisabled) {
+          if ((building.iType === 6 || building.iType === 8) && bDisabled) {
           } else {
             var bCategory = document.createElement("b");
             bCategory.innerText = building.sCategory;
@@ -158,7 +184,7 @@
             bCategory.style.width = "100%";
             bCategory.style.left = "0px";
             bCategory.style.fontSize = "22px";
-            if (building.iType === 6) {
+            if (building.iType === 6 || building.iType === 8) {
               bCategory.style.textShadow = "0px 0px 6px white";
             }
             div1.appendChild(bCategory);
@@ -173,7 +199,7 @@
             if (!bDisabled) {
               pCurr.innerText = "Akt.: " + building.sName;
             }
-            if (building.iType === 6) {
+            if (building.iType === 6 || building.iType === 8) {
               pCurr.style.textShadow = "0px 0px 6px white";
             }
             div1.appendChild(pCurr);
@@ -254,6 +280,8 @@
           btn.addEventListener("click", function () { buildBuilding(this); });
           if (building.bDispoOk == false) {
             btn.disabled = "disabled";
+          } else if (building.iType === 6 || building.iType === 8) {
+            btn.style.opacity = 0.9;
           }
 
           if (ltBuildingsFree && building.iLevel == 0) {
@@ -353,7 +381,7 @@
         txtNew.style.left = "0px";
         txtNew.style.width = "48%";
         txtNew.style.fontSize = "16px";
-        if (building.iType === 6) {
+        if (building.iType === 6 || building.iType === 8) {
           txtNew.style.textShadow = "0px 0px 6px white";
         }
         divNew.appendChild(txtNew);
@@ -424,19 +452,20 @@
 
     $(document).ready(function () {
       bSound = @Html.Raw(Json.Encode(Model.bSound));
+      cl1 = @Html.Raw(Json.Encode(Model.sColor1));
 
       $.ajax({
         url: '/Member/StadiumGetTopring',
         type: "GET",
         dataType: "JSON",
         success: function (bTopring) {
-          getCurrentBuildings(bTopring);
+          getCurrentBuildings(bTopring, cl1);
           bTopringGlobal = bTopring;
         }
       });
     }); // $(document).ready()
 
-    function getCurrentBuildings(bTopring) {
+    function getCurrentBuildings(bTopring, cl1) {
       var divGroundContainer = $("#divGroundContainer");
       divGroundContainer.html('');
       $.ajax({
@@ -453,23 +482,23 @@
             if (iType < buildings.ltBuildings.length) {
               var iRpt = 0;
               for (iRpt = 0; iRpt < buildings.ltBuildings[iType].nRepeat - 1; iRpt++) {
-                divGroundContainer.append(getGround(buildings.ltBuildings[iType], null, true, iB, iRpt));
+                divGroundContainer.append(getGround(buildings.ltBuildings[iType], null, true, iB, iRpt, cl1));
                 iB++;
 
                 if (iB == Math.ceil((buildings.iGround - 1) / 2)) {
                   divGroundContainer.append(getGroundStadium(bTopring));
                 }
               }
-              divGroundContainer.append(getGround(buildings.ltBuildings[iType], null, false, iB, iRpt));
+              divGroundContainer.append(getGround(buildings.ltBuildings[iType], null, false, iB, iRpt, cl1));
             } else {
               // Ground without building
-              divGroundContainer.append(getGround(buildings.ltBuildingsFree.length > 0 ? buildings.ltBuildingsFree[0] : null, buildings.ltBuildingsFree, false, iB, 0));
+              divGroundContainer.append(getGround(buildings.ltBuildingsFree.length > 0 ? buildings.ltBuildingsFree[0] : null, buildings.ltBuildingsFree, false, iB, 0, cl1));
             }
 
             iType++;
           }
 
-          var grdNext = getGround(null, buildings.ltBuildingsFree, false, iB);
+          var grdNext = getGround(null, buildings.ltBuildingsFree, false, iB, cl1);
           grdNext.getElementsByTagName("img")[0].style.opacity = 0.5;
 
           var btnBuyGround = document.createElement("button");

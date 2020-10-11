@@ -4879,6 +4879,8 @@ namespace CornerkickWebMvc.Controllers
       mdStadionSurr.iFanshop       = clb.buildings.bgFanshop.iLevel;
       if (clb.buildings.bgFanshop.ctn != null) mdStadionSurr.iFanshop = Math.Max(mdStadionSurr.iFanshop, clb.buildings.bgFanshop.ctn.iLevelNew);
 
+      mdStadionSurr.sColor1 = "rgb(" + clb.cl[0].R.ToString() + "," + clb.cl[0].G.ToString() + "," + clb.cl[0].B.ToString() + ")";
+
       return View(mdStadionSurr);
     }
 

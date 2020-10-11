@@ -9,6 +9,7 @@ namespace CornerkickWebMvc.Models
   public class StadiumSurroundingsModel
   {
     public bool bSound { get; set; }
+    public string sColor1 { get; set; }
 
     public List<SelectListItem> ddlTrainingsgel { get; set; }
     public int iTrainingsgel { get; set; }
