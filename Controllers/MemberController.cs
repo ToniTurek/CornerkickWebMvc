@@ -5186,7 +5186,9 @@ namespace CornerkickWebMvc.Controllers
           CornerkickManager.Finance.doTransaction(clb, MvcApplication.ckcore.dtDatum, -iCostDaysTc[0], CornerkickManager.Finance.iTransferralTypePayStadiumSurr, "Bau " + sConstructionNames[iType]);
         }
       } else {
-        CornerkickManager.UI.doConstruction(clb, iType, (byte)iLevel, MvcApplication.ckcore.dtDatum, sConstructionNames[iType]);
+        if (!CornerkickManager.UI.doConstruction(clb, iType, (byte)iLevel, MvcApplication.ckcore.dtDatum, sConstructionNames[iType])) {
+          return Json("Sie benötigen erst ein neues Grundstück", JsonRequestBehavior.AllowGet);
+        }
       }
 
       return Json("Der Bau des " + sConstructionNames[iType] + "s wurde in Auftrag gegeben", JsonRequestBehavior.AllowGet);
