@@ -2353,7 +2353,6 @@ namespace CornerkickWebMvc.Controllers
       */
     }
 
-    [HttpGet]
     public JsonResult PlayerDetailsGetAveSkill(int iPlayerId)
     {
       if (iPlayerId < 0) return Json(0.0, JsonRequestBehavior.AllowGet);
@@ -2363,7 +2362,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(new float[] { CornerkickGame.Tool.getAveSkill(player), CornerkickGame.Tool.getAveSkill(player, bIdeal: true) }, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpGet]
     public JsonResult PlayerDetailsGetDoping(int iPlayerId)
     {
       float[] fDoping = new float[4];
@@ -2372,7 +2370,7 @@ namespace CornerkickWebMvc.Controllers
 
       CornerkickGame.Player player = MvcApplication.ckcore.ltPlayer[iPlayerId].plGame;
 
-      if (player.doping != null) {
+      if (player.doping != null && player.doping.fEffectMax > 0f) {
         fDoping[0] = player.doping.fEffect;
         fDoping[1] = player.doping.fEffect / player.doping.fEffectMax;
         fDoping[2] = player.doping.fReductionRate;

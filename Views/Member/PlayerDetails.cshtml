@@ -512,7 +512,6 @@
     function printAveSkill(iPlayerId) {
       $.ajax({
         url: "/Member/PlayerDetailsGetAveSkill",
-        type: "GET",
         dataType: "JSON",
         data: { iPlayerId: iPlayerId },
         success: function (fAveSkill) {
@@ -521,7 +520,7 @@
         },
         error: function (xhr) {
           debugger;
-          alert(xhr);
+          alert(xhr.status + ': ' + xhr.statusText);
         }
       });
     }
@@ -529,7 +528,6 @@
     function printDoping(iPlayerId) {
       $.ajax({
         url: "/Member/PlayerDetailsGetDoping",
-        type: "GET",
         dataType: "JSON",
         data: { iPlayerId: iPlayerId },
         success: function (fDoping) {
@@ -598,7 +596,7 @@
         },
         error: function (xhr) {
           debugger;
-          alert(xhr.status + ': ' + xhr.statusText);
+          alert(xhr.status + ': ' + xhr.statusText + ", " + xhr.responseText);
         }
       });
     }
