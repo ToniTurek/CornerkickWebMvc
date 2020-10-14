@@ -10,16 +10,21 @@ namespace CornerkickWebMvc.Models
   public class StadionModel
   {
     public string sName { get; set; }
-    public int[] iSeats { get; set; }
-    public int[] iSeatType { get; set; }
-    public int[] iSeatsBuild { get; set; }
-    public bool bTopring { get; set; }
-    public static int iKosten { get; set; }
 
+    public int[] iSeats { get; set; }
+    public int[] iSeatsConstr { get; set; }
+
+    public string[] sBlocksConstrName { get; set; }
+    public int[] iBlocksConstrSeats { get; set; }
+    public string[] sBlocksConstrType { get; set; }
+    public int[] iBlocksConstrDays { get; set; }
+
+    public bool bTopring { get; set; }
+
+    public bool bBlockConstructions { get; set; }
     public bool bEditable { get; set; } // Stadium name editable
 
-    public CornerkickGame.Stadium stadion    { get; set; }
-    public CornerkickGame.Stadium stadionNew { get; set; }
+    public CornerkickGame.Stadium stadion { get; set; }
 
     public List<SelectListItem> ltDdlStadionSeatType { get; set; }
 

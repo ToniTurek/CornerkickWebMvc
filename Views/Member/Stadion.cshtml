@@ -98,6 +98,11 @@
 
       setImage();
 
+      // Print seats header
+      var iSeats = @Html.Raw(Json.Encode(Model.iSeats));
+      var iSeatsConstr = @Html.Raw(Json.Encode(Model.iSeatsConstr));
+      printTotalSeats(iSeats[0], iSeats[1], iSeats[2], iSeatsConstr[0], iSeatsConstr[1], iSeatsConstr[2]);
+
       ltBlocks = @Html.Raw(Json.Encode(Model.stadion.blocks));
       bTopring = @Html.Raw(Json.Encode(Model.stadion.bTopring && Model.stadion.iTopringDaysConstruct == 0));
 
@@ -225,6 +230,43 @@
       });
     }
 
+    function printTotalSeats(iSeats0, iSeats1, iSeats2, iSeatsConstr0, iSeatsConstr1, iSeatsConstr2) {
+      var divStadiumSeats = document.getElementById("divStadiumSeats");
+      divStadiumSeats.innerHTML = "";
+
+      // Acctual seats
+      var h4Seats = document.createElement("text");
+      //h4Seats.style.float = "left";
+      h4Seats.style.fontSize = "18px";
+      h4Seats.innerText = (iSeats0 + iSeats1 + iSeats2).toLocaleString() + "\xa0(" + iSeats0.toLocaleString() + "\xa0/\xa0" + iSeats1.toLocaleString() + "\xa0/\xa0" + iSeats2.toLocaleString() + ")";
+      divStadiumSeats.appendChild(h4Seats);
+
+      // Seats under construction
+      if (iSeatsConstr0 + iSeatsConstr1 + iSeatsConstr2 > 0) {
+        h4Seats.innerText += "\n"
+        //h4SeatsConstr.style.marginLeft = "10px";
+
+        var h4SeatsConstr = document.createElement("text");
+        //h4SeatsConstr.style.float = "left";
+        h4SeatsConstr.style.fontSize = "18px";
+        h4SeatsConstr.style.color = "grey";
+        h4SeatsConstr.innerText = (iSeats0 + iSeatsConstr0 + iSeats1 + iSeatsConstr1 + iSeats2 + iSeatsConstr2).toLocaleString() + "\xa0(" + (iSeats0 + iSeatsConstr0).toLocaleString() + "\xa0/\xa0" + (iSeats1 + iSeatsConstr1).toLocaleString() + "\xa0/\xa0" + (iSeats2 + iSeatsConstr2).toLocaleString() + ")";
+        divStadiumSeats.appendChild(h4SeatsConstr);
+
+        //divStadiumSeats.style.height = "60px";
+      }
+    }
+
+    function updateTotalSeats() {
+      $.ajax({
+        url: '/Member/StadiumGetSeats',
+        dataType: "JSON",
+        success: function (iSeats) {
+          printTotalSeats(iSeats[0], iSeats[1], iSeats[2], iSeats[3], iSeats[4], iSeats[5]);
+        }
+      });
+    }
+
     function getStadiumBuildBlock(iBlock, iSeats, iType) {
       if (!e) var e = window.event;
       e.cancelBubble = true;
@@ -328,6 +370,9 @@
           dataType: "JSON",
           data: { iBlock: iBlock, iSeats: iSeats, iType: iType },
           success: function (sMessage) {
+            // Update total seat header
+            updateTotalSeats()
+
             // Update ltBlocks
             ltBlocks[iBlock].iSeats = iSeats;
             ltBlocks[iBlock].iType = iType;
@@ -738,17 +783,10 @@
 
 <body>
   @{
-    var sStadion = "";
     string sName = "";
     if (Model != null) {
       if (!string.IsNullOrEmpty(Model.sName)) {
         sName = Model.sName;
-        sStadion = Model.stadion.getSeats().ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
-        sStadion += " (";
-        sStadion += Model.stadion.getSeats(0).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / ";
-        sStadion += Model.stadion.getSeats(1).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / ";
-        sStadion += Model.stadion.getSeats(2).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
-        sStadion += ")";
       }
     }
 
@@ -762,7 +800,9 @@
   }
 
   <div style="position: relative; width: 100%; height: 600px">
-    <h4>@sStadion</h4>
+    <div id="divStadiumSeats" style="position: relative; width: 100%">
+      <h4 id="txtStadiumSeats"></h4>
+    </div>
 
     <div class="image" style="position: relative; width: 100%; margin-bottom: 1%">
       <img id="imgStadium" style="position: relative; width: 100%" src="~/Content/Images/stadium/stadion_S.jpg" alt="" />
@@ -793,7 +833,7 @@
 
         bool bShow = false;
         for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
-          if (Model.iSeatsBuild[iB] > 0) {
+          if (Model.bBlockConstructions) {
             bShow = true;
             break;
           }
@@ -815,13 +855,13 @@
 
               @{
                 for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
-                  if (Model.iSeatsBuild[iB] > 0) {
+                  if (Model.iBlocksConstrSeats[iB] > 0) {
                     //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
                     <tr>
-                      <td align="center">Block @Model.stadion.blocks[iB].sName</td>
-                      <td align="center">@CornerkickManager.Stadium.sBlocktype[Model.stadionNew.blocks[iB].iType]</td>
-                      <td align="center">@Model.stadion.blocks[iB].iSeats</td>
-                      <td align="center">@Model.iSeatsBuild[iB] d</td>
+                      <td align="center">Block @Model.sBlocksConstrName[iB]</td>
+                      <td align="center">@Model.sBlocksConstrType[iB]</td>
+                      <td align="center">@Model.iBlocksConstrSeats[iB]</td>
+                      <td align="center">@Model.iBlocksConstrDays[iB] d</td>
                     </tr>
                   }
                 }

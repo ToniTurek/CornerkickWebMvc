@@ -4471,27 +4471,32 @@ namespace CornerkickWebMvc.Controllers
 
       stadionModel.sName = clb.stadium.sName;
 
-      stadionModel.iSeats = new int[clb.stadium.blocks.Length];
-      for (int i = 0; i < clb.stadium.blocks.Length; i++) {
-        stadionModel.iSeats[i] = clb.stadium.blocks[i].iSeats;
+      stadionModel.iSeats       = new int[3];
+      stadionModel.iSeatsConstr = new int[3];
+      for (byte iBT = 0; iBT < 3; iBT++) {
+        stadionModel.iSeats      [iBT] = clb.stadium.getSeats(iType: iBT, iModeConstruction: 0);
+        stadionModel.iSeatsConstr[iBT] = clb.stadium.getSeats(iType: iBT, iModeConstruction: 1);
+
+        stadionModel.bBlockConstructions = stadionModel.bBlockConstructions || stadionModel.iSeatsConstr[iBT] > stadionModel.iSeats[iBT];
       }
 
-      stadionModel.iSeatType = new int[clb.stadium.blocks.Length];
+      // Blocks construction table
+      stadionModel.sBlocksConstrName  = new string[clb.stadium.blocks.Length];
+      stadionModel.iBlocksConstrSeats = new int   [clb.stadium.blocks.Length];
+      stadionModel.sBlocksConstrType  = new string[clb.stadium.blocks.Length];
+      stadionModel.iBlocksConstrDays  = new int   [clb.stadium.blocks.Length];
       for (int i = 0; i < clb.stadium.blocks.Length; i++) {
-        stadionModel.iSeatType[i] = clb.stadium.blocks[i].iType;
+        stadionModel.sBlocksConstrName [i] = clb.stadium.blocks[i].sName;
+        stadionModel.iBlocksConstrSeats[i] = clb.stadium.blocks[i].iSeats;
+        stadionModel.sBlocksConstrType [i] = CornerkickManager.Stadium.sBlocktype[clb.stadium.blocks[i].iType];
+        stadionModel.iBlocksConstrDays [i] = clb.stadium.blocks[i].iSeatsDaysConstruct;
       }
 
-      stadionModel.iSeatsBuild = new int[clb.stadium.blocks.Length];
-      for (int i = 0; i < clb.stadium.blocks.Length; i++) {
-        stadionModel.iSeatsBuild[i] = clb.stadium.blocks[i].iSeatsDaysConstruct;
-      }
-
+      // Topring
       stadionModel.bTopring = bStadiumGetTopring(clb);
 
       if (clb.stadium.iVideoDaysConstruct == 0) clb.stadium.iVideoNew = clb.stadium.iVideo;
       stadionModel.iVideo = clb.stadium.iVideoNew;
-
-      stadionModel.stadionNew = convertToStadion(stadionModel.iSeats, stadionModel.iSeatType, stadionModel.iSeatsBuild);
 
       stadionModel.iSnackbarNew = (byte)Math.Max(clb.stadium.iSnackbarNew - clb.stadium.iSnackbar, 0);
       stadionModel.iToiletsNew  = (byte)Math.Max(clb.stadium.iToiletsNew  - clb.stadium.iToilets,  0);
@@ -4519,6 +4524,21 @@ namespace CornerkickWebMvc.Controllers
       stadionModel.bEditable = stadionModel.bEditable || stadionModel.sName.Equals(clb.sName + " Stadion");
 
       return View(stadionModel);
+    }
+
+    public JsonResult StadiumGetSeats()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      int[] iSeats = new int[6];
+
+      for (byte iBT = 0; iBT < 3; iBT++) {
+        iSeats[iBT    ] = clb.stadium.getSeats(iType: iBT, iModeConstruction: 0);
+        iSeats[iBT + 3] = clb.stadium.getSeats(iType: iBT, iModeConstruction: 1);
+      }
+
+      return Json(iSeats, JsonRequestBehavior.AllowGet);
     }
 
     public JsonResult StadiumGetBuildCost(int iBlock, int iSeats, int iType)
