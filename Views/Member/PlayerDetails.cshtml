@@ -529,6 +529,7 @@
     function printDoping(iPlayerId) {
       $.ajax({
         url: "/Member/PlayerDetailsGetDoping",
+        type: "GET",
         dataType: "JSON",
         data: { iPlayerId: iPlayerId },
         success: function (fDoping) {
@@ -597,7 +598,7 @@
         },
         error: function (xhr) {
           debugger;
-          alert(xhr);
+          alert(xhr.status + ': ' + xhr.statusText);
         }
       });
     }

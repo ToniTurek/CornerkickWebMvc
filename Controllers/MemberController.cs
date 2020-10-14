@@ -2361,6 +2361,7 @@ namespace CornerkickWebMvc.Controllers
       return Json(new float[] { CornerkickGame.Tool.getAveSkill(player), CornerkickGame.Tool.getAveSkill(player, bIdeal: true) }, JsonRequestBehavior.AllowGet);
     }
 
+    [HttpGet]
     public JsonResult PlayerDetailsGetDoping(int iPlayerId)
     {
       float[] fDoping = new float[4];
