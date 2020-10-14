@@ -106,7 +106,7 @@
       ltBlocks = @Html.Raw(Json.Encode(Model.stadion.blocks));
       bTopring = @Html.Raw(Json.Encode(Model.stadion.bTopring && Model.stadion.iTopringDaysConstruct == 0));
 
-      drawSeats(ltBlocks, bTopring, -1);
+      drawBlocks(ltBlocks, bTopring, -1);
       getTopring();
       getExtras();
       getVideoCost();
@@ -180,8 +180,38 @@
         });
       });
 
+      let sctBuildBlocks = createBlockBuildSelect(ltBlocks, bTopring);
+
+      var cbBuildBlocks = document.getElementById("cbBuildBlocks");
+      cbBuildBlocks.checked = false;
+      cbBuildBlocks.addEventListener("change", function () {
+        sctBuildBlocks.disabled = !this.checked;
+
+        drawBlocks(ltBlocks, bTopring, this.checked ? parseInt(sctBuildBlocks.value) : -1);
+      });
+
+      /*
+      $(window).resize(function () {
+        if (cbBuildBlocks.checked) {
+          drawBlocks(ltBlocks, bTopring, parseInt(sctBuildBlocks.value));
+        }
+      });
+      */
+    }); // document ready
+
+    function createBlockBuildSelect(ltBlocks, bTopring) {
       let sctBuildBlocks = document.getElementById("sctBuildBlocks");
+
+      // Disable select
       sctBuildBlocks.disabled = true;
+
+      // Clear select menu
+      var i, L = sctBuildBlocks.options.length - 1;
+      for (i = L; i >= 0; i--) {
+        sctBuildBlocks.remove(i);
+      }
+
+      // Add select options
       $.each(ltBlocks, function (i, block) {
         if (!bTopring && i > 9) {
           return false;
@@ -194,26 +224,14 @@
           sctBuildBlocks.appendChild(optBlock);
         }
       });
+
+      // Add change event listener
       sctBuildBlocks.addEventListener("change", function () {
-        drawSeats(ltBlocks, bTopring, parseInt(this.value));
+        drawBlocks(ltBlocks, bTopring, parseInt(this.value));
       });
 
-      var cbBuildBlocks = document.getElementById("cbBuildBlocks");
-      cbBuildBlocks.checked = false;
-      cbBuildBlocks.addEventListener("change", function () {
-        sctBuildBlocks.disabled = !this.checked;
-
-        drawSeats(ltBlocks, bTopring, this.checked ? parseInt(sctBuildBlocks.value) : -1);
-      });
-
-      /*
-      $(window).resize(function () {
-        if (cbBuildBlocks.checked) {
-          drawSeats(ltBlocks, bTopring, parseInt(sctBuildBlocks.value));
-        }
-      });
-      */
-    }); // document ready
+      return sctBuildBlocks;
+    }
 
     function setImage() {
       $.ajax({
@@ -268,6 +286,13 @@
     }
 
     function getStadiumBuildBlock(iBlock, iSeats, iType) {
+      var bnBuild = document.getElementById("bnBuild");
+
+      if (!iSeats) {
+        bnBuild.innerText = "Block ausbauen"
+        bnBuild.disabled = true;
+      }
+
       if (!e) var e = window.event;
       e.cancelBubble = true;
       if (e.stopPropagation) e.stopPropagation();
@@ -277,8 +302,6 @@
         dataType: "JSON",
         data: { iBlock: iBlock, iSeats: iSeats, iType: iType },
         success: function (iCostDaysDispo) {
-          bnBuild = document.getElementById("bnBuild");
-
           if (typeof iCostDaysDispo === 'number') {
             bnBuild.innerHTML = "Maximale Anzahl Plätze: " + iCostDaysDispo.toLocaleString();
             bnBuild.disabled = true;
@@ -381,9 +404,12 @@
 
             var cbBuildBlocks = document.getElementById("cbBuildBlocks");
             cbBuildBlocks.checked = false;
-            var sctBuildBlocks = document.getElementById("sctBuildBlocks");
-            sctBuildBlocks.disabled = true;
-            drawSeats(ltBlocks, bTopring, -1);
+
+            createBlockBuildSelect(ltBlocks, bTopring);
+            //var sctBuildBlocks = document.getElementById("sctBuildBlocks");
+            //sctBuildBlocks.disabled = true;
+
+            drawBlocks(ltBlocks, bTopring, -1);
 
             updateBalance(iBalance[0]);
 
@@ -401,7 +427,7 @@
       });
     }
 
-    function drawSeats(ltBlocks, bTopring, iBlockBuild) {
+    function drawBlocks(ltBlocks, bTopring, iBlockBuild) {
       if (!e) var e = window.event;
       if (e) {
         e.cancelBubble = true;
@@ -489,8 +515,11 @@
           iptSeats = document.createElement("input");
           iptSeats.id = "iptBlockSeats_" + iBlockBuild.toString();
           iptSeats.style.width = "100%";
+          iptSeats.style.textAlign = "right";
           iptSeats.type = "number";
-          iptSeats.value = block.iSeats.toString();
+          if (block.iSeats > 0) {
+            iptSeats.value = block.iSeats.toString();
+          }
 
           var sctType = document.createElement("select");
           sctType.id = "sctBlockType";
@@ -557,6 +586,19 @@
 
       if (iptSeats) {
         iptSeats.focus();
+
+        /*
+        // Set cursor position to left (not working)
+        if (iptSeats.setSelectionRange) { // For Most Web Browsers
+          iptSeats.setSelectionRange(0, 0);
+        } else if (ctrl.createTextRange) { // IE8 and below
+          var range = iptSeats.createTextRange();
+          range.collapse(true);
+          range.moveEnd('character', 0);
+          range.moveStart('character', 0);
+          range.select();
+        }
+        */
       }
     }
 
