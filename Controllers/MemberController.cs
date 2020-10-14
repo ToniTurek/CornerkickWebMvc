@@ -2101,8 +2101,10 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [Authorize]
-    public ActionResult PlayerDetails(Models.PlayerModel plModel, int i, HttpPostedFileBase file = null)
+    public ActionResult PlayerDetails(Models.PlayerModel plModel, int i = -1, HttpPostedFileBase file = null)
     {
+      if (i < 0) return RedirectToAction("Desk");
+
       if (file != null) {
         AccountController.uploadFileAsync(file, "Portraits", i);
       }
