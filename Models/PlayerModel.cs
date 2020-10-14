@@ -24,6 +24,8 @@ namespace CornerkickWebMvc.Models
     public bool bNation { get; set; }
     public bool bCpuPlayerNotOnTransferlist { get; set; }
 
+    public byte iPos { get; set; }
+
     // Emblem
     public string sPortrait { get; set; }
     public string sEmblem { get; set; }

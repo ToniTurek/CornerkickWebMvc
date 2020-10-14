@@ -2180,6 +2180,16 @@ namespace CornerkickWebMvc.Controllers
         );
       }
 
+      // Current position
+      plModel.iPos = 0;
+      for (int iPl = 0; iPl < Math.Min(11, clbPlayer.ltPlayer.Count); iPl++) {
+        if (plDetails == clbPlayer.ltPlayer[iPl]) {
+          plDetails.plGame.iIndex = (byte)iPl;
+          plModel.iPos = CornerkickGame.Tool.getPosRole(plDetails.plGame, clbPlayer.ltTactic[0].formation, MvcApplication.ckcore.game.ptPitch);
+          break;
+        }
+      }
+
       // Captain
       plModel.bCaptain  = i == club.iCaptainId[0];
       plModel.bCaptain2 = i == club.iCaptainId[1];

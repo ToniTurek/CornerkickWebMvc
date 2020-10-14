@@ -1253,7 +1253,7 @@
               <table border="1" cellpadding="4" style="width: auto">
                 <thead>
                   <tr>
-                    <th style="text-align:center">Position</th>
+                    <th style="text-align:center">Pos.</th>
                     <th style="text-align:center">Wert</th>
                     <th style="text-align:center">Stärke</th>
                   </tr>
@@ -1269,14 +1269,24 @@
                     } else if (player.plGame.fExperiencePos[i] > 0.8) {
                       sColor = "style=color:blue";
                     }
+
+                    string sPosSkill = CornerkickManager.Main.sPosition[i + 1];
+                    if (Model.iPos > 0 && Model.iPos == i + 1) {
+                      sPosSkill += " *";
+                    }
                     <tr @sBold>
-                      <td align="center">@CornerkickManager.Main.sPosition[i + 1]</td>
+                      <td align="center">@sPosSkill</td>
                       <td align="right"><span @sColor>@player.plGame.fExperiencePos[i].ToString("0.0%")</span></td>
                       <td align="center">@CornerkickGame.Tool.getAveSkill(player.plGame, j).ToString("0.0")</td>
                     </tr>
                   }
                 </tbody>
               </table>
+              @{
+                if (Model.iPos > 0) {
+                  <text>* Aktuelle Position</text>
+                }
+              }
             </div>
 
             <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
@@ -1292,23 +1302,38 @@
                     <th>Wert</th>
                     @{
                       if (Model.bOwnPlayer && !Model.bNation) {
-                        <th>Training</th>
-                        <th>Ind.</th>
-                        <th>Bonus</th>
+                        <th style="text-align:center">Eff. *</th>
+                        <th style="text-align:center">Training</th>
+                        <th style="text-align:center">Ind.</th>
+                        <th style="text-align:center">Bonus</th>
                       }
                     }
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td align="right">@CornerkickManager.PlayerTool.sSkills[0]</td>
-                    <td align="center">@player.plGame.iSkill[0]</td>
+                    <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
+                    <td align="center">@player.plGame.iSkill[i]</td>
                     @{
                       if (Model.bOwnPlayer && !Model.bNation) {
+                        <td align="center">@CornerkickGame.Tool.getSkillEff(player.plGame, (byte)i, Model.iPos).ToString("0.0")</td>
                         var fTraining = player.fSkillTraining[i] + 1.0;
                         <td align="right">@fTraining.ToString("0.0%")</td>
                         <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
                         <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
+                      }
+                    }
+                  </tr>
+                  <tr>
+                    <td align="right" style="color: grey">Schnelligk. m. Ball</td>
+                    <td align="center"></td>
+                    @{
+                      if (Model.bOwnPlayer && !Model.bNation) {
+                        string sSpeedWithBall = (CornerkickGame.Tool.getSkillEff(player.plGame, 0, Model.iPos) - (CornerkickGame.Tool.getSkillEff(player.plGame, 0, Model.iPos) / CornerkickGame.Tool.getSkillEff(player.plGame, 1, Model.iPos))).ToString("0.0");
+                        <td align="center" style="color: grey">@sSpeedWithBall</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                       }
                     }
                   </tr>
@@ -1320,6 +1345,7 @@
                     <td align="center">@player.plGame.iSkill[i]</td>
                     @{
                       if (Model.bOwnPlayer && !Model.bNation) {
+                        <td align="center">@CornerkickGame.Tool.getSkillEff(player.plGame, (byte)i, Model.iPos).ToString("0.0")</td>
                         var fTraining = player.fSkillTraining[i] + 1.0;
                         <td align="right">@fTraining.ToString("0.0%")</td>
                         <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
@@ -1341,6 +1367,7 @@
                       <td align="center">@player.plGame.iSkill[i]</td>
                       @{
                         if (Model.bOwnPlayer && !Model.bNation) {
+                          <td align="center">@CornerkickGame.Tool.getSkillEff(player.plGame, (byte)i, Model.iPos).ToString("0.0")</td>
                           <td align="right">@fTraining.ToString("0.0%")</td>
                           <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
                           <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
@@ -1350,13 +1377,16 @@
                   }
                 </tbody>
               </table>
+              * Effektiver Wert - abh. z.B. von Frische, Moral und akt. Pos.
             </div>
-          </div>
 
-          @if (Model.bOwnPlayer && !Model.bNation) {
-            <h4>Entwicklungschancen</h4>
-            <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 50%; min-width: 320px; margin-top: 10px; margin-bottom: 10px; float: left"></div>
-          }
+            @if (Model.bOwnPlayer && !Model.bNation) {
+              <div style="position: relative; width: 42%; height: auto; float: left; margin-bottom: 10px">
+                <h4>Entwicklungschancen</h4>
+                <div id="divChartChanceDevelopment" style="position: relative; height: 310px; width: 100%; min-width: 320px; margin-top: 10px; margin-bottom: 10px; float: left"></div>
+              </div>
+            }
+          </div>
         </div>
 
         <div id="tabs-3" style="overflow: hidden">
