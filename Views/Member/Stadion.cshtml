@@ -540,7 +540,13 @@
           });
 
           sctType.addEventListener("change", function () {
-            getStadiumBuildBlock(iBlockBuild, parseInt(iptSeats.value), parseInt(this.value));
+            // Calculate new number of seats with new type at same block size
+            var iSeatsConvert = Math.round(ltBlocks[iBlockBuild].iSeats * getBlockTypeFactor(ltBlocks[iBlockBuild].iType, parseInt(this.value)));
+            if (iSeatsConvert != parseInt(iptSeats.value)) {
+              iptSeats.value = iSeatsConvert.toString();
+            }
+
+            getStadiumBuildBlock(iBlockBuild, iSeatsConvert, parseInt(this.value));
           });
 
           divBlock.appendChild(iptSeats);
@@ -600,6 +606,17 @@
         }
         */
       }
+    }
+
+    function getBlockTypeFactor(iTypeCur, iTypeNew) {
+      if      (iTypeNew == 0 && iTypeCur == 1) return     1.5;
+      else if (iTypeNew == 1 && iTypeCur == 0) return 1 / 1.5;
+      else if (iTypeNew == 1 && iTypeCur == 2) return     4.0;
+      else if (iTypeNew == 2 && iTypeCur == 1) return 1 / 4.0;
+      else if (iTypeNew == 0 && iTypeCur == 2) return     6.0;
+      else if (iTypeNew == 2 && iTypeCur == 0) return 1 / 6.0;
+
+      return 1;
     }
 
     function buildTopring() {
