@@ -13,7 +13,7 @@
       "names": [ "Nichts", "Fitnessräder", "Einfacher Fitnessraum", "Großer Fitnessraum", "Unterdruckhalle" ],
       "costs": [ 0, 100000, 500000, 3000000, 20000000 ],
       "construct": [ 0, 30, 180, 320, 600 ],
-      "grounds": [ 1, 1, 1, 1, 1 ]
+      "grounds": [ 0, 1, 1, 1, 1 ]
     },
   "spa":
     {
@@ -21,7 +21,7 @@
       "names": [ "Nichts", "Whirlpool", "Schwimmbecken", "Saunalandschaft", "Wellnessoase" ],
       "costs": [ 0, 100000, 500000, 3000000, 20000000 ],
       "construct": [ 0, 30, 180, 320, 600 ],
-      "grounds": [ 1, 1, 1, 1, 1 ]
+      "grounds": [ 0, 1, 1, 1, 1 ]
     },
   "jouth_internat":
     {
@@ -29,7 +29,7 @@
       "names": [ "Keins", "Einfaches Jugendinternat", "Großes Jugendinternat", "Jugendakademie", "Nachwuchsleistungszentrum" ],
       "costs": [ 0, 1500000, 7000000, 20000000, 60000000 ],
       "construct": [ 0, 60, 120, 240, 480 ],
-      "grounds": [ 1, 1, 1, 1, 2 ]
+      "grounds": [ 0, 1, 1, 1, 2 ]
     },
   "club_house":
     {
@@ -37,7 +37,7 @@
       "names": [ "Keins", "Einfaches Vereinsheim", "Mittleres Vereinsheim", "Großes Vereinsheim", "Luxus Vereinsheim" ],
       "costs": [ 0, 2000000, 10000000, 30000000, 100000000 ],
       "construct": [ 0, 90, 180, 320, 600 ],
-      "grounds": [ 1, 1, 1, 1, 2 ]
+      "grounds": [ 0, 1, 1, 1, 2 ]
     },
   "club_museum":
     {
@@ -45,7 +45,7 @@
       "names": [ "Keins", "Einfaches Vereinsmuseum", "Mittleres Vereinsmuseum", "Großes Vereinsmuseum", "Historisches Vereinsdorf" ],
       "costs": [ 0, 2000000, 10000000, 30000000, 100000000 ],
       "construct": [ 0, 90, 180, 320, 600 ],
-      "grounds": [ 1, 1, 1, 1, 2 ]
+      "grounds": [ 0, 1, 1, 1, 2 ]
     },
   "mass_transit":
     {
@@ -53,7 +53,7 @@
       "names": [ "Keine", "Bushaltestelle", "S/U-Bahnhof", "Regional-/Fernbahnhof", "Flughafen" ],
       "costs": [ 0, 2500000, 12500000, 40000000, 150000000 ],
       "construct": [ 0, 90, 180, 320, 600 ],
-      "grounds": [ 1, 1, 1, 2, 3 ]
+      "grounds": [ 0, 1, 1, 2, 3 ]
     },
   "carpark":
     {
