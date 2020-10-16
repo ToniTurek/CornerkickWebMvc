@@ -63,9 +63,17 @@
         activate: function (event, ui) {
           var iTabActive = $(this).tabs('option', 'active');
 
+          $(this).css({
+            "min-width": ""
+          });
+
           if (iTabActive == 0) {
             plotCFM();
           } else if (iTabActive == 1) {
+            $(this).css({
+              "min-width": "400px"
+            });
+
             plotChanceDevelopment();
 
             if (tt && tt.bShow && tt.iLevel === 10) {
@@ -1302,7 +1310,7 @@
                     <th>Wert</th>
                     @{
                       if (Model.bOwnPlayer && !Model.bNation) {
-                        <th style="text-align:center">Eff. *</th>
+                        <th style="text-align:center">Eff.*</th>
                         <th style="text-align:center">Training</th>
                         <th style="text-align:center">Ind.</th>
                         <th style="text-align:center">Bonus</th>
