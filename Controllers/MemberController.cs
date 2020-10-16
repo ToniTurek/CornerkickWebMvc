@@ -4486,8 +4486,6 @@ namespace CornerkickWebMvc.Controllers
       for (byte iBT = 0; iBT < 3; iBT++) {
         stadionModel.iSeats      [iBT] = clb.stadium.getSeats(iType: iBT, iModeConstruction: 0);
         stadionModel.iSeatsConstr[iBT] = clb.stadium.getSeats(iType: iBT, iModeConstruction: 1);
-
-        stadionModel.bBlockConstructions = stadionModel.bBlockConstructions || stadionModel.iSeatsConstr[iBT] > stadionModel.iSeats[iBT];
       }
 
       // Blocks construction table

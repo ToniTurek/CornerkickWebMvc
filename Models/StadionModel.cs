@@ -21,7 +21,6 @@ namespace CornerkickWebMvc.Models
 
     public bool bTopring { get; set; }
 
-    public bool bBlockConstructions { get; set; }
     public bool bEditable { get; set; } // Stadium name editable
 
     public CornerkickGame.Stadium stadion { get; set; }

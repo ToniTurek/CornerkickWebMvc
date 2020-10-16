@@ -891,8 +891,8 @@
         </div>
 
         bool bShow = false;
-        for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
-          if (Model.bBlockConstructions) {
+        for (byte iB = 0; iB < Model.iBlocksConstrDays.Length; iB++) {
+          if (Model.iBlocksConstrDays[iB] > 0) {
             bShow = true;
             break;
           }
@@ -914,7 +914,7 @@
 
               @{
                 for (byte iB = 0; iB < Model.stadion.blocks.Length; iB++) {
-                  if (Model.iBlocksConstrSeats[iB] > 0) {
+                  if (Model.iBlocksConstrDays[iB] > 0) {
                     //string sPlDiff = (Model.stadionNew.iPlaetze[iB] - Model.stadion.iPlaetze[iB]).ToString("#,#", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User));
                     <tr>
                       <td align="center">Block @Model.sBlocksConstrName[iB]</td>
