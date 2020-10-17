@@ -511,6 +511,7 @@ namespace CornerkickWebMvc.Controllers
       public string sImg { get; set; }
     }
 
+    static readonly byte[] iNewspaperTypes = new byte[] { CornerkickManager.Main.iNewsTypeNewYear, CornerkickManager.Main.iNewsTypeCupWin };
     public JsonResult DeskGetNews()
     {
       CornerkickManager.User usr = ckUser();
@@ -528,6 +529,8 @@ namespace CornerkickWebMvc.Controllers
 
       for (int iN = 0; iN < usr.ltNews.Count; iN++) {
         CornerkickManager.Main.News news = usr.ltNews[iN];
+
+        if (iNewspaperTypes.Contains(news.iType)) continue; // No newspaper news
 
         if (news.iType < 99/* && news.bUnread*/) {
           if (news.bRead && news.bRead2) {
@@ -625,7 +628,6 @@ namespace CornerkickWebMvc.Controllers
       }
 
       try {
-        byte[] iNewspaperTypes = new byte[] { CornerkickManager.Main.iNewsTypeNewYear, CornerkickManager.Main.iNewsTypeCupWin };
         for (int iN = ltCkNews.Count - 1; iN >= 0; iN--) {
           CornerkickManager.Main.News news = ltCkNews[iN];
 
