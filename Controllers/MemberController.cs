@@ -5165,7 +5165,6 @@ namespace CornerkickWebMvc.Controllers
       return Json(bdg, JsonRequestBehavior.AllowGet);
     }
 
-    [HttpGet]
     public JsonResult StadiumBuildBuilding(int iType, int iLevel)
     {
       CornerkickManager.Club clb = ckClub();

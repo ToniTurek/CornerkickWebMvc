@@ -584,23 +584,24 @@
 
       $.when(getBalanceAjax()).done(function (iBalance) {
         $.ajax({
-          type: 'GET',
           url: '/Member/StadiumBuildBuilding',
-          dataType: "json",
+          dataType: "JSON",
           data: { iType: iType, iLevel: iLevel },
           success: function (sMessage) {
             alert(sMessage);
 
-            if (bSound) {
-              var audioConstruction = new Audio("/Content/Sound/construction.wav");
-              if (audioConstruction) {
-                audioConstruction.volume = 0.5;
-                audioConstruction.play();
+            if (sMessage.includes("wurde in Auftrag gegeben")) {
+              if (bSound) {
+                var audioConstruction = new Audio("/Content/Sound/construction.wav");
+                if (audioConstruction) {
+                  audioConstruction.volume = 0.5;
+                  audioConstruction.play();
+                }
               }
-            }
 
-            getCurrentBuildings(bTopringGlobal);
-            updateBalance(iBalance[0]);
+              getCurrentBuildings(bTopringGlobal);
+              updateBalance(iBalance[0]);
+            }
           }
         });
       });
