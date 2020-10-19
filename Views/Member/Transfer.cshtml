@@ -122,7 +122,6 @@
       jTable = $('#tableTransfer').DataTable({
         "ajax": {
           "url": '@Url.Action("TransferGetDataTable", "Member")',
-          "type": 'POST',
           "data": function (d) {
             var iType = 0;
             if (bNation) {
@@ -224,7 +223,7 @@
             "render": $.fn.dataTable.render.number('.', ',', 1, '')
           },
           { "data": "age", "className": "dt-center" },
-          { "data": "talent", "className": "dt-center" },
+          { "data": "fTalentAve", "className": "dt-center" },
           {
             "data": "mw", "className": "dt-right",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')

@@ -2149,6 +2149,7 @@ namespace CornerkickWebMvc.Controllers
       plModel.iContractYears = 1;
 
       plModel.sName = plDetails.plGame.sName;
+      plModel.sTalent = (plDetails.getTalentAve() + 1f).ToString("0.0");
 
       plModel.ltDdlNo = new List<SelectListItem>();
       plModel.iNo = plDetails.plGame.iNr;
@@ -3007,16 +3008,16 @@ namespace CornerkickWebMvc.Controllers
       }
 
       DateTime dt25 = MvcApplication.ckcore.dtDatum.AddYears(-25);
-      double fChanceDev    =          CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      double fChanceDev    =          CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
       double[] fChanceDevFte = new double[8];
-      fChanceDevFte[0] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience,               1, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      fChanceDevFte[1] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent,                                6f, pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      fChanceDevFte[2] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday,          4, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      fChanceDevFte[3] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], 1f,                    pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      fChanceDevFte[4] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(                dt25, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
-      fChanceDevFte[5] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      0, iBuilding, fLevel);
-      fChanceDevFte[6] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         0, fLevel);
-      fChanceDevFte[7] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.iTalent, pl.plGame.iSkill[pl.iIndTraining],                                      0f, pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[0] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience,               1, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[1] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining),                                6f, pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[2] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday,                             4, pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[3] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], 1f,                    pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[4] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(                dt25, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
+      fChanceDevFte[5] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum,      0, iBuilding, fLevel);
+      fChanceDevFte[6] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining], pl.plGame.fIndTraining[pl.iIndTraining], pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach,         0, fLevel);
+      fChanceDevFte[7] = fChanceDev - CornerkickManager.PlayerTool.getChanceDevelopment(pl.plGame.dtBirthday, pl.getTalent(pl.iIndTraining), pl.plGame.iSkill[pl.iIndTraining],                                      0f, pl.plGame.fExperience, pl.iIndTraining, MvcApplication.ckcore.dtDatum, iCoach, iBuilding, fLevel);
 
       double fChanceDevTot = 0.0;
       double fChanceDevTotPls = 0.0;
@@ -3393,7 +3394,7 @@ namespace CornerkickWebMvc.Controllers
         dtJouth.fAge = plJ.plGame.getAge(MvcApplication.ckcore.dtDatum);
         dtJouth.sPos = CornerkickManager.PlayerTool.getStrPos(plJ);
         dtJouth.fSkillAve = CornerkickGame.Tool.getAveSkill(plJ.plGame);
-        dtJouth.iTalent = plJ.iTalent + 1;
+        dtJouth.fTalentAve = plJ.getTalentAve() + 1f;
         dtJouth.sNat = CornerkickManager.Main.sLandShort[plJ.iNat1];
 
         ltDtJouth.Add(dtJouth);
@@ -3600,7 +3601,7 @@ namespace CornerkickWebMvc.Controllers
                   MvcApplication.ckcore.sendNews(clbGive.user, "Sie haben ein neues Transferangebot für den Spieler " + pl.plGame.sName + " erhalten!", iType: CornerkickManager.Main.iNewsTypePlayerTransferNewOffer, iId: iPlayerId);
                   sReturn = "Sie haben das Transferangebot für dem Spieler " + pl.plGame.sName + " erfolgreich abgegeben.";
 
-                  bool bNewspaperTalent = pl.iTalent > 5 && pl.plGame.getAge(MvcApplication.ckcore.dtDatum) < 23;
+                  bool bNewspaperTalent = pl.getTalentAve() > 5f && pl.plGame.getAge(MvcApplication.ckcore.dtDatum) < 23;
                   if (bNewspaperTalent || checkIfTop10Player(pl)) {
                     string sTalent = "";
                     if (bNewspaperTalent) sTalent = "Talent ";
@@ -3728,8 +3729,6 @@ namespace CornerkickWebMvc.Controllers
       foreach (CornerkickManager.Transfer.Item transfer in MvcApplication.ckcore.ui.filterTransferlist(sName: "",
                                                                                                        iClubId: iClubId,
                                                                                                        iPos: iPos,
-                                                                                                       fStrength: -1f,
-                                                                                                       iTalent: 0,
                                                                                                        iFType: iFType,
                                                                                                        iF: iFValue,
                                                                                                        bJouth: bJouth,
@@ -3771,7 +3770,7 @@ namespace CornerkickWebMvc.Controllers
             strength = CornerkickGame.Tool.getAveSkill(transfer.player.plGame, bIdeal: false),
             strengthIdeal = CornerkickGame.Tool.getAveSkill(transfer.player.plGame, bIdeal: true),
             age = ((int)transfer.player.plGame.getAge(MvcApplication.ckcore.dtDatum)).ToString(),
-            talent = (transfer.player.iTalent + 1),
+            fTalentAve = transfer.player.getTalentAve() + 1f,
             mw = transfer.player.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) * 1000,
             fixtransferfee = iFixtransferfee,
             club = sClub,

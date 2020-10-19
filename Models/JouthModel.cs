@@ -16,7 +16,7 @@ namespace CornerkickWebMvc.Models
       public string sName { get; set; }
       public string sPos { get; set; }
       public float fSkillAve { get; set; }
-      public int iTalent { get; set; }
+      public float fTalentAve { get; set; }
       public string sNat { get; set; }
     }
   }

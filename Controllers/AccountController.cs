@@ -476,7 +476,7 @@ namespace CornerkickWebMvc.Controllers
     internal void addPlayerToClub(ref CornerkickManager.Club club, int iSkillChange = 0)
     {
       int   iSpeed  = 0;
-      int   iTalent = 0;
+      float  fTalent = 0;
       float fAlter  = 0f;
       Random rnd = new Random();
 
@@ -500,7 +500,7 @@ namespace CornerkickWebMvc.Controllers
           iSpeed  += pl.plGame.iSkill[0];
 
           // Count talent
-          iTalent += pl.iTalent;
+          fTalent += pl.getTalentAve();
 
           // Count age
           float fAge = pl.plGame.getAge(MvcApplication.ckcore.dtDatum);
@@ -558,21 +558,25 @@ namespace CornerkickWebMvc.Controllers
       */
 
       // Equalize player talent
-      while (iTalent > 4.51 * club.ltPlayer.Count) {
+      while (fTalent > 4.51 * club.ltPlayer.Count) {
         CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
-        if (pl.iTalent > 2) {
-          pl.iTalent--;
+        if (pl.getTalentAve() > 2f) {
+          for (byte iT = 0; iT < pl.iTalent.Length; iT++) {
+            if (pl.iTalent[iT] > 0) pl.iTalent[iT]--;
+          }
 
-          iTalent--;
+          fTalent -= 1f;
         }
       }
 
-      while (iTalent < 4.49 * club.ltPlayer.Count) {
+      while (fTalent < 4.49 * club.ltPlayer.Count) {
         CornerkickManager.Player pl = club.ltPlayer[random.Next(club.ltPlayer.Count)];
-        if (pl.iTalent < 7) {
-          pl.iTalent++;
+        if (pl.getTalentAve() < 7f) {
+          for (byte iT = 0; iT < pl.iTalent.Length; iT++) {
+            if (pl.iTalent[iT] < 9) pl.iTalent[iT]++;
+          }
 
-          iTalent++;
+          fTalent += 1f;
         }
       }
 
@@ -613,14 +617,14 @@ namespace CornerkickWebMvc.Controllers
         CornerkickManager.Player pl1 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
         CornerkickManager.Player pl2 = club.ltPlayer[random.Next(club.ltPlayer.Count)];
 
-        if (pl1.iTalent > 2 && pl1.iTalent < 7 &&
-            pl2.iTalent > 2 && pl2.iTalent < 7) {
+        if (pl1.getTalentAve() > 2f && pl1.getTalentAve() < 7f &&
+            pl2.getTalentAve() > 2f && pl2.getTalentAve() < 7f) {
           int iDeltaTalent = +1;
           if ((fAgeTalent > 70.75 && pl1.plGame.dtBirthday.Year > pl2.plGame.dtBirthday.Year) ||
               (fAgeTalent < 68.75 && pl1.plGame.dtBirthday.Year < pl2.plGame.dtBirthday.Year)) iDeltaTalent = -1;
 
-          pl1.iTalent -= iDeltaTalent;
-          pl2.iTalent += iDeltaTalent;
+          for (byte iT = 0; iT < pl1.iTalent.Length; iT++) pl1.iTalent[iT] = (byte)Math.Max(pl1.iTalent[iT] - iDeltaTalent, 0);
+          for (byte iT = 0; iT < pl2.iTalent.Length; iT++) pl2.iTalent[iT] = (byte)Math.Min(pl2.iTalent[iT] + iDeltaTalent, 9);
 
           fAgeTalent = getAgeTalent(club);
         } else if (pl1.plGame.getAge(MvcApplication.ckcore.dtDatum) > 22 &&
@@ -653,7 +657,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Count age
       foreach (CornerkickManager.Player pl in club.ltPlayer) {
-        fAgeTalent += (pl.plGame.getAge(MvcApplication.ckcore.dtDatum) - 10f) * pl.iTalent;
+        fAgeTalent += (pl.plGame.getAge(MvcApplication.ckcore.dtDatum) - 10f) * pl.getTalentAve();
       }
 
       return fAgeTalent / club.ltPlayer.Count;

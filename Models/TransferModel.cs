@@ -84,7 +84,7 @@ namespace CornerkickWebMvc.Models
     public string position { get; set; }
     public float strength { get; set; }
     public float strengthIdeal { get; set; }
-    public int talent { get; set; }
+    public float fTalentAve { get; set; }
     public string club { get; set; }
     public int mw { get; set; }
     public int fixtransferfee { get; set; }
