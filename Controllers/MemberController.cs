@@ -2193,6 +2193,9 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
+      // Skill table
+      plModel.sSkillTable = PlayerDetailsGetSkillTable(plDetails, plModel.iPos);
+
       // Captain
       plModel.bCaptain  = i == club.iCaptainId[0];
       plModel.bCaptain2 = i == club.iCaptainId[1];
@@ -2232,6 +2235,67 @@ namespace CornerkickWebMvc.Controllers
       plModel.bSeasonStart = MvcApplication.ckcore.dtDatum.Date.Equals(MvcApplication.ckcore.dtSeasonStart.Date);
 
       return View(plModel);
+    }
+
+    private static string[][] PlayerDetailsGetSkillTable(CornerkickManager.Player plDetails, byte iPos)
+    {
+      // Define skill order
+      byte[] iSkills = new byte[] {
+        CornerkickGame.Game.iSkillIxSpeed,
+        100, // Speed with ball
+        CornerkickGame.Game.iSkillIxAcceleration,
+        CornerkickGame.Game.iSkillIxJump,
+        CornerkickGame.Game.iSkillIxTechnic,
+        CornerkickGame.Game.iSkillIxDuelOff,
+        CornerkickGame.Game.iSkillIxDuelDef,
+        CornerkickGame.Game.iSkillIxLowPassPower,
+        CornerkickGame.Game.iSkillIxHighPassPower,
+        CornerkickGame.Game.iSkillIxShootPower,
+        CornerkickGame.Game.iSkillIxLowPassAcc,
+        CornerkickGame.Game.iSkillIxHighPassAcc,
+        CornerkickGame.Game.iSkillIxShootAcc,
+        CornerkickGame.Game.iSkillIxFreekick,
+        CornerkickGame.Game.iSkillIxHeader,
+        CornerkickGame.Game.iSkillIxPenalty,
+        CornerkickGame.Game.iSkillIxReaction,
+        CornerkickGame.Game.iSkillIxCatch
+      };
+
+      // Define table
+      string[][] sTable = new string[iSkills.Length][];
+      for (int i = 0; i < sTable.Length; i++) sTable[i] = new string[8];
+
+      // Speed
+      int iIx = 0;
+      foreach (byte iS in iSkills) {
+        // Skill index
+        sTable[iIx][0] = iS.ToString();
+
+        // Skill category
+        if (iIx ==  0) sTable[iIx][1] = "Athletik";
+        else if (iIx ==  4) sTable[iIx][1] = "Koord.";
+        else if (iIx ==  6) sTable[iIx][1] = "Zk";
+        else if (iIx ==  7) sTable[iIx][1] = "Kraft";
+        else if (iIx == 10) sTable[iIx][1] = "Zielgenauigkeit";
+        else if (iIx == 14) sTable[iIx][1] = "Kb";
+        else if (iIx == 15) sTable[iIx][1] = "Kognition";
+
+        if (iS == 100) {
+          sTable[iIx][3] = "Schnelligk. m. Ball";
+          sTable[iIx][5] = (CornerkickGame.Tool.getSkillEff(plDetails.plGame, 0, iPos) - (CornerkickGame.Tool.getSkillEff(plDetails.plGame, 0, iPos) / CornerkickGame.Tool.getSkillEff(plDetails.plGame, 1, iPos))).ToString("0.0");
+        } else {
+          sTable[iIx][2] = (plDetails.getTalent(iS) + 1).ToString();
+          sTable[iIx][3] = CornerkickManager.PlayerTool.sSkills[iS];
+          sTable[iIx][4] = plDetails.plGame.iSkill[iS].ToString();
+          sTable[iIx][5] = CornerkickGame.Tool.getSkillEff(plDetails.plGame, (byte)iS, iPos).ToString("0.0");
+          sTable[iIx][6] = (plDetails.fSkillTraining[iS] + 1f).ToString("0.0%");
+          sTable[iIx][7] = plDetails.plGame.fIndTraining[iS].ToString("0.0%");
+        }
+
+        iIx++;
+      }
+
+      return sTable;
     }
 
     internal static System.Drawing.Color getColorBW(CornerkickManager.Club club)

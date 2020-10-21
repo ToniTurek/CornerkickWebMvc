@@ -52,6 +52,11 @@
       -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)";
       /* Standard */
       transform: rotate(-90.0deg);
+      text-align: center;
+      vertical-align: middle;
+      align-content: center;
+      width: 80px;
+      max-width: 80px;
     }
   </style>
 
@@ -302,7 +307,6 @@
     function setIndTraining(iInd) {
       $.ajax({
         url: '/Member/setPlayerIndTraining',
-        type: "GET",
         dataType: "JSON",
         data: { iPlayer: iPlayerId, iIndTr: iInd },
         success: function (iIndTr) {
@@ -1315,113 +1319,58 @@
 
             <div style="position: relative; width: auto; height: auto; float: left; margin-bottom: 10px; margin-right: 20px">
               <h4>Individuelle Fähigkeiten</h4>
-              @{
-                i = 0;
-              }
 
               <table border="1" cellpadding="4" style="width: auto">
                 <thead>
                   <tr>
-                    <th style="text-align:center">Kat.</th>
-                    <th style="text-align:center">Tal.</th>
-                    <th style="text-align:center">Fähigkeit</th>
+                    <th style="text-align: center" class="category">Kateg.</th>
+                    <th style="text-align: center">Tal.</th>
+                    <th style="text-align: center">Fähigkeit</th>
                     <th>Wert</th>
                     @{
                       if (Model.bOwnPlayer && !Model.bNation) {
-                        <th style="text-align:center">Eff.*</th>
-                        <th style="text-align:center">Training</th>
-                        <th style="text-align:center">Ind.</th>
-                        <th style="text-align:center">Bonus</th>
+                        <th style="text-align: center">Eff.*</th>
+                        <th style="text-align: center">Training</th>
+                        <th style="text-align: center">Ind.</th>
+                        <th style="text-align: center">Bonus</th>
                       }
                     }
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td class="rotate" align="center" rowspan="3">Athletik</td>
-                    <td align="center" rowspan="3">@(player.getTalent(i) + 1)</td>
-                    <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
-                    <td align="center">@player.plGame.iSkill[i]</td>
-                    @{
-                      if (Model.bOwnPlayer && !Model.bNation) {
-                        <td align="center">@CornerkickGame.Tool.getSkillEff(player.plGame, (byte)i, Model.iPos).ToString("0.0")</td>
-                        var fTraining = player.fSkillTraining[i] + 1.0;
-                        <td align="right">@fTraining.ToString("0.0%")</td>
-                        <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                        <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
-                      }
-                    }
-                  </tr>
-                  <tr>
-                    <td align="right" style="color: grey">Schnelligk. m. Ball</td>
-                    <td align="center"></td>
-                    @{
-                      if (Model.bOwnPlayer && !Model.bNation) {
-                        string sSpeedWithBall = (CornerkickGame.Tool.getSkillEff(player.plGame, 0, Model.iPos) - (CornerkickGame.Tool.getSkillEff(player.plGame, 0, Model.iPos) / CornerkickGame.Tool.getSkillEff(player.plGame, 1, Model.iPos))).ToString("0.0");
-                        <td align="center" style="color: grey">@sSpeedWithBall</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      }
-                    }
-                  </tr>
-                  <tr>
-                    @{
-                      i = 16;
-                    }
-                    <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
-                    <td align="center">@player.plGame.iSkill[i]</td>
-                    @{
-                      if (Model.bOwnPlayer && !Model.bNation) {
-                        <td align="center">@CornerkickGame.Tool.getSkillEff(player.plGame, (byte)i, Model.iPos).ToString("0.0")</td>
-                        var fTraining = player.fSkillTraining[i] + 1.0;
-                        <td align="right">@fTraining.ToString("0.0%")</td>
-                        <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                        <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
-                      }
-                    }
-                  </tr>
-                  @for (i = 1; i < player.plGame.iSkill.Length; i++) {
-                    if (i == 16) { // Acceleration (already at 2nd order)
-                      continue;
-                    }
-                    if (i == 17) { // Game intelligence
-                      continue;
-                    }
-
-                    var fTraining = player.fSkillTraining[i] + 1.0;
+                  @for (i = 0; i < Model.sSkillTable.Length; i++) {
                     <tr>
-                      @if (i == 1) {
-                        <td class="rotate" align="center" rowspan="2">Kat.</td>
-                        <td align="center" rowspan="2">@(player.getTalent(i) + 1)</td>
-                      } else if (i == 3) {
-                        <td class="rotate" align="center" rowspan="1">Kat</td>
-                        <td align="center" rowspan="1">@(player.getTalent(i) + 1)</td>
-                      } else if (i == 4) {
-                        <td class="rotate" align="center" rowspan="4">Kat</td>
-                        <td align="center" rowspan="4">@(player.getTalent(i) + 1)</td>
-                      } else if (i == 8) {
-                        <td class="rotate" align="center" rowspan="2">Kat</td>
-                        <td align="center" rowspan="2">@(player.getTalent(i) + 1)</td>
-                      } else if (i == 10) {
-                        <td class="rotate" align="center" rowspan="1">Kat</td>
-                        <td align="center" rowspan="1">@(player.getTalent(i) + 1)</td>
-                      } else if (i == 11) {
-                        <td class="rotate" align="center" rowspan="2">Kat</td>
-                        <td align="center" rowspan="2">@(player.getTalent(i) + 1)</td>
-                      } else if (i == 13) {
-                        <td class="rotate" align="center" rowspan="3">Kat</td>
-                        <td align="center" rowspan="3">@(player.getTalent(i) + 1)</td>
+                      @{ 
+                        int iRowSpan = 1;
+                        if (!string.IsNullOrEmpty(Model.sSkillTable[i][1])) {
+                          while (i + iRowSpan < Model.sSkillTable.Length && string.IsNullOrEmpty(Model.sSkillTable[i + iRowSpan][1])) {
+                            iRowSpan++;
+                          }
+
+                          <td class="rotate" rowspan=@iRowSpan.ToString()>@Model.sSkillTable[i][1]</td>
+                          <td align="center" rowspan=@iRowSpan.ToString()>@Model.sSkillTable[i][2]</td>
+                        }
                       }
 
-                      <td align="right">@CornerkickManager.PlayerTool.sSkills[i]</td>
-                      <td align="center">@player.plGame.iSkill[i]</td>
+                      @{
+                        string sColor = "";
+                        if (i == 1) {
+                          sColor = "color: grey";
+                        }
+                      }
+
+                      <td align="right" style="@sColor">@Model.sSkillTable[i][3]</td>
+                      <td align="center">@Model.sSkillTable[i][4]</td>
                       @{
                         if (Model.bOwnPlayer && !Model.bNation) {
-                          <td align="center">@CornerkickGame.Tool.getSkillEff(player.plGame, (byte)i, Model.iPos).ToString("0.0")</td>
-                          <td align="right">@fTraining.ToString("0.0%")</td>
-                          <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + i.ToString() + ")", id = "rB" + i.ToString() })</td>
-                          <td align="right">@player.plGame.fIndTraining[i].ToString("0.0%")</td>
+                          <td align="center" style="@sColor">@Model.sSkillTable[i][5]</td>
+                          <td align="right">@Model.sSkillTable[i][6]</td>
+                          if (i == 1) {
+                            <td></td>
+                          } else {
+                            <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + Model.sSkillTable[i][0] + ")", id = "rB" + i.ToString() })</td>
+                          }
+                          <td align="right">@Model.sSkillTable[i][7]</td>
                         }
                       }
                     </tr>

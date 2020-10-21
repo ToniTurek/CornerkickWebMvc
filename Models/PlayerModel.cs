@@ -25,6 +25,7 @@ namespace CornerkickWebMvc.Models
     public bool bCpuPlayerNotOnTransferlist { get; set; }
 
     public byte iPos { get; set; }
+    public string[][] sSkillTable { get; set; }
 
     // Emblem
     public string sPortrait { get; set; }
