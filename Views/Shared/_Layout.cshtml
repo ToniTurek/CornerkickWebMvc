@@ -179,6 +179,15 @@
                   <li>@Html.ActionLink("Statistik", "Statistic", "Member")</li>
                   <li>@Html.ActionLink("Persönliches", "UserView", "Member")</li>
                   <li>@Html.ActionLink("Livespiel", "ViewGame", "ViewGame")</li>
+                  @{
+                    if (clb != null && clb.user.nation != null) {
+                      if (clb.bNation) {
+                        <li>@Html.ActionLink("Zum Verein wechseln", "SwitchClubNationView", "Member")</li>
+                      } else {
+                        <li>@Html.ActionLink("Zur Nationalmannschaft wechseln", "SwitchClubNationView", "Member")</li>
+                      }
+                    }
+                  }
                   @*<li>@Html.ActionLink("Konsole", "Console", "Member")</li>*@
                 </ul>
               </li>

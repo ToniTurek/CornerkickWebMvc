@@ -242,6 +242,13 @@ namespace CornerkickWebMvc.Controllers
 
       return Json(bShowClub, JsonRequestBehavior.AllowGet);
     }
+    [Authorize]
+    public ActionResult SwitchClubNationView()
+    {
+      SwitchClubNation();
+
+      return RedirectToAction("Desk");
+    }
 
     [HttpGet]
     public JsonResult SetTutorialLevel(bool bShow, int iLevel)
