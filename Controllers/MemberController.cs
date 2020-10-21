@@ -3740,6 +3740,8 @@ namespace CornerkickWebMvc.Controllers
         try {
           string sClub = "vereinslos";
           if (transfer.player?.contract?.club != null) {
+            if (transfer.player.contract.club.bNation) continue;
+
             sClub = transfer.player.contract.club.sName;
           }
 
