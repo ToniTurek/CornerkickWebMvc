@@ -93,53 +93,56 @@ namespace CornerkickWebMvc.Controllers
       view.bSound = true;
       if (user.lti.Count > 1) view.bSound = user.lti[1] > 0;
 
+      // Create game selector menu
       view.ddlGames = new List<SelectListItem>();
 
-      List<FileInfo> fiGames = getFileInfoGames(clubUser);
+      if (user.game == null || user.game.data.bFinished) {
+        List<FileInfo> fiGames = getFileInfoGames(clubUser);
 
-      // Insert past games into dropdownmenu
-      foreach (FileInfo ckg in fiGames) {
-        DateTime dtGame;
-        int iTeamIdH;
-        int iTeamIdA;
-        string sFilenameInfo = getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA);
-        if (string.IsNullOrEmpty(sFilenameInfo)) continue;
+        // Insert past games into dropdownmenu
+        foreach (FileInfo ckg in fiGames) {
+          DateTime dtGame;
+          int iTeamIdH;
+          int iTeamIdA;
+          string sFilenameInfo = getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA);
+          if (string.IsNullOrEmpty(sFilenameInfo)) continue;
 
-        view.ddlGames.Insert(0,
-          new SelectListItem {
-            Text  = sFilenameInfo,
-            Value = ckg.Name
-          }
-        );
-      }
-
-      // Admin livegame
-      if (AccountController.checkUserIsAdmin(User)) {
-        view.ddlGames.Insert(0, new SelectListItem { Text = "Livespiel", Value = "" });
-      }
-
-      if (view.ddlGames.Count > 0) view.ddlGames[0].Selected = true;
-
-      if (user.game == null && fiGames.Count > 0) {
-        string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
-        try {
-          user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
-        } catch (Exception e) {
-          MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
+          view.ddlGames.Insert(0,
+            new SelectListItem {
+              Text = sFilenameInfo,
+              Value = ckg.Name
+            }
+          );
         }
-      }
 
-      // Insert next games
-      /*
-      List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clubUser, MvcApplication.ckcore.dtDatum);
-      for (byte j = 0; j < ltGdNextGames.Count; j++) {
-        CornerkickGame.Game.Data gd = ltGdNextGames[j];
-        view.ddlGames.Insert(0, new SelectListItem {
-          Text = gd.dt.ToString("d", Controllers.MemberController.getCiStatic(User)) + " " + gd.dt.ToString("t", Controllers.MemberController.getCiStatic(User)) + " *: " + gd.team[0].sTeam + " - " + gd.team[1].sTeam,
-          Value = (-j - 1).ToString()
-        });
+        // Admin livegame
+        if (AccountController.checkUserIsAdmin(User)) {
+          view.ddlGames.Insert(0, new SelectListItem { Text = "Livespiel", Value = "" });
+        }
+
+        if (view.ddlGames.Count > 0) view.ddlGames[0].Selected = true;
+
+        if (user.game == null && fiGames.Count > 0) {
+          string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
+          try {
+            user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
+          } catch (Exception e) {
+            MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
+          }
+        }
+
+        // Insert next games
+        /*
+        List<CornerkickGame.Game.Data> ltGdNextGames = MvcApplication.ckcore.tl.getNextGames(clubUser, MvcApplication.ckcore.dtDatum);
+        for (byte j = 0; j < ltGdNextGames.Count; j++) {
+          CornerkickGame.Game.Data gd = ltGdNextGames[j];
+          view.ddlGames.Insert(0, new SelectListItem {
+            Text = gd.dt.ToString("d", Controllers.MemberController.getCiStatic(User)) + " " + gd.dt.ToString("t", Controllers.MemberController.getCiStatic(User)) + " *: " + gd.team[0].sTeam + " - " + gd.team[1].sTeam,
+            Value = (-j - 1).ToString()
+          });
+        }
+        */
       }
-      */
 
       view.ddlShoots = new List<SelectListItem>(view.ddlHeatmap);
       view.ddlDuels  = new List<SelectListItem>(view.ddlHeatmap);
