@@ -62,7 +62,7 @@ namespace CornerkickWebMvc.Models
       }
 
       ddlClubsAdmin = new List<SelectListItem>();
-      for (int iC = 0; iC < MvcApplication.ckcore.ltClubs.Count; iC++) {
+      for (int iC = 0; iC < MvcApplication.ckcore?.ltClubs?.Count; iC++) {
         CornerkickManager.Club clbCPU = MvcApplication.ckcore.ltClubs[iC];
 
         if (clbCPU.user == null) {
