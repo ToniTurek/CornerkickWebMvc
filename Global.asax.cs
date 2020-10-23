@@ -38,7 +38,8 @@ namespace CornerkickWebMvc
     public const string sVersion = "3.12.14";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
-    private const double fStartDelay = 500.0; // [ms]
+    //private const double fStartDelay = 500.0; // [ms]
+    private const double fLoadDelay = 500.0; // [ms]
 
     public class Settings
     {
@@ -88,6 +89,8 @@ namespace CornerkickWebMvc
       internal string sText { get; set; }
     }
     internal static List<Mail> ltMail;
+
+    static Timer timerLoad;
 
     //Timer timerStart;
     protected void Application_Start()
@@ -195,7 +198,10 @@ namespace CornerkickWebMvc
       // Load ck game
       if (bLoadGame) {
         iLoadState = 1;
-        Task<bool> tkLoadGame = Task.Run(async () => await load(sHomeDir));
+
+        timerLoad = new Timer(fLoadDelay);
+        timerLoad.Elapsed += new ElapsedEventHandler(timerLoad_Tick);
+        timerLoad.Start();
       }
 
       // Login of admin to start database
@@ -204,6 +210,13 @@ namespace CornerkickWebMvc
         Controllers.AccountController accountController = new Controllers.AccountController();
         Task<SignInStatus> tkLoginAdmin = Task.Run(async () => await accountController.SignInManager.PasswordSignInAsync(sAdminEmail, "test", isPersistent: false, shouldLockout: false));
       }
+    }
+
+    private static void timerLoad_Tick(object sender, EventArgs e)
+    {
+      timerLoad.Stop();
+
+      Task<bool> tkLoadGame = Task.Run(async () => await load(getHomeDir()));
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
