@@ -2144,9 +2144,10 @@ namespace CornerkickWebMvc.Controllers
         plModel.bJouthBelow16 = plDetails.plGame.getAge(MvcApplication.ckcore.dtDatum) < 16;
         plModel.bJouthWithContract = plModel.bJouth && plDetails.contract.iSalary != CornerkickManager.Finance.iPlayerJouthSalary;
 
-        plModel.sColorJersey = "rgb(" + clbPlayer.cl[0].R.ToString() + "," + clbPlayer.cl[0].G.ToString() + "," + clbPlayer.cl[0].B.ToString() + ")";
-        System.Drawing.Color clJerseyNo = getColorBW(clbPlayer);
-        plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")";
+        plModel.sColorJersey   = "rgb(" + clbPlayer.cl1[0].R.ToString() + "," + clbPlayer.cl1[0].G.ToString() + "," + clbPlayer.cl1[0].B.ToString() + ")";
+        plModel.sColorJerseyNo = "rgb(" + clbPlayer.cl1[2].R.ToString() + "," + clbPlayer.cl1[2].G.ToString() + "," + clbPlayer.cl1[2].B.ToString() + ")";
+        //System.Drawing.Color clJerseyNo = getColorBW(clbPlayer);
+        //plModel.sColorJerseyNo = "rgb(" + clJerseyNo.R.ToString() + "," + clJerseyNo.G.ToString() + "," + clJerseyNo.B.ToString() + ")";
 
         plModel.bCpuPlayerNotOnTransferlist = !plModel.bOwnPlayer && !MvcApplication.ckcore.plt.onTransferlist(plDetails) && !plModel.bJouth && plDetails.contractNext == null;
       }
@@ -2242,7 +2243,7 @@ namespace CornerkickWebMvc.Controllers
 
     internal static System.Drawing.Color getColorBW(CornerkickManager.Club club)
     {
-      return getColorBW(club.cl[0]);
+      return getColorBW(club.cl1[0]);
     }
     internal static System.Drawing.Color getColorBW(System.Drawing.Color cl)
     {
@@ -4919,7 +4920,7 @@ namespace CornerkickWebMvc.Controllers
       mdStadionSurr.iFanshop       = clb.buildings.bgFanshop.iLevel;
       if (clb.buildings.bgFanshop.ctn != null) mdStadionSurr.iFanshop = Math.Max(mdStadionSurr.iFanshop, clb.buildings.bgFanshop.ctn.iLevelNew);
 
-      mdStadionSurr.sColor1 = "rgb(" + clb.cl[0].R.ToString() + "," + clb.cl[0].G.ToString() + "," + clb.cl[0].B.ToString() + ")";
+      mdStadionSurr.sColor1 = "rgb(" + clb.cl1[0].R.ToString() + "," + clb.cl1[0].G.ToString() + "," + clb.cl1[0].B.ToString() + ")";
 
       return View(mdStadionSurr);
     }
@@ -7393,7 +7394,7 @@ namespace CornerkickWebMvc.Controllers
       }
 
       sponsorModel.sEmblem = getClubEmblem(clb, "height: 100%; width: 100%; object-fit: contain");
-      sponsorModel.sColorJersey = "rgb(" + clb.cl[0].R.ToString() + "," + clb.cl[0].G.ToString() + "," + clb.cl[0].B.ToString() + ")";
+      sponsorModel.sColorJersey = "rgb(" + clb.cl1[0].R.ToString() + "," + clb.cl1[0].G.ToString() + "," + clb.cl1[0].B.ToString() + ")";
 
       // Tutorial
       int iUserIx = MvcApplication.ckcore.ltUser.IndexOf(ckUser());
