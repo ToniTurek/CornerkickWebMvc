@@ -89,7 +89,7 @@ namespace CornerkickWebMvc
     }
     internal static List<Mail> ltMail;
 
-    Timer timerStart;
+    //Timer timerStart;
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();
@@ -97,11 +97,32 @@ namespace CornerkickWebMvc
       RouteConfig.RegisterRoutes(RouteTable.Routes);
       BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+      // Create stopwatch
+      System.Diagnostics.Stopwatch swStart = new System.Diagnostics.Stopwatch();
+
+      // Start stopwatch
+      swStart.Start();
+
+      try {
+        newCk();
+
+        // Stop stopwatch
+        swStart.Stop();
+        TimeSpan tsStart = swStart.Elapsed;
+
+        // Write elapsed time to log
+        if (ckcore != null) ckcore.tl.writeLog("Elapsed time during start: " + tsStart.TotalSeconds.ToString("0.000") + "s");
+      } catch {
+      }
+
+      /*
       timerStart = new Timer(fStartDelay);
       timerStart.Elapsed += new ElapsedEventHandler(timerStart_Tick);
       timerStart.Start();
+      */
     }
 
+    /*
     private void timerStart_Tick(object sender, EventArgs e)
     {
       timerStart.Stop();
@@ -124,6 +145,7 @@ namespace CornerkickWebMvc
       } catch {
       }
     }
+    */
 
     internal static void newCk(bool bLoadGame = true)
     {
