@@ -176,12 +176,14 @@ namespace CornerkickWebMvc
         Task<bool> tkLoadGame = Task.Run(async () => await load(sHomeDir));
       }
 
+      /*
       // Login of admin to start database
       string sAdminEmail = ConfigurationManager.AppSettings["ckAdminEmail"];
       if (!string.IsNullOrEmpty(sAdminEmail)) {
         Controllers.AccountController accountController = new Controllers.AccountController();
         Task<SignInStatus> tkLoginAdmin = Task.Run(async () => await accountController.SignInManager.PasswordSignInAsync(sAdminEmail, "test", isPersistent: false, shouldLockout: false));
       }
+      */
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
