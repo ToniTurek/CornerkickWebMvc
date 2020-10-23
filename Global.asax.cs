@@ -283,45 +283,69 @@ namespace CornerkickWebMvc
         CornerkickManager.Club clbNat = CornerkickManager.Tool.getNation(iN, ckcore.ltClubs);
 
         if (iN == 36) { // GER
-          clbNat.cl[0] = System.Drawing.Color.White;
-          clbNat.cl[1] = System.Drawing.Color.Black;
-          clbNat.cl[2] = System.Drawing.Color.Red;
-          clbNat.cl[3] = System.Drawing.Color.White;
+          clbNat.cl1[0] = System.Drawing.Color.White;
+          clbNat.cl1[1] = System.Drawing.Color.Black;
+          clbNat.cl1[2] = System.Drawing.Color.Black;
+
+          clbNat.cl2[0] = System.Drawing.Color.Red;
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.White;
         } else if (iN == 29) { // ENG
-          clbNat.cl[0] = System.Drawing.Color.White;
-          clbNat.cl[1] = System.Drawing.Color.FromArgb(15, 28, 115); // Blue
-          clbNat.cl[2] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
-          clbNat.cl[3] = System.Drawing.Color.White;
+          clbNat.cl1[0] = System.Drawing.Color.White;
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(15, 28, 115); // Blue
+          clbNat.cl1[2] = System.Drawing.Color.FromArgb(15, 28, 115); // Blue
+
+          clbNat.cl2[0] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.White;
         } else if (iN == 30) { // ESP
-          clbNat.cl[0] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
-          clbNat.cl[1] = System.Drawing.Color.FromArgb(22, 70, 151); // Blue
-          clbNat.cl[2] = System.Drawing.Color.White;
-          clbNat.cl[3] = System.Drawing.Color.White;
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(22, 70, 151); // Blue
+          clbNat.cl1[2] = System.Drawing.Color.FromArgb(22, 70, 151); // Blue
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
         } else if (iN == 45) { // ITA
-          clbNat.cl[0] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
-          clbNat.cl[1] = System.Drawing.Color.White;
-          clbNat.cl[2] = System.Drawing.Color.White;
-          clbNat.cl[3] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
+          clbNat.cl1[1] = System.Drawing.Color.White;
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
         } else if (iN == 33) { // FRA
-          clbNat.cl[0] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
-          clbNat.cl[1] = System.Drawing.Color.White;
-          clbNat.cl[2] = System.Drawing.Color.White;
-          clbNat.cl[3] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
+          clbNat.cl1[1] = System.Drawing.Color.White;
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
         } else if (iN == 54) { // NED
-          clbNat.cl[0] = System.Drawing.Color.FromArgb(255, 79, 0); // Orange
-          clbNat.cl[1] = System.Drawing.Color.FromArgb(255, 79, 0);
-          clbNat.cl[2] = System.Drawing.Color.White;
-          clbNat.cl[3] = System.Drawing.Color.FromArgb(255, 79, 0);
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(255, 79, 0); // Orange
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(255, 79, 0);
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(255, 79, 0);
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(255, 79, 0);
         } else if (iN == 13) { // BRA
-          clbNat.cl[0] = System.Drawing.Color.FromArgb(255, 229, 0); // Yellow
-          clbNat.cl[1] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
-          clbNat.cl[2] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
-          clbNat.cl[3] = System.Drawing.Color.White;
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(255, 229, 0); // Yellow
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
+          clbNat.cl1[2] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
+
+          clbNat.cl2[0] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.White;
         } else if (iN == 3) { // ARG
-          clbNat.cl[0] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
-          clbNat.cl[1] = System.Drawing.Color.White;
-          clbNat.cl[2] = System.Drawing.Color.FromArgb(0, 53, 94);
-          clbNat.cl[3] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
+          clbNat.cl1[1] = System.Drawing.Color.White;
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.FromArgb(0, 53, 94);
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
+          clbNat.cl2[2] = System.Drawing.Color.White;
         }
       }
     }

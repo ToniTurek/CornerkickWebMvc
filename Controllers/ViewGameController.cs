@@ -225,8 +225,8 @@ namespace CornerkickWebMvc.Controllers
     {
       CornerkickManager.Club clbUser = ckClub();
 
-      view.sColorJerseyH = new string[4] { "white", "blue", "blue", "white" };
-      view.sColorJerseyA = new string[4] { "white", "red",  "red",  "white" };
+      view.sColorJerseyH = new string[] { "white", "blue", "blue", "blue", "white", "white" };
+      view.sColorJerseyA = new string[] { "white", "red",  "red",  "red",  "white", "white" };
 
       if (game == null) {
         view.gD = new Models.ViewGameModel.gameData();
@@ -260,7 +260,8 @@ namespace CornerkickWebMvc.Controllers
           if (iNationH >= 0 && iNationH < CornerkickManager.Main.sLandShort.Length) sEmblemH = CornerkickManager.Main.sLandShort[iNationH] + ".png";
         }
 
-        for (byte iC = 0; iC < clubH.cl.Length; iC++) view.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubH.cl1.Length; iC++) view.sColorJerseyH[iC                   ] = "rgb(" + clubH.cl1[iC].R.ToString() + "," + clubH.cl1[iC].G.ToString() + "," + clubH.cl1[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubH.cl2.Length; iC++) view.sColorJerseyH[iC + clubH.cl1.Length] = "rgb(" + clubH.cl2[iC].R.ToString() + "," + clubH.cl2[iC].G.ToString() + "," + clubH.cl2[iC].B.ToString() + ")";
       }
 
       if (game.data.team[1].iTeamId >= 0 && game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
@@ -273,7 +274,9 @@ namespace CornerkickWebMvc.Controllers
           if (iNationA >= 0 && iNationA < CornerkickManager.Main.sLandShort.Length) sEmblemA = CornerkickManager.Main.sLandShort[iNationA] + ".png";
         }
 
-        for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
+        //for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubA.cl1.Length; iC++) view.sColorJerseyA[iC                   ] = "rgb(" + clubA.cl1[iC].R.ToString() + "," + clubA.cl1[iC].G.ToString() + "," + clubA.cl1[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubA.cl2.Length; iC++) view.sColorJerseyA[iC + clubA.cl1.Length] = "rgb(" + clubA.cl2[iC].R.ToString() + "," + clubA.cl2[iC].G.ToString() + "," + clubA.cl2[iC].B.ToString() + ")";
       }
 
       /*
@@ -317,19 +320,19 @@ namespace CornerkickWebMvc.Controllers
       bool bAdmin = AccountController.checkUserIsAdmin(User);
 
       // Colors home
-      gLoc.sColorJerseyH = new string[2] { "white", "blue" };
+      gLoc.sColorJerseyH = new string[] { "white", "blue", "blue" };
       if (user.game.data.team[0].iTeamId >= 0 && user.game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[user.game.data.team[0].iTeamId];
-        for (byte iC = 0; iC < gLoc.sColorJerseyH.Length; iC++) gLoc.sColorJerseyH[iC] = "rgb(" + clubH.cl[iC].R.ToString() + "," + clubH.cl[iC].G.ToString() + "," + clubH.cl[iC].B.ToString() + ")";
-        gLoc.bJerseyTextColorWhiteH = Controllers.MemberController.checkColorBW(clubH.cl[0]);
+        for (byte iC = 0; iC < gLoc.sColorJerseyH.Length; iC++) gLoc.sColorJerseyH[iC] = "rgb(" + clubH.cl1[iC].R.ToString() + "," + clubH.cl1[iC].G.ToString() + "," + clubH.cl1[iC].B.ToString() + ")";
+        //gLoc.bJerseyTextColorWhiteH = Controllers.MemberController.checkColorBW(clubH.cl[0]);
       }
 
       // Colors away
-      gLoc.sColorJerseyA = new string[2] { "white", "red" };
+      gLoc.sColorJerseyA = new string[] { "white", "red", "red" };
       if (user.game.data.team[1].iTeamId >= 0 && user.game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[user.game.data.team[1].iTeamId];
-        for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC + 2].R.ToString() + "," + clubA.cl[iC + 2].G.ToString() + "," + clubA.cl[iC + 2].B.ToString() + ")";
-        gLoc.bJerseyTextColorWhiteA = Controllers.MemberController.checkColorBW(clubA.cl[2]);
+        for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl2[iC].R.ToString() + "," + clubA.cl2[iC].G.ToString() + "," + clubA.cl2[iC].B.ToString() + ")";
+        //gLoc.bJerseyTextColorWhiteA = Controllers.MemberController.checkColorBW(clubA.cl2[2]);
       }
 
       // Set interval
