@@ -90,7 +90,11 @@ namespace CornerkickWebMvc
     }
     internal static List<Mail> ltMail;
 
-    static Timer timerLoad;
+    class TimerLoad : System.Timers.Timer
+    {
+      public string sHomeDir;
+    }
+    static TimerLoad timerLoad;
 
     //Timer timerStart;
     protected void Application_Start()
@@ -199,7 +203,11 @@ namespace CornerkickWebMvc
       if (bLoadGame) {
         iLoadState = 1;
 
-        timerLoad = new Timer(fLoadDelay);
+        timerLoad = new TimerLoad {
+          Interval = fLoadDelay,
+          sHomeDir = sHomeDir
+        };
+
         timerLoad.Elapsed += new ElapsedEventHandler(timerLoad_Tick);
         timerLoad.Start();
       }
@@ -214,9 +222,14 @@ namespace CornerkickWebMvc
 
     private static void timerLoad_Tick(object sender, EventArgs e)
     {
-      timerLoad.Stop();
+      try {
+        if (timerLoad != null) timerLoad.Stop();
+      } catch {
+      }
 
-      Task<bool> tkLoadGame = Task.Run(async () => await load(getHomeDir()));
+      string sHomeDir = ((TimerLoad)sender).sHomeDir;
+
+      Task<bool> tkLoadGame = loadAsync(sHomeDir);
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
@@ -1255,7 +1268,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    internal static async Task<bool> load(string sHomeDir)
+    internal static async Task<bool> loadAsync(string sHomeDir)
     {
       // Create stopwatch
       System.Diagnostics.Stopwatch swLoad = new System.Diagnostics.Stopwatch();
