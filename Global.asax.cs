@@ -5,16 +5,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.UI.WebControls;
+using Microsoft.AspNet.Identity.Owin;
 
 #if _USE_BLOB
 using Microsoft.Azure;
@@ -34,6 +37,8 @@ namespace CornerkickWebMvc
     public static Settings settings = new Settings();
     public const string sVersion = "3.12.14";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
+
+    private const double fStartDelay = 500.0; // [ms]
 
     public class Settings
     {
@@ -84,18 +89,28 @@ namespace CornerkickWebMvc
     }
     internal static List<Mail> ltMail;
 
+    Timer timerStart;
     protected void Application_Start()
     {
+      AreaRegistration.RegisterAllAreas();
+      FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+      RouteConfig.RegisterRoutes(RouteTable.Routes);
+      BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+      timerStart = new Timer(fStartDelay);
+      timerStart.Elapsed += new ElapsedEventHandler(timerStart_Tick);
+      timerStart.Start();
+    }
+
+    private void timerStart_Tick(object sender, EventArgs e)
+    {
+      timerStart.Stop();
+
       // Create stopwatch
       System.Diagnostics.Stopwatch swStart = new System.Diagnostics.Stopwatch();
 
       // Start stopwatch
       swStart.Start();
-
-      AreaRegistration.RegisterAllAreas();
-      FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-      RouteConfig.RegisterRoutes(RouteTable.Routes);
-      BundleConfig.RegisterBundles(BundleTable.Bundles);
 
       try {
         newCk();
