@@ -39,7 +39,7 @@ namespace CornerkickWebMvc
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     //private const double fStartDelay = 500.0; // [ms]
-    private const double fLoadDelay = 500.0; // [ms]
+    private const double fLoadDelay = 1000.0; // [ms]
 
     public class Settings
     {
