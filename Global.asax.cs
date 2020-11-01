@@ -5,16 +5,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.UI.WebControls;
+using Microsoft.AspNet.Identity.Owin;
 
 #if _USE_BLOB
 using Microsoft.Azure;
@@ -32,8 +35,19 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "3.12.10";
+    public const string sVersion = "3.13.0";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
+
+    //private const double fStartDelay = 500.0; // [ms]
+    private const double fLoadDelay = 1000.0; // [ms]
+
+    public const int iCupIdLeague   =  1; // Leagues
+    public const int iCupIdNatCup   =  2; // National cups
+    public const int iCupIdGold     =  3; // Gold cup
+    public const int iCupIdSilver   =  4; // Silver cup
+    public const int iCupIdBronze   = 15; // Bronze cup
+    public const int iCupIdTestgame =  5; // Test games
+    public const int iCupIdWc       =  7; // World cup
 
     public class Settings
     {
@@ -84,18 +98,55 @@ namespace CornerkickWebMvc
     }
     internal static List<Mail> ltMail;
 
+    class TimerLoad : System.Timers.Timer
+    {
+      public string sHomeDir;
+    }
+    static TimerLoad timerLoad;
+
+    //Timer timerStart;
     protected void Application_Start()
     {
+      AreaRegistration.RegisterAllAreas();
+      FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+      RouteConfig.RegisterRoutes(RouteTable.Routes);
+      BundleConfig.RegisterBundles(BundleTable.Bundles);
+
       // Create stopwatch
       System.Diagnostics.Stopwatch swStart = new System.Diagnostics.Stopwatch();
 
       // Start stopwatch
       swStart.Start();
 
-      AreaRegistration.RegisterAllAreas();
-      FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-      RouteConfig.RegisterRoutes(RouteTable.Routes);
-      BundleConfig.RegisterBundles(BundleTable.Bundles);
+      try {
+        newCk();
+
+        // Stop stopwatch
+        swStart.Stop();
+        TimeSpan tsStart = swStart.Elapsed;
+
+        // Write elapsed time to log
+        if (ckcore != null) ckcore.tl.writeLog("Elapsed time during start: " + tsStart.TotalSeconds.ToString("0.000") + "s");
+      } catch {
+      }
+
+      /*
+      timerStart = new Timer(fStartDelay);
+      timerStart.Elapsed += new ElapsedEventHandler(timerStart_Tick);
+      timerStart.Start();
+      */
+    }
+
+    /*
+    private void timerStart_Tick(object sender, EventArgs e)
+    {
+      timerStart.Stop();
+
+      // Create stopwatch
+      System.Diagnostics.Stopwatch swStart = new System.Diagnostics.Stopwatch();
+
+      // Start stopwatch
+      swStart.Start();
 
       try {
         newCk();
@@ -109,6 +160,7 @@ namespace CornerkickWebMvc
       } catch {
       }
     }
+    */
 
     internal static void newCk(bool bLoadGame = true)
     {
@@ -158,8 +210,34 @@ namespace CornerkickWebMvc
       // Load ck game
       if (bLoadGame) {
         iLoadState = 1;
-        Task<bool> tkLoadGame = Task.Run(async () => await load(sHomeDir));
+
+        timerLoad = new TimerLoad {
+          Interval = fLoadDelay,
+          sHomeDir = sHomeDir
+        };
+
+        timerLoad.Elapsed += new ElapsedEventHandler(timerLoad_Tick);
+        timerLoad.Start();
       }
+
+      // Login of admin to start database
+      string sAdminEmail = ConfigurationManager.AppSettings["ckAdminEmail"];
+      if (!string.IsNullOrEmpty(sAdminEmail)) {
+        Controllers.AccountController accountController = new Controllers.AccountController();
+        Task<SignInStatus> tkLoginAdmin = Task.Run(async () => await accountController.SignInManager.PasswordSignInAsync(sAdminEmail, "test", isPersistent: false, shouldLockout: false));
+      }
+    }
+
+    private static void timerLoad_Tick(object sender, EventArgs e)
+    {
+      try {
+        if (timerLoad != null) timerLoad.Stop();
+      } catch {
+      }
+
+      string sHomeDir = ((TimerLoad)sender).sHomeDir;
+
+      Task<bool> tkLoadGame = loadAsync(sHomeDir);
     }
 
     private static void fillLeaguesWithCpuClubs(CornerkickManager.Cup league, CornerkickManager.Cup cup, byte nLeagueSize = 16)
@@ -184,40 +262,63 @@ namespace CornerkickWebMvc
     {
       CornerkickManager.Cup cupGold = ckcore.tl.getCup(3);
 
+      // Create Gold Cup
       if (cupGold == null) {
-        // Create Gold Cup
         cupGold = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
-        cupGold.iId = 3;
-        cupGold.sName = "Gold Cup";
-        cupGold.settings.iNeutral = 2;
-        cupGold.settings.iBonusStart    = 10000000; // 10 mio.
-        cupGold.settings.iBonusCupWin   = 32000000; // 32 mio.
-        cupGold.settings.iBonusVicGroup =  5000000; //  5 mio.
-        cupGold.settings.bBonusReleaseCupWinInKo = true;
-        cupGold.settings.iDayOfWeek = 3;
-        cupGold.settings.fAttraction = 1.25f;
         ckcore.ltCups.Add(cupGold);
       }
+
+      cupGold.iId = iCupIdGold;
+      cupGold.sName = "Gold Cup";
+      cupGold.settings.iNeutral = 2;
+      cupGold.settings.iBonusStart    = 10000000; // 10 mio.
+      cupGold.settings.iBonusCupWin   = 16000000; // 16 mio.
+      cupGold.settings.iBonusVicGroup =  5000000; //  5 mio.
+      cupGold.settings.bBonusReleaseCupWinInKo = true;
+      cupGold.settings.iDayOfWeek = 3;
+      cupGold.settings.fAttraction = 1.25f;
     }
 
     private static void createCupSilver()
     {
-      CornerkickManager.Cup cupSilver = ckcore.tl.getCup(4);
+      CornerkickManager.Cup cupSilver = ckcore.tl.getCup(iCupIdSilver);
 
+      // Create Silver Cup
       if (cupSilver == null) {
-        // Create Silver Cup
         cupSilver = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
-        cupSilver.iId = 4;
-        cupSilver.sName = "Silver Cup";
-        cupSilver.settings.iNeutral = 2;
-        cupSilver.settings.iBonusStart    =  5000000; //  5 mio.
-        cupSilver.settings.iBonusCupWin   = 16000000; // 16 mio.
-        cupSilver.settings.iBonusVicGroup =  2500000; //  2.5 mio.
-        cupSilver.settings.bBonusReleaseCupWinInKo = true;
-        cupSilver.settings.iDayOfWeek = 4;
-        cupSilver.settings.fAttraction = 0.90f;
         ckcore.ltCups.Add(cupSilver);
       }
+
+      cupSilver.iId = iCupIdSilver;
+      cupSilver.sName = "Silver Cup";
+      cupSilver.settings.iNeutral = 2;
+      cupSilver.settings.iBonusStart    =  7500000; //  7.5 mio.
+      cupSilver.settings.iBonusCupWin   = 12000000; // 12 mio.
+      cupSilver.settings.iBonusVicGroup =  3500000; //  3.5 mio.
+      cupSilver.settings.bBonusReleaseCupWinInKo = true;
+      cupSilver.settings.iDayOfWeek = 4;
+      cupSilver.settings.fAttraction = 1.00f;
+    }
+
+    private static void createCupBronze()
+    {
+      CornerkickManager.Cup cupBronze = ckcore.tl.getCup(iCupIdBronze);
+
+      // Create Bronze Cup
+      if (cupBronze == null) {
+        cupBronze = new CornerkickManager.Cup(bKo: true, bKoTwoGames: true, nGroups: 8, nQualifierKo: 2);
+        ckcore.ltCups.Add(cupBronze);
+      }
+
+      cupBronze.iId = iCupIdBronze;
+      cupBronze.sName = "Bronze Cup";
+      cupBronze.settings.iNeutral = 2;
+      cupBronze.settings.iBonusStart = 5000000; //  5 mio.
+      cupBronze.settings.iBonusCupWin = 8000000; // 8 mio.
+      cupBronze.settings.iBonusVicGroup = 2500000; //  2.5 mio.
+      cupBronze.settings.bBonusReleaseCupWinInKo = true;
+      cupBronze.settings.iDayOfWeek = 3;
+      cupBronze.settings.fAttraction = 0.80f;
     }
 
     private static void createCupWc(DateTime dtLeagueEnd)
@@ -255,55 +356,97 @@ namespace CornerkickWebMvc
           clbNat.buildings.bgGym.iLevel = 5;
           clbNat.buildings.bgSpa.iLevel = 5;
 
-          // Colors
-          if (iN == 0) { // GER
-            clbNat.cl[0] = System.Drawing.Color.White;
-            clbNat.cl[1] = System.Drawing.Color.Black;
-            clbNat.cl[2] = System.Drawing.Color.Red;
-            clbNat.cl[3] = System.Drawing.Color.White;
-          } else if (iN == 1) { // ENG
-            clbNat.cl[0] = System.Drawing.Color.White;
-            clbNat.cl[1] = System.Drawing.Color.FromArgb(15, 28, 115); // Blue
-            clbNat.cl[2] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
-            clbNat.cl[3] = System.Drawing.Color.White;
-          } else if (iN == 2) { // ESP
-            clbNat.cl[0] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
-            clbNat.cl[1] = System.Drawing.Color.FromArgb(22, 70, 151); // Blue
-            clbNat.cl[2] = System.Drawing.Color.White;
-            clbNat.cl[3] = System.Drawing.Color.White;
-          } else if (iN == 3) { // ITA
-            clbNat.cl[0] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
-            clbNat.cl[1] = System.Drawing.Color.White;
-            clbNat.cl[2] = System.Drawing.Color.White;
-            clbNat.cl[3] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
-          } else if (iN == 4) { // FRA
-            clbNat.cl[0] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
-            clbNat.cl[1] = System.Drawing.Color.White;
-            clbNat.cl[2] = System.Drawing.Color.White;
-            clbNat.cl[3] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
-          } else if (iN == 5) { // NED
-            clbNat.cl[0] = System.Drawing.Color.FromArgb(255, 79, 0); // Orange
-            clbNat.cl[1] = System.Drawing.Color.FromArgb(255, 79, 0);
-            clbNat.cl[2] = System.Drawing.Color.White;
-            clbNat.cl[3] = System.Drawing.Color.FromArgb(255, 79, 0);
-          } else if (iN == 6) { // BRA
-            clbNat.cl[0] = System.Drawing.Color.FromArgb(255, 229, 0); // Yellow
-            clbNat.cl[1] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
-            clbNat.cl[2] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
-            clbNat.cl[3] = System.Drawing.Color.White;
-          } else if (iN == 7) { // ARG
-            clbNat.cl[0] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
-            clbNat.cl[1] = System.Drawing.Color.FromArgb(0, 53, 94);
-            clbNat.cl[2] = System.Drawing.Color.Black;
-            clbNat.cl[3] = System.Drawing.Color.White;
-          }
-
           ckcore.ltClubs.Add(clbNat);
 
           ckcore.doFormation(clbNat.iId);
 
           cupWc.ltClubs[iGroup / 4].Add(clbNat);
           iGroup++;
+        }
+
+        setNationColors();
+      }
+    }
+
+    private static void setNationColors()
+    {
+      /*
+      36, // GER
+      29, // ENG
+      30, // ESP
+      45, // ITA
+      33, // FRA
+      54, // NED
+      13, // BRA
+       3  // ARG
+       */
+      foreach (int iN in iNations) {
+        CornerkickManager.Club clbNat = CornerkickManager.Tool.getNation(iN, ckcore.ltClubs);
+
+        if (iN == 36) { // GER
+          clbNat.cl1[0] = System.Drawing.Color.White;
+          clbNat.cl1[1] = System.Drawing.Color.Black;
+          clbNat.cl1[2] = System.Drawing.Color.Black;
+
+          clbNat.cl2[0] = System.Drawing.Color.Red;
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.White;
+        } else if (iN == 29) { // ENG
+          clbNat.cl1[0] = System.Drawing.Color.White;
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(15, 28, 115); // Blue
+          clbNat.cl1[2] = System.Drawing.Color.FromArgb(15, 28, 115); // Blue
+
+          clbNat.cl2[0] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.White;
+        } else if (iN == 30) { // ESP
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(22, 70, 151); // Blue
+          clbNat.cl1[2] = System.Drawing.Color.FromArgb(22, 70, 151); // Blue
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(255, 0, 0); // Red
+        } else if (iN == 45) { // ITA
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
+          clbNat.cl1[1] = System.Drawing.Color.White;
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(17, 62, 215); // Azure-blue
+        } else if (iN == 33) { // FRA
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
+          clbNat.cl1[1] = System.Drawing.Color.White;
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(17, 40, 85); // Blue
+        } else if (iN == 54) { // NED
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(255, 79, 0); // Orange
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(255, 79, 0);
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.White;
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(255, 79, 0);
+          clbNat.cl2[2] = System.Drawing.Color.FromArgb(255, 79, 0);
+        } else if (iN == 13) { // BRA
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(255, 229, 0); // Yellow
+          clbNat.cl1[1] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
+          clbNat.cl1[2] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
+
+          clbNat.cl2[0] = System.Drawing.Color.FromArgb(0, 60, 255); // Blue
+          clbNat.cl2[1] = System.Drawing.Color.White;
+          clbNat.cl2[2] = System.Drawing.Color.White;
+        } else if (iN == 3) { // ARG
+          clbNat.cl1[0] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
+          clbNat.cl1[1] = System.Drawing.Color.White;
+          clbNat.cl1[2] = System.Drawing.Color.White;
+
+          clbNat.cl2[0] = System.Drawing.Color.FromArgb(0, 53, 94);
+          clbNat.cl2[1] = System.Drawing.Color.FromArgb(214, 237, 255); // Light-blue
+          clbNat.cl2[2] = System.Drawing.Color.White;
         }
       }
     }
@@ -392,8 +535,9 @@ namespace CornerkickWebMvc
 
     internal static bool performCalendarStep(bool bSave = true)
     {
-      CornerkickManager.Cup cupGold   = ckcore.tl.getCup(3);
-      CornerkickManager.Cup cupSilver = ckcore.tl.getCup(4);
+      CornerkickManager.Cup cupGold   = ckcore.tl.getCup(iCupIdGold);
+      CornerkickManager.Cup cupSilver = ckcore.tl.getCup(iCupIdSilver);
+      CornerkickManager.Cup cupBronze = ckcore.tl.getCup(iCupIdBronze);
 
       // Reset home dir
       string sHomeDir = getHomeDir();
@@ -548,11 +692,12 @@ namespace CornerkickWebMvc
         }
       }
 
-      // CHEAT-section
+      // CHEAT-SECTION
       // Jan no injury
       CornerkickManager.Player plJan = ckcore.ltPlayer[101];
       plJan.plGame.injury = null;
 
+      // Janos/David money
       if (ckcore.dtDatum.Day == 1 && ckcore.dtDatum.Hour == 20 && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Second == 0) {
         CornerkickManager.Club clbJanos = ckcore.ltClubs[5];
         CornerkickManager.Club clbDavid = ckcore.ltClubs[143];
@@ -565,6 +710,7 @@ namespace CornerkickWebMvc
           }
         }
       }
+      // END OF CHEAT-SECTION
 
       // Assign random portrait if none
       for (int iPl = 0; iPl < ckcore.ltPlayer.Count; iPl++) {
@@ -653,6 +799,7 @@ namespace CornerkickWebMvc
         // Draw gold/silver cup
         cupGold  .draw(ckcore.dtDatum);
         cupSilver.draw(ckcore.dtDatum);
+        cupBronze.draw(ckcore.dtDatum);
 
         // Set club next game
         foreach (CornerkickManager.Club clb in ckcore.ltClubs) {
@@ -662,12 +809,27 @@ namespace CornerkickWebMvc
 
       // End of season
       if (iRetCk == 99) {
+        // Clear national coaches
+        for (int iU = 0; iU < ckcore.ltUser.Count; iU++) {
+          ckcore.ltUser[iU].nation = null;
+        }
+        foreach (int iN in iNations) {
+          CornerkickManager.Club nat = CornerkickManager.Tool.getNation(iN, ckcore.ltClubs);
+          nat.user = null;
+        }
+
+        //////////////////////////////////////////////////
+        // Nominate clubs to international cups
+        //////////////////////////////////////////////////
+        // Clear groups
         for (byte iG = 0; iG < cupGold  .ltClubs.Length; iG++) cupGold  .ltClubs[iG].Clear();
         for (byte iG = 0; iG < cupSilver.ltClubs.Length; iG++) cupSilver.ltClubs[iG].Clear();
+        for (byte iG = 0; iG < cupBronze.ltClubs.Length; iG++) cupBronze.ltClubs[iG].Clear();
 
         // Add clubs ...
         int iGroupGold   = 0;
         int iGroupSilver = 0;
+        int iGroupBronze = 0;
         foreach (int iN in iNations) {
           // ... of league iN ...
           CornerkickManager.Cup league = ckcore.tl.getCup(1, iN, 0);
@@ -688,10 +850,18 @@ namespace CornerkickWebMvc
             cupSilver.ltClubs[iGroupSilver].Add(ltTbl[jL].club);
             iGroupSilver++;
           }
+
+          // ... to Bronze Cup
+          for (byte jL = 8; jL < 12; jL++) {
+            if (iGroupBronze >= cupBronze.ltClubs.Length) iGroupBronze = 0;
+            cupBronze.ltClubs[iGroupBronze].Add(ltTbl[jL].club);
+            iGroupBronze++;
+          }
         }
 
         cupGold  .ltMatchdays.Clear();
         cupSilver.ltMatchdays.Clear();
+        cupBronze.ltMatchdays.Clear();
 
         ckcore.calcMatchdays();
 
@@ -703,7 +873,7 @@ namespace CornerkickWebMvc
       foreach (CornerkickManager.Cup cup in ltCupsTmp) {
         if (cup == null) continue;
 
-        if (cup.iId == -5) {
+        if (cup.iId == -iCupIdTestgame) {
           if (cup.ltMatchdays.Count < 1) continue;
 
           if (cup.ltMatchdays[0].dt.CompareTo(ckcore.dtDatum) <= 0) { // if request in past or now ...
@@ -1156,7 +1326,7 @@ namespace CornerkickWebMvc
       }
     }
 
-    internal static async Task<bool> load(string sHomeDir)
+    internal static async Task<bool> loadAsync(string sHomeDir)
     {
       // Create stopwatch
       System.Diagnostics.Stopwatch swLoad = new System.Diagnostics.Stopwatch();
@@ -1410,6 +1580,7 @@ namespace CornerkickWebMvc
       // Create Internat. cups
       createCupGold();
       createCupSilver();
+      createCupBronze();
       createCupWc(dtLeagueEnd);
 
       ckcore.calcMatchdays();

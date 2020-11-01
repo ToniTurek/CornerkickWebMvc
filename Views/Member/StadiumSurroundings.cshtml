@@ -261,7 +261,7 @@
 
           div1.appendChild(divNext);
         } else if (bDisabled) { // Full
-        } else { // No construction
+        } else if (building.iLevelMax === 0 || building.iLevel < building.iLevelMax) { // No construction and not final level reached
           var btn = document.createElement("button");
 
           if (building.bTypeInt) {
@@ -334,7 +334,7 @@
       divStars.style.marginBottom = "6px";
 
       var i = 0;
-      for (i = 0; i < iStarsMax - 1; i++) {
+      for (i = 0; i < iStarsMax; i++) {
         var imgStar = document.createElement("img");
         imgStar.style.position = "relative";
         //imgStar.style.left = (i * (iStarHeight + 4)).toFixed(0) + "px";
@@ -469,9 +469,8 @@
       var divGroundContainer = $("#divGroundContainer");
       divGroundContainer.html('');
       $.ajax({
-        type: 'GET',
         url: '/Member/StadiumSurrGetBuildings',
-        dataType: "json",
+        dataType: "JSON",
         success: function (buildings) {
           var iType = 0;
           for (var iB = 0; iB < buildings.iGround; iB++) {

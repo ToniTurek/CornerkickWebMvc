@@ -271,10 +271,10 @@ namespace CornerkickWebMvc.Controllers
               clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
 
               // Assign club colors
-              clubCpu.cl[0] = cl1;
-              clubCpu.cl[1] = cl2;
-              clubCpu.cl[2] = cl3;
-              clubCpu.cl[3] = cl4;
+              clubCpu.cl1[0] = cl1;
+              clubCpu.cl1[1] = cl2;
+              clubCpu.cl2[0] = cl3;
+              clubCpu.cl2[1] = cl4;
         
               addPlayerToClub(ref clubCpu);
 

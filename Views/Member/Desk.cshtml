@@ -55,6 +55,7 @@
     });
 
     $(document).ready(function () {
+      showLastGames();
       setNews();
       setNewsTableWrap();
       setNewspaper();
@@ -79,6 +80,33 @@
       */
       //document.body.onclick(function() { alert("Test") });
 
+      // Get ending contracts info
+      $.ajax({
+        url: '/Member/DeskGetEndingContractsInfo',
+        type: "GET",
+        dataType: "JSON",
+        cache: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (sInfo) {
+          if (sInfo) {
+            alert(sInfo);
+          }
+        }
+      });
+
+      $('#iDeleteLog').change(function () {
+        $.ajax({
+          url: '/Member/SetDeleteLog',
+          type: "GET",
+          dataType: "JSON",
+          cache: false,
+          contentType: "application/json; charset=utf-8",
+          data: { iDeleteAfter: $(this).val() }
+        });
+      });
+    }); // document ready
+
+    async function showLastGames() {
       $.get("/Member/GetLastGames/", function (dataLastGames) {
         var chart = new CanvasJS.Chart("chartContainerLastGames", {
           animationEnabled: true,
@@ -153,34 +181,9 @@
 
         chart.render();
       });
+    }
 
-      // Get ending contracts info
-      $.ajax({
-        url: '/Member/DeskGetEndingContractsInfo',
-        type: "GET",
-        dataType: "JSON",
-        cache: false,
-        contentType: "application/json; charset=utf-8",
-        success: function (sInfo) {
-          if (sInfo) {
-            alert(sInfo);
-          }
-        }
-      });
-
-      $('#iDeleteLog').change(function () {
-        $.ajax({
-          url: '/Member/SetDeleteLog',
-          type: "GET",
-          dataType: "JSON",
-          cache: false,
-          contentType: "application/json; charset=utf-8",
-          data: { iDeleteAfter: $(this).val() }
-        });
-      });
-    }); // document ready
-
-    function setNews() {
+    async function setNews() {
       $('#tableNews').DataTable({
         "ajax": {
           "url": '@Url.Action("DeskGetNews", "Member")',

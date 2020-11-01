@@ -24,8 +24,8 @@ function drawGame(iState, iGameSpeed) {
       if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
         playerGlobal = drawPlayer(gLoc2);
 
-        changePlayerJerseyColor(0, gLoc2.sColorJerseyH[0], gLoc2.sColorJerseyH[1]);
-        changePlayerJerseyColor(1, gLoc2.sColorJerseyA[0], gLoc2.sColorJerseyA[1]);
+        changePlayerJerseyColor(0, gLoc2.sColorJerseyH[0], gLoc2.sColorJerseyH[1], gLoc2.sColorJerseyH[2]);
+        changePlayerJerseyColor(1, gLoc2.sColorJerseyA[0], gLoc2.sColorJerseyA[1], gLoc2.sColorJerseyA[2]);
 
         imgBall = drawBall();
         divBallTarget = drawBallTarget();
@@ -250,15 +250,6 @@ function getPosPix(ptPos) {
 function drawPlayer(gLoc) {
   if (gLoc.ltPlayer.length < 1) return;
 
-  var sColorTextH = "black";
-  if (gLoc.bJerseyTextColorWhiteH) {
-    sColorTextH = "white";
-  }
-  var sColorTextA = "black";
-  if (gLoc.bJerseyTextColorWhiteA) {
-    sColorTextA = "white";
-  }
-
   var divDrawGame = document.getElementById("divDrawGame");
   var fLookAtSize = 0.3;
 
@@ -287,7 +278,7 @@ function drawPlayer(gLoc) {
     divPlNoH.style.height = "100%";
     divPlNoH.style.top = "0px";
     divPlNoH.style.left = "0px";
-    divPlNoH.innerHTML = '<text style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextH + '; z-index:22">' + gLoc.ltPlayer[iP + 0].iNo.toString() + '</text>';
+    divPlNoH.innerHTML = '<text style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; z-index:22">' + gLoc.ltPlayer[iP + 0].iNo.toString() + '</text>';
     divPlH.appendChild(divPlNoH);
 
     // Draw look-at circle
@@ -331,7 +322,7 @@ function drawPlayer(gLoc) {
     divPlNoA.style.height = "100%";
     divPlNoA.style.top = "0px";
     divPlNoA.style.left = "0px";
-    divPlNoA.innerHTML = '<text style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; color: ' + sColorTextA + '; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</text>';
+    divPlNoA.innerHTML = '<text style="position: absolute; text-align: center; vertical-align: middle; width: 100%; margin: 0; font-size: 100%; z-index:22">' + gLoc.ltPlayer[iP + 11].iNo.toString() + '</text>';
     divPlA.appendChild(divPlNoA);
 
     // Draw look-at circle
@@ -404,7 +395,7 @@ function updatePlayer(player, gLoc, bShowLookAt) {
   }
 }
 
-function changePlayerJerseyColor(iHA, cl1, cl2) {
+function changePlayerJerseyColor(iHA, cl1, cl2, cl3) {
   if (iHA === 0) {
     for (iP = 0; iP < 11; iP++) {
       if (!playerGlobal[iP]) {
@@ -417,6 +408,7 @@ function changePlayerJerseyColor(iHA, cl1, cl2) {
       } else {
         playerGlobal[iP].style.borderColor = cl2;
       }
+      playerGlobal[iP].style.color = cl3;
     }
   } else if (iHA === 1) {
     for (iP = 11; iP < 22; iP++) {
@@ -430,6 +422,7 @@ function changePlayerJerseyColor(iHA, cl1, cl2) {
       } else {
         playerGlobal[iP].style.borderColor = cl2;
       }
+      playerGlobal[iP].style.color = cl3;
     }
   }
 }

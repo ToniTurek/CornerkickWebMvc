@@ -703,9 +703,11 @@
         if (iColorH === 1) {
           divJersey.style.backgroundColor = sColorJersey[0];
           divJersey.style.borderColor     = sColorJersey[1];
+          divJersey.style.color           = sColorJersey[2];
         } else {
-          divJersey.style.backgroundColor = sColorJersey[2];
-          divJersey.style.borderColor     = sColorJersey[3];
+          divJersey.style.backgroundColor = sColorJersey[3];
+          divJersey.style.borderColor     = sColorJersey[4];
+          divJersey.style.color           = sColorJersey[5];
         }
 
         iColorH = 1 - iColorH;
@@ -715,15 +717,17 @@
         if (iColorA === 0) {
           divJersey.style.backgroundColor = sColorJersey[0];
           divJersey.style.borderColor     = sColorJersey[1];
+          divJersey.style.color           = sColorJersey[2];
         } else {
-          divJersey.style.backgroundColor = sColorJersey[2];
-          divJersey.style.borderColor     = sColorJersey[3];
+          divJersey.style.backgroundColor = sColorJersey[3];
+          divJersey.style.borderColor     = sColorJersey[4];
+          divJersey.style.color           = sColorJersey[5];
         }
 
         iColorA = 1 - iColorA;
       }
 
-      changePlayerJerseyColor(iHA, divJersey.style.backgroundColor, divJersey.style.borderColor);
+      changePlayerJerseyColor(iHA, divJersey.style.backgroundColor, divJersey.style.borderColor, divJersey.style.color);
     }
 
     function playAdmin() {
@@ -936,7 +940,7 @@
       <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@Model.sEmblemA alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';" />
     </div>
     <div style="position: absolute; width: 30px; height: 30px; right: 1%; margin-top: 12px">
-      <div id="divJerseyA" style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyA[2]; border: 2px solid @Model.sColorJerseyA[3]; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(1, this)"></div>
+      <div id="divJerseyA" style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyA[3]; border: 2px solid @Model.sColorJerseyA[4]; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(1, this)"></div>
     </div>
     <div style="position: absolute; width: 30%; height: 100%; right: 5%; top: 30%; text-align: left">
       <font size="4">@sA</font>
