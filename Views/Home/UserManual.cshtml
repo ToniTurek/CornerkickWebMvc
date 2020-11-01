@@ -413,28 +413,41 @@ Während einer Saison werden in jedem Land folgende nationale Wettbewerbe durchg
 Über die nationalen Ligen jedes Landes besteht die Möglichkeit, sich für die folgenden internationalen Pokale zu qualifizieren:
 <ul>
   <li>
-    <u><b>Gold-Cup</b></u> (Prioritätsfaktor: @Model.sAfCupGold)<br />
+    <u><b>Gold-Cup</b></u> (Prioritätsfaktor: @Model.sCupGoldAf)<br />
     Die ersten vier Mannschaften jeder ersten nationalen Liga qualifizieren sich für den Gold-Cup. Die insgesamt 32 Mannschaften werden zunächst auf 8 Gruppen je 4 Mannschaften aufgeteilt und spielen eine Gruppenphase mit Hin- und Rückspiel. Die ersten zwei Mannschaften jeder Gruppe qualifizieren sich für das Achtelfinale. Achtel- Viertel und Halbfinale werden im KO-Modus mit Hin- und Rückspiel ausgetragen. Im Finale gibt es kein Rückspiel.<br />
     <u>Prämien</u><br />
     <ul>
       <li>
-        Jede qualifizierte Mannschaft erhält 10 mio. € als Startgeld.
+        Jede qualifizierte Mannschaft erhält @Model.sCupGoldBonusStart mio. € als Startgeld.
       </li>
       <li>
-        Pro Runde werden 32 mio. € an alle Sieger ausgeschüttet. D.h. in der Gruppenphase erhält jede siegreiche Mannschaft 1 mio. €, im Achtelfinale 4 mio. €, im Viertelfinale 8 mio. €, usw.
+        Pro Runde werden @Model.sCupGoldBonus mio. € an alle Sieger ausgeschüttet. D.h. in der Gruppenphase erhält jede siegreiche Mannschaft 0.5 mio. €, im Achtelfinale 2 mio. €, im Viertelfinale 4 mio. €, usw.
       </li>
     </ul>
   </li>
   <li>
-    <u><b>Silver-Cup</b></u> (Prioritätsfaktor: @Model.sAfCupSilver)<br />
+    <u><b>Silver-Cup</b></u> (Prioritätsfaktor: @Model.sCupSilverAf)<br />
     Die Mannschaften auf den Plätzen fünf bis acht jeder ersten nationalen Liga qualifizieren sich für den Silver-Cup. Der Modus ist der gleiche wie der des Gold-Cups.<br />
     <u>Prämien</u><br />
     <ul>
       <li>
-        Jede qualifizierte Mannschaft erhält 5 mio. € als Startgeld.
+        Jede qualifizierte Mannschaft erhält @Model.sCupSilverBonusStart mio. € als Startgeld.
       </li>
       <li>
-        Pro Runde werden 16 mio. € an alle Sieger ausgeschüttet. D.h. in der Gruppenphase erhält jede siegreiche Mannschaft 0,5 mio. €, im Achtelfinale 2 mio. €, im Viertelfinale 4 mio. €, usw.
+        Pro Runde werden @Model.sCupSilverBonus mio. € an alle Sieger ausgeschüttet. D.h. in der Gruppenphase erhält jede siegreiche Mannschaft 0,375 mio. €, im Achtelfinale 1.5 mio. €, im Viertelfinale 3 mio. €, usw.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <u><b>Bronze-Cup</b></u> (Prioritätsfaktor: @Model.sCupBronzeAf)<br />
+    Die Mannschaften auf den Plätzen neun bis zwölf jeder ersten nationalen Liga qualifizieren sich für den Bronze-Cup. Der Modus ist der gleiche wie der des Gold-Cups.<br />
+    <u>Prämien</u><br />
+    <ul>
+      <li>
+        Jede qualifizierte Mannschaft erhält @Model.sCupBronzeBonusStart mio. € als Startgeld.
+      </li>
+      <li>
+        Pro Runde werden @Model.sCupBronzeBonus mio. € an alle Sieger ausgeschüttet. D.h. in der Gruppenphase erhält jede siegreiche Mannschaft 0,25 mio. €, im Achtelfinale 1 mio. €, im Viertelfinale 2 mio. €, usw.
       </li>
     </ul>
   </li>

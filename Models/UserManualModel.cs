@@ -11,8 +11,15 @@ namespace CornerkickWebMvc.Models
     // Cup attraction factors
     public string sAfLeague { get; set; }
     public string sAfCup { get; set; }
-    public string sAfCupGold { get; set; }
-    public string sAfCupSilver { get; set; }
+    public string sCupGoldAf { get; set; }
+    public string sCupGoldBonus { get; set; }
+    public string sCupGoldBonusStart { get; set; }
+    public string sCupSilverAf { get; set; }
+    public string sCupSilverBonus { get; set; }
+    public string sCupSilverBonusStart { get; set; }
+    public string sCupBronzeAf { get; set; }
+    public string sCupBronzeBonus { get; set; }
+    public string sCupBronzeBonusStart { get; set; }
     public string sAfWc { get; set; }
     public string sAfTg { get; set; }
 

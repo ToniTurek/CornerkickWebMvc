@@ -308,6 +308,7 @@
     <Compile Include="Models\ClubModel.cs" />
     <Compile Include="Models\ConsoleModels.cs" />
     <Compile Include="Models\ContractsModel.cs" />
+    <Compile Include="Models\CupBronzeModel.cs" />
     <Compile Include="Models\CupGoldModel.cs" />
     <Compile Include="Models\CupModel.cs" />
     <Compile Include="Models\CupSilverModel.cs" />
@@ -1211,6 +1212,7 @@
     <Content Include="Content\DataTables\css\common.scss" />
     <Content Include="Scripts\canvasjs.min.js" />
     <Content Include="Scripts\Cup.js" />
+    <Content Include="Scripts\CupBronze.js" />
     <Content Include="Scripts\CupGold.js" />
     <Content Include="Scripts\CupSilver.js" />
     <Content Include="Scripts\CupWc.js" />
@@ -1491,6 +1493,7 @@
     <Content Include="Resources\buildings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\Member\CupBronze.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

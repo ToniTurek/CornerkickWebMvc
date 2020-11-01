@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -33,17 +34,32 @@ namespace CornerkickWebMvc.Controllers
     {
       ViewBag.Message = "Cornerkick User Manual";
 
-      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, MvcApplication.iNations[0], 0);
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdLeague, MvcApplication.iNations[0], 0);
       if (league != null) mdUm.sAfLeague = league.settings.fAttraction.ToString("0.00");
 
-      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(2, MvcApplication.iNations[0]);
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdNatCup, MvcApplication.iNations[0]);
       if (cup != null) mdUm.sAfCup = cup.settings.fAttraction.ToString("0.00");
 
-      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(3);
-      if (cupGold != null) mdUm.sAfCupGold = cupGold.settings.fAttraction.ToString("0.00");
+      CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdGold);
+      if (cupGold != null) {
+        mdUm.sCupGoldAf = cupGold.settings.fAttraction.ToString("0.00");
+        mdUm.sCupGoldBonus = (cupGold.settings.iBonusCupWin / 1000000.0).ToString("0");
+        mdUm.sCupGoldBonusStart = (cupGold.settings.iBonusStart / 1000000.0).ToString("0.0");
+      }
 
-      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(4);
-      if (cupSilver != null) mdUm.sAfCupSilver = cupSilver.settings.fAttraction.ToString("0.00");
+      CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdSilver);
+      if (cupSilver != null) {
+        mdUm.sCupSilverAf = cupSilver.settings.fAttraction.ToString("0.00");
+        mdUm.sCupSilverBonus = (cupSilver.settings.iBonusCupWin / 1000000.0).ToString("0");
+        mdUm.sCupSilverBonusStart = (cupSilver.settings.iBonusStart / 1000000.0).ToString("0.0");
+      }
+
+      CornerkickManager.Cup cupBronze = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdBronze);
+      if (cupBronze != null) {
+        mdUm.sCupBronzeAf = cupBronze.settings.fAttraction.ToString("0.00");
+        mdUm.sCupBronzeBonus = (cupBronze.settings.iBonusCupWin / 1000000.0).ToString("0");
+        mdUm.sCupBronzeBonusStart = (cupBronze.settings.iBonusStart / 1000000.0).ToString("0.0");
+      }
 
       CornerkickManager.Cup cupWc = MvcApplication.ckcore.tl.getCup(7);
       if (cupWc != null) mdUm.sAfWc = cupWc.settings.fAttraction.ToString("0.00");
@@ -70,6 +86,17 @@ namespace CornerkickWebMvc.Controllers
       if (usr == null) return null;
 
       return usr.club;
+    }
+
+    private CultureInfo getCi()
+    {
+      CornerkickManager.Club clb = ckClub();
+      if (clb != null) {
+        int iLandUser = clb.iLand;
+        if (iLandUser >= 0 && iLandUser < Controllers.MemberController.sCultureInfo.Length) return new CultureInfo(Controllers.MemberController.sCultureInfo[iLandUser]);
+      }
+
+      return CultureInfo.CurrentCulture;
     }
 
     public ContentResult UmGetStadiumCost()
