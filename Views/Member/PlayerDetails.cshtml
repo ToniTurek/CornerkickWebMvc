@@ -940,7 +940,7 @@
             }
           }
         </div>
-      }
+       }
 
       @{
         string sAge = ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum)).ToString();
@@ -952,31 +952,31 @@
 
         <div style="position: relative; width: 100%; margin-top: 4px">
           <div style="position: absolute; top: 0px; left: 0px">
+            <div style="position: relative; width: 100%; height: 84px">
+              @if (!Model.bJouth) {
+                string sPlNo = player.plGame.iNr.ToString();
+                <div style="position: absolute; width: 96px; height: 100%; text-align: center; background-color: @Model.sColorJersey">
+                  <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+
+                  @if (Model.bOwnPlayer && (player.plGame.iNr < 1 || Model.bSeasonStart)) {
+                    <div style="position: absolute; top: 18px; left: 22px; width: 100%; text-align: left">
+                      @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @onchange = "setNo()", id = "iDdlINo", @style = "width: 70px; height: 50px; font-size: 42px; color: " + Model.sColorJerseyNo + "; background-color: transparent" })
+                    </div>
+                  } else {
+                    <div>
+                      <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
             @if (Model.bOwnPlayer && (Model.bEditable || Model.bJouth)) {
               <div class="form-group">
                 @Html.TextBoxFor(m => m.sName, new { @class = "form-control", @onChange = "setName()", @style = "width:180px" })
               </div>
             } else {
               string sPlName = player.plGame.sName;
-              <div style="position: relative; width: 100%; height: 84px">
-                @if (!Model.bJouth) {
-                  string sPlNo = player.plGame.iNr.ToString();
-                  <div style="position: absolute; width: 96px; height: 100%; text-align: center; background-color: @Model.sColorJersey">
-                    <img style="position: absolute; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
-
-                    @if (Model.bOwnPlayer && (player.plGame.iNr < 1 || Model.bSeasonStart)) {
-                      <div style="position: absolute; top: 18px; left: 22px; width: 100%; text-align: left">
-                        @Html.DropDownListFor(m => m.iNo, Model.ltDdlNo, new { @onchange = "setNo()", id = "iDdlINo", @style = "width: 70px; height: 50px; font-size: 42px; color: " + Model.sColorJerseyNo + "; background-color: transparent" })
-                      </div>
-                    } else {
-                      <div>
-                        <text style="position: relative; top: 14px; font-size: 42px; color: @Model.sColorJerseyNo">@sPlNo</text>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-
               <div style="position: relative; width: 100%">
                 <text style="font-size: 28px">@sPlName</text>
               </div>
@@ -1101,7 +1101,7 @@
                       <td align="right">Laufzeit:</td>
                       <td align="right">@sDauer</td>
                     </tr>
-                  }
+                   }
                   @if (player.contractNext?.club != null && player.contractNext.iLength > 0) {
                     <tr>
                       <td align="right">Verein nächste Saison:</td>
