@@ -2168,7 +2168,7 @@ namespace CornerkickWebMvc.Controllers
       plModel.iContractYears = 1;
 
       plModel.sName = plDetails.plGame.sName;
-      plModel.sTalent = (plDetails.getTalentAve() + 1f).ToString("0.0");
+      plModel.fTalentAve = plDetails.getTalentAve() + 1f;
 
       plModel.ltDdlNo = new List<SelectListItem>();
       plModel.iNo = plDetails.plGame.iNr;
@@ -2260,6 +2260,7 @@ namespace CornerkickWebMvc.Controllers
     {
       // Define skill order
       byte[] iSkills = new byte[] {
+        101,
         CornerkickGame.Game.iSkillIxSpeed,
         100, // Speed with ball
         CornerkickGame.Game.iSkillIxAcceleration,
@@ -2282,7 +2283,7 @@ namespace CornerkickWebMvc.Controllers
 
       // Define table
       string[][] sTable = new string[iSkills.Length][];
-      for (int i = 0; i < sTable.Length; i++) sTable[i] = new string[8];
+      for (int i = 0; i < sTable.Length; i++) sTable[i] = new string[9];
 
       // Speed
       int iIx = 0;
@@ -2291,17 +2292,23 @@ namespace CornerkickWebMvc.Controllers
         sTable[iIx][0] = iS.ToString();
 
         // Skill category
-        if (iIx ==  0) sTable[iIx][1] = "Athletik";
-        else if (iIx ==  4) sTable[iIx][1] = "Koord.";
-        else if (iIx ==  6) sTable[iIx][1] = "Zk";
-        else if (iIx ==  7) sTable[iIx][1] = "Kraft";
-        else if (iIx == 10) sTable[iIx][1] = "Zielgenauigkeit";
-        else if (iIx == 14) sTable[iIx][1] = "Kb";
-        else if (iIx == 15) sTable[iIx][1] = "Kognition";
+        if      (iIx ==  0) sTable[iIx][1] = "Ausdauer";
+        else if (iIx ==  1) sTable[iIx][1] = "Athletik";
+        else if (iIx ==  5) sTable[iIx][1] = "Koordination";
+        else if (iIx ==  7) sTable[iIx][1] = "Zweikampf";
+        else if (iIx ==  8) sTable[iIx][1] = "Kraft";
+        else if (iIx == 11) sTable[iIx][1] = "Zielgenauigkeit";
+        else if (iIx == 15) sTable[iIx][1] = "Kopfball";
+        else if (iIx == 16) sTable[iIx][1] = "Kognition";
 
         if (iS == 100) {
           sTable[iIx][3] = "Schnelligk. m. Ball";
           sTable[iIx][5] = (CornerkickGame.Tool.getSkillEff(plDetails.plGame, 0, iPos) - (CornerkickGame.Tool.getSkillEff(plDetails.plGame, 0, iPos) / CornerkickGame.Tool.getSkillEff(plDetails.plGame, 1, iPos))).ToString("0.0");
+        } else if (iS == 101) {
+          sTable[iIx][2] = (plDetails.iTalent[CornerkickGame.Game.iSkillCategoryIxEndurance] + 1).ToString();
+          sTable[iIx][3] = "Kondition";
+          sTable[iIx][4] = plDetails.plGame.fCondition.ToString("0.0%");
+          sTable[iIx][8] = CornerkickGame.Game.iSkillCategoryIxEndurance.ToString();
         } else {
           sTable[iIx][2] = (plDetails.getTalent(iS) + 1).ToString();
           sTable[iIx][3] = CornerkickManager.PlayerTool.sSkills[iS];
@@ -2310,6 +2317,9 @@ namespace CornerkickWebMvc.Controllers
           sTable[iIx][6] = (plDetails.fSkillTraining[iS] + 1f).ToString("0.0%");
           sTable[iIx][7] = plDetails.plGame.fIndTraining[iS].ToString("0.0%");
         }
+
+        // Skill category index
+        if (iS < CornerkickGame.Game.iSkillCategory.Length) sTable[iIx][8] = CornerkickGame.Game.iSkillCategory[iS].ToString();
 
         iIx++;
       }

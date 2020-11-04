@@ -694,8 +694,17 @@
     <Content Include="Content\Icons\news\stadium.png" />
     <Content Include="Content\Icons\plus.png" />
     <Content Include="Content\Icons\rCard.png" />
+    <Content Include="Content\Icons\skills\0.png" />
+    <Content Include="Content\Icons\skills\1.png" />
+    <Content Include="Content\Icons\skills\2.png" />
+    <Content Include="Content\Icons\skills\3.png" />
+    <Content Include="Content\Icons\skills\4.png" />
+    <Content Include="Content\Icons\skills\5.png" />
+    <Content Include="Content\Icons\skills\6.png" />
+    <Content Include="Content\Icons\skills\7.png" />
     <Content Include="Content\Icons\star.ico" />
     <Content Include="Content\Icons\star_empty.png" />
+    <Content Include="Content\Icons\star_half-empty.png" />
     <Content Include="Content\Icons\sub.png" />
     <Content Include="Content\Icons\weather\0.gif" />
     <Content Include="Content\Icons\weather\1.gif" />

@@ -40,23 +40,18 @@
     }
 
     .rotate {
+      writing-mode: vertical-rl;
       /* FF3.5+ */
-      -moz-transform: rotate(-90.0deg);
+      -moz-transform: rotate(180.0deg);
       /* Opera 10.5 */
-      -o-transform: rotate(-90.0deg);
+      -o-transform: rotate(180.0deg);
       /* Saf3.1+, Chrome */
-      -webkit-transform: rotate(-90.0deg);
-      /* IE6,IE7 */
-      filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=0.083);
-      /* IE8 */
-      -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)";
+      -webkit-transform: rotate(180.0deg);
       /* Standard */
-      transform: rotate(-90.0deg);
+      transform: rotate(180.0deg);
       text-align: center;
       vertical-align: middle;
       align-content: center;
-      width: 80px;
-      max-width: 80px;
     }
   </style>
 
@@ -291,7 +286,7 @@
         }
       });
 
-      plotStars(document.getElementById("divStars"), parseFloat(@Model.sTalent));
+      plotStars(document.getElementById("divStars"), @Html.Raw(Json.Encode(Model.fTalentAve)));
       printAveSkill(iPlayerId);
       if (bOwnPlayer) {
         printDoping(iPlayerId);
@@ -512,8 +507,15 @@
       var fRadius = parent.offsetHeight / 2;
       var iStarHeight = 18;
 
+      var iStars = 0.0;
+      if (fStars - Math.floor(fStars) < 0.25) {
+        iStars = Math.floor(fStars);
+      } else {
+        iStars = Math.ceil(fStars);
+      }
+
       var i = 0;
-      for (i = 0; i < Math.max(10, fStars + 1); i++) {
+      for (i = 0; i < Math.max(10, iStars + 1); i++) {
         if (i > 9) {
           iStarHeight = 26;
         }
@@ -528,9 +530,14 @@
         }
 
         imgStar.style.width = iStarHeight.toString() + "px";
-        if (i < fStars) {
-          imgStar.src = "/Content/Icons/star.ico";
-          imgStar.title = (i + 1).toString();
+        if (i < iStars) {
+          if (i === iStars - 1 && fStars - Math.floor(fStars) < 0.75) {
+            imgStar.src = "/Content/Icons/star_half-empty.png";
+          } else {
+            imgStar.src = "/Content/Icons/star.ico";
+          }
+          //imgStar.title = (i + 1).toString();
+          imgStar.title = fStars.toFixed(1);
         } else {
           imgStar.src = "/Content/Icons/star_empty.png";
         }
@@ -1039,7 +1046,7 @@
                   </tr>
                   <tr>
                     <td align="right">Talent:</td>
-                    <td align="right">@Model.sTalent</td>
+                    <td align="right">@Model.fTalentAve.ToString("0.0")</td>
                   </tr>
                   <tr>
                     <td align="right">Fuß (links/rechts):</td>
@@ -1323,7 +1330,7 @@
               <table border="1" cellpadding="4" style="width: auto">
                 <thead>
                   <tr>
-                    <th style="text-align: center" class="category">Kateg.</th>
+                    <th style="text-align: center" class="category">Kat.</th>
                     <th style="text-align: center">Tal.</th>
                     <th style="text-align: center">Fähigkeit</th>
                     <th>Wert</th>
@@ -1347,25 +1354,29 @@
                             iRowSpan++;
                           }
 
-                          <td class="rotate" rowspan=@iRowSpan.ToString()>@Model.sSkillTable[i][1]</td>
+                          @*<td class="rotate" rowspan=@iRowSpan.ToString()>@Model.sSkillTable[i][1]</td>*@
+                          <td align="center" rowspan=@iRowSpan.ToString() title="@Model.sSkillTable[i][1]">
+                            @{ string sSkillIcon = "/Content/Icons/skills/" + Model.sSkillTable[i][8] + ".png"; }
+                            <img width="24" src=@sSkillIcon />
+                          </td>
                           <td align="center" rowspan=@iRowSpan.ToString()>@Model.sSkillTable[i][2]</td>
                         }
                       }
 
                       @{
                         string sColor = "";
-                        if (i == 1) {
+                        if (i == 2) {
                           sColor = "color: grey";
                         }
                       }
 
-                      <td align="right" style="@sColor">@Model.sSkillTable[i][3]</td>
+                      <td align="center" style="@sColor">@Model.sSkillTable[i][3]</td>
                       <td align="center">@Model.sSkillTable[i][4]</td>
                       @{
                         if (Model.bOwnPlayer && !Model.bNation) {
                           <td align="center" style="@sColor">@Model.sSkillTable[i][5]</td>
                           <td align="right">@Model.sSkillTable[i][6]</td>
-                          if (i == 1) {
+                          if (i == 0 || i == 2) {
                             <td></td>
                           } else {
                             <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + Model.sSkillTable[i][0] + ")", id = "rB" + i.ToString() })</td>

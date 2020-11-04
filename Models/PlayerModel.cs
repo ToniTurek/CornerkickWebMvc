@@ -41,7 +41,7 @@ namespace CornerkickWebMvc.Models
     public int iContractSalaryOffer { get; set; }
 
     public string sName { get; set; }
-    public string sTalent { get; set; }
+    public float fTalentAve { get; set; }
 
     [Display(Name = "Neue Rückennr.:")]
     public int iNo { get; set; }
