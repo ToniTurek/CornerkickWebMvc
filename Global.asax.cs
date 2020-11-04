@@ -810,13 +810,7 @@ namespace CornerkickWebMvc
       // End of season
       if (iRetCk == 99) {
         // Clear national coaches
-        for (int iU = 0; iU < ckcore.ltUser.Count; iU++) {
-          ckcore.ltUser[iU].nation = null;
-        }
-        foreach (int iN in iNations) {
-          CornerkickManager.Club nat = CornerkickManager.Tool.getNation(iN, ckcore.ltClubs);
-          nat.user = null;
-        }
+        clearNations();
 
         //////////////////////////////////////////////////
         // Nominate clubs to international cups
@@ -945,10 +939,7 @@ namespace CornerkickWebMvc
             // Remove national coaches
             CornerkickManager.Cup.Matchday mdWcFinal = cupWc.ltMatchdays[cupWc.ltMatchdays.Count - 1];
             if (mdWcFinal.ltGameData != null && mdWcFinal.ltGameData.Count == 1 && ckcore.dtDatum.Equals(mdWcFinal.dt.AddDays(1))) { // Final game
-              foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.nation = null;
-              foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
-                if (nat.bNation) nat.user = null;
-              }
+              clearNations();
             }
           }
         }
@@ -1089,6 +1080,17 @@ namespace CornerkickWebMvc
     {
       public CornerkickManager.User usr { get; set; }
       public float fAttrFactor { get; set; }
+    }
+
+    private static void clearNations()
+    {
+      foreach (CornerkickManager.User usrNat in ckcore.ltUser) usrNat.nation = null;
+      foreach (CornerkickManager.Club nat in ckcore.ltClubs) {
+        if (nat.bNation) {
+          nat.user = null;
+          nat.ltPlayer.Clear();
+        }
+      }
     }
 
     private static int countCpuPlayerOnTransferlist()
