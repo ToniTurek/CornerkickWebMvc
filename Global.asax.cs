@@ -1388,19 +1388,7 @@ namespace CornerkickWebMvc
         Controllers.MemberController.bHideEocInfo = new bool[MvcApplication.ckcore.ltUser.Count];
 
         // Set length of tutorial class array
-        Controllers.MemberController.ttUser = new Controllers.MemberController.Tutorial[MvcApplication.ckcore.ltUser.Count];
-        for (int iU = 0; iU < Controllers.MemberController.ttUser.Length; iU++) {
-          // Initialize tutorial class
-          Controllers.MemberController.ttUser[iU] = new Controllers.MemberController.Tutorial() { bShow = true, iLevel = 0 };
-
-          // Get user info
-          CornerkickManager.User usr = MvcApplication.ckcore.ltUser[iU];
-
-          if (usr.lti != null) {
-            if (usr.lti.Count > 3) Controllers.MemberController.ttUser[iU].bShow  = usr.lti[3] > 0;
-            if (usr.lti.Count > 4) Controllers.MemberController.ttUser[iU].iLevel = usr.lti[4];
-          }
-        }
+        Controllers.MemberController.initialiteTutorial();
 
         // Set retired players name to none
         List<CornerkickManager.Player> ltPlayerRet = CornerkickManager.PlayerTool.getRetiredPlayer(ckcore.ltPlayer);

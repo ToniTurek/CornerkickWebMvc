@@ -311,6 +311,8 @@ namespace CornerkickWebMvc.Controllers
 #endif
       clb.user = usr;
       MvcApplication.ckcore.ltUser.Add(usr);
+
+      Controllers.MemberController.initialiteTutorial();
 #if DEBUG
       }
 #endif

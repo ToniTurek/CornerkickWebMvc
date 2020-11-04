@@ -109,6 +109,24 @@ namespace CornerkickWebMvc.Controllers
     }
     public static Tutorial[] ttUser; // User tutorial
 
+    public static void initialiteTutorial()
+    {
+      // Set length of tutorial class array
+      ttUser = new Tutorial[MvcApplication.ckcore.ltUser.Count];
+      for (int iU = 0; iU < ttUser.Length; iU++) {
+        // Initialize tutorial class
+        ttUser[iU] = new Tutorial() { bShow = true, iLevel = 0 };
+
+        // Get user info
+        CornerkickManager.User usr = MvcApplication.ckcore.ltUser[iU];
+
+        if (usr.lti != null) {
+          if (usr.lti.Count > 3) ttUser[iU].bShow  = usr.lti[3] > 0;
+          if (usr.lti.Count > 4) ttUser[iU].iLevel = usr.lti[4];
+        }
+      }
+    }
+
     public MemberController()
     {
 #if _CONSOLE
