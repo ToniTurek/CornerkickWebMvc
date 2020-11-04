@@ -1379,7 +1379,7 @@
                           if (i == 0 || i == 2) {
                             <td></td>
                           } else {
-                            <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, i, new { @onchange = "setIndTraining(" + Model.sSkillTable[i][0] + ")", id = "rB" + i.ToString() })</td>
+                            <td align="center">@Html.RadioButtonFor(m => m.iPlayerIndTr, Model.sSkillTable[i][0], new { @onchange = "setIndTraining(" + Model.sSkillTable[i][0] + ")", id = "rB" + i.ToString() })</td>
                           }
                           <td align="right">@Model.sSkillTable[i][7]</td>
                         }
