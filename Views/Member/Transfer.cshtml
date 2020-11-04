@@ -223,7 +223,10 @@
             "render": $.fn.dataTable.render.number('.', ',', 1, '')
           },
           { "data": "age", "className": "dt-center" },
-          { "data": "fTalentAve", "className": "dt-center" },
+          {
+            "data": "fTalentAve", "className": "dt-center",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          },
           {
             "data": "mw", "className": "dt-right",
             "render": $.fn.dataTable.render.number('.', ',', 0, '')
