@@ -195,10 +195,10 @@ namespace CornerkickWebMvc.Controllers
 
     public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
     {
-      addUserToCk(applicationUser, registerViewModel.Land, registerViewModel.cl1, registerViewModel.cl2, registerViewModel.cl3, registerViewModel.cl4, bAdmin: bAdmin, iClubExist: iClubExist, fileEmblem: fileEmblem);
+      addUserToCk(applicationUser, registerViewModel.Land, registerViewModel.clH1, registerViewModel.clH2, registerViewModel.clH3, registerViewModel.clA1, registerViewModel.clA2, registerViewModel.clA3, bAdmin: bAdmin, iClubExist: iClubExist, fileEmblem: fileEmblem);
     }
 #if DEBUG
-    public void addUserToCk(ApplicationUser applicationUser, int iLand, System.Drawing.Color cl1, System.Drawing.Color cl2, System.Drawing.Color cl3, System.Drawing.Color cl4, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
+    public void addUserToCk(ApplicationUser applicationUser, int iLand, System.Drawing.Color clH1, System.Drawing.Color clH2, System.Drawing.Color clH3, System.Drawing.Color clA1, System.Drawing.Color clA2, System.Drawing.Color clA3, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #else
     private void addUserToCk(ApplicationUser applicationUser, int iLand, System.Drawing.Color cl1, System.Drawing.Color cl2, System.Drawing.Color cl3, System.Drawing.Color cl4, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
 #endif
@@ -271,11 +271,13 @@ namespace CornerkickWebMvc.Controllers
               clb = createClub(applicationUser.Vereinsname, (byte)iLand, (byte)iDivision, clubCpu);
 
               // Assign club colors
-              clubCpu.cl1[0] = cl1;
-              clubCpu.cl1[1] = cl2;
-              clubCpu.cl2[0] = cl3;
-              clubCpu.cl2[1] = cl4;
-        
+              clubCpu.cl1[0] = clH1;
+              clubCpu.cl1[1] = clH2;
+              clubCpu.cl1[2] = clH3;
+              clubCpu.cl2[0] = clA1;
+              clubCpu.cl2[1] = clA2;
+              clubCpu.cl2[2] = clA3;
+
               addPlayerToClub(ref clubCpu);
 
               // Do initial formation
@@ -916,10 +918,12 @@ namespace CornerkickWebMvc.Controllers
       mdRegister.bRegisterPossible = checkRegisterPossible();
 
       // Set jersey colors
-      mdRegister.cl1 = System.Drawing.Color.White;
-      mdRegister.cl2 = System.Drawing.Color.Blue;
-      mdRegister.cl3 = System.Drawing.Color.White;
-      mdRegister.cl4 = System.Drawing.Color.Red;
+      mdRegister.clH1 = System.Drawing.Color.White;
+      mdRegister.clH2 = System.Drawing.Color.Blue;
+      mdRegister.clH3 = System.Drawing.Color.Black;
+      mdRegister.clA1 = System.Drawing.Color.White;
+      mdRegister.clA2 = System.Drawing.Color.Red;
+      mdRegister.clA3 = System.Drawing.Color.Black;
 
       return View(mdRegister);
     }
@@ -1149,7 +1153,7 @@ namespace CornerkickWebMvc.Controllers
             RegisterViewModel rvm = new RegisterViewModel();
 
             string[] sLineRegUsrSplit = lineRegUsr.Split(';');
-            if (sLineRegUsrSplit.Length < 9) continue;
+            if (sLineRegUsrSplit.Length < 11) continue;
 
             rvm.Email = sLineRegUsrSplit[0];
             rvm.Verein = sLineRegUsrSplit[1];
@@ -1164,29 +1168,47 @@ namespace CornerkickWebMvc.Controllers
             int.TryParse(sLineRegUsrSplit[5], out iLiga);
             rvm.Liga = iLiga;
 
-            byte[] iCl1 = new byte[3];
-            string[] sLineRegUsrCl1Split = sLineRegUsrSplit[6].Split('/');
-            if (sLineRegUsrCl1Split.Length > 2) {
-              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl1Split[iCl], out iCl1[iCl]);
+            byte[] iClH1 = new byte[3];
+            string[] sLineRegUsrClH1Split = sLineRegUsrSplit[6].Split('/');
+            if (sLineRegUsrClH1Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClH1Split[iCl], out iClH1[iCl]);
             }
+            if (iClH1[0] + iClH1[1] + iClH1[2] > 0) rvm.clH1 = System.Drawing.Color.FromArgb(iClH1[0], iClH1[1], iClH1[2]);
 
-            byte[] iCl2 = new byte[3];
-            string[] sLineRegUsrCl2Split = sLineRegUsrSplit[7].Split('/');
-            if (sLineRegUsrCl2Split.Length > 2) {
-              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl2Split[iCl], out iCl1[iCl]);
+            byte[] iClH2 = new byte[3];
+            string[] sLineRegUsrClH2Split = sLineRegUsrSplit[7].Split('/');
+            if (sLineRegUsrClH2Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClH2Split[iCl], out iClH2[iCl]);
             }
+            if (iClH2[0] + iClH2[1] + iClH2[2] > 0) rvm.clH2 = System.Drawing.Color.FromArgb(iClH2[0], iClH2[1], iClH2[2]);
 
-            byte[] iCl3 = new byte[3];
-            string[] sLineRegUsrCl3Split = sLineRegUsrSplit[8].Split('/');
-            if (sLineRegUsrCl3Split.Length > 2) {
-              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl3Split[iCl], out iCl1[iCl]);
+            byte[] iClH3 = new byte[3];
+            string[] sLineRegUsrClH3Split = sLineRegUsrSplit[8].Split('/');
+            if (sLineRegUsrClH3Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClH3Split[iCl], out iClH3[iCl]);
             }
+            if (iClH3[0] + iClH3[1] + iClH3[2] > 0) rvm.clH3 = System.Drawing.Color.FromArgb(iClH3[0], iClH3[1], iClH3[2]);
 
-            byte[] iCl4 = new byte[3];
-            string[] sLineRegUsrCl4Split = sLineRegUsrSplit[9].Split('/');
-            if (sLineRegUsrCl4Split.Length > 2) {
-              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrCl4Split[iCl], out iCl1[iCl]);
+            byte[] iClA1 = new byte[3];
+            string[] sLineRegUsrClA1Split = sLineRegUsrSplit[9].Split('/');
+            if (sLineRegUsrClA1Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClA1Split[iCl], out iClA1[iCl]);
             }
+            if (iClA1[0] + iClA1[1] + iClA1[2] > 0) rvm.clA1 = System.Drawing.Color.FromArgb(iClA1[0], iClA1[1], iClA1[2]);
+
+            byte[] iClA2 = new byte[3];
+            string[] sLineRegUsrClA2Split = sLineRegUsrSplit[10].Split('/');
+            if (sLineRegUsrClA2Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClA2Split[iCl], out iClA2[iCl]);
+            }
+            if (iClA2[0] + iClA2[1] + iClA2[2] > 0) rvm.clA2 = System.Drawing.Color.FromArgb(iClA2[0], iClA2[1], iClA2[2]);
+
+            byte[] iClA3 = new byte[3];
+            string[] sLineRegUsrClA3Split = sLineRegUsrSplit[11].Split('/');
+            if (sLineRegUsrClA3Split.Length > 2) {
+              for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClA3Split[iCl], out iClA3[iCl]);
+            }
+            if (iClA3[0] + iClA3[1] + iClA3[2] > 0) rvm.clA3 = System.Drawing.Color.FromArgb(iClA3[0], iClA3[1], iClA3[2]);
 
             ltRegisterUser.Add(rvm);
           }
@@ -1557,10 +1579,12 @@ namespace CornerkickWebMvc.Controllers
           fileSettings.Write(rvm.Nachname + ";");
           fileSettings.Write(rvm.Land.ToString() + ";");
           fileSettings.Write(rvm.Liga.ToString() + ";");
-          fileSettings.Write(rvm.cl1.R.ToString() + "/" + rvm.cl1.G.ToString() + "/" + rvm.cl1.B.ToString() + ";");
-          fileSettings.Write(rvm.cl2.R.ToString() + "/" + rvm.cl2.G.ToString() + "/" + rvm.cl2.B.ToString() + ";");
-          fileSettings.Write(rvm.cl3.R.ToString() + "/" + rvm.cl3.G.ToString() + "/" + rvm.cl3.B.ToString() + ";");
-          fileSettings.Write(rvm.cl4.R.ToString() + "/" + rvm.cl4.G.ToString() + "/" + rvm.cl4.B.ToString() + ";");
+          fileSettings.Write(rvm.clH1.R.ToString() + "/" + rvm.clH1.G.ToString() + "/" + rvm.clH1.B.ToString() + ";");
+          fileSettings.Write(rvm.clH2.R.ToString() + "/" + rvm.clH2.G.ToString() + "/" + rvm.clH2.B.ToString() + ";");
+          fileSettings.Write(rvm.clH3.R.ToString() + "/" + rvm.clH3.G.ToString() + "/" + rvm.clH3.B.ToString() + ";");
+          fileSettings.Write(rvm.clA1.R.ToString() + "/" + rvm.clA1.G.ToString() + "/" + rvm.clA1.B.ToString() + ";");
+          fileSettings.Write(rvm.clA2.R.ToString() + "/" + rvm.clA2.G.ToString() + "/" + rvm.clA2.B.ToString() + ";");
+          fileSettings.Write(rvm.clA3.R.ToString() + "/" + rvm.clA3.G.ToString() + "/" + rvm.clA3.B.ToString() + ";");
           fileSettings.WriteLine();
         }
 

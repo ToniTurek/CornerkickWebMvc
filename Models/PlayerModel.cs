@@ -31,8 +31,9 @@ namespace CornerkickWebMvc.Models
     public string sPortrait { get; set; }
     public string sEmblem { get; set; }
 
-    public string sColorJersey { get; set; }
-    public string sColorJerseyNo { get; set; }
+    public string sColorJersey1 { get; set; }
+    public string sColorJersey2 { get; set; }
+    public string sColorJerseyNb { get; set; }
 
     // Contract
     [Display(Name = "zusätzl. Laufzeit [a]:")]

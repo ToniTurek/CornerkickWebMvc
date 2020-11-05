@@ -25,7 +25,7 @@
     $(document).ready(function () {
       checkLeague();
 
-      $("#inputCl1").spectrum({
+      $("#inputClH1").spectrum({
         color: "white",
         showPaletteOnly: true,
         togglePaletteOnly: true,
@@ -34,7 +34,7 @@
         palette: clPalette
       });
 
-      $("#inputCl2").spectrum({
+      $("#inputClH2").spectrum({
         color: "blue",
         showPaletteOnly: true,
         togglePaletteOnly: true,
@@ -43,7 +43,16 @@
         palette: clPalette
       });
 
-      $("#inputCl3").spectrum({
+      $("#inputClH3").spectrum({
+        color: "black",
+        showPaletteOnly: true,
+        togglePaletteOnly: true,
+        togglePaletteMoreText: 'mehr',
+        togglePaletteLessText: 'weniger',
+        palette: clPalette
+      });
+
+      $("#inputClA1").spectrum({
         color: "white",
         showPaletteOnly: true,
         togglePaletteOnly: true,
@@ -52,7 +61,7 @@
         palette: clPalette
       });
 
-      $("#inputCl4").spectrum({
+      $("#inputClA2").spectrum({
         color: "red",
         showPaletteOnly: true,
         togglePaletteOnly: true,
@@ -61,16 +70,36 @@
         palette: clPalette
       });
 
-      setColor(1);
-      setColor(2);
-      setColor(3);
-      setColor(4);
+      $("#inputClA3").spectrum({
+        color: "black",
+        showPaletteOnly: true,
+        togglePaletteOnly: true,
+        togglePaletteMoreText: 'mehr',
+        togglePaletteLessText: 'weniger',
+        palette: clPalette
+      });
+
+      setColor(0, 1);
+      setColor(0, 2);
+      setColor(0, 3);
+      setColor(1, 1);
+      setColor(1, 2);
+      setColor(1, 3);
     });
 
-    function setColor(iCl) {
-      var sCl = $("#inputCl" + iCl.toString()).spectrum('get').toHexString();
-      document.getElementById('cl' + iCl.toString()).value = sCl;
-      document.getElementById('divJersey' + iCl.toString()).style.backgroundColor = sCl;
+    function setColor(iHA, iCl) {
+      var sHA = "H";
+      if (iHA > 0) {
+        sHA = "A";
+      }
+
+      var sCl = $("#inputCl" + sHA + iCl.toString()).spectrum('get').toHexString();
+      document.getElementById('cl' + sHA + iCl.toString()).value = sCl;
+      if (iCl === 3) {
+        document.getElementById('divJersey' + sHA + iCl.toString()).style.color = sCl;
+      } else {
+        document.getElementById('divJersey' + sHA + iCl.toString()).style.backgroundColor = sCl;
+      }
     }
 
     function checkLeague() {
@@ -173,27 +202,33 @@
     <div class="form-group">
       <label class="col-md-2 control-label" for="Liga">Vereinsfarben</label>
       <div class="col-md-10" style="width: 320px; height: 60px">
-        <input type='text' class='basic' id="inputCl1" onchange="setColor(1)" />
-        <input type='text' class='basic' id="inputCl2" onchange="setColor(2)" />
-        <div id="divJersey1" style="position: absolute; top: 0px; right: 20px; width: 48px; height: auto; background-color: white">
+        <input type='text' class='basic' id="inputClH1" onchange="setColor(0, 1)" />
+        <input type='text' class='basic' id="inputClH2" onchange="setColor(0, 2)" />
+        <input type='text' class='basic' id="inputClH3" onchange="setColor(0, 3)" />
+        <div id="divJerseyH1" style="position: absolute; top: 0px; right: 20px; width: 48px; height: auto; background-color: white">
           <img style="position: relative; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+          <div id="divJerseyH3" style="position: absolute; top: 6px; right: 0px; width: 100%; color: black; text-align: center; font-size: 22px">5</div>
         </div>
-        <div id="divJersey2" style="position: absolute; top: 36px; right: 30px; width: 28px; height: 20px; border: 1px solid black; background-color: blue"></div>
-        @Html.TextBoxFor(m => m.cl1, new { @class = "hidden" })
-        @Html.TextBoxFor(m => m.cl2, new { @class = "hidden" })
+        <div id="divJerseyH2" style="position: absolute; top: 36px; right: 30px; width: 28px; height: 20px; border: 1px solid black; background-color: blue"></div>
+        @Html.TextBoxFor(m => m.clH1, new { @class = "hidden" })
+        @Html.TextBoxFor(m => m.clH2, new { @class = "hidden" })
+        @Html.TextBoxFor(m => m.clH3, new { @class = "hidden" })
       </div>
     </div>
     <div class="form-group">
       <label class="col-md-2 control-label" for="Liga">Alternativfarben</label>
       <div class="col-md-10" style="width: 320px; height: 60px">
-        <input type="text" class="basic" id="inputCl3" onchange="setColor(3)" />
-        <input type="text" class="basic" id="inputCl4" onchange="setColor(4)" />
-        <div id="divJersey3" style="position: absolute; top: 0px; right: 20px; width: 48px; height: auto; background-color: white">
+        <input type="text" class="basic" id="inputClA1" onchange="setColor(1, 1)" />
+        <input type="text" class="basic" id="inputClA2" onchange="setColor(1, 2)" />
+        <input type="text" class="basic" id="inputClA3" onchange="setColor(1, 3)" />
+        <div id="divJerseyA1" style="position: absolute; top: 0px; right: 20px; width: 48px; height: auto; background-color: white">
           <img style="position: relative; top: 0px; left: 0px; width: 100%" src="~/Content/Icons/jersey.png" />
+          <div id="divJerseyA3" style="position: absolute; top: 6px; right: 0px; width: 100%; color: black; text-align: center; font-size: 22px">5</div>
         </div>
-        <div id="divJersey4" style="position: absolute; top: 36px; right: 30px; width: 28px; height: 20px; border: 1px solid black; background-color: red"></div>
-        @Html.TextBoxFor(m => m.cl3, new { @class = "hidden" })
-        @Html.TextBoxFor(m => m.cl4, new { @class = "hidden" })
+        <div id="divJerseyA2" style="position: absolute; top: 36px; right: 30px; width: 28px; height: 20px; border: 1px solid black; background-color: red"></div>
+        @Html.TextBoxFor(m => m.clA1, new { @class = "hidden" })
+        @Html.TextBoxFor(m => m.clA2, new { @class = "hidden" })
+        @Html.TextBoxFor(m => m.clA3, new { @class = "hidden" })
       </div>
     </div>
     <div class="form-group">
