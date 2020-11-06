@@ -101,6 +101,10 @@
       "iType": 45
     },
     {
+      "sText": "Ihr Spieler #STRING# ist mit seinem Vertrag unzufrieden und verliert #STRING2# Moral.",
+      "iType": 46
+    },
+    {
       "sText": "Ein Teil Ihres Stadions wurde fertig gestellt! (#STRING#)",
       "iType": 50
     },

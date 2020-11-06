@@ -448,7 +448,7 @@ namespace CornerkickWebMvc.Controllers
 
               if (nPartFirstRound > 0) {
                 int nRound = cup.getKoRound(nPartFirstRound);
-                int iMdClub = Math.Max(cup.getMatchdays(club), 0);
+                int iMdClub = Math.Max(cup.getMatchday(club), 0);
                 int iMdCurr = cup.getMatchday(MvcApplication.ckcore.dtDatum); // Current matchday
 
                 string sCupRound = "";
@@ -484,7 +484,7 @@ namespace CornerkickWebMvc.Controllers
               //sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
               if (iPlace > 1) {
                 byte iKoRound = cupInternat.getKoRound(iPlace);
-                int iMdClub = Math.Max(cupInternat.getMatchdays(club), 0);
+                int iMdClub = Math.Max(cupInternat.getMatchday(club), 0);
 
                 if (iMdClub < iMd) sText = "ausgeschieden (" + CornerkickManager.Main.sCupRound[iKoRound - 1] + ")";
                 else               sText = CornerkickManager.Main.sCupRound[iKoRound - 1];
@@ -2257,6 +2257,13 @@ namespace CornerkickWebMvc.Controllers
         if (plDetails.plGame.injury.iType2 < 0 || plDetails.plGame.injury.iType2 >= CornerkickManager.Main.ltInjury[plDetails.plGame.injury.iType].Count) plDetails.plGame.injury.iType2 = (sbyte)rnd.Next(CornerkickManager.Main.ltInjury[plDetails.plGame.injury.iType].Count);
       }
 
+      // Contract
+      int iGamesPerSeason = 0;
+      CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
+      if (league != null) iGamesPerSeason = league.getMatchday(club);
+
+      plModel.sContractHappyFactor = CornerkickManager.PlayerTool.getHappyWithContractFactor(plDetails, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iGamesPerSeason: iGamesPerSeason).ToString("0.0%");
+
       // Next / Prev. Player
       plModel.iPlIdPrev = -1;
       plModel.iPlIdNext = -1;
@@ -3235,7 +3242,7 @@ namespace CornerkickWebMvc.Controllers
 
       int iGamesPerSeason = 0;
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
-      if (league != null) iGamesPerSeason = league.getMatchdays(club);
+      if (league != null) iGamesPerSeason = league.getMatchday(club);
 
       bool bForceNewContract = checkIfNewContract(plSalary, club);
 
