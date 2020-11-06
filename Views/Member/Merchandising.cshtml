@@ -43,7 +43,9 @@
     $(document).ready(function () {
       bEditable = @Html.Raw(Json.Encode(Model.bFanshopsAvailable)) && !@Html.Raw(Json.Encode(Model.bMarketer));
 
-      oTable = setTableItems();
+      var sctSeason = document.getElementById("sctSeason");
+
+      oTable = setTableItems(sctSeason);
 
       $('#fBalanceSecretFracMerchandisingIncome').keyup(function () {
         $.ajax({
@@ -76,6 +78,18 @@
           });
         }
       });
+
+      // Season selector
+      sctSeason.selectedIndex = "0";
+      sctSeason.addEventListener("change", function () {
+        if (this.value < 0) {
+          bEditable = @Html.Raw(Json.Encode(Model.bFanshopsAvailable)) && !@Html.Raw(Json.Encode(Model.bMarketer));
+        } else {
+          bEditable = false;
+        }
+
+        oTable.ajax.reload();
+      });
     }); // $(document).ready
 
     function getJerseyItemSubTable() {
@@ -88,7 +102,7 @@
       });
     }
 
-    function setTableItems() {
+    function setTableItems(sctSeason) {
       var sColumnAmount = "6";
       var sColumnPricePiece = "7";
       var sColumnPriceTotal = "8";
@@ -99,7 +113,13 @@
           "type": 'GET',
           "dataType": "JSON",
           "cache": false,
-          "contentType": "application/json; charset=utf-8"
+          "contentType": "application/json; charset=utf-8",
+          "data": function (d) {
+            var iSeason = -1;
+            if (sctSeason) { iSeason = sctSeason.value; }
+
+            d.iSeason = iSeason;
+          }
         },
         "columns": [
           { "data": null },
@@ -252,7 +272,7 @@
             txtAmount.innerText = "0";
             divAmount.appendChild(txtAmount);
 
-            txtPrice.innerText = "? €";
+            txtPrice.innerText = aData.fPriceSell.toFixed(2) + " €";
           }
           divPriceSell.appendChild(txtPrice);
 
@@ -404,7 +424,14 @@
 </head>
 
 <body style="width: 100%">
-  <div>
+  <div style="position: relative; width: 100%">
+    <div style="position: absolute; top: 0px; right: 0px; z-index: 99">
+      <label>
+        Jahr:
+        @Html.DropDownListFor(m => m.sSeason, Model.sctSeason, new { @class = "form-horizontal", id = "sctSeason", @style = "width:60px" })
+      </label>
+    </div>
+
     <div style="position: relative; margin-bottom: 40px">
       <h3>Vermarkter</h3>
 

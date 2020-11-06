@@ -5702,6 +5702,13 @@ namespace CornerkickWebMvc.Controllers
       mdMerchandising.bFanshopsAvailable = clb.buildings.bgFanshop.iLevel > 0;
       mdMerchandising.bMarketer = clb.merchMarketer != null;
 
+      // Season of budget plan
+      mdMerchandising.sctSeason = new List<SelectListItem>();
+      mdMerchandising.sctSeason.Add(new SelectListItem { Text = MvcApplication.ckcore.dtSeasonStart.Year.ToString(), Value = "-1" });
+      foreach (CornerkickManager.Club.MerchandisingHistory mh in clb.ltMerchandisingHistory) {
+        mdMerchandising.sctSeason.Add(new SelectListItem { Text = (MvcApplication.ckcore.dtSeasonStart.Year - (MvcApplication.ckcore.iSeason - mh.iSeason)).ToString(), Value = mh.iSeason.ToString() });
+      }
+
       // Secret Balance
       mdMerchandising.fBalanceSecretFracMerchandisingIncome = clb.fBalanceSecretFracMerchandisingIncome * 100f;
 
@@ -5714,7 +5721,7 @@ namespace CornerkickWebMvc.Controllers
       return (int)(Math.Max(clb.getAttractionFactor(MvcApplication.ckcore.iSeason), 500) * fSeasonFrac) * 5000;
     }
 
-    public JsonResult MerchandisingGetItems()
+    public JsonResult MerchandisingGetItems(int iSeason)
     {
       List<Models.MerchandisingModel.DatatableMerchandising> ltDtItems = new List<Models.MerchandisingModel.DatatableMerchandising>();
 
@@ -5725,7 +5732,7 @@ namespace CornerkickWebMvc.Controllers
       foreach (CornerkickManager.Merchandising.Item mi in MvcApplication.ckcore.ltMerchandising) {
         Models.MerchandisingModel.DatatableMerchandising dtm = new Models.MerchandisingModel.DatatableMerchandising();
 
-        CornerkickManager.Club.MerchandisingItem cmi = clb.getMerchandisingItem(mi);
+        CornerkickManager.Club.MerchandisingItem cmi = clb.getMerchandisingItem(mi, iSeason);
 
         dtm.iIx = iIx++;
         dtm.iId = mi.iId;

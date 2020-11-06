@@ -20,6 +20,9 @@ namespace CornerkickWebMvc.Models
     public bool bMarketer { get; set; }
     public float fBalanceSecretFracMerchandisingIncome { get; set; }
 
+    public List<SelectListItem> sctSeason { get; set; }
+    public string sSeason { get; set; }
+
     public class DatatableMerchandising
     {
       public int iIx { get; set; }
