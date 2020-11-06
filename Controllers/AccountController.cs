@@ -1061,7 +1061,7 @@ namespace CornerkickWebMvc.Controllers
       // E-Mail-Nachricht mit diesem Link senden
       string code = await UserManager.GenerateEmailConfirmationTokenAsync(sAppUserId);
       var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = sAppUserId, code = code }, protocol: Request.Url.Scheme);
-      MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl: " + callbackUrl);
+      MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl for user '" + sAppUserId + "': " + callbackUrl);
       await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a><br/><br/><br/>Sollte der link nicht funktioniert, kopiere den folgenden Text und füge ihn in die Adresszeile deines Browsers ein:<br/><br/>" + callbackUrl);
 
       return true;
