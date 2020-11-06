@@ -25,7 +25,7 @@
       "iType": 13
     },
     {
-      "sText": "Ihr Spieler #STRING# ist nicht mehr der Schnellste. Schnelligkeit: #STRING2#: #STRING3#",
+      "sText": "Ihr Spieler #STRING# ist nicht mehr der Schnellste. Schnelligkeit: #STRING2#",
       "iType": 14
     },
     {
