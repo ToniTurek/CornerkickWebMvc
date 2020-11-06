@@ -22,9 +22,8 @@
       if (iYear >= 0) bEdit = false;
 
       $.ajax({
-        type: 'post',
         url: '/Member/FinanceGetBudgetPlan',
-        dataType: "json",
+        dataType: "JSON",
         data: { iYear: iYear },
         success: function (iBudget) {
           // Plan
@@ -194,6 +193,7 @@
         });
       });
 
+      document.getElementById("ddlYear").selectedIndex = "0";
       $('#ddlYear').on('change', function (ev) {
         getBudget(bEdit, $(this).val(), true);
       });

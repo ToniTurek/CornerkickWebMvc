@@ -7317,9 +7317,9 @@ namespace CornerkickWebMvc.Controllers
 
         if (bd[0].iPaySalary == 0) bd[0].iPaySalary = clb.getSalaryPlayer();
         if (bd[0].iPayStaff  == 0) bd[0].iPayStaff  = clb.getSalaryStuff ();
-      } else  if (iYear < usr.ltBudget.Count) {
-        bd[0] = usr.ltBudget[iYear][0];
-        bd[1] = usr.ltBudget[iYear][1];
+      } else  if (usr.ltBudget.Count - 1 - iYear < usr.ltBudget.Count) {
+        bd[0] = usr.ltBudget[usr.ltBudget.Count - 1 - iYear][0];
+        bd[1] = usr.ltBudget[usr.ltBudget.Count - 1 - iYear][1];
       }
 
       long[][] iBudget = new long[2][];
