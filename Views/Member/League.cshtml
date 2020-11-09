@@ -92,17 +92,17 @@
   <div style="position: relative; width: 100%; height: 100%; min-height: 100%; margin-bottom: 20px; float: left">
     <label style="margin-right: 10px">
       Saison:
-      @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlSeason" })
+      @Html.DropDownListFor(m => m.iSeason, Model.ddlSeason, new { @class = "form-horizontal", @onchange = "iniLeague()", id = "ddlSeason" })
     </label>
 
     <label style="margin-right: 10px">
       Land:
-      @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlLand" })
+      @Html.DropDownListFor(m => m.iLand, Model.ddlLand, new { @class = "form-horizontal", @onchange = "iniLeague()", id = "ddlLand" })
     </label>
 
     <label style="margin-right: 10px">
       Liga:
-      @Html.DropDownListFor(m => m.iDivision, Model.ddlDivision, new { @class = "form-horizontal", @onchange = "changeLand()", id = "ddlDivision" })
+      @Html.DropDownListFor(m => m.iDivision, Model.ddlDivision, new { @class = "form-horizontal", @onchange = "iniLeague()", id = "ddlDivision" })
     </label>
 
     <label>

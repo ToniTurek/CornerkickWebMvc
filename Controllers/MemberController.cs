@@ -5969,7 +5969,7 @@ namespace CornerkickWebMvc.Controllers
 
       if (iSeason < MvcApplication.ckcore.iSeason) { // Past seasons
         if (iSeason == iSeasonGlobal && cupGlobal != null) {
-          if (cupGlobal.iId == iType && (iLand < 0 || cupGlobal.iId2 == iLand)) return cupGlobal;
+          if (cupGlobal.iId == iType && (iLand < 0 || cupGlobal.iId2 == iLand) && (iDivision < 0 || cupGlobal.iId3 == iDivision)) return cupGlobal;
         }
 
         string sFileLoad = System.IO.Path.Combine(MvcApplication.getHomeDir(), "archive");
