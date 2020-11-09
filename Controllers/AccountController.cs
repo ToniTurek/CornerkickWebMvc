@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -26,6 +27,47 @@ namespace CornerkickWebMvc.Controllers
       SignInManager = signInManager;
     }
 
+    public class ApplicationUserPlus
+    {
+      public ApplicationUser appUser { get; set; }
+
+      public int iLand { get; set; }
+      public int iLiga { get; set; }
+      public int iClubIx { get; set; }
+      public System.Web.HttpPostedFileBase fileEmblem { get; set; }
+
+      public Color clH1 { get; set; }
+      public Color clH2 { get; set; }
+      public Color clH3 { get; set; }
+      public Color clA1 { get; set; }
+      public Color clA2 { get; set; }
+      public Color clA3 { get; set; }
+
+      public string sCallbackUrl { get; set; }
+
+      public ApplicationUserPlus(ApplicationUser appUser, RegisterViewModel rvm = null)
+      {
+        this.appUser = appUser;
+
+        this.iClubIx = -1;
+
+        if (rvm != null) {
+          this.iLand = rvm.Land;
+          this.iLiga = rvm.Liga;
+
+          this.iClubIx = rvm.iClubIx;
+          this.fileEmblem = rvm.fileEmblem;
+
+          this.clH1 = rvm.clH1;
+          this.clH2 = rvm.clH2;
+          this.clH3 = rvm.clH3;
+          this.clA1 = rvm.clA1;
+          this.clA2 = rvm.clA2;
+          this.clA3 = rvm.clA3;
+        }
+      }
+    }
+
 #if _CONSOLE
     public static CornerkickConsole.CUI ckconsole;
 #endif
@@ -35,7 +77,7 @@ namespace CornerkickWebMvc.Controllers
     private ApplicationSignInManager _signInManager;
     private ApplicationUserManager _userManager;
     public static CultureInfo ciUser;
-    public static List<RegisterViewModel> ltRegisterUser;
+    public static List<ApplicationUserPlus> ltRegisterAppUser;
     const string sFilenameRegisterUser = "registerUser.txt";
     readonly string[] sCultureInfo = new string[82] {
       "",
@@ -193,9 +235,9 @@ namespace CornerkickWebMvc.Controllers
       return usr.club;
     }
 
-    public void addUserToCk(ApplicationUser applicationUser, RegisterViewModel registerViewModel, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
+    public void addUserToCk(ApplicationUserPlus applicationUser, bool bAdmin = false)
     {
-      addUserToCk(applicationUser, registerViewModel.Land, registerViewModel.clH1, registerViewModel.clH2, registerViewModel.clH3, registerViewModel.clA1, registerViewModel.clA2, registerViewModel.clA3, bAdmin: bAdmin, iClubExist: iClubExist, fileEmblem: fileEmblem);
+      addUserToCk(applicationUser.appUser, applicationUser.iLand, applicationUser.clH1, applicationUser.clH2, applicationUser.clH3, applicationUser.clA1, applicationUser.clA2, applicationUser.clA3, bAdmin: bAdmin, iClubExist: applicationUser.iClubIx, fileEmblem: applicationUser.fileEmblem);
     }
 #if DEBUG
     public void addUserToCk(ApplicationUser applicationUser, int iLand, System.Drawing.Color clH1, System.Drawing.Color clH2, System.Drawing.Color clH3, System.Drawing.Color clA1, System.Drawing.Color clA2, System.Drawing.Color clA3, bool bAdmin = false, int iClubExist = -1, HttpPostedFileBase fileEmblem = null)
@@ -1010,22 +1052,20 @@ namespace CornerkickWebMvc.Controllers
             MvcApplication.ckcore.ltClubs.Add(club0);
             // END Initialize dummy club
           } else { // no admin
-            if (MvcApplication.settings.bEmailCertification) {
-              if (ltRegisterUser == null) ltRegisterUser = new List<RegisterViewModel>();
-              ltRegisterUser.Add(model);
-              saveRegisterUser();
+            ApplicationUserPlus appUserPlus = new ApplicationUserPlus(appUser, rvm: model);
 
-              await sendActivationLinkAsync(appUser.Id);
+            if (MvcApplication.settings.bEmailCertification) {
+              sendActivationLinkAsync(appUserPlus);
 
               // Uncomment to debug locally
               // TempData["ViewBagLink"] = callbackUrl;
 
-              ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-MANAGER Konto zu bestätigen!";
+              ViewBag.Message = MvcHtmlString.Create("In den nächsten Minuten solltest du eine e-mail bekommen. Bitte überprüfe deine e-mails um dein CORNERKICK-MANAGER Konto zu bestätigen!<br/><br/>Bekommst du innerhalb der nächsten 30 Minuten keine mail, schreibe bitte an <a href=\"mailto:mail@cornerkick-manager.de\">mail@cornerkick-manager.de</a>.");
             } else {
               await SignInManager.SignInAsync(appUser, isPersistent: false, rememberBrowser: false);
 
               // Create club
-              addUserToCk(appUser, model, false, iClubExist: model.iClubIx, fileEmblem: model.fileEmblem);
+              addUserToCk(appUserPlus, false);
               iniCk();
             }
 
@@ -1055,14 +1095,32 @@ namespace CornerkickWebMvc.Controllers
       return View(model);
     }
 
-    private async Task<bool> sendActivationLinkAsync(string sAppUserId)
+    private async Task<bool> sendActivationLinkAsync(ApplicationUserPlus appUserPlus)
     {
       // Weitere Informationen zum Aktivieren der Kontobestätigung und Kennwortzurücksetzung finden Sie unter https://go.microsoft.com/fwlink/?LinkID=320771
       // E-Mail-Nachricht mit diesem Link senden
-      string code = await UserManager.GenerateEmailConfirmationTokenAsync(sAppUserId);
-      var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = sAppUserId, code = code }, protocol: Request.Url.Scheme);
-      MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl for user '" + sAppUserId + "': " + callbackUrl);
-      await UserManager.SendEmailAsync(sAppUserId, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + callbackUrl + "\">hier</a><br/><br/><br/>Sollte der link nicht funktioniert, kopiere den folgenden Text und füge ihn in die Adresszeile deines Browsers ein:<br/><br/>" + callbackUrl);
+      string code = await UserManager.GenerateEmailConfirmationTokenAsync(appUserPlus.appUser.Id);
+      appUserPlus.sCallbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = appUserPlus.appUser.Id, code = code }, protocol: Request.Url.Scheme);
+
+      // Write log
+      MvcApplication.ckcore.tl.writeLog("E-mail confirmation callbackUrl for user '" + appUserPlus.appUser.Id + "': " + appUserPlus.sCallbackUrl);
+
+      // Send email
+      UserManager.SendEmailAsync(appUserPlus.appUser.Id, "Konto bestätigen", "Bitte bestätige Dein Cornerkick-Manager Konto. Klicke dazu <a href=\"" + appUserPlus.sCallbackUrl + "\">hier</a><br/><br/><br/>Sollte der link nicht funktioniert, kopiere den folgenden Text und füge ihn in die Adresszeile deines Browsers ein:<br/><br/>" + appUserPlus.sCallbackUrl);
+
+      // Store model in list and save to file
+      if (ltRegisterAppUser == null) ltRegisterAppUser = new List<ApplicationUserPlus>();
+      bool bExist = false;
+      foreach (ApplicationUserPlus aup in ltRegisterAppUser) {
+        if (aup.appUser.Email.Equals(appUserPlus.appUser.Email)) {
+          bExist = true;
+          break;
+        }
+      }
+      if (!bExist) {
+        ltRegisterAppUser.Add(appUserPlus);
+        saveRegisterUser();
+      }
 
       return true;
     }
@@ -1085,7 +1143,9 @@ namespace CornerkickWebMvc.Controllers
     {
       ApplicationUser appUser = await UserManager.FindByNameAsync(model.Email);
       if (appUser != null) {
-        sendActivationLinkAsync(appUser.Id);
+        ApplicationUserPlus appUserPlus = new ApplicationUserPlus(appUser, rvm: model);
+
+        sendActivationLinkAsync(appUserPlus);
 
         ViewBag.Message = "In den nächsten Minuten solltest Du eine e-mail bekommen. Bitte überprüfe Deine e-mails um Dein CORNERKICK-MANAGER Konto zu bestätigen!";
 
@@ -1137,7 +1197,7 @@ namespace CornerkickWebMvc.Controllers
       if (userId == null || code == null) return View("Error");
 
       // Read register user from file
-      if (ltRegisterUser == null || ltRegisterUser.Count == 0) {
+      if (ltRegisterAppUser == null || ltRegisterAppUser.Count == 0) {
         string sFileRegisterUser = Path.Combine(MvcApplication.getHomeDir(), sFilenameRegisterUser);
 #if _USE_AMAZON_S3
         AmazonS3FileTransfer as3 = new AmazonS3FileTransfer();
@@ -1145,72 +1205,78 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
         if (System.IO.File.Exists(sFileRegisterUser)) {
-          ltRegisterUser = new List<RegisterViewModel>();
+          ltRegisterAppUser = new List<ApplicationUserPlus>();
           string lineRegUsr;
           System.IO.StreamReader fileRegUsr = new System.IO.StreamReader(@sFileRegisterUser);
 
           while ((lineRegUsr = fileRegUsr.ReadLine()) != null) {
-            RegisterViewModel rvm = new RegisterViewModel();
-
             string[] sLineRegUsrSplit = lineRegUsr.Split(';');
             if (sLineRegUsrSplit.Length < 11) continue;
 
-            rvm.Email = sLineRegUsrSplit[0];
-            rvm.Verein = sLineRegUsrSplit[1];
-            rvm.Vorname = sLineRegUsrSplit[2];
-            rvm.Nachname = sLineRegUsrSplit[3];
+            //ApplicationUser au = new ApplicationUser();
+            ApplicationUser au = await UserManager.FindByNameAsync(sLineRegUsrSplit[0]);
+            if (au == null) continue;
+
+            /*
+            au.Email = sLineRegUsrSplit[0];
+            au.Vereinsname = sLineRegUsrSplit[1];
+            au.Vorname = sLineRegUsrSplit[2];
+            au.Nachname = sLineRegUsrSplit[3];
+            */
+
+            ApplicationUserPlus aup = new ApplicationUserPlus(au);
 
             int iLand = 0;
             int.TryParse(sLineRegUsrSplit[4], out iLand);
-            rvm.Land = iLand;
+            aup.iLand = iLand;
 
             int iLiga = 0;
             int.TryParse(sLineRegUsrSplit[5], out iLiga);
-            rvm.Liga = iLiga;
+            aup.iLiga = iLiga;
 
             byte[] iClH1 = new byte[3];
             string[] sLineRegUsrClH1Split = sLineRegUsrSplit[6].Split('/');
             if (sLineRegUsrClH1Split.Length > 2) {
               for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClH1Split[iCl], out iClH1[iCl]);
             }
-            if (iClH1[0] + iClH1[1] + iClH1[2] > 0) rvm.clH1 = System.Drawing.Color.FromArgb(iClH1[0], iClH1[1], iClH1[2]);
+            if (iClH1[0] + iClH1[1] + iClH1[2] > 0) aup.clH1 = System.Drawing.Color.FromArgb(iClH1[0], iClH1[1], iClH1[2]);
 
             byte[] iClH2 = new byte[3];
             string[] sLineRegUsrClH2Split = sLineRegUsrSplit[7].Split('/');
             if (sLineRegUsrClH2Split.Length > 2) {
               for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClH2Split[iCl], out iClH2[iCl]);
             }
-            if (iClH2[0] + iClH2[1] + iClH2[2] > 0) rvm.clH2 = System.Drawing.Color.FromArgb(iClH2[0], iClH2[1], iClH2[2]);
+            if (iClH2[0] + iClH2[1] + iClH2[2] > 0) aup.clH2 = System.Drawing.Color.FromArgb(iClH2[0], iClH2[1], iClH2[2]);
 
             byte[] iClH3 = new byte[3];
             string[] sLineRegUsrClH3Split = sLineRegUsrSplit[8].Split('/');
             if (sLineRegUsrClH3Split.Length > 2) {
               for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClH3Split[iCl], out iClH3[iCl]);
             }
-            if (iClH3[0] + iClH3[1] + iClH3[2] > 0) rvm.clH3 = System.Drawing.Color.FromArgb(iClH3[0], iClH3[1], iClH3[2]);
+            if (iClH3[0] + iClH3[1] + iClH3[2] > 0) aup.clH3 = System.Drawing.Color.FromArgb(iClH3[0], iClH3[1], iClH3[2]);
 
             byte[] iClA1 = new byte[3];
             string[] sLineRegUsrClA1Split = sLineRegUsrSplit[9].Split('/');
             if (sLineRegUsrClA1Split.Length > 2) {
               for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClA1Split[iCl], out iClA1[iCl]);
             }
-            if (iClA1[0] + iClA1[1] + iClA1[2] > 0) rvm.clA1 = System.Drawing.Color.FromArgb(iClA1[0], iClA1[1], iClA1[2]);
+            if (iClA1[0] + iClA1[1] + iClA1[2] > 0) aup.clA1 = System.Drawing.Color.FromArgb(iClA1[0], iClA1[1], iClA1[2]);
 
             byte[] iClA2 = new byte[3];
             string[] sLineRegUsrClA2Split = sLineRegUsrSplit[10].Split('/');
             if (sLineRegUsrClA2Split.Length > 2) {
               for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClA2Split[iCl], out iClA2[iCl]);
             }
-            if (iClA2[0] + iClA2[1] + iClA2[2] > 0) rvm.clA2 = System.Drawing.Color.FromArgb(iClA2[0], iClA2[1], iClA2[2]);
+            if (iClA2[0] + iClA2[1] + iClA2[2] > 0) aup.clA2 = System.Drawing.Color.FromArgb(iClA2[0], iClA2[1], iClA2[2]);
 
             byte[] iClA3 = new byte[3];
             string[] sLineRegUsrClA3Split = sLineRegUsrSplit[11].Split('/');
             if (sLineRegUsrClA3Split.Length > 2) {
               for (byte iCl = 0; iCl < 3; iCl++) byte.TryParse(sLineRegUsrClA3Split[iCl], out iClA3[iCl]);
             }
-            if (iClA3[0] + iClA3[1] + iClA3[2] > 0) rvm.clA3 = System.Drawing.Color.FromArgb(iClA3[0], iClA3[1], iClA3[2]);
+            if (iClA3[0] + iClA3[1] + iClA3[2] > 0) aup.clA3 = System.Drawing.Color.FromArgb(iClA3[0], iClA3[1], iClA3[2]);
 
-            ltRegisterUser.Add(rvm);
+            ltRegisterAppUser.Add(aup);
           }
 
           fileRegUsr.Close();
@@ -1222,12 +1288,16 @@ namespace CornerkickWebMvc.Controllers
       if (result.Succeeded) {
         // Create club
         ApplicationUser appUser = UserManager.FindById(userId);
-        foreach (RegisterViewModel mrv in ltRegisterUser) {
-          if (appUser.Email.Equals(mrv.Email)) {
-            addUserToCk(appUser, mrv, bAdmin: false, iClubExist: mrv.iClubIx, fileEmblem: mrv.fileEmblem);
+
+        foreach (ApplicationUserPlus aup in ltRegisterAppUser) {
+          if (aup == null) continue;
+          if (aup.appUser == null) continue;
+
+          if (appUser.Email.Equals(aup.appUser.Email)) {
+            addUserToCk(aup, bAdmin: false);
             iniCk();
 
-            ltRegisterUser.Remove(mrv);
+            ltRegisterAppUser.Remove(aup);
             saveRegisterUser();
 
 #if !DEBUG
@@ -1572,19 +1642,23 @@ namespace CornerkickWebMvc.Controllers
       string sFileRegisterUser = Path.Combine(MvcApplication.getHomeDir(), sFilenameRegisterUser);
 
       using (System.IO.StreamWriter fileSettings = new System.IO.StreamWriter(sFileRegisterUser)) {
-        foreach (RegisterViewModel rvm in ltRegisterUser) {
-          fileSettings.Write(rvm.Email + ";");
-          fileSettings.Write(rvm.Verein + ";");
-          fileSettings.Write(rvm.Vorname + ";");
-          fileSettings.Write(rvm.Nachname + ";");
-          fileSettings.Write(rvm.Land.ToString() + ";");
-          fileSettings.Write(rvm.Liga.ToString() + ";");
-          fileSettings.Write(rvm.clH1.R.ToString() + "/" + rvm.clH1.G.ToString() + "/" + rvm.clH1.B.ToString() + ";");
-          fileSettings.Write(rvm.clH2.R.ToString() + "/" + rvm.clH2.G.ToString() + "/" + rvm.clH2.B.ToString() + ";");
-          fileSettings.Write(rvm.clH3.R.ToString() + "/" + rvm.clH3.G.ToString() + "/" + rvm.clH3.B.ToString() + ";");
-          fileSettings.Write(rvm.clA1.R.ToString() + "/" + rvm.clA1.G.ToString() + "/" + rvm.clA1.B.ToString() + ";");
-          fileSettings.Write(rvm.clA2.R.ToString() + "/" + rvm.clA2.G.ToString() + "/" + rvm.clA2.B.ToString() + ";");
-          fileSettings.Write(rvm.clA3.R.ToString() + "/" + rvm.clA3.G.ToString() + "/" + rvm.clA3.B.ToString() + ";");
+        foreach (ApplicationUserPlus au in ltRegisterAppUser) {
+          if (au == null) continue;
+          if (au.appUser == null) continue;
+
+          fileSettings.Write(au.appUser.Email + ";");
+          fileSettings.Write(au.appUser.Vereinsname + ";");
+          fileSettings.Write(au.appUser.Vorname + ";");
+          fileSettings.Write(au.appUser.Nachname + ";");
+          fileSettings.Write(au.iLand.ToString() + ";");
+          fileSettings.Write(au.iLiga.ToString() + ";");
+          fileSettings.Write(au.clH1.R.ToString() + "/" + au.clH1.G.ToString() + "/" + au.clH1.B.ToString() + ";");
+          fileSettings.Write(au.clH2.R.ToString() + "/" + au.clH2.G.ToString() + "/" + au.clH2.B.ToString() + ";");
+          fileSettings.Write(au.clH3.R.ToString() + "/" + au.clH3.G.ToString() + "/" + au.clH3.B.ToString() + ";");
+          fileSettings.Write(au.clA1.R.ToString() + "/" + au.clA1.G.ToString() + "/" + au.clA1.B.ToString() + ";");
+          fileSettings.Write(au.clA2.R.ToString() + "/" + au.clA2.G.ToString() + "/" + au.clA2.B.ToString() + ";");
+          fileSettings.Write(au.clA3.R.ToString() + "/" + au.clA3.G.ToString() + "/" + au.clA3.B.ToString() + ";");
+          fileSettings.Write(au.appUser.Id + ";" + au.sCallbackUrl);
           fileSettings.WriteLine();
         }
 
