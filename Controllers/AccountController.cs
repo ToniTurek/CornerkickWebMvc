@@ -1303,7 +1303,7 @@ namespace CornerkickWebMvc.Controllers
 #if !DEBUG
             // Send mail to admin
             try {
-              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user has confirmed email: " + mrv.Email, mrv.Email + " has confirmed email.");
+              await UserManager.SendEmailAsync(MvcApplication.ckcore.ltUser[0].id, "New user has confirmed email: " + appUser.Email, appUser.Email + " has confirmed email.");
             } catch {
             }
 #endif
