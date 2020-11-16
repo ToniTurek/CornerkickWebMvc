@@ -117,17 +117,20 @@
               <li>@Html.ActionLink("Liga", "League", "Member")</li>
               <li>@Html.ActionLink("Pokal", "Cup", "Member")</li>
               @{
-                CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdGold);
-                if (cupGold != null) {
-                  <li>@Html.ActionLink("Gold Cup", "CupGold", "Member")</li>
-                }
-                CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdSilver);
-                if (cupSilver != null) {
-                  <li>@Html.ActionLink("Silver Cup", "CupSilver", "Member")</li>
-                }
-                CornerkickManager.Cup cupBronze = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdBronze);
-                if (cupBronze != null) {
-                  <li>@Html.ActionLink("Bronze Cup", "CupBronze", "Member")</li>
+                if (MvcApplication.ckcore != null)
+                {
+                  CornerkickManager.Cup cupGold = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdGold);
+                  if (cupGold != null) {
+                      <li>@Html.ActionLink("Gold Cup", "CupGold", "Member")</li>
+                  }
+                  CornerkickManager.Cup cupSilver = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdSilver);
+                  if (cupSilver != null) {
+                      <li>@Html.ActionLink("Silver Cup", "CupSilver", "Member")</li>
+                  }
+                  CornerkickManager.Cup cupBronze = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdBronze);
+                  if (cupBronze != null) {
+                      <li>@Html.ActionLink("Bronze Cup", "CupBronze", "Member")</li>
+                  }
                 }
               }
               <li>@Html.ActionLink("WM", "CupWc", "Member")</li>
