@@ -3231,7 +3231,7 @@ namespace CornerkickWebMvc.Controllers
       public float fMood; // Player mood while negotiating
     }
     [HttpGet]
-    public JsonResult GetPlayerSalary(int iPlayerId, byte iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0, bool bNegotiate = true)
+    public JsonResult GetPlayerSalary(int iPlayerId, int iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0, bool bNegotiate = true)
     {
       if (iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
 
@@ -3246,7 +3246,7 @@ namespace CornerkickWebMvc.Controllers
 
       bool bForceNewContract = checkIfNewContract(plSalary, club);
 
-      CornerkickManager.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(plSalary, club, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason: iGamesPerSeason, iFixedFee: iFixedFee, bNegotiate: bNegotiate, bForceNewContract: bForceNewContract);
+      CornerkickManager.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(plSalary, club, (byte)iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason: iGamesPerSeason, iFixedFee: iFixedFee, bNegotiate: bNegotiate, bForceNewContract: bForceNewContract);
 
       // Create reduced contract to return
       ContractMvc cctMvc = new ContractMvc();
@@ -3319,7 +3319,7 @@ namespace CornerkickWebMvc.Controllers
       if (clbUser == null) return Json("Error", JsonRequestBehavior.AllowGet);
 
       if (iId    < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-      if (iYears < 1) return Json("0",     JsonRequestBehavior.AllowGet);
+      if (iYears < 0) return Json("0",     JsonRequestBehavior.AllowGet);
 
       if (iId < 0) return Json("Error", JsonRequestBehavior.AllowGet);
       if (iId >= MvcApplication.ckcore.ltPlayer.Count) return Json("Error", JsonRequestBehavior.AllowGet);
@@ -3401,6 +3401,7 @@ namespace CornerkickWebMvc.Controllers
         // Remove hidden entry from transfer list
         MvcApplication.ckcore.tr.removePlayerFromTransferlist(plContract);
       } else { // New contract
+        if (iYears < 1) return Json("0", JsonRequestBehavior.AllowGet);
         if (iYears > iContractLengthMax) return Json("Error: Maximale Vertragslänge = " + iContractLengthMax.ToString() + " Jahre", JsonRequestBehavior.AllowGet);
 
         // Create new offer

@@ -1,6 +1,6 @@
 ﻿function getContract(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee, bNego) {
   //alert(iPlayerId + ", " + iYears + ", " + iSalaryOffer);
-  if (iYears) {
+  if (iYears >= 0) {
     return $.ajax({
       type: 'GET',
       url: '/Member/GetPlayerSalary',
@@ -57,16 +57,21 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
     }
   }
 
-  $.when(getContract(iPlayerId, 1, 0, 0, 0, 0, false)).done(function (contract) {
-    if (contract.fMood < 0) {
-      alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
-    } else {
-      $.ajax({
-        url: '/Member/PlayerCheckIfNewContract',
-        type: "GET",
-        dataType: "JSON",
-        data: { iPlayerId: iPlayerId },
-        success: function (iContractType) {
+  $.ajax({
+    url: '/Member/PlayerCheckIfNewContract',
+    type: "GET",
+    dataType: "JSON",
+    data: { iPlayerId: iPlayerId },
+    success: function (iContractType) {
+      var iLengthIni = 1;
+      if (iContractType === 0) {
+        iLengthIni = 0;
+      }
+
+      $.when(getContract(iPlayerId, iLengthIni, 0, 0, 0, 0, false)).done(function (contract) {
+        if (contract.fMood < 0) {
+          alert("Der Spieler möchte nicht mehr mit Ihnen verhandeln.");
+        } else {
           var div0 = document.createElement("div");
           div0.id = "dialogContract2";
           div0.title = "Vertragsverhandlung";
@@ -114,10 +119,10 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           input12.style.textAlign = "right";
           input12.style.width = "50px";
           input12.type = "tel";
-          input12.min = "1";
+          input12.min = iLengthIni.toString();
+          input12.value = iLengthIni.toString();
           input12.max = "5";
           input12.step = "1";
-          input12.value = "1";
           input12.autocomplete = "off";
           input12.onkeyup = function () { updateContract(iPlayerId, input12, false, bnNegotiate); };
           div12.appendChild(input12);
