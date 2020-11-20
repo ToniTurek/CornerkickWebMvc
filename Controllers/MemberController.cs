@@ -6284,6 +6284,7 @@ namespace CornerkickWebMvc.Controllers
     public ContentResult GetLeaguePlaceHistory(int iSeason = 0)
     {
       CornerkickManager.Club club = ckClub();
+      if (club == null) return null;
 
       CornerkickManager.Cup league = getCup(iSeason, MvcApplication.iCupIdLeague, club.iLand, club.iDivision);
       if (league == null) return null;
