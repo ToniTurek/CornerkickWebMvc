@@ -1,7 +1,11 @@
-﻿//#define _USE_BLOB
-#define _USE_AMAZON_S3
-//#define _DEPLOY_ON_AZURE
-#define _DEPLOY_ON_APPHB
+﻿/*
+ List of available macros (to be defined in project)
+   _WebMvc
+   _NO_UPLOAD
+   _USE_AMAZON_S3
+   _DEPLOY_ON_APPHB
+   _DOCKER
+*/
 
 using System;
 using System.Collections.Generic;
@@ -14,9 +18,11 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Web;
 using System.Web.Mvc;
+#if _WebMvc
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.UI.WebControls;
+#endif
 using Microsoft.AspNet.Identity.Owin;
 
 #if _USE_BLOB
@@ -27,7 +33,11 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace CornerkickWebMvc
 {
+#if _WebMvc
   public class MvcApplication : System.Web.HttpApplication
+#else
+  public class MvcApplication
+#endif
   {
     public static CornerkickManager.Main ckcore;
     public static System.Timers.Timer timerCkCalender = null;
@@ -108,9 +118,11 @@ namespace CornerkickWebMvc
     protected void Application_Start()
     {
       AreaRegistration.RegisterAllAreas();
+#if _WebMvc
       FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
       RouteConfig.RegisterRoutes(RouteTable.Routes);
       BundleConfig.RegisterBundles(BundleTable.Bundles);
+#endif
 
       // Create stopwatch
       System.Diagnostics.Stopwatch swStart = new System.Diagnostics.Stopwatch();
@@ -220,12 +232,16 @@ namespace CornerkickWebMvc
         timerLoad.Start();
       }
 
+#if _WebMvc
+#if !DEBUG
       // Login of admin to start database
       string sAdminEmail = ConfigurationManager.AppSettings["ckAdminEmail"];
       if (!string.IsNullOrEmpty(sAdminEmail)) {
         Controllers.AccountController accountController = new Controllers.AccountController();
         Task<SignInStatus> tkLoginAdmin = Task.Run(async () => await accountController.SignInManager.PasswordSignInAsync(sAdminEmail, "test", isPersistent: false, shouldLockout: false));
       }
+#endif
+#endif
     }
 
     private static void timerLoad_Tick(object sender, EventArgs e)
@@ -1271,7 +1287,11 @@ namespace CornerkickWebMvc
 #endif
       }
 
+#if _USE_AMAZON_S3
       saveMails(as3);
+#else
+      saveMails();
+#endif
 
 #if _USE_AMAZON_S3
       // Upload wishlist
@@ -1306,12 +1326,16 @@ namespace CornerkickWebMvc
 #endif
     }
 
+#if _USE_AMAZON_S3
     private static void saveMails(AmazonS3FileTransfer as3 = null)
+#else
+    private static void saveMails()
+#endif
     {
       string sDirMail = System.IO.Path.Combine(ckcore.settings.sHomeDir, "mail");
       if (!System.IO.Directory.Exists(sDirMail)) System.IO.Directory.CreateDirectory(sDirMail);
 
-      if (MvcApplication.ltMail == null) return; ;
+      if (MvcApplication.ltMail == null) return;
 
       foreach (MvcApplication.Mail mail in ltMail) {
         string sDateTime = mail.dt.ToString("yyyyMMddHHmmss");
@@ -1587,6 +1611,7 @@ namespace CornerkickWebMvc
       return false;
     }
 
+#if _USE_AMAZON_S3
     private static async Task<bool> downloadMails(AmazonS3FileTransfer as3, string sHomeDir)
     {
       as3.downloadAllFiles("mail/", sHomeDir, null, ".txt");
@@ -1594,6 +1619,7 @@ namespace CornerkickWebMvc
 
       return true;
     }
+#endif
 
     private static void readMails()
     {
@@ -1640,6 +1666,7 @@ namespace CornerkickWebMvc
       }
     }
 
+#if _USE_AMAZON_S3
     private static async Task<bool> downloadFileAsync(AmazonS3FileTransfer as3, string sKey, string sFile)
     {
       as3.downloadFile(sKey, sFile);
@@ -1651,6 +1678,7 @@ namespace CornerkickWebMvc
       as3.downloadAllFiles(sS3SubDir, sTargetPath, null, sFiles);
       return true;
     }
+#endif
 
     private static async Task<bool> performCalendarStepsAsync(int iGameSpeed, double fInterval, bool bCalendarRunning)
     {
@@ -1738,10 +1766,13 @@ namespace CornerkickWebMvc
 
     public static string getHomeDir()
     {
+#if _DOCKER
+      return "C:\\inetpub\\wwwroot\\";
+#else
 #if DEBUG
       return "C:\\Users\\Jan\\Documents\\Visual Studio 2017\\Projects\\Cornerkick.git\\CornerkickWebMvc\\";
 #else
-
+#if _WebMvc
       if (HttpContext.Current == null) return null;
 
 #if _DEPLOY_ON_APPHB
@@ -1750,6 +1781,10 @@ namespace CornerkickWebMvc
 
       return HttpContext.Current.Server.MapPath("~");
 #endif
+#endif
+#endif
+
+      return null;
     }
 
   }
