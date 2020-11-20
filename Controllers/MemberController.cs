@@ -4207,7 +4207,7 @@ namespace CornerkickWebMvc.Controllers
       byte iHA = 0;
       if (clb.nextGame.team[1].iTeamId == clb.iId) iHA = 1;
 
-      while (clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count <= iAS) clb.nextGame.team[iHA].ltSubstitutionsPlanned.Add(new byte[3] { 0, 0, 0 });
+      while (clb.nextGame.team[iHA].ltSubstitutionsPlanned.Count <= iAS + 1) clb.nextGame.team[iHA].ltSubstitutionsPlanned.Add(new byte[3] { 0, 0, 0 });
 
       if (iIndexPlayerOut < 0 || iIndexPlayerIn < 0) {
         iIndexPlayerOut = 0;
