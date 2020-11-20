@@ -484,7 +484,7 @@ namespace CornerkickWebMvc
       return dtCkTarget;
     }
 
-    static TimeSpan tsTarget = new TimeSpan(18, 30, 0); // Target system time
+    static TimeSpan tsTarget = new TimeSpan(20, 30, 0); // Target system time
     internal static DateTime getCkApproachDate()
     {
       double fDayRel = getDayRelBetweenNowAndTarget();
@@ -497,7 +497,11 @@ namespace CornerkickWebMvc
 
     internal static double getDayRelBetweenNowAndTarget()
     {
-      double fDayRel = (tsTarget - DateTime.UtcNow.TimeOfDay).TotalDays;
+      // German (and France) time:
+      var euTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+      DateTime euTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, euTimeZone);
+
+      double fDayRel = (tsTarget - euTime.TimeOfDay).TotalDays;
       if (fDayRel < 0) fDayRel += 1.0;
 
       return fDayRel;
