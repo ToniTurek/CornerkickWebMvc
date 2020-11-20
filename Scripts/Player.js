@@ -1,21 +1,39 @@
 ﻿function getContract(iPlayerId, iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iFixedFee, bNego) {
   //alert(iPlayerId + ", " + iYears + ", " + iSalaryOffer);
-  if (iYears >= 0) {
-    return $.ajax({
-      type: 'GET',
-      url: '/Member/GetPlayerSalary',
-      dataType: "json",
-      data: {
-        iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee, bNegotiate: bNego
-      },
-      success: function (contract) {
-      },
-      error: function (jqXHR, msg, obj) {
-        alert(msg);
-        alert(obj);
-      }
-    });
+
+  // Cast to int
+  iYears = parseInt(iYears, 10);
+
+  // Check if NaN
+  if (Number.isNaN(iYears)) {
+    return;
   }
+
+  if (iYears < 0) {
+    return;
+  }
+
+  if (iYears > 5) {
+    alert("Error: Maximale Vertragslänge = 5 Jahre");
+
+    iYears = 5;
+    document.getElementById("tbContractYears").value = iYears.toString();
+  }
+
+  return $.ajax({
+    type: 'GET',
+    url: '/Member/GetPlayerSalary',
+    dataType: "json",
+    data: {
+      iPlayerId: iPlayerId, iYears: iYears, iSalaryOffer: iSalaryOffer, iBonusPlayOffer: iBonusPlayOffer, iBonusGoalOffer: iBonusGoalOffer, iFixedFee: iFixedFee, bNegotiate: bNego
+    },
+    success: function (contract) {
+    },
+    error: function (jqXHR, msg, obj) {
+      alert(msg);
+      alert(obj);
+    }
+  });
 }
 
 function getTableTransferDetailsAjax(iPlayerId) {
@@ -81,6 +99,8 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
             div0.title += " (Vertragsverlängerung)";
           }
 
+          var input12 = document.createElement("input");
+
           // Negotiation button
           var bnNegotiate = document.createElement("button");
           bnNegotiate.type = "submit";
@@ -113,7 +133,6 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           div12.style.width = "60%";
           div12.style.left = "40%";
           div12.align = "left";
-          var input12 = document.createElement("input");
           input12.className = "form-control tbContractYears text-box single-line";
           input12.id = "tbContractYears";
           input12.style.textAlign = "right";
