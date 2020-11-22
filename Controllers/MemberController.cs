@@ -2262,8 +2262,9 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
       if (league != null) iGamesPerSeason = league.getMatchday(club);
 
-      plModel.sContractHappyFactor = CornerkickManager.PlayerTool.getHappyWithContractFactor(plDetails, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iGamesPerSeason: iGamesPerSeason).ToString("0.0%");
-
+      //plModel.sContractHappyFactor = CornerkickManager.PlayerTool.getHappyWithContractFactor(plDetails, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iGamesPerSeason: iGamesPerSeason).ToString("0.0%");
+      plModel.fContractHappyFactor = CornerkickManager.PlayerTool.getHappyWithContractFactor(plDetails, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iGamesPerSeason: iGamesPerSeason);
+ 
       // Next / Prev. Player
       plModel.iPlIdPrev = -1;
       plModel.iPlIdNext = -1;
@@ -3366,7 +3367,9 @@ namespace CornerkickWebMvc.Controllers
         plContract.contract.iFixTransferFee = iFixTransferFee;
         plContract.contract.fMood = fPlayerMood;
 
-        sReturn = "Der Vertrag mit " + plContract.plGame.sName + " wurde um " + iYears.ToString() + " Jahre verlängert.";
+        sReturn = "Der Vertrag mit " + plContract.plGame.sName + " wurde ";
+        if (iYears > 0) sReturn += "um " + iYears.ToString() + " Jahre verlängert.";
+        else            sReturn += "geändert.";
 
         if (plContract.contract?.club != null) {
           CornerkickManager.Club clb = plContract.contract.club;
