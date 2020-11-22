@@ -1111,10 +1111,16 @@
                       <td align="right">Laufzeit:</td>
                       <td align="right">@sDauer</td>
                     </tr>
-                    if (!Model.bJouth) {
+                    if (Model.bOwnPlayer && !Model.bJouth && !Model.bNation) {
                       <tr>
                         <td align="right">Zufriedenheit:</td>
-                        <td align="right">@Model.sContractHappyFactor</td>
+                        @if (Model.fContractHappyFactor < 0.5) {
+                          <td align="right" style="color: red">@Model.fContractHappyFactor.ToString("0.0%")</td>
+                        } else if (Model.fContractHappyFactor < 0.75) {
+                          <td align="right" style="color: orange">@Model.fContractHappyFactor.ToString("0.0%")</td>
+                        } else {
+                          <td align="right" style="color: green">@Model.fContractHappyFactor.ToString("0.0%")</td>
+                        }
                       </tr>
                     }
                   }
@@ -1287,7 +1293,7 @@
           </div>
         </div>
 
-        <div id="tabs-2" style="overflow: hidden">
+        <div id="tabs-2" style="overflow: hidden; width: 100%; min-width: 450px">
           <div style="position: relative; width: 100%">
             @{
               int i = 0;
