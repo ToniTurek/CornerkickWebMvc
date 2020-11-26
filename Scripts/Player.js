@@ -392,10 +392,10 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
           var cellrowFxdFee1 = rowFixedFee.insertCell();
           cellrowFxdFee1.style.paddingRight = "6px";
           cellrowFxdFee1.style.textAlign = "right";
-          var txtrowFxdFee1 = document.createElement("txt");
-          txtrowFxdFee1.id = "txtContractFixedFeeReq";
-          txtrowFxdFee1.innerText = contractReq.iFixTransferFee.toLocaleString() + " €";
-          cellrowFxdFee1.appendChild(txtrowFxdFee1);
+          var txtFxdFee1 = document.createElement("txt");
+          txtFxdFee1.id = "txtContractFixedFeeReq";
+          txtFxdFee1.innerText = contractReq.iFixTransferFee.toLocaleString() + " €";
+          cellrowFxdFee1.appendChild(txtFxdFee1);
 
           var cellFxdFee2 = rowFixedFee.insertCell();
           cellFxdFee2.style.textAlign = "center";
@@ -537,11 +537,11 @@ function getContractDialog(parent, iPlayerId, bFeeDialog) {
                 id: "bnOk",
                 click: function () {
                   var iYears           = getIntFromString(iptYears   .value);
-                  var iSalaryOffer     = getIntFromString(iptSlry2   .value);
-                  var iBonusPlayOffer  = getIntFromString(iptBnsPlay2.value);
-                  var iBonusPointOffer = getIntFromString(iptBnsPnt2 .value);
-                  var iBonusGoalOffer  = getIntFromString(iptBnsGl2  .value);
-                  var iFixedFee        = getIntFromString(iptFxdFee2 .value);
+                  var iSalaryOffer     = getIntFromString(txtSlry1   .innerText);
+                  var iBonusPlayOffer  = getIntFromString(txtBnsPlay1.innerText);
+                  var iBonusPointOffer = getIntFromString(txtBnsPnt1 .innerText);
+                  var iBonusGoalOffer  = getIntFromString(txtBnsGl1  .innerText);
+                  var iFixedFee        = getIntFromString(txtFxdFee1 .innerText);
                   var iaCupBonus = getCupBonus(tBdyCupBonus);
                   var sPlayerMood = $("#txtContractMood").text();
 
