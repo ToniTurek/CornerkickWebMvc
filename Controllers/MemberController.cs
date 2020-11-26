@@ -448,7 +448,7 @@ namespace CornerkickWebMvc.Controllers
 
               if (nPartFirstRound > 0) {
                 int nRound = cup.getKoRound(nPartFirstRound);
-                int iMdClub = Math.Max(cup.getMatchday(club), 0);
+                int iMdClub = Math.Max(cup.getMatchdays(club), 0);
                 int iMdCurr = cup.getMatchday(MvcApplication.ckcore.dtDatum); // Current matchday
 
                 string sCupRound = "";
@@ -484,7 +484,7 @@ namespace CornerkickWebMvc.Controllers
               //sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
               if (iPlace > 1) {
                 byte iKoRound = cupInternat.getKoRound(iPlace);
-                int iMdClub = Math.Max(cupInternat.getMatchday(club), 0);
+                int iMdClub = Math.Max(cupInternat.getMatchdays(club), 0);
 
                 if (iMdClub < iMd) sText = "ausgeschieden (" + CornerkickManager.Main.sCupRound[iKoRound - 1] + ")";
                 else               sText = CornerkickManager.Main.sCupRound[iKoRound - 1];
@@ -2260,7 +2260,7 @@ namespace CornerkickWebMvc.Controllers
       // Contract
       int iGamesPerSeason = 0;
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
-      if (league != null) iGamesPerSeason = league.getMatchday(club);
+      if (league != null) iGamesPerSeason = league.getMatchdays(club);
 
       //plModel.sContractHappyFactor = CornerkickManager.PlayerTool.getHappyWithContractFactor(plDetails, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iGamesPerSeason: iGamesPerSeason).ToString("0.0%");
       plModel.fContractHappyFactor = CornerkickManager.PlayerTool.getHappyWithContractFactor(plDetails, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iGamesPerSeason: iGamesPerSeason);
@@ -3220,46 +3220,91 @@ namespace CornerkickWebMvc.Controllers
       return 1000 * (pl.getValue(MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd) / 50);
     }
 
-    // Copy of CornerkickGame.Player.Contract class without club
+    public class PlayerSalary
+    {
+      public int iPlayerId { get; set; }
+      public int iYears { get; set; }
+      public int iSalary { get; set; }
+      public int iBonusPlay { get; set; }
+      public int iBonusPoint { get; set; }
+      public int iBonusGoal { get; set; }
+      public int[] iaCupBonus { get; set; }
+      public int iFixedFee { get; set; }
+      public bool bNegotiateNextSeason { get; set; }
+      public string sPlayerMood { get; set; }
+    }
+    // Copy of CornerkickGame.Player.Contract class without club for return
     public class ContractMvc
     {
-      public byte iLength;  // Length of contract [years]
-      public int iSalary;  // Salary [$/month]
-      public int iGoal;    // Bonus goal
-      public int iPlay;    // Bonus play
-      public int iFixTransferFee;  // Fix transfer fee
+      public byte iLength;        // Length of contract [years]
+      public int iSalary;         // Salary [$/month]
+      public int iGoal;           // Bonus goal
+      public int iPlay;           // Bonus play
+      public int iPoint;          // Bonus point
+      public int[] iaCupBonus;    // Bonus cup
+      public int iFixTransferFee; // Fix transfer fee
       public bool bTransferCurrentSeason; // Player was transferred in current season (no further transfer allowed)
       public float fMood; // Player mood while negotiating
     }
-    [HttpGet]
-    public JsonResult GetPlayerSalary(int iPlayerId, int iYears, int iSalaryOffer = 0, int iBonusPlayOffer = 0, int iBonusGoalOffer = 0, int iFixedFee = 0, bool bNegotiate = true)
+    [HttpPost]
+    public JsonResult GetPlayerSalary(PlayerSalary ps)
     {
-      if (iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
+      if (ps.iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
 
       CornerkickManager.Club club = ckClub();
       if (club == null) return Json(false, JsonRequestBehavior.AllowGet);
 
-      CornerkickManager.Player plSalary = MvcApplication.ckcore.ltPlayer[iPlayerId];
+      CornerkickManager.Player plSalary = MvcApplication.ckcore.ltPlayer[ps.iPlayerId];
 
       int iGamesPerSeason = 0;
       CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, club.iLand, club.iDivision);
-      if (league != null) iGamesPerSeason = league.getMatchday(club);
+      if (league != null) iGamesPerSeason = league.getMatchdays(club);
 
       bool bForceNewContract = checkIfNewContract(plSalary, club);
 
-      CornerkickManager.Player.Contract contract = MvcApplication.ckcore.tl.negotiatePlayerContract(plSalary, club, (byte)iYears, iSalaryOffer, iBonusPlayOffer, iBonusGoalOffer, iGamesPerSeason: iGamesPerSeason, iFixedFee: iFixedFee, bNegotiate: bNegotiate, bForceNewContract: bForceNewContract);
+      // Get cup bonus class
+      List<CornerkickManager.Player.Contract.CupBonus> ltCupBonus = getCupBonus(ps.iaCupBonus, plSalary.contract.club);
+
+      CornerkickManager.Player.Contract contract = MvcApplication.ckcore.plt.negotiatePlayerContract(plSalary, club, (byte)ps.iYears, iSalaryOffer: ps.iSalary, iBonusPlayOffer: ps.iBonusPlay, iBonusPointOffer: ps.iBonusPoint, iBonusGoalOffer: ps.iBonusGoal, ltCupBonusOffer: ltCupBonus, iGamesPerSeason: iGamesPerSeason, iFixedFeeOffer: ps.iFixedFee, bNegotiate: ps.bNegotiateNextSeason, bForceNewContract: bForceNewContract);
 
       // Create reduced contract to return
-      ContractMvc cctMvc = new ContractMvc();
-      cctMvc.iLength                = contract.iLength;  // Length of contract [years]
-      cctMvc.iSalary                = contract.iSalary;  // Salary [$/month]
-      cctMvc.iGoal                  = contract.iGoal;    // Bonus goal
-      cctMvc.iPlay                  = contract.iPlay;    // Bonus play
-      cctMvc.iFixTransferFee        = contract.iFixTransferFee;  // Fix transfer fee
-      cctMvc.bTransferCurrentSeason = contract.bTransferCurrentSeason; // Player was transferred in current season (no further transfer allowed)
-      cctMvc.fMood                  = contract.fMood; // Player mood while negotiating
+      ContractMvc cctReqMvc = new ContractMvc();
+      cctReqMvc.iLength                = contract.iLength;  // Length of contract [years]
+      cctReqMvc.iSalary                = contract.iSalary;  // Salary [$/month]
+      cctReqMvc.iPlay                  = contract.iPlay;    // Bonus play
+      cctReqMvc.iPoint                 = contract.iPoint;   // Bonus point
+      cctReqMvc.iGoal                  = contract.iGoal;    // Bonus goal
+      cctReqMvc.iFixTransferFee        = contract.iFixTransferFee;  // Fix transfer fee
+      cctReqMvc.bTransferCurrentSeason = contract.bTransferCurrentSeason; // Player was transferred in current season (no further transfer allowed)
+      cctReqMvc.fMood                  = contract.fMood; // Player mood while negotiating
 
-      return Json(cctMvc, JsonRequestBehavior.AllowGet);
+      ContractMvc cctOffMvc = new ContractMvc();
+      CornerkickManager.Transfer.Offer offer = MvcApplication.ckcore.tr.getOffer(plSalary, club);
+      if (offer?.contractOffered == null) {
+        cctOffMvc = cctReqMvc;
+      } else {
+        cctOffMvc.iLength                = offer.contractOffered.iLength;  // Length of contract [years]
+        cctOffMvc.iSalary                = offer.contractOffered.iSalary;  // Salary [$/month]
+        cctOffMvc.iPlay                  = offer.contractOffered.iPlay;    // Bonus play
+        cctOffMvc.iPoint                 = offer.contractOffered.iPoint;   // Bonus point
+        cctOffMvc.iGoal                  = offer.contractOffered.iGoal;    // Bonus goal
+        cctOffMvc.iFixTransferFee        = offer.contractOffered.iFixTransferFee;  // Fix transfer fee
+        cctOffMvc.bTransferCurrentSeason = offer.contractOffered.bTransferCurrentSeason; // Player was transferred in current season (no further transfer allowed)
+        cctOffMvc.fMood                  = offer.contractOffered.fMood; // Player mood while negotiating
+
+        // Apply cup bonus
+        if (offer.contractOffered.ltCupBonus != null) {
+          List<int> ltCb = new List<int>();
+          foreach (CornerkickManager.Player.Contract.CupBonus cb in offer.contractOffered.ltCupBonus) {
+            ltCb.Add(cb.cup.iId);
+            ltCb.Add(cb.iPlace);
+            ltCb.Add(cb.iValue);
+          }
+          cctOffMvc.iaCupBonus = ltCb.ToArray();
+        }
+      }
+
+      return Json(new ContractMvc[] { cctReqMvc, cctOffMvc }, JsonRequestBehavior.AllowGet);
     }
 
     // Returns
@@ -3311,7 +3356,8 @@ namespace CornerkickWebMvc.Controllers
 
     // iMode: 0 - Extention, 1 - new contract
     const byte iContractLengthMax = 5;
-    public JsonResult NegotiatePlayerContract(int iId, int iYears, string sSalary, string sBonusPlay, string sBonusGoal, string sFixTransferFee, bool bNextSeason, string sPlayerMood)
+    [HttpPost]
+    public JsonResult NegotiatePlayerContract(PlayerSalary ps)
     {
       // Initialize status code with ERROR
       Response.StatusCode = 1;
@@ -3319,57 +3365,49 @@ namespace CornerkickWebMvc.Controllers
       CornerkickManager.Club clbUser = ckClub();
       if (clbUser == null) return Json("Error", JsonRequestBehavior.AllowGet);
 
-      if (iId    < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-      if (iYears < 0) return Json("0",     JsonRequestBehavior.AllowGet);
+      if (ps.iPlayerId < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iYears < 0) return Json("0",     JsonRequestBehavior.AllowGet);
 
-      if (iId < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-      if (iId >= MvcApplication.ckcore.ltPlayer.Count) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iPlayerId < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iPlayerId >= MvcApplication.ckcore.ltPlayer.Count) return Json("Error", JsonRequestBehavior.AllowGet);
 
       // Get player
-      CornerkickManager.Player plContract = MvcApplication.ckcore.ltPlayer[iId];
+      CornerkickManager.Player plContract = MvcApplication.ckcore.ltPlayer[ps.iPlayerId];
 
-      // Convert salary to int
-      int iSalary = convertCurrencyToInt(sSalary);
-      if (iSalary < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-
-      // Convert salary to int
-      int iBonusPlay = convertCurrencyToInt(sBonusPlay);
-      if (iBonusPlay < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-
-      // Convert salary to int
-      int iBonusGoal = convertCurrencyToInt(sBonusGoal);
-      if (iBonusGoal < 0) return Json("Error", JsonRequestBehavior.AllowGet);
-
-      // Convert salary to int
-      int iFixTransferFee = convertCurrencyToInt(sFixTransferFee);
-      if (iFixTransferFee < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iSalary < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iBonusPlay < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iBonusPoint < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iBonusGoal < 0) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (ps.iFixedFee < 0) return Json("Error", JsonRequestBehavior.AllowGet);
 
       // Convert player mood to double
-      sPlayerMood = sPlayerMood.Replace("%", string.Empty);
-      sPlayerMood = sPlayerMood.Replace(".", string.Empty);
-      sPlayerMood = sPlayerMood.Trim();
+      ps.sPlayerMood = ps.sPlayerMood.Replace("%", string.Empty);
+      ps.sPlayerMood = ps.sPlayerMood.Replace(".", string.Empty);
+      ps.sPlayerMood = ps.sPlayerMood.Trim();
       float fPlayerMood = 1f;
-      if (!float.TryParse(sPlayerMood, out fPlayerMood)) return Json("Error", JsonRequestBehavior.AllowGet);
+      if (!float.TryParse(ps.sPlayerMood, out fPlayerMood)) return Json("Error", JsonRequestBehavior.AllowGet);
       fPlayerMood /= 100f;
 
       string sReturn = "";
       if (CornerkickManager.PlayerTool.ownPlayer(clbUser, plContract)) { // Contract extention
-        byte iContractLegth = (byte)iYears;
+        byte iContractLegth = (byte)ps.iYears;
 
         if (!checkIfNewContract(plContract, clbUser)) iContractLegth += plContract.contract.iLength;
 
         if (iContractLegth > iContractLengthMax) return Json("Error: Maximale Vertragslänge = " + iContractLengthMax.ToString() + " Jahre", JsonRequestBehavior.AllowGet);
 
         plContract.contract.iLength = iContractLegth;
-        plContract.contract.iSalary = iSalary;
-        plContract.contract.iPlay = iBonusPlay;
-        plContract.contract.iGoal = iBonusGoal;
-        plContract.contract.iFixTransferFee = iFixTransferFee;
+        plContract.contract.iSalary = ps.iSalary;
+        plContract.contract.iPlay   = ps.iBonusPlay;
+        plContract.contract.iPoint  = ps.iBonusPoint;
+        plContract.contract.iGoal   = ps.iBonusGoal;
+        plContract.contract.ltCupBonus = getCupBonus(ps.iaCupBonus, plContract.contract.club);
+        plContract.contract.iFixTransferFee = ps.iFixedFee;
         plContract.contract.fMood = fPlayerMood;
 
         sReturn = "Der Vertrag mit " + plContract.plGame.sName + " wurde ";
-        if (iYears > 0) sReturn += "um " + iYears.ToString() + " Jahre verlängert.";
-        else            sReturn += "geändert.";
+        if (ps.iYears > 0) sReturn += "um " + ps.iYears.ToString() + " Jahre verlängert.";
+        else               sReturn += "geändert.";
 
         if (plContract.contract?.club != null) {
           CornerkickManager.Club clb = plContract.contract.club;
@@ -3404,24 +3442,26 @@ namespace CornerkickWebMvc.Controllers
         // Remove hidden entry from transfer list
         MvcApplication.ckcore.tr.removePlayerFromTransferlist(plContract);
       } else { // New contract
-        if (iYears < 1) return Json("0", JsonRequestBehavior.AllowGet);
-        if (iYears > iContractLengthMax) return Json("Error: Maximale Vertragslänge = " + iContractLengthMax.ToString() + " Jahre", JsonRequestBehavior.AllowGet);
+        if (ps.iYears < 1) return Json("0", JsonRequestBehavior.AllowGet);
+        if (ps.iYears > iContractLengthMax) return Json("Error: Maximale Vertragslänge = " + iContractLengthMax.ToString() + " Jahre", JsonRequestBehavior.AllowGet);
 
         // Create new offer
         CornerkickManager.Transfer.Offer offer = new CornerkickManager.Transfer.Offer();
         CornerkickManager.Player.Contract contract = new CornerkickManager.Player.Contract();
-        contract.iLength = (byte)iYears;
-        contract.iSalary = iSalary;
-        contract.iPlay = iBonusPlay;
-        contract.iGoal = iBonusGoal;
-        contract.iFixTransferFee = iFixTransferFee;
+        contract.iLength = (byte)ps.iYears;
+        contract.iSalary = ps.iSalary;
+        contract.iPlay   = ps.iBonusPlay;
+        contract.iPoint  = ps.iBonusPoint;
+        contract.iGoal   = ps.iBonusGoal;
+        contract.ltCupBonus = getCupBonus(ps.iaCupBonus, plContract.contract.club);
+        contract.iFixTransferFee = ps.iFixedFee;
         contract.fMood = fPlayerMood;
         contract.club = clbUser;
         offer.contract = contract;
-        offer.bNextSeason = bNextSeason;
+        offer.bNextSeason = ps.bNegotiateNextSeason;
 
-        MvcApplication.ckcore.tr.addChangeOffer(iId, offer);
-        sReturn = "Sie haben sich mit dem Spieler " + plContract.plGame.sName + " auf eine Zusammenarbeit über " + iYears.ToString() + " Jahre geeinigt.";
+        MvcApplication.ckcore.tr.addChangeOffer(ps.iPlayerId, offer);
+        sReturn = "Sie haben sich mit dem Spieler " + plContract.plGame.sName + " auf eine Zusammenarbeit über " + ps.iYears.ToString() + " Jahre geeinigt.";
       }
 
       // Set status code to OK
@@ -3469,6 +3509,84 @@ namespace CornerkickWebMvc.Controllers
       if (iPlayer < 0) return Json("", JsonRequestBehavior.AllowGet);
 
       return Json(MvcApplication.ckcore.ltPlayer[iPlayer].plGame.sName, JsonRequestBehavior.AllowGet);
+    }
+
+    /*
+    // cupBonus: [][cup id, place, value]
+    [Serializable]
+    public class CupBonus
+    {
+      public int iCupId { get; set; }
+      public int iPlace { get; set; }
+      public int iValue { get; set; }
+    }
+    */
+    public class ContractQuotient
+    {
+      public int iPlayerId { get; set; }
+      public byte iYears { get; set; }
+      public int iSalaryOff { get; set; }
+      public int iBonusPlayOff { get; set; }
+      public int iBonusPointOff { get; set; }
+      public int iBonusGoalOff { get; set; }
+      public int[] iaCupBonus { get; set; }
+      public int iFixTransferFee { get; set; }
+    }
+    [HttpPost]
+    //public JsonResult getContractQuotientOfferedRequired(int iPlayerId, byte iYears, int iSalaryOff, int iBonusPlayOff, int iBonusPointOff, int iBonusGoalOff, string[] ltCupBonus)
+    public JsonResult getContractQuotientOfferedRequired(ContractQuotient cq)
+    {
+      if (cq.iPlayerId < 0) return Json("Invalid player", JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Club clb = ckClub();
+      if (clb == null) return Json(false, JsonRequestBehavior.AllowGet);
+
+      const int iGamesPerSeason = 30;
+
+      CornerkickManager.Player pl = MvcApplication.ckcore.ltPlayer[cq.iPlayerId];
+
+      // Add current contract years
+      byte iYearsReq = cq.iYears;
+      if (!checkIfNewContract(pl, clb)) {
+        iYearsReq += pl.contract.iLength;
+      }
+
+      // Get cup bonus list
+      List<CornerkickManager.Player.Contract.CupBonus> ltCupBonus = getCupBonus(cq.iaCupBonus, pl.contract.club);
+
+      int iSalaryTotReq = CornerkickManager.PlayerTool.getSalaryTotalRequired(pl, iYearsReq, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iFixedFee: cq.iFixTransferFee);
+      int iSalaryTotOff = CornerkickManager.PlayerTool.getSalaryTotal(iSalary: cq.iSalaryOff, iBonusPlay: cq.iBonusPlayOff, iBonusPoint: cq.iBonusPointOff, iBonusGoal: cq.iBonusGoalOff, ltCupBonus: ltCupBonus, clbPlayer: clb, iGamesPerSeason: iGamesPerSeason, fBonusGoalFactor: pl.getGoalBonusFactor());
+
+      return Json(iSalaryTotOff / (float)iSalaryTotReq, JsonRequestBehavior.AllowGet);
+    }
+
+    private List<CornerkickManager.Player.Contract.CupBonus> getCupBonus(int[] iaCupBonus, CornerkickManager.Club clb)
+    {
+      if (iaCupBonus == null) return null;
+
+      List<CornerkickManager.Player.Contract.CupBonus> ltCupBonus = null;
+      int iCb = 0;
+      for (int jCb = 0; jCb < iaCupBonus.Length; jCb++) {
+        if (jCb % 3 == 0) {
+          if (ltCupBonus == null) ltCupBonus = new List<CornerkickManager.Player.Contract.CupBonus>();
+
+          CornerkickManager.Cup cup = null;
+          if      (iaCupBonus[jCb] == 1) cup = MvcApplication.ckcore.tl.getCup(iaCupBonus[jCb], clb.iLand, clb.iDivision);
+          else if (iaCupBonus[jCb] == 2) cup = MvcApplication.ckcore.tl.getCup(iaCupBonus[jCb], clb.iLand);
+          else cup = MvcApplication.ckcore.tl.getCup(iaCupBonus[jCb]);
+          jCb++;
+
+          ltCupBonus.Add(
+            new CornerkickManager.Player.Contract.CupBonus() {
+              cup = cup,
+              iPlace = (byte)iaCupBonus[jCb++],
+              iValue = iaCupBonus[jCb]
+            }
+          );
+        }
+      }
+
+      return ltCupBonus;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -5977,7 +6095,7 @@ namespace CornerkickWebMvc.Controllers
         }
 
         string sFileLoad = System.IO.Path.Combine(MvcApplication.getHomeDir(), "archive");
-        List<CornerkickManager.Cup> ltCupsTmp = MvcApplication.ckcore.io.readCup(sFileLoad, iSeason);
+        List<CornerkickManager.Cup> ltCupsTmp = MvcApplication.ckcore.io.readCups(sFileLoad, iSeason);
 
         foreach (CornerkickManager.Cup cp in ltCupsTmp) {
           if (cp.iId == iType && (iLand < 0 || cp.iId2 == iLand) && (iDivision < 0 || cp.iId3 == iDivision)) {
