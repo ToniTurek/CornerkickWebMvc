@@ -104,7 +104,8 @@ namespace CornerkickWebMvc.Controllers
           DateTime dtGame;
           int iTeamIdH;
           int iTeamIdA;
-          string sFilenameInfo = getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA);
+          int iCupId;
+          string sFilenameInfo = getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA, out iCupId);
           if (string.IsNullOrEmpty(sFilenameInfo)) continue;
 
           view.ddlGames.Insert(0,
@@ -172,7 +173,8 @@ namespace CornerkickWebMvc.Controllers
           DateTime dtGame = new DateTime();
           int iTeamIdH = -1;
           int iTeamIdA = -1;
-          if (string.IsNullOrEmpty(getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA))) continue;
+          int iCupId = -1;
+          if (string.IsNullOrEmpty(getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA, out iCupId))) continue;
 
           if (iTeamIdH == clubUser.iId || iTeamIdA == clubUser.iId || AccountController.checkUserIsAdmin(User)) fiGames.Add(ckg);
         }
@@ -181,11 +183,16 @@ namespace CornerkickWebMvc.Controllers
       return fiGames;
     }
 
-    private string getFilenameInfo(FileInfo fiGame, out DateTime dtGame, out int iTeamIdH, out int iTeamIdA)
+    private string getFilenameInfo(FileInfo fiGame, out DateTime dtGame, out int iTeamIdH, out int iTeamIdA, out int iCupId)
+    {
+      return getFilenameInfo(fiGame, out dtGame, out iTeamIdH, out iTeamIdA, out iCupId, Controllers.MemberController.getCiStatic(User));
+    }
+    public static string getFilenameInfo(FileInfo fiGame, out DateTime dtGame, out int iTeamIdH, out int iTeamIdA, out int iCupId, CultureInfo ciUser = null)
     {
       string sFilenameInfo = "";
 
       dtGame = new DateTime();
+      iCupId = -1;
       iTeamIdH = -1;
       iTeamIdA = -1;
 
@@ -195,12 +202,16 @@ namespace CornerkickWebMvc.Controllers
       // Date/Time
       if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd_HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) return null;
 
+      // Cup ID
+      string[] sFilenameDataCupId = sFilenameData[1].Split('_');
+      if (!int.TryParse(sFilenameDataCupId[0], out iCupId)) return null;
+
       // Team names
       string[] sFilenameDataTeamIds = sFilenameData[2].Split('_');
       if (!int.TryParse(sFilenameDataTeamIds[0], out iTeamIdH)) return null;
       if (!int.TryParse(sFilenameDataTeamIds[1], out iTeamIdA)) return null;
 
-      return dtGame.ToString("d", Controllers.MemberController.getCiStatic(User)) + " " + dtGame.ToString("t", Controllers.MemberController.getCiStatic(User)) + ": " + MvcApplication.ckcore.ltClubs[iTeamIdH].sName + " - " + MvcApplication.ckcore.ltClubs[iTeamIdA].sName;
+      return dtGame.ToString("d", ciUser) + " " + dtGame.ToString("t", ciUser) + ": " + MvcApplication.ckcore.ltClubs[iTeamIdH].sName + " - " + MvcApplication.ckcore.ltClubs[iTeamIdA].sName;
     }
 
     public JsonResult loadGame(Models.ViewGameModel view, string sFilename)

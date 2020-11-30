@@ -45,7 +45,7 @@ namespace CornerkickWebMvc
     public static List<string> ltLog = new List<string>();
     private static Random random = new Random();
     public static Settings settings = new Settings();
-    public const string sVersion = "4.2.0";
+    public const string sVersion = "4.2.1";
     public static int iLoadState = 1; // 1: Initial value, 2: starting calendar steps, 0: ready for login, 3: error
 
     //private const double fStartDelay = 500.0; // [ms]
@@ -1235,21 +1235,27 @@ namespace CornerkickWebMvc
       // Write last ck state to file
       saveLaststate(sHomeDir);
 
+      //saveMerchHistory(sHomeDir);
+
 #if _USE_AMAZON_S3
       // Upload games
       DirectoryInfo diGames = new DirectoryInfo(Path.Combine(sHomeDir, "save", "games"));
       ckcore.tl.writeLog("Directory info games: '" + diGames.FullName + "'. Exist: " + diGames.Exists.ToString());
+
       if (diGames.Exists) {
         FileInfo[] ltCkgFiles = diGames.GetFiles("*.ckgx");
         ckcore.tl.writeLog("File info games length: " + ltCkgFiles.Length.ToString());
+
         foreach (FileInfo ckg in ltCkgFiles) {
           DateTime dtGame;
+          int iTeamIdH;
+          int iTeamIdA;
+          int iCupId;
 
-          string[] sFilenameData = Path.GetFileNameWithoutExtension(ckg.Name).Split('x');
-          if (sFilenameData.Length < 3) continue;
+          Controllers.ViewGameController.getFilenameInfo(ckg, out dtGame, out iTeamIdH, out iTeamIdA, out iCupId);
 
-          if (!DateTime.TryParseExact(sFilenameData[0], "yyyyMMdd_HHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dtGame)) continue;
           if (dtGame.CompareTo(dtLoadCk) < 0) continue; // If game was already present when ck was started
+          if (iCupId == iCupIdTestgame) continue; // If game is test-game
 
           string sFileGameSave = Path.Combine(sHomeDir, "save", "games", ckg.Name);
           as3.uploadFile(sFileGameSave, "save/games/" + ckg.Name, "application/zip");
