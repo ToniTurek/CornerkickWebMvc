@@ -682,6 +682,9 @@
           if (!string.IsNullOrEmpty(Model.sSilverCupRound)) {
             <p>@Html.ActionLink("Silver-Cup", "CupSilver", "Member"): @Model.sSilverCupRound</p>
           }
+          if (!string.IsNullOrEmpty(Model.sBronzeCupRound)) {
+            <p>@Html.ActionLink("Bronze-Cup", "CupBronze", "Member"): @Model.sBronzeCupRound</p>
+          }
         }
         <p>@Html.ActionLink(@Model.sStrength, "Team", "Member")</p>
         <p>@Html.ActionLink(@Model.sKFM, "Training", "Member")</p>

@@ -464,8 +464,8 @@ namespace CornerkickWebMvc.Controllers
         }
       }
 
-      // Gold/Silver cup round
-      for (int iCupId = 3; iCupId <= 4; iCupId++) {
+      // Gold/Silver/Bronze cup round
+      foreach (int iCupId in new int[] { MvcApplication.iCupIdBronze, MvcApplication.iCupIdSilver, MvcApplication.iCupIdGold  }) {
         CornerkickManager.Cup cupInternat = MvcApplication.ckcore.tl.getCup(iCupId);
 
         if (cupInternat.checkClubInCup(club)) {
@@ -481,7 +481,6 @@ namespace CornerkickWebMvc.Controllers
             if (iPlace > 9) {
               sText = "ausgeschieden (Gruppenphase, " + cupInternat.getPlace(club, iMd, bGroupPhaseOnly: true).ToString() + ". Platz)";
             } else {
-              //sText = CornerkickManager.Main.sCupRound[3 - ((iMd - 6) / 2)];
               if (iPlace > 1) {
                 byte iKoRound = cupInternat.getKoRound(iPlace);
                 int iMdClub = Math.Max(cupInternat.getMatchdays(club), 0);
@@ -494,8 +493,9 @@ namespace CornerkickWebMvc.Controllers
             }
           }
 
-          if      (iCupId == 3) desk.sGoldCupRound = sText;
-          else if (iCupId == 4) desk.sSilverCupRound = sText;
+          if      (iCupId == MvcApplication.iCupIdGold)   desk.sGoldCupRound   = sText;
+          else if (iCupId == MvcApplication.iCupIdSilver) desk.sSilverCupRound = sText;
+          else if (iCupId == MvcApplication.iCupIdBronze) desk.sBronzeCupRound = sText;
         }
       }
       /*
