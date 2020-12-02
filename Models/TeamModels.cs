@@ -63,6 +63,7 @@ namespace CornerkickWebMvc.Models
       public CornerkickGame.Tactic.Formation formation { get; set; }
       public string sTeamAveSkill { get; set; }
       public string sTeamAveAge { get; set; }
+      public string sEmblem { get; set; }
 
       // Opponent player details
       public byte iKibitzer { get; set; }
@@ -71,6 +72,7 @@ namespace CornerkickWebMvc.Models
       public CornerkickGame.Tactic.Formation formationOpp { get; set; }
       public string sTeamOppAveSkill { get; set; }
       public string sTeamOppAveAge { get; set; }
+      public string sEmblemOpp { get; set; }
 
       public CornerkickGame.Player plSelected { get; set; }
       public byte iCaptainIx { get; set; }

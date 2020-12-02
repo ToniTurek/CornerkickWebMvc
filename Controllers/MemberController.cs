@@ -1740,15 +1740,18 @@ namespace CornerkickWebMvc.Controllers
       float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: 11);
       tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
+      tD.sEmblem = getClubEmblem(club, sStyle: "width: 64px");
 
       tD.bNation = club.bNation;
 
+      //////////////////////////////////////////////////////////////////////////////////////////////////
+      // Opponent team
+      //////////////////////////////////////////////////////////////////////////////////////////////////
       // Get current or next game data
       CornerkickGame.Game.Data gdOpp = null;
       if (usr.game != null && !usr.game.data.bFinished) gdOpp = usr.game.data;
       else if (club.nextGame != null) gdOpp = club.nextGame;
 
-      // Opponent team
       if (gdOpp != null) {
         if (club.bNation) tD.iKibitzer = 3;
         else              tD.iKibitzer = club.staff.iKibitzer;
@@ -1793,6 +1796,7 @@ namespace CornerkickWebMvc.Controllers
           float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: gdOpp.nPlStart);
           tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
           tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
+          tD.sEmblemOpp = getClubEmblem(clubOpp, sStyle: "width: 64px");
         }
       }
 

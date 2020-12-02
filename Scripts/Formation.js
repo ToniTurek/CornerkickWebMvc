@@ -158,6 +158,25 @@
           dragElement(divPlayerBox);
         }
 
+        // Draw team emblems
+        if (teamData.sEmblem) {
+          var divEmblem = document.createElement("div");
+          divEmblem.style.position = "absolute";
+          divEmblem.style.left = "0px";
+          divEmblem.style.bottom = "0px";
+          divEmblem.innerHTML = teamData.sEmblem;
+          divDrawFormation.appendChild(divEmblem);
+        }
+
+        if (teamData.sEmblemOpp) {
+          var divEmblemOpp = document.createElement("div");
+          divEmblemOpp.style.position = "absolute";
+          divEmblemOpp.style.left = "0px";
+          divEmblemOpp.style.top = "0px";
+          divEmblemOpp.innerHTML = teamData.sEmblemOpp;
+          divDrawFormation.appendChild(divEmblemOpp);
+        }
+
         // Add transparent class to player portraits
         if (iSelectedPlayer > 0) {
           var imgPortraits = document.getElementsByName("imgPortrait");
