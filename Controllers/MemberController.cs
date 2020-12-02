@@ -6422,6 +6422,93 @@ namespace CornerkickWebMvc.Controllers
       return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
     }
 
+    [HttpGet]
+    public JsonResult GetMatchdayTeam(int iCupId, int iLand, int iDiv)
+    {
+      Models.TeamModels.TeamData tD = new Models.TeamModels.TeamData();
+      tD.ltPlayer2 = new List<Models.TeamModels.Player>();
+
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(iCupId, iLand, iDiv);
+
+      int iMd = cup.getMatchday(MvcApplication.ckcore.dtDatum);
+      if (iMd < 1) return Json(tD, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Cup.Matchday md = cup.ltMatchdays[iMd - 1];
+
+      int iForm = 19;
+      tD.formation = MvcApplication.ckcore.ltFormationen[iForm];
+
+      List<CornerkickManager.Player> ltPlayerMd = new List<CornerkickManager.Player>(); // List of all potential players
+      List<CornerkickManager.Player> ltPlayerBest = new List<CornerkickManager.Player>();
+
+      foreach (CornerkickGame.Game.Data gd in md.ltGameData) {
+        for (byte iHA = 0; iHA < 2; iHA++) {
+          CornerkickManager.Club clb = CornerkickManager.Tool.getClubFromId(gd.team[iHA].iTeamId, MvcApplication.ckcore.ltClubs);
+          if (clb == null) continue;
+          if (clb.ltPlayer == null) continue;
+
+          foreach (CornerkickManager.Player pl in clb.ltPlayer) {
+            if (pl?.plGame?.statGame != null && pl.plGame.statGame.iGameType == iCupId && pl.plGame.statGame.iGameType2 == iLand && pl.plGame.statGame.iMatchday == iMd - 1/* && pl.plGame.bPlayed*/) ltPlayerMd.Add(pl);
+          }
+        }
+      }
+
+      for (byte iP = 0; iP < 11; iP++) {
+        float fGrade = 7f;
+        tD.ltPlayer2.Add(null);
+        ltPlayerBest.Add(null);
+
+        byte iPosExact = CornerkickGame.Tool.getPosRole(MvcApplication.ckcore.ltFormationen[iForm].ptPos[iP], MvcApplication.ckcore.game.ptPitch);
+        byte iPos = CornerkickGame.Tool.getBasisPos(iPosExact);
+
+        foreach (CornerkickManager.Player pl in ltPlayerMd) {
+          if (pl.plGame.fExperiencePos[iPos - 1] < 0.999) continue; // Main position
+
+          // Check if already in best graded players list
+          bool bSame = false;
+          foreach (CornerkickManager.Player plSame in ltPlayerBest) {
+            if (plSame != null && plSame.plGame.iId == pl.plGame.iId) {
+              bSame = true;
+              break;
+            }
+          }
+          if (bSame) continue;
+
+          float fGradeTmp = pl.plGame.getGrade(iPos, 90);
+
+          if (fGradeTmp > 0f && fGradeTmp < fGrade) {
+            if (tD.ltPlayer2[iP] == null) tD.ltPlayer2[iP] = new Models.TeamModels.Player();
+
+            tD.ltPlayer2[iP].sName = pl.plGame.sName;
+            tD.ltPlayer2[iP].iNb = (byte)(iP + 1);
+            tD.ltPlayer2[iP].sNat = CornerkickManager.Main.sLandShort[pl.iNat1];
+            tD.ltPlayer2[iP].sPortrait = getPlayerPortrait(pl, sStyle: "height: 100%; width: 100%; object-fit: contain", bSmall: true);
+            tD.ltPlayer2[iP].iPos = iPos;
+
+            if (tD.formation.ptPos.Length > iP) {
+              tD.ltPlayer2[iP].sSkillAve = fGradeTmp.ToString("0.0");
+            }
+
+            fGradeTmp = pl.plGame.getGrade(iPos, 90);
+            fGrade = fGradeTmp;
+
+            if (pl.contract?.club != null) tD.ltPlayer2[iP].sTeamname = pl.contract.club.sName;
+            tD.ltPlayer2[iP].sAge = pl.plGame.getAge(MvcApplication.ckcore.dtDatum).ToString("0.0");
+
+            ltPlayerBest[iP] = pl;
+          }
+        }
+      }
+
+      /*
+      float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(ltPlayerBest, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, iPlStop: 11);
+      tD.fTeamAveStrength = fTeamAve11[3];
+      tD.fTeamAveAge = fTeamAve11[4];
+      */
+
+      return Json(tD, JsonRequestBehavior.AllowGet);
+    }
+
     //[Authorize]
     public ActionResult Cup(Models.CupModel cupModel)
     {
