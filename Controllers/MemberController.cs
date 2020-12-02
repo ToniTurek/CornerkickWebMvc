@@ -1743,13 +1743,18 @@ namespace CornerkickWebMvc.Controllers
 
       tD.bNation = club.bNation;
 
+      // Get current or next game data
+      CornerkickGame.Game.Data gdOpp = null;
+      if (usr.game != null && !usr.game.data.bFinished) gdOpp = usr.game.data;
+      else if (club.nextGame != null) gdOpp = club.nextGame;
+
       // Opponent team
-      if (club.nextGame != null) {
+      if (gdOpp != null) {
         if (club.bNation) tD.iKibitzer = 3;
         else              tD.iKibitzer = club.staff.iKibitzer;
 
-        int iClubOpp = club.nextGame.team[1].iTeamId;
-        if (club.nextGame.team[1].iTeamId == club.iId) iClubOpp = club.nextGame.team[0].iTeamId;
+        int iClubOpp = gdOpp.team[1].iTeamId;
+        if (gdOpp.team[1].iTeamId == club.iId) iClubOpp = gdOpp.team[0].iTeamId;
 
         tD.ltPlayerOpp2 = new List<Models.TeamModels.Player>();
 
@@ -1760,7 +1765,7 @@ namespace CornerkickWebMvc.Controllers
 
           tD.formationOpp = clubOpp.ltTactic[0].formation;
 
-          for (byte iPl = 0; iPl < club.nextGame.nPlStart; iPl++) {
+          for (byte iPl = 0; iPl < gdOpp.nPlStart; iPl++) {
             if (iPl >= clubOpp.ltPlayer.Count) break;
 
             CornerkickManager.Player plOpp = clubOpp.ltPlayer[iPl];
@@ -1785,7 +1790,7 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Opp. team averages
-          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: club.nextGame.nPlStart);
+          float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: gdOpp.nPlStart);
           tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
           tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
         }
