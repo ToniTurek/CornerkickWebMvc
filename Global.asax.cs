@@ -716,6 +716,8 @@ namespace CornerkickWebMvc
       // Jan no injury
       CornerkickManager.Player plJan = ckcore.ltPlayer[101];
       plJan.plGame.injury = null;
+      CornerkickManager.Player plAaronSchulz = ckcore.ltPlayer[3029];
+      plAaronSchulz.plGame.injury = null;
 
       // Janos/David money
       if (ckcore.dtDatum.Day == 1 && ckcore.dtDatum.Hour == 20 && ckcore.dtDatum.Minute == 0 && ckcore.dtDatum.Second == 0) {
