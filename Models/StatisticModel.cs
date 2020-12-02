@@ -8,16 +8,8 @@ namespace CornerkickWebMvc.Models
 {
   public class StatisticModel
   {
-    public int iNation { get; set; }
-    public List<SelectListItem> ddlNations { get; set; }
-
-    public string sFormation { get; set; }
-    public List<SelectListItem> ltsFormations { get; set; }
-
     public string sCupId { get; set; }
     public List<SelectListItem> ddlLeagues { get; set; }
-
-    public string[][] sPlayerSkillBest { get; set; }
   }
 
   public class DatatableEntryTeams

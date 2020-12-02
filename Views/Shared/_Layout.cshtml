@@ -45,7 +45,9 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>@ViewBag.Title - Cornerkick</title>
+
   @Styles.Render("~/Content/css")
   @Scripts.Render("~/bundles/modernizr")
   @Scripts.Render("~/bundles/jquery")
@@ -64,6 +66,16 @@
       width: 120px;
       height: 600px;
     }
+
+    .dropdown-submenu {
+      position: relative;
+    }
+
+    .dropdown-submenu .dropdown-menu {
+      top: 0;
+      left: 100%;
+      margin-top: -1px;
+    }
   </style>
 
   <script type="text/javascript">
@@ -72,6 +84,12 @@
       document.getElementById("divEmblem").style.backgroundImage = 'url("' + sEmblemImg + '")';
       document.getElementById("divEmblem").style.backgroundRepeat = 'no-repeat';
       document.getElementById("divEmblem").style.backgroundSize = '100%';
+
+      $('.dropdown-submenu a.test').on("click", function (e) {
+        $(this).next('ul').toggle();
+        e.stopPropagation();
+        e.preventDefault();
+      });
     });
 
     function switchClubNation() {
@@ -104,6 +122,7 @@
           }
         }
       </div>
+
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <li>
@@ -183,7 +202,13 @@
                       <li>@Html.ActionLink("Transfermarkt", "Transfer", "Member")</li>
                     }
                   }
-                  <li>@Html.ActionLink("Statistik", "Statistic", "Member")</li>
+                  <li class="dropdown-submenu">
+                    <a class="test" tabindex="-1" href="#">Statistik<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li>@Html.ActionLink("Statistik Spieler", "StatisticPlayer", "Member")</li>
+                      <li>@Html.ActionLink("Statistik Vereine", "Statistic", "Member")</li>
+                    </ul>
+                  </li>
                   <li>@Html.ActionLink("Persönliches", "UserView", "Member")</li>
                   <li>@Html.ActionLink("Livespiel", "ViewGame", "ViewGame")</li>
                   @{
