@@ -328,6 +328,7 @@
     <Compile Include="Models\StadionModel.cs" />
     <Compile Include="Models\StadiumSurroundingsModel.cs" />
     <Compile Include="Models\StatisticModel.cs" />
+    <Compile Include="Models\StatisticPlayerModel.cs" />
     <Compile Include="Models\TaktikModel.cs" />
     <Compile Include="Models\TeamModels.cs" />
     <Compile Include="Models\TrainingModel.cs" />
@@ -1508,6 +1509,11 @@
     <None Include=".dockerignore">
       <DependentUpon>Dockerfile</DependentUpon>
     </None>
+    <None Include="Properties\PublishProfiles\Cornerkick - Web Deploy Package.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\IISProfilePacket.pubxml" />
+    <Content Include="Views\Member\StatisticPlayer.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
