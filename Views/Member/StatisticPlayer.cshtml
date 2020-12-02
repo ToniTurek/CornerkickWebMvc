@@ -39,7 +39,7 @@
       });
 
       drawBest11();
-
+      drawTablePlayer();
       drawTableTransfers();
     }); // document ready
 
@@ -77,6 +77,136 @@
             alert("data hasn't worked!");
           }
         }
+      });
+    }
+
+    function drawTablePlayer() {
+      $('#tblStatisticPlayer').DataTable({
+        "ajax": {
+          "url": '@Url.Action("StatisticPlayerGetPlayer", "Member")',
+          "type": 'GET',
+          "dataType": "JSON",
+          "cache": false,
+          "contentType": "application/json; charset=utf-8",
+          "data": function (d) {
+            d.iCupId = 1;
+            d.iLand = 36;
+            d.iType = 0;
+          }
+        },
+        "columns": [
+          { "data": "iPlayerIx" },
+          { "data": "sName" },
+          { "data": "sClubName" },
+          {
+            "data": "fAge",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          },
+          { "data": "iGames" },
+          { "data": "iMinutes" },
+          { "data": "iGoals" },
+          { "data": "iGoalsRight" },
+          { "data": "iGoalsLeft" },
+          { "data": "iGoalsHeader" },
+          {
+            "data": "fGoalsPerGame",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          },
+          { "data": "iPenaltyP" },
+          { "data": "iPenaltyM" },
+          {
+            "data": "fPenalty",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '', '%')
+          },
+          { "data": "iFreekickP" },
+          { "data": "iFreekickM" },
+          {
+            "data": "fFreekick",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '', '%')
+          },
+          { "data": "iAssists" },
+          { "data": "iShoots" },
+          { "data": "iShootsOG" },
+          { "data": "iAssistShoots" },
+          { "data": "iPassP" },
+          { "data": "iPassM" },
+          {
+            "data": "fPass",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '', '%')
+          },
+          { "data": "iPassStolen" },
+          { "data": "iDuelDefP" },
+          { "data": "iDuelDefM" },
+          {
+            "data": "fDuelDef",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '', '%')
+          },
+          { "data": "iDuelOffP" },
+          { "data": "iDuelOffM" },
+          {
+            "data": "fDuelOff",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '', '%')
+          },
+          { "data": "iFouls" },
+          { "data": "iCardY" },
+          { "data": "iCardYR" },
+          { "data": "iCardR" },
+          { "data": "iBallContacts" },
+          {
+            "data": "fGrade",
+            "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          }
+        ],
+        "language": {
+          "emptyTable": "Keine Spieler"
+        },
+        "pageLength": 10,
+        "paging": true,
+        "info": true,
+        "responsive": true,
+        "searching": true,
+        "select": true,
+        "select": {
+          selector: 'tr',
+          style: 'os'
+        },
+        "order": [[1, "asc"]],
+        "columnDefs": [
+          {
+            "targets": [0],
+            "visible": false,
+            "searchable": false
+          },
+          {
+            "targets": "_all",
+            "className": "dt-center"
+          }
+        ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+          if (aData.fGoalsPerGame < 0) {
+            $('td:eq(9)', nRow).text("-");
+          }
+          if (aData.fPenalty < 0) {
+            $('td:eq(12)', nRow).text("-");
+          }
+          if (aData.fFreekick < 0) {
+            $('td:eq(15)', nRow).text("-");
+          }
+          if (aData.fPass < 0) {
+            $('td:eq(22)', nRow).text("-");
+          }
+          if (aData.fDuelDef < 0) {
+            $('td:eq(26)', nRow).text("-");
+          }
+          if (aData.fDuelOff < 0) {
+            $('td:eq(29)', nRow).text("-");
+          }
+          if (aData.fGrade < 0.5) {
+            $('td:eq(35)', nRow).text("-");
+          }
+
+          return nRow;
+        },
       });
     }
 
@@ -183,6 +313,59 @@
         }
       </tbody>
     </table>
+  </div>
+
+  <div style="position: relative">
+    <h3 style="position: relative; margin-top: 30px">Spielerstatistiken</h3>
+
+    <div style="position: relative; width: auto; top: 0px">
+      <table id="tblStatisticPlayer" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Spieler</th>
+            <th>Verein</th>
+            <th>Alter</th>
+            <th>Spiele</th>
+            <th>Min.</th>
+            <th>Tore</th>
+            <th>mit rechts</th>
+            <th>mit links</th>
+            <th>per Kopf</th>
+            <th>Tore/Spiel</th>
+            <th>11m +</th>
+            <th>11m -</th>
+            <th>11m</th>
+            <th>Freistoß +</th>
+            <th>Freistoß -</th>
+            <th>Freistoß</th>
+            <th>Torvorl.</th>
+            <th>Torschüsse</th>
+            <th>aufs Tor</th>
+            <th>Torschussvorl.</th>
+            <th>Abspiel +</th>
+            <th>Abspiel -</th>
+            <th>Abspiel</th>
+            <th>Pässe abgef.</th>
+            <th>Zk def. +</th>
+            <th>Zk def. -</th>
+            <th>Zk def.</th>
+            <th>Zk off. +</th>
+            <th>Zk off. -</th>
+            <th>Zk off.</th>
+            <th>Fouls</th>
+            <th>Gelb</th>
+            <th>Gelb/Rot</th>
+            <th>Rot</th>
+            <th>Ballk.</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!---Data and tags are dynamically generated--->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div style="position: relative">

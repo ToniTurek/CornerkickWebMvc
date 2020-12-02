@@ -8213,6 +8213,75 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpGet]
+    public JsonResult StatisticPlayerGetPlayer(int iCupId, int iLand, int iType)
+    {
+      //The table or entity I'm querying
+      List<Models.DatatableEntryPlayer> ltDePlayer = new List<Models.DatatableEntryPlayer>();
+
+      int iP = 0;
+      foreach (CornerkickManager.Player pl in MvcApplication.ckcore.ltPlayer) {
+        if (pl == null) continue;
+        if (pl.bRetire) continue;
+        if (string.IsNullOrEmpty(pl.plGame.sName)) continue;
+        if (pl.contract == null) continue;
+        if (pl.contract.club.iLand != iLand) continue;
+
+        CornerkickGame.Player.Statistic stat = pl.plGame.getStatistic(iCupId, bSeason: iType == 0/*, iGameType2: iLand*/);
+        if (stat == null) continue;
+
+        int[] iStat = stat.iStat;
+
+        if (iStat[0] < 1) continue;
+
+        int iGoalsTotal = pl.getGoalsTotal(iCupId, iType == 0/*, iGameType2: iLand*/);
+
+        ltDePlayer.Add(
+          new Models.DatatableEntryPlayer() {
+            iPlayerIx = ltDePlayer.Count,
+            sName = pl.plGame.sName.Trim(),
+            fAge = pl.plGame.getAge(MvcApplication.ckcore.dtDatum),
+            sClubName = pl.contract == null ? "vereinslos" : pl.contract.club.sName,
+            iGames = iStat[0],
+            iMinutes = iStat[28],
+            iGoals = iGoalsTotal,
+            iGoalsRight = iStat[1],
+            iGoalsLeft = iStat[2],
+            iGoalsHeader = iStat[3],
+            fGoalsPerGame = iStat[0] > 0 ? iGoalsTotal / (float)iStat[0] : -1,
+            iPenaltyP = iStat[4],
+            iPenaltyM = iStat[5],
+            fPenalty = iStat[4] + iStat[5] > 0 ? 100 * iStat[4] / (float)(iStat[4] + iStat[5]) : -1,
+            iFreekickP = iStat[6],
+            iFreekickM = iStat[7],
+            fFreekick = iStat[6] + iStat[7] > 0 ? 100 * iStat[6] / (float)(iStat[6] + iStat[7]) : -1,
+            iAssists = iStat[8],
+            iShoots = iStat[9],
+            iShootsOG = iStat[10],
+            iAssistShoots = iStat[27],
+            iPassP = iStat[15],
+            iPassM = iStat[16],
+            fPass = iStat[15] + iStat[16] > 0 ? 100 * iStat[15] / (float)(iStat[15] + iStat[16]) : -1,
+            iDuelDefP = iStat[17],
+            iDuelDefM = iStat[18],
+            fDuelDef = iStat[17] + iStat[18] > 0 ? 100 * iStat[17] / (float)(iStat[17] + iStat[18]) : -1,
+            iDuelOffP = iStat[19],
+            iDuelOffM = iStat[20],
+            fDuelOff = iStat[19] + iStat[20] > 0 ? 100 * iStat[19] / (float)(iStat[19] + iStat[20]) : -1,
+            iFouls = iStat[21],
+            iCardY = iStat[22],
+            iCardYR = iStat[23],
+            iCardR = iStat[24],
+            iBallContacts = iStat[25],
+            iPassStolen = iStat[26],
+            fGrade = iStat[30] > 0 ? (iStat[29] * 0.1f) / iStat[30] : 0f
+          }
+        );
+      }
+
+      return Json(new { aaData = ltDePlayer.ToArray() }, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpGet]
     public JsonResult StatisticGetTransferTable()
     {
       //The table or entity I'm querying
