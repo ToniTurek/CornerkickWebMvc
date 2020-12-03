@@ -66,9 +66,11 @@ namespace CornerkickWebMvc.Controllers
       for (int iGd = 0; iGd < ltGd.Count; iGd++) {
         if (ltGd[iGd].iTeamId == gd.iTeamId) {
           ltGd[iGd] = gd;
-          break;
+          return;
         };
       }
+
+      ltGd.Add(gd);
     }
 
     [Authorize]
@@ -151,7 +153,7 @@ namespace CornerkickWebMvc.Controllers
 
       fHeatmapMax = 0f;
 
-      setGame(view, user.game);
+      iniGameData(view, user.game);
 
       return View(view);
     }
@@ -224,7 +226,7 @@ namespace CornerkickWebMvc.Controllers
 
       try {
         user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
-        setGame(view, user.game);
+        iniGameData(view, user.game);
       } catch {
         MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", CornerkickManager.Main.sErrorFile);
       }
@@ -232,12 +234,10 @@ namespace CornerkickWebMvc.Controllers
       return Json(true, JsonRequestBehavior.AllowGet);
     }
 
-    public void setGame(Models.ViewGameModel view, CornerkickGame.Game game)
+    public void iniGameData(Models.ViewGameModel view, CornerkickGame.Game game)
     {
+      CornerkickManager.User user = ckUser();
       CornerkickManager.Club clbUser = ckClub();
-
-      view.sColorJerseyH = new string[] { "white", "blue", "blue", "blue", "white", "white" };
-      view.sColorJerseyA = new string[] { "white", "red",  "red",  "red",  "white", "white" };
 
       if (game == null) {
         view.gD = new Models.ViewGameModel.gameData();
@@ -248,21 +248,24 @@ namespace CornerkickWebMvc.Controllers
       }
 
       if (ltGd == null) ltGd = new List<Models.ViewGameModel.gameData>();
-      Models.ViewGameModel.gameData gD = getGameData(clbUser.iId);
-      if (gD == null) {
-        gD = new Models.ViewGameModel.gameData();
-        gD.iTeamId = clbUser.iId;
-        ltGd.Add(gD);
-      }
-      gD = new Models.ViewGameModel.gameData();
+      Models.ViewGameModel.gameData gD = new Models.ViewGameModel.gameData();
+      gD.iTeamId = clbUser.iId;
+
+      gD.sColorJerseyH = new string[] { "white", "blue", "blue", "blue", "white", "white" };
+      gD.sColorJerseyA = new string[] { "white", "red",  "red",  "red",  "white", "white" };
 
       string sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Uploads", "emblems");
       string sEmblemDirHtml = "/Content/Uploads/emblems/";
       string sEmblemH = game.data.team[0].iTeamId.ToString() + ".png";
       string sEmblemA = game.data.team[1].iTeamId.ToString() + ".png";
 
+      gD.sStadium = game.data.stadium.sName;
+
       if (game.data.team[0].iTeamId >= 0 && game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[game.data.team[0].iTeamId];
+
+        // Set team name
+        gD.sTeamH = clubH.sName;
 
         if (clubH.bNation) {
           sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
@@ -271,12 +274,17 @@ namespace CornerkickWebMvc.Controllers
           if (iNationH >= 0 && iNationH < CornerkickManager.Main.sLandShort.Length) sEmblemH = CornerkickManager.Main.sLandShort[iNationH] + ".png";
         }
 
-        for (int iC = 0; iC < clubH.cl1.Length; iC++) view.sColorJerseyH[iC                   ] = "rgb(" + clubH.cl1[iC].R.ToString() + "," + clubH.cl1[iC].G.ToString() + "," + clubH.cl1[iC].B.ToString() + ")";
-        for (int iC = 0; iC < clubH.cl2.Length; iC++) view.sColorJerseyH[iC + clubH.cl1.Length] = "rgb(" + clubH.cl2[iC].R.ToString() + "," + clubH.cl2[iC].G.ToString() + "," + clubH.cl2[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubH.cl1.Length; iC++) gD.sColorJerseyH[iC                   ] = "rgb(" + clubH.cl1[iC].R.ToString() + "," + clubH.cl1[iC].G.ToString() + "," + clubH.cl1[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubH.cl2.Length; iC++) gD.sColorJerseyH[iC + clubH.cl1.Length] = "rgb(" + clubH.cl2[iC].R.ToString() + "," + clubH.cl2[iC].G.ToString() + "," + clubH.cl2[iC].B.ToString() + ")";
+
+        if (string.IsNullOrEmpty(gD.sStadium)) gD.sStadium = clubH.stadium.sName;
       }
 
       if (game.data.team[1].iTeamId >= 0 && game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
         CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[game.data.team[1].iTeamId];
+
+        // Set team name
+        gD.sTeamA = clubA.sName;
 
         if (clubA.bNation) {
           sEmblemDir = Path.Combine(MvcApplication.getHomeDir(), "Content", "Icons", "flags");
@@ -286,8 +294,8 @@ namespace CornerkickWebMvc.Controllers
         }
 
         //for (byte iC = 0; iC < clubA.cl.Length; iC++) view.sColorJerseyA[iC] = "rgb(" + clubA.cl[iC].R.ToString() + "," + clubA.cl[iC].G.ToString() + "," + clubA.cl[iC].B.ToString() + ")";
-        for (int iC = 0; iC < clubA.cl1.Length; iC++) view.sColorJerseyA[iC                   ] = "rgb(" + clubA.cl1[iC].R.ToString() + "," + clubA.cl1[iC].G.ToString() + "," + clubA.cl1[iC].B.ToString() + ")";
-        for (int iC = 0; iC < clubA.cl2.Length; iC++) view.sColorJerseyA[iC + clubA.cl1.Length] = "rgb(" + clubA.cl2[iC].R.ToString() + "," + clubA.cl2[iC].G.ToString() + "," + clubA.cl2[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubA.cl1.Length; iC++) gD.sColorJerseyA[iC                   ] = "rgb(" + clubA.cl1[iC].R.ToString() + "," + clubA.cl1[iC].G.ToString() + "," + clubA.cl1[iC].B.ToString() + ")";
+        for (int iC = 0; iC < clubA.cl2.Length; iC++) gD.sColorJerseyA[iC + clubA.cl1.Length] = "rgb(" + clubA.cl2[iC].R.ToString() + "," + clubA.cl2[iC].G.ToString() + "," + clubA.cl2[iC].B.ToString() + ")";
       }
 
       /*
@@ -295,9 +303,13 @@ namespace CornerkickWebMvc.Controllers
       if (!System.IO.File.Exists(Path.Combine(sEmblemDir, sEmblemA))) sEmblemA = "0.png";
       */
 
-      view.sEmblemH = sEmblemDirHtml + sEmblemH;
-      view.sEmblemA = sEmblemDirHtml + sEmblemA;
+      gD.sEmblemH = sEmblemDirHtml + sEmblemH;
+      gD.sEmblemA = sEmblemDirHtml + sEmblemA;
 
+      // Stadium seats
+      gD.sStadium += " (" + (game.data.iSpectators[0] + game.data.iSpectators[1] + game.data.iSpectators[2]).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / " + game.data.stadium.getSeats().ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
+
+      // Heatmap
       string[] sHA = new string[2] { "H", "A" };
       // Add player to heatmap
       for (byte iHA = 0; iHA < 2; iHA++) {
@@ -312,6 +324,8 @@ namespace CornerkickWebMvc.Controllers
       view.game = game;
 
       //gD = getAllGameData(view);
+
+      setGameData(ref gD, game.data, user, clbUser);
 
       view.gD = gD;
     }
@@ -329,22 +343,6 @@ namespace CornerkickWebMvc.Controllers
       }
 
       bool bAdmin = AccountController.checkUserIsAdmin(User);
-
-      // Colors home
-      gLoc.sColorJerseyH = new string[] { "white", "blue", "blue" };
-      if (user.game.data.team[0].iTeamId >= 0 && user.game.data.team[0].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
-        CornerkickManager.Club clubH = MvcApplication.ckcore.ltClubs[user.game.data.team[0].iTeamId];
-        for (byte iC = 0; iC < gLoc.sColorJerseyH.Length; iC++) gLoc.sColorJerseyH[iC] = "rgb(" + clubH.cl1[iC].R.ToString() + "," + clubH.cl1[iC].G.ToString() + "," + clubH.cl1[iC].B.ToString() + ")";
-        //gLoc.bJerseyTextColorWhiteH = Controllers.MemberController.checkColorBW(clubH.cl[0]);
-      }
-
-      // Colors away
-      gLoc.sColorJerseyA = new string[] { "white", "red", "red" };
-      if (user.game.data.team[1].iTeamId >= 0 && user.game.data.team[1].iTeamId < MvcApplication.ckcore.ltClubs.Count) {
-        CornerkickManager.Club clubA = MvcApplication.ckcore.ltClubs[user.game.data.team[1].iTeamId];
-        for (byte iC = 0; iC < gLoc.sColorJerseyA.Length; iC++) gLoc.sColorJerseyA[iC] = "rgb(" + clubA.cl2[iC].R.ToString() + "," + clubA.cl2[iC].G.ToString() + "," + clubA.cl2[iC].B.ToString() + ")";
-        //gLoc.bJerseyTextColorWhiteA = Controllers.MemberController.checkColorBW(clubA.cl2[2]);
-      }
 
       // Set interval
       if (MvcApplication.ckcore.ltUser.Count > 0) {
@@ -536,6 +534,11 @@ namespace CornerkickWebMvc.Controllers
       } else if (iState >= 0) {
         gD = getAllGameData(view, iState);
       } else if (iState <  0) {
+        if (iState == -3) {
+          gD.iLastStatePerformed = 0;
+          gD.sTimelineIcons = "";
+        }
+
         /*
         // Return null if not new round
         if (gameData.ltState.Count > 0 && iState != -3) {
@@ -586,13 +589,17 @@ namespace CornerkickWebMvc.Controllers
         // Shoots
         CornerkickGame.Game.Shoot shoot = state.shoot;
         if (shoot.plShoot != null && shoot.iHA == iHA) {
-          float fDist = CornerkickGame.Tool.getDistanceToGoal(shoot.plShoot, MvcApplication.ckcore.game.ptPitch.X, MvcApplication.ckcore.game.fConvertDist2Meter)[0];
-
           string sShootDesc = MvcApplication.ckcore.ui.getMinuteString(shoot.tsMinute, false) + " Min.: " +
                               shoot.iGoalsH.ToString() + ":" + shoot.iGoalsA.ToString();
           sShootDesc += " - " + shoot.plShoot.sName;
-          if (shoot.iType == 5) sShootDesc += ", FE";
-          else                  sShootDesc += ", Entf.:" + fDist.ToString("0.0").PadLeft(5) + "m";
+          if (shoot.iType == 5) {
+            sShootDesc += ", FE";
+          } else {
+            float fDist = CornerkickGame.Tool.getDistanceToGoal(shoot.plShoot, MvcApplication.ckcore.game.ptPitch.X, MvcApplication.ckcore.game.fConvertDist2Meter)[0];
+
+            sShootDesc += ", Entf.:" + fDist.ToString("0.0").PadLeft(5) + "m";
+          }
+
           if (shoot.plAssist != null) sShootDesc += " (" + shoot.plAssist.sName + ")";
 
           string sImg = "yellow";
@@ -678,6 +685,11 @@ namespace CornerkickWebMvc.Controllers
       gD.iLastStatePerformed = iState;
     }
 
+    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    {
+      sbyte iStandard;
+      setGameData(ref gD, gameData, user, club, out iStandard, iState: iState, iHeatmap: iHeatmap, iAllShoots: iAllShoots, iAllDuels: iAllDuels, iAllPasses: iAllPasses);
+    }
     private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, out sbyte iStandard, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       iStandard = 0;
@@ -691,6 +703,7 @@ namespace CornerkickWebMvc.Controllers
         return;
       }
 
+      if (gameData?.ltState == null) return;
       if (gameData.ltState.Count == 0) return;
 
       CornerkickGame.Game.State state = gameData.ltState[gameData.ltState.Count - 1];
@@ -1052,13 +1065,6 @@ namespace CornerkickWebMvc.Controllers
       gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
 #endif
-
-      gD.iShoots       = new int[2];
-      gD.iShootsOnGoal = new int[2];
-      gD.iPassesGood   = new int[2];
-      gD.iPassesBad    = new int[2];
-      gD.iDuels        = new int[2];
-      gD.iFouls        = new int[2];
 
       CornerkickGame.Game.Data gameData = user.game.data;
 

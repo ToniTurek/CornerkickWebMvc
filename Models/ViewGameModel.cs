@@ -35,25 +35,15 @@ namespace CornerkickWebMvc.Models
 
     //public List<CornerkickGame.Game.Shoot>[] ltShoots { get; set; }
 
-    public string sEmblemH { get; set; }
-    public string sEmblemA { get; set; }
-
-    public string[] sColorJerseyH { get; set; }
-    public string[] sColorJerseyA { get; set; }
-
     public int iGameSpeed { get; set; }
 
     public struct gameLoc
     {
       public bool bFinished { get; set; }
+      public bool bHalftime { get; set; }
       public int iInterval { get; set; }
       public List<gamePlayer> ltPlayer { get; set; }
       public gameBall gBall { get; set; }
-
-      public string[] sColorJerseyH { get; set; }
-      public bool bJerseyTextColorWhiteH { get; set; }
-      public string[] sColorJerseyA { get; set; }
-      public bool bJerseyTextColorWhiteA { get; set; }
 
       public List<string[]> ltComments { get; set; }
       public bool bUpdateStatistic { get; set; }
@@ -89,6 +79,17 @@ namespace CornerkickWebMvc.Models
       public TimeSpan tsMinute { get; set; }
 
       public int iTeamId { get; set; }
+      public string sTeamH { get; set; }
+      public string sTeamA { get; set; }
+
+      public string sEmblemH { get; set; }
+      public string sEmblemA { get; set; }
+
+      public string[] sColorJerseyH { get; set; }
+      public string[] sColorJerseyA { get; set; }
+
+      public string sStadium { get; set; }
+
       public int iGoalsH { get; set; }
       public int iGoalsA { get; set; }
       public int[] iShoots { get; set; }
@@ -130,6 +131,16 @@ namespace CornerkickWebMvc.Models
 
       public List<Models.DataPointGeneral>[] ltF { get; set; }
       //public List<Models.DataPointGeneral>[] ltM { get; set; }
+
+      public gameData()
+      {
+        iShoots       = new int[2];
+        iShootsOnGoal = new int[2];
+        iPassesGood   = new int[2];
+        iPassesBad    = new int[2];
+        iDuels        = new int[2];
+        iFouls        = new int[2];
+      }
     }
     public gameData gD;
 

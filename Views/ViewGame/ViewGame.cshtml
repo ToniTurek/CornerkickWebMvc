@@ -1,26 +1,7 @@
 ﻿@model CornerkickWebMvc.Models.ViewGameModel
 
 @{
-  var sHeader = "Livespiel";
-  var sH = "";
-  var sA = "";
-  var sGoalsH = "";
-  var sGoalsA = "";
-  if (Model.game != null) {
-    sHeader = Model.game.data.team[0].sTeam + " - " + Model.game.data.team[1].sTeam;
-    sH = Model.game.data.team[0].sTeam;
-    sA = Model.game.data.team[1].sTeam;
-    sGoalsH = Model.game.data.team[0].iGoals.ToString();
-    sGoalsA = Model.game.data.team[1].iGoals.ToString();
-  }
-
-  var sStadion = "";
-  if (Model.game != null) {
-    sStadion = Model.game.data.stadium.sName;
-    sStadion += " (" + (Model.game.data.iSpectators[0] + Model.game.data.iSpectators[1] + Model.game.data.iSpectators[2]).ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + " / " + Model.game.data.stadium.getSeats().ToString("N0", CornerkickWebMvc.Controllers.MemberController.getCiStatic(User)) + ")";
-  }
-
-  ViewBag.Title = sHeader;
+  ViewBag.Title = "Livespiel";
   Layout = "~/Views/Shared/_Layout_plain.cshtml";
 }
 
@@ -90,6 +71,8 @@
   <script type="text/javascript">
     var iColorH = 0;
     var iColorA = 0;
+    var sColorJerseyH;
+    var sColorJerseyA;
 
     $(window).resize(function () {
       setView();
@@ -688,7 +671,7 @@
           dataType: "JSON",
           data: { sFilename: $(this).val() },
           success: function () {
-            drawGame(-1);
+            drawGame(-3);
             $("body").css("cursor", "default");
             $("#divDrawGameContainer").removeClass("disabledDiv");
           }
@@ -698,30 +681,26 @@
 
     function changeJerseyColors(iHA, divJersey) {
       if (iHA === 0) {
-        var sColorJersey = @Html.Raw(Json.Encode(Model.sColorJerseyH));
-
         if (iColorH === 1) {
-          divJersey.style.backgroundColor = sColorJersey[0];
-          divJersey.style.borderColor     = sColorJersey[1];
-          divJersey.style.color           = sColorJersey[2];
+          divJersey.style.backgroundColor = sColorJerseyH[0];
+          divJersey.style.borderColor     = sColorJerseyH[1];
+          divJersey.style.color           = sColorJerseyH[2];
         } else {
-          divJersey.style.backgroundColor = sColorJersey[3];
-          divJersey.style.borderColor     = sColorJersey[4];
-          divJersey.style.color           = sColorJersey[5];
+          divJersey.style.backgroundColor = sColorJerseyH[3];
+          divJersey.style.borderColor     = sColorJerseyH[4];
+          divJersey.style.color           = sColorJerseyH[5];
         }
 
         iColorH = 1 - iColorH;
       } else if (iHA === 1) {
-        var sColorJersey = @Html.Raw(Json.Encode(Model.sColorJerseyA));
-
         if (iColorA === 0) {
-          divJersey.style.backgroundColor = sColorJersey[0];
-          divJersey.style.borderColor     = sColorJersey[1];
-          divJersey.style.color           = sColorJersey[2];
+          divJersey.style.backgroundColor = sColorJerseyA[0];
+          divJersey.style.borderColor     = sColorJerseyA[1];
+          divJersey.style.color           = sColorJerseyA[2];
         } else {
-          divJersey.style.backgroundColor = sColorJersey[3];
-          divJersey.style.borderColor     = sColorJersey[4];
-          divJersey.style.color           = sColorJersey[5];
+          divJersey.style.backgroundColor = sColorJerseyA[3];
+          divJersey.style.borderColor     = sColorJerseyA[4];
+          divJersey.style.color           = sColorJerseyA[5];
         }
 
         iColorA = 1 - iColorA;
@@ -915,39 +894,39 @@
 
   <div id="divHeader" style="position: relative; width: 100%; height: 71px; background-color: lightgrey; -webkit-border-radius: 10px; -moz-border-radius: 10px">
     <div style="position: absolute; width: 4%; height: 60%; top: 20%; left: 36%">
-      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" src=@Model.sEmblemH alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';" />
+      <img id="imgEmblemH" style="position: absolute; height: 100%; right: 0px" alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';" />
     </div>
     <div style="position: absolute; width: 30px; height: 30px; left:  1%; margin-top: 12px">
-      <div id="divJerseyH" style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyH[0]; border: 2px solid @Model.sColorJerseyH[1]; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(0, this)"></div>
+      <div id="divJerseyH" style="position: relative; width: 30px; height: 30px; border: 2px solid blue; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(0, this)"></div>
     </div>
     <div style="position: absolute; width: 30%; height: 100%; left: 5%; top: 30%; text-align: right">
-      <font size="4">@sH</font>
+      <text id="lbTeamH" style="font-size: 20px"></text>
     </div>
 
     <div style="position: absolute; width: 20%; height: 100%; left: 40%">
       <div style="position: absolute; width: 35%; height: 100%; left: 0%; text-align: right">
-        <font id="lbGoalsH" size="8">@sGoalsH</font>
+        <text id="lbGoalsH" style="font-size: 48px"></text>
       </div>
       <div style="position: absolute; width: 100%; height: 100%; left: 0px; text-align: center">
-        <font size="8">-</font>
+        <text style="font-size: 48px">-</text>
       </div>
       <div style="position: absolute; width: 35%; height: 100%; right: 0%; text-align: left">
-        <font id="lbGoalsA" size="8">@sGoalsA</font>
+        <text id="lbGoalsA" style="font-size: 48px"></text>
       </div>
     </div>
 
     <div style="position: absolute; width: 4%; height: 60%; top: 20%; right: 36%">
-      <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" src=@Model.sEmblemA alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';" />
+      <img id="imgEmblemA" style="position: absolute; height: 100%; left: 0px" alt="" onerror="if (this.src != '/Content/Uploads/emblems/0.png') this.src = '/Content/Uploads/emblems/0.png';" />
     </div>
     <div style="position: absolute; width: 30px; height: 30px; right: 1%; margin-top: 12px">
-      <div id="divJerseyA" style="position: relative; width: 30px; height: 30px; background-color: @Model.sColorJerseyA[3]; border: 2px solid @Model.sColorJerseyA[4]; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(1, this)"></div>
+      <div id="divJerseyA" style="position: relative; width: 30px; height: 30px; border: 2px solid red; -webkit-border-radius: 50%; -moz-border-radius: 50%; cursor: pointer" onclick="changeJerseyColors(1, this)"></div>
     </div>
     <div style="position: absolute; width: 30%; height: 100%; right: 5%; top: 30%; text-align: left">
-      <font size="4">@sA</font>
+      <text id="lbTeamA" style="font-size: 20px"></text>
     </div>
 
     <div style="position: absolute; width: 100%; height: auto; bottom: 0px; left: 0px; text-align: center">
-      <font size="2">@sStadion</font>
+      <text id="lbStadium" style="font-size: 12px"></text>
     </div>
   </div>
 

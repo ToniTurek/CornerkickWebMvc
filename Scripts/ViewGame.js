@@ -21,31 +21,28 @@ function drawGame(iState, iGameSpeed) {
     dataType: "JSON",
     data: { iState: iState, bAverage: bAverage },
     success: function (gLoc2) {
-      if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
-        playerGlobal = drawPlayer(gLoc2);
-
-        changePlayerJerseyColor(0, gLoc2.sColorJerseyH[0], gLoc2.sColorJerseyH[1], gLoc2.sColorJerseyH[2]);
-        changePlayerJerseyColor(1, gLoc2.sColorJerseyA[0], gLoc2.sColorJerseyA[1], gLoc2.sColorJerseyA[2]);
-
-        imgBall = drawBall();
-        divBallTarget = drawBallTarget();
-        //ptBallLast = gLoc2.gBall.ptPos;
-        plotStatistics(-3);
-      }
-
       // Set finished flag
       bFinished = gLoc2.bFinished;
 
-      if (iState >= 0 || gLoc2.bFinished || iState === -4) { // If specific state or game is finished --> draw only once
+      if (iState >= 0 || gLoc2.bFinished || iState === -3 || iState === -4) { // If specific state or game is finished or initial call --> draw only once
+        if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
+          playerGlobal = drawPlayer(gLoc2);
+
+          imgBall = drawBall();
+          divBallTarget = drawBallTarget();
+          //ptBallLast = gLoc2.gBall.ptPos;
+
+          // Recall function if game not finished
+          if (!bFinished && iGameSpeed > 0) {
+            setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
+          }
+        }
+
         $("#tblComments tr").remove();
 
         gLocArray = [];
         drawGame2(gLoc2, iState, iGameSpeed);
         plotStatistics(iState);
-      } else if (iState === -3) { // If initial call --> set global bFinished flag and recall function if game not finished
-        if (!bFinished && iGameSpeed > 0) {
-          setTimeout(function () { drawGame(-1, iGameSpeed); }, iGameSpeed);
-        }
       } else { // If running game --> Add latest element of locations to the array
         gLocArray.push(gLoc2);
       }
@@ -108,7 +105,14 @@ function drawGame2(gLoc, iState, iGameSpeed) {
 function drawBall() {
   var divDrawGame = document.getElementById("divDrawGame");
 
+  // Remove ball if exist
+  var ltDivToRm = divDrawGame.getElementsByClassName("divBall");
+  while (ltDivToRm.length > 0) {
+    ltDivToRm[0].parentNode.removeChild(ltDivToRm[0]);
+  }
+
   var divBallTmp = document.createElement("div");
+  divBallTmp.className = "divBall";
   divBallTmp.id = "divBall";
   divBallTmp.style.position = "absolute";
   divBallTmp.style.top  = "49.0625%";
@@ -248,9 +252,16 @@ function getPosPix(ptPos) {
 }
 
 function drawPlayer(gLoc) {
+  var divDrawGame = document.getElementById("divDrawGame");
+
+  // Clear pitch
+  var ltDivToRm = divDrawGame.getElementsByClassName("divPlayer");
+  while (ltDivToRm.length > 0) {
+    ltDivToRm[0].parentNode.removeChild(ltDivToRm[0]);
+  }
+
   if (gLoc.ltPlayer.length < 1) return;
 
-  var divDrawGame = document.getElementById("divDrawGame");
   var fLookAtSize = 0.3;
 
   var player = [];
@@ -261,6 +272,7 @@ function drawPlayer(gLoc) {
 
     // Player Home
     var divPlH = document.createElement("div");
+    divPlH.className = "divPlayer divPlayerH";
     divPlH.id = "divPlayerH_" + iP.toString();
     divPlH.style.position = "absolute";
     divPlH.style.width = "2%";
@@ -305,6 +317,7 @@ function drawPlayer(gLoc) {
 
     // Player Away
     var divPlA = document.createElement("div");
+    divPlA.className = "divPlayer divPlayerA";
     divPlA.id = "divPlayerA_" + iP.toString();
     divPlA.style.position = "absolute";
     divPlA.style.width = "2%";
@@ -517,12 +530,29 @@ function plotStatistics(jState = -1) {
         iState = nStates;
       }
 
-      var fMinute = (gD.tsMinute.Hours * 60) + gD.tsMinute.Minutes + (gD.tsMinute.Seconds / 60);
+      if (jState === -3) {
+        document.getElementById("lbTeamH").innerText = gD.sTeamH;
+        document.getElementById("lbTeamA").innerText = gD.sTeamA;
+
+        document.getElementById("imgEmblemH").src = gD.sEmblemH;
+        document.getElementById("imgEmblemA").src = gD.sEmblemA;
+
+        document.getElementById("lbStadium").innerText = gD.sStadium;
+
+        iColorH = 1;
+        iColorA = 1;
+        sColorJerseyH = gD.sColorJerseyH;
+        sColorJerseyA = gD.sColorJerseyA;
+        changeJerseyColors(0, document.getElementById("divJerseyH"));
+        changeJerseyColors(1, document.getElementById("divJerseyA"));
+      }
 
       document.getElementById("lbGoalsH").innerText = gD.iGoalsH.toString();
       document.getElementById("lbGoalsA").innerText = gD.iGoalsA.toString();
 
       pMainSlider = $('#slider-Minute');
+
+      var fMinute = (gD.tsMinute.Hours * 60) + gD.tsMinute.Minutes + (gD.tsMinute.Seconds / 60);
 
       if (iState < 0) {
         iState = gD.nStates;
