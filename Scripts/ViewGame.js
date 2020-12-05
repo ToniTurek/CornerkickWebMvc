@@ -816,14 +816,16 @@ function plotStatistics(jState = -1) {
       $("#txtAdminChanceGoal")       .html(gD.sAdminChanceGoal);
 
       // Update team table
-      $('#tableTeamViewGame').DataTable().ajax.reload();
+      if (tblTeamViewGame) {
+        tblTeamViewGame.ajax.reload();
+      }
 
       /////////////////////////////////////////////////////////////////
       // Charts
       /////////////////////////////////////////////////////////////////
       // Plot fresh
       try {
-        if (gD.ltF) {
+        if (chartF && gD.ltF) {
           var iF = 0;
 
           for (iF = 0; iF < gD.ltF.length; ++iF) {
@@ -862,7 +864,7 @@ function plotStatistics(jState = -1) {
       // Plot moral
       /*
       try {
-        if (gD.ltM) {
+        if (chartM && gD.ltM) {
           var iM = 0;
 
           for (iM = 0; iM < gD.ltM.length; ++iM) {

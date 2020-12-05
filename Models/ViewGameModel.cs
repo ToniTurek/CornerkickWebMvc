@@ -10,6 +10,7 @@ namespace CornerkickWebMvc.Models
   public class ViewGameModel
   {
     public bool bAdmin { get; set; }
+    public bool bOwnLiveGame { get; set; }
     public bool bSound { get; set; }
 
     public int iStateGlobal { get; set; }
@@ -74,6 +75,9 @@ namespace CornerkickWebMvc.Models
 
     public class gameData
     {
+      public string sUserId { get; set; }
+      public bool bOwnLiveGame { get; set; }
+
       public int iLastStatePerformed { get; set; }
 
       public TimeSpan tsMinute { get; set; }
@@ -143,6 +147,14 @@ namespace CornerkickWebMvc.Models
       }
     }
     public gameData gD;
+
+    public class gameData2
+    {
+      public string sUserId { get; set; }
+
+      public gameData viewGd { get; set; }
+      public CornerkickGame.Game game { get; set; }
+    }
 
     public struct drawLine
     {

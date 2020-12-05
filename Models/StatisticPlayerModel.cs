@@ -15,6 +15,38 @@ namespace CornerkickWebMvc.Models
     public List<SelectListItem> ltsFormations { get; set; }
 
     public string[][] sPlayerSkillBest { get; set; }
+
+    public List<SelectListItem> ddlFilterCup { get; set; }
+    public string sFilterCup { get; set; }
+
+    public StatisticPlayerModel()
+    {
+      ddlFilterCup = new List<SelectListItem>();
+
+      /*
+      foreach (int iN in MvcApplication.iNations) {
+        for (byte iD = 0; iD < 2; iD++) {
+          CornerkickManager.Cup league = MvcApplication.ckcore.tl.getCup(1, iN, iD);
+          if (league != null) ddlFilterCup.Add(new SelectListItem { Text = league.sName, Value = "1," + iN.ToString() + "," + iD.ToString() });
+        }
+
+        CornerkickManager.Cup cupNat = MvcApplication.ckcore.tl.getCup(2, iN, -1);
+        ddlFilterCup.Add(new SelectListItem { Text = cupNat.sName, Value = "2," + iN.ToString() + ",-1" });
+      }
+      */
+
+      ddlFilterCup.Add(new SelectListItem { Text = "Liga", Value = "1,-1,-1" });
+      ddlFilterCup.Add(new SelectListItem { Text = "Nat. Pokal", Value = "2,-1,-1" });
+
+      CornerkickManager.Cup cupG = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdGold);
+      ddlFilterCup.Add(new SelectListItem { Text = cupG.sName, Value = MvcApplication.iCupIdGold.ToString() + ",-1,-1" });
+      CornerkickManager.Cup cupS = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdSilver);
+      ddlFilterCup.Add(new SelectListItem { Text = cupS.sName, Value = MvcApplication.iCupIdSilver.ToString() + ",-1,-1" });
+      CornerkickManager.Cup cupB = MvcApplication.ckcore.tl.getCup(MvcApplication.iCupIdBronze);
+      ddlFilterCup.Add(new SelectListItem { Text = cupB.sName, Value = MvcApplication.iCupIdBronze.ToString() + ",-1,-1" });
+
+      ddlFilterCup.Add(new SelectListItem { Text = "Nationalm.", Value = "7,-1,-1" });
+    }
   }
 
   /*
@@ -56,6 +88,7 @@ namespace CornerkickWebMvc.Models
     public int iPlayerIx { get; set; }
     public string sName { get; set; }
     public string sClubName { get; set; }
+    public string sNat { get; set; }
     public float fAge { get; set; }
     public int iGames { get; set; }
     public int iMinutes { get; set; }

@@ -53,6 +53,8 @@
       ltF[i] = [];
       //ltM[i] = [];
     }
+
+    var tblTeamViewGame;
   </script>
 
   <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -102,6 +104,7 @@
       setView();
 
       var iGameSpeed = @Html.Raw(Json.Encode(Model.iGameSpeed));
+      var bOwnLiveGame = @Html.Raw(Json.Encode(Model.bOwnLiveGame));
 
       drawGame(-3, iGameSpeed);
 
@@ -287,340 +290,342 @@
       });
 
       // List team
-      oTable = $('#tableTeamViewGame').DataTable({
-        "ajax": {
-          "url": '@Url.Action("getTableTeam", "Member")',
-          "type": 'GET',
-          "dataType": "JSON",
-          "cache": false,
-          "contentType": "application/json; charset=utf-8",
-          "data": function (d) {
-            return $.extend({}, d, {
-              "iPlayerMax": 11,
-            });
-          }
-        },
-        "columns": [
-          { "data": "iIndex" },
-          { "data": "sID" },
-          { "data": "bSubstituted" },
-          { "data": "sNr" },
-          { "data": "sName" },
-          { "data": "sPosition" },
-          { "data": "sStaerke" },
-          { "data": "sKondi" },
-          { "data": "sFrische" },
-          { "data": "sMoral" },
-          { "data": "sErf" },
-          {
-            "data": "sForm",
-            "render": function (sForm, type, row) {
-              return getFormIcon(sForm);
+      if (bOwnLiveGame) {
+        tblTeamViewGame = $('#tableTeamViewGame').DataTable({
+          "ajax": {
+            "url": '@Url.Action("getTableTeam", "Member")',
+            "type": 'GET',
+            "dataType": "JSON",
+            "cache": false,
+            "contentType": "application/json; charset=utf-8",
+            "data": function (d) {
+              return $.extend({}, d, {
+                "iPlayerMax": 11,
+              });
             }
           },
-          { "data": "sLeader" },
-          { "data": "sGrade" },
-          { "data": "sAlter" },
-          { "data": "sTalent" },
-          { "data": "sStaerkeIdeal" },
-          { "data": "sCaptain" },
-          { "data": "iMarktwert" },
-          { "data": "iGehalt" },
-          { "data": "sLz" },
-          {
-            "data": "sNat",
-            "render": function (sNat, type, row) {
-              return getNatIcon(sNat);
+          "columns": [
+            { "data": "iIndex" },
+            { "data": "sID" },
+            { "data": "bSubstituted" },
+            { "data": "sNr" },
+            { "data": "sName" },
+            { "data": "sPosition" },
+            { "data": "sStaerke" },
+            { "data": "sKondi" },
+            { "data": "sFrische" },
+            { "data": "sMoral" },
+            { "data": "sErf" },
+            {
+              "data": "sForm",
+              "render": function (sForm, type, row) {
+                return getFormIcon(sForm);
+              }
+            },
+            { "data": "sLeader" },
+            { "data": "sGrade" },
+            { "data": "sAlter" },
+            { "data": "sTalent" },
+            { "data": "sStaerkeIdeal" },
+            { "data": "sCaptain" },
+            { "data": "iMarktwert" },
+            { "data": "iGehalt" },
+            { "data": "sLz" },
+            {
+              "data": "sNat",
+              "render": function (sNat, type, row) {
+                return getNatIcon(sNat);
+              }
+            },
+            { "data": "iSuspended" }
+          ],
+          rowReorder: {
+            dataSrc: 'iIndex'
+          },
+          "pageLength": 50,
+          "paging": false,
+          "info": false,
+          "responsive": true,
+          "searching": false,
+          columnDefs: [
+            {
+              targets: [1, 2, 16, 18, 19, 20, 22], // sID, bSubstituted, sStaerkeIdeal, sMarktwert, sGehalt, iSuspended
+              "orderable": false,
+              "visible": false,
+              "searchable": false
+            },
+            { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], "className": "dt-center" }
+          ],
+          select: true,
+          select: {
+            selector: 'tr',
+            style: 'os'
+          },
+          "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+            if (aData.iIndex % 2 == 0) {
+              $('td', nRow).css('background-color', "rgb(235,255,235)");
+            } else {
+              $('td', nRow).css('background-color', "rgb(245,255,245)");
             }
+            $('td', nRow).eq(0).css('background-color', "rgb(210,230,188)");
+
+            // Highlight cards
+            if (aData.iSuspended < 0) { // Player has yellow card -->
+              $('td', nRow).css('color', "rgb(220,140,0)"); // --> text color yellow
+            } else if (aData.iSuspended > 0) { // Player has red card -->
+              $('td', nRow).css('color', "rgb(255,0,0)"); // --> text color red
+            }
+          }
+        });
+
+        // Fresh/Moral chart
+        CanvasJS.addColorSet("csF", [
+          "rgba(0,0,130,1.0)",
+          "rgba(0,0,155,1.0)",
+          "rgba(0,0,180,1.0)",
+          "rgba(0,0,205,1.0)",
+          "rgba(0,0,230,1.0)",
+          "rgba(0,0,255,1.0)",
+          "rgba(25,25,255,1.0)",
+          "rgba(50,50,255,1.0)",
+          "rgba(75,75,255,1.0)",
+          "rgba(100,100,255,1.0)",
+          "rgba(125,125,255,1.0)"]
+        );
+
+        chartF = new CanvasJS.Chart("chartContainerF", {
+          colorSet: "colorSet3",
+          animationEnabled: false,
+          theme: "theme2",//theme1
+          title: {
+            text: "Frische",
+            fontSize: 18
           },
-          { "data": "iSuspended" }
-        ],
-        rowReorder: {
-          dataSrc: 'iIndex'
-        },
-        "pageLength": 50,
-        "paging": false,
-        "info": false,
-        "responsive": true,
-        "searching": false,
-        columnDefs: [
+          axisX: {
+            labelFontColor: "white",
+            gridThickness: 1
+          },
+          axisY: {
+            valueFormatString: "0.0%",
+            maximum: 1,
+            includeZero: false
+          },
+          legend: {
+            horizontalAlign: "center", // left, center, right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          toolTip: {
+            content: "{name}: {y}"
+          },
+          data: [{
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "1",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[0]
+          },
           {
-            targets: [1, 2, 16, 18, 19, 20, 22], // sID, bSubstituted, sStaerkeIdeal, sMarktwert, sGehalt, iSuspended
-            "orderable": false,
-            "visible": false,
-            "searchable": false
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "2",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[1]
           },
-          { targets: [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], "className": "dt-center" }
-        ],
-        select: true,
-        select: {
-          selector: 'tr',
-          style: 'os'
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-          if (aData.iIndex % 2 == 0) {
-            $('td', nRow).css('background-color', "rgb(235,255,235)");
-          } else {
-            $('td', nRow).css('background-color', "rgb(245,255,245)");
-          }
-          $('td', nRow).eq(0).css('background-color', "rgb(210,230,188)");
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "3",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[2]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "4",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[3]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "5",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[4]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "6",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[5]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "7",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[6]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "8",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[7]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "9",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[8]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "10",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[9]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "11",
+            yValueFormatString: "0.0%",
+            dataPoints: ltF[10]
+          }]
+        });
 
-          // Highlight cards
-          if (aData.iSuspended < 0) { // Player has yellow card -->
-            $('td', nRow).css('color', "rgb(220,140,0)"); // --> text color yellow
-          } else if (aData.iSuspended > 0) { // Player has red card -->
-            $('td', nRow).css('color', "rgb(255,0,0)"); // --> text color red
-          }
-        }
-      });
+        //chartF.render();
 
-      // Fresh/Moral chart
-      CanvasJS.addColorSet("csF", [
-        "rgba(0,0,130,1.0)",
-        "rgba(0,0,155,1.0)",
-        "rgba(0,0,180,1.0)",
-        "rgba(0,0,205,1.0)",
-        "rgba(0,0,230,1.0)",
-        "rgba(0,0,255,1.0)",
-        "rgba(25,25,255,1.0)",
-        "rgba(50,50,255,1.0)",
-        "rgba(75,75,255,1.0)",
-        "rgba(100,100,255,1.0)",
-        "rgba(125,125,255,1.0)"]
-      );
-
-      chartF = new CanvasJS.Chart("chartContainerF", {
-        colorSet: "colorSet3",
-        animationEnabled: false,
-        theme: "theme2",//theme1
-        title: {
-          text: "Frische",
-          fontSize: 18
-        },
-        axisX: {
-          labelFontColor: "white",
-          gridThickness: 1
-        },
-        axisY: {
-          valueFormatString: "0.0%",
-          maximum: 1,
-          includeZero: false
-        },
-        legend: {
-          horizontalAlign: "center", // left, center, right
-          verticalAlign: "bottom",  // top, center, bottom
-          dockInsidePlotArea: true
-        },
-        toolTip: {
-          content: "{name}: {y}"
-        },
-        data: [{
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "1",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[0]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "2",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[1]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "3",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[2]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "4",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[3]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "5",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[4]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "6",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[5]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "7",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[6]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "8",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[7]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "9",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[8]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "10",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[9]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "11",
-          yValueFormatString: "0.0%",
-          dataPoints: ltF[10]
-        }]
-      });
-
-      //chartF.render();
-
-      /*
-      chartM = new CanvasJS.Chart("chartContainerM", {
-        colorSet: "colorSet3",
-        animationEnabled: false,
-        theme: "theme2",//theme1
-        title: {
-          text: "Moral",
-          fontSize: 18
-        },
-        axisX: {
-          labelFontColor: "white",
-          gridThickness: 1
-        },
-        axisY: {
-          valueFormatString: "0.0%",
-          includeZero: false
-        },
-        legend: {
-          horizontalAlign: "center", // left, center, right
-          verticalAlign: "bottom",  // top, center, bottom
-          dockInsidePlotArea: true
-        },
-        toolTip: {
-          content: "{name}: {y}"
-        },
-        data: [{
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "1",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[0]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "2",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[1]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "3",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[2]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "4",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[3]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "5",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[4]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "6",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[5]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "7",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[6]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "8",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[7]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "9",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[8]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "10",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[9]
-        },
-        {
-          // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
-          showInLegend: true,
-          type: "line",
-          name: "11",
-          yValueFormatString: "0.0%",
-          dataPoints: ltM[10]
-        }]
-      });
-      */
+        /*
+        chartM = new CanvasJS.Chart("chartContainerM", {
+          colorSet: "colorSet3",
+          animationEnabled: false,
+          theme: "theme2",//theme1
+          title: {
+            text: "Moral",
+            fontSize: 18
+          },
+          axisX: {
+            labelFontColor: "white",
+            gridThickness: 1
+          },
+          axisY: {
+            valueFormatString: "0.0%",
+            includeZero: false
+          },
+          legend: {
+            horizontalAlign: "center", // left, center, right
+            verticalAlign: "bottom",  // top, center, bottom
+            dockInsidePlotArea: true
+          },
+          toolTip: {
+            content: "{name}: {y}"
+          },
+          data: [{
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "1",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[0]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "2",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[1]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "3",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[2]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "4",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[3]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "5",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[4]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "6",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[5]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "7",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[6]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "8",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[7]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "9",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[8]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "10",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[9]
+          },
+          {
+            // Change type to "bar", "splineArea", "area", "spline", "pie",etc.
+            showInLegend: true,
+            type: "line",
+            name: "11",
+            yValueFormatString: "0.0%",
+            dataPoints: ltM[10]
+          }]
+        });
+        */
+      } // if (bOwnLiveGame)
 
       // Dialogs
       $("#dialogOptions").dialog({
@@ -882,11 +887,11 @@
 <body onload="setTimeout(function(){ window.scrollTo(0, 1); }, 100)" style="height: 100%; min-height: 100%">
   <input type="hidden" id="bShowChances" name="bShowChances">
 
- @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
+  @if (Model.game == null || (Model.game != null && Model.game.data.bFinished) || Model.bAdmin) {
     <div id="divOptions" style="position: relative; left: 0px; width: 100%; height: 40px">
       @Html.DropDownListFor(m => m.sSelectedGame, Model.ddlGames, new { @class = "form-control", style = "position: absolute; width: 165px" })
 
-     @if (Model.bAdmin) {
+      @if (Model.bAdmin) {
         <a href="#" id="aAdminOptions" style="position: absolute; top: 0px; right: 0px; color:#000aaa">Admin</a>
       }
     </div>
@@ -957,12 +962,16 @@
     <img id="imgGame" style="position: relative; width: 100%" src="~/Content/Images/stadium/field_full.png" alt="" />
     <div id="drawHeatmap" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
     <div id="divDrawGame" style="position: absolute; margin-left: 5%; width: 90%; height: 84%; top: 8%"></div>
-    <div id="divLinkTeam" style="position: absolute; top: 0px; left: 5%; width: 30%">
-      @Html.ActionLink("Aufstellung", "Team", "Member", null, new { @style = "color:#000aaa;" })
-    </div>
-    <div id="divLinkTactic" style="position: absolute; top: 20px; left: 5%; width: 30%">
-      @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
-    </div>
+    @{
+      if (Model.bOwnLiveGame) {
+        <div id="divLinkTeam" style="position: absolute; top: 0px; left: 5%; width: 30%">
+          @Html.ActionLink("Aufstellung", "Team", "Member", null, new { @style = "color:#000aaa;" })
+        </div>
+        <div id="divLinkTactic" style="position: absolute; top: 20px; left: 5%; width: 30%">
+          @Html.ActionLink("Taktik", "Taktik", "Member", null, new { @style = "color:#000aaa;" })
+        </div>
+      }
+    }
     <div id="divLinkHome" style="position: absolute; top: 0px; left: 35%; width: 30%; text-align: center">
       @Html.ActionLink("Home", "Desk", "Member", null, new { @style = "color:#000aaa;" })
     </div>
@@ -1010,45 +1019,47 @@
     <text id="playerAction"></text>
   </div>
 
-  <div id="divTableViewGame" style="position: relative; float: left; width: 100%; margin-top: 10px; margin-bottom: 10px">
-    <table id="tableTeamViewGame" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>ID</th>
-          <th>subst</th>
-          <th>Nr</th>
-          <th>Name</th>
-          <th>Pos.</th>
-          <th>Stärke</th>
-          <th>Kondi.</th>
-          <th>Frische</th>
-          <th>Moral</th>
-          <th>SP</th>
-          <th>Form</th>
-          <th>FP</th>
-          <th>Note</th>
-          <th>Alter</th>
-          <th>Tal.</th>
-          <th>St. ber.</th>
-          <th>C</th>
-          <th>Marktwert [€]</th>
-          <th>Gehalt [€/a]</th>
-          <th>Lz [a]</th>
-          <th>Nat.</th>
-          <th>susp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!---Data and tags are dynamically generated--->
-      </tbody>
-    </table>
-  </div>
+  @{
+    if (Model.bOwnLiveGame) {
+      <div id="divTableViewGame" style="position: relative; float: left; width: 100%; margin-top: 10px; margin-bottom: 10px">
+        <table id="tableTeamViewGame" cellspacing="0" style="width: 100%" class="display responsive nowrap compact">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ID</th>
+              <th>subst</th>
+              <th>Nr</th>
+              <th>Name</th>
+              <th>Pos.</th>
+              <th>Stärke</th>
+              <th>Kondi.</th>
+              <th>Frische</th>
+              <th>Moral</th>
+              <th>SP</th>
+              <th>Form</th>
+              <th>FP</th>
+              <th>Note</th>
+              <th>Alter</th>
+              <th>Tal.</th>
+              <th>St. ber.</th>
+              <th>C</th>
+              <th>Marktwert [€]</th>
+              <th>Gehalt [€/a]</th>
+              <th>Lz [a]</th>
+              <th>Nat.</th>
+              <th>susp</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    }
 
-  <div id="chartContainerF" style="position: relative; float: left; height: 300px; width: 100%; margin-top: 10px"></div>
-  @*
-    <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
-  *@
+    <div id="chartContainerF" style="position: relative; float: left; height: 300px; width: 100%; margin-top: 10px"></div>
+    @*
+      <div id="chartContainerM" style="position: relative; float: left; height: 300px; width: 100%"></div>
+    *@
+  }
 
   <div style="position: relative; float: left; width: 100%; margin-top: 40px">
     Soundeffekte werden unter der Lizenz CC BY 3.0 (<a>https://creativecommons.org/licenses/by/3.0/</a>) verwendet und können verändert worden sein.<br />

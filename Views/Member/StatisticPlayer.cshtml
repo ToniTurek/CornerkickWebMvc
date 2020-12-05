@@ -20,7 +20,9 @@
     $(document).ready(function () {
       var ddlStatNations   = $('#ddlStatNations');
       var ddlStatFormation = $('#ddlStatFormation');
-      var ddlStatLeagues = document.getElementById("ddlStatLeagues");
+      var rbStatisticPlayerSeason = document.getElementById("rbStatisticPlayerSeason");
+      var rbStatisticPlayerTotal = document.getElementById("rbStatisticPlayerTotal");
+      var ddlFilterCup = document.getElementById("ddlFilterCup");
 
       $("#rbProfi").on('change', function (ev) {
         drawBest11();
@@ -39,8 +41,20 @@
       });
 
       drawBest11();
-      drawTablePlayer();
+      var tblStatisticPlayer = drawTablePlayer(rbStatisticPlayerSeason, ddlFilterCup);
       drawTableTransfers();
+
+      rbStatisticPlayerSeason.onchange = function () {
+        tblStatisticPlayer.ajax.reload();
+      };
+
+      rbStatisticPlayerTotal.onchange = function () {
+        tblStatisticPlayer.ajax.reload();
+      };
+
+      ddlFilterCup.onchange = function () {
+        tblStatisticPlayer.ajax.reload();
+      };
     }); // document ready
 
     function drawBest11() {
@@ -80,8 +94,8 @@
       });
     }
 
-    function drawTablePlayer() {
-      $('#tblStatisticPlayer').DataTable({
+    function drawTablePlayer(rbSeason, ddlFilterCup) {
+      return $('#tblStatisticPlayer').DataTable({
         "ajax": {
           "url": '@Url.Action("StatisticPlayerGetPlayer", "Member")',
           "type": 'GET',
@@ -89,9 +103,8 @@
           "cache": false,
           "contentType": "application/json; charset=utf-8",
           "data": function (d) {
-            d.iCupId = 1;
-            d.iLand = 36;
-            d.iType = 0;
+            d.sCupId = ddlFilterCup.value;
+            d.bSeason = rbSeason.checked;
           }
         },
         "columns": [
@@ -101,6 +114,12 @@
           {
             "data": "fAge",
             "render": $.fn.dataTable.render.number('.', ',', 1, '')
+          },
+          {
+            "data": "sNat",
+            "render": function (sNat, type, row) {
+              return getNatIcon(sNat);
+            }
           },
           { "data": "iGames" },
           { "data": "iMinutes" },
@@ -318,6 +337,26 @@
   <div style="position: relative">
     <h3 style="position: relative; margin-top: 30px">Spielerstatistiken</h3>
 
+    <div align="center" style="position: absolute; top: 6px; left: 200px; width: auto">
+      <div style="position: absolute; width: 140px; height: 22px; left: 0px; background-color: white; white-space: nowrap; border: 1px solid black; -webkit-border-radius: 10px; -moz-border-radius: 10px">
+        <form>
+          <fieldset>
+            <label style="font-size:100%; color: black; margin-right: 4%">
+              <input type="radio" id="rbStatisticPlayerSeason" name="rbStatisticPlayerSeasonTotal" value="0" checked>
+              Saison
+            </label>
+            <label style="font-size:100%; color: black">
+              <input type="radio" id="rbStatisticPlayerTotal" name="rbStatisticPlayerSeasonTotal" value="1">
+              Total
+            </label>
+          </fieldset>
+        </form>
+      </div>
+      <div style="position: absolute; width: 100px; height: 22px; left: 150px">
+        @Html.DropDownListFor(m => m.sFilterCup, Model.ddlFilterCup, new { id = "ddlFilterCup", @style = "width:100%", @onchange = "getDdlClubFilter(this.value)" })
+      </div>
+    </div>
+
     <div style="position: relative; width: auto; top: 0px">
       <table id="tblStatisticPlayer" cellspacing="0" style="width: auto" class="display responsive nowrap compact">
         <thead>
@@ -326,6 +365,7 @@
             <th>Spieler</th>
             <th>Verein</th>
             <th>Alter</th>
+            <th>Nat.</th>
             <th>Spiele</th>
             <th>Min.</th>
             <th>Tore</th>

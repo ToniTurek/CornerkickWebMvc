@@ -16,7 +16,7 @@ namespace CornerkickWebMvc.Controllers
 {
   public class ViewGameController : Controller
   {
-    private static List<Models.ViewGameModel.gameData> ltGd;
+    private static List<Models.ViewGameModel.gameData2> ltGd;
 
     private CornerkickManager.User ckUser()
     {
@@ -53,18 +53,20 @@ namespace CornerkickWebMvc.Controllers
     /// <param name="ViewGame"></param>
     /// <returns></returns>
     //////////////////////////////////////////////////////////////////////////
-    private static Models.ViewGameModel.gameData getGameData(int iTeamId)
+    private static Models.ViewGameModel.gameData2 getViewGameData(string sUserId)
     {
       for (int iGd = 0; iGd < ltGd.Count; iGd++) {
-        if (ltGd[iGd].iTeamId == iTeamId) return ltGd[iGd];
+        if (ltGd[iGd].sUserId.Equals(sUserId)) return ltGd[iGd];
       }
 
       return null;
     }
-    private static void setGameDataList(Models.ViewGameModel.gameData gd)
+    private static void setViewGameDataList(Models.ViewGameModel.gameData2 gd)
     {
       for (int iGd = 0; iGd < ltGd.Count; iGd++) {
-        if (ltGd[iGd].iTeamId == gd.iTeamId) {
+        if (ltGd[iGd].sUserId == null) continue;
+
+        if (ltGd[iGd].sUserId.Equals(gd.sUserId)) {
           ltGd[iGd] = gd;
           return;
         };
@@ -74,7 +76,7 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [Authorize]
-    public ActionResult ViewGame(Models.ViewGameModel view)
+    public ActionResult ViewGame(Models.ViewGameModel view, string sGameId = null)
     {
       view.iStateGlobal = 0;
 
@@ -87,9 +89,14 @@ namespace CornerkickWebMvc.Controllers
 
       view.bAdmin = AccountController.checkUserIsAdmin(User.Identity.GetUserName());
 
-      if (view.bAdmin && user.game == null) {
-        user.game = MvcApplication.ckcore.game.tl.getDefaultGame();
-        user.game.data.iGameSpeed = 300;
+      CornerkickGame.Game game = user.game;
+
+      // Initialize own game flag
+      view.bOwnLiveGame = game != null && !game.data.bFinished;
+
+      if (view.bAdmin && game == null) {
+        game = MvcApplication.ckcore.game.tl.getDefaultGame();
+        game.data.iGameSpeed = 300;
       }
 
       view.bSound = true;
@@ -98,7 +105,23 @@ namespace CornerkickWebMvc.Controllers
       // Create game selector menu
       view.ddlGames = new List<SelectListItem>();
 
-      if (user.game == null || user.game.data.bFinished) {
+      if (!string.IsNullOrEmpty(sGameId)) {
+        // First, look for live games in user list
+        bool bUserGame = false;
+        foreach (CornerkickManager.User usrGame in MvcApplication.ckcore.ltUser) {
+          if (usrGame.id.Equals(sGameId)) {
+            game = usrGame.game;
+            bUserGame = true;
+            view.bOwnLiveGame = usrGame.id.Equals(user.id); // Set own live-game flag
+            break;
+          }
+        }
+
+        // If not live game, check for stored games to load
+        if (!bUserGame) game = MvcApplication.ckcore.io.loadGame(Path.Combine(MvcApplication.getHomeDir(), "save", "games", sGameId + ".ckgx"));
+      } else if (game == null || game.data.bFinished) {
+        view.bOwnLiveGame = false; // Set own live-game flag
+
         List<FileInfo> fiGames = getFileInfoGames(clubUser);
 
         // Insert past games into dropdownmenu
@@ -125,10 +148,10 @@ namespace CornerkickWebMvc.Controllers
 
         if (view.ddlGames.Count > 0) view.ddlGames[0].Selected = true;
 
-        if (user.game == null && fiGames.Count > 0) {
+        if (game == null && fiGames.Count > 0) {
           string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", fiGames[fiGames.Count - 1].Name);
           try {
-            user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
+            game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
           } catch (Exception e) {
             MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'" + Environment.NewLine + e.Message + e.StackTrace, CornerkickManager.Main.sErrorFile);
           }
@@ -153,7 +176,7 @@ namespace CornerkickWebMvc.Controllers
 
       fHeatmapMax = 0f;
 
-      iniGameData(view, user.game);
+      iniGameData(view, game);
 
       return View(view);
     }
@@ -219,14 +242,15 @@ namespace CornerkickWebMvc.Controllers
     public JsonResult loadGame(Models.ViewGameModel view, string sFilename)
     {
       // Get user
-      CornerkickManager.User user = ckUser();
-      if (user == null) return Json(false, JsonRequestBehavior.AllowGet);
+      CornerkickManager.User usr = ckUser();
+      if (usr == null) return Json(false, JsonRequestBehavior.AllowGet);
+      Models.ViewGameModel.gameData2 gd2 = getViewGameData(usr.id);
 
       string sFilenameGame = Path.Combine(MvcApplication.getHomeDir(), "save", "games", sFilename);
 
       try {
-        user.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
-        iniGameData(view, user.game);
+        gd2.game = MvcApplication.ckcore.io.loadGame(sFilenameGame);
+        iniGameData(view, gd2.game);
       } catch {
         MvcApplication.ckcore.tl.writeLog("Unable to load game: '" + sFilenameGame + "'", CornerkickManager.Main.sErrorFile);
       }
@@ -236,7 +260,7 @@ namespace CornerkickWebMvc.Controllers
 
     public void iniGameData(Models.ViewGameModel view, CornerkickGame.Game game)
     {
-      CornerkickManager.User user = ckUser();
+      CornerkickManager.User usr = ckUser();
       CornerkickManager.Club clbUser = ckClub();
 
       if (game == null) {
@@ -247,9 +271,15 @@ namespace CornerkickWebMvc.Controllers
         return;
       }
 
-      if (ltGd == null) ltGd = new List<Models.ViewGameModel.gameData>();
+      if (ltGd == null) ltGd = new List<Models.ViewGameModel.gameData2>();
+      Models.ViewGameModel.gameData2 gd2 = new Models.ViewGameModel.gameData2();
       Models.ViewGameModel.gameData gD = new Models.ViewGameModel.gameData();
+      gd2.sUserId = usr.id;
+      gd2.viewGd = gD;
+      gd2.game = game;
+
       gD.iTeamId = clbUser.iId;
+      gD.bOwnLiveGame = view.bOwnLiveGame;
 
       gD.sColorJerseyH = new string[] { "white", "blue", "blue", "blue", "white", "white" };
       gD.sColorJerseyA = new string[] { "white", "red",  "red",  "red",  "white", "white" };
@@ -325,7 +355,7 @@ namespace CornerkickWebMvc.Controllers
 
       //gD = getAllGameData(view);
 
-      setGameData(ref gD, game.data, user, clbUser);
+      setGameData(ref gD, gd2.game, gd2.sUserId);
 
       view.gD = gD;
     }
@@ -335,9 +365,10 @@ namespace CornerkickWebMvc.Controllers
       Models.ViewGameModel.ltLoc = new List<float[]>();
       Models.ViewGameModel.gameLoc gLoc = new Models.ViewGameModel.gameLoc();
 
-      CornerkickManager.User user = ckUser();
+      CornerkickManager.User usr = ckUser();
+      Models.ViewGameModel.gameData2 gd2 = getViewGameData(usr.id);
 
-      if (user.game == null) {
+      if (gd2.game == null) {
         Response.StatusCode = 1;
         return Json(Models.ViewGameModel.ltLoc, JsonRequestBehavior.AllowGet);
       }
@@ -349,29 +380,32 @@ namespace CornerkickWebMvc.Controllers
         if (MvcApplication.ckcore.ltUser[0].nextGame != null) gLoc.iInterval = MvcApplication.ckcore.ltUser[0].nextGame.iGameSpeed;
       }
 
-      CornerkickGame.Game.State state = user.game.newState();
-      if (user.game.data.ltState.Count > 0) state = user.game.data.ltState[user.game.data.ltState.Count - 1];
+      CornerkickGame.Game.State state = gd2.game.newState();
+      if (gd2.game.data.ltState.Count > 0) state = gd2.game.data.ltState[gd2.game.data.ltState.Count - 1];
 
-      if (iState > 0 && iState < user.game.data.ltState.Count) state = user.game.data.ltState[iState];
+      if (iState > 0 && iState < gd2.game.data.ltState.Count) state = gd2.game.data.ltState[iState];
       //if (fTime >= 0f) state = MvcApplication.ckcore.game.tl.getState(user.game.data, fTime);
       //CornerkickGame.Game.State state = MvcApplication.ckcore.game.tl.getState(user.game.data, fTime);
 
+      /*
       float fFinished = 0f;
-      /*if (fTime >= 0f) fFinished = state.i;
-      else */if (user.game.data.bFinished) fFinished = 1f;
-      gLoc.bFinished = user.game.data.bFinished;
+      if (fTime >= 0f) fFinished = state.i;
+      else if (user.game.data.bFinished) fFinished = 1f;
+      */
+      gLoc.bFinished = gd2.game.data.bFinished;
+      gLoc.bHalftime = gd2.game.iStandard == 9;
 
       // Ball
       Models.ViewGameModel.gameBall gBall = new Models.ViewGameModel.gameBall();
       CornerkickGame.Game.Ball ball;
-      if (iState < 0) ball = user.game.ball;
+      if (iState < 0) ball = gd2.game.ball;
       else            ball = state.ball;
 
       CornerkickGame.Game.PointBall pbBall = new CornerkickGame.Game.PointBall();
       pbBall = ball.Pos;
 
       if (bAverage) {
-        System.Drawing.Point ptAve = CornerkickManager.UI.getAveragePos(user.game, -1, -1, iState);
+        System.Drawing.Point ptAve = CornerkickManager.UI.getAveragePos(gd2.game, -1, -1, iState);
         pbBall.X = ptAve.X;
         pbBall.Y = ptAve.Y;
         pbBall.Z = 0f;
@@ -387,18 +421,18 @@ namespace CornerkickWebMvc.Controllers
           Models.ViewGameModel.gamePlayer gPlayer = new Models.ViewGameModel.gamePlayer();
 
           CornerkickGame.Player pl;
-          if (iState < 0) pl = user.game.player[iHA][iP];
+          if (iState < 0) pl = gd2.game.player[iHA][iP];
           else            pl = state.player[iHA][iP];
 
           if (pl == null) continue;
           if (string.IsNullOrEmpty(pl.sName)) continue;
 
           if      (pl.bYellowCard)                              gPlayer.iCard = 1;
-          else if (pl.iSuspension[user.game.iSuspensionIx] > 0) gPlayer.iCard = 2;
+          else if (pl.iSuspension[gd2.game.iSuspensionIx] > 0) gPlayer.iCard = 2;
 
           gPlayer.ptPos = pl.ptPos;
           if (bAverage) {
-            System.Drawing.Point ptAve = CornerkickManager.UI.getAveragePos(user.game, iHA, iP, iState);
+            System.Drawing.Point ptAve = CornerkickManager.UI.getAveragePos(gd2.game, iHA, iP, iState);
             gPlayer.ptPos = ptAve;
           }
 
@@ -410,12 +444,12 @@ namespace CornerkickWebMvc.Controllers
           //Models.ViewGameModel.ltLoc.Add(new float[5] { iPosX, iPosY, pl.iLookAt, pl.iNr, fCard });
 
           if (bAdmin && iState >= 0) {
-            user.game.player[iHA][iP].iHA     = pl.iHA;
-            user.game.player[iHA][iP].iIndex  = pl.iIndex;
-            user.game.player[iHA][iP].ptPos.X = pl.ptPos.X;
-            user.game.player[iHA][iP].ptPos.Y = pl.ptPos.Y;
-            user.game.player[iHA][iP].iLookAt = pl.iLookAt;
-            user.game.player[iHA][iP].fSteps = 6f;
+            gd2.game.player[iHA][iP].iHA     = pl.iHA;
+            gd2.game.player[iHA][iP].iIndex  = pl.iIndex;
+            gd2.game.player[iHA][iP].ptPos.X = pl.ptPos.X;
+            gd2.game.player[iHA][iP].ptPos.Y = pl.ptPos.Y;
+            gd2.game.player[iHA][iP].iLookAt = pl.iLookAt;
+            gd2.game.player[iHA][iP].fSteps = 6f;
           }
         }
       }
@@ -424,26 +458,26 @@ namespace CornerkickWebMvc.Controllers
       if (bAdmin) gLoc.bFinished = true;
 
       if (bAdmin && iState >= 0) {
-        user.game.ball = ball;
-        user.game.tsMinute = state.tsMinute;
+        gd2.game.ball = ball;
+        gd2.game.tsMinute = state.tsMinute;
 
         // Find player at ball
-        user.game.ball.plAtBall = null;
-        if (user.game.ball.iPassStep == 0) {
+        gd2.game.ball.plAtBall = null;
+        if (gd2.game.ball.iPassStep == 0) {
           for (byte iHA = 0; iHA < 2; iHA++) {
             for (int iP = 0; iP < MvcApplication.ckcore.game.data.nPlStart; iP++) {
-              if (iP < user.game.player[iHA].Length) {
-                CornerkickGame.Player plAtBall = user.game.player[iHA][iP];
+              if (iP < gd2.game.player[iHA].Length) {
+                CornerkickGame.Player plAtBall = gd2.game.player[iHA][iP];
                 if (plAtBall == null) continue;
 
                 if (ball.ptPos == plAtBall.ptPos) {
-                  user.game.ball.plAtBall = plAtBall;
+                  gd2.game.ball.plAtBall = plAtBall;
                   break;
                 }
               }
             }
 
-            if (user.game.ball.plAtBall != null) break;
+            if (gd2.game.ball.plAtBall != null) break;
           }
         }
       }
@@ -507,21 +541,22 @@ namespace CornerkickWebMvc.Controllers
 
     public JsonResult ViewGameGetDataStatisticObject(Models.ViewGameModel view, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
-      CornerkickManager.User user = ckUser();
-      CornerkickManager.Club club = ckClub();
+      CornerkickManager.User usr = ckUser();
+      //CornerkickManager.Club club = ckClub();
 
-      Models.ViewGameModel.gameData gD = getGameData(club.iId);
+      Models.ViewGameModel.gameData2 gd2 = getViewGameData(usr.id); // view.gD;
+      Models.ViewGameModel.gameData gD = gd2.viewGd; // view.gD;
       sbyte iStandard = 0;
 
-      if (user.game == null) {
-        setGameData(ref gD, null, user, club, out iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
+      if (gd2.game == null) {
+        setGameData(ref gD, gd2.game, gd2.sUserId, out iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
         return Json(gD, JsonRequestBehavior.AllowGet);
       }
 
-      CornerkickGame.Game.Data gameData = user.game.data;
+      CornerkickGame.Game.Data gameData = gd2.game.data;
 
       // Clear chart arrays
-      gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
+      gD.ltF = new List<Models.DataPointGeneral>[gameData.nPlStart];
       for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
 
 #if _PLOT_MORAL
@@ -530,9 +565,9 @@ namespace CornerkickWebMvc.Controllers
 #endif
 
       if (gD.nStates == 0) {
-        gD = getAllGameData(view);
+        gD = getAllGameData(gameData);
       } else if (iState >= 0) {
-        gD = getAllGameData(view, iState);
+        gD = getAllGameData(gameData, iState);
       } else if (iState <  0) {
         if (iState == -3) {
           gD.iLastStatePerformed = 0;
@@ -547,22 +582,22 @@ namespace CornerkickWebMvc.Controllers
         */
 
         // Add game data to struct
-        for (int i = gD.iLastStatePerformed; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, user, club, i);
+        for (int i = gD.iLastStatePerformed; i < gameData.ltState.Count; i++) addGameData(ref gD, gameData, i);
       }
 
-      iStandard = user.game.iStandard;
-      setGameData(ref gD, gameData, user, club, out iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
+      iStandard = gd2.game.iStandard;
+      setGameData(ref gD, gd2.game, gd2.sUserId, out iStandard, iState, iHeatmap, iAllShoots, iAllDuels, iAllPasses);
 
       return Json(gD, JsonRequestBehavior.AllowGet);
     }
 
     // Adds comment, shoots/cards and chart data of current state to gD
-    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, bool bAddFMList = true)
+    private void addGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, int iState = -1, bool bAddFMList = true)
     {
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
-      if (user.game == null) return;
+      if (gameData?.ltState == null) return;
 
       if (gameData.ltState.Count == 0) return;
 
@@ -572,12 +607,12 @@ namespace CornerkickWebMvc.Controllers
       float fLeft = ((state.tsMinute.Hours * 60f) + state.tsMinute.Minutes + (state.tsMinute.Seconds / 60f)) / 0.9f;
       if (gameData.bFinished) fLeft = (100.0f * state.i) / gameData.ltState.Count;
 
-      for (byte iHA = 0; iHA < 2; iHA++) {
+      for (byte jHA = 0; jHA < 2; jHA++) {
         int iIconTop = 2;
-        if (iHA == 1) iIconTop = 44;
+        if (jHA == 1) iIconTop = 44;
 
         string sTeam = gameData.team[0].sTeam;
-        if (iHA > 0) sTeam = gameData.team[1].sTeam;
+        if (jHA > 0) sTeam = gameData.team[1].sTeam;
 
         string sOnClick = "";
         string sCursor = "";
@@ -588,7 +623,7 @@ namespace CornerkickWebMvc.Controllers
 
         // Shoots
         CornerkickGame.Game.Shoot shoot = state.shoot;
-        if (shoot.plShoot != null && shoot.iHA == iHA) {
+        if (shoot.plShoot != null && shoot.iHA == jHA) {
           string sShootDesc = MvcApplication.ckcore.ui.getMinuteString(shoot.tsMinute, false) + " Min.: " +
                               shoot.iGoalsH.ToString() + ":" + shoot.iGoalsA.ToString();
           sShootDesc += " - " + shoot.plShoot.sName;
@@ -617,21 +652,21 @@ namespace CornerkickWebMvc.Controllers
           gD.sTimelineIcons += "<img " + sOnClick + "src=\"/Content/Icons/ball_" + sImg + ".png\" alt=\"Torschuss\" style=\"position: absolute; top: " + iIconTop.ToString() + "px; width: 12px; left: " + (fLeft - 0.5).ToString(nfi) + "%" + sCursor + "\" title=\"" + sShootDesc + "\"/>";
 
           // Count shoots
-          gD.iShoots[iHA]++;
-          if (shoot.iResult > 0 && shoot.iResult < 7) gD.iShootsOnGoal[iHA]++;
+          gD.iShoots[jHA]++;
+          if (shoot.iResult > 0 && shoot.iResult < 7) gD.iShootsOnGoal[jHA]++;
         } // shoot
 
         // Passes
         CornerkickGame.Game.Pass pass = state.pass;
-        if (pass.plPasser != null && pass.plPasser.iHA == iHA) {
-          if      (pass.plReceiver     == null)              gD.iPassesBad [iHA]++;
-          else if (pass.plReceiver.iHA != pass.plPasser.iHA) gD.iPassesBad [iHA]++;
-          else if (pass.plReceiver     != pass.plPasser)     gD.iPassesGood[iHA]++;
+        if (pass.plPasser != null && pass.plPasser.iHA == jHA) {
+          if      (pass.plReceiver     == null)              gD.iPassesBad [jHA]++;
+          else if (pass.plReceiver.iHA != pass.plPasser.iHA) gD.iPassesBad [jHA]++;
+          else if (pass.plReceiver     != pass.plPasser)     gD.iPassesGood[jHA]++;
         }
 
         // Duels
         CornerkickGame.Game.Duel duel = state.duel;
-        if (duel.plDef != null && duel.plDef.iHA == iHA) {
+        if (duel.plDef != null && duel.plDef.iHA == jHA) {
           if (duel.iResult > 2) {
             string sCardDesc = MvcApplication.ckcore.ui.getMinuteString(duel.tsMinute, false) + " Min.: " +
                                 sTeam +
@@ -649,130 +684,132 @@ namespace CornerkickWebMvc.Controllers
           }
 
           // Count duels (fouls)
-          gD.iDuels[iHA]++;
-          if (duel.iResult > 1) gD.iFouls[iHA]++;
+          gD.iDuels[jHA]++;
+          if (duel.iResult > 1) gD.iFouls[jHA]++;
         }
       } // iHA
 
-      byte jHA = 0;
-      if (user.game.data.team[1].iTeamId == club.iId) jHA = 1;
-
       // Chart
-      if (bAddFMList) {
-        if (gD.ltF == null || iState == -1) {
-          gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
-          for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
-        }
+      if (gD.bOwnLiveGame) {
+        byte iHA = 2;
+        if      (gD.iTeamId == gameData.team[0].iTeamId) iHA = 0;
+        else if (gD.iTeamId == gameData.team[1].iTeamId) iHA = 1;
+        if (bAddFMList && iHA < 2) {
+          if (gD.ltF == null || iState == -1) {
+            gD.ltF = new List<Models.DataPointGeneral>[gameData.nPlStart];
+            for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
+          }
 
 #if _PLOT_MORAL
-        if (gD.ltM == null || iState == -1) {
-          gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
-          for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
-        }
+          if (gD.ltM == null || iState == -1) {
+            gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
+            for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
+          }
 #endif
 
-        for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
-          gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fFresh));
-        }
+          for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) {
+            gD.ltF[iPl].Add(new Models.DataPointGeneral(state.i, state.player[iHA][iPl].fFresh));
+          }
 #if _PLOT_MORAL
-        for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) {
-          gD.ltM[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fMoral));
-        }
+          for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) {
+            gD.ltM[iPl].Add(new Models.DataPointGeneral(state.i, state.player[jHA][iPl].fMoral));
+          }
 #endif
+        }
       }
 
       // Set counter of performed state
       gD.iLastStatePerformed = iState;
     }
 
-    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    private void setGameData(ref Models.ViewGameModel.gameData gd, CornerkickGame.Game game, string sUserId, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       sbyte iStandard;
-      setGameData(ref gD, gameData, user, club, out iStandard, iState: iState, iHeatmap: iHeatmap, iAllShoots: iAllShoots, iAllDuels: iAllDuels, iAllPasses: iAllPasses);
+      setGameData(ref gd, game, sUserId, out iStandard, iState: iState, iHeatmap: iHeatmap, iAllShoots: iAllShoots, iAllDuels: iAllDuels, iAllPasses: iAllPasses);
     }
-    private void setGameData(ref Models.ViewGameModel.gameData gD, CornerkickGame.Game.Data gameData, CornerkickManager.User user, CornerkickManager.Club club, out sbyte iStandard, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
+    private void setGameData(ref Models.ViewGameModel.gameData gd, CornerkickGame.Game game, string sUserId, out sbyte iStandard, int iState = -1, int iHeatmap = -1, int iAllShoots = -1, int iAllDuels = -1, int iAllPasses = -1)
     {
       iStandard = 0;
 
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
-      if (user.game == null) {
-        gD.iGoalsH = -1;
-        gD.iGoalsA = -1;
+      if (game == null) {
+        gd.iGoalsH = -1;
+        gd.iGoalsA = -1;
         return;
       }
 
-      if (gameData?.ltState == null) return;
-      if (gameData.ltState.Count == 0) return;
+      if (game.data?.ltState == null) return;
+      if (game.data.ltState.Count == 0) return;
 
-      CornerkickGame.Game.State state = gameData.ltState[gameData.ltState.Count - 1];
-      if (iState >= 0 && iState < gameData.ltState.Count) state = gameData.ltState[iState];
+      CornerkickGame.Game.State state = game.data.ltState[game.data.ltState.Count - 1];
+      if (iState >= 0 && iState < game.data.ltState.Count) state = game.data.ltState[iState];
 
-      gD.nStates = gameData.ltState.Count;
+      gd.nStates = game.data.ltState.Count;
 
-      gD.tsMinute = state.tsMinute;
+      gd.tsMinute = state.tsMinute;
 
       iStandard = state.iStandard;
 
-      gD.ltDrawLineShoot = new List<Models.ViewGameModel.drawLine>();
-      gD.ltDrawLinePass  = new List<Models.ViewGameModel.drawLine>();
-      gD.sCard = "";
-      gD.sStatSubs = "";
+      gd.ltDrawLineShoot = new List<Models.ViewGameModel.drawLine>();
+      gd.ltDrawLinePass  = new List<Models.ViewGameModel.drawLine>();
+      gd.sCard = "";
+      gd.sStatSubs = "";
 
       // Draw shoot on pitch
-      if ((iState >= 0 && iState < gameData.ltState.Count) || iAllShoots >= 0) {
+      if ((iState >= 0 && iState < game.data.ltState.Count) || iAllShoots >= 0) {
         if (iAllShoots >= 0) {
           byte iHA   =  0;
           int  iPlIx = -1;
-          getStatisticHAPlayerIx(iAllShoots, user.game.data.nPlStart, out iHA, out iPlIx);
+          getStatisticHAPlayerIx(iAllShoots, game.data.nPlStart, out iHA, out iPlIx);
 
-          for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
-            CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
-            gD.ltDrawLineShoot.AddRange(getShootLine(stateTmp, user.game, iHA, iPlIx));
+          for (int iSt = 0; iSt < game.data.ltState.Count; iSt++) {
+            CornerkickGame.Game.State stateTmp = game.data.ltState[iSt];
+            gd.ltDrawLineShoot.AddRange(getShootLine(stateTmp, game, iHA, iPlIx));
 
             if (iState >= 0 && iSt >= iState) break; // If review --> stop at selected state
           }
         } else {
-          gD.ltDrawLineShoot = getShootLine(state, user.game);
+          gd.ltDrawLineShoot = getShootLine(state, game);
         }
       }
 
       // Draw pass on pitch
-      if ((iState >= 0 && iState < gameData.ltState.Count) || iAllPasses >= 0) {
+      if ((iState >= 0 && iState < game.data.ltState.Count) || iAllPasses >= 0) {
         if (iAllPasses >= 0) {
           byte iHA = 0;
           int iPlIx = -1;
-          getStatisticHAPlayerIx(iAllPasses, user.game.data.nPlStart, out iHA, out iPlIx);
+          getStatisticHAPlayerIx(iAllPasses, game.data.nPlStart, out iHA, out iPlIx);
 
-          for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
-            CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
-            gD.ltDrawLinePass.Add(getPassLine(stateTmp, user.game, iHA, iPlIx));
+          for (int iSt = 0; iSt < game.data.ltState.Count; iSt++) {
+            CornerkickGame.Game.State stateTmp = game.data.ltState[iSt];
+            gd.ltDrawLinePass.Add(getPassLine(stateTmp, game, iHA, iPlIx));
 
             if (iState >= 0 && iSt >= iState) break; // If review --> stop at selected state
           }
         } else {
-          gD.ltDrawLinePass.Clear();
-          gD.ltDrawLinePass.Add(getPassLine(state, user.game));
+          gd.ltDrawLinePass.Clear();
+          gd.ltDrawLinePass.Add(getPassLine(state, game));
         }
       }
 
       // Draw duel on pitch
-      if ((iState >= 0 && iState < gameData.ltState.Count) || iAllDuels >= 0) {
+      if ((iState >= 0 && iState < game.data.ltState.Count) || iAllDuels >= 0) {
         // Show duel on pitch
         if (iAllDuels >= 0) {
           byte iHA   =  0;
           int  iPlIx = -1;
-          getStatisticHAPlayerIx(iAllDuels, user.game.data.nPlStart, out iHA, out iPlIx);
+          getStatisticHAPlayerIx(iAllDuels, game.data.nPlStart, out iHA, out iPlIx);
 
-          for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
-            CornerkickGame.Game.State stateTmp = gameData.ltState[iSt];
-            gD.sCard += getDuelIcon(stateTmp, user.game, iHA, iPlIx);
+          for (int iSt = 0; iSt < game.data.ltState.Count; iSt++) {
+            CornerkickGame.Game.State stateTmp = game.data.ltState[iSt];
+            gd.sCard += getDuelIcon(stateTmp, game, iHA, iPlIx);
 
             if (iState >= 0 && iSt >= iState) break; // If review --> stop at selected state
           }
         } else {
-          gD.sCard = getDuelIcon(state, user.game);
+          gd.sCard = getDuelIcon(state, game);
         }
       }
 
@@ -785,85 +822,90 @@ namespace CornerkickWebMvc.Controllers
         int iIconTop = 2;
         if (iHA == 1) iIconTop = 44;
 
-        string sTeam = gameData.team[0].sTeam;
-        if (iHA > 0) sTeam = gameData.team[1].sTeam;
+        string sTeam = game.data.team[0].sTeam;
+        if (iHA > 0) sTeam = game.data.team[1].sTeam;
 
         //int iStTmp = 0;
         // loop over states
         //foreach (CornerkickGame.Game.State state in gameData.ltState) {
 
         if (iHA == 0) {
-          gD.iGoalsH = state.iGoalsH;
+          gd.iGoalsH = state.iGoalsH;
           nPossession[0] = state.iPossessionH;
           nCornerkick[0] = state.iCornerkickH;
           nOffsite   [0] = state.iOffsiteH;
         } else {
-          gD.iGoalsA = state.iGoalsA;
+          gd.iGoalsA = state.iGoalsA;
           nPossession[1] = state.iPossessionA;
           nCornerkick[1] = state.iCornerkickA;
           nOffsite   [1] = state.iOffsiteA;
         }
-        if (gD.iPassesGood[iHA] + gD.iPassesBad[iHA] > 0) fPasses[iHA] = (100 * gD.iPassesGood[iHA]) / (float)(gD.iPassesGood[iHA] + gD.iPassesBad[iHA]);
+        if (gd.iPassesGood[iHA] + gd.iPassesBad[iHA] > 0) fPasses[iHA] = (100 * gd.iPassesGood[iHA]) / (float)(gd.iPassesGood[iHA] + gd.iPassesBad[iHA]);
 
         //iStTmp++;
         //} // foreach state
 
         // Substitutions
-        if (gameData.team[iHA].ltSubstitutions != null) {
-          for (int iS = 0; iS < gameData.team[iHA].ltSubstitutions.Count; iS++) {
-            int[] iSub = gameData.team[iHA].ltSubstitutions[iS];
+        if (game.data.team[iHA].ltSubstitutions != null) {
+          for (int iS = 0; iS < game.data.team[iHA].ltSubstitutions.Count; iS++) {
+            int[] iSub = game.data.team[iHA].ltSubstitutions[iS];
             float fMin = iSub[2];
 
             string sSubDesc = (iSub[2] + 1).ToString() + ". Min.: " + sTeam + " - " + MvcApplication.ckcore.ltPlayer[iSub[1]].plGame.sName + " für " + MvcApplication.ckcore.ltPlayer[iSub[0]].plGame.sName;
 
-            if (string.IsNullOrEmpty(gD.sStatSubs)) gD.sStatSubs = "<br/><u>Spielerwechsel:</u>";
-            gD.sStatSubs += "<br/>" + sSubDesc;
+            if (string.IsNullOrEmpty(gd.sStatSubs)) gd.sStatSubs = "<br/><u>Spielerwechsel:</u>";
+            gd.sStatSubs += "<br/>" + sSubDesc;
 
-            gD.sTimelineIcons += "<img src=\"/Content/Icons/sub.png\" alt=\"Spielerwechsel\" style=\"position: absolute; top: " + iIconTop.ToString(nfi) + "px; width: 12px; left: " + ((fMin - 0.5) / 0.9).ToString(nfi) + "%\" title=\"" + sSubDesc + "\"/>";
+            gd.sTimelineIcons += "<img src=\"/Content/Icons/sub.png\" alt=\"Spielerwechsel\" style=\"position: absolute; top: " + iIconTop.ToString(nfi) + "px; width: 12px; left: " + ((fMin - 0.5) / 0.9).ToString(nfi) + "%\" title=\"" + sSubDesc + "\"/>";
           }
         }
       } // iHA
 
       // Referee quality
-      gD.sRefereeQuality   = gameData.referee.fQuality.ToString("0.0%");
-      gD.sRefereeDecisions = "-";
-      if (gameData.referee.iDecisions[0] > 0) gD.sRefereeDecisions = (gameData.referee.iDecisions[1] / (float)gameData.referee.iDecisions[0]).ToString("0.0%");
+      gd.sRefereeQuality   = game.data.referee.fQuality.ToString("0.0%");
+      gd.sRefereeDecisions = "-";
+      if (game.data.referee.iDecisions[0] > 0) gd.sRefereeDecisions = (game.data.referee.iDecisions[1] / (float)game.data.referee.iDecisions[0]).ToString("0.0%");
 
       // Bar statistics
       float fPossessionH = 50f;
       if (nPossession[0] + nPossession[1] > 0) fPossessionH = 100f * nPossession[0] / (float)(nPossession[0] + nPossession[1]);
 
-      gD.fDataH = new float[][] { new float[2] { (float)gD.iGoalsH, 0f }, new float[2] { (float)gD.iShoots[0], -1f }, new float[2] { (float)gD.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] { (float)gD.iDuels[0], -4f }, new float[2] { (float)gD.iFouls[0], -5f }, new float[2] { (float)nCornerkick[0], -6f }, new float[2] { (float)nOffsite[0], -7f }, new float[2] { fPasses[0], -8f } };
-      gD.fDataA = new float[][] { new float[2] { (float)gD.iGoalsA, 0f }, new float[2] { (float)gD.iShoots[1], -1f }, new float[2] { (float)gD.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { (float)gD.iDuels[1], -4f }, new float[2] { (float)gD.iFouls[1], -5f }, new float[2] { (float)nCornerkick[1], -6f }, new float[2] { (float)nOffsite[1], -7f }, new float[2] { fPasses[1], -8f } };
+      gd.fDataH = new float[][] { new float[2] { (float)gd.iGoalsH, 0f }, new float[2] { (float)gd.iShoots[0], -1f }, new float[2] { (float)gd.iShootsOnGoal[0], -2f }, new float[2] {        fPossessionH, -3f }, new float[2] { (float)gd.iDuels[0], -4f }, new float[2] { (float)gd.iFouls[0], -5f }, new float[2] { (float)nCornerkick[0], -6f }, new float[2] { (float)nOffsite[0], -7f }, new float[2] { fPasses[0], -8f } };
+      gd.fDataA = new float[][] { new float[2] { (float)gd.iGoalsA, 0f }, new float[2] { (float)gd.iShoots[1], -1f }, new float[2] { (float)gd.iShootsOnGoal[1], -2f }, new float[2] { 100f - fPossessionH, -3f }, new float[2] { (float)gd.iDuels[1], -4f }, new float[2] { (float)gd.iFouls[1], -5f }, new float[2] { (float)nCornerkick[1], -6f }, new float[2] { (float)nOffsite[1], -7f }, new float[2] { fPasses[1], -8f } };
 
       if (AccountController.checkUserIsAdmin(User.Identity.GetUserName())) {
-        if (user.game.ball.plAtBall != null) {
+        if (game.ball.plAtBall != null) {
 #if _AI2
-          float fShootOnGoal = user.game.ai.getChanceShootOnGoal(user.game.ball.plAtBall, 0);
+          float fShootOnGoal = game.ai.getChanceShootOnGoal(game.ball.plAtBall, 0);
 #else
-          float fShootOnGoal = user.game.ai.getChanceShootOnGoal    (user.game.ball.plAtBall);
+          float fShootOnGoal = game.ai.getChanceShootOnGoal    (game.ball.plAtBall);
 #endif
-          float fKeeperSave  = user.game.ai.getChanceShootKeeperSave(user.game.ball.plAtBall);
+          float fKeeperSave  = game.ai.getChanceShootKeeperSave(game.ball.plAtBall);
 
-          gD.sAdminChanceShootOnGoal = "<br/><u>Change Schuss aufs Tor:</u> " + fShootOnGoal.ToString("0.0%");
-          gD.sAdminChanceGoal        = "<br/><u>Change Tor:</u> " + (fShootOnGoal * (1f - fKeeperSave)).ToString("0.0%");
+          gd.sAdminChanceShootOnGoal = "<br/><u>Change Schuss aufs Tor:</u> " + fShootOnGoal.ToString("0.0%");
+          gd.sAdminChanceGoal        = "<br/><u>Change Tor:</u> " + (fShootOnGoal * (1f - fKeeperSave)).ToString("0.0%");
         }
       }
 
       // Heatmap
-      gD.sDivHeatmap = "";
+      gd.sDivHeatmap = "";
       if (iHeatmap >= 0) {
         byte iHA   =  0;
         int  iPlIx = -1;
-        getStatisticHAPlayerIx(iHeatmap, user.game.data.nPlStart, out iHA, out iPlIx);
-        gD.sDivHeatmap = getDivHeatmap(iHA, iState, iPlIx);
+        getStatisticHAPlayerIx(iHeatmap, game.data.nPlStart, out iHA, out iPlIx);
+        gd.sDivHeatmap = getDivHeatmap(iHA, iState, iPlIx);
       }
 
       // Player action chances
-      gD.fPlAction    = state.fPlAction;
-      gD.fPlActionRnd = state.fPlActionRandom;
+      gd.fPlAction    = state.fPlAction;
+      gd.fPlActionRnd = state.fPlActionRandom;
 
-      setGameDataList(gD);
+      Models.ViewGameModel.gameData2 gd2 = new Models.ViewGameModel.gameData2() {
+        sUserId = sUserId,
+        viewGd = gd,
+        game = game
+      };
+      setViewGameDataList(gd2);
     }
 
     private void getStatisticHAPlayerIx(int i, byte nPlStart, out byte iHA, out int iPl)
@@ -1043,9 +1085,8 @@ namespace CornerkickWebMvc.Controllers
       return sDuelIcon;
     }
 
-    public Models.ViewGameModel.gameData getAllGameData(Models.ViewGameModel view, int iState = -1)
+    public Models.ViewGameModel.gameData getAllGameData(CornerkickGame.Game.Data gd, int iState = -1)
     {
-      CornerkickManager.User user = ckUser();
       CornerkickManager.Club clbUser = ckClub();
 
       Models.ViewGameModel.gameData gD = new Models.ViewGameModel.gameData();
@@ -1054,23 +1095,19 @@ namespace CornerkickWebMvc.Controllers
       NumberFormatInfo nfi = new NumberFormatInfo();
       nfi.NumberDecimalSeparator = ".";
 
-      if (user.game == null) return gD;
+      if (gd == null) return gD;
 
-      if (view.game == null) view.game = user.game;
-
-      // initialize chart values
-      gD.ltF = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
+      // Initialize chart values
+      gD.ltF = new List<Models.DataPointGeneral>[gd.nPlStart];
       for (byte iPl = 0; iPl < gD.ltF.Length; iPl++) gD.ltF[iPl] = new List<Models.DataPointGeneral>();
 #if _PLOT_MORAL
       gD.ltM = new List<Models.DataPointGeneral>[user.game.data.nPlStart];
       for (byte iPl = 0; iPl < gD.ltM.Length; iPl++) gD.ltM[iPl] = new List<Models.DataPointGeneral>();
 #endif
 
-      CornerkickGame.Game.Data gameData = user.game.data;
-
-      for (int iSt = 0; iSt < gameData.ltState.Count; iSt++) {
-        CornerkickGame.Game.State state = gameData.ltState[iSt];
-        addGameData(ref gD, gameData, user, clbUser, iSt, state.tsMinute.Seconds == 0 && state.bNewRound);
+      for (int iSt = 0; iSt < gd.ltState.Count; iSt++) {
+        CornerkickGame.Game.State state = gd.ltState[iSt];
+        addGameData(ref gD, gd, iSt, state.tsMinute.Seconds == 0 && state.bNewRound);
 
         if (iState == iSt) break;
       }
@@ -1081,11 +1118,12 @@ namespace CornerkickWebMvc.Controllers
     float fHeatmapMax = 0f;
     private string getDivHeatmap(byte iHA = 0, int iStateMax = 0, int iPlayer = -1)
     {
-      CornerkickManager.User user = ckUser();
+      CornerkickManager.User usr = ckUser();
+      Models.ViewGameModel.gameData2 gd2 = getViewGameData(usr.id);
 
-      if (user.game == null) return "";
+      if (gd2.game == null) return "";
 
-      float[][] fHeatmap = MvcApplication.ckcore.ui.getHeatmap(user.game, iHA, ref fHeatmapMax, iStateMax, iPlayer);
+      float[][] fHeatmap = MvcApplication.ckcore.ui.getHeatmap(gd2.game, iHA, ref fHeatmapMax, iStateMax, iPlayer);
 
       string sDiv = "";
 

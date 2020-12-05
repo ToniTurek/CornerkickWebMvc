@@ -6317,7 +6317,16 @@ namespace CornerkickWebMvc.Controllers
           sBox += sLiveGameTd;
         } else {
           if (gd.team[0].iGoals + gd.team[1].iGoals >= 0) {
-            sBox += "<td style=\"white-space: nowrap\" align=\"center\">" + CornerkickManager.UI.getResultString(gd) + "</td>";
+            sBox += "<td style=\"white-space: nowrap\" align=\"center\">";
+
+            string sFilenameGame = CornerkickManager.IO.getFilenameGame(gd);
+            if (System.IO.File.Exists(System.IO.Path.Combine(MvcApplication.getHomeDir(), "save", "games", sFilenameGame + ".ckgx"))) {
+              sBox += "<a href=\"/ViewGame/ViewGame?sGameId=" + sFilenameGame + "\" target=\"\">" + CornerkickManager.UI.getResultString(gd) + "</a>";
+            } else {
+              sBox += CornerkickManager.UI.getResultString(gd);
+            }
+
+            sBox += "</td>";
           } else {
             sBox += "<td style=\"white-space: nowrap\" align=\"center\">-</td>";
           }
@@ -6335,7 +6344,13 @@ namespace CornerkickWebMvc.Controllers
           if (!usr.game.data.bFinished) {
             if (usr.game.data.team[0].iTeamId == gd.team[0].iTeamId ||
                 usr.game.data.team[1].iTeamId == gd.team[1].iTeamId) {
-              return "<td style=\"white-space: nowrap; color: #ff8c00\" align=\"center\">" + CornerkickManager.UI.getResultString(usr.game.data) + " - " + MvcApplication.ckcore.ui.getMinuteString(usr.game.tsMinute, false) + " Min.</td>";
+              string sTd = "<td style=\"white-space: nowrap; color: #ff8c00\" align=\"center\">";
+              sTd += "<a href=\"/ViewGame/ViewGame?sGameId=" + usr.id + "\" target=\"\" style=\"white-space: nowrap; color: #ff8c00\">";
+              sTd += CornerkickManager.UI.getResultString(usr.game.data) + " - " + MvcApplication.ckcore.ui.getMinuteString(usr.game.tsMinute, false) + " Min.";
+              sTd += "</a>";
+              sTd += "</td>";
+
+              return sTd;
             }
           }
         }
@@ -8213,10 +8228,24 @@ namespace CornerkickWebMvc.Controllers
     }
 
     [HttpGet]
-    public JsonResult StatisticPlayerGetPlayer(int iCupId, int iLand, int iType)
+    public JsonResult StatisticPlayerGetPlayer(string sCupId, bool bSeason)
     {
       //The table or entity I'm querying
       List<Models.DatatableEntryPlayer> ltDePlayer = new List<Models.DatatableEntryPlayer>();
+
+      int iCupId  =  1;
+      int iCupId2 = -1;
+      int iCupId3 = -1;
+
+      if (!string.IsNullOrEmpty(sCupId)) {
+        string[] sCupIdSplit = sCupId.Split(',');
+
+        if (sCupIdSplit.Length > 2) {
+          iCupId  = int.Parse(sCupIdSplit[0]);
+          iCupId2 = int.Parse(sCupIdSplit[1]);
+          iCupId3 = int.Parse(sCupIdSplit[2]);
+        }
+      }
 
       int iP = 0;
       foreach (CornerkickManager.Player pl in MvcApplication.ckcore.ltPlayer) {
@@ -8224,21 +8253,22 @@ namespace CornerkickWebMvc.Controllers
         if (pl.bRetire) continue;
         if (string.IsNullOrEmpty(pl.plGame.sName)) continue;
         if (pl.contract == null) continue;
-        if (pl.contract.club.iLand != iLand) continue;
+        if (iCupId2 >= 0 && pl.contract.club.iLand != iCupId2) continue;
 
-        CornerkickGame.Player.Statistic stat = pl.plGame.getStatistic(iCupId, bSeason: iType == 0/*, iGameType2: iLand*/);
+        CornerkickGame.Player.Statistic stat = pl.plGame.getStatistic(iCupId, bSeason: bSeason/*, iGameType2: iCupId2*/);
         if (stat == null) continue;
 
         int[] iStat = stat.iStat;
 
         if (iStat[0] < 1) continue;
 
-        int iGoalsTotal = pl.getGoalsTotal(iCupId, iType == 0/*, iGameType2: iLand*/);
+        int iGoalsTotal = pl.getGoalsTotal(iCupId, bSeason/*, iGameType2: iLand*/);
 
         ltDePlayer.Add(
           new Models.DatatableEntryPlayer() {
             iPlayerIx = ltDePlayer.Count,
             sName = pl.plGame.sName.Trim(),
+            sNat = CornerkickManager.Main.sLandShort[pl.iNat1],
             fAge = pl.plGame.getAge(MvcApplication.ckcore.dtDatum),
             sClubName = pl.contract == null ? "vereinslos" : pl.contract.club.sName,
             iGames = iStat[0],
