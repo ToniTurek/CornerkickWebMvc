@@ -164,6 +164,7 @@
           divEmblem.style.position = "absolute";
           divEmblem.style.left = "0px";
           divEmblem.style.bottom = "0px";
+          divEmblem.style.width = "10%";
           divEmblem.innerHTML = teamData.sEmblem;
           divDrawFormation.appendChild(divEmblem);
         }
@@ -173,6 +174,7 @@
           divEmblemOpp.style.position = "absolute";
           divEmblemOpp.style.left = "0px";
           divEmblemOpp.style.top = "0px";
+          divEmblemOpp.style.width = "10%";
           divEmblemOpp.innerHTML = teamData.sEmblemOpp;
           divDrawFormation.appendChild(divEmblemOpp);
         }

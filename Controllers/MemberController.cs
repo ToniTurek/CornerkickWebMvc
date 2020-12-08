@@ -1740,7 +1740,7 @@ namespace CornerkickWebMvc.Controllers
       float[] fTeamAve11 = CornerkickManager.Tool.getTeamAve(club, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: 11);
       tD.sTeamAveSkill = fTeamAve11[3].ToString("0.00");
       tD.sTeamAveAge   = fTeamAve11[4].ToString("0.0");
-      tD.sEmblem = getClubEmblem(club, sStyle: "width: 64px");
+      tD.sEmblem = getClubEmblem(club, sStyle: "width: 100%");
 
       tD.bNation = club.bNation;
 
@@ -1796,7 +1796,7 @@ namespace CornerkickWebMvc.Controllers
           float[] fTeamOppAve11 = CornerkickManager.Tool.getTeamAve(clubOpp, MvcApplication.ckcore.dtDatum, MvcApplication.ckcore.dtSeasonEnd, ptPitch: MvcApplication.ckcore.game.ptPitch, iPlStop: gdOpp.nPlStart);
           tD.sTeamOppAveSkill = fTeamOppAve11[3].ToString("0.00");
           tD.sTeamOppAveAge   = fTeamOppAve11[4].ToString("0.0");
-          tD.sEmblemOpp = getClubEmblem(clubOpp, sStyle: "width: 64px");
+          tD.sEmblemOpp = getClubEmblem(clubOpp, sStyle: "width: 100%");
         }
       }
 
