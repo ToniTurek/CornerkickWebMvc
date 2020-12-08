@@ -1,6 +1,4 @@
-﻿#define _USE_AMAZON_S3
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
