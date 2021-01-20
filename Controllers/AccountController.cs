@@ -505,7 +505,7 @@ namespace CornerkickWebMvc.Controllers
 
     private CornerkickManager.Finance.Sponsor createDefaultSponsor()
     {
-      CornerkickManager.Finance.Sponsor sponUser = MvcApplication.ckcore.fz.newSponsor();
+      CornerkickManager.Finance.Sponsor sponUser = CornerkickManager.Finance.newSponsor();
 
       sponUser.iType = 0;
       sponUser.iId = 1;
