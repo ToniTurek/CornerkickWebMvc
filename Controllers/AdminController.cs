@@ -301,6 +301,80 @@ namespace CornerkickWebMvc.Controllers
       MvcApplication.clubAdmin = MvcApplication.ckcore.ltClubs[iClubIx];
     }
 
+    public class UnfinishedGame
+    {
+      public int iCupId1 { get; set; }
+      public int iCupId2 { get; set; }
+      public int iCupId3 { get; set; }
+      public string sCupName { get; set; }
+      public int iMd { get; set; }
+      public int iClubIdH { get; set; }
+      public int iClubIdA { get; set; }
+      public string sClubNameH { get; set; }
+      public string sClubNameA { get; set; }
+    }
+    public JsonResult GetUnfinishedGames()
+    {
+      List<UnfinishedGame> ltUg = new List<UnfinishedGame>();
+
+      foreach (CornerkickManager.Cup cup in MvcApplication.ckcore.ltCups) {
+        if (Math.Abs(cup.iId) == MvcApplication.iCupIdTestgame) continue; // No test-games
+
+        for (int iMd = 0; iMd < cup.ltMatchdays.Count; iMd++) {
+          if (cup.ltMatchdays[iMd].dt.CompareTo(MvcApplication.ckcore.dtDatum) < 0) { // Game is in past
+            for (int iGd = 0; iGd < cup.ltMatchdays[iMd].ltGameData.Count; iGd++) {
+              if (cup.ltMatchdays[iMd].ltGameData[iGd].team[0].iGoals < 0 ||
+                  cup.ltMatchdays[iMd].ltGameData[iGd].team[1].iGoals < 0) {
+                ltUg.Add(
+                  new UnfinishedGame() {
+                    iCupId1 = cup.iId,
+                    iCupId2 = cup.iId2,
+                    iCupId3 = cup.iId3,
+                    sCupName = cup.sName,
+                    iMd = iMd,
+                    iClubIdH = cup.ltMatchdays[iMd].ltGameData[iGd].team[0].iTeamId,
+                    iClubIdA = cup.ltMatchdays[iMd].ltGameData[iGd].team[1].iTeamId,
+                    sClubNameH = CornerkickManager.Tool.getClubFromId(cup.ltMatchdays[iMd].ltGameData[iGd].team[0].iTeamId, MvcApplication.ckcore.ltClubs).sName,
+                    sClubNameA = CornerkickManager.Tool.getClubFromId(cup.ltMatchdays[iMd].ltGameData[iGd].team[1].iTeamId, MvcApplication.ckcore.ltClubs).sName
+                  }
+                );
+              }
+            }
+          }
+        }
+      }
+
+      return Json(new { games = ltUg }, JsonRequestBehavior.AllowGet);
+    }
+
+    public JsonResult setUnfinishedGameResult(int iCupId1, int iCupId2, int iCupId3, int iMd, int iClubIdH, int iClubIdA, int iGoalsH, int iGoalsA)
+    {
+      if (iGoalsH < 0 || iGoalsA < 0) return Json(new { result = "ERROR", Message = "Goals not valid!" }, JsonRequestBehavior.AllowGet);
+
+      CornerkickManager.Cup cup = MvcApplication.ckcore.tl.getCup(iCupId1, iCupId2, iCupId3);
+      if (cup == null) return Json(new { result = "ERROR", Message = "Cup not found!" }, JsonRequestBehavior.AllowGet);
+
+      if (cup.ltMatchdays == null || iMd >= cup.ltMatchdays.Count) return Json(new { result = "ERROR", Message = "Matchday not valid" }, JsonRequestBehavior.AllowGet);
+
+      for (int iGd = 0; iGd < cup.ltMatchdays[iMd].ltGameData.Count; iGd++) {
+        if (cup.ltMatchdays[iMd].ltGameData[iGd].team[0].iTeamId == iClubIdH &&
+            cup.ltMatchdays[iMd].ltGameData[iGd].team[1].iTeamId == iClubIdA) {
+          // Reset cup ids
+          cup.ltMatchdays[iMd].ltGameData[iGd].iGameType  = cup.iId;
+          cup.ltMatchdays[iMd].ltGameData[iGd].iGameType2 = cup.iId2;
+          cup.ltMatchdays[iMd].ltGameData[iGd].iGameType3 = cup.iId3;
+
+          // Set new result
+          cup.ltMatchdays[iMd].ltGameData[iGd].team[0].iGoals = iGoalsH;
+          cup.ltMatchdays[iMd].ltGameData[iGd].team[1].iGoals = iGoalsA;
+
+          return Json(new { result = "OK" }, JsonRequestBehavior.AllowGet);
+        }
+      }
+
+      return Json(new { result = "ERROR", Message = "Clubs not found!" }, JsonRequestBehavior.AllowGet);
+    }
+
     public string getHomeDir()
     {
 #if DEBUG

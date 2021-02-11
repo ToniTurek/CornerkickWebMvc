@@ -10,6 +10,8 @@
   $(document).ready(function () {
     setFileExplorer();
 
+    showUnfinishedGames();
+
     $("#bnSetWeeks1").click(function () {
       setCalInterval(1);
     });
@@ -88,7 +90,6 @@
     });
   }
 
-
   function setFileExplorerTable(sContent) {
     var sBox = '';
     sBox += '<table id="tableFileExplorer" style="width: 100%; background-color: black; color: white">';
@@ -110,6 +111,76 @@
     return sBox;
   }
 
+  function showUnfinishedGames() {
+    $.ajax({
+      url: '/Admin/GetUnfinishedGames',
+      type: "GET",
+      dataType: "JSON",
+      success: function (ret) {
+        if (ret) {
+          if (ret.games) {
+            var tblUg = document.getElementById("tblUg").getElementsByTagName("tbody")[0];
+
+            // Clear table body
+            tblUg.innerHTML = '';
+
+            // Loop over all games
+            for (var iUg = 0; iUg < ret.games.length; iUg++) {
+              let ug = ret.games[iUg];
+
+              let rowUg = tblUg.insertRow(-1);
+
+              rowUg.insertCell(-1).innerText = ug.sCupName;
+              rowUg.insertCell(-1).innerText = ug.iMd;
+              rowUg.insertCell(-1).innerText = ug.sClubNameH;
+              rowUg.insertCell(-1).innerText = ug.sClubNameA;
+
+              let iptGoalsH = document.createElement("input");
+              iptGoalsH.type = "tel";
+              iptGoalsH.value = -1;
+              iptGoalsH.style.width = "40px";
+              rowUg.insertCell(-1).appendChild(iptGoalsH);
+
+              let iptGoalsA = document.createElement("input");
+              iptGoalsA.type = "tel";
+              iptGoalsA.value = -1;
+              iptGoalsA.style.width = "40px";
+              rowUg.insertCell(-1).appendChild(iptGoalsA);
+
+              let iptSetResult = document.createElement("input");
+              iptSetResult.type = "button";
+              iptSetResult.value = "set";
+              iptSetResult.style.width = "40px";
+              iptSetResult.addEventListener("click", function () {
+                setUnfinishedGameResult(ug.iCupId1, ug.iCupId2, ug.iCupId3, ug.iMd, ug.iClubIdH, ug.iClubIdA, iptGoalsH, iptGoalsA);
+              });
+              rowUg.insertCell(-1).appendChild(iptSetResult);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function setUnfinishedGameResult(iCupId1, iCupId2, iCupId3, iMd, iClubIdH, iClubIdA, iptGoalsH, iptGoalsA) {
+    $.ajax({
+      url: '/Admin/setUnfinishedGameResult',
+      type: "GET",
+      dataType: "JSON",
+      data: { iCupId1: iCupId1, iCupId2: iCupId2, iCupId3: iCupId3, iMd: iMd, iClubIdH: iClubIdH, iClubIdA: iClubIdA, iGoalsH: iptGoalsH.value, iGoalsA: parseInt(iptGoalsA.value) },
+      success: function (ret) {
+        if (ret) {
+          if (ret.result) {
+            if (ret.result == "OK") {
+              showUnfinishedGames();
+            } else if (ret.Message) {
+              alert(ret.Message);
+            }
+          }
+        }
+      }
+    });
+  }
 </script>
 
 @Html.ActionLink("Log", "Log", "Admin")
@@ -242,6 +313,23 @@
 <div style="position: relative; width: 50%; min-width: 300px; height: 40px">
   @Html.DropDownListFor(m => m.iSelectedClubAdmin, Model.ddlClubsAdmin, new { @class = "form-control", style = "position: absolute; width: 180px" })
 </div>
+
+
+<h3>Unfinished games</h3>
+<table id="tblUg" border="1">
+  <thead>
+    <tr>
+      <th>Wettbewerb</th>
+      <th>Md</th>
+      <th>Club home</th>
+      <th>Club away</th>
+      <th>Goals H</th>
+      <th>Goals A</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 @{
   string sMapPath = Server.MapPath("~");
