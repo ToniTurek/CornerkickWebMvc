@@ -1265,16 +1265,20 @@
 
               @{
                 if (Model.bOwnPlayer) {
+                  float fAge = player.plGame.getAge(MvcApplication.ckcore.dtDatum);
                   string sExtendContract = "Vertrag verlängern";
-                  if (Model.bJouthWithContract) {
-                    sExtendContract = "In Profikader übernehmen";
-                  } else if (Model.bJouth) {
-                    sExtendContract = "Profivertrag aushandeln";
+
+                  if ((int)fAge > 15) {
+                    if (Model.bJouthWithContract) {
+                      sExtendContract = "In Profikader übernehmen";
+                    } else if (Model.bJouth) {
+                      sExtendContract = "Profivertrag aushandeln";
+                    }
                   }
 
                   if (!Model.bNation) {
                     @* Extend player contract *@
-                    if ((int)player.plGame.getAge(MvcApplication.ckcore.dtDatum) > 15) {
+                    if ((int)fAge > 15 || player.contract.iLength < 2) {
                       <button type="submit" id="bnContract" class="btn btn-default" style="width: 90%; margin-bottom: 4px">@sExtendContract</button>
                     }
 
